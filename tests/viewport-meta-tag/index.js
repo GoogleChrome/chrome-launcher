@@ -16,9 +16,7 @@
 
 'use strict';
 
-let Test = require('../test.js');
-
-class ViewportMetaTagTest extends Test {
+class ViewportMetaTagTest {
 
   /**
    * Runs the Viewport Test. Looks for a viewport meta tag.
@@ -35,11 +33,12 @@ class ViewportMetaTagTest extends Test {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input[0] !== 'string') {
-      return Promise.reject('Input is not a string.');
+    if (typeof input[0] !== 'function') {
+      return Promise.reject('Input is not a DOMParser.');
     }
 
-    let viewport = this.parse('meta[name="viewport"]');
+    let domParser = input[0];
+    let viewport = domParser('meta[name="viewport"]');
 
     // If there's a viewport return a score of 1.
     // TODO(paullewis): make this test more nuanced.

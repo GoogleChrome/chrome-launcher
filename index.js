@@ -16,14 +16,15 @@
 
 'use strict';
 
-let testLoader = require('./helpers/test-loader');
+let TestLoader = require('./helpers/test-loader');
+let DOMParser = require('./helpers/dom-parser');
 let https = require('https');
 
 class TestRunner {
 
   static get () {
     return new Promise((resolve, reject) => {
-      testLoader.getTests('tests').then(tests => {
+      TestLoader.getTests('tests').then(tests => {
         resolve(new TestRunner(tests));
       });
     });
@@ -59,6 +60,9 @@ class TestRunner {
     let output;
 
     inputs.forEach(input => {
+
+      input = input.toLowerCase();
+
       switch (input) {
 
       case 'html':
@@ -67,6 +71,16 @@ class TestRunner {
             let body = '';
             res.on('data', data => body += data);
             res.on('end', () => resolve(body));
+          });
+        });
+        break;
+
+      case 'dom':
+        output = new Promise((resolve, reject) => {
+          https.get(url, (res) => {
+            let body = '';
+            res.on('data', data => body += data);
+            res.on('end', () => resolve(DOMParser.parse(body)));
           });
         });
         break;

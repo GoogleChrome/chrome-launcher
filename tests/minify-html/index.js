@@ -16,9 +16,7 @@
 
 'use strict';
 
-let Test = require('../test.js');
-
-class MinifyHTMLTest extends Test {
+class MinifyHTMLTest {
 
   /**
    * Runs the Minify HTML Test. Looks for minified HTML.
