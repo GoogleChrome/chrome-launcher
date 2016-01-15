@@ -1,0 +1,5 @@
+node_modules
+*.pyc
+.DS_Store
+dist
+init.sh

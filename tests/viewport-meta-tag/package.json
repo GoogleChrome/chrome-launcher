@@ -1,0 +1,15 @@
+{
+  "name": "viewport-meta-tag",
+  "version": "1.0.0",
+  "description": "Tests the existence and validity of the viewport's meta tag",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "inputs": [
+    "html"
+  ],
+  "outputs": [
+    "score"
+  ]
+}
