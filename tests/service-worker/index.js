@@ -18,26 +18,26 @@
 
 class ServiceWorkerTest {
 
-  run (input, loader) {
+  run (inputs) {
 
-    if (input.length < 1) {
+    if (inputs.length < 1) {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input.driver !== 'object') {
-      return Promise.reject('Input is not an object. Probably not a driver');
+    if (typeof inputs.driver !== 'object') {
+      return Promise.reject('No Driver provided.');
     }
 
-    if (typeof input.url !== 'string') {
-      return Promise.reject('URL not provided.');
+    if (typeof inputs.url !== 'string') {
+      return Promise.reject('No URL provided.');
     }
 
     return new Promise((resolve, reject) => {
-      let driver = input.driver;
+      let driver = inputs.driver;
       let browser = driver.browser;
       driver.flow([
         () => {
-          browser.get(input.url);
+          browser.get(inputs.url);
         },
 
         () => {
@@ -60,9 +60,6 @@ class ServiceWorkerTest {
                         if (typeof reg === 'undefined') {
                           return cb(null);
                         }
-
-                        console.log(reg, reg.active,
-                            reg.waiting, reg.installing);
 
                         var scriptURL = null;
 
@@ -111,7 +108,7 @@ class ServiceWorkerTest {
                   }
 
                   // Get the Service Worker JS. We need a nicer way to do this!
-                  return input.loader.load(serviceWorkerPath)
+                  return inputs.loader.load(serviceWorkerPath)
                       .then(fileContents => {
                         result.fetch = this.hasFetchRegistered(fileContents);
                         return resolve(result);
