@@ -25,25 +25,26 @@ class MinifyHTMLTest {
    */
   run (input) {
 
-    if (!Array.isArray(input)) {
-      return Promise.reject('Unexpected input type: ' + (typeof input));
-    }
-
-    if (input.length < 1) {
+    if (typeof input === 'undefined') {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input[0] !== 'string') {
+    if (typeof input.html !== 'string') {
       return Promise.reject('Input is not a string.');
     }
 
-    let html = input[0];
-    let whitespaceTest = /(\s)/igm;
-    let matches = html.match(whitespaceTest);
+    let html = input.html;
 
-    let wholeStringLen = Math.max(1, html.length - 1);
-    let whiteSpaceLen = matches.length;
-    let ratio = 1 - ((whiteSpaceLen / wholeStringLen) / 0.3);
+    // See how compressed the HTML _could_ be if whitespace was removed.
+    // This could be a lot more aggressive.
+    let htmlNoWhiteSpaces = html
+        .replace(/\n/igm, '')
+        .replace(/\t/igm, '')
+        .replace(/\s+/igm, ' ');
+
+    let htmlLen = Math.max(1, html.length);
+    let htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
+    let ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
 
     return Promise.resolve(ratio);
   }

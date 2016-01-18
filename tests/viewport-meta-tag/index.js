@@ -25,19 +25,15 @@ class ViewportMetaTagTest {
    */
   run (input) {
 
-    if (!Array.isArray(input)) {
-      return Promise.reject('Unexpected input type: ' + (typeof input));
-    }
-
-    if (input.length < 1) {
+    if (typeof input === 'undefined') {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input[0] !== 'function') {
+    if (typeof input.dom !== 'function') {
       return Promise.reject('Input is not a DOMParser.');
     }
 
-    let domParser = input[0];
+    let domParser = input.dom;
     let viewport = domParser('meta[name="viewport"]');
 
     // If there's a viewport return a score of 1.

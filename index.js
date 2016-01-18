@@ -18,7 +18,9 @@
 
 let TestLoader = require('./helpers/test-loader');
 let DOMParser = require('./helpers/dom-parser');
+let RemoteFileLoader = require('./helpers/remote-file-loader');
 let https = require('https');
+let ChromeDriver = require('./helpers/browser/driver');
 
 class TestRunner {
 
@@ -31,33 +33,48 @@ class TestRunner {
   }
 
   constructor (tests) {
-    this.tests = tests;
+    this.tests_ = tests;
+    this.driver_ = null;
+    this.loader_ = new RemoteFileLoader();
   }
 
   test (url) {
 
-    let testNames = Object.keys(this.tests);
+    let testNames = Object.keys(this.tests_);
     let testResponses = [];
 
     testNames.forEach(testName => {
 
-      let testInfo = this.tests[testName];
+      let testInfo = this.tests_[testName];
       let test = require(testInfo.main);
 
       testResponses.push(
-        this.buildInputsForURL(url, testInfo.inputs)
+        this.buildInputsForTest(url, testInfo.inputs)
             .then(inputs => test.run(inputs))
+            .then(result => {
+              return {testName, result};
+            })
       );
 
     });
 
-    return Promise.all(testResponses);
+    return Promise.all(testResponses).then(results => {
+      if (this.driver_ !== null) {
+        if (typeof this.driver_.browser !== 'undefined') {
+          this.driver_.browser.quit();
+        }
+      }
+      return results;
+    });
   }
 
-  buildInputsForURL (url, inputs) {
+  buildInputsForTest (url, inputs) {
 
-    let outputs = [];
-    let output;
+    let collatedOutputs = {
+      loader: this.loader_
+    };
+    let outputPromises = [];
+    let outputPromise;
 
     inputs.forEach(input => {
 
@@ -66,23 +83,46 @@ class TestRunner {
       switch (input) {
 
       case 'html':
-        output = new Promise((resolve, reject) => {
+        outputPromise = new Promise((resolve, reject) => {
           https.get(url, (res) => {
             let body = '';
             res.on('data', data => body += data);
-            res.on('end', () => resolve(body));
+            res.on('end', () => {
+              collatedOutputs.html = body;
+              resolve();
+            });
           });
         });
         break;
 
       case 'dom':
-        output = new Promise((resolve, reject) => {
+        outputPromise = new Promise((resolve, reject) => {
           https.get(url, (res) => {
             let body = '';
             res.on('data', data => body += data);
-            res.on('end', () => resolve(DOMParser.parse(body)));
+            res.on('end', () => {
+              collatedOutputs.dom = DOMParser.parse(body);
+              resolve();
+            });
           });
         });
+        break;
+
+      case 'chrome':
+        outputPromise = new Promise((resolve, reject) => {
+
+          if (this.driver_ === null) {
+            this.driver_ = new ChromeDriver();
+          }
+
+          collatedOutputs.driver = this.driver_;
+          resolve();
+        });
+        break;
+
+      case 'url':
+        collatedOutputs.url = url;
+        outputPromise = Promise.resolve();
         break;
 
       default:
@@ -90,16 +130,16 @@ class TestRunner {
         break;
       }
 
-      outputs.push(output);
+      outputPromises.push(outputPromise);
     });
 
-    return Promise.all(outputs);
+    return Promise.all(outputPromises).then(() => collatedOutputs);
   }
 
 }
 
 TestRunner.get()
-    .then(testRunner => testRunner.test('https://aerotwist.com/'))
+    .then(testRunner => testRunner.test('https://voice-memos.appspot.com/'))
     .then(results => {
       console.log(results);
     }, err => {
