@@ -20,30 +20,30 @@ class ViewportMetaTagTest {
 
   /**
    * Runs the Viewport Test. Looks for a viewport meta tag.
-   * @param  {*} input The test input.
+   * @param  {*} inputs The test inputs.
    * @return {Number} A score. 1 = viewport meta tag present; 0 = not found.
    */
-  run (input) {
+  run (inputs) {
 
-    if (typeof input === 'undefined') {
+    if (typeof inputs === 'undefined') {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input.dom !== 'function') {
-      return Promise.reject('Input is not a DOMParser.');
+    if (typeof inputs.dom !== 'function') {
+      return Promise.reject('No DOM Parser provided.');
     }
 
-    let domParser = input.dom;
+    let domParser = inputs.dom;
     let viewport = domParser('meta[name="viewport"]');
 
     // If there's a viewport return a score of 1.
     // TODO(paullewis): make this test more nuanced.
     if (typeof viewport !== 'undefined' && viewport !== null) {
-      return Promise.resolve(1);
+      return Promise.resolve(true);
     }
 
     // Else zero.
-    return Promise.resolve(0);
+    return Promise.resolve(false);
 
   }
 }

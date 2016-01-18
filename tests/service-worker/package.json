@@ -9,8 +9,5 @@
   "inputs": [
     "chrome",
     "url"
-  ],
-  "outputs": [
-    "score"
   ]
 }

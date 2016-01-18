@@ -20,20 +20,20 @@ class MinifyHTMLTest {
 
   /**
    * Runs the Minify HTML Test. Looks for minified HTML.
-   * @param  {*} input The test input.
+   * @param  {*} inputs The test inputs.
    * @return {Number} A score. 1 = 100% minified; 0 = 0% minified.
    */
-  run (input) {
+  run (inputs) {
 
-    if (typeof input === 'undefined') {
+    if (typeof inputs === 'undefined') {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof input.html !== 'string') {
-      return Promise.reject('Input is not a string.');
+    if (typeof inputs.html !== 'string') {
+      return Promise.reject('No HTML provided.');
     }
 
-    let html = input.html;
+    let html = inputs.html;
 
     // See how compressed the HTML _could_ be if whitespace was removed.
     // This could be a lot more aggressive.
