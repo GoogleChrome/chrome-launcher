@@ -18,11 +18,6 @@
 
 class ServiceWorkerTest {
 
-  /**
-   * Runs the Minify HTML Test. Looks for minified HTML.
-   * @param  {*} input The test input.
-   * @return {Number} A score. 1 = 100% minified; 0 = 0% minified.
-   */
   run (input, loader) {
 
     if (input.length < 1) {
@@ -46,7 +41,7 @@ class ServiceWorkerTest {
         },
 
         () => {
-          // Allow the browser to wait some time before failing the scroll.
+          // Allow the browser to wait some time before failing.
           browser.manage().timeouts().setScriptTimeout(15000);
 
           browser
