@@ -1,0 +1,13 @@
+{
+  "name": "time-in-javascript",
+  "version": "1.0.0",
+  "description": "Figures out how long the page spends in JS during load.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "inputs": [
+    "chrome",
+    "url"
+  ]
+}

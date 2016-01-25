@@ -32,6 +32,13 @@ class Driver {
     opts = opts || {};
 
     let options = new chrome.Options();
+    let traceCategories = [
+      'blink.console',
+      'devtools.timeline',
+      'toplevel',
+      'disabled-by-default-devtools.timeline',
+      'disabled-by-default-devtools.timeline.frame'
+    ];
 
     if (opts.android) {
       options = options.androidChrome();
@@ -42,6 +49,15 @@ class Driver {
 
     // Run without a sandbox.
     options.addArguments('no-sandbox');
+
+    // Set up that we want to get trace data.
+    options.setLoggingPrefs({
+      performance: 'ALL'
+    });
+
+    options.setPerfLoggingPrefs({
+      'traceCategories': traceCategories.join(',')
+    });
 
     this.browser_ = null;
     this.browser = new webdriver.Builder()
@@ -63,6 +79,34 @@ class Driver {
       controlFlow.execute(step);
     });
   }
+
+
+  getTrace () {
+
+    return (new webdriver.WebDriver.Logs(this.browser_))
+      .get('performance')
+      .then((logs) => {
+        let trace = '';
+        let processedLog;
+        logs.forEach((log, index, arr) => {
+
+          // Parse the message.
+          processedLog = JSON.parse(log.message);
+
+          // Skip any records that aren't categorized.
+          if (!processedLog.message.params.cat) {
+            return;
+          }
+
+          // Now append it for the trace file.
+          trace += JSON.stringify(processedLog.message.params) +
+              ((index < arr.length - 1) ? ',' : '') + '\n';
+        });
+
+        return '[' + trace + ']';
+      });
+  }
+
 }
 
 module.exports = Driver;
