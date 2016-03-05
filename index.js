@@ -22,6 +22,9 @@ let RemoteFileLoader = require('./helpers/remote-file-loader');
 let https = require('https');
 let ChromeDriver = require('./helpers/browser/driver');
 
+let processor = require('./lib/processor');
+
+
 class TestRunner {
 
   static get () {
@@ -146,3 +149,14 @@ TestRunner.get()
       console.error(err);
     });
 
+
+module.exports = {
+
+  RESPONSE: processor.RESPONSE,
+  ANIMATION: processor.ANIMATION,
+  LOAD: processor.LOAD,
+
+  analyze: function (traceContents, opts) {
+    return processor.analyzeTrace(traceContents, opts);
+  }
+};
