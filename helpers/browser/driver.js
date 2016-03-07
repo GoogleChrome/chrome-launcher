@@ -81,9 +81,9 @@ class Driver {
   }
 
 
-  getTrace () {
+  getTrace () { 
 
-    return (new webdriver.WebDriver.Logs(this.browser_))
+    return this.browser.manage().logs()
       .get('performance')
       .then((logs) => {
         let trace = '';
