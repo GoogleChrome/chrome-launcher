@@ -22,6 +22,9 @@ let RemoteFileLoader = require('./helpers/remote-file-loader');
 let https = require('https');
 let ChromeDriver = require('./helpers/browser/driver');
 
+let processor = require('./lib/processor');
+
+
 class TestRunner {
 
   static get () {
@@ -97,11 +100,17 @@ class TestRunner {
 
       case 'dom':
         outputPromise = new Promise((resolve, reject) => {
+            // shut up
+            return resolve();
           https.get(url, (res) => {
             let body = '';
             res.on('data', data => body += data);
             res.on('end', () => {
-              collatedOutputs.dom = DOMParser.parse(body);
+              try {
+                collatedOutputs.dom = DOMParser.parse(body);
+              } catch (e){
+                reject(e);
+              }
               resolve();
             });
           });
@@ -146,3 +155,14 @@ TestRunner.get()
       console.error(err);
     });
 
+
+module.exports = {
+
+  RESPONSE: processor.RESPONSE,
+  ANIMATION: processor.ANIMATION,
+  LOAD: processor.LOAD,
+
+  analyze: function (traceContents, opts) {
+    return processor.analyzeTrace(traceContents, opts);
+  }
+};
