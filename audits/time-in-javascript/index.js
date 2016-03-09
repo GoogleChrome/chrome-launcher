@@ -36,25 +36,16 @@ class TimeInJavaScriptTest {
 
     return new Promise((resolve, reject) => {
       let driver = inputs.driver;
-      let browser = driver.browser;
-      driver.flow([
-        () => {
-          browser.get(inputs.url);
-        },
 
-        () => {
-          // Allow the browser to wait some time before failing.
-          browser.manage().timeouts().setScriptTimeout(15000);
-        },
-
-        () => {
-          driver.getTrace()
-            .then(contents => traceProcessor.analyzeTrace(contents))
-            .then(results => {
-              resolve(results[0].extendedInfo.javaScript);
-            });
-        }
-      ]);
+      driver
+        .requestTab(inputs.url)
+        .then(driver.profilePageLoad.bind(driver))
+        .then(contents => traceProcessor.analyzeTrace(contents))
+        .then(results => {
+          resolve(results[0].extendedInfo.javaScript);
+        }).catch(err => {
+          console.error(err)
+        });
     });
   }
 }

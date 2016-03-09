@@ -32,97 +32,38 @@ class ServiceWorkerTest {
       return Promise.reject('No URL provided.');
     }
 
-    return new Promise((resolve, reject) => {
+    this.url = inputs.url;
+
+    return new Promise(((resolve, reject) => {
       let driver = inputs.driver;
-      let browser = driver.browser;
-      driver.flow([
-        () => {
-          browser.get(inputs.url);
-        },
 
-        () => {
-          // Allow the browser to wait some time before failing.
-          browser.manage().timeouts().setScriptTimeout(15000);
+      // hacky settimeout to delay SW work from page loading
+      setTimeout(_ => {
+        driver
+          .requestTab(this.url)
+          .then(_ => {
+            driver.subscribeToServiceWorkerDetails(this.swVersionUpdated.bind(this), resolve)
+          })
 
-          browser
-              .executeAsyncScript(function () {
-                var cb = arguments[arguments.length - 1];
+      }, 5 * 1000);
 
-                function go () {
+    }).bind(this));
 
-                  if (!('serviceWorker' in navigator)) {
-                    return cb(null);
-                  }
+  }
 
-                  navigator.serviceWorker.getRegistration()
-                      .then(function (reg) {
-
-                        if (typeof reg === 'undefined') {
-                          return cb(null);
-                        }
-
-                        var scriptURL = null;
-
-                        if (reg.active !== null) {
-                          scriptURL = reg.active.scriptURL;
-                        }
-
-                        if (reg.waiting !== null) {
-                          scriptURL = reg.waiting.scriptURL;
-                        }
-
-                        if (reg.installing !== null) {
-                          scriptURL = reg.installing.scriptURL;
-                        }
-
-                        return cb(scriptURL);
-                      });
-                }
-
-                // Poll-wait until the page is ready then wait another second
-                // to see if a Service Worker is registered. The test needs to
-                // an awful lot better than this.
-                if (document.readyState !== 'complete') {
-                  var poll = setInterval(function () {
-                    if (document.readyState === 'complete') {
-                      clearInterval(poll);
-
-                      setTimeout(go, 1000);
-                    }
-                  }, 100);
-                } else {
-                  setTimeout(go, 1000);
-                }
-              })
-              .then((serviceWorkerPath) => {
-
-                let result = {
-                  registered: (serviceWorkerPath !== ''),
-                  fetch: false
-                };
-
-                if (result.registered) {
-
-                  if (serviceWorkerPath === null) {
-                    return resolve(result);
-                  }
-
-                  // Get the Service Worker JS. We need a nicer way to do this!
-                  return inputs.loader.load(serviceWorkerPath)
-                      .then(fileContents => {
-                        result.fetch = this.hasFetchRegistered(fileContents);
-                        return resolve(result);
-                      });
-                }
-
-                return resolve(result);
-              });
-        }
-      ]);
-    });
+  swVersionUpdated (data, resolve) {
+    var swObj = data.versions.filter( sw => sw.scriptURL.includes(this.url) ).pop();
+    resolve(swObj);
   }
 
   hasFetchRegistered (fileContents) {
+
+      // Get the Service Worker JS. We need a nicer way to do this!
+          // return inputs.loader.load(serviceWorkerPath)
+          //     .then(fileContents => {
+          //       result.fetch = this.hasFetchRegistered(fileContents);
+          //       return resolve(result);
+          //     });
 
     let matchSelfFetch = /self\.onfetch/igm;
     let matchAddEventListener = /self\.addEventListener\s?\(\s?'fetch'/igm;
@@ -130,6 +71,49 @@ class ServiceWorkerTest {
     return (matchSelfFetch.test(fileContents) ||
         matchAddEventListener.test(fileContents));
   }
+
+  inBrowserTest () {
+
+    var cb = arguments[arguments.length - 1];
+
+    function go () {
+
+      if (!('serviceWorker' in navigator)) {
+        return cb(null);
+      }
+
+      navigator.serviceWorker.getRegistration()
+        .then(function (reg) {
+
+          if (typeof reg === 'undefined') {
+            return cb(null);
+          }
+
+          var scriptURL = null;
+          if (reg.active !== null) scriptURL = reg.active.scriptURL;
+          if (reg.waiting !== null) scriptURL = reg.waiting.scriptURL;
+          if (reg.installing !== null) scriptURL = reg.installing.scriptURL;
+
+          return cb(scriptURL);
+      });
+    }
+
+    // Poll-wait until the page is ready then wait another second
+    // to see if a Service Worker is registered. The test needs to
+    // an awful lot better than this.
+    if (document.readyState !== 'complete') {
+      var poll = setInterval(function () {
+        if (document.readyState === 'complete') {
+          clearInterval(poll);
+
+          setTimeout(go, 1000);
+        }
+      }, 100);
+    } else {
+      setTimeout(go, 1000);
+    }
+  }
+
 }
 
 module.exports = new ServiceWorkerTest();
