@@ -29,7 +29,7 @@ class TestRunner {
 
   static get () {
     return new Promise((resolve, reject) => {
-      TestLoader.getTests('tests').then(tests => {
+      TestLoader.getTests('audits').then(tests => {
         resolve(new TestRunner(tests));
       });
     });
