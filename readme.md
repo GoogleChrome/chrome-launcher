@@ -2,22 +2,21 @@
 
 _status: very early. mostly not working_
 
-## running audits 
+## Running audits 
 
-Will run the audits defined in the `tests/` folder against a demo app. Will launch and control via chromedriver.
+Will run the audits defined in the `audits/` folder against a demo app. Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface).
 ```sh
+# Start Chrome with a few flags
+/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome  --remote-debugging-port=9222 --no-first-run --user-data-dir="/tmp/lighthouse-profile" "about:blank"
+# Kick off a lighthouse run
 node .
 ```
 
 
-## running processor on a trace.
+## Trace processing
 
-The processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) is integrated directly here. It's currently exposed as `getTrace` in [`driver.js`](https://github.com/GoogleChrome/big-rig/blob/tests/helpers/browser/driver.js#L84).
-The [time-in-javascript](https://github.com/GoogleChrome/big-rig/blob/tests/tests/time-in-javascript/index.js) audit uses this.  
+The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. It's exposed by `lib/processor`. See an example use in the [time-in-javascript](https://github.com/GoogleChrome/lighthouse/blob/85933f07791982d556177fddb55f578d30a4b56f/audits/time-in-javascript/index.js#L43) audit 
 
-You can also use it directly. (I think)
-```js
-var processor = require('./lib/processor');
-var model = processor.analyzeTrace(traceContents, opts);
-```
+## Tests
 
+Some basic unit tests forked from node-big-rig are in `/test`. They may be broken.
