@@ -17,96 +17,120 @@
 
 'use strict';
 
-/*
- * This approach is very much based on Sam Saccone's excellent memory leak
- * detector: Drool.
- * @see https://github.com/samccone/drool
- */
-let webdriver = require('selenium-webdriver');
-let chrome = require('selenium-webdriver/chrome');
-let controlFlow = webdriver.promise.controlFlow();
+var chromeremoteinterface = require('chrome-remote-interface');
 
-class Driver {
+class ChromeProtocol {
 
-  constructor (opts) {
+  constructor(opts) {
     opts = opts || {};
 
-    let options = new chrome.Options();
-    let traceCategories = [
-      'blink.console',
-      'devtools.timeline',
-      'toplevel',
-      'disabled-by-default-devtools.timeline',
-      'disabled-by-default-devtools.timeline.frame'
+    this.categories = [
+      "-*", // exclude default
+      "toplevel",
+      "blink.console",
+      "devtools.timeline",
+      "disabled-by-default-devtools.timeline",
+      "disabled-by-default-devtools.timeline.frame",
+      "disabled-by-default-devtools.timeline.stack",
+      "disabled-by-default-devtools.screenshot",
+      "disabled-by-default-v8.cpu_profile"
     ];
-
-    if (opts.android) {
-      options = options.androidChrome();
-    }
-
     // Add on GPU benchmarking.
-    options.addArguments('enable-gpu-benchmarking');
+    // FIXME: --enable-gpu-benchmarking
 
-    // Run without a sandbox.
-    options.addArguments('no-sandbox');
-
-    // Set up that we want to get trace data.
-    options.setLoggingPrefs({
-      performance: 'ALL'
-    });
-
-    options.setPerfLoggingPrefs({
-      'traceCategories': traceCategories.join(',')
-    });
-
-    this.browser_ = null;
-    this.browser = new webdriver.Builder()
-        .forBrowser('chrome')
-        .setChromeOptions(options)
-        .build();
   }
 
-  get browser () {
-    return this.browser_;
+  requestTab(url) {
+    return new Promise(((resolve, reject) => {
+
+      this.url = url;
+      if (this.instance())
+          return resolve(this.instance())
+
+      chromeremoteinterface({ /* github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
+        instance => {
+          this._instance = instance;
+          resolve(instance);
+        }
+      ).on('error', (e)  => reject(e) );
+    }).bind(this))
   }
 
-  set browser (browser_) {
-    this.browser_ = browser_;
+  instance() {
+    return this._instance;
   }
 
-  flow (steps) {
-    steps.forEach((step) => {
-      controlFlow.execute(step);
-    });
+  discardTab() {
+    if (this._instance)
+      this._instance.close();
   }
 
+  resetFailureTimeout(reject) {
+    if (this.timeoutID)
+        clearTimeout(this.timeoutID);
 
-  getTrace () { 
+    this.timeoutID = setTimeout(_ => {
+      this.discardTab();
+      reject(new Error('Trace retrieval timed out'));
+    }, 15 * 1000)
+  }
 
-    return this.browser.manage().logs()
-      .get('performance')
-      .then((logs) => {
-        let trace = '';
-        let processedLog;
-        logs.forEach((log, index, arr) => {
+  subscribeToServiceWorkerDetails(cb, resolve){
+    var chrome = this.instance();
 
-          // Parse the message.
-          processedLog = JSON.parse(log.message);
+    chrome.ServiceWorker.enable();
+    // chrome.on("ServiceWorker.workerCreated", log)
+    // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
+    chrome.on("ServiceWorker.workerVersionUpdated", data => { cb(data, resolve); });
+  }
 
-          // Skip any records that aren't categorized.
-          if (!processedLog.message.params.cat) {
-            return;
-          }
+  evaluateScript(scriptStr){
+    return new Promise((function(resolve, reject) {
 
-          // Now append it for the trace file.
-          trace += JSON.stringify(processedLog.message.params) +
-              ((index < arr.length - 1) ? ',' : '') + '\n';
-        });
+      chrome.Runtime.evaluate({
+        expression : 'alert(navigator.userAgent)',
+        contextId : 0
+      }, result => {
+        resolve(result);
+      })
 
-        return '[' + trace + ']';
+    }).bind(this));
+  }
+
+  profilePageLoad(chrome) {
+
+    return new Promise((function(resolve, reject) {
+
+      var rawEvents = [];
+      this.resetFailureTimeout(reject);
+
+      chrome.Page.enable();
+      chrome.Tracing.start({
+        "categories":   this.categories.join(','),
+        "options":      "sampling-frequency=10000"  // 1000 is default and too slow.
       });
+
+      chrome.Page.navigate({'url': this.url})
+      chrome.Page.loadEventFired( _ =>  {
+        chrome.Tracing.end()
+        this.resetFailureTimeout(reject);
+      });
+
+      chrome.Tracing.dataCollected(function(data){
+        rawEvents = rawEvents.concat(data.value);
+      });
+
+      chrome.Tracing.tracingComplete((function () {
+        resolve(rawEvents);
+        // this.discardTab(); // FIXME: close connection later
+      }).bind(this));
+
+    }).bind(this));
   }
 
 }
 
-module.exports = Driver;
+
+
+
+module.exports = ChromeProtocol;
