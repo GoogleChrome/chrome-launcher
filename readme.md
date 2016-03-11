@@ -7,7 +7,7 @@ _status: very early. mostly not working_
 Will run the audits defined in the `audits/` folder against a demo app. Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface). Start Chrome manually; we can pursue [auto-launching](https://www.npmjs.com/package/chrome-launch) it later.
 ```sh
 # Start Chrome with a few flags
-/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome  --remote-debugging-port=9222 --no-first-run --user-data-dir="/tmp/lighthouse-profile" "about:blank"
+/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary  --remote-debugging-port=9222 --no-first-run --user-data-dir="/tmp/lighthouse-profile" "about:blank"
 # Kick off a lighthouse run
 node .
 ```
