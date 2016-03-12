@@ -6,7 +6,7 @@ var fs = require('fs');
 var expect = require('chai').expect;
 var bigrig = require('../');
 
-describe('Big Rig', function () {
+describe('Lighthouse', function () {
 
   it ('throws if no processes are found', function () {
 
