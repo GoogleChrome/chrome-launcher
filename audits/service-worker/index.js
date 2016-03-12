@@ -18,8 +18,7 @@
 
 class ServiceWorkerTest {
 
-  run (inputs) {
-
+  run(inputs) {
     if (inputs.length < 1) {
       return Promise.reject('No data provided.');
     }
@@ -34,7 +33,7 @@ class ServiceWorkerTest {
 
     this.url = inputs.url;
 
-    return new Promise(((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let driver = inputs.driver;
 
       // hacky settimeout to delay SW work from page loading
@@ -42,22 +41,18 @@ class ServiceWorkerTest {
         driver
           .requestTab(this.url)
           .then(_ => {
-            driver.subscribeToServiceWorkerDetails(this.swVersionUpdated.bind(this), resolve)
-          })
-
+            driver.subscribeToServiceWorkerDetails(this.swVersionUpdated.bind(this), resolve);
+          });
       }, 5 * 1000);
-
-    }).bind(this));
-
+    });
   }
 
-  swVersionUpdated (data, resolve) {
-    var swObj = data.versions.filter( sw => sw.scriptURL.includes(this.url) ).pop();
+  swVersionUpdated(data, resolve) {
+    var swObj = data.versions.filter(sw => sw.scriptURL.includes(this.url)).pop();
     resolve(swObj);
   }
 
-  hasFetchRegistered (fileContents) {
-
+  hasFetchRegistered(fileContents) {
       // Get the Service Worker JS. We need a nicer way to do this!
           // return inputs.loader.load(serviceWorkerPath)
           //     .then(fileContents => {

@@ -37,23 +37,22 @@ class ChromeProtocol {
     ];
     // Add on GPU benchmarking.
     // FIXME: --enable-gpu-benchmarking
-
   }
 
   requestTab(url) {
-    return new Promise(((resolve, reject) => {
-
+    return new Promise((resolve, reject) => {
       this.url = url;
-      if (this.instance())
-          return resolve(this.instance())
+      if (this.instance()) {
+        return resolve(this.instance());
+      }
 
       chromeremoteinterface({ /* github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
         instance => {
           this._instance = instance;
           resolve(instance);
         }
-      ).on('error', (e)  => reject(e) );
-    }).bind(this))
+      ).on('error', e => reject(e));
+    });
   }
 
   instance() {
@@ -61,76 +60,69 @@ class ChromeProtocol {
   }
 
   discardTab() {
-    if (this._instance)
+    if (this._instance) {
       this._instance.close();
+    }
   }
 
   resetFailureTimeout(reject) {
-    if (this.timeoutID)
-        clearTimeout(this.timeoutID);
+    if (this.timeoutID) {
+      clearTimeout(this.timeoutID);
+    }
 
     this.timeoutID = setTimeout(_ => {
       this.discardTab();
       reject(new Error('Trace retrieval timed out'));
-    }, 15 * 1000)
+    }, 15 * 1000);
   }
 
-  subscribeToServiceWorkerDetails(cb, resolve){
+  subscribeToServiceWorkerDetails(cb, resolve) {
     var chrome = this.instance();
 
     chrome.ServiceWorker.enable();
     // chrome.on("ServiceWorker.workerCreated", log)
     // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
-    chrome.on("ServiceWorker.workerVersionUpdated", data => { cb(data, resolve); });
+    chrome.on("ServiceWorker.workerVersionUpdated", data => {
+      cb(data, resolve);
+    });
   }
 
-  evaluateScript(scriptStr){
-    return new Promise((function(resolve, reject) {
-
+  evaluateScript(chrome) { /* TODO(paulirish): scriptStr parameter */
+    return new Promise(function(resolve, reject) {
       chrome.Runtime.evaluate({
-        expression : 'alert(navigator.userAgent)',
-        contextId : 0
-      }, result => {
-        resolve(result);
-      })
-
-    }).bind(this));
+        expression: 'alert(navigator.userAgent)',
+        contextId: 0
+      }, resolve);
+    });
   }
 
   profilePageLoad(chrome) {
-
     return new Promise((function(resolve, reject) {
-
       var rawEvents = [];
       this.resetFailureTimeout(reject);
 
       chrome.Page.enable();
       chrome.Tracing.start({
-        "categories":   this.categories.join(','),
-        "options":      "sampling-frequency=10000"  // 1000 is default and too slow.
+        categories: this.categories.join(','),
+        options: "sampling-frequency=10000"  // 1000 is default and too slow.
       });
 
-      chrome.Page.navigate({'url': this.url})
-      chrome.Page.loadEventFired( _ =>  {
-        chrome.Tracing.end()
+      chrome.Page.navigate({url: this.url});
+      chrome.Page.loadEventFired(_ => {
+        chrome.Tracing.end();
         this.resetFailureTimeout(reject);
       });
 
-      chrome.Tracing.dataCollected(function(data){
+      chrome.Tracing.dataCollected(function(data) {
         rawEvents = rawEvents.concat(data.value);
       });
 
-      chrome.Tracing.tracingComplete((function () {
+      chrome.Tracing.tracingComplete(_ => {
         resolve(rawEvents);
         // this.discardTab(); // FIXME: close connection later
-      }).bind(this));
-
+      });
     }).bind(this));
   }
-
 }
-
-
-
 
 module.exports = ChromeProtocol;

@@ -23,8 +23,7 @@ class ViewportMetaTagTest {
    * @param  {*} inputs The test inputs.
    * @return {Number} A score. 1 = viewport meta tag present; 0 = not found.
    */
-  run (inputs) {
-
+  run(inputs) {
     if (typeof inputs === 'undefined') {
       return Promise.reject('No data provided.');
     }
@@ -44,7 +43,6 @@ class ViewportMetaTagTest {
 
     // Else zero.
     return Promise.resolve(false);
-
   }
 }
 
