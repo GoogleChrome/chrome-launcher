@@ -74,14 +74,16 @@ class ChromeProtocol {
     }, 15 * 1000);
   }
 
-  subscribeToServiceWorkerDetails(cb, resolve) {
+  subscribeToServiceWorkerDetails(fn) {
     var chrome = this.instance();
 
-    chrome.ServiceWorker.enable();
-    // chrome.on("ServiceWorker.workerCreated", log)
-    // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
-    chrome.on("ServiceWorker.workerVersionUpdated", data => {
-      cb(data, resolve);
+    return new Promise(function(res, rej) {
+      chrome.ServiceWorker.enable();
+      // chrome.on("ServiceWorker.workerCreated", log)
+      // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
+      chrome.on("ServiceWorker.workerVersionUpdated", data => {
+        res(fn(data));
+      });
     });
   }
 

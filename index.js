@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+/**
 'use strict';
 
 let TestLoader = require('./helpers/test-loader');
 let RemoteFileLoader = require('./helpers/remote-file-loader');
 let https = require('https');
-let ChromeDriver = require('./helpers/browser/driver');
 
 let processor = require('./lib/processor');
 
@@ -158,3 +158,26 @@ module.exports = {
     return processor.analyzeTrace(traceContents, opts);
   }
 };
+*/
+
+var URL = 'https://voice-memos.appspot.com/';
+
+var gatherer = require('./gatherer');
+var auditor = require('./auditor');
+var browser = require('./browser');
+
+browser.construct()
+.then(gatherer.bind(null, [
+//  require('audits/minify-html/gather'),
+  require('./audits/service-worker/gather'),
+//  require('audits/time-in-javascript/gather'),
+//  require('audits/viewport-meta-tag/gather'),
+], URL)).then(auditor.bind(null, [
+  require('./audits/service-worker/audit'),
+])).then(function(results) {
+  console.log('all done');
+  console.log(results);
+}).catch(function(err) {
+  console.log('error encountered', err);
+  throw err;
+});
