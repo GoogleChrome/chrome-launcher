@@ -20,8 +20,7 @@ let traceProcessor = require('../../lib/processor');
 
 class TimeInJavaScriptTest {
 
-  run (inputs) {
-
+  run(inputs) {
     if (inputs.length < 1) {
       return Promise.reject('No data provided.');
     }
@@ -44,7 +43,7 @@ class TimeInJavaScriptTest {
         .then(results => {
           resolve(results[0].extendedInfo.javaScript);
         }).catch(err => {
-          console.error(err)
+          console.error(err);
         });
     });
   }

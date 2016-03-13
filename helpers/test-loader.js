@@ -23,7 +23,7 @@ let fs = require('fs');
 let tests = {};
 
 module.exports = {
-  getTests: function (filePath) {
+  getTests: function(filePath) {
     if (typeof tests[filePath] !== 'undefined') {
       return tests[filePath];
     }

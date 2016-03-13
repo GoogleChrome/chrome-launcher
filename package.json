@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && npm run unit",
+    "test": "npm run lint --silent && npm run unit",
     "unit": "mocha test/*.js --timeout 60000"
   },
   "repository": {

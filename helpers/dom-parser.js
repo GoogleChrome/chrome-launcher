@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* global window */
+
 'use strict';
 
 class DOMParser {
@@ -24,10 +26,10 @@ class DOMParser {
    * @param  {String} input The HTML to parse.
    * @return {Object} A selector engine.
    */
-  static parse (input) {
+  static parse(input) {
     let output;
     if (typeof window === 'undefined') {
-      // TODO(paullewis: change this to load dynamically to avoid
+      // TODO(paullewis): change this to load dynamically to avoid
       // being transpiled in every time.
       let cheerio = require('cheerio');
       output = cheerio.load(input);

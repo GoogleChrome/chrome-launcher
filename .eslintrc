@@ -1,3 +1,22 @@
 {
-  "extends": "google"
+  "extends": "google",
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-implicit-coercion": [2, {
+      "boolean": false,
+      "number": true,
+      "string": true
+    }],
+    "no-unused-expressions": [2, {
+      "allowShortCircuit": true,
+      "allowTernary": false
+    }],
+    "no-unused-vars": [2, {
+      "vars": "all",
+      "args": "after-used",
+      "argsIgnorePattern": "(^reject$|^_$)"
+    }],
+  }
 }
