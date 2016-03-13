@@ -22,8 +22,6 @@ Some basic unit tests forked from node-big-rig are in `/test` and run via mocha.
 npm test
 ```
 
-The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. It's exposed by `lib/processor`. See an example use in the [time-in-javascript](https://github.com/GoogleChrome/lighthouse/blob/85933f07791982d556177fddb55f578d30a4b56f/audits/time-in-javascript/index.js#L43) audit
-
 ## Trace processing
 
 The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. It's exposed by `lib/processor`. See an example use in the [time-in-javascript](https://github.com/GoogleChrome/lighthouse/blob/85933f07791982d556177fddb55f578d30a4b56f/audits/time-in-javascript/index.js#L43) audit
