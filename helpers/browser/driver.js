@@ -106,7 +106,7 @@ class ChromeProtocol {
           contextId: contexts[0].id // hard dep
         }, (err, evalRes) => {
           if (err || evalRes.wasThrown){
-            return reject(evalResult);
+            return reject(evalRes);
           }
 
           chrome.Runtime.getProperties({
