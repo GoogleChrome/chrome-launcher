@@ -35,8 +35,6 @@ class ChromeProtocol {
       "disabled-by-default-devtools.screenshot",
       "disabled-by-default-v8.cpu_profile"
     ];
-    // Add on GPU benchmarking.
-    // FIXME: --enable-gpu-benchmarking
   }
 
   requestTab(url) {
