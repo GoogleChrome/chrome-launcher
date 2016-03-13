@@ -168,14 +168,15 @@ var browser = require('./browser');
 
 browser.construct()
 .then(gatherer.bind(null, [
+  require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
   require('./audits/service-worker/gather'),
   require('./audits/time-in-javascript/gather'),
-//  require('audits/viewport-meta-tag/gather'),
 ], URL)).then(auditor.bind(null, [
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),
   require('./audits/time-in-javascript/audit'),
+  require('./audits/viewport-meta-tag/audit'),
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
