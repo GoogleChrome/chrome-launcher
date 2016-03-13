@@ -28,22 +28,41 @@ class ViewportMetaTagTest {
       return Promise.reject('No data provided.');
     }
 
-    if (typeof inputs.dom !== 'function') {
-      return Promise.reject('No DOM Parser provided.');
+    if (typeof inputs.driver === 'undefined') {
+      return Promise.reject('No Driver provided.');
     }
 
-    let domParser = inputs.dom;
-    let viewport = domParser('meta[name="viewport"]');
+    let driver = inputs.driver;
+    let ret = {};
 
-    // If there's a viewport return a score of 1.
-    // TODO(paullewis): make this test more nuanced.
-    if (typeof viewport !== 'undefined' && viewport !== null) {
-      return Promise.resolve(true);
-    }
+    return driver
+      .requestTab(inputs.url)
+      // make this not totally stupid.
+      .then((instance) => {
+        return driver.evaluateScript(findMetaViewport)
+            .then((obj) => {
+              if (obj.type === "object" && obj.subtype === "null")
+                ret = { pass : false };
+              else if (obj.subtype === 'node' && obj.props.content.includes('width='))
+                ret = { pass: true };
+              else
+                throw new Error("Unexpected viewport elements.");
+              return ret;
+            });
+      });
 
     // Else zero.
-    return Promise.resolve(false);
+    // return Promise.resolve(false);
   }
+
 }
+
+// must be defined as a standalone function expression to be stringified successfully.
+function findMetaViewport() {
+  // If there's a viewport return a score of 1.
+  // TODO(paullewis): make this test more nuanced.
+  return document.head.querySelector('meta[name="viewport"]')
+}
+
 
 module.exports = new ViewportMetaTagTest();

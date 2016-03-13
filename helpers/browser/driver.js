@@ -85,12 +85,43 @@ class ChromeProtocol {
     });
   }
 
-  evaluateScript(chrome) { /* TODO(paulirish): scriptStr parameter */
-    return new Promise(function(resolve, reject) {
-      chrome.Runtime.evaluate({
-        expression: 'alert(navigator.userAgent)',
-        contextId: 0
-      }, resolve);
+  evaluateScript(scriptStr) {
+    var chrome = this.instance();
+
+    var contexts = [];
+    chrome.Runtime.enable();
+    chrome.on('Runtime.executionContextCreated', res => {
+      contexts.push(res.context);
+    });
+
+    var wrappedScriptStr = '(' + scriptStr.toString() + ')()';
+
+    return new Promise((resolve, reject) => {
+      function evalInContext(){
+
+        chrome.Runtime.evaluate({
+          expression: wrappedScriptStr,
+          contextId: contexts[0].id // hard dep
+        }, (err, evalRes) => {
+          if (err || evalRes.wasThrown){
+            return reject(evalResult);
+          }
+
+          chrome.Runtime.getProperties({
+            objectId : evalRes.result.objectId
+          }, (err, res) => {
+              evalRes.result.props = {};
+              if (Array.isArray(res.result)) {
+                res.result.forEach(prop => {
+                    evalRes.result.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
+                });
+              }
+              resolve(evalRes.result);
+          })
+        });
+      }
+      // allow time to pull in some contexts
+      setTimeout(evalInContext, 500);
     });
   }
 
