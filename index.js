@@ -18,9 +18,11 @@ var URL = 'https://voice-memos.appspot.com/';
 
 var gatherer = require('./gatherer');
 var auditor = require('./auditor');
-var browser = require('./browser');
+var Browser = require('./browser');
+var _browser;
 
-browser.construct()
+Browser.construct(URL)
+.then(b => _browser = b)
 .then(gatherer.bind(null, [
   require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
@@ -34,6 +36,7 @@ browser.construct()
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
+  _browser.discardTab();
 }).catch(function(err) {
   console.log('error encountered', err);
   console.log(err.stack);
