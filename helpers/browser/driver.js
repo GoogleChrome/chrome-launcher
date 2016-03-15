@@ -80,43 +80,54 @@ class ChromeProtocol {
     });
   }
 
-  evaluateScript(scriptStr) {
-    var chrome = this.instance();
+  static getEvaluationContextFor(url, instance) {
+    return new Promise((res, rej) => {
+      var errorTimeout = setTimeout((_ => rej(new Error(`No Evaluation context found for ${url}`))), 4000);
 
-    var contexts = [];
-    chrome.Runtime.enable();
-    chrome.on('Runtime.executionContextCreated', res => {
-      contexts.push(res.context);
+      instance.on('Runtime.executionContextCreated', evalContext => {
+        if (evalContext.context.origin.indexOf(url) !== -1) {
+          clearTimeout(errorTimeout);
+          res(evalContext.context.id);
+        }
+      });
     });
+  }
 
+  evaluateScript(scriptStr, url) {
+    var chrome = this._instance;
     var wrappedScriptStr = '(' + scriptStr.toString() + ')()';
 
-    return new Promise((resolve, reject) => {
-      function evalInContext(){
+    chrome.Runtime.enable();
 
-        chrome.Runtime.evaluate({
-          expression: wrappedScriptStr,
-          contextId: contexts[0].id // hard dep
-        }, (err, evalRes) => {
-          if (err || evalRes.wasThrown){
-            return reject(evalRes);
-          }
+    return ChromeProtocol.getEvaluationContextFor(url, chrome)
+    .then(contextId => {
+      return new Promise((resolve, reject) => {
+        function evalInContext(){
 
-          chrome.Runtime.getProperties({
-            objectId : evalRes.result.objectId
-          }, (err, res) => {
+          chrome.Runtime.evaluate({
+            expression: wrappedScriptStr,
+            contextId: contextId,
+          }, (err, evalRes) => {
+            if (err || evalRes.wasThrown){
+              return reject(evalRes);
+            }
+
+            chrome.Runtime.getProperties({
+              objectId : evalRes.result.objectId
+            }, (err, res) => {
               evalRes.result.props = {};
               if (Array.isArray(res.result)) {
                 res.result.forEach(prop => {
-                    evalRes.result.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
+                  evalRes.result.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
                 });
               }
               resolve(evalRes.result);
-          })
-        });
-      }
-      // allow time to pull in some contexts
-      setTimeout(evalInContext, 500);
+            })
+          });
+        }
+        // allow time to pull in some contexts
+        setTimeout(evalInContext, 500);
+      });
     });
   }
 

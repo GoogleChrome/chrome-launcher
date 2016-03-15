@@ -25,12 +25,7 @@ function findMetaViewport() {
 
 var ViewportHasMetaContent = {
   run: function(driver, url) {
-    return driver
-    .requestTab(url)
-    // make this not totally stupid.
-    .then((instance) => {
-      return driver.evaluateScript(findMetaViewport)
-    })
+    return driver.evaluateScript(findMetaViewport, url)
     .then((ret) => {
       return {viewportMetaQuery: ret};
     });
