@@ -36,5 +36,6 @@ browser.construct()
   console.log(results);
 }).catch(function(err) {
   console.log('error encountered', err);
+  console.log(err.stack);
   throw err;
 });
