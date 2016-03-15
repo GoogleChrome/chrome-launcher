@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var URL = 'https://voice-memos.appspot.com/';
+var URL = 'https://voice-memos.appspot.com';
 
 var gatherer = require('./gatherer');
 var auditor = require('./auditor');
