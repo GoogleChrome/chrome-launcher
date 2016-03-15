@@ -19,8 +19,11 @@ var ChromeDriver = require('./helpers/browser/driver');
 /**
  * @returns {Promise}
  */
-function construct() {
-  return Promise.resolve(new ChromeDriver());
+function construct(URL) {
+  return Promise.resolve(new ChromeDriver())
+  .then(function(driver) {
+    return driver._requestTab().then(_ => driver)
+  });
 }
 
 module.exports = {

@@ -18,9 +18,7 @@
 var TimeInJavascript = {
   run: function(driver, url) {
     return new Promise((resolve, reject) => {
-      driver
-      .requestTab(url)
-      .then(driver.profilePageLoad.bind(driver))
+      driver.profilePageLoad(url)
       .then(results => {
         resolve({pageLoadProfile: results});
       });

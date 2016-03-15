@@ -37,11 +37,10 @@ class ChromeProtocol {
     ];
   }
 
-  requestTab(url) {
+  _requestTab() {
     return new Promise((resolve, reject) => {
-      this.url = url;
-      if (this.instance()) {
-        return resolve(this.instance());
+      if (this._instance) {
+        return resolve(this._instance);
       }
 
       chromeremoteinterface({ /* github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
@@ -53,14 +52,8 @@ class ChromeProtocol {
     });
   }
 
-  instance() {
-    return this._instance;
-  }
-
   discardTab() {
-    if (this._instance) {
-      this._instance.close();
-    }
+    this._instance.close();
   }
 
   resetFailureTimeout(reject) {
@@ -75,7 +68,7 @@ class ChromeProtocol {
   }
 
   subscribeToServiceWorkerDetails(fn) {
-    var chrome = this.instance();
+    var chrome = this._instance;
 
     return new Promise(function(res, rej) {
       chrome.ServiceWorker.enable();
@@ -127,28 +120,28 @@ class ChromeProtocol {
     });
   }
 
-  profilePageLoad(chrome) {
+  profilePageLoad(url) {
     return new Promise((function(resolve, reject) {
       var rawEvents = [];
       this.resetFailureTimeout(reject);
 
-      chrome.Page.enable();
-      chrome.Tracing.start({
+      this._instance.Page.enable();
+      this._instance.Tracing.start({
         categories: this.categories.join(','),
         options: "sampling-frequency=10000"  // 1000 is default and too slow.
       });
 
-      chrome.Page.navigate({url: this.url});
-      chrome.Page.loadEventFired(_ => {
-        chrome.Tracing.end();
-        this.resetFailureTimeout(reject);
+      this._instance.Page.navigate({url: url});
+      this._instance.Page.loadEventFired(_ => {
+        this._instance.Tracing.end();
+        this.resetFailureTimeout(reject) ;
       });
 
-      chrome.Tracing.dataCollected(function(data) {
+      this._instance.Tracing.dataCollected(function(data) {
         rawEvents = rawEvents.concat(data.value);
       });
 
-      chrome.Tracing.tracingComplete(_ => {
+      this._instance.Tracing.tracingComplete(_ => {
         resolve(rawEvents);
         // this.discardTab(); // FIXME: close connection later
       });
