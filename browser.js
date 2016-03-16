@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-/* global window, fetch */
+var ChromeDriver = require('./helpers/browser/driver');
 
-'use strict';
-
-class RemoteFileLoader {
-
-  load(url) {
-    if (typeof window === 'undefined') {
-      // TODO(paullewis): change this to load dynamically to avoid
-      // being transpiled in every time.
-      return new Promise((resolve, reject) => {
-        let https = require('https');
-        https.get(url, res => {
-          let body = '';
-          res.on('data', data => {
-            body += data;
-          });
-          res.on('end', () => resolve(body));
-        });
-      });
-    }
-
-    return fetch(url).then(response => response.text());
-  }
+/**
+ * @returns {Promise}
+ */
+function construct() {
+  return Promise.resolve(new ChromeDriver())
+  .then(function(driver) {
+    return driver._requestTab().then(_ => driver);
+  });
 }
 
-module.exports = RemoteFileLoader;
+module.exports = {
+  construct: construct
+};

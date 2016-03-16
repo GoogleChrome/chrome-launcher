@@ -14,30 +14,22 @@
  * limitations under the License.
  */
 
-/* global window, fetch */
+var traceProcessor = require('../../lib/processor');
 
-'use strict';
-
-class RemoteFileLoader {
-
-  load(url) {
-    if (typeof window === 'undefined') {
-      // TODO(paullewis): change this to load dynamically to avoid
-      // being transpiled in every time.
-      return new Promise((resolve, reject) => {
-        let https = require('https');
-        https.get(url, res => {
-          let body = '';
-          res.on('data', data => {
-            body += data;
-          });
-          res.on('end', () => resolve(body));
-        });
-      });
-    }
-
-    return fetch(url).then(response => response.text());
-  }
+function gatherTimeInJavascript(pageLoadProfile) {
+  return new Promise(function(res, rej) {
+    res(traceProcessor.analyzeTrace(pageLoadProfile));
+  }).then(ret => ret[0].extendedInfo.javaScript);
 }
 
-module.exports = RemoteFileLoader;
+module.exports = function(data) {
+  if (data.pageLoadProfile === undefined) {
+    throw new Error('time in javascript auditor requires page load profile data');
+  }
+
+  return gatherTimeInJavascript(data.pageLoadProfile).then(ret => {
+    return {
+      timeInJavascript: ret
+    };
+  });
+};

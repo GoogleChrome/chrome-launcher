@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2015 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,11 +37,10 @@ class ChromeProtocol {
     ];
   }
 
-  requestTab(url) {
+  _requestTab() {
     return new Promise((resolve, reject) => {
-      this.url = url;
-      if (this.instance()) {
-        return resolve(this.instance());
+      if (this._instance) {
+        return resolve(this._instance);
       }
 
       chromeremoteinterface({ /* github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
@@ -53,14 +52,8 @@ class ChromeProtocol {
     });
   }
 
-  instance() {
-    return this._instance;
-  }
-
   discardTab() {
-    if (this._instance) {
-      this._instance.close();
-    }
+    this._instance.close();
   }
 
   resetFailureTimeout(reject) {
@@ -74,48 +67,101 @@ class ChromeProtocol {
     }, 15 * 1000);
   }
 
-  subscribeToServiceWorkerDetails(cb, resolve) {
-    var chrome = this.instance();
+  subscribeToServiceWorkerDetails(fn) {
+    var chrome = this._instance;
 
-    chrome.ServiceWorker.enable();
-    // chrome.on("ServiceWorker.workerCreated", log)
-    // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
-    chrome.on("ServiceWorker.workerVersionUpdated", data => {
-      cb(data, resolve);
+    return new Promise(function(res, rej) {
+      chrome.ServiceWorker.enable();
+      // chrome.on("ServiceWorker.workerCreated", log)
+      // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
+      chrome.on("ServiceWorker.workerVersionUpdated", data => {
+        res(fn(data));
+      });
     });
   }
 
-  evaluateScript(chrome) { /* TODO(paulirish): scriptStr parameter */
-    return new Promise(function(resolve, reject) {
-      chrome.Runtime.evaluate({
-        expression: 'alert(navigator.userAgent)',
-        contextId: 0
-      }, resolve);
+  static getEvaluationContextFor(url, instance) {
+    return new Promise((res, rej) => {
+      var errorTimeout = setTimeout((_ => rej(new Error(`No Evaluation context found for ${url}`))), 4000);
+
+      instance.on('Runtime.executionContextCreated', evalContext => {
+        if (evalContext.context.origin.indexOf(url) !== -1) {
+          clearTimeout(errorTimeout);
+          res(evalContext.context.id);
+        }
+      });
     });
   }
 
-  profilePageLoad(chrome) {
+  evaluateFunction(fn, url) {
+    var wrappedScriptStr = '(' + fn.toString() + ')()';
+    return this.evaluateString(wrappedScriptStr, url);
+  }
+
+  evaluateString(scriptStr, url) {
+    var chrome = this._instance;
+
+    chrome.Runtime.enable();
+    return ChromeProtocol.getEvaluationContextFor(url, chrome)
+      .then(contextId => {
+        return new Promise((resolve, reject) => {
+          var evalOpts = {
+            expression: scriptStr,
+            contextId: contextId
+          };
+          chrome.Runtime.evaluate(evalOpts, (err, evalResult) => {
+            if (err || evalResult.wasThrown) {
+              return reject(evalResult);
+            }
+            getObjectDetails(evalResult.result, resolve);
+          });
+        });
+      });
+
+    function getObjectDetails(obj, resolve) {
+      chrome.Runtime.getProperties({
+        objectId: obj.objectId
+      }, (err, propsResult) => {
+        if (err) {
+          /* continue anyway */
+        }
+        obj.props = {};
+        if (Array.isArray(propsResult.result)) {
+          propsResult.result.forEach(prop => {
+            obj.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
+          });
+        }
+        resolve(obj);
+      });
+    }
+  }
+
+  profilePageLoad(url) {
     return new Promise((function(resolve, reject) {
       var rawEvents = [];
       this.resetFailureTimeout(reject);
 
-      chrome.Page.enable();
-      chrome.Tracing.start({
+      this._instance.Page.enable();
+      this._instance.Tracing.start({
         categories: this.categories.join(','),
         options: "sampling-frequency=10000"  // 1000 is default and too slow.
+      }, (err, data) => {
+        if (err) {
+          reject(data);
+        }
       });
 
-      chrome.Page.navigate({url: this.url});
-      chrome.Page.loadEventFired(_ => {
-        chrome.Tracing.end();
+      this._instance.Page.navigate({url: url});
+      this._instance.Page.loadEventFired(_ => {
+        this._instance.Tracing.end();
         this.resetFailureTimeout(reject);
       });
 
-      chrome.Tracing.dataCollected(function(data) {
+      this._instance.Tracing.dataCollected(function(data) {
         rawEvents = rawEvents.concat(data.value);
       });
 
-      chrome.Tracing.tracingComplete(_ => {
+      this._instance.Tracing.tracingComplete(_ => {
         resolve(rawEvents);
         // this.discardTab(); // FIXME: close connection later
       });
