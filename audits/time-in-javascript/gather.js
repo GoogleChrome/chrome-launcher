@@ -17,11 +17,9 @@
 
 var TimeInJavascript = {
   run: function(driver, url) {
-    return new Promise((resolve, reject) => {
-      driver.profilePageLoad(url)
-      .then(results => {
-        resolve({pageLoadProfile: results});
-      });
+    return driver.profilePageLoad(url)
+    .then(results => {
+      return {pageLoadProfile: results};
     });
   }
 };
