@@ -15,18 +15,18 @@
  */
 
 function hasFetchRegistered(fileContents) {
-      // Get the Service Worker JS. We need a nicer way to do this!
-          // return inputs.loader.load(serviceWorkerPath)
-          //     .then(fileContents => {
-          //       result.fetch = this.hasFetchRegistered(fileContents);
-          //       return resolve(result);
-          //     });
+  // Get the Service Worker JS. We need a nicer way to do this!
+  // return inputs.loader.load(serviceWorkerPath)
+  //     .then(fileContents => {
+  //       result.fetch = this.hasFetchRegistered(fileContents);
+  //       return resolve(result);
+  //     });
 
-    var matchSelfFetch = /self\.onfetch/igm;
-    var matchAddEventListener = /self\.addEventListener\s?\(\s?'fetch'/igm;
+  var matchSelfFetch = /self\.onfetch/igm;
+  var matchAddEventListener = /self\.addEventListener\s?\(\s?'fetch'/igm;
 
-    return (matchSelfFetch.test(fileContents) ||
-        matchAddEventListener.test(fileContents));
+  return (matchSelfFetch.test(fileContents) ||
+      matchAddEventListener.test(fileContents));
 }
 
 module.exports = function(data) {
@@ -37,4 +37,4 @@ module.exports = function(data) {
   return Promise.resolve({
     hasFetchRegistered: hasFetchRegistered(data.serviceWorker)
   });
-}
+};

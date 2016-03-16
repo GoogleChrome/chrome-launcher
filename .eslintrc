@@ -16,7 +16,9 @@
     "no-unused-vars": [2, {
       "vars": "all",
       "args": "after-used",
-      "argsIgnorePattern": "(^reject$|^_$)"
+      "argsIgnorePattern": "(^reject$|^_$|^rej$)"
     }],
+    "valid-jsdoc": "off",
+    "require-jsdoc": "off",
   }
 }

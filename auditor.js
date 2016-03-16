@@ -20,4 +20,4 @@ module.exports = function(audits, results) {
   }, {});
 
   return Promise.all(audits.map(v => v(flattenedAudits)));
-}
+};

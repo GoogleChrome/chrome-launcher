@@ -16,15 +16,18 @@
  */
 
 function hasCorrectViewportMetaQuery(obj) {
-  if (obj.type === "object" && obj.subtype === "null")
-    ret = { pass : false };
-  else if (obj.subtype === 'node' && obj.props.content.includes('width='))
-    ret = { pass: true };
-  else
-    throw new Error("Unexpected viewport elements.");
-  return ret;
-};
+  var ret;
 
+  if (obj.type === "object" && obj.subtype === "null") {
+    ret = {pass: false};
+  } else if (obj.subtype === 'node' && obj.props.content.includes('width=')) {
+    ret = {pass: true};
+  } else {
+    throw new Error("Unexpected viewport elements.");
+  }
+
+  return ret;
+}
 
 module.exports = function(data) {
   if (data.viewportMetaQuery === undefined) {
@@ -32,6 +35,8 @@ module.exports = function(data) {
   }
 
   return Promise.resolve({
-    hasCorrectViewportMetaQuery: hasCorrectViewportMetaQuery(data.viewportMetaQuery),
+    hasCorrectViewportMetaQuery: hasCorrectViewportMetaQuery(
+                                     data.viewportMetaQuery)
   });
-}
+};
+

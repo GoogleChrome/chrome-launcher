@@ -100,35 +100,34 @@ class ChromeProtocol {
     chrome.Runtime.enable();
 
     return ChromeProtocol.getEvaluationContextFor(url, chrome)
-    .then(contextId => {
-      return new Promise((resolve, reject) => {
-        function evalInContext(){
-
-          chrome.Runtime.evaluate({
-            expression: wrappedScriptStr,
-            contextId: contextId,
-          }, (err, evalRes) => {
-            if (err || evalRes.wasThrown){
-              return reject(evalRes);
-            }
-
-            chrome.Runtime.getProperties({
-              objectId : evalRes.result.objectId
-            }, (err, res) => {
-              evalRes.result.props = {};
-              if (Array.isArray(res.result)) {
-                res.result.forEach(prop => {
-                  evalRes.result.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
-                });
+      .then(contextId => {
+        return new Promise((resolve, reject) => {
+          function evalInContext() {
+            chrome.Runtime.evaluate({
+              expression: wrappedScriptStr,
+              contextId: contextId
+            }, (err, evalRes) => {
+              if (err || evalRes.wasThrown) {
+                return reject(evalRes);
               }
-              resolve(evalRes.result);
-            })
-          });
-        }
-        // allow time to pull in some contexts
-        setTimeout(evalInContext, 500);
+
+              chrome.Runtime.getProperties({
+                objectId: evalRes.result.objectId
+              }, (err, res) => {
+                evalRes.result.props = {};
+                if (Array.isArray(res.result)) {
+                  res.result.forEach(prop => {
+                    evalRes.result.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
+                  });
+                }
+                resolve(evalRes.result);
+              });
+            });
+          }
+          // allow time to pull in some contexts
+          setTimeout(evalInContext, 500);
+        });
       });
-    });
   }
 
   profilePageLoad(url) {
@@ -145,7 +144,7 @@ class ChromeProtocol {
       this._instance.Page.navigate({url: url});
       this._instance.Page.loadEventFired(_ => {
         this._instance.Tracing.end();
-        this.resetFailureTimeout(reject) ;
+        this.resetFailureTimeout(reject);
       });
 
       this._instance.Tracing.dataCollected(function(data) {

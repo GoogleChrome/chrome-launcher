@@ -17,9 +17,11 @@
 var traceProcessor = require('../../lib/processor');
 
 function gatherTimeInJavascript(pageLoadProfile) {
+  /* eslint-disable no-unused-vars */
   return new Promise(function(res, rej) {
-    res(traceProcessor.analyzeTrace(pageLoadProfile))
-  }).then((ret) => ret[0].extendedInfo.javaScript);
+    /* eslint-enable */
+    res(traceProcessor.analyzeTrace(pageLoadProfile));
+  }).then(ret => ret[0].extendedInfo.javaScript);
 }
 
 module.exports = function(data) {
@@ -29,7 +31,7 @@ module.exports = function(data) {
 
   return gatherTimeInJavascript(data.pageLoadProfile).then(ret => {
     return {
-      timeInJavascript: ret,
+      timeInJavascript: ret
     };
   });
-}
+};

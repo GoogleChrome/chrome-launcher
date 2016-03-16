@@ -27,10 +27,9 @@ var ServiceWorkerGatherer = {
     return new Promise((resolve, reject) => {
       // hacky settimeout to delay SW work from page loading
       setTimeout(_ => {
-          driver.subscribeToServiceWorkerDetails(swVersionUpdated.bind(null, url))
-          .then((data) => {
-            return resolve({serviceWorker: data});
-          });
+        driver.subscribeToServiceWorkerDetails(swVersionUpdated.bind(null, url)).then(data => {
+          return resolve({serviceWorker: data});
+        });
       }, 5 * 1000);
     });
   }

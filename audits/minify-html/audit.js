@@ -20,9 +20,9 @@ function getCompressionRatio(source) {
     .replace(/\t/igm, '')
     .replace(/\s+/igm, ' ');
 
-    var htmlLen = Math.max(1, source.length);
-    var htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
-    var ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
+  var htmlLen = Math.max(1, source.length);
+  var htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
+  var ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
 
   return ratio;
 }
@@ -35,8 +35,8 @@ function checkHtmlMinificationRatio(htmlSources) {
     htmlCompressionRatios: htmlSources.map(function(entity) {
       return {
         filename: entity.filename,
-        compressionRatio: getCompressionRatio(entity.source),
-      }
+        compressionRatio: getCompressionRatio(entity.source)
+      };
     })
   });
 }
@@ -47,6 +47,4 @@ module.exports = function(data) {
   }
 
   return checkHtmlMinificationRatio(data.htmlSources);
-}
-
-
+};

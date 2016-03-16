@@ -15,18 +15,19 @@
  * limitations under the License.
  */
 
-
 // must be defined as a standalone function expression to be stringified successfully.
 function findMetaViewport() {
   // If there's a viewport return a score of 1.
   // TODO(paullewis): make this test more nuanced.
-  return document.head.querySelector('meta[name="viewport"]')
+  /* eslint-disable no-undef */
+  return document.head.querySelector('meta[name="viewport"]');
+  /* eslint-enable */
 }
 
 var ViewportHasMetaContent = {
   run: function(driver, url) {
     return driver.evaluateScript(findMetaViewport, url)
-    .then((ret) => {
+    .then(ret => {
       return {viewportMetaQuery: ret};
     });
   }

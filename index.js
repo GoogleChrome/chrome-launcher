@@ -21,18 +21,20 @@ var auditor = require('./auditor');
 var Browser = require('./browser');
 var _browser;
 
-Browser.construct(URL)
-.then(b => _browser = b)
-.then(gatherer.bind(null, [
+Browser.construct(URL).then(b => {
+  _browser = b;
+
+  return b;
+}).then(gatherer.bind(null, [
   require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
   require('./audits/service-worker/gather'),
-  require('./audits/time-in-javascript/gather'),
+  require('./audits/time-in-javascript/gather')
 ], URL)).then(auditor.bind(null, [
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),
   require('./audits/time-in-javascript/audit'),
-  require('./audits/viewport-meta-tag/audit'),
+  require('./audits/viewport-meta-tag/audit')
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
