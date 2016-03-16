@@ -4,18 +4,18 @@
 
 var fs = require('fs');
 var expect = require('chai').expect;
-var bigrig = require('../');
+var bigrig = require('../lib/processor');
 
 describe('Lighthouse', function() {
   it('throws if no processes are found', function() {
     expect(function() {
-      bigrig.analyze(null);
+      bigrig.analyzeTrace(null);
     }).to.throw('Zero processes (tabs) found.');
   });
 
   it('throws if given invalid input data is given', function() {
     expect(function() {
-      bigrig.analyze('wobble');
+      bigrig.analyzeTrace('wobble');
     }).to.throw('Invalid trace contents; not JSON');
   });
 
@@ -32,7 +32,7 @@ describe('Lighthouse', function() {
               'see http://bit.ly/bigrig-extensions';
 
           expect(function() {
-            bigrig.analyze(data, {
+            bigrig.analyzeTrace(data, {
               strict: true
             });
           }).to.throw(error);
@@ -50,7 +50,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
 
         expect(jsonData).to.be.an('array');
         expect(jsonData[0]).to.be.an('object');
@@ -65,7 +65,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
         jsonData = JSON.parse(JSON.stringify(jsonData));
 
         expect(jsonData).to.be.an('array');
@@ -80,7 +80,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
 
         expect(jsonData[0]).to.be.an('object');
         expect(jsonData[0].title).to.equal('sideNavAnimation');
@@ -99,7 +99,7 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyze(data, {
+          var jsonData = bigrig.analyzeTrace(data, {
             types: {
               sideNavAnimation: bigrig.ANIMATION
             }
@@ -118,7 +118,7 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyze(data);
+          var jsonData = bigrig.analyzeTrace(data);
           expect(jsonData[0].type).to.equal(bigrig.LOAD);
           expect(jsonData[0].title).to.equal('Load');
           done();
@@ -133,7 +133,7 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyze(data);
+          var jsonData = bigrig.analyzeTrace(data);
           expect(jsonData[0].type).to.equal(bigrig.RESPONSE);
           expect(jsonData[0].title).to.equal('sideNavResponse');
           done();
@@ -148,7 +148,7 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyze(data);
+          var jsonData = bigrig.analyzeTrace(data);
           expect(jsonData[0].type).to.equal(bigrig.ANIMATION);
           expect(jsonData[0].title).to.equal('sideNavAnimation');
           done();
@@ -162,7 +162,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
 
         expect(jsonData.length).to.equal(2);
 
@@ -183,7 +183,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
         expect(jsonData[0].fps).to.be.within(59, 61);
         done();
       });
@@ -196,7 +196,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
         expect(
           jsonData[0].extendedInfo.javaScript['localhost:11080']
         ).to.be.within(245, 246);
@@ -214,7 +214,7 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyze(data);
+        var jsonData = bigrig.analyzeTrace(data);
         expect(
           jsonData[0].extendedInfo.forcedRecalcs
         ).to.equal(1);
