@@ -18,12 +18,12 @@
 function hasCorrectViewportMetaQuery(obj) {
   var ret;
 
-  if (obj.type === "object" && obj.subtype === "null") {
+  if (obj.type === 'object' && obj.subtype === 'null') {
     ret = {pass: false};
   } else if (obj.subtype === 'node' && obj.props.content.includes('width=')) {
     ret = {pass: true};
   } else {
-    throw new Error("Unexpected viewport elements.");
+    throw new Error('Unexpected viewport elements.');
   }
 
   return ret;
