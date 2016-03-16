@@ -1,0 +1,6 @@
+language: node_js
+node_js:
+  - "stable"
+# TODO: switch back to `npm test` default once tests are fixed.
+script: npm run lint
+sudo: false
