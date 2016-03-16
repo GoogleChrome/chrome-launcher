@@ -1,5 +1,7 @@
 # lighthouse
 
+[![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
+
 _status: very early. mostly not working_
 
 ## Running audits
