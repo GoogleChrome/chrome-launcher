@@ -17,9 +17,7 @@
 var traceProcessor = require('../../lib/processor');
 
 function gatherTimeInJavascript(pageLoadProfile) {
-  /* eslint-disable no-unused-vars */
   return new Promise(function(res, rej) {
-    /* eslint-enable */
     res(traceProcessor.analyzeTrace(pageLoadProfile));
   }).then(ret => ret[0].extendedInfo.javaScript);
 }

@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
+/* global document */
+
 // must be defined as a standalone function expression to be stringified successfully.
 function findMetaViewport() {
-  /* eslint-disable no-undef */
   return document.head.querySelector('meta[name="viewport"]');
-  /* eslint-enable */
 }
 
 var ViewportHasMetaContent = {
