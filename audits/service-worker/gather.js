@@ -13,26 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-function swVersionUpdated(url, data) {
-  var swObj = data.versions.filter(sw => sw.scriptURL.includes(url)).pop();
-
-  // eventually we will want until a specific state is reached inside of the
-  // service worker to resolve this.
-  return Promise.resolve(swObj);
-}
+'use strict';
 
 var ServiceWorkerGatherer = {
   run: function(driver, url) {
-    return new Promise((resolve, reject) => {
-      // hacky settimeout to delay SW work from page loading
-      setTimeout(_ => {
-        driver.subscribeToServiceWorkerDetails(swVersionUpdated.bind(null, url))
-          .then(data => {
-            return resolve({serviceWorker: data});
-          });
-      }, 5 * 1000);
-    });
+    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
+      .then(driver.getServiceWorkerRegistrations)
+      .then(serviceWorkerRegistrations => ({serviceWorkerRegistrations}));
   }
 };
 

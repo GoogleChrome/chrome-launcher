@@ -13,11 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 /**
  * @param {Array<{run: function}>} gatherers
  * @returns {Promise}
  */
-module.exports = function(gatherers, URL, driver) {
-  return Promise.all(gatherers.map(v => v.run(driver, URL)));
+module.exports = function(gatherers, url) {
+  return function gather(driver) {
+    let artifacts = [];
+
+    // Execute gatherers sequentially and return results array when complete.
+    return gatherers.reduce((prev, curr) => {
+      return prev
+        .then(_ => curr.run(driver, url))
+        .then(artifact => artifacts.push(artifact));
+    }, Promise.resolve())
+      .then(_ => artifacts);
+  };
 };

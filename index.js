@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-var URL = 'https://voice-memos.appspot.com';
+let URL = 'https://voice-memos.appspot.com';
 
-var gatherer = require('./gatherer');
-var auditor = require('./auditor');
-var Browser = require('./browser');
-var _browser;
+let gatherer = require('./gatherer');
+let auditor = require('./auditor');
+let ChromeProtocol = require('./helpers/browser/driver');
 
-Browser.construct(URL).then(b => {
-  _browser = b;
+const driver = new ChromeProtocol();
 
-  return b;
-}).then(gatherer.bind(null, [
+Promise.resolve(driver).then(gatherer([
   require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
   require('./audits/service-worker/gather'),
   require('./audits/time-in-javascript/gather')
-], URL)).then(auditor.bind(null, [
+], URL)).then(auditor([
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),
   require('./audits/time-in-javascript/audit'),
@@ -38,7 +36,8 @@ Browser.construct(URL).then(b => {
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
-  _browser.discardTab();
+  // driver.discardTab(); // FIXME: close connection later
+  // process.exit(0);
 }).catch(function(err) {
   console.log('error encountered', err);
   console.log(err.stack);

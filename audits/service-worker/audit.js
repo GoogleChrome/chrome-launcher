@@ -13,28 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-function hasFetchRegistered(fileContents) {
-  // Get the Service Worker JS. We need a nicer way to do this!
-  // return inputs.loader.load(serviceWorkerPath)
-  //     .then(fileContents => {
-  //       result.fetch = this.hasFetchRegistered(fileContents);
-  //       return resolve(result);
-  //     });
-
-  var matchSelfFetch = /self\.onfetch/igm;
-  var matchAddEventListener = /self\.addEventListener\s?\(\s?'fetch'/igm;
-
-  return (matchSelfFetch.test(fileContents) ||
-      matchAddEventListener.test(fileContents));
-}
+'use strict';
 
 module.exports = function(data) {
-  if (data.serviceWorker === undefined) {
-    throw new Error('Service worker auditor requires service worker data');
-  }
+  // Test the Service Worker registrations for validity.
+  let registrations = data.serviceWorkerRegistrations;
+  let activatedRegistrations = registrations.versions.filter(reg =>
+      reg.status === 'activated');
 
-  return Promise.resolve({
-    hasFetchRegistered: hasFetchRegistered(data.serviceWorker)
-  });
+  return {
+    'service-worker': activatedRegistrations.length > 0
+  };
 };

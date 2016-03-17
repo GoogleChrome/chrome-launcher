@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 var traceProcessor = require('../../lib/processor');
 
-function gatherTimeInJavascript(pageLoadProfile) {
-  return new Promise(function(resolve, reject) {
-    resolve(traceProcessor.analyzeTrace(pageLoadProfile));
-  }).then(ret => ret[0].extendedInfo.javaScript);
-}
-
 module.exports = function(data) {
-  if (data.pageLoadProfile === undefined) {
-    throw new Error('time in javascript auditor requires page load profile.');
-  }
+  let results = traceProcessor.analyzeTrace(data.traceContents);
 
-  return gatherTimeInJavascript(data.pageLoadProfile).then(ret => {
-    return {
-      timeInJavascript: ret
-    };
-  });
+  return {
+    'time-in-javascript': results[0].extendedInfo.javaScript
+  };
 };

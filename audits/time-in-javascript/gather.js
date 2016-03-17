@@ -14,13 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 var TimeInJavascript = {
   run: function(driver, url) {
-    return driver.profilePageLoad(url)
-    .then(results => {
-      return {pageLoadProfile: results};
-    });
+    return driver.disableCaching()
+      // Fire up the trace.
+      .then(driver.beginTrace)
+
+      // Go to the URL.
+      .then(_ => driver.gotoURL(url, driver.WAIT_FOR_LOAD))
+
+      // Stop the trace, which captures the records.
+      .then(driver.endTrace)
+      .then(traceContents => ({traceContents}));
   }
 };
 

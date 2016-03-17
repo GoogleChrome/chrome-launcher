@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 /* global document */
 
@@ -24,10 +25,8 @@ function findMetaViewport() {
 
 var ViewportHasMetaContent = {
   run: function(driver, url) {
-    return driver.evaluateFunction(findMetaViewport, url)
-    .then(ret => {
-      return {viewportMetaQuery: ret};
-    });
+    return driver.evaluateFunction(url, findMetaViewport)
+      .then(viewportElement => ({viewportElement}));
   }
 };
 

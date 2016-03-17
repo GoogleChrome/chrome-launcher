@@ -6,6 +6,9 @@
   "directories": {
     "test": "tests"
   },
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint --silent && npm run unit",

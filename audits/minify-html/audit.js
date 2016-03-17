@@ -13,38 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-function getCompressionRatio(source) {
-  var htmlNoWhiteSpaces = source
+module.exports = function(data) {
+  // See how compressed the HTML _could_ be if whitespace was removed.
+  // This could be a lot more aggressive.
+  let htmlNoWhiteSpaces = data.html
     .replace(/\n/igm, '')
     .replace(/\t/igm, '')
     .replace(/\s+/igm, ' ');
 
-  var htmlLen = Math.max(1, source.length);
-  var htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
-  var ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
+  let htmlLen = Math.max(1, data.html.length);
+  let htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
+  let ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
 
-  return ratio;
-}
-
-function checkHtmlMinificationRatio(htmlSources) {
-  // See how compressed the HTML _could_ be if whitespace was removed.
-  // This could be a lot more aggressive.
-
-  return Promise.resolve({
-    htmlCompressionRatios: htmlSources.map(function(entity) {
-      return {
-        filename: entity.filename,
-        compressionRatio: getCompressionRatio(entity.source)
-      };
-    })
-  });
-}
-
-module.exports = function(data) {
-  if (data.htmlSources === undefined) {
-    throw new Error('minify html auditor requires html sources data');
-  }
-
-  return checkHtmlMinificationRatio(data.htmlSources);
+  return {
+    'minify-html': ratio
+  };
 };

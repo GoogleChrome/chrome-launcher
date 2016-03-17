@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-module.exports = function(audits, results) {
-  var flattenedAudits = results.reduce(function(prev, curr) {
-    return Object.assign(prev, curr);
-  }, {});
+module.exports = function(audits) {
+  return function audit(results) {
+    var flattenedAudits = results.reduce(function(prev, curr) {
+      return Object.assign(prev, curr);
+    }, {});
 
-  return Promise.all(audits.map(v => v(flattenedAudits)));
+    return Promise.all(audits.map(v => v(flattenedAudits)));
+  };
 };
