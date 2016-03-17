@@ -17,14 +17,14 @@
 var traceProcessor = require('../../lib/processor');
 
 function gatherTimeInJavascript(pageLoadProfile) {
-  return new Promise(function(res, rej) {
-    res(traceProcessor.analyzeTrace(pageLoadProfile));
+  return new Promise(function(resolve, reject) {
+    resolve(traceProcessor.analyzeTrace(pageLoadProfile));
   }).then(ret => ret[0].extendedInfo.javaScript);
 }
 
 module.exports = function(data) {
   if (data.pageLoadProfile === undefined) {
-    throw new Error('time in javascript auditor requires page load profile data');
+    throw new Error('time in javascript auditor requires page load profile.');
   }
 
   return gatherTimeInJavascript(data.pageLoadProfile).then(ret => {

@@ -25,15 +25,15 @@ class ChromeProtocol {
     opts = opts || {};
 
     this.categories = [
-      "-*", // exclude default
-      "toplevel",
-      "blink.console",
-      "devtools.timeline",
-      "disabled-by-default-devtools.timeline",
-      "disabled-by-default-devtools.timeline.frame",
-      "disabled-by-default-devtools.timeline.stack",
-      "disabled-by-default-devtools.screenshot",
-      "disabled-by-default-v8.cpu_profile"
+      '-*', // exclude default
+      'toplevel',
+      'blink.console',
+      'devtools.timeline',
+      'disabled-by-default-devtools.timeline',
+      'disabled-by-default-devtools.timeline.frame',
+      'disabled-by-default-devtools.timeline.stack',
+      'disabled-by-default-devtools.screenshot',
+      'disabled-by-default-v8.cpu_profile'
     ];
   }
 
@@ -43,7 +43,7 @@ class ChromeProtocol {
         return resolve(this._instance);
       }
 
-      chromeremoteinterface({ /* github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
+      chromeremoteinterface({ /* https://github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
         instance => {
           this._instance = instance;
           resolve(instance);
@@ -70,24 +70,25 @@ class ChromeProtocol {
   subscribeToServiceWorkerDetails(fn) {
     var chrome = this._instance;
 
-    return new Promise(function(res, rej) {
+    return new Promise(function(resolve, reject) {
       chrome.ServiceWorker.enable();
       // chrome.on("ServiceWorker.workerCreated", log)
       // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
-      chrome.on("ServiceWorker.workerVersionUpdated", data => {
-        res(fn(data));
+      chrome.on('ServiceWorker.workerVersionUpdated', data => {
+        resolve(fn(data));
       });
     });
   }
 
   static getEvaluationContextFor(url, instance) {
-    return new Promise((res, rej) => {
-      var errorTimeout = setTimeout((_ => rej(new Error(`No Evaluation context found for ${url}`))), 4000);
+    return new Promise((resolve, reject) => {
+      var errorTimeout = setTimeout((_ =>
+          reject(new Error(`No Evaluation context found for ${url}`))), 4000);
 
       instance.on('Runtime.executionContextCreated', evalContext => {
         if (evalContext.context.origin.indexOf(url) !== -1) {
           clearTimeout(errorTimeout);
-          res(evalContext.context.id);
+          resolve(evalContext.context.id);
         }
       });
     });
@@ -128,7 +129,8 @@ class ChromeProtocol {
         obj.props = {};
         if (Array.isArray(propsResult.result)) {
           propsResult.result.forEach(prop => {
-            obj.props[prop.name] = prop.value ? prop.value.value : prop.get.description;
+            obj.props[prop.name] = prop.value ? prop.value.value :
+                prop.get.description;
           });
         }
         resolve(obj);
@@ -144,7 +146,7 @@ class ChromeProtocol {
       this._instance.Page.enable();
       this._instance.Tracing.start({
         categories: this.categories.join(','),
-        options: "sampling-frequency=10000"  // 1000 is default and too slow.
+        options: 'sampling-frequency=10000'  // 1000 is default and too slow.
       }, (err, data) => {
         if (err) {
           reject(data);
