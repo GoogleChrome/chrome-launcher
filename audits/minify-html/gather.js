@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 var MinifyHtmlGatherer = {
-  /* eslint-disable no-unused-vars */
   run: function(driver, url) {
-    /* eslint-enable */
-
-    /* somehow get the html resources from a given page
-      and return {htmlSources: [{
-      filename: '....',
-      source: '....'
-      }]} */
-
-    console.warn('todo implement minify html gatherer');
-
-    return Promise.resolve({
-      htmlSources: []
-    });
+    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
+      .then(driver.getPageHTML)
+      .then(html => ({html}));
   }
 };
 

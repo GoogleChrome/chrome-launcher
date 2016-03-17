@@ -14,29 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-function hasCorrectViewportMetaQuery(obj) {
-  var ret;
-
-  if (obj.type === 'object' && obj.subtype === 'null') {
-    ret = {pass: false};
-  } else if (obj.subtype === 'node' && obj.props.content.includes('width=')) {
-    ret = {pass: true};
-  } else {
-    throw new Error('Unexpected viewport elements.');
-  }
-
-  return ret;
-}
+'use strict';
 
 module.exports = function(data) {
-  if (data.viewportMetaQuery === undefined) {
-    throw new Error('viewport meta auditor requires viewport meta query data');
-  }
+  let viewportElement = data.viewportElement;
+  let hasValidViewport = viewportElement.type === 'object' &&
+      viewportElement.subtype === 'node' &&
+      viewportElement.props.content.includes('width=');
 
-  return Promise.resolve({
-    hasCorrectViewportMetaQuery: hasCorrectViewportMetaQuery(
-                                     data.viewportMetaQuery)
-  });
+  return {
+    'viewport-meta-tag': hasValidViewport
+  };
 };
 

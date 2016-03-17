@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
-var chromeremoteinterface = require('chrome-remote-interface');
+const chromeRemoteInterface = require('chrome-remote-interface');
+
+const EXECUTION_CONTEXT_TIMEOUT = 4000;
 
 class ChromeProtocol {
-
   constructor(opts) {
     opts = opts || {};
 
@@ -35,25 +35,36 @@ class ChromeProtocol {
       'disabled-by-default-devtools.screenshot',
       'disabled-by-default-v8.cpu_profile'
     ];
+
+    this._traceEvents = [];
+    this._currentURL = null;
+    this._instance = null;
+
+    this.getPageHTML = this.getPageHTML.bind(this);
+    this.evaluateFunction = this.evaluateFunction.bind(this);
+    this.evaluateScript = this.evaluateScript.bind(this);
+    this.getServiceWorkerRegistrations =
+        this.getServiceWorkerRegistrations.bind(this);
+    this.beginTrace = this.beginTrace.bind(this);
+    this.endTrace = this.endTrace.bind(this);
   }
 
-  _requestTab() {
-    return new Promise((resolve, reject) => {
-      if (this._instance) {
-        return resolve(this._instance);
-      }
-
-      chromeremoteinterface({ /* https://github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback */ },
-        instance => {
-          this._instance = instance;
-          resolve(instance);
-        }
-      ).on('error', e => reject(e));
-    });
+  get WAIT_FOR_LOAD() {
+    return true;
   }
 
-  discardTab() {
-    this._instance.close();
+  getInstance() {
+    if (!this._instance) {
+      this._instance = new Promise((resolve, reject) => {
+        // @see: github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback
+        const OPTIONS = {};
+        chromeRemoteInterface(OPTIONS,
+          resolve
+        ).on('error', e => reject(e));
+      });
+    }
+
+    return this._instance;
   }
 
   resetFailureTimeout(reject) {
@@ -62,30 +73,56 @@ class ChromeProtocol {
     }
 
     this.timeoutID = setTimeout(_ => {
-      this.discardTab();
+      // FIXME
+      // this.discardTab();
       reject(new Error('Trace retrieval timed out'));
-    }, 15 * 1000);
+    }, 15000);
   }
 
-  subscribeToServiceWorkerDetails(fn) {
-    var chrome = this._instance;
-
-    return new Promise(function(resolve, reject) {
-      chrome.ServiceWorker.enable();
-      // chrome.on("ServiceWorker.workerCreated", log)
-      // chrome.on("ServiceWorker.workerRegistrationUpdated", log)
-      chrome.on('ServiceWorker.workerVersionUpdated', data => {
-        resolve(fn(data));
+  getServiceWorkerRegistrations() {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
+        chrome.ServiceWorker.enable();
+        chrome.on('ServiceWorker.workerVersionUpdated', data => {
+          resolve(data);
+        });
       });
     });
   }
 
-  static getEvaluationContextFor(url, instance) {
+  getPageHTML() {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
+        chrome.send('DOM.getDocument', null, (docErr, docResult) => {
+          if (docErr) {
+            return reject(docErr);
+          }
+
+          let nodeId = {
+            nodeId: docResult.root.nodeId
+          };
+
+          chrome.send('DOM.getOuterHTML', nodeId, (htmlErr, htmlResult) => {
+            if (htmlErr) {
+              return reject(htmlErr);
+            }
+
+            resolve(htmlResult.outerHTML);
+          });
+        });
+      });
+    });
+  }
+
+  static getEvaluationContextFor(chrome, url) {
     return new Promise((resolve, reject) => {
       var errorTimeout = setTimeout((_ =>
-          reject(new Error(`No Evaluation context found for ${url}`))), 4000);
+        reject(new Error(`Timed out waiting for ${url} execution context`))),
+      EXECUTION_CONTEXT_TIMEOUT);
 
-      instance.on('Runtime.executionContextCreated', evalContext => {
+      chrome.Runtime.enable();
+      chrome.on('Runtime.executionContextCreated', evalContext => {
+        // console.info(`executionContext: "${evalContext.context.origin}"`);
         if (evalContext.context.origin.indexOf(url) !== -1) {
           clearTimeout(errorTimeout);
           resolve(evalContext.context.id);
@@ -94,80 +131,106 @@ class ChromeProtocol {
     });
   }
 
-  evaluateFunction(fn, url) {
-    var wrappedScriptStr = '(' + fn.toString() + ')()';
-    return this.evaluateString(wrappedScriptStr, url);
+  evaluateFunction(url, fn) {
+    let wrappedScriptStr = '(' + fn.toString() + ')()';
+    return this.evaluateScript(url, wrappedScriptStr);
   }
 
-  evaluateString(scriptStr, url) {
-    var chrome = this._instance;
+  evaluateScript(url, scriptSrc) {
+    return this.getInstance().then(chrome => {
+      // Set up executionContext listener before navigation.
+      let contextListener = ChromeProtocol.getEvaluationContextFor(chrome, url);
 
-    chrome.Runtime.enable();
-    return ChromeProtocol.getEvaluationContextFor(url, chrome)
-      .then(contextId => {
-        return new Promise((resolve, reject) => {
-          var evalOpts = {
-            expression: scriptStr,
+      return this.gotoURL(url, this.WAIT_FOR_LOAD)
+        .then(_ => contextListener)
+        .then(contextId => new Promise((resolve, reject) => {
+          let evalOpts = {
+            expression: scriptSrc,
             contextId: contextId
           };
           chrome.Runtime.evaluate(evalOpts, (err, evalResult) => {
             if (err || evalResult.wasThrown) {
               return reject(evalResult);
             }
-            getObjectDetails(evalResult.result, resolve);
-          });
-        });
-      });
 
-    function getObjectDetails(obj, resolve) {
-      chrome.Runtime.getProperties({
-        objectId: obj.objectId
-      }, (err, propsResult) => {
-        if (err) {
-          /* continue anyway */
-        }
-        obj.props = {};
-        if (Array.isArray(propsResult.result)) {
-          propsResult.result.forEach(prop => {
-            obj.props[prop.name] = prop.value ? prop.value.value :
-                prop.get.description;
+            let result = evalResult.result;
+
+            chrome.Runtime.getProperties({
+              objectId: result.objectId
+            }, (err, propsResult) => {
+              if (err) {
+                /* continue anyway */
+              }
+              result.props = {};
+              if (Array.isArray(propsResult.result)) {
+                propsResult.result.forEach(prop => {
+                  result.props[prop.name] = prop.value ? prop.value.value :
+                      prop.get.description;
+                });
+              }
+              resolve(result);
+            });
           });
-        }
-        resolve(obj);
-      });
-    }
+        }));
+    });
   }
 
-  profilePageLoad(url) {
-    return new Promise((function(resolve, reject) {
-      var rawEvents = [];
-      this.resetFailureTimeout(reject);
+  gotoURL(url, waitForLoad) {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
+        chrome.Page.enable();
+        chrome.Page.navigate({url}, (err, response) => {
+          if (err) {
+            reject(err);
+          }
 
-      this._instance.Page.enable();
-      this._instance.Tracing.start({
+          if (waitForLoad) {
+            chrome.Page.loadEventFired(_ => {
+              this._currentURL = url;
+              resolve(response);
+            });
+          } else {
+            resolve(response);
+          }
+        });
+      });
+    });
+  }
+
+  beginTrace() {
+    this._traceEvents = [];
+
+    return this.getInstance().then(chrome => {
+      chrome.Page.enable();
+      chrome.Tracing.start({
         categories: this.categories.join(','),
         options: 'sampling-frequency=10000'  // 1000 is default and too slow.
-      }, (err, data) => {
-        if (err) {
-          reject(data);
-        }
       });
 
-      this._instance.Page.navigate({url: url});
-      this._instance.Page.loadEventFired(_ => {
-        this._instance.Tracing.end();
+      chrome.Tracing.dataCollected(data => {
+        this._traceEvents.push(...data.value);
+      });
+
+      return true;
+    });
+  }
+
+  disableCaching() {
+    // TODO(paullewis): implement.
+    return Promise.resolve(true);
+  }
+
+  endTrace() {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
+        chrome.Tracing.end();
         this.resetFailureTimeout(reject);
-      });
 
-      this._instance.Tracing.dataCollected(function(data) {
-        rawEvents = rawEvents.concat(data.value);
+        chrome.Tracing.tracingComplete(_ => {
+          resolve(this._traceEvents);
+        });
       });
-
-      this._instance.Tracing.tracingComplete(_ => {
-        resolve(rawEvents);
-        // this.discardTab(); // FIXME: close connection later
-      });
-    }).bind(this));
+    });
   }
 }
 
