@@ -27,7 +27,7 @@ Promise.resolve(driver).then(gatherer([
   require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
   require('./audits/service-worker/gather'),
-  require('./audits/time-in-javascript/gather')
+  require('./gatherers/trace')
 ], URL)).then(auditor([
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),

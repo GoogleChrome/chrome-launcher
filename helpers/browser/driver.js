@@ -18,6 +18,8 @@
 
 const chromeRemoteInterface = require('chrome-remote-interface');
 
+var NetworkRecorder = require('../network-recorder');
+
 const EXECUTION_CONTEXT_TIMEOUT = 4000;
 
 class ChromeProtocol {
@@ -39,6 +41,8 @@ class ChromeProtocol {
     this._traceEvents = [];
     this._currentURL = null;
     this._instance = null;
+    this._networkRecords = [];
+    this._networkRecorder = null;
 
     this.getPageHTML = this.getPageHTML.bind(this);
     this.evaluateFunction = this.evaluateFunction.bind(this);
@@ -47,6 +51,8 @@ class ChromeProtocol {
         this.getServiceWorkerRegistrations.bind(this);
     this.beginTrace = this.beginTrace.bind(this);
     this.endTrace = this.endTrace.bind(this);
+    this.beginNetworkCollect = this.beginNetworkCollect.bind(this);
+    this.endNetworkCollect = this.endNetworkCollect.bind(this);
   }
 
   get WAIT_FOR_LOAD() {
@@ -197,6 +203,11 @@ class ChromeProtocol {
     });
   }
 
+  disableCaching() {
+    // TODO(paullewis): implement.
+    return Promise.resolve();
+  }
+
   beginTrace() {
     this._traceEvents = [];
 
@@ -215,11 +226,6 @@ class ChromeProtocol {
     });
   }
 
-  disableCaching() {
-    // TODO(paullewis): implement.
-    return Promise.resolve(true);
-  }
-
   endTrace() {
     return this.getInstance().then(chrome => {
       return new Promise((resolve, reject) => {
@@ -231,6 +237,59 @@ class ChromeProtocol {
         });
       });
     });
+  }
+
+  beginNetworkCollect() {
+    return this.getInstance().then(chrome =>
+      new Promise((resolve, reject) => {
+        this._networkRecords = [];
+        this._networkRecorder = new NetworkRecorder(this._networkRecords);
+
+        chrome.on('Network.requestWillBeSent',
+            this._networkRecorder.onRequestWillBeSent);
+        chrome.on('Network.requestServedFromCache',
+            this._networkRecorder.onRequestServedFromCache);
+        chrome.on('Network.responseReceived',
+            this._networkRecorder.onResponseReceived);
+        chrome.on('Network.dataReceived',
+            this._networkRecorder.onDataReceived);
+        chrome.on('Network.loadingFinished',
+            this._networkRecorder.onLoadingFinished);
+        chrome.on('Network.loadingFailed',
+            this._networkRecorder.onLoadingFailed);
+
+        chrome.Network.enable();
+        chrome.once('ready', _ => {
+          resolve();
+        });
+      })
+    );
+  }
+
+  endNetworkCollect() {
+    return this.getInstance().then(chrome =>
+      new Promise((resolve, reject) => {
+        chrome.removeListener('Network.requestWillBeSent',
+            this._networkRecorder.onRequestWillBeSent);
+        chrome.removeListener('Network.requestServedFromCache',
+            this._networkRecorder.onRequestServedFromCache);
+        chrome.removeListener('Network.responseReceived',
+            this._networkRecorder.onResponseReceived);
+        chrome.removeListener('Network.dataReceived',
+            this._networkRecorder.onDataReceived);
+        chrome.removeListener('Network.loadingFinished',
+            this._networkRecorder.onLoadingFinished);
+        chrome.removeListener('Network.loadingFailed',
+            this._networkRecorder.onLoadingFailed);
+
+        chrome.Network.disable();
+        chrome.once('ready', _ => {
+          resolve(this._networkRecords);
+          this._networkRecorder = null;
+          this._networkRecords = [];
+        });
+      })
+    );
   }
 }
 
