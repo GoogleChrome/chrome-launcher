@@ -305,12 +305,17 @@ var ManifestParser = (function() {
 
 var d = document;
 
-var hasManifest = () => {
-  var link = d.querySelector('link[rel=manifest]');
-  return !!link;
+var hasManifest = chrome => {
+  return new Promise((res, reject) => {
+    chrome.tabs.executeScript(null, {
+      code: '!!document.querySelector("link[rel=manifest]")'
+    }, ret => {
+      res(`has manifest: ${ret}`);
+    });
+  });
 };
 
-const parseManifest = Promise.resolve().then(() => {
+const parseManifest = Promise.resolve().then(_ => {
   var link = d.querySelector('link[rel=manifest]');
   return fetch(link.href);
 })
@@ -395,15 +400,10 @@ var tests = [
   [hasServiceWorkerRegistration, 'Site is has a service worker registration']
 ];
 
-export function runPwaTests() {
-  var results = tests.map(t => {
-    // put the call to the function in a promise.
-    /* eslint-disable no-unused-vars */
-    return Promise.resolve().then(_ => t[0]()).then(r => {
-      return `${t[1]}: ${r}`;
-    }).catch(r => `${t[1]}: false`);
-    /* eslint-enable */
+export function runPwaTests(chrome) {
+  return new Promise((res, reject) => {
+    tests[0][0](chrome).then(r => {
+      res(r);
+    });
   });
-
-  return Promise.all(results);
 }

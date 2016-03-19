@@ -5,9 +5,8 @@ document.addEventListener('DOMContentLoaded', _ => {
 });
 
 function checkPWA() {
-  document.body.innerHTML += 'wow';
-  runPwaTests().then(_ => {
-    document.body.innerHTML = 'kk';
+  runPwaTests(chrome).then(ret => {
+    document.body.innerHTML = ret;
   });
 }
 
