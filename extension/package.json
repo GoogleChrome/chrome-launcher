@@ -29,21 +29,5 @@
     "rollup-plugin-babel": "^2.4.0",
     "run-sequence": "^1.1.5",
     "wiredep": "^3.0.0"
-  },
-  "eslintConfig": {
-    "env": {
-      "node": true,
-      "browser": true
-    },
-    "globals": {
-      "chrome": true
-    },
-    "rules": {
-      "eol-last": 0,
-      "quotes": [
-        2,
-        "single"
-      ]
-    }
   }
 }
