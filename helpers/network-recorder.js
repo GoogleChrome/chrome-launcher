@@ -41,7 +41,7 @@ global.WebInspector = {
     return this._moduleSettings[settingName];
   }
 };
-// Enum from chromium/src/out/Debug/gen/devtools/inspector.js
+// Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
 global.NetworkAgent = {
   RequestMixedContentType: {
     Blockable: 'blockable',
@@ -49,7 +49,7 @@ global.NetworkAgent = {
     None: 'none'
   }
 };
-// Enum from chromium/src/out/Debug/gen/devtools/inspector.js
+// Enum from SecurityState enum in protocol's Security domain
 global.SecurityAgent = {
   SecurityState: {
     Unknown: 'unknown',
