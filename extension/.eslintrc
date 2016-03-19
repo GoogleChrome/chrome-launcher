@@ -4,7 +4,8 @@
     "browser": true
   },
   "globals": {
-    "chrome": true
+    "chrome": true,
+    "__lighthouse": true,
   },
   "rules": {
     "max-len": [2, 100, {
@@ -28,6 +29,7 @@
     }],
     "quotes": [2, "single"],
     "require-jsdoc": "off",
-    "valid-jsdoc": "off"
+    "valid-jsdoc": "off",
+    "comma-dangle": "off",
   }
 }
