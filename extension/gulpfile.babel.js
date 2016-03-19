@@ -82,6 +82,7 @@ gulp.task('chromeManifest', () => {
 gulp.task('babel', () => {
   return gulp.src([
     'app/scripts.babel/app.js',
+    'app/scripts.babel/chromereload.js',
     'app/scripts.babel/background.js'])
     .pipe($.rollup({
       sourceMap: true
