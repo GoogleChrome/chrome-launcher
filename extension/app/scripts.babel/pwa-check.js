@@ -1,4 +1,3 @@
-/**
 var ManifestParser = (function() {
   'use strict';
 
@@ -29,7 +28,7 @@ var ManifestParser = (function() {
       return undefined;
     }
 
-    if (typeof object[property] != 'string') {
+    if (typeof object[property] !== 'string') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a string but is not.');
       return undefined;
@@ -49,7 +48,7 @@ var ManifestParser = (function() {
       return defaultValue;
     }
 
-    if (typeof object[property] != 'boolean') {
+    if (typeof object[property] !== 'boolean') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a boolean but is not.');
       return defaultValue;
@@ -61,15 +60,12 @@ var ManifestParser = (function() {
   function _parseURL(args) {
     var object = args.object;
     var property = args.property;
-    var baseURL = args.baseURL;
 
     var str = _parseString({object: object, property: property, trim: false});
     if (str === undefined) {
       return undefined;
     }
 
-    // TODO: resolve url using baseURL
-    // new URL(object[property], baseURL);
     return object[property];
   }
 
@@ -80,7 +76,7 @@ var ManifestParser = (function() {
       return undefined;
     }
 
-    if (typeof object[property] != 'string') {
+    if (typeof object[property] !== 'string') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a string but is not.');
       return undefined;
@@ -91,12 +87,12 @@ var ManifestParser = (function() {
     var dummy = document.createElement('div');
     dummy.style.color = 'white';
     dummy.style.color = object[property];
-    if (dummy.style.color != 'white') {
+    if (dummy.style.color !== 'white') {
       return object[property];
     }
     dummy.style.color = 'black';
     dummy.style.color = object[property];
-    if (dummy.style.color != 'black') {
+    if (dummy.style.color !== 'black') {
       return object[property];
     }
     return undefined;
@@ -113,7 +109,6 @@ var ManifestParser = (function() {
   }
 
   function _parseStartUrl() {
-    // TODO: parse url using manifest_url as a base (missing).
     return _parseURL({object: _jsonInput, property: 'start_url'});
   }
 
@@ -125,7 +120,7 @@ var ManifestParser = (function() {
       return display;
     }
 
-    if (ALLOWED_DISPLAY_VALUES.indexOf(display.toLowerCase()) == -1) {
+    if (ALLOWED_DISPLAY_VALUES.indexOf(display.toLowerCase()) === -1) {
       _logs.push('ERROR: \'display\' has an invalid value, will be ignored.');
       return undefined;
     }
@@ -141,7 +136,7 @@ var ManifestParser = (function() {
       return orientation;
     }
 
-    if (ALLOWED_ORIENTATION_VALUES.indexOf(orientation.toLowerCase()) == -1) {
+    if (ALLOWED_ORIENTATION_VALUES.indexOf(orientation.toLowerCase()) === -1) {
       _logs.push('ERROR: \'orientation\' has an invalid value' +
           ', will be ignored.');
       return undefined;
@@ -169,7 +164,6 @@ var ManifestParser = (function() {
       if (!('src' in object)) {
         return;
       }
-      // TODO: pass manifest url as base.
       icon.src = _parseURL({object: object, property: 'src'});
       icon.type = _parseString({object: object,
                                  property: 'type',
@@ -189,7 +183,7 @@ var ManifestParser = (function() {
           set.add(link.sizes.item(i).toLowerCase());
         }
 
-        if (set.size != 0) {
+        if (set.size !== 0) {
           icon.sizes = set;
         }
       }
@@ -222,7 +216,6 @@ var ManifestParser = (function() {
       application.id = _parseString({object: object,
                                       property: 'id',
                                       trim: true});
-      // TODO: pass manfiest url as base.
       application.url = _parseURL({object: object, property: 'url'});
       applications.push(application);
     });
@@ -245,7 +238,6 @@ var ManifestParser = (function() {
   }
 
   function _parse(string) {
-    // TODO: temporary while ManifestParser is a collection of static methods.
     _logs = [];
     _tips = [];
     _success = true;
@@ -268,7 +260,7 @@ var ManifestParser = (function() {
     _logs.push('JSON parsed successfully.');
 
     _manifest.name = _parseName();
-    //jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+    /*eslint-disable*/
     _manifest.short_name = _parseShortName();
     _manifest.start_url = _parseStartUrl();
     _manifest.display = _parseDisplay();
@@ -299,15 +291,15 @@ var ManifestParser = (function() {
         _manifest.theme_color);
     _logs.push('Parsed `background_color` property is: ' +
         _manifest.background_color);
-    //jscs:enable
+    /*eslint-enable*/
   }
 
   return {
     parse: _parse,
-    manifest: function() { return _manifest; },
-    logs: function() { return _logs; },
-    tips: function() { return _tips; },
-    success: function() { return _success; }
+    manifest: _ => _manifest,
+    logs: _ => _logs,
+    tips: _ => _tips,
+    success: _ => _success
   };
 })();
 
@@ -328,95 +320,90 @@ const parseManifest = Promise.resolve().then(() => {
   return ManifestParser.manifest();
 });
 
-var hasManifestThemeColor = () => {
+var hasManifestThemeColor = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.theme_color;
   });
 };
 
-var hasManifestBackgroundColor = () => {
+var hasManifestBackgroundColor = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.background_color;
   });
 };
 
-var hasManifestIcons = () => {
+var hasManifestIcons = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.icons;
   });
 };
 
-var hasManifestIcons192 = () => {
+var hasManifestIcons192 = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.icons.find(function(i) {
-        return i.sizes.has("192x192");
+      return i.sizes.has('192x192');
     });
   });
 };
 
-var hasManifestShortName = () => {
+var hasManifestShortName = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.short_name;
   });
 };
 
-var hasManifestName = () => {
+var hasManifestName = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.name;
   });
 };
 
-var hasManifestStartUrl = () => {
+var hasManifestStartUrl = _ => {
   return parseManifest.then(manifest => {
     return !!manifest.start_url;
   });
 };
 
-var hasCanonicalUrl = () => {
+var hasCanonicalUrl = _ => {
   var link = d.querySelector('link[rel=canonical]');
 
   return !!link;
 };
 
-var isControlledByServiceWorker = () => {
+var isControlledByServiceWorker = _ => {
   return !!(navigator.serviceWorker.controller);
 };
 
-var hasServiceWorkerRegistration = () => {
+var hasServiceWorkerRegistration = _ => {
   return navigator.serviceWorker.getRegistration().then(r => !!r);
 };
 
-var isOnHTTPS = () => location.protocol == 'https:';
+var isOnHTTPS = _ => location.protocol === 'https:';
 
 var tests = [
-  [hasManifest, "Has a manifest"],
-  [isOnHTTPS, "Site is on HTTPS"],
-  [hasCanonicalUrl, "Site has a canonical URL"],
-  [hasManifestThemeColor, "Site manifest has theme_color"],
-  [hasManifestBackgroundColor, "Site manifest has background_color"],
-  [hasManifestStartUrl, "Site manifest has start_url"],
-  [hasManifestShortName, "Site manifest has short_name"],
-  [hasManifestName, "Site manifest has name"],
-  [hasManifestIcons, "Site manifest has icons defined"],
-  [hasManifestIcons192, "Site manifest has 192px icon"],
-  [isControlledByServiceWorker, "Site is currently controlled by a service worker"],
-  [hasServiceWorkerRegistration, "Site is has a service worker registration"]
+  [hasManifest, 'Has a manifest'],
+  [isOnHTTPS, 'Site is on HTTPS'],
+  [hasCanonicalUrl, 'Site has a canonical URL'],
+  [hasManifestThemeColor, 'Site manifest has theme_color'],
+  [hasManifestBackgroundColor, 'Site manifest has background_color'],
+  [hasManifestStartUrl, 'Site manifest has start_url'],
+  [hasManifestShortName, 'Site manifest has short_name'],
+  [hasManifestName, 'Site manifest has name'],
+  [hasManifestIcons, 'Site manifest has icons defined'],
+  [hasManifestIcons192, 'Site manifest has 192px icon'],
+  [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
+  [hasServiceWorkerRegistration, 'Site is has a service worker registration']
 ];
 
 export function runPwaTests() {
-  var results = tests.map((t) => {
+  var results = tests.map(t => {
     // put the call to the function in a promise.
-    return Promise.resolve().then(() => t[0]()).then(r => `${t[1]}: ${r}`).catch(r => `${t[1]}: false`);
+    /* eslint-disable no-unused-vars */
+    return Promise.resolve().then(_ => t[0]()).then(r => {
+      return `${t[1]}: ${r}`;
+    }).catch(r => `${t[1]}: false`);
+    /* eslint-enable */
   });
 
-  // Some voodoo by Jake.
-  results.reduce((chain, item) => {
-    return chain.then(() => item).then(r => document.body.innerHTML += r);
-  }, Promise.resolve());
+  return Promise.all(results);
 }
-**/
-
-function foo() {
-}
-
-export {foo};
