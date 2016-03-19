@@ -28,6 +28,7 @@ class ChromeProtocol {
       '-*', // exclude default
       'toplevel',
       'blink.console',
+      'blink.user_timing',
       'devtools.timeline',
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',

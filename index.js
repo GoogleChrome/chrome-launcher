@@ -27,12 +27,14 @@ Promise.resolve(driver).then(gatherer([
   require('./audits/viewport-meta-tag/gather'),
   require('./audits/minify-html/gather'),
   require('./audits/service-worker/gather'),
-  require('./audits/time-in-javascript/gather')
+  require('./audits/time-in-javascript/gather'),
+  require('./metrics/first-meaningful-paint/gather')
 ], URL)).then(auditor([
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),
   require('./audits/time-in-javascript/audit'),
-  require('./audits/viewport-meta-tag/audit')
+  require('./audits/viewport-meta-tag/audit'),
+  require('./metrics/first-meaningful-paint/audit')
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
