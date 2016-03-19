@@ -1,5 +1,10 @@
 # lighthouse
 
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px">
+</p>
+
+
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 
 _status: very early. mostly not working_

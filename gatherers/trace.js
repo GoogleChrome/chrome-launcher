@@ -16,19 +16,37 @@
  */
 'use strict';
 
-var TimeInJavascript = {
+const PAUSE_AFTER_LOAD = 3000;
+
+var TraceGatherer = {
   run: function(driver, url) {
+    let artifacts = {};
+
     return driver.disableCaching()
-      // Fire up the trace.
+      // Begin trace and network recording.
       .then(driver.beginTrace)
+      .then(driver.beginNetworkCollect)
 
       // Go to the URL.
       .then(_ => driver.gotoURL(url, driver.WAIT_FOR_LOAD))
 
-      // Stop the trace, which captures the records.
+      // Pause after load
+      .then(_ => new Promise((resolve, reject) => {
+        setTimeout(resolve, PAUSE_AFTER_LOAD);
+      }))
+
+      // Stop recording and save the results.
+      .then(driver.endNetworkCollect)
+      .then(networkRecords => {
+        artifacts.networkRecords = networkRecords;
+      })
       .then(driver.endTrace)
-      .then(traceContents => ({traceContents}));
+      .then(traceContents => {
+        artifacts.traceContents = traceContents;
+      })
+
+      .then(_ => artifacts);
   }
 };
 
-module.exports = TimeInJavascript;
+module.exports = TraceGatherer;
