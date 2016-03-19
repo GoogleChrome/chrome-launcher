@@ -23,9 +23,10 @@ module.exports = function(data) {
   var events = model.timelineModel().mainThreadEvents();
 
   var navStartEvent = events.filter(e => e.name === 'navigationStart');
-  var firstTextPaintEvent = events.filter(e =>
-    e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint'
-  );
+  var firstTextPaintEvent = events.filter(function findFirstTextPaint(e){
+    return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint';
+  });
+  if ()
   var duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
 
   return {
