@@ -80,7 +80,12 @@ gulp.task('chromeManifest', () => {
 });
 
 gulp.task('babel', () => {
-  return gulp.src('app/scripts.babel/**/*.js')
+  return gulp.src([
+      'app/scripts.babel/app.js',
+      'app/scripts.babel/background.js'])
+      .pipe($.rollup({
+        sourceMap: true
+      }))
       .pipe($.babel({
         presets: ['es2015']
       }))

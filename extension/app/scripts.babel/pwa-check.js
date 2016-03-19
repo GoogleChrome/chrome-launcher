@@ -415,3 +415,8 @@ export function runPwaTests() {
   }, Promise.resolve());
 }
 **/
+
+function foo() {
+}
+
+export {foo};

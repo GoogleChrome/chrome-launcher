@@ -1,4 +1,4 @@
-import {runPwaTests} from './pwa-check.js';
+import {foo} from './pwa-check.js';
 
 document.addEventListener('DOMContentLoaded', _ => {
   document.querySelector('#pwa').addEventListener('click', checkPWA);
@@ -6,6 +6,6 @@ document.addEventListener('DOMContentLoaded', _ => {
 
 function checkPWA() {
   document.body.innerHTML += 'wow';
-  runPwaTests();
+  foo();
 }
 
