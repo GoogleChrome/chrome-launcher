@@ -21,17 +21,19 @@ module.exports = function(data) {
   // FIXME(paulirish) save the trace to file in debug file for later analysis.
   var model = new DevtoolsTimelineModel(data.traceContents);
   var events = model.timelineModel().mainThreadEvents();
+  var ret = {};
 
   var navStartEvent = events.filter(e => e.name === 'navigationStart');
-  var firstTextPaintEvent = events.filter(function findFirstTextPaint(e){
+  var firstTextPaintEvent = events.filter(function findFirstTextPaint(e) {
     return e.categoriesString.includes('blink.user_timing') && e.name === 'firstTextPaint';
   });
-  if ()
-  var duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
+  if (firstTextPaintEvent.length && navStartEvent.length) {
+    ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
+  } else {
+    ret.fault = 'First meaningful paint metric not found';
+  }
 
   return {
-    'first-meaningful-paint': {
-      duration: duration
-    }
+    'first-meaningful-paint': ret
   };
 };
