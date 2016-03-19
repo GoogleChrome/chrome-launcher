@@ -23,8 +23,8 @@ gulp.task('extras', () => {
 function lint(files, options) {
   return () => {
     return gulp.src(files)
-      .pipe($.eslint(options))
-      .pipe($.eslint.format());
+    .pipe($.eslint(options))
+    .pipe($.eslint.format());
   };
 }
 
@@ -36,60 +36,60 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-    .pipe($.if($.if.isFile, $.cache($.imagemin({
-      progressive: true,
-      interlaced: true,
-      // don't remove IDs from SVGs, they are often used
-      // as hooks for embedding and styling
-      svgoPlugins: [{cleanupIDs: false}]
-    }))
-    .on('error', function (err) {
-      console.log(err);
-      this.end();
-    })))
-    .pipe(gulp.dest('dist/images'));
+  .pipe($.if($.if.isFile, $.cache($.imagemin({
+    progressive: true,
+    interlaced: true,
+    // don't remove IDs from SVGs, they are often used
+    // as hooks for embedding and styling
+    svgoPlugins: [{cleanupIDs: false}]
+  }))
+  .on('error', function (err) {
+    console.log(err);
+    this.end();
+  })))
+  .pipe(gulp.dest('dist/images'));
 });
 
 gulp.task('html',  () => {
   return gulp.src('app/*.html')
-    .pipe($.sourcemaps.init())
-    .pipe($.if('*.js', $.uglify()))
+  .pipe($.sourcemaps.init())
+  .pipe($.if('*.js', $.uglify()))
     .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
-    .pipe($.sourcemaps.write())
-    .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
-    .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
-    .pipe(gulp.dest('dist'));
+  .pipe($.sourcemaps.write())
+  .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
+  .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
+  .pipe(gulp.dest('dist'));
 });
 
 gulp.task('chromeManifest', () => {
   return gulp.src('app/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: true,
-      background: {
-        target: 'scripts/background.js',
-        exclude: [
-          'scripts/chromereload.js'
-        ]
-      }
+  .pipe($.chromeManifest({
+    buildnumber: true,
+    background: {
+      target: 'scripts/background.js',
+      exclude: [
+        'scripts/chromereload.js'
+      ]
+    }
   }))
   .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
   .pipe($.if('*.js', $.sourcemaps.init()))
-  .pipe($.if('*.js', $.uglify()))
-  .pipe($.if('*.js', $.sourcemaps.write('.')))
-  .pipe(gulp.dest('dist'));
+    .pipe($.if('*.js', $.uglify()))
+      .pipe($.if('*.js', $.sourcemaps.write('.')))
+        .pipe(gulp.dest('dist'));
 });
 
 gulp.task('babel', () => {
   return gulp.src([
-      'app/scripts.babel/app.js',
-      'app/scripts.babel/background.js'])
-      .pipe($.rollup({
-        sourceMap: true
-      }))
-      .pipe($.babel({
-        presets: ['es2015']
-      }))
-      .pipe(gulp.dest('app/scripts'));
+    'app/scripts.babel/app.js',
+    'app/scripts.babel/background.js'])
+    .pipe($.rollup({
+      sourceMap: true
+    }))
+    .pipe($.babel({
+      presets: ['es2015']
+    }))
+    .pipe(gulp.dest('app/scripts'));
 });
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
@@ -115,17 +115,17 @@ gulp.task('size', () => {
 
 gulp.task('wiredep', () => {
   gulp.src('app/*.html')
-    .pipe(wiredep({
-      ignorePath: /^(\.\.\/)*\.\./
-    }))
-    .pipe(gulp.dest('app'));
+  .pipe(wiredep({
+    ignorePath: /^(\.\.\/)*\.\./
+  }))
+  .pipe(gulp.dest('app'));
 });
 
 gulp.task('package', function () {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.zip('lighthouse-' + manifest.version + '.zip'))
-      .pipe(gulp.dest('package'));
+  .pipe($.zip('lighthouse-' + manifest.version + '.zip'))
+  .pipe(gulp.dest('package'));
 });
 
 gulp.task('build', (cb) => {
