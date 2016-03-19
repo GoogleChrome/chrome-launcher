@@ -240,8 +240,8 @@ class ChromeProtocol {
   }
 
   beginNetworkCollect() {
-    return this.getInstance().then(chrome =>
-      new Promise((resolve, reject) => {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
         this._networkRecords = [];
         this._networkRecorder = new NetworkRecorder(this._networkRecords);
 
@@ -262,13 +262,13 @@ class ChromeProtocol {
         chrome.once('ready', _ => {
           resolve();
         });
-      })
-    );
+      });
+    });
   }
 
   endNetworkCollect() {
-    return this.getInstance().then(chrome =>
-      new Promise((resolve, reject) => {
+    return this.getInstance().then(chrome => {
+      return new Promise((resolve, reject) => {
         chrome.removeListener('Network.requestWillBeSent',
             this._networkRecorder.onRequestWillBeSent);
         chrome.removeListener('Network.requestServedFromCache',
@@ -288,8 +288,8 @@ class ChromeProtocol {
           this._networkRecorder = null;
           this._networkRecords = [];
         });
-      })
-    );
+      });
+    });
   }
 }
 
