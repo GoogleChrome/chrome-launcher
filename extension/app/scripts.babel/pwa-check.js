@@ -7,6 +7,10 @@ var hasManifest = _ => {
 var parseManifest = function() {
   var link = document.querySelector('link[rel=manifest]');
 
+  if (!link) {
+    return {};
+  }
+
   var request = new XMLHttpRequest();
   request.open('GET', link.href, false);  // `false` makes the request synchronous
   request.send(null);
@@ -42,6 +46,10 @@ var hasManifestIcons = _ => {
 
 var hasManifestIcons192 = _ => {
   let manifest = __lighthouse.parseManifest();
+
+  if (!manifest.icons) {
+    return false;
+  }
 
   return !!manifest.icons.find(function(i) {
     return i.sizes.has('192x192');
