@@ -1,2 +1,5 @@
 # Igore js files inside local chromium download on Travis.
 chrome-linux/
+
+node_modules/
+extension/
