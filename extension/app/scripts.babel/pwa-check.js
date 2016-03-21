@@ -84,11 +84,26 @@ var isControlledByServiceWorker = _ => {
   return !!(navigator.serviceWorker.controller);
 };
 
-/* eslint-disable no-unused-vars*/
 var hasServiceWorkerRegistration = _ => {
-  return navigator.serviceWorker.getRegistration().then(r => !!r);
+  return new Promise((resolve, reject) => {
+    navigator.serviceWorker.getRegistration().then(r => {
+      // Fail immediately for non-existent registrations.
+      if (typeof r === 'undefined') {
+        return resolve(false);
+      }
+
+      // If there's an active SW call this done.
+      if (r.active) {
+        return resolve(!!r.active);
+      }
+
+      // Give any installing SW chance to install.
+      r.installing.onstatechange = function() {
+        resolve(this.state === 'installed');
+      };
+    });
+  });
 };
-/* eslint-enable no-unused-vars*/
 
 var isOnHTTPS = _ => location.protocol === 'https:';
 
@@ -105,22 +120,38 @@ function injectIntoTab(chrome, fnPair) {
   });
 }
 
-function executeInTab(chrome, fn) {
-  return new Promise((res, reject) => {
-    chrome.tabs.executeScript(null, {
-      code: `(${fn.toString()})()`
-    }, ret => {
-      res(ret);
-    });
+function convertAuditToPromiseString(audit) {
+  return `new Promise(function(resolve, reject) {
+      resolve(Promise.all([
+        Promise.resolve("${audit[1]}"),
+        (${audit[0].toString()})()
+      ]));
+    })`;
+}
+
+function runAudits(chrome, audits) {
+  // Remap each audit to a Promise (see above).
+  const fnString = audits.reduce((prevValue, audit, index) => {
+    return prevValue + (index > 0 ? ',' : '') + convertAuditToPromiseString(audit);
+  }, '');
+
+  // Ask the tab to run the promises, and beacon back the results.
+  chrome.tabs.executeScript(null, {
+    code: `Promise.all([${fnString}]).then(__lighthouse.postAuditResults)`
   });
+}
+
+function postAuditResults(results) {
+  chrome.runtime.sendMessage({onAuditsComplete: results});
 }
 
 var functionsToInject = [
   ['ManifestParser', ManifestParser],
   ['parseManifest', parseManifest],
+  ['postAuditResults', postAuditResults]
 ];
 
-var tests = [
+var audits = [
   [hasManifest, 'Has a manifest'],
   [isOnHTTPS, 'Site is on HTTPS'],
   [hasCanonicalUrl, 'Site has a canonical URL'],
@@ -132,18 +163,26 @@ var tests = [
   [hasManifestIcons, 'Site manifest has icons defined'],
   [hasManifestIcons192, 'Site manifest has 192px icon'],
   [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
-  // This requires an async callback.. not sure how to do that yet!
-  // [hasServiceWorkerRegistration, 'Site is has a service worker registration']
+  [hasServiceWorkerRegistration, 'Site has a service worker registration']
 ];
 
-export function runPwaTests(chrome) {
-  return Promise.all(functionsToInject.map(fnPair => injectIntoTab(chrome, fnPair)))
-  .then(_ => Promise.all(tests.map(testPair => {
-    return executeInTab(chrome, testPair[0]).then(ret => `${testPair[1]} : <b>${ret}</b>`);
-  })))
-  .then(results => {
-    return results.join('</br>');
-  }).catch(err => {
-    return 'ERROR: ' + err;
+export function runPwaAudits(chrome) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.onMessage.addListener(message => {
+      if (!message.onAuditsComplete) {
+        return;
+      }
+
+      resolve(message.onAuditsComplete.reduce((prev, result, index) => {
+        return prev + (index > 0 ? '<br/>' : '') +
+          `${result[0]}: <strong>${result[1]}</strong>`;
+      }, ''));
+    });
+
+    Promise.all(functionsToInject.map(fnPair => injectIntoTab(chrome, fnPair)))
+        .then(_ => runAudits(chrome, audits))
+        .catch(err => {
+          return 'ERROR: ' + err;
+        });
   });
 }
