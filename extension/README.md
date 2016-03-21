@@ -9,7 +9,7 @@
 * Load `/app` as Unpacked extension.
 
 
-## Deploy
+## Manual Deploy to CWS
 
 * Be in lighthouse-extension-owners group
 * `npm run build`
@@ -22,8 +22,10 @@
 * Select `packages/lighthouse-0.X.X.zip`
 * _Publish_ at the bottom
 
-## deploy via chrome app
-(This appears to be broken, unfortunately.)
+## ~~Easier Deploy via API~~
+
+(This appears to be broken, unfortunately.…)
+
 * Install [web store api app](https://chrome.google.com/webstore/detail/web-store-api-sample-app/ndgidogppopohjpghapeojgoehfmflab)
   * Add dist folder
 * `npm run build`
