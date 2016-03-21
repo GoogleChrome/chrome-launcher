@@ -138,18 +138,34 @@ var functionsToInject = [
 ];
 
 var audits = [
-  [hasManifest, 'Has a manifest'],
-  [isOnHTTPS, 'Site is on HTTPS'],
-  [hasCanonicalUrl, 'Site has a canonical URL'],
-  [hasManifestThemeColor, 'Site manifest has theme_color'],
-  [hasManifestBackgroundColor, 'Site manifest has background_color'],
-  [hasManifestStartUrl, 'Site manifest has start_url'],
-  [hasManifestShortName, 'Site manifest has short_name'],
-  [hasManifestName, 'Site manifest has name'],
-  [hasManifestIcons, 'Site manifest has icons defined'],
-  [hasManifestIcons192, 'Site manifest has 192px icon'],
-  [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
-  [hasServiceWorkerRegistration, 'Site is has a service worker registration']
+  {
+    Security: [
+      [isOnHTTPS, 'Site is on HTTPS']
+    ]
+  },
+  {
+    Offline: [
+      [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
+      [hasServiceWorkerRegistration, 'Site is has a service worker registration']
+    ]
+  },
+  {
+    Manifest: [
+      [hasManifest, 'Has a manifest'],
+      [hasManifestThemeColor, 'Site manifest has theme_color'],
+      [hasManifestBackgroundColor, 'Site manifest has background_color'],
+      [hasManifestStartUrl, 'Site manifest has start_url'],
+      [hasManifestShortName, 'Site manifest has short_name'],
+      [hasManifestName, 'Site manifest has name'],
+      [hasManifestIcons, 'Site manifest has icons defined'],
+      [hasManifestIcons192, 'Site manifest has 192px icon'],
+    ]
+  },
+  {
+    Miscellaneous: [
+      [hasCanonicalUrl, 'Site has a canonical URL']
+    ]
+  }
 ];
 
 export function runPwaAudits(chrome) {
