@@ -90,6 +90,7 @@ var hasManifestStartUrl = _ => {
   return !!manifest.start_url;
 };
 
+// quoth kinlan >> re: canonical, it is always good to have them, but not needed.  This test is more of a warning than anything else to let you know you should consider it.
 var hasCanonicalUrl = _ => {
   var link = document.querySelector('link[rel=canonical]');
 
