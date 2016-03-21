@@ -29,7 +29,7 @@
   "dependencies": {
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
-    "devtools-timeline-model": "1.0.14",
+    "devtools-timeline-model": "1.0.16",
     "file": "^0.2.2",
     "traceviewer": "^1.0.8"
   },
