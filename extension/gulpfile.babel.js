@@ -57,11 +57,11 @@ gulp.task('images', () => {
 
 gulp.task('html',  () => {
   return gulp.src('app/*.html')
+  .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
   .pipe($.sourcemaps.init())
   .pipe($.if('*.js', $.uglify()))
   .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
   .pipe($.sourcemaps.write())
-  .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
   .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
   .pipe(gulp.dest('dist'));
 });
@@ -121,14 +121,6 @@ gulp.task('size', () => {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
-gulp.task('copy', () => {
-
-  gulp.src(['app/styles/**/*'])
-  .pipe(debug({title: 'copying to dist:'}))
-  .pipe(gulp.dest('dist/styles'));
-});
-
-
 gulp.task('wiredep', () => {
   gulp.src('app/*.html')
   .pipe(wiredep({
@@ -146,7 +138,7 @@ gulp.task('package', function () {
 
 gulp.task('build', (cb) => {
   runSequence(
-    'copy', 'lint', 'babel', 'chromeManifest',
+    'lint', 'babel', 'chromeManifest',
     ['html', 'images', 'extras'],
     'size', cb);
 });
