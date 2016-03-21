@@ -5,6 +5,8 @@ import del from 'del';
 import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
+var debug = require('gulp-debug');
+
 const $ = gulpLoadPlugins();
 
 gulp.task('extras', () => {
@@ -12,12 +14,15 @@ gulp.task('extras', () => {
     'app/*.*',
     'app/_locales/**',
     '!app/scripts.babel',
+    '!app/.DS_Store',
     '!app/*.json',
     '!app/*.html',
   ], {
     base: 'app',
     dot: true
-  }).pipe(gulp.dest('dist'));
+  })
+  .pipe(debug({title: 'copying to dist:'}))
+  .pipe(gulp.dest('dist'));
 });
 
 function lint(files, options) {
@@ -54,7 +59,7 @@ gulp.task('html',  () => {
   return gulp.src('app/*.html')
   .pipe($.sourcemaps.init())
   .pipe($.if('*.js', $.uglify()))
-    .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
+  .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
   .pipe($.sourcemaps.write())
   .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
   .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
@@ -62,8 +67,7 @@ gulp.task('html',  () => {
 });
 
 gulp.task('chromeManifest', () => {
-  return gulp.src('app/manifest.json')
-  .pipe($.chromeManifest({
+  var manifestOpts = {
     buildnumber: true,
     background: {
       target: 'scripts/background.js',
@@ -71,12 +75,14 @@ gulp.task('chromeManifest', () => {
         'scripts/chromereload.js'
       ]
     }
-  }))
+  };
+  return gulp.src('app/manifest.json')
+  .pipe($.chromeManifest(manifestOpts))
   .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
-  .pipe($.if('*.js', $.sourcemaps.init()))
-    .pipe($.if('*.js', $.uglify()))
-      .pipe($.if('*.js', $.sourcemaps.write('.')))
-        .pipe(gulp.dest('dist'));
+  .pipe($.if('*.js',  $.sourcemaps.init()))
+  .pipe($.if('*.js',  $.uglify()))
+  .pipe($.if('*.js',  $.sourcemaps.write('.')))
+  .pipe(gulp.dest('dist'));
 });
 
 gulp.task('babel', () => {
@@ -90,7 +96,8 @@ gulp.task('babel', () => {
     .pipe($.babel({
       presets: ['es2015']
     }))
-    .pipe(gulp.dest('app/scripts'));
+    .pipe(gulp.dest('app/scripts'))
+    .pipe(gulp.dest('dist/scripts'));
 });
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
@@ -114,6 +121,14 @@ gulp.task('size', () => {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 
+gulp.task('copy', () => {
+
+  gulp.src(['app/styles/**/*'])
+  .pipe(debug({title: 'copying to dist:'}))
+  .pipe(gulp.dest('dist/styles'));
+});
+
+
 gulp.task('wiredep', () => {
   gulp.src('app/*.html')
   .pipe(wiredep({
@@ -131,7 +146,7 @@ gulp.task('package', function () {
 
 gulp.task('build', (cb) => {
   runSequence(
-    'lint', 'babel', 'chromeManifest',
+    'copy', 'lint', 'babel', 'chromeManifest',
     ['html', 'images', 'extras'],
     'size', cb);
 });
