@@ -129,6 +129,10 @@ function injectIntoTab(chrome, fnPair) {
       code: `window.__lighthouse = window.__lighthouse || {};
       window.__lighthouse['${fnPair[0]}'] = ${singleLineFn}`
     }, ret => {
+      if (chrome.runtime.lastError) {
+        return reject(chrome.runtime.lastError);
+      }
+
       res(ret);
     });
   });
@@ -158,6 +162,10 @@ function runAudits(chrome, audits) {
   // Ask the tab to run the promises, and beacon back the results.
   chrome.tabs.executeScript(null, {
     code: `Promise.all([${fnString}]).then(__lighthouse.postAuditResults)`
+  }, function() {
+    if (chrome.runtime.lastError) {
+      throw chrome.runtime.lastError;
+    }
   });
 }
 
@@ -242,16 +250,16 @@ export function runPwaAudits(chrome) {
       if (!message.onAuditsComplete) {
         return;
       }
-
-      console.log(message.onAuditsComplete);
-
       resolve(createResultsHTML(message.onAuditsComplete));
     });
 
     Promise.all(functionsToInject.map(fnPair => injectIntoTab(chrome, fnPair)))
-        .then(_ => runAudits(chrome, audits))
+        .then(_ => runAudits(chrome, audits),
+            err => {
+              throw err;
+            })
         .catch(err => {
-          return 'ERROR: ' + err;
+          reject(err);
         });
   });
 }

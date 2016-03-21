@@ -17,16 +17,22 @@
 import {runPwaAudits} from './pwa-check.js';
 
 document.addEventListener('DOMContentLoaded', _ => {
-  // const siteNameEl = window.document.querySelector('header h1');
   const siteNameEl = window.document.querySelector('header h2');
+  const resultsEl = document.body.querySelector('.results');
 
-  chrome.tabs.query({active: true}, function(tabs) {
+  chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs) {
+    if (tabs.length === 0) {
+      return;
+    }
+
     const siteURL = new URL(tabs[0].url);
     siteNameEl.textContent = siteURL.origin;
   });
 
   runPwaAudits(chrome).then(ret => {
-    document.body.querySelector('.results').innerHTML = ret;
+    resultsEl.innerHTML = ret;
+  }, err => {
+    resultsEl.innerHTML = `<div class="error">Unable to audit page: ${err.message}</div>`;
   });
 });
 

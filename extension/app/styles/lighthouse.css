@@ -118,3 +118,9 @@ header h2 {
 .results .fail {
   color: #D0021B;
 }
+
+.results .error {
+  padding: 24px;
+  text-align: center;
+  color: #D0021B;
+}
