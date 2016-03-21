@@ -43,11 +43,5 @@ document.addEventListener('click', evt => {
     return;
   }
 
-  if (targetClassName.contains('expanded')) {
-    targetClassName.remove('expanded');
-    targetClassName.add('collapsed');
-  } else {
-    targetClassName.add('expanded');
-    targetClassName.remove('collapsed');
-  }
+  targetClassName.toggle('expanded');
 });
