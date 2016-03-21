@@ -138,6 +138,19 @@ function injectIntoTab(chrome, fnPair) {
   });
 }
 
+function convertAuditsToPromiseStrings(audits) {
+  const auditNames = Object.keys(audits);
+
+  return auditNames.reduce((prevAuditGroup, auditName, auditGroupIndex) => {
+    // Then within each group, reduce each audit down to a Promise.
+    return prevAuditGroup + (auditGroupIndex > 0 ? ',' : '') +
+      audits[auditName].reduce((prevAudit, audit, auditIndex) => {
+        return prevAudit + (auditIndex > 0 ? ',' : '') +
+            convertAuditToPromiseString(auditName, audit);
+      }, '');
+  }, '');
+}
+
 function convertAuditToPromiseString(auditName, audit) {
   return `Promise.all([
       Promise.resolve("${auditName}"),
@@ -147,17 +160,8 @@ function convertAuditToPromiseString(auditName, audit) {
 }
 
 function runAudits(chrome, audits) {
-  const auditNames = Object.keys(audits);
-
   // Reduce each group of audits.
-  const fnString = auditNames.reduce((prevAuditGroup, auditName, auditGroupIndex) => {
-    // Then within each group, reduce each audit down to a Promise.
-    return prevAuditGroup + (auditGroupIndex > 0 ? ',' : '') +
-      audits[auditName].reduce((prevAudit, audit, auditIndex) => {
-        return prevAudit + (auditIndex > 0 ? ',' : '') +
-            convertAuditToPromiseString(auditName, audit);
-      }, '');
-  }, '');
+  const fnString = convertAuditsToPromiseStrings(audits);
 
   // Ask the tab to run the promises, and beacon back the results.
   chrome.tabs.executeScript(null, {
