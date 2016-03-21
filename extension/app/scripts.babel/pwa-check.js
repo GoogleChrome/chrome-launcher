@@ -87,11 +87,20 @@ var isControlledByServiceWorker = _ => {
 var hasServiceWorkerRegistration = _ => {
   return new Promise((resolve, reject) => {
     navigator.serviceWorker.getRegistration().then(r => {
-      if (r.active) {
-        resolve(true);
-      } else {
-        resolve(false);
+      // Fail immediately for non-existent registrations.
+      if (typeof r === 'undefined') {
+        return resolve(false);
       }
+
+      // If there's an active SW call this done.
+      if (r.active) {
+        return resolve(!!r.active);
+      }
+
+      // Give any installing SW chance to install.
+      r.installing.onstatechange = function() {
+        resolve(this.state === 'installed');
+      };
     });
   });
 };
@@ -149,7 +158,7 @@ var audits = [
   [hasManifestIcons, 'Site manifest has icons defined'],
   [hasManifestIcons192, 'Site manifest has 192px icon'],
   [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
-  [hasServiceWorkerRegistration, 'Site is has a service worker registration']
+  [hasServiceWorkerRegistration, 'Site has a service worker registration']
 ];
 
 export function runPwaAudits(chrome) {
