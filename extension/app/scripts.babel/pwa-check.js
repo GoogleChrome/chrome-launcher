@@ -134,6 +134,14 @@ function injectIntoTab(chrome, fnPair) {
   });
 }
 
+function convertAuditToPromiseString(auditName, audit) {
+  return `Promise.all([
+      Promise.resolve("${auditName}"),
+      Promise.resolve("${audit[1]}"),
+      (${audit[0].toString()})()
+  ])`;
+}
+
 function runAudits(chrome, audits) {
   const auditNames = Object.keys(audits);
 
@@ -143,14 +151,11 @@ function runAudits(chrome, audits) {
     return prevAuditGroup + (auditGroupIndex > 0 ? ',' : '') +
       audits[auditName].reduce((prevAudit, audit, auditIndex) => {
         return prevAudit + (auditIndex > 0 ? ',' : '') +
-          `Promise.all([
-              Promise.resolve("${auditName}"),
-              Promise.resolve("${audit[1]}"),
-              (${audit[0].toString()})()
-          ])`;
+            convertAuditToPromiseString(auditName, audit);
       }, '');
   }, '');
 
+  // Ask the tab to run the promises, and beacon back the results.
   chrome.tabs.executeScript(null, {
     code: `Promise.all([${fnString}]).then(__lighthouse.postAuditResults)`
   });
