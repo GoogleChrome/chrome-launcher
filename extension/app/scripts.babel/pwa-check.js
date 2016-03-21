@@ -1,3 +1,19 @@
+/**
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {ManifestParser} from './manifest-parser.js';
 
 var hasManifest = _ => {
@@ -80,10 +96,6 @@ var hasCanonicalUrl = _ => {
   return !!link;
 };
 
-var isControlledByServiceWorker = _ => {
-  return !!(navigator.serviceWorker.controller);
-};
-
 var hasServiceWorkerRegistration = _ => {
   return new Promise((resolve, reject) => {
     navigator.serviceWorker.getRegistration().then(r => {
@@ -101,6 +113,8 @@ var hasServiceWorkerRegistration = _ => {
       r.installing.onstatechange = function() {
         resolve(this.state === 'installed');
       };
+    }).catch(_ => {
+      resolve(false);
     });
   });
 };
@@ -121,14 +135,20 @@ function injectIntoTab(chrome, fnPair) {
 }
 
 function runAudits(chrome, audits) {
-  const fnString = audits.reduce((prevValue, audit, index) => {
-    return prevValue + (index > 0 ? ',' : '') +
-        `new Promise(function(resolve, reject) {
-          resolve(Promise.all([
-            Promise.resolve("${audit[1]}"),
-            (${audit[0].toString()})()
-          ]));
-        })`;
+  const auditNames = Object.keys(audits);
+
+  // Reduce each group of audits.
+  const fnString = auditNames.reduce((prevAuditGroup, auditName, auditGroupIndex) => {
+    // Then within each group, reduce each audit down to a Promise.
+    return prevAuditGroup + (auditGroupIndex > 0 ? ',' : '') +
+      audits[auditName].reduce((prevAudit, audit, auditIndex) => {
+        return prevAudit + (auditIndex > 0 ? ',' : '') +
+          `Promise.all([
+              Promise.resolve("${auditName}"),
+              Promise.resolve("${audit[1]}"),
+              (${audit[0].toString()})()
+          ])`;
+      }, '');
   }, '');
 
   chrome.tabs.executeScript(null, {
@@ -146,20 +166,70 @@ var functionsToInject = [
   ['postAuditResults', postAuditResults]
 ];
 
-var audits = [
-  [hasManifest, 'Has a manifest'],
-  [isOnHTTPS, 'Site is on HTTPS'],
-  [hasCanonicalUrl, 'Site has a canonical URL'],
-  [hasManifestThemeColor, 'Site manifest has theme_color'],
-  [hasManifestBackgroundColor, 'Site manifest has background_color'],
-  [hasManifestStartUrl, 'Site manifest has start_url'],
-  [hasManifestShortName, 'Site manifest has short_name'],
-  [hasManifestName, 'Site manifest has name'],
-  [hasManifestIcons, 'Site manifest has icons defined'],
-  [hasManifestIcons192, 'Site manifest has 192px icon'],
-  [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
-  [hasServiceWorkerRegistration, 'Site has a service worker registration']
-];
+var audits = {
+  Security: [
+    [isOnHTTPS, 'Served over HTTPS']
+  ],
+  Offline: [
+    [hasServiceWorkerRegistration, 'Has a service worker registration']
+  ],
+  Manifest: [
+    [hasManifest, 'Exists'],
+    [hasManifestThemeColor, 'Contains theme_color'],
+    [hasManifestBackgroundColor, 'Contains background_color'],
+    [hasManifestStartUrl, 'Contains start_url'],
+    [hasManifestShortName, 'Contains short_name'],
+    [hasManifestName, 'Contains name'],
+    [hasManifestIcons, 'Contains icons defined'],
+    [hasManifestIcons192, 'Contains 192px icon'],
+  ],
+  Miscellaneous: [
+    [hasCanonicalUrl, 'Site has a Canonical URL']
+  ]
+};
+
+function createResultsHTML(results) {
+  const resultsGroup = {};
+  let groupName = null;
+  results.forEach(result => {
+    groupName = result[0];
+    if (!resultsGroup[groupName]) {
+      resultsGroup[groupName] = [];
+    }
+
+    resultsGroup[groupName].push({
+      title: result[1],
+      value: result[2]
+    });
+  });
+
+  const groups = Object.keys(resultsGroup);
+  let resultsHTML = '';
+
+  groups.forEach(group => {
+    let groupHasErrors = false;
+
+    const groupHTML = resultsGroup[group].reduce((prev, result) => {
+      const status = result.value ?
+          '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+      groupHasErrors = groupHasErrors || (!result.value);
+      return prev + `<li>${result.title}: ${status}</li>`;
+    }, '');
+
+    const groupClass = 'group ' +
+        (groupHasErrors ? 'errors expanded' : 'no-errors collapsed');
+
+    resultsHTML +=
+      `<li class="${groupClass}">
+        <span class="group-name">${group}</span>
+        <ul>
+          ${groupHTML}
+        </ul>
+      </li>`;
+  });
+
+  return resultsHTML;
+}
 
 export function runPwaAudits(chrome) {
   return new Promise((resolve, reject) => {
@@ -168,10 +238,9 @@ export function runPwaAudits(chrome) {
         return;
       }
 
-      resolve(message.onAuditsComplete.reduce((prev, result, index) => {
-        return prev + (index > 0 ? '<br/>' : '') +
-          `${result[0]}: <strong>${result[1]}</strong>`;
-      }, ''));
+      console.log(message.onAuditsComplete);
+
+      resolve(createResultsHTML(message.onAuditsComplete));
     });
 
     Promise.all(functionsToInject.map(fnPair => injectIntoTab(chrome, fnPair)))
