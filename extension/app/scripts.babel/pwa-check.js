@@ -121,16 +121,21 @@ function injectIntoTab(chrome, fnPair) {
 }
 
 function runAudits(chrome, audits) {
+  const convertAuditToPromiseString = audit => {
+    return `new Promise(function(resolve, reject) {
+        resolve(Promise.all([
+          Promise.resolve("${audit[1]}"),
+          (${audit[0].toString()})()
+        ]));
+      })`;
+  };
+
+  // Remap each audit to a Promise (see above).
   const fnString = audits.reduce((prevValue, audit, index) => {
-    return prevValue + (index > 0 ? ',' : '') +
-        `new Promise(function(resolve, reject) {
-          resolve(Promise.all([
-            Promise.resolve("${audit[1]}"),
-            (${audit[0].toString()})()
-          ]));
-        })`;
+    return prevValue + (index > 0 ? ',' : '') + convertAuditToPromiseString(audit);
   }, '');
 
+  // Ask the tab to run the promises, and beacon back the results.
   chrome.tabs.executeScript(null, {
     code: `Promise.all([${fnString}]).then(__lighthouse.postAuditResults)`
   });
