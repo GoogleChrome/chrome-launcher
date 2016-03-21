@@ -32,7 +32,8 @@ Promise.resolve(driver).then(gatherer([
   require('./audits/minify-html/audit'),
   require('./audits/service-worker/audit'),
   require('./audits/time-in-javascript/audit'),
-  require('./audits/viewport-meta-tag/audit')
+  require('./audits/viewport-meta-tag/audit'),
+  require('./metrics/first-meaningful-paint/audit')
 ])).then(function(results) {
   console.log('all done');
   console.log(results);
