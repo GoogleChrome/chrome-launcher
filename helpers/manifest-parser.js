@@ -15,8 +15,9 @@
  */
 'use strict';
 
-var ManifestParser = (function() {
+/* global document */
 
+var ManifestParser = (function() {
   var _jsonInput = {};
   var _manifest = {};
   var _logs = [];
@@ -44,7 +45,7 @@ var ManifestParser = (function() {
       return undefined;
     }
 
-    if (typeof object[property] != 'string') {
+    if (typeof object[property] !== 'string') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a string but is not.');
       return undefined;
@@ -64,7 +65,7 @@ var ManifestParser = (function() {
       return defaultValue;
     }
 
-    if (typeof object[property] != 'boolean') {
+    if (typeof object[property] !== 'boolean') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a boolean but is not.');
       return defaultValue;
@@ -76,7 +77,6 @@ var ManifestParser = (function() {
   function _parseURL(args) {
     var object = args.object;
     var property = args.property;
-    var baseURL = args.baseURL;
 
     var str = _parseString({object: object, property: property, trim: false});
     if (str === undefined) {
@@ -84,6 +84,7 @@ var ManifestParser = (function() {
     }
 
     // TODO: resolve url using baseURL
+    // var baseURL = args.baseURL;
     // new URL(object[property], baseURL);
     return object[property];
   }
@@ -95,7 +96,7 @@ var ManifestParser = (function() {
       return undefined;
     }
 
-    if (typeof object[property] != 'string') {
+    if (typeof object[property] !== 'string') {
       _logs.push('ERROR: \'' + property +
           '\' expected to be a string but is not.');
       return undefined;
@@ -106,12 +107,12 @@ var ManifestParser = (function() {
     var dummy = document.createElement('div');
     dummy.style.color = 'white';
     dummy.style.color = object[property];
-    if (dummy.style.color != 'white') {
+    if (dummy.style.color !== 'white') {
       return object[property];
     }
     dummy.style.color = 'black';
     dummy.style.color = object[property];
-    if (dummy.style.color != 'black') {
+    if (dummy.style.color !== 'black') {
       return object[property];
     }
     return undefined;
@@ -140,7 +141,7 @@ var ManifestParser = (function() {
       return display;
     }
 
-    if (ALLOWED_DISPLAY_VALUES.indexOf(display.toLowerCase()) == -1) {
+    if (ALLOWED_DISPLAY_VALUES.indexOf(display.toLowerCase()) === -1) {
       _logs.push('ERROR: \'display\' has an invalid value, will be ignored.');
       return undefined;
     }
@@ -156,7 +157,7 @@ var ManifestParser = (function() {
       return orientation;
     }
 
-    if (ALLOWED_ORIENTATION_VALUES.indexOf(orientation.toLowerCase()) == -1) {
+    if (ALLOWED_ORIENTATION_VALUES.indexOf(orientation.toLowerCase()) === -1) {
       _logs.push('ERROR: \'orientation\' has an invalid value' +
           ', will be ignored.');
       return undefined;
@@ -204,7 +205,7 @@ var ManifestParser = (function() {
           set.add(link.sizes.item(i).toLowerCase());
         }
 
-        if (set.size != 0) {
+        if (set.size !== 0) {
           icon.sizes = set;
         }
       }
@@ -319,10 +320,10 @@ var ManifestParser = (function() {
 
   return {
     parse: _parse,
-    manifest: function() { return _manifest; },
-    logs: function() { return _logs; },
-    tips: function() { return _tips; },
-    success: function() { return _success; }
+    manifest: _ => _manifest,
+    logs: _ => _logs,
+    tips: _ => _tips,
+    success: _ => _success
   };
 })();
 
