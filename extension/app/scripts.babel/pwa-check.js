@@ -204,6 +204,8 @@ var audits = {
 function createResultsHTML(results) {
   const resultsGroup = {};
   let groupName = null;
+
+  // Go through each group and restructure the results accordingly.
   results.forEach(result => {
     groupName = result[0];
     if (!resultsGroup[groupName]) {
