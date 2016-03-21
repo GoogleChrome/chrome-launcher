@@ -87,11 +87,20 @@ var isControlledByServiceWorker = _ => {
 var hasServiceWorkerRegistration = _ => {
   return new Promise((resolve, reject) => {
     navigator.serviceWorker.getRegistration().then(r => {
-      if (r.active) {
-        resolve(true);
-      } else {
-        resolve(false);
+      // Fail immediately for non-existent registrations.
+      if (typeof r === 'undefined') {
+        return resolve(false);
       }
+
+      // If there's an active SW call this done.
+      if (r.active) {
+        return resolve(!!r.active);
+      }
+
+      // Give any installing SW chance to install.
+      r.installing.onstatechange = function() {
+        resolve(this.state === 'installed');
+      };
     });
   });
 };
@@ -138,34 +147,18 @@ var functionsToInject = [
 ];
 
 var audits = [
-  {
-    Security: [
-      [isOnHTTPS, 'Site is on HTTPS']
-    ]
-  },
-  {
-    Offline: [
-      [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
-      [hasServiceWorkerRegistration, 'Site is has a service worker registration']
-    ]
-  },
-  {
-    Manifest: [
-      [hasManifest, 'Has a manifest'],
-      [hasManifestThemeColor, 'Site manifest has theme_color'],
-      [hasManifestBackgroundColor, 'Site manifest has background_color'],
-      [hasManifestStartUrl, 'Site manifest has start_url'],
-      [hasManifestShortName, 'Site manifest has short_name'],
-      [hasManifestName, 'Site manifest has name'],
-      [hasManifestIcons, 'Site manifest has icons defined'],
-      [hasManifestIcons192, 'Site manifest has 192px icon'],
-    ]
-  },
-  {
-    Miscellaneous: [
-      [hasCanonicalUrl, 'Site has a canonical URL']
-    ]
-  }
+  [hasManifest, 'Has a manifest'],
+  [isOnHTTPS, 'Site is on HTTPS'],
+  [hasCanonicalUrl, 'Site has a canonical URL'],
+  [hasManifestThemeColor, 'Site manifest has theme_color'],
+  [hasManifestBackgroundColor, 'Site manifest has background_color'],
+  [hasManifestStartUrl, 'Site manifest has start_url'],
+  [hasManifestShortName, 'Site manifest has short_name'],
+  [hasManifestName, 'Site manifest has name'],
+  [hasManifestIcons, 'Site manifest has icons defined'],
+  [hasManifestIcons192, 'Site manifest has 192px icon'],
+  [isControlledByServiceWorker, 'Site is currently controlled by a service worker'],
+  [hasServiceWorkerRegistration, 'Site has a service worker registration']
 ];
 
 export function runPwaAudits(chrome) {
