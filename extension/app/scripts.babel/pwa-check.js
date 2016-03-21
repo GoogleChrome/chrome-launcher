@@ -120,16 +120,16 @@ function injectIntoTab(chrome, fnPair) {
   });
 }
 
-function runAudits(chrome, audits) {
-  const convertAuditToPromiseString = audit => {
-    return `new Promise(function(resolve, reject) {
-        resolve(Promise.all([
-          Promise.resolve("${audit[1]}"),
-          (${audit[0].toString()})()
-        ]));
-      })`;
-  };
+function convertAuditToPromiseString(audit) {
+  return `new Promise(function(resolve, reject) {
+      resolve(Promise.all([
+        Promise.resolve("${audit[1]}"),
+        (${audit[0].toString()})()
+      ]));
+    })`;
+}
 
+function runAudits(chrome, audits) {
   // Remap each audit to a Promise (see above).
   const fnString = audits.reduce((prevValue, audit, index) => {
     return prevValue + (index > 0 ? ',' : '') + convertAuditToPromiseString(audit);
