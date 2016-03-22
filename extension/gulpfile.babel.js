@@ -87,7 +87,6 @@ gulp.task('chromeManifest', () => {
 });
 
 gulp.task('babel', () => {
-  console.log('Babeling up...');
   return gulp.src([
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
