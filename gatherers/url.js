@@ -15,12 +15,12 @@
  */
 'use strict';
 
-var ServiceWorkerGatherer = {
-  run: function(driver, url) {
-    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
-      .then(driver.getServiceWorkerRegistrations)
-      .then(serviceWorkerRegistrations => ({serviceWorkerRegistrations}));
-  }
-};
+const Gather = require('./gather');
 
-module.exports = ServiceWorkerGatherer;
+class URL extends Gather {
+  static gather(options) {
+    return Promise.resolve({url: options.url});
+  }
+}
+
+module.exports = URL;

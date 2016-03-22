@@ -17,16 +17,19 @@
 'use strict';
 
 const chromeRemoteInterface = require('chrome-remote-interface');
-
-var NetworkRecorder = require('../network-recorder');
-
-const EXECUTION_CONTEXT_TIMEOUT = 4000;
+const NetworkRecorder = require('../network-recorder');
 
 class ChromeProtocol {
-  constructor(opts) {
-    opts = opts || {};
 
-    this.categories = [
+  get WAIT_FOR_LOAD() {
+    return true;
+  }
+
+  constructor() {
+    this._url = null;
+    this._chrome = null;
+    this._traceEvents = [];
+    this._traceCategories = [
       '-*', // exclude default
       'toplevel',
       'blink.console',
@@ -39,183 +42,105 @@ class ChromeProtocol {
       'disabled-by-default-v8.cpu_profile'
     ];
 
-    this._traceEvents = [];
-    this._currentURL = null;
-    this._instance = null;
-    this._networkRecords = [];
-    this._networkRecorder = null;
-
-    this.getPageHTML = this.getPageHTML.bind(this);
-    this.evaluateFunction = this.evaluateFunction.bind(this);
-    this.evaluateScript = this.evaluateScript.bind(this);
-    this.getServiceWorkerRegistrations =
-        this.getServiceWorkerRegistrations.bind(this);
-    this.beginTrace = this.beginTrace.bind(this);
-    this.endTrace = this.endTrace.bind(this);
-    this.beginNetworkCollect = this.beginNetworkCollect.bind(this);
-    this.endNetworkCollect = this.endNetworkCollect.bind(this);
+    this.timeoutID = null;
   }
 
-  get WAIT_FOR_LOAD() {
-    return true;
+  get url() {
+    return this._url;
   }
 
-  getInstance() {
-    if (!this._instance) {
-      this._instance = new Promise((resolve, reject) => {
-        // @see: github.com/cyrus-and/chrome-remote-interface#moduleoptions-callback
-        const OPTIONS = {};
-        chromeRemoteInterface(OPTIONS,
-          resolve
-        ).on('error', e => reject(e));
-      });
+  set url(_url) {
+    this._url = _url;
+  }
+
+  connect() {
+    return new Promise((resolve, reject) => {
+      if (this._chrome) {
+        return resolve(this._chrome);
+      }
+
+      chromeRemoteInterface({}, chrome => {
+        this._chrome = chrome;
+        resolve(chrome);
+      }).on('error', e => reject(e));
+    });
+  }
+
+  disconnect() {
+    if (this._chrome === null) {
+      return;
     }
 
-    return this._instance;
-  }
-
-  resetFailureTimeout(reject) {
     if (this.timeoutID) {
       clearTimeout(this.timeoutID);
+      this.timeoutID = null;
     }
 
-    this.timeoutID = setTimeout(_ => {
-      // FIXME
-      // this.discardTab();
-      reject(new Error('Trace retrieval timed out'));
-    }, 15000);
+    this._chrome.close();
+    this._chrome = null;
+    this.url = null;
   }
 
-  getServiceWorkerRegistrations() {
-    return this.getInstance().then(chrome => {
-      return new Promise((resolve, reject) => {
-        chrome.ServiceWorker.enable();
-        chrome.on('ServiceWorker.workerVersionUpdated', data => {
-          resolve(data);
-        });
-      });
-    });
+  on(eventName, cb) {
+    if (this._chrome === null) {
+      return;
+    }
+
+    this._chrome.on(eventName, cb);
   }
 
-  getPageHTML() {
-    return this.getInstance().then(chrome => {
-      return new Promise((resolve, reject) => {
-        chrome.send('DOM.getDocument', null, (docErr, docResult) => {
-          if (docErr) {
-            return reject(docErr);
-          }
-
-          let nodeId = {
-            nodeId: docResult.root.nodeId
-          };
-
-          chrome.send('DOM.getOuterHTML', nodeId, (htmlErr, htmlResult) => {
-            if (htmlErr) {
-              return reject(htmlErr);
-            }
-
-            resolve(htmlResult.outerHTML);
-          });
-        });
-      });
-    });
-  }
-
-  static getEvaluationContextFor(chrome, url) {
+  sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      var errorTimeout = setTimeout((_ =>
-        reject(new Error(`Timed out waiting for ${url} execution context`))),
-      EXECUTION_CONTEXT_TIMEOUT);
+      this._chrome.send(command, params, (err, result) => {
+        if (err) {
+          return reject(err);
+        }
 
-      chrome.Runtime.enable();
-      chrome.on('Runtime.executionContextCreated', evalContext => {
-        // console.info(`executionContext: "${evalContext.context.origin}"`);
-        if (evalContext.context.origin.indexOf(url) !== -1) {
-          clearTimeout(errorTimeout);
-          resolve(evalContext.context.id);
+        resolve(result);
+      });
+    });
+  }
+
+  gotoURL(url, waitForLoad) {
+    return new Promise((resolve, reject) => {
+      this._chrome.Page.enable();
+      this._chrome.Page.navigate({url}, (err, response) => {
+        if (err) {
+          reject(err);
+        }
+
+        this.url = url;
+
+        if (waitForLoad) {
+          this._chrome.Page.loadEventFired(_ => {
+            resolve(response);
+          });
+        } else {
+          resolve(response);
         }
       });
     });
   }
 
-  evaluateFunction(url, fn) {
-    let wrappedScriptStr = '(' + fn.toString() + ')()';
-    return this.evaluateScript(url, wrappedScriptStr);
-  }
+  _resetFailureTimeout(reject) {
+    if (this.timeoutID) {
+      clearTimeout(this.timeoutID);
+      this.timeoutID = null;
+    }
 
-  evaluateScript(url, scriptSrc) {
-    return this.getInstance().then(chrome => {
-      // Set up executionContext listener before navigation.
-      let contextListener = ChromeProtocol.getEvaluationContextFor(chrome, url);
-
-      return this.gotoURL(url, this.WAIT_FOR_LOAD)
-        .then(_ => contextListener)
-        .then(contextId => new Promise((resolve, reject) => {
-          let evalOpts = {
-            expression: scriptSrc,
-            contextId: contextId
-          };
-          chrome.Runtime.evaluate(evalOpts, (err, evalResult) => {
-            if (err || evalResult.wasThrown) {
-              return reject(evalResult);
-            }
-
-            let result = evalResult.result;
-
-            chrome.Runtime.getProperties({
-              objectId: result.objectId
-            }, (err, propsResult) => {
-              if (err) {
-                /* continue anyway */
-              }
-              result.props = {};
-              if (Array.isArray(propsResult.result)) {
-                propsResult.result.forEach(prop => {
-                  result.props[prop.name] = prop.value ? prop.value.value :
-                      prop.get.description;
-                });
-              }
-              resolve(result);
-            });
-          });
-        }));
-    });
-  }
-
-  gotoURL(url, waitForLoad) {
-    return this.getInstance().then(chrome => {
-      return new Promise((resolve, reject) => {
-        chrome.Page.enable();
-        chrome.Page.navigate({url}, (err, response) => {
-          if (err) {
-            reject(err);
-          }
-
-          if (waitForLoad) {
-            chrome.Page.loadEventFired(_ => {
-              this._currentURL = url;
-              resolve(response);
-            });
-          } else {
-            resolve(response);
-          }
-        });
-      });
-    });
-  }
-
-  disableCaching() {
-    // TODO(paullewis): implement.
-    return Promise.resolve();
+    this.timeoutID = setTimeout(_ => {
+      this.disconnect();
+      reject(new Error('Trace retrieval timed out'));
+    }, 15000);
   }
 
   beginTrace() {
     this._traceEvents = [];
 
-    return this.getInstance().then(chrome => {
+    return this.connect().then(chrome => {
       chrome.Page.enable();
       chrome.Tracing.start({
-        categories: this.categories.join(','),
+        categories: this._traceCategories.join(','),
         options: 'sampling-frequency=10000'  // 1000 is default and too slow.
       });
 
@@ -228,10 +153,10 @@ class ChromeProtocol {
   }
 
   endTrace() {
-    return this.getInstance().then(chrome => {
+    return this.connect().then(chrome => {
       return new Promise((resolve, reject) => {
         chrome.Tracing.end();
-        this.resetFailureTimeout(reject);
+        this._resetFailureTimeout(reject);
 
         chrome.Tracing.tracingComplete(_ => {
           resolve(this._traceEvents);
@@ -241,7 +166,7 @@ class ChromeProtocol {
   }
 
   beginNetworkCollect() {
-    return this.getInstance().then(chrome => {
+    return this.connect().then(chrome => {
       return new Promise((resolve, reject) => {
         this._networkRecords = [];
         this._networkRecorder = new NetworkRecorder(this._networkRecords);
@@ -268,7 +193,7 @@ class ChromeProtocol {
   }
 
   endNetworkCollect() {
-    return this.getInstance().then(chrome => {
+    return this.connect().then(chrome => {
       return new Promise((resolve, reject) => {
         chrome.removeListener('Network.requestWillBeSent',
             this._networkRecorder.onRequestWillBeSent);

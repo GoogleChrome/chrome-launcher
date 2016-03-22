@@ -61,6 +61,25 @@ global.SecurityAgent = {
   }
 };
 
+// From https://chromium.googlesource.com/chromium/src/third_party/WebKit/Source/devtools/+/master/protocol.json#93
+global.PageAgent = {
+  ResourceType: {
+    Document: 'document',
+    Stylesheet: 'stylesheet',
+    Image: 'image',
+    Media: 'media',
+    Font: 'font',
+    Script: 'script',
+    TextTrack: 'texttrack',
+    XHR: 'xhr',
+    Fetch: 'fetch',
+    EventSource: 'eventsource',
+    WebSocket: 'websocket',
+    Manifest: 'manifest',
+    Other: 'other'
+  }
+};
+
 require('chrome-devtools-frontend/front_end/common/Object.js');
 require('chrome-devtools-frontend/front_end/common/ParsedURL.js');
 require('chrome-devtools-frontend/front_end/common/ResourceType.js');

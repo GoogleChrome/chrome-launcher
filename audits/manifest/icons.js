@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-var traceProcessor = require('../../lib/processor');
+const manifestParser = require('../../helpers/manifest-parser');
 
-module.exports = function(data) {
-  let results = traceProcessor.analyzeTrace(data.traceContents);
+class ManifestIcons {
 
-  return {
-    'time-in-javascript': results[0].extendedInfo.javaScript
-  };
-};
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains icons';
+  }
+
+  static audit(inputs) {
+    let hasIcons = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasIcons = (!!manifest.icons);
+    }
+
+    return {
+      value: hasIcons,
+      tags: ManifestIcons.tags,
+      description: ManifestIcons.description
+    };
+  }
+}
+
+module.exports = ManifestIcons;

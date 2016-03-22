@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-module.exports = function(data) {
-  // See how compressed the HTML _could_ be if whitespace was removed.
-  // This could be a lot more aggressive.
-  let htmlNoWhiteSpaces = data.html
-    .replace(/\n/igm, '')
-    .replace(/\t/igm, '')
-    .replace(/\s+/igm, ' ');
+class ServiceWorker {
 
-  let htmlLen = Math.max(1, data.html.length);
-  let htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
-  let ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
+  static get tags() {
+    return ['Offline'];
+  }
 
-  return {
-    'minify-html': ratio
-  };
-};
+  static get description() {
+    return 'Has a Service Worker registration';
+  }
+
+  static audit(inputs) {
+    const registrations = inputs.serviceWorkers.versions;
+    const activatedRegistrations = registrations.filter(reg => {
+      return reg.status === 'activated' &&
+          reg.scriptURL.startsWith(inputs.url);
+    });
+
+    return {
+      value: (activatedRegistrations.length > 0),
+      tags: ServiceWorker.tags,
+      description: ServiceWorker.description
+    };
+  }
+}
+
+module.exports = ServiceWorker;

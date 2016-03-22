@@ -1,12 +1,11 @@
 /**
- * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,18 +15,25 @@
  */
 'use strict';
 
-/* global document */
+class Viewport {
 
-// must be defined as a standalone function expression to be stringified successfully.
-function findMetaViewport() {
-  return document.head.querySelector('meta[name="viewport"]');
+  static get tags() {
+    return ['Mobile Friendly'];
+  }
+
+  static get description() {
+    return 'Site has a viewport meta tag';
+  }
+
+  static audit(inputs) {
+    const viewportExpression = /<meta ([^c]+)content="width=/gim;
+
+    return {
+      value: viewportExpression.test(inputs.html),
+      tags: Viewport.tags,
+      description: Viewport.description
+    };
+  }
 }
 
-var ViewportHasMetaContent = {
-  run: function(driver, url) {
-    return driver.evaluateFunction(url, findMetaViewport)
-      .then(viewportElement => ({viewportElement}));
-  }
-};
-
-module.exports = ViewportHasMetaContent;
+module.exports = Viewport;

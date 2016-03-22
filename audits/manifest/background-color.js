@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-var MinifyHtmlGatherer = {
-  run: function(driver, url) {
-    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
-      .then(driver.getPageHTML)
-      .then(html => ({html}));
-  }
-};
+const manifestParser = require('../../helpers/manifest-parser');
 
-module.exports = MinifyHtmlGatherer;
+class ManifestBackgroundColor {
+
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains background_color';
+  }
+
+  static audit(inputs) {
+    let hasBackgroundColor = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasBackgroundColor = (!!manifest.background_color);
+    }
+
+    return {
+      value: hasBackgroundColor,
+      tags: ManifestBackgroundColor.tags,
+      description: ManifestBackgroundColor.description
+    };
+  }
+}
+
+module.exports = ManifestBackgroundColor;

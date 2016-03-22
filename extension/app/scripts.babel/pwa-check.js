@@ -14,197 +14,35 @@
  * limitations under the License.
  */
 
-import {ManifestParser} from './manifest-parser.js';
+'use strict';
 
-var hasManifest = _ => {
-  return !!document.querySelector('link[rel=manifest]');
-};
+const ExtensionProtocol = require('../../../helpers/extension/driver.js');
+const Auditor = require('../../../auditor');
+const Gatherer = require('../../../gatherer');
 
-var parseManifest = function() {
-  var link = document.querySelector('link[rel=manifest]');
-
-  if (!link) {
-    return {};
-  }
-
-  var request = new XMLHttpRequest();
-  request.open('GET', link.href, false);  // `false` makes the request synchronous
-  request.send(null);
-
-  if (request.status === 200) {
-    /* eslint-disable new-cap*/
-    let parserInstance = (window.__lighthouse.ManifestParser)();
-    /* eslint-enable new-cap*/
-    parserInstance.parse(request.responseText);
-    return parserInstance.manifest();
-  }
-
-  throw new Error('Unable to fetch manifest at ' + link);
-};
-
-var hasManifestThemeColor = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.theme_color;
-};
-
-var hasManifestBackgroundColor = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.background_color;
-};
-
-var hasManifestIcons = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.icons;
-};
-
-var hasManifestIcons192 = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  if (!manifest.icons) {
-    return false;
-  }
-
-  return !!manifest.icons.find(function(i) {
-    return i.sizes.has('192x192');
-  });
-};
-
-var hasManifestShortName = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.short_name;
-};
-
-var hasManifestName = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.name;
-};
-
-var hasManifestStartUrl = _ => {
-  let manifest = __lighthouse.parseManifest();
-
-  return !!manifest.start_url;
-};
-
-// quoth kinlan >> re: canonical, it is always good to have them, but not needed.  This test is more of a warning than anything else to let you know you should consider it.
-var hasCanonicalUrl = _ => {
-  var link = document.querySelector('link[rel=canonical]');
-
-  return !!link;
-};
-
-var hasServiceWorkerRegistration = _ => {
-  return new Promise((resolve, reject) => {
-    navigator.serviceWorker.getRegistration().then(r => {
-      // Fail immediately for non-existent registrations.
-      if (typeof r === 'undefined') {
-        return resolve(false);
-      }
-
-      // If there's an active SW call this done.
-      if (r.active) {
-        return resolve(!!r.active);
-      }
-
-      // Give any installing SW chance to install.
-      r.installing.onstatechange = function() {
-        resolve(this.state === 'installed');
-      };
-    }).catch(_ => {
-      resolve(false);
-    });
-  });
-};
-
-var isOnHTTPS = _ => location.protocol === 'https:';
-
-function injectIntoTab(chrome, fnPair) {
-  var singleLineFn = fnPair[1].toString();
-
-  return new Promise((res, reject) => {
-    chrome.tabs.executeScript(null, {
-      code: `window.__lighthouse = window.__lighthouse || {};
-      window.__lighthouse['${fnPair[0]}'] = ${singleLineFn}`
-    }, ret => {
-      if (chrome.runtime.lastError) {
-        return reject(chrome.runtime.lastError);
-      }
-
-      res(ret);
-    });
-  });
-}
-
-function convertAuditsToPromiseStrings(audits) {
-  const auditNames = Object.keys(audits);
-
-  return auditNames.reduce((prevAuditGroup, auditName, auditGroupIndex) => {
-    // Then within each group, reduce each audit down to a Promise.
-    return prevAuditGroup + (auditGroupIndex > 0 ? ',' : '') +
-      audits[auditName].reduce((prevAudit, audit, auditIndex) => {
-        return prevAudit + (auditIndex > 0 ? ',' : '') +
-            convertAuditToPromiseString(auditName, audit);
-      }, '');
-  }, '');
-}
-
-function convertAuditToPromiseString(auditName, audit) {
-  return `Promise.all([
-      Promise.resolve("${auditName}"),
-      Promise.resolve("${audit[1]}"),
-      (${audit[0].toString()})()
-  ])`;
-}
-
-function runAudits(chrome, audits) {
-  // Reduce each group of audits.
-  const fnString = convertAuditsToPromiseStrings(audits);
-
-  // Ask the tab to run the promises, and beacon back the results.
-  chrome.tabs.executeScript(null, {
-    code: `Promise.all([${fnString}]).then(__lighthouse.postAuditResults)`
-  }, function() {
-    if (chrome.runtime.lastError) {
-      throw chrome.runtime.lastError;
-    }
-  });
-}
-
-function postAuditResults(results) {
-  chrome.runtime.sendMessage({onAuditsComplete: results});
-}
-
-var functionsToInject = [
-  ['ManifestParser', ManifestParser],
-  ['parseManifest', parseManifest],
-  ['postAuditResults', postAuditResults]
+const driver = new ExtensionProtocol();
+const gatherer = new Gatherer();
+const auditor = new Auditor();
+const gatherers = [
+  require('../../../gatherers/url'),
+  require('../../../gatherers/https'),
+  require('../../../gatherers/service-worker'),
+  require('../../../gatherers/html'),
+  require('../../../gatherers/manifest')
 ];
-
-var audits = {
-  Security: [
-    [isOnHTTPS, 'Served over HTTPS']
-  ],
-  Offline: [
-    [hasServiceWorkerRegistration, 'Has a service worker registration']
-  ],
-  Manifest: [
-    [hasManifest, 'Exists'],
-    [hasManifestThemeColor, 'Contains theme_color'],
-    [hasManifestBackgroundColor, 'Contains background_color'],
-    [hasManifestStartUrl, 'Contains start_url'],
-    [hasManifestShortName, 'Contains short_name'],
-    [hasManifestName, 'Contains name'],
-    [hasManifestIcons, 'Contains icons defined'],
-    [hasManifestIcons192, 'Contains 192px icon'],
-  ],
-  Miscellaneous: [
-    [hasCanonicalUrl, 'Site has a Canonical URL']
-  ]
-};
+const audits = [
+  require('../../../audits/security/is-on-https'),
+  require('../../../audits/offline/service-worker'),
+  require('../../../audits/mobile-friendly/viewport'),
+  require('../../../audits/manifest/exists'),
+  require('../../../audits/manifest/background-color'),
+  require('../../../audits/manifest/theme-color'),
+  require('../../../audits/manifest/icons'),
+  require('../../../audits/manifest/icons-192'),
+  require('../../../audits/manifest/name'),
+  require('../../../audits/manifest/short-name'),
+  require('../../../audits/manifest/start-url')
+];
 
 function createResultsHTML(results) {
   const resultsGroup = {};
@@ -212,14 +50,14 @@ function createResultsHTML(results) {
 
   // Go through each group and restructure the results accordingly.
   results.forEach(result => {
-    groupName = result[0];
+    groupName = result.tags;
     if (!resultsGroup[groupName]) {
       resultsGroup[groupName] = [];
     }
 
     resultsGroup[groupName].push({
-      title: result[1],
-      value: result[2]
+      title: result.description,
+      value: result.value
     });
   });
 
@@ -251,22 +89,11 @@ function createResultsHTML(results) {
   return resultsHTML;
 }
 
-export function runPwaAudits(chrome) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.onMessage.addListener(message => {
-      if (!message.onAuditsComplete) {
-        return;
-      }
-      resolve(createResultsHTML(message.onAuditsComplete));
+export function runPwaAudits() {
+  return gatherer
+    .gather(gatherers, {driver})
+    .then(artifacts => auditor.audit(artifacts, audits))
+    .then(results => {
+      return createResultsHTML(results);
     });
-
-    Promise.all(functionsToInject.map(fnPair => injectIntoTab(chrome, fnPair)))
-        .then(_ => runAudits(chrome, audits),
-            err => {
-              throw err;
-            })
-        .catch(err => {
-          reject(err);
-        });
-  });
 }

@@ -15,22 +15,24 @@
  */
 'use strict';
 
-class Gatherer {
+const Gather = require('./gather');
 
-  gather(gatherers, options) {
+class ServiceWorker extends Gather {
+
+  static gather(options) {
     const driver = options.driver;
-    const artifacts = [];
 
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+    return new Promise((resolve, reject) => {
+      // Register for the event.
+      driver.on('ServiceWorker.workerVersionUpdated', data => {
+        resolve({
+          serviceWorkers: data
+        });
+      });
+
+      driver.sendCommand('ServiceWorker.enable');
+    });
   }
-
 }
 
-module.exports = Gatherer;
+module.exports = ServiceWorker;

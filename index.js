@@ -15,32 +15,44 @@
  */
 'use strict';
 
-let URL = 'https://voice-memos.appspot.com';
+const url = 'https://voice-memos.appspot.com';
+const ChromeProtocol = require('./helpers/browser/driver');
 
-let gatherer = require('./gatherer');
-let auditor = require('./auditor');
-let ChromeProtocol = require('./helpers/browser/driver');
+const Auditor = require('./auditor');
+const Gatherer = require('./gatherer');
 
 const driver = new ChromeProtocol();
+const gatherer = new Gatherer();
+const auditor = new Auditor();
+const gatherers = [
+  require('./gatherers/url'),
+  require('./gatherers/load-trace'),
+  require('./gatherers/https'),
+  require('./gatherers/service-worker'),
+  require('./gatherers/html'),
+  require('./gatherers/manifest')
+];
+const audits = [
+  require('./audits/security/is-on-https'),
+  require('./audits/offline/service-worker'),
+  require('./audits/mobile-friendly/viewport'),
+  require('./audits/manifest/exists'),
+  require('./audits/manifest/background-color'),
+  require('./audits/manifest/theme-color'),
+  require('./audits/manifest/icons'),
+  require('./audits/manifest/icons-192'),
+  require('./audits/manifest/name'),
+  require('./audits/manifest/short-name'),
+  require('./audits/manifest/start-url')
+];
 
-Promise.resolve(driver).then(gatherer([
-  require('./audits/viewport-meta-tag/gather'),
-  require('./audits/minify-html/gather'),
-  require('./audits/service-worker/gather'),
-  require('./gatherers/trace')
-], URL)).then(auditor([
-  require('./audits/minify-html/audit'),
-  require('./audits/service-worker/audit'),
-  require('./audits/time-in-javascript/audit'),
-  require('./audits/viewport-meta-tag/audit'),
-  require('./metrics/first-meaningful-paint/audit')
-])).then(function(results) {
-  console.log('all done');
-  console.log(results);
-  // driver.discardTab(); // FIXME: close connection later
-  // process.exit(0);
-}).catch(function(err) {
-  console.log('error encountered', err);
-  console.log(err.stack);
-  throw err;
-});
+gatherer
+    .gather(gatherers, {url, driver})
+    .then(artifacts => auditor.audit(artifacts, audits))
+    .then(results => {
+      console.log(results);
+    }).catch(function(err) {
+      console.log('error encountered', err);
+      console.log(err.stack);
+      throw err;
+    });

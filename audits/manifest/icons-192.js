@@ -13,24 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-class Gatherer {
+const manifestParser = require('../../helpers/manifest-parser');
 
-  gather(gatherers, options) {
-    const driver = options.driver;
-    const artifacts = [];
+class ManifestIcons192 {
 
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+  static get tags() {
+    return ['Manifest'];
   }
 
+  static get description() {
+    return 'Contains 192px icons';
+  }
+
+  static audit(inputs) {
+    let hasIcons = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest && manifest.icons) {
+      const icons192 = manifest.icons.raw.find(i => i.sizes === '192x192');
+      hasIcons = (!!icons192);
+    }
+
+    return {
+      value: hasIcons,
+      tags: ManifestIcons192.tags,
+      description: ManifestIcons192.description
+    };
+  }
 }
 
-module.exports = Gatherer;
+module.exports = ManifestIcons192;

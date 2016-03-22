@@ -2,6 +2,7 @@
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
+import browserify from 'gulp-browserify';
 import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
@@ -96,6 +97,7 @@ gulp.task('babel', () => {
     .pipe($.babel({
       presets: ['es2015']
     }))
+    .pipe(browserify())
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
 });
