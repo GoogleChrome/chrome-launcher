@@ -22,8 +22,6 @@ const Auditor = require('./auditor');
 const Gatherer = require('./gatherer');
 
 const driver = new ChromeProtocol();
-const gatherer = new Gatherer();
-const auditor = new Auditor();
 const gatherers = [
   require('./gatherers/url'),
   require('./gatherers/load-trace'),
@@ -48,9 +46,9 @@ const audits = [
 
 module.exports = function(opts) {
   var url = opts.url || defaultUrl;
-  gatherer
+  Gatherer
       .gather(gatherers, {url, driver})
-      .then(artifacts => auditor.audit(artifacts, audits))
+      .then(artifacts => Auditor.audit(artifacts, audits))
       .then(results => {
         console.log(results);
       }).catch(function(err) {
@@ -58,4 +56,4 @@ module.exports = function(opts) {
         console.log(err.stack);
         throw err;
       });
-}
+};

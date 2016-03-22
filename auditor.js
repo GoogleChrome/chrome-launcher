@@ -17,14 +17,14 @@
 
 class Auditor {
 
-  _flattenArtifacts(artifacts) {
+  static _flattenArtifacts(artifacts) {
     return artifacts.reduce(function(prev, curr) {
       return Object.assign(prev, curr);
     }, {});
   }
 
-  audit(artifacts, audits) {
-    const flattenedArtifacts = this._flattenArtifacts(artifacts);
+  static audit(artifacts, audits) {
+    const flattenedArtifacts = Auditor._flattenArtifacts(artifacts);
     return Promise.all(audits.map(audit => audit.audit(flattenedArtifacts)));
   }
 }

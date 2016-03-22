@@ -17,7 +17,7 @@
 
 class Gatherer {
 
-  gather(gatherers, options) {
+  static gather(gatherers, options) {
     const driver = options.driver;
     const artifacts = [];
 

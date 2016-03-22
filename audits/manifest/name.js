@@ -16,8 +16,6 @@
 
 'use strict';
 
-const manifestParser = require('../../helpers/manifest-parser');
-
 class ManifestName {
 
   static get tags() {
@@ -30,10 +28,10 @@ class ManifestName {
 
   static audit(inputs) {
     let hasName = false;
-    const manifest = manifestParser(inputs.manifest).value;
+    const manifest = inputs.manifest;
 
     if (manifest) {
-      hasName = (!!manifest.name);
+      hasName = (!!manifest.name.value);
     }
 
     return {
