@@ -18,21 +18,23 @@
 const DevtoolsTimelineModel = require('devtools-timeline-model');
 
 class FirstMeaningfulPaint {
-  constructor(traceData) {
-    const model = new DevtoolsTimelineModel(traceData);
-    const events = model.timelineModel().mainThreadEvents();
-    const ret = {};
+  static parse(traceData) {
+    return new Promise((resolve, reject) => {
+      const model = new DevtoolsTimelineModel(traceData);
+      const events = model.timelineModel().mainThreadEvents();
+      const ret = {};
 
-    const navStartEvent = events.filter(e => e.name === 'navigationStart');
-    const firstTextPaintEvent = events.filter(this._filterEvents);
+      const navStartEvent = events.filter(e => e.name === 'navigationStart');
+      const firstTextPaintEvent = events.filter(this._filterEvents);
 
-    if (firstTextPaintEvent.length && navStartEvent.length) {
-      ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
-    } else {
-      ret.err = new Error('First meaningful paint metric not found');
-    }
+      if (firstTextPaintEvent.length && navStartEvent.length) {
+        ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
+      } else {
+        ret.err = new Error('First meaningful paint metric not found');
+      }
 
-    return ret;
+      resolve(ret);
+    });
   }
 
   _filterEvents(e) {

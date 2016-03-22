@@ -16,7 +16,7 @@
 
 'use strict';
 
-const FMP = require('../../metrics/performance/first-meaningful-paint');
+const FMPMetric = require('../../metrics/performance/first-meaningful-paint');
 
 class FirstMeaningfulPaint {
 
@@ -28,25 +28,32 @@ class FirstMeaningfulPaint {
     return 'Has a good first meaningful paint';
   }
 
+  /**
+   * Audits the page to give a score for First Meaningful Paint.
+   * @see  https://github.com/GoogleChrome/lighthouse/issues/26
+   * @param  {Object} inputs The inputs from the gather phase.
+   * @return {Object} The score from the audit, ranging from 0-100.
+   */
   static audit(inputs) {
-    let score = 100;
+    return FMPMetric
+        .parse(inputs.traceContents)
+        .then(fmp => {
+          if (fmp.err) {
+            return -1;
+          }
 
-    try {
-      const fmp = new FMP(inputs.traceContents);
-      if (fmp.err) {
-        score = -1;
-      } else {
-        score -= Math.max(0, fmp.duration - 1000) / 200;
-      }
-    } catch (e) {
-      score = -1;
-    }
-
-    return {
-      value: score,
-      tags: FirstMeaningfulPaint.tags,
-      description: FirstMeaningfulPaint.description
-    };
+          return 100 - (Math.max(0, fmp.duration - 1000) / 200);
+        }, _ => {
+          // Recover from trace parsing failures.
+          return -1;
+        })
+        .then(score => {
+          return {
+            value: score,
+            tags: FirstMeaningfulPaint.tags,
+            description: FirstMeaningfulPaint.description
+          };
+        });
   }
 }
 
