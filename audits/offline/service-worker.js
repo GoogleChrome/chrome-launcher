@@ -27,7 +27,6 @@ class ServiceWorker {
   }
 
   static audit(inputs) {
-    // Test the Service Worker registrations for validity.
     const registrations = inputs.serviceWorkers.versions;
     const activatedRegistrations = registrations.filter(reg =>
         reg.status === 'activated');

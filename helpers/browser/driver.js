@@ -26,10 +26,10 @@ class ChromeProtocol {
   }
 
   constructor() {
-    this.url_ = null;
-    this.chrome_ = null;
-    this.traceEvents_ = [];
-    this.traceCategories_ = [
+    this._url = null;
+    this._chrome = null;
+    this._traceEvents = [];
+    this._traceCategories = [
       '-*', // exclude default
       'toplevel',
       'blink.console',
@@ -46,28 +46,28 @@ class ChromeProtocol {
   }
 
   get url() {
-    return this.url_;
+    return this._url;
   }
 
-  set url(url_) {
-    this.url_ = url_;
+  set url(_url) {
+    this._url = _url;
   }
 
   connect() {
     return new Promise((resolve, reject) => {
-      if (this.chrome_) {
-        return resolve(this.chrome_);
+      if (this._chrome) {
+        return resolve(this._chrome);
       }
 
       chromeRemoteInterface({}, chrome => {
-        this.chrome_ = chrome;
+        this._chrome = chrome;
         resolve(chrome);
       }).on('error', e => reject(e));
     });
   }
 
   disconnect() {
-    if (this.chrome_ === null) {
+    if (this._chrome === null) {
       return;
     }
 
@@ -76,22 +76,22 @@ class ChromeProtocol {
       this.timeoutID = null;
     }
 
-    this.chrome_.close();
-    this.chrome_ = null;
+    this._chrome.close();
+    this._chrome = null;
     this.url = null;
   }
 
   on(eventName, cb) {
-    if (this.chrome_ === null) {
+    if (this._chrome === null) {
       return;
     }
 
-    this.chrome_.on(eventName, cb);
+    this._chrome.on(eventName, cb);
   }
 
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      this.chrome_.send(command, params, (err, result) => {
+      this._chrome.send(command, params, (err, result) => {
         if (err) {
           return reject(err);
         }
@@ -103,8 +103,8 @@ class ChromeProtocol {
 
   gotoURL(url, waitForLoad) {
     return new Promise((resolve, reject) => {
-      this.chrome_.Page.enable();
-      this.chrome_.Page.navigate({url}, (err, response) => {
+      this._chrome.Page.enable();
+      this._chrome.Page.navigate({url}, (err, response) => {
         if (err) {
           reject(err);
         }
@@ -112,7 +112,7 @@ class ChromeProtocol {
         this.url = url;
 
         if (waitForLoad) {
-          this.chrome_.Page.loadEventFired(_ => {
+          this._chrome.Page.loadEventFired(_ => {
             resolve(response);
           });
         } else {
@@ -122,7 +122,7 @@ class ChromeProtocol {
     });
   }
 
-  resetFailureTimeout(reject) {
+  _resetFailureTimeout(reject) {
     if (this.timeoutID) {
       clearTimeout(this.timeoutID);
       this.timeoutID = null;
@@ -135,17 +135,17 @@ class ChromeProtocol {
   }
 
   beginTrace() {
-    this.traceEvents_ = [];
+    this._traceEvents = [];
 
     return this.connect().then(chrome => {
       chrome.Page.enable();
       chrome.Tracing.start({
-        categories: this.traceCategories_.join(','),
+        categories: this._traceCategories.join(','),
         options: 'sampling-frequency=10000'  // 1000 is default and too slow.
       });
 
       chrome.Tracing.dataCollected(data => {
-        this.traceEvents_.push(...data.value);
+        this._traceEvents.push(...data.value);
       });
 
       return true;
@@ -156,10 +156,10 @@ class ChromeProtocol {
     return this.connect().then(chrome => {
       return new Promise((resolve, reject) => {
         chrome.Tracing.end();
-        this.resetFailureTimeout(reject);
+        this._resetFailureTimeout(reject);
 
         chrome.Tracing.tracingComplete(_ => {
-          resolve(this.traceEvents_);
+          resolve(this._traceEvents);
         });
       });
     });

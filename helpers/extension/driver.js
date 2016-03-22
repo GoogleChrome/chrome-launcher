@@ -21,64 +21,64 @@
 class ExtensionProtocol {
 
   constructor() {
-    this.listeners_ = {};
-    this.tabId_ = null;
-    this.url_ = null;
-    chrome.debugger.onEvent.addListener(this.onEvent_.bind(this));
+    this._listeners = {};
+    this._tabId = null;
+    this._url = null;
+    chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
   }
 
   get url() {
-    return this.url_;
+    return this._url;
   }
 
-  set url(url_) {
-    this.url_ = url_;
+  set url(_url) {
+    this._url = _url;
   }
 
   connect() {
     return this.queryCurrentTab_()
       .then(tabId => {
-        this.tabId_ = tabId;
+        this._tabId = tabId;
         return this.attachDebugger_(tabId);
       });
   }
 
   disconnect() {
-    if (this.tabId_ === null) {
+    if (this._tabId === null) {
       return;
     }
 
-    this.detachDebugger_(this.tabId_)
+    this.detachDebugger_(this._tabId)
         .then(_ => {
-          this.tabId_ = null;
+          this._tabId = null;
           this.url = null;
         });
   }
 
   on(eventName, cb) {
-    if (typeof this.listeners_[eventName] === 'undefined') {
-      this.listeners_[eventName] = [];
+    if (typeof this._listeners[eventName] === 'undefined') {
+      this._listeners[eventName] = [];
     }
 
-    this.listeners_[eventName].push(cb);
+    this._listeners[eventName].push(cb);
   }
 
-  onEvent_(source, method, params) {
-    if (typeof this.listeners_[method] === 'undefined') {
+  _onEvent(source, method, params) {
+    if (typeof this._listeners[method] === 'undefined') {
       return;
     }
 
-    this.listeners_[method].forEach(cb => {
+    this._listeners[method].forEach(cb => {
       cb(params);
     });
 
     // Reset the listeners;
-    this.listeners_[method].length = 0;
+    this._listeners[method].length = 0;
   }
 
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      chrome.debugger.sendCommand({tabId: this.tabId_}, command, params, result => {
+      chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
