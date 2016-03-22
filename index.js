@@ -25,6 +25,7 @@ const driver = new ChromeProtocol();
 const gatherer = new Gatherer();
 const auditor = new Auditor();
 const gatherers = [
+  require('./gatherers/url'),
   require('./gatherers/load-trace'),
   require('./gatherers/https'),
   require('./gatherers/service-worker'),

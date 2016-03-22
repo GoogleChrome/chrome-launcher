@@ -24,6 +24,7 @@ const driver = new ExtensionProtocol();
 const gatherer = new Gatherer();
 const auditor = new Auditor();
 const gatherers = [
+  require('../../../gatherers/url'),
   require('../../../gatherers/https'),
   require('../../../gatherers/service-worker'),
   require('../../../gatherers/html'),

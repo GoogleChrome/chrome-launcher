@@ -13,32 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
-class ServiceWorker {
+const Gather = require('./gather');
 
-  static get tags() {
-    return ['Offline'];
-  }
-
-  static get description() {
-    return 'Has a Service Worker registration';
-  }
-
-  static audit(inputs) {
-    const registrations = inputs.serviceWorkers.versions;
-    const activatedRegistrations = registrations.filter(reg => {
-      return reg.status === 'activated' &&
-          reg.scriptURL.startsWith(inputs.url);
-    });
-
-    return {
-      value: (activatedRegistrations.length > 0),
-      tags: ServiceWorker.tags,
-      description: ServiceWorker.description
-    };
+class URL extends Gather {
+  static gather(options) {
+    return Promise.resolve({url: options.url});
   }
 }
 
-module.exports = ServiceWorker;
+module.exports = URL;
