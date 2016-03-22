@@ -16,19 +16,36 @@ Will run the audits defined in the `audits/` folder against a demo app. Chrome p
 # Start Chrome with a few flags
 ./launch-chrome.sh
 
-# Kick off a lighthouse run
+# set up the global
+npm link
 
-npm start
+# Kick off a lighthouse run
+lighthouse
+lighthouse https://airhorner.com/
 ```
+
+## Chrome Extension
+
+See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extension).
 
 ## Tests
 
-Some basic unit tests forked from node-big-rig are in `/test` and run via mocha. eslint is also checked for style violations.
+Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
 
 ```js
 npm test
 ```
 
+### Code Style
+
+The `.eslintrc` defines all.
+
+#### Variable declarations
+
+`const` > `let` > `var`.  Use `const` wherever possible. Save `var` for emergencies only.
+
+
 ## Trace processing
 
-The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. It's exposed by `lib/processor`. See an example use in the [time-in-javascript](https://github.com/GoogleChrome/lighthouse/blob/85933f07791982d556177fddb55f578d30a4b56f/audits/time-in-javascript/index.js#L43) audit
+The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. Additionally, the [DevTools' Timeline Model](https://github.com/paulirish/devtools-timeline-model) is available as well. There may be advantages for using one model over another.
+

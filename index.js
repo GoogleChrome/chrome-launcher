@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const url = 'https://voice-memos.appspot.com';
+const defaultUrl = 'https://voice-memos.appspot.com';
 const ChromeProtocol = require('./helpers/browser/driver');
 
 const Auditor = require('./auditor');
@@ -44,13 +44,16 @@ const audits = [
   require('./audits/manifest/start-url')
 ];
 
-Gatherer
-    .gather(gatherers, {url, driver})
-    .then(artifacts => Auditor.audit(artifacts, audits))
-    .then(results => {
-      console.log(results);
-    }).catch(function(err) {
-      console.log('error encountered', err);
-      console.log(err.stack);
-      throw err;
-    });
+module.exports = function(opts) {
+  const url = opts.url || defaultUrl;
+  Gatherer
+      .gather(gatherers, {url, driver})
+      .then(artifacts => Auditor.audit(artifacts, audits))
+      .then(results => {
+        console.log(results);
+      }).catch(function(err) {
+        console.log('error encountered', err);
+        console.log(err.stack);
+        throw err;
+      });
+};
