@@ -16,8 +16,6 @@
 
 'use strict';
 
-const manifestParser = require('../../helpers/manifest-parser');
-
 class ManifestThemeColor {
 
   static get tags() {
@@ -30,10 +28,10 @@ class ManifestThemeColor {
 
   static audit(inputs) {
     let hasThemeColor = false;
-    const manifest = manifestParser(inputs.manifest).value;
+    const manifest = inputs.manifest;
 
     if (manifest) {
-      hasThemeColor = (!!manifest.theme_color);
+      hasThemeColor = (!!manifest.theme_color.value);
     }
 
     return {

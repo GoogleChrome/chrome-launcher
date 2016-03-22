@@ -16,8 +16,6 @@
 
 'use strict';
 
-const manifestParser = require('../../helpers/manifest-parser');
-
 class ManifestIcons {
 
   static get tags() {
@@ -30,10 +28,10 @@ class ManifestIcons {
 
   static audit(inputs) {
     let hasIcons = false;
-    const manifest = manifestParser(inputs.manifest).value;
+    const manifest = inputs.manifest;
 
     if (manifest) {
-      hasIcons = (!!manifest.icons);
+      hasIcons = (manifest.icons.value.length > 0);
     }
 
     return {

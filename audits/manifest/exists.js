@@ -28,7 +28,7 @@ class ManifestExists {
 
   static audit(inputs) {
     return {
-      value: inputs.manifest.length > 0,
+      value: (typeof inputs.manifest !== 'undefined'),
       tags: ManifestExists.tags,
       description: ManifestExists.description
     };

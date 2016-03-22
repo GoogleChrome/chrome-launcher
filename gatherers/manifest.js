@@ -18,6 +18,7 @@
 /* global window, fetch */
 
 const Gather = require('./gather');
+const manifestParser = require('../helpers/manifest-parser');
 
 class Manifest extends Gather {
 
@@ -71,7 +72,11 @@ class Manifest extends Gather {
           })
           .then(manifestURL => Manifest._loadFromURL(options, manifestURL));
         })
-        .then(manifest => ({manifest}));
+        .then(manifestContent => {
+          return {
+            manifest: manifestParser(manifestContent).value
+          };
+        });
   }
 }
 
