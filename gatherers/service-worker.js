@@ -15,12 +15,24 @@
  */
 'use strict';
 
-var MinifyHtmlGatherer = {
-  run: function(driver, url) {
-    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
-      .then(driver.getPageHTML)
-      .then(html => ({html}));
-  }
-};
+const Gather = require('./gather');
 
-module.exports = MinifyHtmlGatherer;
+class ServiceWorker extends Gather {
+
+  static gather(options) {
+    const driver = options.driver;
+
+    return new Promise((resolve, reject) => {
+      // Register for the event.
+      driver.on('ServiceWorker.workerVersionUpdated', data => {
+        resolve({
+          serviceWorkers: data
+        });
+      });
+
+      driver.sendCommand('ServiceWorker.enable');
+    });
+  }
+}
+
+module.exports = ServiceWorker;

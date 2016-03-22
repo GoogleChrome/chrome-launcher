@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-var traceProcessor = require('../../lib/processor');
+const manifestParser = require('../../helpers/manifest-parser');
 
-module.exports = function(data) {
-  let results = traceProcessor.analyzeTrace(data.traceContents);
+class ManifestBackgroundColor {
 
-  return {
-    'time-in-javascript': results[0].extendedInfo.javaScript
-  };
-};
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains background_color';
+  }
+
+  static audit(inputs) {
+    let hasBackgroundColor = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasBackgroundColor = (!!manifest.background_color);
+    }
+
+    return {
+      value: hasBackgroundColor,
+      tags: ManifestBackgroundColor.tags,
+      description: ManifestBackgroundColor.description
+    };
+  }
+}
+
+module.exports = ManifestBackgroundColor;

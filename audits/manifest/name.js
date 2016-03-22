@@ -13,15 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-module.exports = function(data) {
-  // Test the Service Worker registrations for validity.
-  let registrations = data.serviceWorkerRegistrations;
-  let activatedRegistrations = registrations.versions.filter(reg =>
-      reg.status === 'activated');
+const manifestParser = require('../../helpers/manifest-parser');
 
-  return {
-    'service-worker': activatedRegistrations.length > 0
-  };
-};
+class ManifestName {
+
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains name';
+  }
+
+  static audit(inputs) {
+    let hasName = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasName = (!!manifest.name);
+    }
+
+    return {
+      value: hasName,
+      tags: ManifestName.tags,
+      description: ManifestName.description
+    };
+  }
+}
+
+module.exports = ManifestName;

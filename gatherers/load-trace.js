@@ -17,15 +17,18 @@
 'use strict';
 
 const PAUSE_AFTER_LOAD = 3000;
+const Gather = require('./gather');
 
-var TraceGatherer = {
-  run: function(driver, url) {
-    let artifacts = {};
+class LoadTrace extends Gather {
 
-    return driver.disableCaching()
-      // Begin trace and network recording.
-      .then(driver.beginTrace)
-      .then(driver.beginNetworkCollect)
+  static gather(options) {
+    const url = options.url;
+    const driver = options.driver;
+    const artifacts = {};
+
+    // Begin trace and network recording.
+    return driver.beginTrace()
+      .then(_ => driver.beginNetworkCollect())
 
       // Go to the URL.
       .then(_ => driver.gotoURL(url, driver.WAIT_FOR_LOAD))
@@ -36,17 +39,17 @@ var TraceGatherer = {
       }))
 
       // Stop recording and save the results.
-      .then(driver.endNetworkCollect)
+      .then(_ => driver.endNetworkCollect())
       .then(networkRecords => {
         artifacts.networkRecords = networkRecords;
       })
-      .then(driver.endTrace)
+      .then(_ => driver.endTrace())
       .then(traceContents => {
         artifacts.traceContents = traceContents;
       })
 
       .then(_ => artifacts);
   }
-};
+}
 
-module.exports = TraceGatherer;
+module.exports = LoadTrace;

@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-class Gatherer {
+class ServiceWorker {
 
-  gather(gatherers, options) {
-    const driver = options.driver;
-    const artifacts = [];
-
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+  static get tags() {
+    return ['Offline'];
   }
 
+  static get description() {
+    return 'Has a Service Worker registration';
+  }
+
+  static audit(inputs) {
+    // Test the Service Worker registrations for validity.
+    const registrations = inputs.serviceWorkers.versions;
+    const activatedRegistrations = registrations.filter(reg =>
+        reg.status === 'activated');
+
+    return {
+      value: (activatedRegistrations.length > 0),
+      tags: ServiceWorker.tags,
+      description: ServiceWorker.description
+    };
+  }
 }
 
-module.exports = Gatherer;
+module.exports = ServiceWorker;

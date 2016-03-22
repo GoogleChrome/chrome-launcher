@@ -13,21 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-module.exports = function(data) {
-  // See how compressed the HTML _could_ be if whitespace was removed.
-  // This could be a lot more aggressive.
-  let htmlNoWhiteSpaces = data.html
-    .replace(/\n/igm, '')
-    .replace(/\t/igm, '')
-    .replace(/\s+/igm, ' ');
+const manifestParser = require('../../helpers/manifest-parser');
 
-  let htmlLen = Math.max(1, data.html.length);
-  let htmlNoWhiteSpacesLen = htmlNoWhiteSpaces.length;
-  let ratio = Math.min(1, (htmlNoWhiteSpacesLen / htmlLen));
+class ManifestStartUrl {
 
-  return {
-    'minify-html': ratio
-  };
-};
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains start_url';
+  }
+
+  static audit(inputs) {
+    let hasStartUrl = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasStartUrl = (!!manifest.start_url);
+    }
+
+    return {
+      value: hasStartUrl,
+      tags: ManifestStartUrl.tags,
+      description: ManifestStartUrl.description
+    };
+  }
+}
+
+module.exports = ManifestStartUrl;

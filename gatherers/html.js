@@ -15,22 +15,20 @@
  */
 'use strict';
 
-class Gatherer {
+const Gather = require('./gather');
 
-  gather(gatherers, options) {
+class HTML extends Gather {
+
+  static gather(options) {
     const driver = options.driver;
-    const artifacts = [];
 
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+    return driver.sendCommand('DOM.getDocument')
+        .then(result => result.root.nodeId)
+        .then(nodeId => driver.sendCommand('DOM.getOuterHTML', {
+          nodeId: nodeId
+        }))
+        .then(nodeHTML => ({html: nodeHTML.outerHTML}));
   }
-
 }
 
-module.exports = Gatherer;
+module.exports = HTML;

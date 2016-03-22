@@ -13,24 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-class Gatherer {
+const manifestParser = require('../../helpers/manifest-parser');
 
-  gather(gatherers, options) {
-    const driver = options.driver;
-    const artifacts = [];
+class ManifestShortName {
 
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+  static get tags() {
+    return ['Manifest'];
   }
 
+  static get description() {
+    return 'Contains short_name';
+  }
+
+  static audit(inputs) {
+    let hasShortName = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasShortName = (!!manifest.short_name);
+    }
+
+    return {
+      value: hasShortName,
+      tags: ManifestShortName.tags,
+      description: ManifestShortName.description
+    };
+  }
 }
 
-module.exports = Gatherer;
+module.exports = ManifestShortName;

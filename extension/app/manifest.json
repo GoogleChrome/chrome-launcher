@@ -15,7 +15,8 @@
     ]
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "debugger"
   ],
   "browser_action": {
     "default_icon": {

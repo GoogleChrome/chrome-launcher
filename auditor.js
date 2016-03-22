@@ -15,12 +15,18 @@
  */
 'use strict';
 
-module.exports = function(audits) {
-  return function audit(results) {
-    var flattenedAudits = results.reduce(function(prev, curr) {
+class Auditor {
+
+  flattenArtifacts_(artifacts) {
+    return artifacts.reduce(function(prev, curr) {
       return Object.assign(prev, curr);
     }, {});
+  }
 
-    return Promise.all(audits.map(v => v(flattenedAudits)));
-  };
-};
+  audit(artifacts, audits) {
+    const flattenedArtifacts = this.flattenArtifacts_(artifacts);
+    return Promise.all(audits.map(audit => audit.audit(flattenedArtifacts)));
+  }
+}
+
+module.exports = Auditor;

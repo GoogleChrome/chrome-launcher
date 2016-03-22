@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-var ServiceWorkerGatherer = {
-  run: function(driver, url) {
-    return driver.gotoURL(url, driver.WAIT_FOR_LOAD)
-      .then(driver.getServiceWorkerRegistrations)
-      .then(serviceWorkerRegistrations => ({serviceWorkerRegistrations}));
-  }
-};
+const manifestParser = require('../../helpers/manifest-parser');
 
-module.exports = ServiceWorkerGatherer;
+class ManifestIcons {
+
+  static get tags() {
+    return ['Manifest'];
+  }
+
+  static get description() {
+    return 'Contains icons';
+  }
+
+  static audit(inputs) {
+    let hasIcons = false;
+    const manifest = manifestParser(inputs.manifest).value;
+
+    if (manifest) {
+      hasIcons = (!!manifest.icons);
+    }
+
+    return {
+      value: hasIcons,
+      tags: ManifestIcons.tags,
+      description: ManifestIcons.description
+    };
+  }
+}
+
+module.exports = ManifestIcons;

@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-class Gatherer {
+class ManifestExists {
 
-  gather(gatherers, options) {
-    const driver = options.driver;
-    const artifacts = [];
-
-    // Execute gatherers sequentially and return results array when complete.
-    return gatherers.reduce((chain, gatherer) => {
-      return chain
-        .then(_ => gatherer.gather(options))
-        .then(artifact => artifacts.push(artifact));
-    }, driver.connect())
-      .then(_ => driver.disconnect())
-      .then(_ => artifacts);
+  static get tags() {
+    return ['Manifest'];
   }
 
+  static get description() {
+    return 'Exists';
+  }
+
+  static audit(inputs) {
+    return {
+      value: inputs.manifest.length > 0,
+      tags: ManifestExists.tags,
+      description: ManifestExists.description
+    };
+  }
 }
 
-module.exports = Gatherer;
+module.exports = ManifestExists;

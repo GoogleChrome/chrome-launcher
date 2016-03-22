@@ -2,6 +2,7 @@
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
+import browserify from 'gulp-browserify';
 import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
@@ -86,6 +87,7 @@ gulp.task('chromeManifest', () => {
 });
 
 gulp.task('babel', () => {
+  console.log('Babeling up...');
   return gulp.src([
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
@@ -96,6 +98,7 @@ gulp.task('babel', () => {
     .pipe($.babel({
       presets: ['es2015']
     }))
+    .pipe(browserify())
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
 });
