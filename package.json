@@ -30,7 +30,6 @@
   },
   "homepage": "https://github.com/googlechrome/big-rig#readme",
   "dependencies": {
-    "chalk": "^1.1.1",
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
     "devtools-timeline-model": "1.0.16",

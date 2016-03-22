@@ -17,7 +17,6 @@
 
 'use strict';
 
-var chalk = require('chalk');
 var meow = require('meow');
 var lighthouse = require('./');
 
@@ -31,7 +30,7 @@ var cli = meow({
     'Usage',
     '  lighthouse [url]'
   ]
-})
+});
 
 lighthouse({
   url: cli.input[0],
