@@ -45,7 +45,7 @@ const audits = [
 ];
 
 module.exports = function(opts) {
-  var url = opts.url || defaultUrl;
+  const url = opts.url || defaultUrl;
   Gatherer
       .gather(gatherers, {url, driver})
       .then(artifacts => Auditor.audit(artifacts, audits))

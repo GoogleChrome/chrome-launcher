@@ -17,10 +17,10 @@
 
 'use strict';
 
-var meow = require('meow');
-var lighthouse = require('./');
+const meow = require('meow');
+const lighthouse = require('./');
 
-var cli = meow({
+const cli = meow({
   pkg: './package.json',
   help: [
     'Options',
