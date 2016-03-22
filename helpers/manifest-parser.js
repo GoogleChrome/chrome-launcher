@@ -150,7 +150,7 @@ function parseIcon(raw) {
     let set = new Set();
     sizes.value.split(/\s/).forEach(size => set.add(size.toLowerCase()));
 
-    sizes.value = set.size > 0 ? set : undefined;
+    sizes.value = set.size > 0 ? Array.from(set) : undefined;
   }
 
   return {
