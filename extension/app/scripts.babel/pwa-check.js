@@ -21,8 +21,6 @@ const Auditor = require('../../../auditor');
 const Gatherer = require('../../../gatherer');
 
 const driver = new ExtensionProtocol();
-const gatherer = new Gatherer();
-const auditor = new Auditor();
 const gatherers = [
   require('../../../gatherers/url'),
   require('../../../gatherers/https'),
@@ -90,9 +88,9 @@ function createResultsHTML(results) {
 }
 
 export function runPwaAudits() {
-  return gatherer
+  return Gatherer
     .gather(gatherers, {driver})
-    .then(artifacts => auditor.audit(artifacts, audits))
+    .then(artifacts => Auditor.audit(artifacts, audits))
     .then(results => {
       return createResultsHTML(results);
     });

@@ -16,8 +16,6 @@
 
 'use strict';
 
-const manifestParser = require('../../helpers/manifest-parser');
-
 class ManifestStartUrl {
 
   static get tags() {
@@ -30,10 +28,10 @@ class ManifestStartUrl {
 
   static audit(inputs) {
     let hasStartUrl = false;
-    const manifest = manifestParser(inputs.manifest).value;
+    const manifest = inputs.manifest;
 
     if (manifest) {
-      hasStartUrl = (!!manifest.start_url);
+      hasStartUrl = (!!manifest.start_url.value);
     }
 
     return {
