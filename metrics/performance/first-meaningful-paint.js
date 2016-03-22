@@ -15,18 +15,16 @@
  */
 'use strict';
 
+const DevtoolsTimelineModel = require('devtools-timeline-model');
+
 class FirstMeaningfulPaint {
   constructor(traceData) {
-    const DevtoolsTimelineModel = require('devtools-timeline-model');
     const model = new DevtoolsTimelineModel(traceData);
     const events = model.timelineModel().mainThreadEvents();
     const ret = {};
 
     const navStartEvent = events.filter(e => e.name === 'navigationStart');
-    const firstTextPaintEvent = events.filter(e => {
-      return e.categoriesString.includes('blink.user_timing') &&
-          e.name === 'firstTextPaint';
-    });
+    const firstTextPaintEvent = events.filter(this._filterEvents);
 
     if (firstTextPaintEvent.length && navStartEvent.length) {
       ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
@@ -35,6 +33,11 @@ class FirstMeaningfulPaint {
     }
 
     return ret;
+  }
+
+  _filterEvents(e) {
+    return e.categoriesString.includes('blink.user_timing') &&
+        e.name === 'firstTextPaint';
   }
 }
 
