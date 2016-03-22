@@ -19,7 +19,7 @@ const Gather = require('./gather');
 
 class URL extends Gather {
   static gather(options) {
-    return Promise.resolve({url: options.url});
+    return Promise.resolve({url: options.url || options.driver.url});
   }
 }
 
