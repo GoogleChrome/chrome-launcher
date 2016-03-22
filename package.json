@@ -35,6 +35,7 @@
     "devtools-timeline-model": "1.0.16",
     "file": "^0.2.2",
     "meow": "^3.7.0",
+    "npmlog": "^2.0.3",
     "traceviewer": "^1.0.8"
   },
   "devDependencies": {
