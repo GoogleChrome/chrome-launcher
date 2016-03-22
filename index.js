@@ -24,7 +24,7 @@ const Gatherer = require('./gatherer');
 const driver = new ChromeProtocol();
 const gatherers = [
   require('./gatherers/url'),
-  require('./gatherers/load-trace'),
+  require('./gatherers/load'),
   require('./gatherers/https'),
   require('./gatherers/service-worker'),
   require('./gatherers/html'),
@@ -34,6 +34,7 @@ const audits = [
   require('./audits/security/is-on-https'),
   require('./audits/offline/service-worker'),
   require('./audits/mobile-friendly/viewport'),
+  require('./audits/performance/first-meaningful-paint'),
   require('./audits/manifest/exists'),
   require('./audits/manifest/background-color'),
   require('./audits/manifest/theme-color'),

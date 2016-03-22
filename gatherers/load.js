@@ -19,7 +19,7 @@
 const PAUSE_AFTER_LOAD = 3000;
 const Gather = require('./gather');
 
-class LoadTrace extends Gather {
+class Load extends Gather {
 
   static gather(options) {
     const url = options.url;
@@ -47,9 +47,8 @@ class LoadTrace extends Gather {
       .then(traceContents => {
         artifacts.traceContents = traceContents;
       })
-
       .then(_ => artifacts);
   }
 }
 
-module.exports = LoadTrace;
+module.exports = Load;
