@@ -17,36 +17,25 @@
 
 /* global describe, it */
 
-var ManifestParser = require('../helpers/manifest-parser');
+var manifestParser = require('../helpers/manifest-parser');
 var expect = require('chai').expect;
 
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {
-    ManifestParser.parse('');
-    expect(ManifestParser.success()).to.equal(false);
-  });
-
-  it('has empty values when parsing empty manifest', function() {
-    ManifestParser.parse('');
-    expect(ManifestParser.manifest().name).to.equal(undefined);
-    expect(ManifestParser.manifest().short_name).to.equal(undefined);
-    expect(ManifestParser.manifest().start_url).to.equal(undefined);
-    expect(ManifestParser.manifest().display).to.equal(undefined);
-    expect(ManifestParser.manifest().orientation).to.equal(undefined);
-    expect(ManifestParser.manifest().theme_color).to.equal(undefined);
-    expect(ManifestParser.manifest().background_color).to.equal(undefined);
+    let parsedManifest = manifestParser('');
+    expect(!parsedManifest.warning).to.equal(false);
   });
 
   it('accepts empty dictionary', function() {
-    ManifestParser.parse('{}');
-    expect(ManifestParser.success()).to.equal(true);
-    expect(ManifestParser.manifest().name).to.equal(undefined);
-    expect(ManifestParser.manifest().short_name).to.equal(undefined);
-    expect(ManifestParser.manifest().start_url).to.equal(undefined);
-    expect(ManifestParser.manifest().display).to.equal(undefined);
-    expect(ManifestParser.manifest().orientation).to.equal(undefined);
-    expect(ManifestParser.manifest().theme_color).to.equal(undefined);
-    expect(ManifestParser.manifest().background_color).to.equal(undefined);
+    let parsedManifest = manifestParser('{}');
+    expect(!parsedManifest.warning).to.equal(true);
+    expect(parsedManifest.value.name.value).to.equal(undefined);
+    expect(parsedManifest.value.short_name.value).to.equal(undefined);
+    expect(parsedManifest.value.start_url.value).to.equal(undefined);
+    expect(parsedManifest.value.display.value).to.equal(undefined);
+    expect(parsedManifest.value.orientation.value).to.equal(undefined);
+    expect(parsedManifest.value.theme_color.value).to.equal(undefined);
+    expect(parsedManifest.value.background_color.value).to.equal(undefined);
     // TODO:
     // icons
     // related_applications
@@ -55,62 +44,62 @@ describe('Manifest Parser', function() {
 
   it('accepts unknown values', function() {
     // TODO(bckenny): this is the same exact test as above
-    ManifestParser.parse('{}');
-    expect(ManifestParser.success()).to.equal(true);
-    expect(ManifestParser.manifest().name).to.equal(undefined);
-    expect(ManifestParser.manifest().short_name).to.equal(undefined);
-    expect(ManifestParser.manifest().start_url).to.equal(undefined);
-    expect(ManifestParser.manifest().display).to.equal(undefined);
-    expect(ManifestParser.manifest().orientation).to.equal(undefined);
-    expect(ManifestParser.manifest().theme_color).to.equal(undefined);
-    expect(ManifestParser.manifest().background_color).to.equal(undefined);
+    let parsedManifest = manifestParser('{}');
+    expect(!parsedManifest.warning).to.equal(true);
+    expect(parsedManifest.value.name.value).to.equal(undefined);
+    expect(parsedManifest.value.short_name.value).to.equal(undefined);
+    expect(parsedManifest.value.start_url.value).to.equal(undefined);
+    expect(parsedManifest.value.display.value).to.equal(undefined);
+    expect(parsedManifest.value.orientation.value).to.equal(undefined);
+    expect(parsedManifest.value.theme_color.value).to.equal(undefined);
+    expect(parsedManifest.value.background_color.value).to.equal(undefined);
   });
 
   describe('name parsing', function() {
     it('it parses basic string', function() {
-      ManifestParser.parse('{"name":"foo"}');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().name).to.equal('foo');
+      let parsedManifest = manifestParser('{"name":"foo"}');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.name.value).to.equal('foo');
     });
 
     it('it trims whitespaces', function() {
-      ManifestParser.parse('{"name":" foo "}');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().name).to.equal('foo');
+      let parsedManifest = manifestParser('{"name":" foo "}');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.name.value).to.equal('foo');
     });
 
     it('doesn\'t parse non-string', function() {
-      ManifestParser.parse('{"name": {} }');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().name).to.equal(undefined);
+      let parsedManifest = manifestParser('{"name": {} }');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.name.value).to.equal(undefined);
 
-      ManifestParser.parse('{"name": 42 }');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().name).to.equal(undefined);
+      parsedManifest = manifestParser('{"name": 42 }');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.name.value).to.equal(undefined);
     });
   });
 
   describe('short_name parsing', function() {
     it('it parses basic string', function() {
-      ManifestParser.parse('{"short_name":"foo"}');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().short_name).to.equal('foo');
+      let parsedManifest = manifestParser('{"short_name":"foo"}');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.short_name.value).to.equal('foo');
     });
 
     it('it trims whitespaces', function() {
-      ManifestParser.parse('{"short_name":" foo "}');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().short_name).to.equal('foo');
+      let parsedManifest = manifestParser('{"short_name":" foo "}');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.short_name.value).to.equal('foo');
     });
 
     it('doesn\'t parse non-string', function() {
-      ManifestParser.parse('{"short_name": {} }');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().short_name).to.equal(undefined);
+      let parsedManifest = manifestParser('{"short_name": {} }');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.short_name.value).to.equal(undefined);
 
-      ManifestParser.parse('{"short_name": 42 }');
-      expect(ManifestParser.success()).to.equal(true);
-      expect(ManifestParser.manifest().short_name).to.equal(undefined);
+      parsedManifest = manifestParser('{"short_name": 42 }');
+      expect(!parsedManifest.warning).to.equal(true);
+      expect(parsedManifest.value.short_name.value).to.equal(undefined);
     });
   });
 });
