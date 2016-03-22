@@ -18,6 +18,8 @@
 
 const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
+const log = require('npmlog');
+
 
 class ChromeProtocol {
 
@@ -59,8 +61,9 @@ class ChromeProtocol {
         return resolve(this._chrome);
       }
 
-      chromeRemoteInterface({}, chrome => {
+      chromeRemoteInterface({ port: 9222 }, chrome => {
         this._chrome = chrome;
+        this.beginLogging();
         resolve(chrome);
       }).on('error', e => reject(e));
     });
@@ -81,16 +84,30 @@ class ChromeProtocol {
     this.url = null;
   }
 
+
+  beginLogging() {
+    if (true) {
+      this._chrome.on('event', req => _logSnippet(req, true));
+    }
+  }
+
   on(eventName, cb) {
     if (this._chrome === null) {
       return;
     }
-
+    if (true) {
+      console.log('sup')
+      this._chrome.on(eventName, params => _logSnippet({method: eventName, params: params}));
+    }
     this._chrome.on(eventName, cb);
   }
 
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
+      if (true) {
+        console.log('sup')
+        _logSnippet({method: command, params: params}, true);
+      }
       this._chrome.send(command, params, (err, result) => {
         if (err) {
           return reject(err);
@@ -102,23 +119,25 @@ class ChromeProtocol {
   }
 
   gotoURL(url, waitForLoad) {
+    var sendCommand = this.sendCommand.bind(this);
+
     return new Promise((resolve, reject) => {
-      this._chrome.Page.enable();
-      this._chrome.Page.navigate({url}, (err, response) => {
-        if (err) {
-          reject(err);
-        }
+      sendCommand('Page.enable')
+        .then(sendCommand('Page.navigate', {url}))
+        .then((err, response) => {
+          if (err) {
+            reject(err);
+          }
 
-        this.url = url;
+          this.url = url;
 
-        if (waitForLoad) {
-          this._chrome.Page.loadEventFired(_ => {
+          if (!waitForLoad) {
             resolve(response);
-          });
-        } else {
-          resolve(response);
-        }
-      });
+          } else {
+            sendCommand('Page.loadEventFired').then((err, response) => {
+              resolve(response);
+            });
+        });
     });
   }
 
@@ -217,6 +236,14 @@ class ChromeProtocol {
       });
     });
   }
+}
+
+function _logSnippet(req, bool) {
+  let arrow = '=>';
+  let maxLength = process.stdout.columns - req.method.length - arrow.length - 7;
+  if (!req.params) console.error('omfg', req, bool)
+  let snippet = JSON.stringify(req.params).substr(0, maxLength);
+  log[bool ? 'info' : 'http'](req.method, arrow, snippet);
 }
 
 module.exports = ChromeProtocol;
