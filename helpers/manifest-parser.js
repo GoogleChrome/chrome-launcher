@@ -68,6 +68,7 @@ function parseColor(raw) {
   }
 
   // TODO(bckenny): validate color, but for reals
+  // possibly pull in devtools/front_end/common/Color.js
   // If style.color changes when set to the given color, it is valid. Testing
   // against 'white' and 'black' in case of the given color is one of them.
   // var dummy = document.createElement('div');
@@ -104,7 +105,7 @@ function parseStartUrl(jsonInput) {
 }
 
 function parseDisplay(jsonInput) {
-  var display = parseString(jsonInput.display, true);
+  let display = parseString(jsonInput.display, true);
 
   if (display.value && ALLOWED_DISPLAY_VALUES.indexOf(display.value.toLowerCase()) === -1) {
     display.value = undefined;
@@ -115,7 +116,7 @@ function parseDisplay(jsonInput) {
 }
 
 function parseOrientation(jsonInput) {
-  var orientation = parseString(jsonInput.orientation, true);
+  let orientation = parseString(jsonInput.orientation, true);
 
   if (orientation.value &&
       ALLOWED_ORIENTATION_VALUES.indexOf(orientation.value.toLowerCase()) === -1) {
