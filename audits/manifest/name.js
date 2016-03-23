@@ -30,7 +30,7 @@ class ManifestName {
     let hasName = false;
     const manifest = inputs.manifest;
 
-    if (manifest) {
+    if (manifest && manifest.name) {
       hasName = (!!manifest.name.value);
     }
 

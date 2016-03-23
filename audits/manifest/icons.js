@@ -30,7 +30,7 @@ class ManifestIcons {
     let hasIcons = false;
     const manifest = inputs.manifest;
 
-    if (manifest) {
+    if (manifest && manifest.icons && manifest.icons.value) {
       hasIcons = (manifest.icons.value.length > 0);
     }
 
