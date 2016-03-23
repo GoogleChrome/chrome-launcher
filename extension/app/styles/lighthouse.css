@@ -70,6 +70,7 @@ header h2 {
   color: #4B4B4B;
   list-style: none;
   color: #222;
+  position: relative;
 }
 
 .results .group-name {
@@ -88,6 +89,15 @@ header h2 {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+.results .group-score {
+  position: absolute;
+  top: 0;
+  line-height: 44px;
+  right: 16px;
+  font-size: 14px;
+  color: #AAA;
 }
 
 .results .group.no-errors .group-name::before {
