@@ -24,8 +24,10 @@ class FirstMeaningfulPaint {
       const events = model.timelineModel().mainThreadEvents();
       const ret = {};
 
-      const navStartEvent = events.filter(e => e.name === 'navigationStart');
-      const firstTextPaintEvent = events.filter(this._filterEvents);
+      const navStartEvent = events
+          .filter(FirstMeaningfulPaint._filterEventsForNavStart);
+      const firstTextPaintEvent = events
+          .filter(FirstMeaningfulPaint._filterEventsForFirstTextPaint);
 
       if (firstTextPaintEvent.length && navStartEvent.length) {
         ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
@@ -37,7 +39,12 @@ class FirstMeaningfulPaint {
     });
   }
 
-  _filterEvents(e) {
+  static _filterEventsForNavStart(e) {
+    return e.categoriesString.includes('blink.user_timing') &&
+        e.name === 'navigationStart';
+  }
+
+  static _filterEventsForFirstTextPaint(e) {
     return e.categoriesString.includes('blink.user_timing') &&
         e.name === 'firstTextPaint';
   }

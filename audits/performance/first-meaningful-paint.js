@@ -42,7 +42,19 @@ class FirstMeaningfulPaint {
             return -1;
           }
 
-          return 100 - (Math.max(0, fmp.duration - 1000) / 200);
+          // Roughly an exponential curve.
+          // < 1000ms: penalty=0
+          // 3000ms: penalty=90
+          // >= 5000ms: penalty=100
+          const power = (fmp.duration - 1000) * 0.001 * 0.5;
+          const penalty = power > 0 ? Math.pow(10, power) : 0;
+          let score = 100 - penalty;
+
+          // Clamp the score to 0 <= x <= 100.
+          score = Math.min(100, score);
+          score = Math.max(0, score);
+
+          return score;
         }, _ => {
           // Recover from trace parsing failures.
           return -1;
