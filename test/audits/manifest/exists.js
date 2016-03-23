@@ -13,33 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const Audit = require('../../../audits/manifest/exists.js');
+const assert = require('assert');
 
-'use strict';
+/* global describe, it*/
 
-class ManifestShortName {
+describe('manifest: exists audit', () => {
+  it('fails when no manifest present', () => {
+    return assert.equal(Audit.audit({}).value, false);
+  });
 
-  static get tags() {
-    return ['Manifest'];
-  }
-
-  static get description() {
-    return 'Contains short_name';
-  }
-
-  static audit(inputs) {
-    let hasShortName = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.short_name) {
-      hasShortName = (!!manifest.short_name.value);
-    }
-
-    return {
-      value: hasShortName,
-      tags: ManifestShortName.tags,
-      description: ManifestShortName.description
-    };
-  }
-}
-
-module.exports = ManifestShortName;
+  it('succeeds when a manifest is present', () => {
+    return assert.equal(Audit.audit({manifest: {}}).value, true);
+  });
+});

@@ -30,7 +30,7 @@ class ManifestStartUrl {
     let hasStartUrl = false;
     const manifest = inputs.manifest;
 
-    if (manifest) {
+    if (manifest && manifest.start_url) {
       hasStartUrl = (!!manifest.start_url.value);
     }
 

@@ -30,7 +30,7 @@ class ManifestThemeColor {
     let hasThemeColor = false;
     const manifest = inputs.manifest;
 
-    if (manifest) {
+    if (manifest && manifest.theme_color) {
       hasThemeColor = (!!manifest.theme_color.value);
     }
 
