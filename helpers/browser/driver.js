@@ -18,8 +18,7 @@
 
 const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
-const log = require('npmlog');
-
+const npmlog = require('npmlog');
 
 class ChromeProtocol {
 
@@ -61,7 +60,7 @@ class ChromeProtocol {
         return resolve(this._chrome);
       }
 
-      chromeRemoteInterface({ port: 9222 }, chrome => {
+      chromeRemoteInterface({port: 9222}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
         resolve(chrome);
@@ -84,30 +83,27 @@ class ChromeProtocol {
     this.url = null;
   }
 
-
   beginLogging() {
-    if (true) {
-      // log all events received
-      this._chrome.on('event', req => _logSnippet('verbose', '<=', req));
-    }
+    // log events received
+    this._chrome.on('event', req => _log('verbose', '<=', req));
   }
 
+  // bind listeners for protocol events
   on(eventName, cb) {
     if (this._chrome === null) {
       throw new Error('Trying to call on() but no cri instance available yet');
     }
-    if (true) {
-      // event listeners being bound
-      _logSnippet('info', 'event => browser', {method: eventName});
-    }
+    // log event listeners being bound
+    _log('info', 'event => browser', {method: eventName});
+
     this._chrome.on(eventName, cb);
   }
 
+  // call protocol methods
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      if (true) {
-        _logSnippet('info', 'method => browser', {method: command, params: params});
-      }
+      _log('info', 'method => browser', {method: command, params: params});
+
       this._chrome.send(command, params, (err, result) => {
         if (err) {
           return reject(err);
@@ -157,7 +153,7 @@ class ChromeProtocol {
     };
 
     this.on('Tracing.dataCollected', data => {
-       this._traceEvents.push(...data.value);
+      this._traceEvents.push(...data.value);
     });
 
     return this.connect()
@@ -184,8 +180,8 @@ class ChromeProtocol {
         this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
         this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
         this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
-        this.on('Network.dataReceived',  this._networkRecorder.onDataReceived);
-        this.on('Network.loadingFinished',  this._networkRecorder.onLoadingFinished);
+        this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
+        this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
         this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
         this.sendCommand('Network.enable');
@@ -223,11 +219,11 @@ class ChromeProtocol {
   }
 }
 
-function _logSnippet(level, prefix, data) {
+function _log(level, prefix, data) {
   const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
   const maxLength = columns - data.method.length - prefix.length - 7;
   const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
-  log[level](prefix, data.method, snippet);
+  npmlog[level](prefix, data.method, snippet);
 }
 
 module.exports = ChromeProtocol;
