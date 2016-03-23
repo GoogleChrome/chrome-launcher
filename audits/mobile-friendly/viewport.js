@@ -26,6 +26,8 @@ class Viewport {
   }
 
   static audit(inputs) {
+    // TODO: This'll be a false positive if the body content has this string.
+    // Unless we want to parse the original HTML, we should query for `head > .meta[name=viewport]`
     const viewportExpression = /<meta ([^c]+)content="width=/gim;
 
     return {

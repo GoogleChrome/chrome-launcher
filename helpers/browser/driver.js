@@ -18,6 +18,9 @@
 
 const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
+const npmlog = require('npmlog');
+
+const port = process.env.PORT || 9222;
 
 class ChromeProtocol {
 
@@ -59,8 +62,9 @@ class ChromeProtocol {
         return resolve(this._chrome);
       }
 
-      chromeRemoteInterface({}, chrome => {
+      chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
+        this.beginLogging();
         resolve(chrome);
       }).on('error', e => reject(e));
     });
@@ -81,19 +85,30 @@ class ChromeProtocol {
     this.url = null;
   }
 
+  beginLogging() {
+    // log events received
+    this._chrome.on('event', req => _log('verbose', '<=', req));
+  }
+
+  // bind listeners for protocol events
   on(eventName, cb) {
     if (this._chrome === null) {
-      return;
+      throw new Error('Trying to call on() but no cri instance available yet');
     }
+    // log event listeners being bound
+    _log('info', 'event => browser', {method: eventName});
 
     this._chrome.on(eventName, cb);
   }
 
+  // call protocol methods
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
+      _log('info', 'method => browser', {method: command, params: params});
+
       this._chrome.send(command, params, (err, result) => {
         if (err) {
-          return reject(err);
+          return reject(result);
         }
 
         resolve(result);
@@ -102,22 +117,19 @@ class ChromeProtocol {
   }
 
   gotoURL(url, waitForLoad) {
-    return new Promise((resolve, reject) => {
-      this._chrome.Page.enable();
-      this._chrome.Page.navigate({url}, (err, response) => {
-        if (err) {
-          reject(err);
-        }
+    const sendCommand = this.sendCommand.bind(this);
 
+    return new Promise((resolve, reject) => {
+      Promise.resolve()
+      .then(_ => sendCommand('Page.enable'))
+      .then(_ => sendCommand('Page.navigate', {url: url}))
+      .then(response => {
         this.url = url;
 
-        if (waitForLoad) {
-          this._chrome.Page.loadEventFired(_ => {
-            resolve(response);
-          });
-        } else {
-          resolve(response);
+        if (!waitForLoad) {
+          return resolve(response);
         }
+        this.on('Page.loadEventFired', response => resolve(response));
       });
     });
   }
@@ -136,31 +148,27 @@ class ChromeProtocol {
 
   beginTrace() {
     this._traceEvents = [];
+    const sendCommand = this.sendCommand.bind(this);
+    const tracingOpts = {
+      categories: this._traceCategories.join(','),
+      options: 'sampling-frequency=10000'  // 1000 is default and too slow.
+    };
 
-    return this.connect().then(chrome => {
-      chrome.Page.enable();
-      chrome.Tracing.start({
-        categories: this._traceCategories.join(','),
-        options: 'sampling-frequency=10000'  // 1000 is default and too slow.
-      });
-
-      chrome.Tracing.dataCollected(data => {
-        this._traceEvents.push(...data.value);
-      });
-
-      return true;
+    this.on('Tracing.dataCollected', data => {
+      this._traceEvents.push(...data.value);
     });
+
+    return this.connect()
+      .then(_ => sendCommand('Page.enable'))
+      .then(_ => sendCommand('Tracing.start', tracingOpts));
   }
 
   endTrace() {
-    return this.connect().then(chrome => {
-      return new Promise((resolve, reject) => {
-        chrome.Tracing.end();
+    return new Promise((resolve, reject) => {
+      this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
+      return this.connect().then(_ => {
+        this.sendCommand('Tracing.end');
         this._resetFailureTimeout(reject);
-
-        chrome.Tracing.tracingComplete(_ => {
-          resolve(this._traceEvents);
-        });
       });
     });
   }
@@ -171,20 +179,14 @@ class ChromeProtocol {
         this._networkRecords = [];
         this._networkRecorder = new NetworkRecorder(this._networkRecords);
 
-        chrome.on('Network.requestWillBeSent',
-            this._networkRecorder.onRequestWillBeSent);
-        chrome.on('Network.requestServedFromCache',
-            this._networkRecorder.onRequestServedFromCache);
-        chrome.on('Network.responseReceived',
-            this._networkRecorder.onResponseReceived);
-        chrome.on('Network.dataReceived',
-            this._networkRecorder.onDataReceived);
-        chrome.on('Network.loadingFinished',
-            this._networkRecorder.onLoadingFinished);
-        chrome.on('Network.loadingFailed',
-            this._networkRecorder.onLoadingFailed);
+        this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
+        this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
+        this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
+        this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
+        this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
+        this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        chrome.Network.enable();
+        this.sendCommand('Network.enable');
         chrome.once('ready', _ => {
           resolve();
         });
@@ -208,7 +210,7 @@ class ChromeProtocol {
         chrome.removeListener('Network.loadingFailed',
             this._networkRecorder.onLoadingFailed);
 
-        chrome.Network.disable();
+        this.sendCommand('Network.disable');
         chrome.once('ready', _ => {
           resolve(this._networkRecords);
           this._networkRecorder = null;
@@ -217,6 +219,13 @@ class ChromeProtocol {
       });
     });
   }
+}
+
+function _log(level, prefix, data) {
+  const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
+  const maxLength = columns - data.method.length - prefix.length - 7;
+  const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
+  npmlog[level](prefix, data.method, snippet);
 }
 
 module.exports = ChromeProtocol;

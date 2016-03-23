@@ -19,6 +19,7 @@
 
 const meow = require('meow');
 const lighthouse = require('./');
+const log = require('npmlog');
 
 const cli = meow({
   pkg: './package.json',
@@ -26,6 +27,7 @@ const cli = meow({
     'Options',
     '  --help          Show this help',
     '  --version       Current version of package',
+    '  --verbose       Displays verbose logging',
     '',
     'Usage',
     '  lighthouse [url]'
@@ -36,3 +38,7 @@ lighthouse({
   url: cli.input[0],
   flags: cli.flags
 });
+
+if (cli.flags.verbose) {
+  log.level = 'verbose';
+}
