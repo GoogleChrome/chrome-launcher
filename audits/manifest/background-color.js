@@ -26,13 +26,14 @@ class ManifestBackgroundColor {
     return 'Contains background_color';
   }
 
-  static audit(inputs) {
-    let hasBackgroundColor = false;
-    const manifest = inputs.manifest;
+  static hasBackgroundColorValue(manifest) {
+    return manifest !== undefined &&
+      manifest.background_color !== undefined &&
+      manifest.background_color.value !== undefined;
+  }
 
-    if (manifest) {
-      hasBackgroundColor = (!!manifest.background_color.value);
-    }
+  static audit(inputs) {
+    const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(inputs.manifest);
 
     return {
       value: hasBackgroundColor,

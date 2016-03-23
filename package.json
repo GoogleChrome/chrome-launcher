@@ -15,7 +15,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint --silent && npm run unit",
-    "unit": "mocha test/*.js --timeout 60000",
+    "unit": "mocha test/**/*.js --timeout 60000",
     "start": "node ."
   },
   "repository": {
