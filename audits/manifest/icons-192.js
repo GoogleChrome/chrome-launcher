@@ -32,7 +32,7 @@ class ManifestIcons192 {
 
     if (manifest && manifest.icons.value) {
       const icons192 = manifest.icons.value.find(icon => {
-        return icon.value.sizes.value.includes('192x192');
+        return icon.value.sizes.value.indexOf('192x192') !== -1;
       });
       hasIcons = (!!icons192);
     }

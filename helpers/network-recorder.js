@@ -22,24 +22,23 @@ global.self = global;
 global.Protocol = {
   Agents() {}
 };
-global.WebInspector = {
-  _moduleSettings: {
-    cacheDisabled: {
-      addChangeListener() {},
-      get() {
-        return false;
-      }
-    },
-    monitoringXHREnabled: {
-      addChangeListener() {},
-      get() {
-        return false;
-      }
+global.WebInspector = global.WebInspector || {};
+global.WebInspector._moduleSettings = {
+  cacheDisabled: {
+    addChangeListener() {},
+    get() {
+      return false;
     }
   },
-  moduleSetting: function(settingName) {
-    return this._moduleSettings[settingName];
+  monitoringXHREnabled: {
+    addChangeListener() {},
+    get() {
+      return false;
+    }
   }
+};
+global.WebInspector.moduleSetting = function(settingName) {
+  return this._moduleSettings[settingName];
 };
 // Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
 global.NetworkAgent = {

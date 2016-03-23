@@ -15,6 +15,10 @@
  */
 'use strict';
 
+// Required to initialize WebInspector.Color.
+global.WebInspector = global.WebInspector || {};
+require('chrome-devtools-frontend/front_end/common/Color.js');
+
 const ALLOWED_DISPLAY_VALUES = [
   'fullscreen',
   'standalone',
@@ -61,33 +65,21 @@ function parseURL(raw) {
 }
 
 function parseColor(raw) {
-  let color = parseString(raw);
+  const color = parseString(raw);
 
+  // Finished if color missing or not a string.
   if (color.value === undefined) {
     return color;
   }
 
-  // TODO(bckenny): validate color, but for reals
-  // possibly pull in devtools/front_end/common/Color.js
-  // If style.color changes when set to the given color, it is valid. Testing
-  // against 'white' and 'black' in case of the given color is one of them.
-  // var dummy = document.createElement('div');
-  // dummy.style.color = 'white';
-  // dummy.style.color = color.value;
-  // if (dummy.style.color !== 'white') {
-  //   return color;
-  // }
-  // dummy.style.color = 'black';
-  // dummy.style.color = color.value;
-  // if (dummy.style.color !== 'black') {
-  //   return color;
-  // }
+  // Use DevTools's color parser to check CSS3 Color parsing.
+  const parsedColor = global.WebInspector.Color.parse(color.raw);
+  if (!parsedColor) {
+    color.value = undefined;
+    color.warning = 'ERROR: color parsing failed.';
+  }
+
   return color;
-
-  // color.value = undefined;
-  // color.warning = 'ERROR: color parsing failed';
-
-  // return color;
 }
 
 function parseName(jsonInput) {
