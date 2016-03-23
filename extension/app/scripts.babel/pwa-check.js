@@ -64,11 +64,14 @@ function createResultsHTML(results) {
 
   groups.forEach(group => {
     let groupHasErrors = false;
+    let total = resultsGroup[group].length;
+    let score = 0;
 
     const groupHTML = resultsGroup[group].reduce((prev, result) => {
       const status = result.value ?
           '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
       groupHasErrors = groupHasErrors || (!result.value);
+      score += result.value ? 1 : 0;
       return prev + `<li>${result.title}: ${status}</li>`;
     }, '');
 
@@ -78,6 +81,7 @@ function createResultsHTML(results) {
     resultsHTML +=
       `<li class="${groupClass}">
         <span class="group-name">${group}</span>
+        <span class="group-score">(${score}/${total})</span>
         <ul>
           ${groupHTML}
         </ul>
