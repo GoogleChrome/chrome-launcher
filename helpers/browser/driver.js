@@ -119,25 +119,20 @@ class ChromeProtocol {
   }
 
   gotoURL(url, waitForLoad) {
-    var sendCommand = this.sendCommand.bind(this);
+    const sendCommand = this.sendCommand.bind(this);
 
     return new Promise((resolve, reject) => {
-      sendCommand('Page.enable')
-        .then(sendCommand('Page.navigate', {url}))
-        .then((err, response) => {
-          if (err) {
-            reject(err);
-          }
+      Promise.resolve()
+      .then(_ => sendCommand('Page.enable'))
+      .then(_ => sendCommand('Page.navigate', {url: url}))
+      .then(response => {
+        this.url = url;
 
-          this.url = url;
-
-          if (!waitForLoad) {
-            resolve(response);
-          } else {
-            sendCommand('Page.loadEventFired').then((err, response) => {
-              resolve(response);
-            });
-        });
+        if (!waitForLoad) {
+          return resolve(response);
+        }
+        this.on('Page.loadEventFired', response => resolve(response));
+      });
     });
   }
 
@@ -155,31 +150,27 @@ class ChromeProtocol {
 
   beginTrace() {
     this._traceEvents = [];
+    const sendCommand = this.sendCommand.bind(this);
+    const tracingOpts = {
+      categories: this._traceCategories.join(','),
+      options: 'sampling-frequency=10000'  // 1000 is default and too slow.
+    };
 
-    return this.connect().then(chrome => {
-      chrome.Page.enable();
-      chrome.Tracing.start({
-        categories: this._traceCategories.join(','),
-        options: 'sampling-frequency=10000'  // 1000 is default and too slow.
-      });
-
-      chrome.Tracing.dataCollected(data => {
-        this._traceEvents.push(...data.value);
-      });
-
-      return true;
+    this.on('Tracing.dataCollected', data => {
+       this._traceEvents.push(...data.value);
     });
+
+    return this.connect()
+      .then(_ => sendCommand('Page.enable'))
+      .then(_ => sendCommand('Tracing.start', tracingOpts));
   }
 
   endTrace() {
-    return this.connect().then(chrome => {
-      return new Promise((resolve, reject) => {
-        chrome.Tracing.end();
+    return new Promise((resolve, reject) => {
+      this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
+      return this.connect().then(_ => {
+        this.sendCommand('Tracing.end');
         this._resetFailureTimeout(reject);
-
-        chrome.Tracing.tracingComplete(_ => {
-          resolve(this._traceEvents);
-        });
       });
     });
   }
@@ -190,20 +181,14 @@ class ChromeProtocol {
         this._networkRecords = [];
         this._networkRecorder = new NetworkRecorder(this._networkRecords);
 
-        chrome.on('Network.requestWillBeSent',
-            this._networkRecorder.onRequestWillBeSent);
-        chrome.on('Network.requestServedFromCache',
-            this._networkRecorder.onRequestServedFromCache);
-        chrome.on('Network.responseReceived',
-            this._networkRecorder.onResponseReceived);
-        chrome.on('Network.dataReceived',
-            this._networkRecorder.onDataReceived);
-        chrome.on('Network.loadingFinished',
-            this._networkRecorder.onLoadingFinished);
-        chrome.on('Network.loadingFailed',
-            this._networkRecorder.onLoadingFailed);
+        this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
+        this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
+        this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
+        this.on('Network.dataReceived',  this._networkRecorder.onDataReceived);
+        this.on('Network.loadingFinished',  this._networkRecorder.onLoadingFinished);
+        this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        chrome.Network.enable();
+        this.sendCommand('Network.enable');
         chrome.once('ready', _ => {
           resolve();
         });
@@ -227,7 +212,7 @@ class ChromeProtocol {
         chrome.removeListener('Network.loadingFailed',
             this._networkRecorder.onLoadingFailed);
 
-        chrome.Network.disable();
+        this.sendCommand('Network.disable()');
         chrome.once('ready', _ => {
           resolve(this._networkRecords);
           this._networkRecorder = null;
