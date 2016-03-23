@@ -1,0 +1,3 @@
+[{"pid":9331,"tid":1295,"ts":1676076836140,"ph":"I","cat":"disabled-by-default-devtools.timeline","name":"TracingStartedInPage","args":{"data":{"page":"0xf5fc2501e08","sessionId":"9331.8"}},"tts":432617,"s":"t"},
+{"pid":9331,"tid":1295,"ts":1676076864852,"ph":"R","cat":"blink.user_timing","name":"navigationStart","args":{"frame":"0xf5fc2501e08"},"tts":432915},
+{"pid":9331,"tid":1295,"ts":1676086864852,"ph":"R","cat":"blink.user_timing","name":"firstTextPaint","args":{"frame":"0xf5fc2501e08"},"tts":467636}]
