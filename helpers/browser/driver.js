@@ -87,17 +87,18 @@ class ChromeProtocol {
 
   beginLogging() {
     if (true) {
-      this._chrome.on('event', req => _logSnippet(req, true));
+      // log all events received
+      this._chrome.on('event', req => _logSnippet('verbose', '<=', req));
     }
   }
 
   on(eventName, cb) {
     if (this._chrome === null) {
-      return;
+      throw new Error('Trying to call on() but no cri instance available yet');
     }
     if (true) {
-      console.log('sup')
-      this._chrome.on(eventName, params => _logSnippet({method: eventName, params: params}));
+      // event listeners being bound
+      _logSnippet('info', 'event => browser', {method: eventName});
     }
     this._chrome.on(eventName, cb);
   }
@@ -105,8 +106,7 @@ class ChromeProtocol {
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       if (true) {
-        console.log('sup')
-        _logSnippet({method: command, params: params}, true);
+        _logSnippet('info', 'method => browser', {method: command, params: params});
       }
       this._chrome.send(command, params, (err, result) => {
         if (err) {
@@ -238,12 +238,11 @@ class ChromeProtocol {
   }
 }
 
-function _logSnippet(req, bool) {
-  let arrow = '=>';
-  let maxLength = process.stdout.columns - req.method.length - arrow.length - 7;
-  if (!req.params) console.error('omfg', req, bool)
-  let snippet = JSON.stringify(req.params).substr(0, maxLength);
-  log[bool ? 'info' : 'http'](req.method, arrow, snippet);
+function _logSnippet(level, prefix, data) {
+  const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
+  const maxLength = columns - data.method.length - prefix.length - 7;
+  const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
+  log[level](prefix, data.method, snippet);
 }
 
 module.exports = ChromeProtocol;
