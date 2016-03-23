@@ -22,7 +22,7 @@ global.self = global;
 global.Protocol = {
   Agents() {}
 };
-global.WebInspector = {
+global.WebInspector = Object.assign(global.WebInspector || {}, {
   _moduleSettings: {
     cacheDisabled: {
       addChangeListener() {},
@@ -40,7 +40,7 @@ global.WebInspector = {
   moduleSetting: function(settingName) {
     return this._moduleSettings[settingName];
   }
-};
+});
 // Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
 global.NetworkAgent = {
   RequestMixedContentType: {

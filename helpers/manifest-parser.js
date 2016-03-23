@@ -73,8 +73,8 @@ function parseColor(raw) {
   }
 
   // Use DevTools's color parser to check CSS3 Color parsing.
-  const parseColor = global.WebInspector.Color.parse(color.raw);
-  if (!parseColor) {
+  const parsedColor = global.WebInspector.Color.parse(color.raw);
+  if (!parsedColor) {
     color.value = undefined;
     color.warning = 'ERROR: color parsing failed.';
   }
