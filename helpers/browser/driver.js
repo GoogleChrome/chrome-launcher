@@ -106,7 +106,7 @@ class ChromeProtocol {
 
       this._chrome.send(command, params, (err, result) => {
         if (err) {
-          return reject(err);
+          return reject(result);
         }
 
         resolve(result);
@@ -208,7 +208,7 @@ class ChromeProtocol {
         chrome.removeListener('Network.loadingFailed',
             this._networkRecorder.onLoadingFailed);
 
-        this.sendCommand('Network.disable()');
+        this.sendCommand('Network.disable');
         chrome.once('ready', _ => {
           resolve(this._networkRecords);
           this._networkRecorder = null;
