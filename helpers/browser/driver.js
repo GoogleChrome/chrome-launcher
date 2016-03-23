@@ -20,6 +20,8 @@ const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
 const npmlog = require('npmlog');
 
+const port = process.env.PORT || 9222;
+
 class ChromeProtocol {
 
   get WAIT_FOR_LOAD() {
@@ -60,7 +62,7 @@ class ChromeProtocol {
         return resolve(this._chrome);
       }
 
-      chromeRemoteInterface({port: 9222}, chrome => {
+      chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
         resolve(chrome);
