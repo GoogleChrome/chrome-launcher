@@ -21,18 +21,15 @@ const meow = require('meow');
 const lighthouse = require('./');
 const log = require('npmlog');
 
-const cli = meow({
-  pkg: './package.json',
-  help: [
-    'Options',
-    '  --help          Show this help',
-    '  --version       Current version of package',
-    '  --verbose       Displays verbose logging',
-    '',
-    'Usage',
-    '  lighthouse [url]'
-  ]
-});
+const cli = meow(`
+  Usage
+    lighthouse [url]
+
+  Options
+    --help         Show this help
+    --version      Current version of package
+    --verbose      Displays verbose logging
+`);
 
 lighthouse({
   url: cli.input[0],
