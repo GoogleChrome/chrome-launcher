@@ -2,15 +2,9 @@
   "name": "lighthouse",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "bin": {
-    "lighthouse": "cli.js"
-  },
-  "directories": {
-    "test": "tests"
-  },
+  "bin": "cli.js",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=5"
   },
   "scripts": {
     "lint": "eslint .",
@@ -18,11 +12,12 @@
     "unit": "mocha test/*.js --timeout 60000",
     "start": "node ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/googlechrome/lighthouse.git"
-  },
-  "keywords": [],
+  "repository": "googlechrome/lighthouse",
+  "keywords": [
+    "google",
+    "chrome",
+    "devtools"
+  ],
   "author": "The Chromium Authors",
   "license": "Apache-2.0",
   "bugs": {
@@ -33,7 +28,6 @@
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
     "devtools-timeline-model": "1.0.16",
-    "file": "^0.2.2",
     "meow": "^3.7.0",
     "npmlog": "^2.0.3",
     "traceviewer": "^1.0.8"
