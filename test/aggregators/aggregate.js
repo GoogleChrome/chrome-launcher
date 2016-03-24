@@ -250,4 +250,36 @@ describe('Aggregate', () => {
       }]
     });
   });
+
+  it('outputs a score', () => {
+    const expected = {
+      test: {
+        value: true,
+        weight: 1
+      }
+    };
+
+    const results = [{
+      name: 'test',
+      value: true
+    }];
+
+    return assert.equal(Aggregate.compare(results, expected).overall, 1);
+  });
+
+  it('outputs subitems', () => {
+    const expected = {
+      test: {
+        value: true,
+        weight: 1
+      }
+    };
+
+    const results = [{
+      name: 'test',
+      value: true
+    }];
+
+    return assert.ok(Array.isArray(Aggregate.compare(results, expected).subItems));
+  });
 });
