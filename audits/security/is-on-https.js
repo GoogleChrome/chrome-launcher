@@ -27,7 +27,7 @@ class HTTPS {
 
   static audit(inputs) {
     return {
-      value: inputs.https,
+      value: (!!inputs.https),
       tags: HTTPS.tags,
       description: HTTPS.description
     };
