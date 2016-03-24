@@ -24,7 +24,7 @@
       "argsIgnorePattern": "(^reject$|^_$)"
     }],
     "quotes": [2, "single"],
-    "require-jsdoc": "off",
-    "valid-jsdoc": "off"
+    "require-jsdoc": 0,
+    "valid-jsdoc": 0
   }
 }
