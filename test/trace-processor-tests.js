@@ -3,20 +3,18 @@
 /* global describe, it */
 
 var fs = require('fs');
-var expect = require('chai').expect;
-var bigrig = require('../lib/processor');
+var assert = require('assert');
+var traceProcessor = require('../helpers/traces/processor');
 
-describe('Lighthouse', function() {
+describe('Trace Processor', function() {
   it('throws if no processes are found', function() {
-    expect(function() {
-      bigrig.analyzeTrace(null);
-    }).to.throw('Zero processes (tabs) found.');
+    return assert.throws(_ => traceProcessor.analyzeTrace(null),
+        'Zero processes (tabs) found.');
   });
 
   it('throws if given invalid input data is given', function() {
-    expect(function() {
-      bigrig.analyzeTrace('wobble');
-    }).to.throw('Invalid trace contents; not JSON');
+    return assert.throws(_ => traceProcessor.analyzeTrace('wobble'),
+        'Invalid trace contents; not JSON');
   });
 
   it('throws if given a trace with extensions and strict mode is enabled',
@@ -31,11 +29,11 @@ describe('Lighthouse', function() {
           var error = 'Extensions running during capture; ' +
               'see http://bit.ly/bigrig-extensions';
 
-          expect(function() {
-            bigrig.analyzeTrace(data, {
+          assert.throws(_ => {
+            traceProcessor.analyzeTrace(data, {
               strict: true
             });
-          }).to.throw(error);
+          }, error);
 
           done();
         });
@@ -50,10 +48,10 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
+        var jsonData = traceProcessor.analyzeTrace(data);
 
-        expect(jsonData).to.be.an('array');
-        expect(jsonData[0]).to.be.an('object');
+        assert.ok(Array.isArray(jsonData));
+        assert.equal(typeof jsonData[0], 'object');
         done();
       });
   });
@@ -65,10 +63,10 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
+        var jsonData = traceProcessor.analyzeTrace(data);
         jsonData = JSON.parse(JSON.stringify(jsonData));
 
-        expect(jsonData).to.be.an('array');
+        assert.ok(Array.isArray(jsonData));
         done();
       });
   });
@@ -80,12 +78,13 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
+        var jsonData = traceProcessor.analyzeTrace(data);
 
-        expect(jsonData[0]).to.be.an('object');
-        expect(jsonData[0].title).to.equal('sideNavAnimation');
-        expect(jsonData[0].start).to.be.above(0);
-        expect(jsonData[0].end).to.be.within(1179, 1180);
+        assert.ok(typeof jsonData[0], 'object');
+        assert.equal(jsonData[0].title, 'sideNavAnimation');
+        assert.ok(jsonData[0].start > 0);
+        assert.ok(jsonData[0].end > 1179);
+        assert.ok(jsonData[0].end < 1180);
         done();
       });
   });
@@ -99,13 +98,13 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyzeTrace(data, {
+          var jsonData = traceProcessor.analyzeTrace(data, {
             types: {
-              sideNavAnimation: bigrig.ANIMATION
+              sideNavAnimation: traceProcessor.ANIMATION
             }
           });
 
-          expect(jsonData[0].type).to.equal(bigrig.ANIMATION);
+          assert.equal(jsonData[0].type, traceProcessor.ANIMATION);
           done();
         });
     });
@@ -118,9 +117,9 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyzeTrace(data);
-          expect(jsonData[0].type).to.equal(bigrig.LOAD);
-          expect(jsonData[0].title).to.equal('Load');
+          var jsonData = traceProcessor.analyzeTrace(data);
+          assert.equal(jsonData[0].type, traceProcessor.LOAD);
+          assert.equal(jsonData[0].title, 'Load');
           done();
         });
     });
@@ -133,9 +132,9 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyzeTrace(data);
-          expect(jsonData[0].type).to.equal(bigrig.RESPONSE);
-          expect(jsonData[0].title).to.equal('sideNavResponse');
+          var jsonData = traceProcessor.analyzeTrace(data);
+          assert.equal(jsonData[0].type, traceProcessor.RESPONSE);
+          assert.equal(jsonData[0].title, 'sideNavResponse');
           done();
         });
     });
@@ -148,9 +147,9 @@ describe('Lighthouse', function() {
             throw err;
           }
 
-          var jsonData = bigrig.analyzeTrace(data);
-          expect(jsonData[0].type).to.equal(bigrig.ANIMATION);
-          expect(jsonData[0].title).to.equal('sideNavAnimation');
+          var jsonData = traceProcessor.analyzeTrace(data);
+          assert(jsonData[0].type, traceProcessor.ANIMATION);
+          assert(jsonData[0].title, 'sideNavAnimation');
           done();
         });
     });
@@ -162,15 +161,15 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
+        var jsonData = traceProcessor.analyzeTrace(data);
 
-        expect(jsonData.length).to.equal(2);
+        assert.equal(jsonData.length, 2);
 
-        expect(jsonData[0].type).to.equal(bigrig.RESPONSE);
-        expect(jsonData[0].title).to.equal('sideNavResponse');
+        assert.equal(jsonData[0].type, traceProcessor.RESPONSE);
+        assert.equal(jsonData[0].title, 'sideNavResponse');
 
-        expect(jsonData[1].type).to.equal(bigrig.ANIMATION);
-        expect(jsonData[1].title).to.equal('sideNavAnimation');
+        assert.equal(jsonData[1].type, traceProcessor.ANIMATION);
+        assert.equal(jsonData[1].title, 'sideNavAnimation');
 
         done();
       });
@@ -183,8 +182,9 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
-        expect(jsonData[0].fps).to.be.within(59, 61);
+        var jsonData = traceProcessor.analyzeTrace(data);
+        assert.ok(jsonData[0].fps > 59);
+        assert.ok(jsonData[0].fps < 61);
         done();
       });
   });
@@ -196,13 +196,11 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
-        expect(
-          jsonData[0].extendedInfo.javaScript['localhost:11080']
-        ).to.be.within(245, 246);
-        expect(
-          jsonData[0].extendedInfo.javaScript['www.google-analytics.com']
-        ).to.be.within(59, 60);
+        var jsonData = traceProcessor.analyzeTrace(data);
+        assert.ok(jsonData[0].extendedInfo.javaScript['localhost:11080'] > 245);
+        assert.ok(jsonData[0].extendedInfo.javaScript['localhost:11080'] < 246);
+        assert.ok(jsonData[0].extendedInfo.javaScript['www.google-analytics.com'] > 59);
+        assert.ok(jsonData[0].extendedInfo.javaScript['www.google-analytics.com'] < 60);
         done();
       });
   });
@@ -214,13 +212,9 @@ describe('Lighthouse', function() {
           throw err;
         }
 
-        var jsonData = bigrig.analyzeTrace(data);
-        expect(
-          jsonData[0].extendedInfo.forcedRecalcs
-        ).to.equal(1);
-        expect(
-          jsonData[0].extendedInfo.forcedLayouts
-        ).to.equal(1);
+        var jsonData = traceProcessor.analyzeTrace(data);
+        assert.equal(jsonData[0].extendedInfo.forcedRecalcs, 1);
+        assert.equal(jsonData[0].extendedInfo.forcedLayouts, 1);
         done();
       });
   });
