@@ -61,7 +61,7 @@ class FirstMeaningfulPaint extends Audit {
 
           return {
             duration: `${fmp.duration.toFixed(2)}ms`,
-            score: score
+            score: score.toFixed(2)
           };
         }, _ => {
           // Recover from trace parsing failures.
