@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ManifestShortName {
+const Audit = require('../audit');
+
+class ManifestShortName extends Audit {
 
   static get tags() {
     return ['Manifest'];
+  }
+
+  static get name() {
+    return 'manifest-short-name';
   }
 
   static get description() {
@@ -34,11 +40,7 @@ class ManifestShortName {
       hasShortName = (!!manifest.short_name.value);
     }
 
-    return {
-      value: hasShortName,
-      tags: ManifestShortName.tags,
-      description: ManifestShortName.description
-    };
+    return ManifestShortName.buildOutput(hasShortName);
   }
 }
 

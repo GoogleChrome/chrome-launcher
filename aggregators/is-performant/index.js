@@ -16,32 +16,22 @@
 
 'use strict';
 
-const Audit = require('../audit');
+const Aggregate = require('../aggregate');
 
-class ManifestThemeColor extends Audit {
-
-  static get tags() {
-    return ['Manifest'];
-  }
+class IsPerformant extends Aggregate {
 
   static get name() {
-    return 'manifest-theme-color';
+    return 'Is Performant';
   }
 
-  static get description() {
-    return 'Contains theme_color';
-  }
-
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.buildOutput(hasThemeColor);
+  static get criteria() {
+    return {
+      'first-meaningful-paint': {
+        value: 100,
+        weight: 1
+      }
+    };
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = IsPerformant;

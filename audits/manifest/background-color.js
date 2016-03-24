@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ManifestBackgroundColor {
+const Audit = require('../audit');
+
+class ManifestBackgroundColor extends Audit {
 
   static get tags() {
     return ['Manifest'];
+  }
+
+  static get name() {
+    return 'manifest-background-color';
   }
 
   static get description() {
@@ -35,11 +41,7 @@ class ManifestBackgroundColor {
   static audit(inputs) {
     const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(inputs.manifest);
 
-    return {
-      value: hasBackgroundColor,
-      tags: ManifestBackgroundColor.tags,
-      description: ManifestBackgroundColor.description
-    };
+    return ManifestBackgroundColor.buildOutput(hasBackgroundColor);
   }
 }
 

@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ManifestIcons192 {
+const Audit = require('../audit');
+
+class ManifestIcons192 extends Audit {
 
   static get tags() {
     return ['Manifest'];
+  }
+
+  static get name() {
+    return 'manifest-icons-192';
   }
 
   static get description() {
@@ -37,11 +43,7 @@ class ManifestIcons192 {
       hasIcons = (!!icons192);
     }
 
-    return {
-      value: hasIcons,
-      tags: ManifestIcons192.tags,
-      description: ManifestIcons192.description
-    };
+    return ManifestIcons192.buildOutput(hasIcons);
   }
 }
 

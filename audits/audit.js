@@ -16,32 +16,28 @@
 
 'use strict';
 
-const Audit = require('../audit');
-
-class ManifestThemeColor extends Audit {
-
+class Audit {
   static get tags() {
-    return ['Manifest'];
+    throw new Error('Audit tags must be overridden');
   }
 
   static get name() {
-    return 'manifest-theme-color';
+    throw new Error('Audit name must be overridden');
   }
 
   static get description() {
-    return 'Contains theme_color';
+    throw new Error('Audit description must be overridden');
   }
 
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.buildOutput(hasThemeColor);
+  static buildOutput(value, rawValue) {
+    return {
+      value: value,
+      rawValue: rawValue,
+      name: this.name,
+      tags: this.tags,
+      description: this.description
+    };
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = Audit;

@@ -16,32 +16,38 @@
 
 'use strict';
 
-const Audit = require('../audit');
+const Aggregate = require('../aggregate');
 
-class ManifestThemeColor extends Audit {
-
-  static get tags() {
-    return ['Manifest'];
-  }
+class AddToHomescreen extends Aggregate {
 
   static get name() {
-    return 'manifest-theme-color';
+    return 'Has valid Add to Homescreen Manifest';
   }
 
-  static get description() {
-    return 'Contains theme_color';
-  }
-
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.buildOutput(hasThemeColor);
+  static get criteria() {
+    return {
+      'manifest-exists': {
+        value: true,
+        weight: 1
+      },
+      'manifest-background-color': {
+        value: true,
+        weight: 1
+      },
+      'manifest-icons': {
+        value: true,
+        weight: 1
+      },
+      'manifest-icons-192': {
+        value: true,
+        weight: 1
+      },
+      'manifest-short-name': {
+        value: true,
+        weight: 0
+      }
+    };
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = AddToHomescreen;

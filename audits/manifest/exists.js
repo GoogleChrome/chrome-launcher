@@ -16,22 +16,26 @@
 
 'use strict';
 
-class ManifestExists {
+const Audit = require('../audit');
+
+class ManifestExists extends Audit {
 
   static get tags() {
     return ['Manifest'];
   }
 
+  static get name() {
+    return 'manifest-exists';
+  }
+
   static get description() {
-    return 'Exists';
+    return 'Manifest exists';
   }
 
   static audit(inputs) {
-    return {
-      value: (typeof inputs.manifest !== 'undefined'),
-      tags: ManifestExists.tags,
-      description: ManifestExists.description
-    };
+    return ManifestExists.buildOutput(
+      typeof inputs.manifest !== 'undefined'
+    );
   }
 }
 

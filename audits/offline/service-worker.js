@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ServiceWorker {
+const Audit = require('../audit');
+
+class ServiceWorker extends Audit {
 
   static get tags() {
     return ['Offline'];
+  }
+
+  static get name() {
+    return 'service-worker';
   }
 
   static get description() {
@@ -33,11 +39,7 @@ class ServiceWorker {
           reg.scriptURL.startsWith(inputs.url);
     });
 
-    return {
-      value: (activatedRegistrations.length > 0),
-      tags: ServiceWorker.tags,
-      description: ServiceWorker.description
-    };
+    return ServiceWorker.buildOutput(activatedRegistrations.length > 0);
   }
 }
 

@@ -15,10 +15,16 @@
  */
 'use strict';
 
-class HTTPS {
+const Audit = require('../audit');
+
+class HTTPS extends Audit {
 
   static get tags() {
     return ['Security'];
+  }
+
+  static get name() {
+    return 'is-on-https';
   }
 
   static get description() {
@@ -26,11 +32,7 @@ class HTTPS {
   }
 
   static audit(inputs) {
-    return {
-      value: (!!inputs.https),
-      tags: HTTPS.tags,
-      description: HTTPS.description
-    };
+    return HTTPS.buildOutput(!!inputs.https);
   }
 }
 

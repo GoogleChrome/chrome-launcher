@@ -20,6 +20,7 @@ const ChromeProtocol = require('./helpers/browser/driver');
 
 const Auditor = require('./auditor');
 const Gatherer = require('./gatherer');
+const Aggregator = require('./aggregator');
 
 const driver = new ChromeProtocol();
 const gatherers = [
@@ -44,15 +45,18 @@ const audits = [
   require('./audits/manifest/short-name'),
   require('./audits/manifest/start-url')
 ];
-
+const aggregators = [
+  require('./aggregators/will-get-add-to-homescreen-prompt'),
+  require('./aggregators/is-secure'),
+  require('./aggregators/is-performant')
+];
 module.exports = function(opts) {
   const url = opts.url || defaultUrl;
-  Gatherer
+  return Gatherer
       .gather(gatherers, {url, driver})
       .then(artifacts => Auditor.audit(artifacts, audits))
-      .then(results => {
-        console.log(results);
-      }).catch(function(err) {
+      .then(results => Aggregator.aggregate(aggregators, results))
+      .catch(function(err) {
         console.log('error encountered', err);
         console.log(err.stack);
         throw err;
