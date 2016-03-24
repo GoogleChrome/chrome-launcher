@@ -263,7 +263,7 @@ function parseBackgroundColor(jsonInput) {
   return parseColor(jsonInput.background_color);
 }
 
-function parse(string, logToConsole) {
+function parse(string) {
   let jsonInput;
 
   try {
@@ -290,22 +290,6 @@ function parse(string, logToConsole) {
     background_color: parseBackgroundColor(jsonInput)
   };
   /* eslint-enable camelcase */
-
-  if (logToConsole) {
-    console.log('JSON parsed successfully.');
-    console.log('Parsed `name` property is: ' + manifest.name);
-    console.log('Parsed `short_name` property is: ' + manifest.short_name);
-    console.log('Parsed `start_url` property is: ' + manifest.start_url);
-    console.log('Parsed `display` property is: ' + manifest.display);
-    console.log('Parsed `orientation` property is: ' + manifest.orientation);
-    console.log('Parsed `icons` property is: ' + JSON.stringify(manifest.icons, null, 4));
-    console.log('Parsed `related_applications` property is: ' +
-        JSON.stringify(manifest.related_applications, null, 4));
-    console.log('Parsed `prefer_related_applications` property is: ' +
-        JSON.stringify(manifest.prefer_related_applications, null, 4));
-    console.log('Parsed `theme_color` property is: ' + manifest.theme_color);
-    console.log('Parsed `background_color` property is: ' + manifest.background_color);
-  }
 
   return {
     raw: string,
