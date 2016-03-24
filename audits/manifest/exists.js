@@ -33,7 +33,7 @@ class ManifestExists extends Audit {
   }
 
   static audit(inputs) {
-    return ManifestExists.buildOutput(
+    return ManifestExists.generateAuditResult(
       typeof inputs.manifest !== 'undefined'
     );
   }

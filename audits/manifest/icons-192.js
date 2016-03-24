@@ -43,7 +43,7 @@ class ManifestIcons192 extends Audit {
       hasIcons = (!!icons192);
     }
 
-    return ManifestIcons192.buildOutput(hasIcons);
+    return ManifestIcons192.generateAuditResult(hasIcons);
   }
 }
 

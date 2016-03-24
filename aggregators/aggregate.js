@@ -44,6 +44,10 @@ class Aggregate {
   static _remapResultsByName(results) {
     const remapped = {};
     results.forEach(r => {
+      if (remapped[r.name]) {
+        throw new Error(`Cannot remap: ${r.name} already exists`);
+      }
+
       remapped[r.name] = r;
     });
     return remapped;
@@ -51,6 +55,21 @@ class Aggregate {
 
   static _convertToWeight(result, expected) {
     let weight = 0;
+
+    if (typeof expected === 'undefined' ||
+        typeof expected.value === 'undefined' ||
+        typeof expected.weight === 'undefined') {
+      return weight;
+    }
+
+    if (typeof result === 'undefined' ||
+        typeof result.value === 'undefined') {
+      return weight;
+    }
+
+    if (typeof result.value !== typeof expected.value) {
+      return weight;
+    }
 
     switch (typeof expected.value) {
       case 'boolean':

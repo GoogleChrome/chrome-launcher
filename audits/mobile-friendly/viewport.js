@@ -36,7 +36,7 @@ class Viewport extends Audit {
     // Unless we want to parse the original HTML, we should query for `head > .meta[name=viewport]`
     const viewportExpression = /<meta ([^c]+)content="width=/gim;
 
-    return Viewport.buildOutput(viewportExpression.test(inputs.html));
+    return Viewport.generateAuditResult(viewportExpression.test(inputs.html));
   }
 }
 

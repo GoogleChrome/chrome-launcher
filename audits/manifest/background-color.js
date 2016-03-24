@@ -41,7 +41,7 @@ class ManifestBackgroundColor extends Audit {
   static audit(inputs) {
     const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(inputs.manifest);
 
-    return ManifestBackgroundColor.buildOutput(hasBackgroundColor);
+    return ManifestBackgroundColor.generateAuditResult(hasBackgroundColor);
   }
 }
 

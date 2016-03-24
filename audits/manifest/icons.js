@@ -40,7 +40,7 @@ class ManifestIcons extends Audit {
       hasIcons = (manifest.icons.value.length > 0);
     }
 
-    return ManifestIcons.buildOutput(hasIcons);
+    return ManifestIcons.generateAuditResult(hasIcons);
   }
 }
 

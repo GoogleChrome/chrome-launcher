@@ -40,7 +40,7 @@ class ManifestThemeColor extends Audit {
       hasThemeColor = (!!manifest.theme_color.value);
     }
 
-    return ManifestThemeColor.buildOutput(hasThemeColor);
+    return ManifestThemeColor.generateAuditResult(hasThemeColor);
   }
 }
 

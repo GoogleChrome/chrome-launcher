@@ -32,7 +32,7 @@ class HTTPS extends Audit {
   }
 
   static audit(inputs) {
-    return HTTPS.buildOutput(!!inputs.https);
+    return HTTPS.generateAuditResult(!!inputs.https);
   }
 }
 

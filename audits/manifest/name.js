@@ -40,7 +40,7 @@ class ManifestName extends Audit {
       hasName = (!!manifest.name.value);
     }
 
-    return ManifestName.buildOutput(hasName);
+    return ManifestName.generateAuditResult(hasName);
   }
 }
 

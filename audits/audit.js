@@ -29,7 +29,7 @@ class Audit {
     throw new Error('Audit description must be overridden');
   }
 
-  static buildOutput(value, rawValue) {
+  static generateAuditResult(value, rawValue) {
     return {
       value: value,
       rawValue: rawValue,

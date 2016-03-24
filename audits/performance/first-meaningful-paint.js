@@ -72,7 +72,7 @@ class FirstMeaningfulPaint extends Audit {
           };
         })
         .then(result => {
-          return FirstMeaningfulPaint.buildOutput(result.score, result.duration);
+          return FirstMeaningfulPaint.generateAuditResult(result.score, result.duration);
         });
   }
 }
