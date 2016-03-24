@@ -147,7 +147,7 @@ describe('Aggregate', () => {
     return assert.equal(Aggregate._convertToWeight(undefined, expected), 0);
   });
 
-  it('returns a weight of zero for undefined results', () => {
+  it('returns a weight of zero for undefined expectations', () => {
     const result = {
       value: true
     };
