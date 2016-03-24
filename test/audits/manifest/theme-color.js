@@ -21,7 +21,7 @@ const manifest = manifestParser(manifestSrc).value;
 
 /* global describe, it*/
 
-describe('manifest: theme_color audit', () => {
+describe('Manifest: theme_color audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });

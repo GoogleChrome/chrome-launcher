@@ -20,7 +20,7 @@ const assert = require('assert');
 
 // Need to disable camelcase check for dealing with background_color.
 /* eslint-disable camelcase */
-describe('manifest: background color audit', () => {
+describe('Manifest: background color audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });

@@ -21,7 +21,7 @@ const manifest = manifestParser(manifestSrc).value;
 
 /* global describe, it*/
 
-describe('manifest: short_name audit', () => {
+describe('Manifest: short_name audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });

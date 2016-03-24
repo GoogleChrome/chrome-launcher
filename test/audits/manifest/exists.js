@@ -18,7 +18,7 @@ const assert = require('assert');
 
 /* global describe, it*/
 
-describe('manifest: exists audit', () => {
+describe('Manifest: exists audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });

@@ -17,7 +17,7 @@ const Audit = require('../../../audits/performance/first-meaningful-paint.js');
 const assert = require('assert');
 
 /* global describe, it*/
-describe('performance: first-meaningful-paint audit', () => {
+describe('Performance: first-meaningful-paint audit', () => {
   it('scores a -1 when no trace data is present', () => {
     return Audit.audit({}).then(response => {
       return assert.equal(response.value, -1);
