@@ -21,7 +21,7 @@ const manifest = manifestParser(manifestSrc).value;
 
 /* global describe, it*/
 
-describe('manifest: start_url audit', () => {
+describe('Manifest: start_url audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });

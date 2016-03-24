@@ -13,31 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/manifest/background-color.js');
+const Audit = require('../../../audits/mobile-friendly/viewport.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
 // Need to disable camelcase check for dealing with background_color.
 /* eslint-disable camelcase */
-describe('Manifest: background color audit', () => {
-  it('fails when no manifest present', () => {
+describe('Mobile-friendly: viewport audit', () => {
+  it('fails when no input present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });
 
-  it('fails when no background color present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      foo: 1}}).value, false);
+  it('fails when invalid HTML given', () => {
+    return assert.equal(Audit.audit({
+      html: null
+    }).value, false);
   });
 
-  it('fails when no background color value present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      background_color: 'no'}}).value, false);
+  it('fails when HTML does not contain a viewport meta tag', () => {
+    return assert.equal(Audit.audit({
+      html: ''
+    }).value, false);
   });
 
-  it('passes when color is present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      background_color: {value: 'black'}}}).value, true);
+  it('passes when a viewport is provided', () => {
+    return assert.equal(Audit.audit({
+      html: `<!doctype html>
+             <html>
+             <head>
+               <meta name="viewport" content="width=device-width">
+               <title>Sample page</title>
+             </head>
+             <body></body>
+             </html>`
+    }).value, true);
   });
+
+  // TODO: add test for ensuring the meta tag is in the head.
 });
 /* eslint-enable */

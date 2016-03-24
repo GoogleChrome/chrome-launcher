@@ -13,17 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/manifest/exists.js');
+const Audit = require('../../../audits/security/is-on-https.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
-describe('Manifest: exists audit', () => {
-  it('fails when no manifest present', () => {
+// Need to disable camelcase check for dealing with background_color.
+/* eslint-disable camelcase */
+describe('Security: HTTPS audit', () => {
+  it('fails when no input present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });
 
-  it('succeeds when a manifest is present', () => {
-    return assert.equal(Audit.audit({manifest: {}}).value, true);
+  it('fails when invalid HTML given', () => {
+    return assert.equal(Audit.audit({
+      html: null
+    }).value, false);
+  });
+
+  it('fails when not on HTTPS', () => {
+    return assert.equal(Audit.audit({
+      https: false
+    }).value, false);
+  });
+
+  it('passes when on HTTPS', () => {
+    return assert.equal(Audit.audit({
+      https: true
+    }).value, true);
   });
 });
+/* eslint-enable */
