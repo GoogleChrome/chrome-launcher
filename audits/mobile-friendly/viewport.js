@@ -15,10 +15,16 @@
  */
 'use strict';
 
-class Viewport {
+const Audit = require('../audit');
+
+class Viewport extends Audit {
 
   static get tags() {
     return ['Mobile Friendly'];
+  }
+
+  static get name() {
+    return 'viewport';
   }
 
   static get description() {
@@ -30,11 +36,7 @@ class Viewport {
     // Unless we want to parse the original HTML, we should query for `head > .meta[name=viewport]`
     const viewportExpression = /<meta ([^c]+)content="width=/gim;
 
-    return {
-      value: viewportExpression.test(inputs.html),
-      tags: Viewport.tags,
-      description: Viewport.description
-    };
+    return Viewport.generateAuditResult(viewportExpression.test(inputs.html));
   }
 }
 

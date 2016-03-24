@@ -19,6 +19,7 @@
 const ExtensionProtocol = require('../../../helpers/extension/driver.js');
 const Auditor = require('../../../auditor');
 const Gatherer = require('../../../gatherer');
+const Aggregator = require('../../../aggregator');
 
 const driver = new ExtensionProtocol();
 const gatherers = [
@@ -41,47 +42,32 @@ const audits = [
   require('../../../audits/manifest/short-name'),
   require('../../../audits/manifest/start-url')
 ];
+const aggregators = [
+  require('../../../aggregators/will-get-add-to-homescreen-prompt'),
+  require('../../../aggregators/is-secure')
+];
 
 function createResultsHTML(results) {
-  const resultsGroup = {};
-  let groupName = null;
-
-  // Go through each group and restructure the results accordingly.
-  results.forEach(result => {
-    groupName = result.tags;
-    if (!resultsGroup[groupName]) {
-      resultsGroup[groupName] = [];
-    }
-
-    resultsGroup[groupName].push({
-      title: result.description,
-      value: result.value
-    });
-  });
-
-  const groups = Object.keys(resultsGroup);
   let resultsHTML = '';
 
-  groups.forEach(group => {
-    let groupHasErrors = false;
-    let total = resultsGroup[group].length;
-    let score = 0;
-
-    const groupHTML = resultsGroup[group].reduce((prev, result) => {
-      const status = result.value ?
-          '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
-      groupHasErrors = groupHasErrors || (!result.value);
-      score += result.value ? 1 : 0;
-      return prev + `<li>${result.title}: ${status}</li>`;
-    }, '');
-
+  results.forEach(item => {
+    const score = (item.score.overall * 100).toFixed(0);
+    const groupHasErrors = (score < 100);
     const groupClass = 'group ' +
         (groupHasErrors ? 'errors expanded' : 'no-errors collapsed');
 
+    let groupHTML = '';
+    item.score.subItems.forEach(subitem => {
+      // TODO: make this work with numeric values.
+      const status = subitem.value ?
+          '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+      groupHTML += `<li>${subitem.description}: ${status}</li>`;
+    });
+
     resultsHTML +=
       `<li class="${groupClass}">
-        <span class="group-name">${group}</span>
-        <span class="group-score">(${score}/${total})</span>
+        <span class="group-name">${item.name}</span>
+        <span class="group-score">(${score}%)</span>
         <ul>
           ${groupHTML}
         </ul>
@@ -95,6 +81,7 @@ export function runPwaAudits() {
   return Gatherer
     .gather(gatherers, {driver})
     .then(artifacts => Auditor.audit(artifacts, audits))
+    .then(results => Aggregator.aggregate(aggregators, results))
     .then(results => {
       return createResultsHTML(results);
     });

@@ -16,32 +16,24 @@
 
 'use strict';
 
-const Audit = require('../audit');
+const Aggregate = require('../aggregate');
 
-class ManifestThemeColor extends Audit {
-
-  static get tags() {
-    return ['Manifest'];
-  }
+class IsSecure extends Aggregate {
 
   static get name() {
-    return 'manifest-theme-color';
+    return 'Is Secure';
   }
 
-  static get description() {
-    return 'Contains theme_color';
-  }
+  static get criteria() {
+    const isOnHTTPS = require('../../audits/security/is-on-https').name;
+    const criteria = {};
+    criteria[isOnHTTPS] = {
+      value: true,
+      weight: 1
+    };
 
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.generateAuditResult(hasThemeColor);
+    return criteria;
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = IsSecure;

@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ManifestStartUrl {
+const Audit = require('../audit');
+
+class ManifestStartUrl extends Audit {
 
   static get tags() {
     return ['Manifest'];
+  }
+
+  static get name() {
+    return 'manifest-start-url';
   }
 
   static get description() {
@@ -34,11 +40,7 @@ class ManifestStartUrl {
       hasStartUrl = (!!manifest.start_url.value);
     }
 
-    return {
-      value: hasStartUrl,
-      tags: ManifestStartUrl.tags,
-      description: ManifestStartUrl.description
-    };
+    return ManifestStartUrl.generateAuditResult(hasStartUrl);
   }
 }
 

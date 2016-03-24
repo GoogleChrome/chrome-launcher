@@ -16,32 +16,24 @@
 
 'use strict';
 
-const Audit = require('../audit');
+const Aggregate = require('../aggregate');
+const AddToHomescreen = require('./add-to-homescreen');
+const WorksOffline = require('./works-offline');
+const MobileFriendly = require('./mobile-friendly');
 
-class ManifestThemeColor extends Audit {
-
-  static get tags() {
-    return ['Manifest'];
-  }
+class WillGetAddToHomescreenPrompt extends Aggregate {
 
   static get name() {
-    return 'manifest-theme-color';
+    return 'Will Get Add to Homescreen Prompt';
   }
 
-  static get description() {
-    return 'Contains theme_color';
-  }
-
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.generateAuditResult(hasThemeColor);
+  static get criteria() {
+    return Object.assign({},
+      WorksOffline.criteria,
+      AddToHomescreen.criteria,
+      MobileFriendly.criteria
+    );
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = WillGetAddToHomescreenPrompt;

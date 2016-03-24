@@ -16,10 +16,16 @@
 
 'use strict';
 
-class ManifestName {
+const Audit = require('../audit');
+
+class ManifestName extends Audit {
 
   static get tags() {
     return ['Manifest'];
+  }
+
+  static get name() {
+    return 'manifest-name';
   }
 
   static get description() {
@@ -34,11 +40,7 @@ class ManifestName {
       hasName = (!!manifest.name.value);
     }
 
-    return {
-      value: hasName,
-      tags: ManifestName.tags,
-      description: ManifestName.description
-    };
+    return ManifestName.generateAuditResult(hasName);
   }
 }
 

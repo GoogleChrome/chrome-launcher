@@ -29,11 +29,37 @@ const cli = meow(`
     --help         Show this help
     --version      Current version of package
     --verbose      Displays verbose logging
+    --pretty-print Pretty prints the output
 `);
+
+const prettyPrint = results => {
+  // TODO: colorise
+  let score;
+  results.forEach(item => {
+    score = (item.score.overall * 100).toFixed(0);
+    console.log(`${item.name}: ${score}%`);
+
+    item.score.subItems.forEach(subitem => {
+      let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
+      if (subitem.rawValue) {
+        lineItem += ` (${subitem.rawValue})`;
+      }
+      console.log(lineItem);
+    });
+
+    console.log('');
+  });
+};
 
 lighthouse({
   url: cli.input[0],
   flags: cli.flags
+}).then(results => {
+  if (cli.flags.prettyPrint) {
+    prettyPrint(results);
+  } else {
+    console.log(JSON.stringify(results));
+  }
 });
 
 if (cli.flags.verbose) {

@@ -17,11 +17,16 @@
 'use strict';
 
 const FMPMetric = require('../../metrics/performance/first-meaningful-paint');
+const Audit = require('../audit');
 
-class FirstMeaningfulPaint {
+class FirstMeaningfulPaint extends Audit {
 
   static get tags() {
     return ['Performance'];
+  }
+
+  static get name() {
+    return 'first-meaningful-paint';
   }
 
   static get description() {
@@ -39,7 +44,9 @@ class FirstMeaningfulPaint {
         .parse(inputs.traceContents)
         .then(fmp => {
           if (fmp.err) {
-            return -1;
+            return {
+              score: -1
+            };
           }
 
           // Roughly an exponential curve.
@@ -54,17 +61,18 @@ class FirstMeaningfulPaint {
           score = Math.min(100, score);
           score = Math.max(0, score);
 
-          return score;
+          return {
+            duration: `${fmp.duration.toFixed(2)}ms`,
+            score: Math.round(score)
+          };
         }, _ => {
           // Recover from trace parsing failures.
-          return -1;
-        })
-        .then(score => {
           return {
-            value: score,
-            tags: FirstMeaningfulPaint.tags,
-            description: FirstMeaningfulPaint.description
+            score: -1
           };
+        })
+        .then(result => {
+          return FirstMeaningfulPaint.generateAuditResult(result.score, result.duration);
         });
   }
 }

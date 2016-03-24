@@ -16,32 +16,24 @@
 
 'use strict';
 
-const Audit = require('../audit');
+const Aggregate = require('../aggregate');
 
-class ManifestThemeColor extends Audit {
-
-  static get tags() {
-    return ['Manifest'];
-  }
+class MobileFriendly extends Aggregate {
 
   static get name() {
-    return 'manifest-theme-color';
+    return 'Is Mobile Friendly';
   }
 
-  static get description() {
-    return 'Contains theme_color';
-  }
+  static get criteria() {
+    const viewport = require('../../audits/mobile-friendly/viewport').name;
+    const criteria = {};
+    criteria[viewport] = {
+      value: true,
+      weight: 1
+    };
 
-  static audit(inputs) {
-    let hasThemeColor = false;
-    const manifest = inputs.manifest;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
-    }
-
-    return ManifestThemeColor.generateAuditResult(hasThemeColor);
+    return criteria;
   }
 }
 
-module.exports = ManifestThemeColor;
+module.exports = MobileFriendly;
