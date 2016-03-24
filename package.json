@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint --silent && npm run unit",
-    "unit": "mocha test/**/*.js --timeout 60000",
+    "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
     "start": "node ."
   },
   "repository": "googlechrome/lighthouse",
@@ -33,7 +33,6 @@
     "traceviewer": "^1.0.8"
   },
   "devDependencies": {
-    "chai": "^3.4.0",
     "eslint": "^2.4.0",
     "eslint-config-google": "^0.4.0",
     "mocha": "^2.3.3",
