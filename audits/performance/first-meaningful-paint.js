@@ -44,7 +44,9 @@ class FirstMeaningfulPaint extends Audit {
         .parse(inputs.traceContents)
         .then(fmp => {
           if (fmp.err) {
-            return -1;
+            return {
+              score: -1
+            };
           }
 
           // Roughly an exponential curve.
@@ -65,7 +67,9 @@ class FirstMeaningfulPaint extends Audit {
           };
         }, _ => {
           // Recover from trace parsing failures.
-          return -1;
+          return {
+            score: -1
+          };
         })
         .then(result => {
           return FirstMeaningfulPaint.buildOutput(result.score, result.duration);
