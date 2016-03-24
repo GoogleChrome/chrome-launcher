@@ -15,9 +15,7 @@
  */
 const Audit = require('../../../audits/manifest/icons-192.js');
 const assert = require('assert');
-const manifestSrc = JSON.stringify(require('./manifest.json'));
 const manifestParser = require('../../../helpers/manifest-parser');
-const manifest = manifestParser(manifestSrc).value;
 
 /* global describe, it*/
 
@@ -40,7 +38,45 @@ describe('Manifest: icons-192 audit', () => {
     return assert.equal(Audit.audit(inputs).value, false);
   });
 
+  it('fails when a manifest contains an icon with no size', () => {
+    const manifestSrc = JSON.stringify({
+      icons: [{
+        src: 'icon.png'
+      }]
+    });
+    const manifest = manifestParser(manifestSrc).value;
+
+    return assert.equal(Audit.audit({manifest}).value, false);
+  });
+
+  it('fails when a manifest contains an icon with no 192x192 within its sizes', () => {
+    const manifestSrc = JSON.stringify({
+      icons: [{
+        src: 'icon.png',
+        sizes: '72x72 96x96 128x128 256x256'
+      }]
+    });
+    const manifest = manifestParser(manifestSrc).value;
+
+    return assert.equal(Audit.audit({manifest}).value, false);
+  });
+
   it('succeeds when a manifest contains a 192x192 icon', () => {
-    return assert.equal(Audit.audit({manifest: manifest}).value, true);
+    const manifestSrc = JSON.stringify(require('./manifest.json'));
+    const manifest = manifestParser(manifestSrc).value;
+
+    return assert.equal(Audit.audit({manifest}).value, true);
+  });
+
+  it('succeeds when a manifest contains an icon with 192x192 within its sizes', () => {
+    const manifestSrc = JSON.stringify({
+      icons: [{
+        src: 'icon.png',
+        sizes: '96x96 128x128 192x192 256x256'
+      }]
+    });
+    const manifest = manifestParser(manifestSrc).value;
+
+    return assert.equal(Audit.audit({manifest}).value, true);
   });
 });
