@@ -25,12 +25,14 @@ class IsSecure extends Aggregate {
   }
 
   static get criteria() {
-    return {
-      'is-on-https': {
-        value: true,
-        weight: 1
-      }
+    const isOnHTTPS = require('../../audits/security/is-on-https').name;
+    const criteria = {};
+    criteria[isOnHTTPS] = {
+      value: true,
+      weight: 1
     };
+
+    return criteria;
   }
 }
 

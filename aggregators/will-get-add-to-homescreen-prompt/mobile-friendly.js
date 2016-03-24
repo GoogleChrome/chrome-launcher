@@ -25,12 +25,14 @@ class MobileFriendly extends Aggregate {
   }
 
   static get criteria() {
-    return {
-      viewport: {
-        value: true,
-        weight: 1
-      }
+    const viewport = require('../../audits/mobile-friendly/viewport').name;
+    const criteria = {};
+    criteria[viewport] = {
+      value: true,
+      weight: 1
     };
+
+    return criteria;
   }
 }
 

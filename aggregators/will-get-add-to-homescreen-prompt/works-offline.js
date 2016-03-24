@@ -25,12 +25,14 @@ class WorksOffline extends Aggregate {
   }
 
   static get criteria() {
-    return {
-      'service-worker': {
-        value: true,
-        weight: 1
-      }
+    const serviceWorker = require('../../audits/offline/service-worker').name;
+    const criteria = {};
+    criteria[serviceWorker] = {
+      value: true,
+      weight: 1
     };
+
+    return criteria;
   }
 }
 

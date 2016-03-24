@@ -25,28 +25,39 @@ class AddToHomescreen extends Aggregate {
   }
 
   static get criteria() {
-    return {
-      'manifest-exists': {
-        value: true,
-        weight: 1
-      },
-      'manifest-background-color': {
-        value: true,
-        weight: 1
-      },
-      'manifest-icons': {
-        value: true,
-        weight: 1
-      },
-      'manifest-icons-192': {
-        value: true,
-        weight: 1
-      },
-      'manifest-short-name': {
-        value: true,
-        weight: 0
-      }
+    const manifestExists = require('../../audits/manifest/exists').name;
+    const manifestBackgroundColor = require('../../audits/manifest/background-color').name;
+    const manifestIcons = require('../../audits/manifest/icons').name;
+    const manifestIcons192 = require('../../audits/manifest/icons-192').name;
+    const manifestShortName = require('../../audits/manifest/short-name').name;
+
+    const criteria = {};
+    criteria[manifestExists] = {
+      value: true,
+      weight: 1
     };
+
+    criteria[manifestBackgroundColor] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestIcons] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestIcons192] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestShortName] = {
+      value: true,
+      weight: 0
+    };
+
+    return criteria;
   }
 }
 

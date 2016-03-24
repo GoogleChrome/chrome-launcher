@@ -25,12 +25,14 @@ class IsPerformant extends Aggregate {
   }
 
   static get criteria() {
-    return {
-      'first-meaningful-paint': {
-        value: 100,
-        weight: 1
-      }
+    const firstMeaningfulPaint = require('../../audits/performance/first-meaningful-paint').name;
+    const criteria = {};
+    criteria[firstMeaningfulPaint] = {
+      value: 100,
+      weight: 1
     };
+
+    return criteria;
   }
 }
 
