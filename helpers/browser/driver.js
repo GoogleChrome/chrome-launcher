@@ -96,7 +96,7 @@ class ChromeProtocol {
       throw new Error('Trying to call on() but no cri instance available yet');
     }
     // log event listeners being bound
-    _log('info', 'event => browser', {method: eventName});
+    _log('info', 'listen for event =>', {method: eventName});
 
     this._chrome.on(eventName, cb);
   }
@@ -165,7 +165,9 @@ class ChromeProtocol {
 
   endTrace() {
     return new Promise((resolve, reject) => {
+      // When all Tracing.dataCollected events have finished, this event fire
       this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
+
       return this.connect().then(_ => {
         this.sendCommand('Tracing.end');
         this._resetFailureTimeout(reject);
