@@ -22,7 +22,12 @@ npm link
 # Kick off a lighthouse run
 lighthouse
 lighthouse https://airhorner.com/
+
+# see flags and options
+lighthouse --help
 ```
+
+
 
 ## Chrome Extension
 

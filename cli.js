@@ -29,10 +29,15 @@ const cli = meow(`
     --help         Show this help
     --version      Current version of package
     --verbose      Displays verbose logging
-    --pretty-print Pretty prints the output
+    --quiet        Displays no progress or debug logs
+    --json         Output results as JSON
+
 `);
 
+const url = cli.input[0];
+
 const prettyPrint = results => {
+  log.info('\n\n\nLighthouse results:', url);
   // TODO: colorise
   let score;
   results.forEach(item => {
@@ -52,16 +57,18 @@ const prettyPrint = results => {
 };
 
 lighthouse({
-  url: cli.input[0],
+  url: url,
   flags: cli.flags
 }).then(results => {
-  if (cli.flags.prettyPrint) {
-    prettyPrint(results);
+  if (cli.flags.json) {
+    console.log(JSON.stringify(results, null, 2));
   } else {
-    console.log(JSON.stringify(results));
+    prettyPrint(results);
   }
 });
 
 if (cli.flags.verbose) {
   log.level = 'verbose';
+} else if (cli.flags.quiet) {
+  log.level = 'error';
 }
