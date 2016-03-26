@@ -5,9 +5,10 @@ sudo: false
 cache:
    directories:
      - node_modules
+     - chrome-linux
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - wget 'https://download-chromium.appspot.com/dl/Linux_x64?type=continuous' -O chrome.zip && unzip chrome.zip
+  - ./test/download-chrome.sh
   - start-stop-daemon --start --background --exec $(pwd)/chrome-linux/chrome -- --remote-debugging-port=9222 --no-first-run --enable-gpu-benchmarking --user-data-dir="/tmp/lighthouse-profile" --disable-setuid-sandbox "about:blank"
   - sleep 5
