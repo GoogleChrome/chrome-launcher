@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const defaultUrl = 'https://voice-memos.appspot.com';
+const defaultUrl = 'https://m.flipkart.com';
 const ChromeProtocol = require('./helpers/browser/driver');
 
 const Auditor = require('./auditor');
