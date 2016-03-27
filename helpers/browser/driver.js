@@ -93,7 +93,11 @@ class ChromeProtocol {
     this._chrome.on('event', req => _log('verbose', '<=', req));
   }
 
-  // bind listeners for protocol events
+  /**
+   * Bind listeners for protocol events
+   * @param {!string} eventName
+   * @param {!Function} cb
+   */
   on(eventName, cb) {
     if (this._chrome === null) {
       throw new Error('Trying to call on() but no cri instance available yet');
@@ -103,11 +107,21 @@ class ChromeProtocol {
     this._chrome.on(eventName, cb);
   }
 
+  /**
+   * Unbind event listeners
+   * @param {!string} eventName
+   * @param {!Function} cb
+   */
   off(eventName, cb) {
     this._chrome.removeListener(eventName, cb);
   }
 
-  // call protocol methods
+  /**
+   * Call protocol methods
+   * @param {!string} command
+   * @param {!object} params
+   * @return {!Promise}
+   */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       _log('info', 'method => browser', {method: command, params: params});
@@ -121,6 +135,10 @@ class ChromeProtocol {
     });
   }
 
+  /**
+   * Resolves when all outstanding protocol methods have returned.
+   * @return {!Promise}
+   */
   pendingCommandsComplete() {
     return new Promise((resolve, reject) => {
       this._chrome.once('ready', _ => resolve());
