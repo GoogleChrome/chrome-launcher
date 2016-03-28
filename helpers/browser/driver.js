@@ -58,16 +58,19 @@ class ChromeProtocol {
     this._url = _url;
   }
 
+  /**
+   * @return {!Promise<null>}
+   */
   connect() {
     return new Promise((resolve, reject) => {
       if (this._chrome) {
-        return resolve(this._chrome);
+        return resolve();
       }
 
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
-        resolve(chrome);
+        resolve();
       }).on('error', e => reject(e));
     });
   }
@@ -92,18 +95,35 @@ class ChromeProtocol {
     this._chrome.on('event', req => _log('verbose', '<=', req));
   }
 
-  // bind listeners for protocol events
+  /**
+   * Bind listeners for protocol events
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
   on(eventName, cb) {
     if (this._chrome === null) {
       throw new Error('Trying to call on() but no cri instance available yet');
     }
     // log event listeners being bound
     _log('info', 'listen for event =>', {method: eventName});
-
     this._chrome.on(eventName, cb);
   }
 
-  // call protocol methods
+  /**
+   * Unbind event listeners
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
+  off(eventName, cb) {
+    this._chrome.removeListener(eventName, cb);
+  }
+
+  /**
+   * Call protocol methods
+   * @param {!string} command
+   * @param {!Object} params
+   * @return {!Promise}
+   */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       _log('info', 'method => browser', {method: command, params: params});
@@ -112,9 +132,18 @@ class ChromeProtocol {
         if (err) {
           return reject(result);
         }
-
         resolve(result);
       });
+    });
+  }
+
+  /**
+   * Resolves when all outstanding protocol methods have returned.
+   * @return {!Promise}
+   */
+  pendingCommandsComplete() {
+    return new Promise((resolve, reject) => {
+      this._chrome.once('ready', _ => resolve());
     });
   }
 
@@ -197,7 +226,7 @@ class ChromeProtocol {
   }
 
   beginNetworkCollect() {
-    return this.connect().then(chrome => {
+    return this.connect().then(_ => {
       return new Promise((resolve, reject) => {
         this._networkRecords = [];
         this._networkRecorder = new NetworkRecorder(this._networkRecords);
@@ -210,7 +239,7 @@ class ChromeProtocol {
         this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
         this.sendCommand('Network.enable');
-        chrome.once('ready', _ => {
+        this.pendingCommandsComplete().then(_ => {
           resolve();
         });
       });
@@ -218,23 +247,17 @@ class ChromeProtocol {
   }
 
   endNetworkCollect() {
-    return this.connect().then(chrome => {
+    return this.connect().then(_ => {
       return new Promise((resolve, reject) => {
-        chrome.removeListener('Network.requestWillBeSent',
-            this._networkRecorder.onRequestWillBeSent);
-        chrome.removeListener('Network.requestServedFromCache',
-            this._networkRecorder.onRequestServedFromCache);
-        chrome.removeListener('Network.responseReceived',
-            this._networkRecorder.onResponseReceived);
-        chrome.removeListener('Network.dataReceived',
-            this._networkRecorder.onDataReceived);
-        chrome.removeListener('Network.loadingFinished',
-            this._networkRecorder.onLoadingFinished);
-        chrome.removeListener('Network.loadingFailed',
-            this._networkRecorder.onLoadingFailed);
+        this.off('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
+        this.off('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
+        this.off('Network.responseReceived', this._networkRecorder.onResponseReceived);
+        this.off('Network.dataReceived', this._networkRecorder.onDataReceived);
+        this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
+        this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
         this.sendCommand('Network.disable');
-        chrome.once('ready', _ => {
+        this.pendingCommandsComplete().then(_ => {
           resolve(this._networkRecords);
           this._networkRecorder = null;
           this._networkRecords = [];
