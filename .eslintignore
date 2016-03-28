@@ -3,3 +3,5 @@ chrome-linux/
 
 node_modules/
 extension/
+
+dist

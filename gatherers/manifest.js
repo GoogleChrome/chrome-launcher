@@ -46,38 +46,19 @@ class Manifest extends Gather {
 
   static gather(options) {
     const driver = options.driver;
-
-    return driver.sendCommand('DOM.getDocument')
-        .then(result => result.root.nodeId)
-        .then(nodeId => driver.sendCommand('DOM.querySelector', {
-          nodeId: nodeId,
-          selector: 'link[rel="manifest"]'
-        }))
-        .then(manifestNode => manifestNode.nodeId)
-        .then(manifestNodeId => {
-          if (manifestNodeId === 0) {
-            return '';
-          }
-
-          return driver.sendCommand('DOM.getAttributes', {
-            nodeId: manifestNodeId
-          })
-          .then(manifestAttributes => manifestAttributes.attributes)
-          .then(attributes => {
-            const hrefIndex = attributes.indexOf('href');
-            if (hrefIndex === -1) {
-              return '';
-            }
-
-            return attributes[hrefIndex + 1];
-          })
-          .then(manifestURL => Manifest._loadFromURL(options, manifestURL));
-        })
-        .then(manifestContent => {
-          return {
-            manifest: manifestParser(manifestContent).value
-          };
-        });
+    /**
+     * This re-fetches the manifest separately, which could
+     * potentially lead to a different asset. Using the original manifest
+     * resource is tracked in issue #83
+     */
+    return driver.querySelector('head link[rel="manifest"]')
+      .then(node => node.getAttribute('href'))
+      .then(manifestURL => Manifest._loadFromURL(options, manifestURL))
+      .then(manifestContent => {
+        return {
+          manifest: manifestParser(manifestContent).value
+        };
+      });
   }
 }
 

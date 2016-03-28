@@ -20,6 +20,8 @@ const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
 const npmlog = require('npmlog');
 
+const Element = require('../element.js');
+
 const port = process.env.PORT || 9222;
 
 class ChromeProtocol {
@@ -134,6 +136,25 @@ class ChromeProtocol {
     });
   }
 
+  /**
+   * @param {string} selector Selector to find in the DOM
+   * @return {!Promise<Element>} The found element, or null, resolved in a promise
+   */
+  querySelector(selector) {
+    return this.sendCommand('DOM.getDocument')
+      .then(result => result.root.nodeId)
+      .then(nodeId => this.sendCommand('DOM.querySelector', {
+        nodeId,
+        selector
+      }))
+      .then(element => {
+        if (element.nodeId === 0) {
+          return null;
+        }
+        return new Element(element, this);
+      });
+  }
+
   _resetFailureTimeout(reject) {
     if (this.timeoutID) {
       clearTimeout(this.timeoutID);
@@ -165,7 +186,7 @@ class ChromeProtocol {
 
   endTrace() {
     return new Promise((resolve, reject) => {
-      // When all Tracing.dataCollected events have finished, this event fire
+      // When all Tracing.dataCollected events have finished, this event fires
       this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
 
       return this.connect().then(_ => {
