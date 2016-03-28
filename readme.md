@@ -38,17 +38,25 @@ See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extensi
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
 
 ```js
-npm test
+# lint and test all files
+npm test 
+
+## run linting and unit tests seprately
+npm run lint
+npm run unit
 ```
 
 ### Code Style
 
 The `.eslintrc` defines all.
 
+#### Code documentation
+
+We're using [JSDoc](http://usejsdoc.org/) along with [closure annotations](https://developers.google.com/closure/compiler/docs/js-for-compiler). Annotations encouraged for all contributions.
+
 #### Variable declarations
 
 `const` > `let` > `var`.  Use `const` wherever possible. Save `var` for emergencies only.
-
 
 ## Trace processing
 
