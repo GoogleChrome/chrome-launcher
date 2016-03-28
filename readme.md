@@ -9,16 +9,22 @@
 
 _status: very early. mostly not working_
 
-## Running audits
+## Running
 
 Will run the audits defined in the `audits/` folder against a demo app. Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface). Start Chrome manually; we can pursue [auto-launching](https://www.npmjs.com/package/chrome-launch) it later.
-```sh
-# Start Chrome with a few flags
-./launch-chrome.sh
 
-# set up the global
+#### Setup
+```sh
+npm install
+
 npm link
 
+# Start Chrome with a few flags
+./launch-chrome.sh
+```
+
+#### Run
+```sh
 # Kick off a lighthouse run
 lighthouse
 lighthouse https://airhorner.com/

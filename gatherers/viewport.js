@@ -16,26 +16,22 @@
  */
 'use strict';
 
-const Audit = require('../audit');
+const Gather = require('./gather');
 
-class Viewport extends Audit {
+class Viewport extends Gather {
 
-  static get tags() {
-    return ['Mobile Friendly'];
-  }
+  /**
+   * @param {!{driver: !object}} options
+   * @return {!Promise<{viewport: !string}>
+   */
+  static gather(options) {
+    const driver = options.driver;
 
-  static get name() {
-    return 'viewport';
-  }
-
-  static get description() {
-    return 'Site has a viewport meta tag';
-  }
-
-  static audit(inputs) {
-    const hasMobileViewport = typeof inputs.viewport === 'string' &&
-        inputs.viewport.includes('width=');
-    return Viewport.generateAuditResult(!!hasMobileViewport);
+    return driver.querySelector('head meta[name="viewport"]')
+      .then(node => node && node.getAttribute('content'))
+      .then(viewport => {
+        return {viewport};
+      });
   }
 }
 

@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,31 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/security/is-on-https.js');
+const Audit = require('../../../audits/html/theme-color.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
-describe('Security: HTTPS audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+describe('HTML: theme-color audit', () => {
+  it('fails when no window or html present', () => {
+    assert.equal(Audit.audit({}).value, false);
   });
 
-  it('fails when invalid HTML given', () => {
-    return assert.equal(Audit.audit({
-      html: null
+  it('fails when no value given', () => {
+    assert.equal(Audit.audit({
+      themeColorMeta: null
     }).value, false);
   });
 
-  it('fails when not on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      https: false
-    }).value, false);
+  it('succeeds when theme-color present in the html', () => {
+    assert.equal(Audit.audit({
+      themeColorMeta: '#fafa33'
+    }).value, true);
   });
 
-  it('passes when on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      https: true
+  it('succeeds when theme-color has a CSS name content value', () => {
+    assert.equal(Audit.audit({
+      themeColorMeta: 'red'
     }).value, true);
   });
 });

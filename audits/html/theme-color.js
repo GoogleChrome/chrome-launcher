@@ -1,5 +1,5 @@
 /**
- * @license
+ * @licence
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,25 +18,24 @@
 
 const Audit = require('../audit');
 
-class Viewport extends Audit {
+class ThemeColor extends Audit {
 
   static get tags() {
-    return ['Mobile Friendly'];
+    return ['HTML'];
   }
 
   static get name() {
-    return 'viewport';
+    return 'theme-color-meta';
   }
 
   static get description() {
-    return 'Site has a viewport meta tag';
+    return 'Site has a theme-color meta tag';
   }
 
   static audit(inputs) {
-    const hasMobileViewport = typeof inputs.viewport === 'string' &&
-        inputs.viewport.includes('width=');
-    return Viewport.generateAuditResult(!!hasMobileViewport);
+    const themeColorMeta = inputs.themeColorMeta;
+    return ThemeColor.generateAuditResult(!!themeColorMeta, themeColorMeta);
   }
 }
 
-module.exports = Viewport;
+module.exports = ThemeColor;

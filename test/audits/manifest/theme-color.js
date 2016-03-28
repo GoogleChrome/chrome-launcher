@@ -30,7 +30,7 @@ describe('Manifest: theme_color audit', () => {
     return assert.equal(Audit.audit({manifest: {}}).value, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
+  // Need to disable camelcase check for dealing with theme_color.
   /* eslint-disable camelcase */
   it('fails when a manifest contains no theme_color', () => {
     const inputs = {
