@@ -57,18 +57,18 @@ class ChromeProtocol {
   }
 
   /**
-   * @return {Promise<null>}
+   * @return {!Promise<null>}
    */
   connect() {
     return new Promise((resolve, reject) => {
       if (this._chrome) {
-        return resolve(null);
+        return resolve();
       }
 
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
-        resolve(null);
+        resolve();
       }).on('error', e => reject(e));
     });
   }
@@ -96,7 +96,7 @@ class ChromeProtocol {
   /**
    * Bind listeners for protocol events
    * @param {!string} eventName
-   * @param {!Function} cb
+   * @param {function(...)} cb
    */
   on(eventName, cb) {
     if (this._chrome === null) {
@@ -110,7 +110,7 @@ class ChromeProtocol {
   /**
    * Unbind event listeners
    * @param {!string} eventName
-   * @param {!Function} cb
+   * @param {function(...)} cb
    */
   off(eventName, cb) {
     this._chrome.removeListener(eventName, cb);
@@ -119,7 +119,7 @@ class ChromeProtocol {
   /**
    * Call protocol methods
    * @param {!string} command
-   * @param {!object} params
+   * @param {!Object} params
    * @return {!Promise}
    */
   sendCommand(command, params) {
