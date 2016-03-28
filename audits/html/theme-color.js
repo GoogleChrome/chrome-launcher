@@ -34,6 +34,7 @@ class ThemeColor extends Audit {
 
   static audit(inputs) {
     const themeColorMeta = inputs.themeColorMeta;
+    // TODO: Verify this is a valid CSS color. Issue #92
     return ThemeColor.generateAuditResult(!!themeColorMeta, themeColorMeta);
   }
 }

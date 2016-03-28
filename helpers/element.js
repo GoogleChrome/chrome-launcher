@@ -27,8 +27,8 @@ class Element {
   }
 
   /**
-   * @param {!string} name
-   * @return {Promise<string>}
+   * @param {!string} name Attribute name
+   * @return {!Promise<string>} The attribute value or null if not found
    */
   getAttribute(name) {
     return this.driver

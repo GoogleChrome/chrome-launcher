@@ -21,8 +21,8 @@ const Gather = require('./gather');
 class Viewport extends Gather {
 
   /**
-   * @param {!{driver: !object}} options
-   * @return {!Promise<{viewport: !string}>
+   * @param {!{driver: !Object}} options Run options
+   * @return {!Promise<{viewport: !string}>} The value of the viewport meta's content attribute, or null
    */
   static gather(options) {
     const driver = options.driver;

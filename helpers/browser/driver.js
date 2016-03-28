@@ -137,15 +137,15 @@ class ChromeProtocol {
   }
 
   /**
-   * @param {!string} selector
-   * @return {Promise<Element>}
+   * @param {string} selector Selector to find in the DOM
+   * @return {!Promise<Element>} The found element, or null, resolved in a promise
    */
   querySelector(selector) {
     return this.sendCommand('DOM.getDocument')
       .then(result => result.root.nodeId)
       .then(nodeId => this.sendCommand('DOM.querySelector', {
-        nodeId: nodeId,
-        selector: selector
+        nodeId,
+        selector
       }))
       .then(element => {
         if (element.nodeId === 0) {
