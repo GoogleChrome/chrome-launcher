@@ -16,7 +16,6 @@
  */
 'use strict';
 
-
 const ChromeProtocol = require('../browser/driver.js')
 
 /* globals chrome */
@@ -27,7 +26,6 @@ class ExtensionProtocol extends ChromeProtocol {
     super();
     this._listeners = {};
     this._tabId = null;
-    this._url = null;
     chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
   }
 
