@@ -56,7 +56,7 @@ class Manifest extends Gather {
       .then(manifestURL => manifestURL && Manifest._loadFromURL(options, manifestURL))
       .then(manifestContent => {
         return {
-          manifest: manifestContent && manifestParser(manifestContent).value
+          manifest: manifestParser(manifestContent).value
         };
       });
   }
