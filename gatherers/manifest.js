@@ -24,7 +24,7 @@ const manifestParser = require('../helpers/manifest-parser');
 class Manifest extends Gather {
 
   static _loadFromURL(options, manifestURL) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && 'fetch' in window) {
       const finalURL = (new window.URL(options.driver.url).origin) + '/' + manifestURL;
       return fetch(finalURL).then(response => response.text());
     }
