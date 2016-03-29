@@ -119,19 +119,16 @@ gulp.task('watch', ['lint', 'babel', 'html'], () => {
     'app/_locales/**/*.json'
   ]).on('change', $.livereload.reload);
 
-  const watcher = gulp.watch([
+  gulp.watch([
     '*.js',
     'app/scripts.babel/**/*.js',
-    // These below don't appear to work just yet. Hard to debug
     '../helpers/**/*.js',
     '../audits/**/*.js',
     '../aggregators/**/*.js',
     '../gatherers/**/*.js',
     '../metrics/**/*.js'
   ], ['babel', 'lint']);
-  watcher.on('change', function(event) {
-    debug('File ' + event.path + ' was ' + event.type + ', running tasks...');
-  });
+
   gulp.watch('bower.json', ['wiredep']);
 });
 
