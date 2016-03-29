@@ -52,11 +52,11 @@ class Manifest extends Gather {
      * resource is tracked in issue #83
      */
     return driver.querySelector('head link[rel="manifest"]')
-      .then(node => node.getAttribute('href'))
-      .then(manifestURL => Manifest._loadFromURL(options, manifestURL))
+      .then(node => node && node.getAttribute('href'))
+      .then(manifestURL => manifestURL && Manifest._loadFromURL(options, manifestURL))
       .then(manifestContent => {
         return {
-          manifest: manifestParser(manifestContent).value
+          manifest: manifestContent && manifestParser(manifestContent).value
         };
       });
   }
