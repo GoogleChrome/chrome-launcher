@@ -1,0 +1,43 @@
+'use strict';
+
+const Printer = {
+  /**
+   * @param {{info: function(...)}} debugLog
+   * @param {{log: function(...)}} output
+   * @param {string} url
+   * @param {!Array<?>} results
+   */
+  json: function(debugLog, output, url, results) {
+    debugLog.info('\n\n\nJSON Lighthouse results:', url);
+
+    output.log(JSON.stringify(results, null, 2));
+  },
+
+  /**
+   * @param {{info: function(...)}} debugLog
+   * @param {string} url
+   * @param {{log: function(...)}} output
+   * @param {!Array<?>} results
+   */
+  prettyPrint: function(debugLog, output, url, results) {
+    debugLog.info('\n\n\nPretty Print Lighthouse results:', url);
+
+    // TODO: colorise
+    results.forEach(item => {
+      let score = (item.score.overall * 100).toFixed(0);
+      output.log(`${item.name}: ${score}%`);
+
+      item.score.subItems.forEach(subitem => {
+        let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
+        if (subitem.rawValue) {
+          lineItem += ` (${subitem.rawValue})`;
+        }
+        output.log(lineItem);
+      });
+
+      output.log('');
+    });
+  }
+};
+
+module.exports = Printer;
