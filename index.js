@@ -16,7 +16,6 @@
  */
 'use strict';
 
-const defaultUrl = 'https://m.flipkart.com';
 const ChromeProtocol = require('./helpers/browser/driver');
 
 const Auditor = require('./auditor');
@@ -52,7 +51,7 @@ const aggregators = [
   require('./aggregators/is-performant')
 ];
 module.exports = function(opts) {
-  const url = opts.url || defaultUrl;
+  const url = opts.url;
   return Gatherer
       .gather(gatherers, {url, driver})
       .then(artifacts => Auditor.audit(artifacts, audits))

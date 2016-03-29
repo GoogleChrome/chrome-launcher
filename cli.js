@@ -22,6 +22,7 @@ const meow = require('meow');
 const lighthouse = require('./');
 const log = require('npmlog');
 
+
 const cli = meow(`
   Usage
     lighthouse [url]
@@ -35,7 +36,8 @@ const cli = meow(`
 
 `);
 
-const url = cli.input[0];
+const defaultUrl = 'https://m.flipkart.com';
+const url = cli.input[0] || defaultUrl;
 
 const prettyPrint = results => {
   log.info('\n\n\nLighthouse results:', url);

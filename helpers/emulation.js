@@ -16,8 +16,10 @@
  */
 'use strict';
 
-// Nexus5X metrics adaparted from emulated_devices/module.json
-const DEVICE_EMULATION_METRICS = {
+/**
+ * Nexus 5X metrics adapted from emulated_devices/module.json
+ */
+const NEXUS5X_EMULATION_METRICS = {
   mobile: true,
   screenWidth: 412,
   screenHeight: 732,
@@ -34,12 +36,12 @@ const DEVICE_EMULATION_METRICS = {
   }
 };
 
-const DEVICE_EMULATION_USERAGENT = {
+const NEXUS5X_USERAGENT = {
   userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36' +
     '(KHTML, like Gecko) Chrome/51.0.2690.0 Mobile Safari/537.36'
 };
 
-const NETWORK_THROTTLING_CONFIG = {
+const TYPICAL_MOBILE_THROTTLING_METRICS = {
   latency: 150, // 150ms
   downloadThroughput: 1.6 * 1024 * 1024 / 8, // 1.6Mbps
   uploadThroughput: 750 * 1024 / 8, // 750Kbps
@@ -47,16 +49,21 @@ const NETWORK_THROTTLING_CONFIG = {
 };
 
 function enableNexus5X(driver) {
-  driver.sendCommand('Emulation.setDeviceMetricsOverride', DEVICE_EMULATION_METRICS);
-  driver.sendCommand('Network.setUserAgentOverride', DEVICE_EMULATION_USERAGENT);
+  driver.sendCommand('Emulation.setDeviceMetricsOverride', NEXUS5X_EMULATION_METRICS);
+  driver.sendCommand('Network.setUserAgentOverride', NEXUS5X_USERAGENT);
   driver.sendCommand('Emulation.setTouchEmulationEnabled', {
     enabled: true,
     configuration: 'mobile'
   });
 
-  // from emulation/TouchModel.js
+  /**
+   * Finalizes touch emulation by enabling `"ontouchstart" in window` feature detect
+   * to work. Messy hack, though copied verbatim from DevTools' emulation/TouchModel.js
+   * where it's been working for years. addScriptToEvaluateOnLoad runs before any of the
+   * page's JavaScript executes.
+   */
   /* eslint-disable no-proto */ /* global window, document */
-  const injectedFunction = function() {
+  const injectedTouchEventsFunction = function() {
     const touchEvents = ['ontouchstart', 'ontouchend', 'ontouchmove', 'ontouchcancel'];
     var recepients = [window.__proto__, document.__proto__];
     for (var i = 0; i < touchEvents.length; ++i) {
@@ -71,7 +78,7 @@ function enableNexus5X(driver) {
   };
   /* eslint-enable */
   driver.sendCommand('Page.addScriptToEvaluateOnLoad', {
-    scriptSource: '(' + injectedFunction.toString() + ')()'
+    scriptSource: '(' + injectedTouchEventsFunction.toString() + ')()'
   });
 }
 
@@ -80,7 +87,7 @@ function disableCache(driver) {
 }
 
 function enableNetworkThrottling(driver) {
-  driver.sendCommand('Network.emulateNetworkConditions', NETWORK_THROTTLING_CONFIG);
+  driver.sendCommand('Network.emulateNetworkConditions', TYPICAL_MOBILE_THROTTLING_METRICS);
 }
 
 module.exports = {
