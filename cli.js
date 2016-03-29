@@ -39,7 +39,7 @@ const defaultUrl = 'https://m.flipkart.com';
 const url = cli.input[0] || defaultUrl;
 
 const prettyPrint = results => {
-  log.info('\n\n\nLighthouse results:', url);
+  log.info('\n\n\nLighthouse results:', url ? url : '');
   // TODO: colorise
   let score;
   results.forEach(item => {
