@@ -28,8 +28,8 @@
       "argsIgnorePattern": "(^reject$|^_$)"
     }],
     "quotes": [2, "single"],
-    "require-jsdoc": "off",
-    "valid-jsdoc": "off",
-    "comma-dangle": "off",
+    "require-jsdoc": 0,
+    "valid-jsdoc": 0,
+    "comma-dangle": 0
   }
 }

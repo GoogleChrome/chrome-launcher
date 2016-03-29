@@ -16,27 +16,19 @@
  */
 'use strict';
 
-const Audit = require('../audit');
+const Gather = require('./gather');
 
-class Viewport extends Audit {
+class ThemeColor extends Gather {
 
-  static get tags() {
-    return ['Mobile Friendly'];
-  }
+  static gather(options) {
+    const driver = options.driver;
 
-  static get name() {
-    return 'viewport';
-  }
-
-  static get description() {
-    return 'Site has a viewport meta tag';
-  }
-
-  static audit(inputs) {
-    const hasMobileViewport = typeof inputs.viewport === 'string' &&
-        inputs.viewport.includes('width=');
-    return Viewport.generateAuditResult(!!hasMobileViewport);
+    return driver.querySelector('head meta[name="theme-color"]')
+      .then(node => node && node.getAttribute('content'))
+      .then(themeColorMeta => {
+        return {themeColorMeta};
+      });
   }
 }
 
-module.exports = Viewport;
+module.exports = ThemeColor;

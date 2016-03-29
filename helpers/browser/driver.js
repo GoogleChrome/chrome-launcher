@@ -22,6 +22,8 @@ const emulation = require('../emulation');
 
 const npmlog = require('npmlog');
 
+const Element = require('../element.js');
+
 const port = process.env.PORT || 9222;
 
 class ChromeProtocol {
@@ -59,19 +61,19 @@ class ChromeProtocol {
   }
 
   /**
-   * @return {Promise<null>}
+   * @return {!Promise<null>}
    */
   connect() {
     return new Promise((resolve, reject) => {
       if (this._chrome) {
-        return resolve(null);
+        return resolve();
       }
 
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
         this.beginEmulation().then(_ => {
-          resolve(null);
+          resolve();
         });
       }).on('error', e => reject(e));
     });
@@ -97,7 +99,11 @@ class ChromeProtocol {
     this._chrome.on('event', req => _log('verbose', '<=', req));
   }
 
-  // bind listeners for protocol events
+  /**
+   * Bind listeners for protocol events
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
   on(eventName, cb) {
     if (this._chrome === null) {
       throw new Error('Trying to call on() but no cri instance available yet');
@@ -107,11 +113,21 @@ class ChromeProtocol {
     this._chrome.on(eventName, cb);
   }
 
+  /**
+   * Unbind event listeners
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
   off(eventName, cb) {
     this._chrome.removeListener(eventName, cb);
   }
 
-  // call protocol methods
+  /**
+   * Call protocol methods
+   * @param {!string} command
+   * @param {!Object} params
+   * @return {!Promise}
+   */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       _log('info', 'method => browser', {method: command, params: params});
@@ -125,6 +141,10 @@ class ChromeProtocol {
     });
   }
 
+  /**
+   * Resolves when all outstanding protocol methods have returned.
+   * @return {!Promise}
+   */
   pendingCommandsComplete() {
     return new Promise((resolve, reject) => {
       this._chrome.once('ready', _ => resolve());
@@ -147,6 +167,25 @@ class ChromeProtocol {
         this.on('Page.loadEventFired', response => resolve(response));
       });
     });
+  }
+
+  /**
+   * @param {string} selector Selector to find in the DOM
+   * @return {!Promise<Element>} The found element, or null, resolved in a promise
+   */
+  querySelector(selector) {
+    return this.sendCommand('DOM.getDocument')
+      .then(result => result.root.nodeId)
+      .then(nodeId => this.sendCommand('DOM.querySelector', {
+        nodeId,
+        selector
+      }))
+      .then(element => {
+        if (element.nodeId === 0) {
+          return null;
+        }
+        return new Element(element, this);
+      });
   }
 
   _resetFailureTimeout(reject) {
@@ -180,7 +219,7 @@ class ChromeProtocol {
 
   endTrace() {
     return new Promise((resolve, reject) => {
-      // When all Tracing.dataCollected events have finished, this event fire
+      // When all Tracing.dataCollected events have finished, this event fires
       this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
 
       return this.connect().then(_ => {

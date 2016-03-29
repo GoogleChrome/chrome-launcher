@@ -22,7 +22,6 @@ const meow = require('meow');
 const lighthouse = require('./');
 const log = require('npmlog');
 
-
 const cli = meow(`
   Usage
     lighthouse [url]

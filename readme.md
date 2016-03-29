@@ -9,16 +9,22 @@
 
 _status: very early. mostly not working_
 
-## Running audits
+## Running
 
 Will run the audits defined in the `audits/` folder against a demo app. Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface). Start Chrome manually; we can pursue [auto-launching](https://www.npmjs.com/package/chrome-launch) it later.
-```sh
-# Start Chrome with a few flags
-./launch-chrome.sh
 
-# set up the global
+#### Setup
+```sh
+npm install
+
 npm link
 
+# Start Chrome with a few flags
+./launch-chrome.sh
+```
+
+#### Run
+```sh
 # Kick off a lighthouse run
 lighthouse
 lighthouse https://airhorner.com/
@@ -38,17 +44,25 @@ See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extensi
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
 
 ```js
-npm test
+# lint and test all files
+npm test 
+
+## run linting and unit tests seprately
+npm run lint
+npm run unit
 ```
 
 ### Code Style
 
 The `.eslintrc` defines all.
 
+#### Code documentation
+
+We're using [JSDoc](http://usejsdoc.org/) along with [closure annotations](https://developers.google.com/closure/compiler/docs/js-for-compiler). Annotations encouraged for all contributions.
+
 #### Variable declarations
 
 `const` > `let` > `var`.  Use `const` wherever possible. Save `var` for emergencies only.
-
 
 ## Trace processing
 
