@@ -18,6 +18,7 @@
 
 const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
+const emulation = require('../emulation');
 const Element = require('../element.js');
 const port = process.env.PORT || 9222;
 
@@ -69,7 +70,9 @@ class ChromeProtocol {
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
-        resolve();
+        this.beginEmulation().then(_ => {
+          resolve();
+        });
       }).on('error', e => reject(e));
     });
   }
@@ -262,6 +265,15 @@ class ChromeProtocol {
           this._networkRecords = [];
         });
       });
+    });
+  }
+
+  beginEmulation() {
+    return new Promise((resolve, reject) => {
+      emulation.enableNexus5X(this);
+      emulation.enableNetworkThrottling(this);
+      emulation.disableCache(this);
+      this.pendingCommandsComplete().then(_ => resolve());
     });
   }
 }
