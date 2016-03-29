@@ -91,13 +91,17 @@ gulp.task('babel', () => {
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
     'app/scripts.babel/background.js'])
+    .pipe($.sourcemaps.init())
     .pipe($.rollup({
       sourceMap: true
     }))
     .pipe($.babel({
       presets: ['es2015']
     }))
-    .pipe(browserify())
+    .pipe(browserify({
+      ignore: ['npmlog']
+    }))
+    .pipe($.sourcemaps.write())
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
 });
@@ -115,7 +119,16 @@ gulp.task('watch', ['lint', 'babel', 'html'], () => {
     'app/_locales/**/*.json'
   ]).on('change', $.livereload.reload);
 
-  gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
+  gulp.watch([
+    '*.js',
+    'app/scripts.babel/**/*.js',
+    '../helpers/**/*.js',
+    '../audits/**/*.js',
+    '../aggregators/**/*.js',
+    '../gatherers/**/*.js',
+    '../metrics/**/*.js'
+  ], ['babel', 'lint']);
+
   gulp.watch('bower.json', ['wiredep']);
 });
 

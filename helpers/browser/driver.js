@@ -19,12 +19,10 @@
 const chromeRemoteInterface = require('chrome-remote-interface');
 const NetworkRecorder = require('../network-recorder');
 const emulation = require('../emulation');
-
-const npmlog = require('npmlog');
-
 const Element = require('../element.js');
-
 const port = process.env.PORT || 9222;
+
+const log = (typeof process === 'undefined') ? console.log.bind(console) : require('npmlog').log;
 
 class ChromeProtocol {
 
@@ -284,7 +282,7 @@ function _log(level, prefix, data) {
   const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
   const maxLength = columns - data.method.length - prefix.length - 7;
   const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
-  npmlog[level](prefix, data.method, snippet);
+  log(level, prefix, data.method, snippet);
 }
 
 module.exports = ChromeProtocol;

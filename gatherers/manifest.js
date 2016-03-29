@@ -24,8 +24,8 @@ const manifestParser = require('../helpers/manifest-parser');
 class Manifest extends Gather {
 
   static _loadFromURL(options, manifestURL) {
-    if (typeof window !== 'undefined') {
-      const finalURL = (new window.URL(options.driver.url).origin) + manifestURL;
+    if (typeof window !== 'undefined' && 'fetch' in window) {
+      const finalURL = (new window.URL(options.driver.url).origin) + '/' + manifestURL;
       return fetch(finalURL).then(response => response.text());
     }
 
@@ -52,8 +52,8 @@ class Manifest extends Gather {
      * resource is tracked in issue #83
      */
     return driver.querySelector('head link[rel="manifest"]')
-      .then(node => node.getAttribute('href'))
-      .then(manifestURL => Manifest._loadFromURL(options, manifestURL))
+      .then(node => node && node.getAttribute('href'))
+      .then(manifestURL => manifestURL && Manifest._loadFromURL(options, manifestURL))
       .then(manifestContent => {
         return {
           manifest: manifestParser(manifestContent).value
