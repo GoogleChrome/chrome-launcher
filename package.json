@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "test": "npm run lint --silent && npm run unit",
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
-    "start": "node ."
+    "start": "node .",
+    "chrome": "./launch-chrome.sh"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [

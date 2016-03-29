@@ -20,7 +20,7 @@ npm install
 npm link
 
 # Start Chrome with a few flags
-./launch-chrome.sh
+npm run chrome
 ```
 
 #### Run
@@ -45,7 +45,7 @@ Some basic unit tests forked are in `/test` and run via mocha. eslint is also ch
 
 ```js
 # lint and test all files
-npm test 
+npm test
 
 ## run linting and unit tests seprately
 npm run lint
@@ -67,4 +67,3 @@ We're using [JSDoc](http://usejsdoc.org/) along with [closure annotations](https
 ## Trace processing
 
 The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. Additionally, the [DevTools' Timeline Model](https://github.com/paulirish/devtools-timeline-model) is available as well. There may be advantages for using one model over another.
-
