@@ -25,7 +25,7 @@ class Manifest extends Gather {
 
   static _loadFromURL(options, manifestURL) {
     if (typeof window !== 'undefined') {
-      const finalURL = (new window.URL(options.driver.url).origin) + manifestURL;
+      const finalURL = (new window.URL(options.driver.url).origin) + '/' + manifestURL;
       return fetch(finalURL).then(response => response.text());
     }
 

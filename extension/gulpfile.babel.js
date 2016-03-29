@@ -91,13 +91,17 @@ gulp.task('babel', () => {
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
     'app/scripts.babel/background.js'])
+    .pipe($.sourcemaps.init())
     .pipe($.rollup({
       sourceMap: true
     }))
     .pipe($.babel({
       presets: ['es2015']
     }))
-    .pipe(browserify())
+    .pipe(browserify({
+      ignore: ['npmlog']
+    }))
+    .pipe($.sourcemaps.write())
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
 });
@@ -108,6 +112,7 @@ gulp.task('watch', ['lint', 'babel', 'html'], () => {
   $.livereload.listen();
 
   gulp.watch([
+    '*.js',
     'app/*.html',
     'app/scripts/**/*.js',
     'app/images/**/*',

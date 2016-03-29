@@ -16,23 +16,19 @@
  */
 'use strict';
 
+
+const ChromeProtocol = require('../browser/driver.js')
+
 /* globals chrome */
 
-class ExtensionProtocol {
+class ExtensionProtocol extends ChromeProtocol {
 
   constructor() {
+    super();
     this._listeners = {};
     this._tabId = null;
     this._url = null;
     chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
-  }
-
-  get url() {
-    return this._url;
-  }
-
-  set url(_url) {
-    this._url = _url;
   }
 
   connect() {
@@ -55,6 +51,11 @@ class ExtensionProtocol {
         });
   }
 
+  /**
+   * Bind listeners for protocol events
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
   on(eventName, cb) {
     if (typeof this._listeners[eventName] === 'undefined') {
       this._listeners[eventName] = [];
@@ -76,6 +77,12 @@ class ExtensionProtocol {
     this._listeners[method].length = 0;
   }
 
+  /**
+   * Call protocol methods
+   * @param {!string} command
+   * @param {!Object} params
+   * @return {!Promise}
+   */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
