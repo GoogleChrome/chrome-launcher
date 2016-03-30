@@ -52,7 +52,24 @@ npm run lint
 npm run unit
 ```
 
-### Code Style
+## Architecture
+
+_It's a moving target, but here's a recent attempt at capturing..._
+
+#### Components
+* **Driver** - Interfaces with Chrome Debugging Protocol
+* **Gathers** - Requesting data from the browser (and maybe post-processing)
+* **Artifacts** - The output of gatherers
+* **Audits** - Non-performance evaluations of capabilities and issues. Includes a raw value and score of that value.
+* **Metrics** - Performance metrics summarizing the UX
+* **Diagnoses** - The perf problems that affect those metrics
+* **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
+
+### Gatherers
+
+* _Reading the DOM:_ We prefer reading the DOM right from the browser (See #77). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values. 
+
+## Code Style
 
 The `.eslintrc` defines all.
 
