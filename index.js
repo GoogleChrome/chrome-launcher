@@ -46,12 +46,15 @@ const audits = [
   require('./audits/manifest/name'),
   require('./audits/manifest/short-name'),
   require('./audits/manifest/start-url'),
-  require('./audits/html/theme-color')
+  require('./audits/html/meta-theme-color')
 ];
 const aggregators = [
   require('./aggregators/will-get-add-to-homescreen-prompt'),
+  require('./aggregators/omnibox-is-themed'),
+  require('./aggregators/can-load-offline'),
   require('./aggregators/is-secure'),
-  require('./aggregators/is-performant')
+  require('./aggregators/is-performant'),
+  require('./aggregators/is-sized-for-mobile-screen')
 ];
 module.exports = function(opts) {
   const url = opts.url;

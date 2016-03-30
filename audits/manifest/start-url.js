@@ -38,7 +38,7 @@ class ManifestStartUrl extends Audit {
    * @override
    */
   static get description() {
-    return 'Contains start_url';
+    return 'Manifest contains start_url';
   }
 
   /**

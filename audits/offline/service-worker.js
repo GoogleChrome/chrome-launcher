@@ -38,7 +38,7 @@ class ServiceWorker extends Audit {
    * @override
    */
   static get description() {
-    return 'Has a Service Worker registration';
+    return 'Has a registered Service Worker';
   }
 
   /**

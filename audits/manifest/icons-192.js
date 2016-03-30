@@ -38,7 +38,7 @@ class ManifestIcons192 extends Audit {
    * @override
    */
   static get description() {
-    return 'Contains 192px icons';
+    return 'Manifest contains 192px icons';
   }
 
   /**

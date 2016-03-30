@@ -22,15 +22,20 @@ const Aggregate = require('../aggregate');
 class AddToHomescreen extends Aggregate {
 
   static get name() {
-    return 'Has valid Add to Homescreen Manifest';
+    return 'Omnibox Matches Brand Colors';
   }
 
+  /**
+   * For the omnibox to adopt a theme color, Chrome needs the following:
+   *   - has valid manifest
+   *   - valid theme_color in manifest
+   *   - valid theme-color <meta> element
+   * More details: https://github.com/GoogleChrome/lighthouse/issues/25
+   */
   static get criteria() {
     const manifestExists = require('../../audits/manifest/exists').name;
-    const manifestBackgroundColor = require('../../audits/manifest/background-color').name;
-    const manifestIcons = require('../../audits/manifest/icons').name;
-    const manifestIcons192 = require('../../audits/manifest/icons-192').name;
-    const manifestShortName = require('../../audits/manifest/short-name').name;
+    const manifestThemeColor = require('../../audits/manifest/theme-color').name;
+    const metaThemeColor = require('../../audits/html/meta-theme-color').name;
 
     const criteria = {};
     criteria[manifestExists] = {
@@ -38,24 +43,14 @@ class AddToHomescreen extends Aggregate {
       weight: 1
     };
 
-    criteria[manifestBackgroundColor] = {
+    criteria[manifestThemeColor] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestIcons] = {
+    criteria[metaThemeColor] = {
       value: true,
       weight: 1
-    };
-
-    criteria[manifestIcons192] = {
-      value: true,
-      weight: 1
-    };
-
-    criteria[manifestShortName] = {
-      value: true,
-      weight: 0
     };
 
     return criteria;

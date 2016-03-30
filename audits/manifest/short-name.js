@@ -38,7 +38,7 @@ class ManifestShortName extends Audit {
    * @override
    */
   static get description() {
-    return 'Contains short_name';
+    return 'Manifest contains short_name';
   }
 
   /**
