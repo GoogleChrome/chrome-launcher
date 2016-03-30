@@ -21,6 +21,7 @@
 const meow = require('meow');
 const lighthouse = require('./');
 const log = require('npmlog');
+const semver = require('semver');
 const Printer = require('./cli/printer');
 const cli = meow(`
   Usage
@@ -37,6 +38,11 @@ const cli = meow(`
 
 const defaultUrl = 'https://m.flipkart.com';
 const url = cli.input[0] || defaultUrl;
+
+if (semver.lt(process.version, '5.9.0')) {
+  console.error('Lighthouse requires node version 5.9 or newer');
+  process.exit(1);
+}
 
 lighthouse({
   url: url,
