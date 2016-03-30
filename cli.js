@@ -35,7 +35,7 @@ const cli = meow(`
 
 `);
 
-const defaultUrl = 'https://m.flipkart.com';
+const defaultUrl = 'https://operasoftware.github.io/pwa-list/';
 const url = cli.input[0] || defaultUrl;
 
 const prettyPrint = results => {

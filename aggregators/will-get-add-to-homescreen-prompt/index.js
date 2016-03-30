@@ -18,23 +18,48 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-const AddToHomescreen = require('./add-to-homescreen');
-const WorksOffline = require('./works-offline');
-const MobileFriendly = require('./mobile-friendly');
 
-class WillGetAddToHomescreenPrompt extends Aggregate {
+class AddToHomescreen extends Aggregate {
 
   static get name() {
     return 'Will Get Add to Homescreen Prompt';
   }
 
   static get criteria() {
-    return Object.assign({},
-      WorksOffline.criteria,
-      AddToHomescreen.criteria,
-      MobileFriendly.criteria
-    );
+    const manifestExists = require('../../audits/manifest/exists').name;
+    const manifestBackgroundColor = require('../../audits/manifest/background-color').name;
+    const manifestIcons = require('../../audits/manifest/icons').name;
+    const manifestIcons192 = require('../../audits/manifest/icons-192').name;
+    const manifestShortName = require('../../audits/manifest/short-name').name;
+
+    const criteria = {};
+    criteria[manifestExists] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestBackgroundColor] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestIcons] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestIcons192] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[manifestShortName] = {
+      value: true,
+      weight: 0
+    };
+
+    return criteria;
   }
 }
 
-module.exports = WillGetAddToHomescreenPrompt;
+module.exports = AddToHomescreen;
