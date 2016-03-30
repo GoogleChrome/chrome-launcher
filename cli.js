@@ -21,7 +21,7 @@
 const meow = require('meow');
 const lighthouse = require('./');
 const log = require('npmlog');
-
+const Printer = require('./cli/printer');
 const cli = meow(`
   Usage
     lighthouse [url]
@@ -38,35 +38,11 @@ const cli = meow(`
 const defaultUrl = 'https://m.flipkart.com';
 const url = cli.input[0] || defaultUrl;
 
-const prettyPrint = results => {
-  log.info('\n\n\nLighthouse results:', url);
-  // TODO: colorise
-  let score;
-  results.forEach(item => {
-    score = (item.score.overall * 100).toFixed(0);
-    console.log(`${item.name}: ${score}%`);
-
-    item.score.subItems.forEach(subitem => {
-      let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
-      if (subitem.rawValue) {
-        lineItem += ` (${subitem.rawValue})`;
-      }
-      console.log(lineItem);
-    });
-
-    console.log('');
-  });
-};
-
 lighthouse({
   url: url,
   flags: cli.flags
 }).then(results => {
-  if (cli.flags.json) {
-    console.log(JSON.stringify(results, null, 2));
-  } else {
-    prettyPrint(results);
-  }
+  Printer[cli.flags.json ? 'json' : 'prettyPrint'](log, console, url, results);
 });
 
 if (cli.flags.verbose) {
