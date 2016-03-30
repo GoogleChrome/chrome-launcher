@@ -20,27 +20,43 @@
 const Audit = require('../audit');
 
 class ManifestBackgroundColor extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Manifest'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'manifest-background-color';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Contains background_color';
   }
 
+  /**
+   * @param {!Manifest} manifest
+   * @return {boolean}
+   */
   static hasBackgroundColorValue(manifest) {
     return manifest !== undefined &&
       manifest.background_color !== undefined &&
       manifest.background_color.value !== undefined;
   }
 
-  static audit(inputs) {
-    const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(inputs.manifest);
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(artifacts.manifest);
 
     return ManifestBackgroundColor.generateAuditResult(hasBackgroundColor);
   }

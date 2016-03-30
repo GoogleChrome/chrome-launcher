@@ -19,6 +19,9 @@
 const DevtoolsTimelineModel = require('devtools-timeline-model');
 
 class FirstMeaningfulPaint {
+  /**
+   * @param {!Array<!Object>} traceData
+   */
   static parse(traceData) {
     return new Promise((resolve, reject) => {
       const model = new DevtoolsTimelineModel(traceData);
@@ -40,11 +43,21 @@ class FirstMeaningfulPaint {
     });
   }
 
+  /**
+   * @param {!DevtoolsTimelineModel.MainThreadEvent} e
+   * @return {boolean}
+   * @private
+   */
   static _filterEventsForNavStart(e) {
     return e.categoriesString.includes('blink.user_timing') &&
         e.name === 'navigationStart';
   }
 
+  /**
+   * @param {!DevtoolsTimelineModel.MainThreadEvent} e
+   * @return {boolean}
+   * @private
+   */
   static _filterEventsForFirstTextPaint(e) {
     return e.categoriesString.includes('blink.user_timing') &&
         e.name === 'firstTextPaint';

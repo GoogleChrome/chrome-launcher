@@ -15,41 +15,28 @@
  * limitations under the License.
  */
 
-'use strict';
+/**
+ * Typing externs file for the result of an audit.
+ * @externs
+ */
 
-const Audit = require('../audit');
+/**
+ * @struct
+ * @record
+ */
+function AuditResult() {}
 
-class ManifestExists extends Audit {
-  /**
-   * @override
-   */
-  static get tags() {
-    return ['Manifest'];
-  }
+/** @type {(boolean|number|string)} */
+AuditResult.prototype.value;
 
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-exists';
-  }
+/** @type {(boolean|number|string|undefined|null)} */
+AuditResult.prototype.rawValue;
 
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest exists';
-  }
+/** @type {string} */
+AuditResult.prototype.name;
 
-  /**
-   * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
-   */
-  static audit(artifacts) {
-    return ManifestExists.generateAuditResult(
-      typeof artifacts.manifest !== 'undefined'
-    );
-  }
-}
+/** @type {!Array<string>} */
+AuditResult.prototype.tags;
 
-module.exports = ManifestExists;
+/** @type {string} */
+AuditResult.prototype.description;

@@ -21,15 +21,23 @@ const FMPMetric = require('../../metrics/performance/first-meaningful-paint');
 const Audit = require('../audit');
 
 class FirstMeaningfulPaint extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Performance'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'first-meaningful-paint';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Has a good first meaningful paint';
   }
@@ -37,12 +45,12 @@ class FirstMeaningfulPaint extends Audit {
   /**
    * Audits the page to give a score for First Meaningful Paint.
    * @see  https://github.com/GoogleChrome/lighthouse/issues/26
-   * @param  {Object} inputs The inputs from the gather phase.
-   * @return {Object} The score from the audit, ranging from 0-100.
+   * @param {!Artifacts} artifacts The artifacts from the gather phase.
+   * @return {!AuditResult} The score from the audit, ranging from 0-100.
    */
-  static audit(inputs) {
+  static audit(artifacts) {
     return FMPMetric
-        .parse(inputs.traceContents)
+        .parse(artifacts.traceContents)
         .then(fmp => {
           if (fmp.err) {
             return {
