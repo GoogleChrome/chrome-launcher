@@ -22,22 +22,33 @@ const assert = require('assert');
 /* eslint-disable camelcase */
 describe('Manifest: background color audit', () => {
   it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+    return assert.equal(Audit.audit({manifest: {
+      value: undefined
+    }}).value, false);
   });
 
   it('fails when no background color present', () => {
     return assert.equal(Audit.audit({manifest: {
-      foo: 1}}).value, false);
+      value: {
+        foo: 1
+      }
+    }}).value, false);
   });
 
   it('fails when no background color value present', () => {
     return assert.equal(Audit.audit({manifest: {
-      background_color: 'no'}}).value, false);
+      value: {
+        background_color: 'no'
+      }
+    }}).value, false);
   });
 
   it('passes when color is present', () => {
     return assert.equal(Audit.audit({manifest: {
-      background_color: {value: 'black'}}}).value, true);
+      value: {
+        background_color: {value: 'black'}
+      }
+    }}).value, true);
   });
 });
 /* eslint-enable */

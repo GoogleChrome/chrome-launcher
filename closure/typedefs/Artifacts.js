@@ -38,7 +38,7 @@ Artifacts.prototype.networkRecords;
 /** @type {?} */
 Artifacts.prototype.traceContents;
 
-/** @type {!Manifest} */
+/** @type {!ManifestNode<(!Manifest|undefined)>} */
 Artifacts.prototype.manifest;
 
 /** @type {!ServiceWorkerVersions} */

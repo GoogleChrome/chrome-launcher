@@ -42,7 +42,7 @@ class ManifestBackgroundColor extends Audit {
   }
 
   /**
-   * @param {!Manifest} manifest
+   * @param {!Manifest=} manifest
    * @return {boolean}
    */
   static hasBackgroundColorValue(manifest) {
@@ -56,7 +56,8 @@ class ManifestBackgroundColor extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const hasBackgroundColor = ManifestBackgroundColor.hasBackgroundColorValue(artifacts.manifest);
+    const hasBackgroundColor = ManifestBackgroundColor
+        .hasBackgroundColorValue(artifacts.manifest.value);
 
     return ManifestBackgroundColor.generateAuditResult(hasBackgroundColor);
   }

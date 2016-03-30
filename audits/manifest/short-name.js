@@ -47,7 +47,7 @@ class ManifestShortName extends Audit {
    */
   static audit(artifacts) {
     let hasShortName = false;
-    const manifest = artifacts.manifest;
+    const manifest = artifacts.manifest.value;
 
     if (manifest && manifest.short_name) {
       hasShortName = (!!manifest.short_name.value);

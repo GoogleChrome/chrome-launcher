@@ -32,6 +32,9 @@ AuditResult.prototype.value;
 /** @type {(boolean|number|string|undefined|null)} */
 AuditResult.prototype.rawValue;
 
+/** @type {(string|undefined)} */
+AuditResult.prototype.debugString;
+
 /** @type {string} */
 AuditResult.prototype.name;
 

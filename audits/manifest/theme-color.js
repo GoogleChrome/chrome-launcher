@@ -47,7 +47,7 @@ class ManifestThemeColor extends Audit {
    */
   static audit(artifacts) {
     let hasThemeColor = false;
-    const manifest = artifacts.manifest;
+    const manifest = artifacts.manifest.value;
 
     if (manifest && manifest.theme_color) {
       hasThemeColor = (!!manifest.theme_color.value);

@@ -17,13 +17,15 @@ const Audit = require('../../../audits/manifest/icons.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('./manifest.json'));
 const manifestParser = require('../../../helpers/manifest-parser');
-const manifest = manifestParser(manifestSrc).value;
+const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
 describe('Manifest: icons audit', () => {
   it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+    return assert.equal(Audit.audit({manifest: {
+      value: undefined
+    }}).value, false);
   });
 
   it('fails when an empty manifest is present', () => {

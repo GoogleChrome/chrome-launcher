@@ -47,7 +47,9 @@ class ManifestExists extends Audit {
    */
   static audit(artifacts) {
     return ManifestExists.generateAuditResult(
-      typeof artifacts.manifest !== 'undefined'
+      typeof artifacts.manifest.value !== 'undefined',
+      undefined,
+      artifacts.manifest.warning
     );
   }
 }
