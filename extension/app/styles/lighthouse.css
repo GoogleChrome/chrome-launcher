@@ -121,6 +121,11 @@ header h2 {
   margin: 0;
 }
 
+.results [title] {
+  cursor: help;
+  border-bottom: 1px dashed black;
+}
+
 .results .pass {
   color: #44A736;
 }
