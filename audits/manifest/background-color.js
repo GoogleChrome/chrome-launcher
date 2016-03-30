@@ -38,7 +38,7 @@ class ManifestBackgroundColor extends Audit {
    * @override
    */
   static get description() {
-    return 'Contains background_color';
+    return 'Manifest contains background_color';
   }
 
   /**

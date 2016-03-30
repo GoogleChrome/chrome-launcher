@@ -27,6 +27,8 @@ const gatherers = [
   require('../../../gatherers/url'),
   require('../../../gatherers/https'),
   require('../../../gatherers/service-worker'),
+  require('../../../gatherers/viewport'),
+  require('../../../gatherers/theme-color'),
   require('../../../gatherers/html'),
   require('../../../gatherers/manifest')
 ];
@@ -41,11 +43,15 @@ const audits = [
   require('../../../audits/manifest/icons-192'),
   require('../../../audits/manifest/name'),
   require('../../../audits/manifest/short-name'),
-  require('../../../audits/manifest/start-url')
+  require('../../../audits/manifest/start-url'),
+  require('../../../audits/html/meta-theme-color')
 ];
 const aggregators = [
   require('../../../aggregators/will-get-add-to-homescreen-prompt'),
-  require('../../../aggregators/is-secure')
+  require('../../../aggregators/omnibox-is-themed'),
+  require('../../../aggregators/can-load-offline'),
+  require('../../../aggregators/is-secure'),
+  require('../../../aggregators/is-sized-for-mobile-screen')
 ];
 
 function createResultsHTML(results) {

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/html/theme-color.js');
+const Audit = require('../../../audits/html/meta-theme-color.js');
 const assert = require('assert');
 
 /* global describe, it*/

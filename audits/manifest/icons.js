@@ -38,7 +38,7 @@ class ManifestIcons extends Audit {
    * @override
    */
   static get description() {
-    return 'Contains icons';
+    return 'Manifest contains icons';
   }
 
   /**
