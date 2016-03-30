@@ -1,5 +1,5 @@
 /**
- * @licence
+ * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,21 +19,33 @@
 const Audit = require('../audit');
 
 class ThemeColor extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['HTML'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'theme-color-meta';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Site has a theme-color meta tag';
   }
 
-  static audit(inputs) {
-    const themeColorMeta = inputs.themeColorMeta;
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    const themeColorMeta = artifacts.themeColorMeta;
     // TODO: Verify this is a valid CSS color. Issue #92
     return ThemeColor.generateAuditResult(!!themeColorMeta, themeColorMeta);
   }

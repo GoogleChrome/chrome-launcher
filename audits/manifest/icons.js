@@ -20,22 +20,34 @@
 const Audit = require('../audit');
 
 class ManifestIcons extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Manifest'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'manifest-icons';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Contains icons';
   }
 
-  static audit(inputs) {
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
     let hasIcons = false;
-    const manifest = inputs.manifest;
+    const manifest = artifacts.manifest;
 
     if (manifest && manifest.icons && manifest.icons.value) {
       hasIcons = (manifest.icons.value.length > 0);

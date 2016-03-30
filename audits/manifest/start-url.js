@@ -20,22 +20,34 @@
 const Audit = require('../audit');
 
 class ManifestStartUrl extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Manifest'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'manifest-start-url';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Contains start_url';
   }
 
-  static audit(inputs) {
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
     let hasStartUrl = false;
-    const manifest = inputs.manifest;
+    const manifest = artifacts.manifest;
 
     if (manifest && manifest.start_url) {
       hasStartUrl = (!!manifest.start_url.value);

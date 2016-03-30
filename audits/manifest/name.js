@@ -20,22 +20,34 @@
 const Audit = require('../audit');
 
 class ManifestName extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Manifest'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'manifest-name';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Contains name';
   }
 
-  static audit(inputs) {
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
     let hasName = false;
-    const manifest = inputs.manifest;
+    const manifest = artifacts.manifest;
 
     if (manifest && manifest.name) {
       hasName = (!!manifest.name.value);

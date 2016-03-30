@@ -15,41 +15,37 @@
  * limitations under the License.
  */
 
-'use strict';
+/**
+ * Typing externs file for collected output of the artifact gatherers stage.
+ * @externs
+ */
 
-const Audit = require('../audit');
+/**
+ * @struct
+ * @record
+ */
+function Artifacts() {}
 
-class ManifestExists extends Audit {
-  /**
-   * @override
-   */
-  static get tags() {
-    return ['Manifest'];
-  }
+/** @type {string} */
+Artifacts.prototype.html;
 
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-exists';
-  }
+/** @type {boolean} */
+Artifacts.prototype.https;
 
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest exists';
-  }
+/** @type {!Array<!Object>} */
+Artifacts.prototype.networkRecords;
 
-  /**
-   * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
-   */
-  static audit(artifacts) {
-    return ManifestExists.generateAuditResult(
-      typeof artifacts.manifest !== 'undefined'
-    );
-  }
-}
+/** @type {?} */
+Artifacts.prototype.traceContents;
 
-module.exports = ManifestExists;
+/** @type {!Manifest} */
+Artifacts.prototype.manifest;
+
+/** @type {!ServiceWorkerVersions} */
+Artifacts.prototype.serviceWorkers;
+
+/** @type {?string} */
+Artifacts.prototype.themeColorMeta;
+
+/** @type {string} */
+Artifacts.prototype.url;

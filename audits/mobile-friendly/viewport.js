@@ -19,22 +19,34 @@
 const Audit = require('../audit');
 
 class Viewport extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Mobile Friendly'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'viewport';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Site has a viewport meta tag';
   }
 
-  static audit(inputs) {
-    const hasMobileViewport = typeof inputs.viewport === 'string' &&
-        inputs.viewport.includes('width=');
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    const hasMobileViewport = typeof artifacts.viewport === 'string' &&
+        artifacts.viewport.includes('width=');
     return Viewport.generateAuditResult(!!hasMobileViewport);
   }
 }

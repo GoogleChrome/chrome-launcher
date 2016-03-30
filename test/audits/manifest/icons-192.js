@@ -24,14 +24,10 @@ describe('Manifest: icons-192 audit', () => {
     return assert.equal(Audit.audit({}).value, false);
   });
 
-  it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({manifest: {}}).value, false);
-  });
-
   it('fails when a manifest contains no icons', () => {
     const inputs = {
       manifest: {
-        icons: null
+        icons: {}
       }
     };
 

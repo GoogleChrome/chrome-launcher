@@ -20,22 +20,34 @@
 const Audit = require('../audit');
 
 class ManifestThemeColor extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Manifest'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'manifest-theme-color';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Contains theme_color';
   }
 
-  static audit(inputs) {
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
     let hasThemeColor = false;
-    const manifest = inputs.manifest;
+    const manifest = artifacts.manifest;
 
     if (manifest && manifest.theme_color) {
       hasThemeColor = (!!manifest.theme_color.value);

@@ -20,24 +20,36 @@
 const Audit = require('../audit');
 
 class ServiceWorker extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Offline'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'service-worker';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Has a Service Worker registration';
   }
 
-  static audit(inputs) {
-    const registrations = inputs.serviceWorkers.versions;
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    const registrations = artifacts.serviceWorkers.versions;
     const activatedRegistrations = registrations.filter(reg => {
       return reg.status === 'activated' &&
-          reg.scriptURL.startsWith(inputs.url);
+          reg.scriptURL.startsWith(artifacts.url);
     });
 
     return ServiceWorker.generateAuditResult(activatedRegistrations.length > 0);

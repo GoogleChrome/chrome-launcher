@@ -14,22 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
 class Audit {
+  /**
+   * @return {!Array<string>}
+   */
   static get tags() {
     throw new Error('Audit tags must be overridden');
   }
 
+  /**
+   * @return {string}
+   */
   static get name() {
     throw new Error('Audit name must be overridden');
   }
 
+  /**
+   * @return {string}
+   */
   static get description() {
     throw new Error('Audit description must be overridden');
   }
 
+  /**
+   * @param {(boolean|number|string)} value
+   * @param {?(boolean|number|string)=} rawValue
+   * @return {!AuditResult}
+   */
   static generateAuditResult(value, rawValue) {
     return {
       value: value,

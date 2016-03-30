@@ -19,21 +19,33 @@
 const Audit = require('../audit');
 
 class HTTPS extends Audit {
-
+  /**
+   * @override
+   */
   static get tags() {
     return ['Security'];
   }
 
+  /**
+   * @override
+   */
   static get name() {
     return 'is-on-https';
   }
 
+  /**
+   * @override
+   */
   static get description() {
     return 'Site is on HTTPS';
   }
 
-  static audit(inputs) {
-    return HTTPS.generateAuditResult(!!inputs.https);
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    return HTTPS.generateAuditResult(!!artifacts.https);
   }
 }
 
