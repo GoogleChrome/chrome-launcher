@@ -25,20 +25,39 @@ class AddToHomescreen extends Aggregate {
     return 'Will Get Add to Homescreen Prompt';
   }
 
+  /**
+   * For the install-to-homescreen / install-app-banner prompt to show,
+   * Chrome needs the following:
+   *   - has a registered SW
+   *   - has valid manifest
+   *   - valid start_url
+   *   - valid name
+   *   - valid short_name
+   *   - icon of size >= 144x144 and png (either type `image/png` or filename ending in `.png`
+   * More details: https://github.com/GoogleChrome/lighthouse/issues/23
+   *
+   * TODO: We should allow icons >=144, rather than >= 192
+   */
   static get criteria() {
+    const serviceWorker = require('../../audits/offline/service-worker').name;
     const manifestExists = require('../../audits/manifest/exists').name;
-    const manifestBackgroundColor = require('../../audits/manifest/background-color').name;
+    const manifestStartUrl = require('../../audits/manifest/start-url').name;
     const manifestIcons = require('../../audits/manifest/icons').name;
     const manifestIcons192 = require('../../audits/manifest/icons-192').name;
     const manifestShortName = require('../../audits/manifest/short-name').name;
 
     const criteria = {};
+    criteria[serviceWorker] = {
+      value: true,
+      weight: 1
+    };
+
     criteria[manifestExists] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestBackgroundColor] = {
+    criteria[manifestStartUrl] = {
       value: true,
       weight: 1
     };
