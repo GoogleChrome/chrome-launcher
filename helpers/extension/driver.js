@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const ChromeProtocol = require('../browser/driver.js')
+const ChromeProtocol = require('../browser/driver.js');
 
 /* globals chrome */
 
