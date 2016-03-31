@@ -19,7 +19,7 @@
 
 const Aggregate = require('../aggregate');
 
-class AddToHomescreen extends Aggregate {
+class OmniboxThemeColor extends Aggregate {
 
   static get name() {
     return 'Omnibox Matches Brand Colors';
@@ -62,4 +62,4 @@ class AddToHomescreen extends Aggregate {
   }
 }
 
-module.exports = AddToHomescreen;
+module.exports = OmniboxThemeColor;
