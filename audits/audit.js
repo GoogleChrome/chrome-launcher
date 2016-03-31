@@ -41,12 +41,14 @@ class Audit {
   /**
    * @param {(boolean|number|string)} value
    * @param {?(boolean|number|string)=} rawValue
+   * @param {string=} debugString Optional string to describe any error condition encountered.
    * @return {!AuditResult}
    */
-  static generateAuditResult(value, rawValue) {
+  static generateAuditResult(value, rawValue, debugString) {
     return {
-      value: value,
-      rawValue: rawValue,
+      value,
+      rawValue,
+      debugString,
       name: this.name,
       tags: this.tags,
       description: this.description

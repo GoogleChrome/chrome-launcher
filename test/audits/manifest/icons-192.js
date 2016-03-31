@@ -21,7 +21,9 @@ const manifestParser = require('../../../helpers/manifest-parser');
 
 describe('Manifest: icons-192 audit', () => {
   it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+    return assert.equal(Audit.audit({manifest: {
+      value: undefined
+    }}).value, false);
   });
 
   it('fails when a manifest contains no icons', () => {
@@ -59,7 +61,7 @@ describe('Manifest: icons-192 audit', () => {
 
   it('succeeds when a manifest contains a 192x192 icon', () => {
     const manifestSrc = JSON.stringify(require('./manifest.json'));
-    const manifest = manifestParser(manifestSrc).value;
+    const manifest = manifestParser(manifestSrc);
 
     return assert.equal(Audit.audit({manifest}).value, true);
   });
@@ -71,7 +73,7 @@ describe('Manifest: icons-192 audit', () => {
         sizes: '96x96 128x128 192x192 256x256'
       }]
     });
-    const manifest = manifestParser(manifestSrc).value;
+    const manifest = manifestParser(manifestSrc);
 
     return assert.equal(Audit.audit({manifest}).value, true);
   });

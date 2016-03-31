@@ -32,8 +32,6 @@ document.addEventListener('DOMContentLoaded', _ => {
 
   runPwaAudits(chrome).then(ret => {
     resultsEl.innerHTML = ret;
-  }, err => {
-    resultsEl.innerHTML = `<div class="error">Unable to audit page: ${err.message}</div>`;
   });
 });
 

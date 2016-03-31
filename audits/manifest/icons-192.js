@@ -47,7 +47,7 @@ class ManifestIcons192 extends Audit {
    */
   static audit(artifacts) {
     let hasIcons = false;
-    const manifest = artifacts.manifest;
+    const manifest = artifacts.manifest.value;
 
     if (manifest && manifest.icons.value) {
       const icons192 = manifest.icons.value.find(icon => {

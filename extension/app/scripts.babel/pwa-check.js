@@ -54,6 +54,15 @@ const aggregators = [
   require('../../../aggregators/is-sized-for-mobile-screen')
 ];
 
+function escapeHTML(str) {
+  return str.replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/>/g, '&gt;')
+    .replace(/</g, '&lt;')
+    .replace(/`/g, '&#96;');
+}
+
 function createResultsHTML(results) {
   let resultsHTML = '';
 
@@ -65,15 +74,18 @@ function createResultsHTML(results) {
 
     let groupHTML = '';
     item.score.subItems.forEach(subitem => {
+      const debugString = subitem.debugString ? ` title="${escapeHTML(subitem.debugString)}"` : '';
+
       // TODO: make this work with numeric values.
       const status = subitem.value ?
-          '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
-      groupHTML += `<li>${subitem.description}: ${status}</li>`;
+          `<span class="pass" ${debugString}>Pass</span>` :
+          `<span class="fail" ${debugString}>Fail</span>`;
+      groupHTML += `<li>${escapeHTML(subitem.description)}: ${status}</li>`;
     });
 
     resultsHTML +=
       `<li class="${groupClass}">
-        <span class="group-name">${item.name}</span>
+        <span class="group-name">${escapeHTML(item.name)}</span>
         <span class="group-score">(${score}%)</span>
         <ul>
           ${groupHTML}
@@ -91,5 +103,6 @@ export function runPwaAudits() {
     .then(results => Aggregator.aggregate(aggregators, results))
     .then(results => {
       return createResultsHTML(results);
-    });
+    })
+    .catch(err => `<div class="error">Unable to audit page: ${escapeHTML(err.message)}</div>`);
 }

@@ -35,13 +35,23 @@ class Manifest extends Gather {
       const finalURL = url.resolve(options.url, manifestURL);
 
       request(finalURL, function(err, response, body) {
-        if (err) {
-          return resolve('');
+        if (err || response.statusCode >= 400) {
+          return reject(`${response.statusCode}: ${response.statusMessage}`);
         }
 
         resolve(body);
       });
     });
+  }
+
+  static _errorManifest(errorString) {
+    return {
+      manifest: {
+        raw: undefined,
+        value: undefined,
+        debugString: errorString
+      }
+    };
   }
 
   static gather(options) {
@@ -52,12 +62,26 @@ class Manifest extends Gather {
      * resource is tracked in issue #83
      */
     return driver.querySelector('head link[rel="manifest"]')
-      .then(node => node && node.getAttribute('href'))
-      .then(manifestURL => manifestURL && Manifest._loadFromURL(options, manifestURL))
-      .then(manifestContent => {
-        return {
-          manifest: manifestParser(manifestContent).value
-        };
+      .then(node => {
+        if (!node) {
+          return this._errorManifest('No <link rel="manifest"> found in DOM.');
+        }
+
+        return node.getAttribute('href').then(manifestURL => {
+          if (!manifestURL) {
+            return this._errorManifest('No href found on <link rel="manifest">.');
+          }
+
+          return Manifest._loadFromURL(options, manifestURL)
+            .then(manifestContent => {
+              return {
+                manifest: manifestParser(manifestContent)
+              };
+            })
+            .catch(reason => {
+              return this._errorManifest(`Unable to fetch manifest at ${manifestURL}: ${reason}.`);
+            });
+        });
       });
   }
 }

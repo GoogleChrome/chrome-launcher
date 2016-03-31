@@ -47,7 +47,7 @@ class ManifestName extends Audit {
    */
   static audit(artifacts) {
     let hasName = false;
-    const manifest = artifacts.manifest;
+    const manifest = artifacts.manifest.value;
 
     if (manifest && manifest.name) {
       hasName = (!!manifest.name.value);

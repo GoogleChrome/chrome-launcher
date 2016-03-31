@@ -33,6 +33,9 @@ const Printer = {
           lineItem += ` (${subitem.rawValue})`;
         }
         output.log(lineItem);
+        if (subitem.debugString) {
+          output.log(`    ${subitem.debugString}`);
+        }
       });
 
       output.log('');
