@@ -49,7 +49,7 @@ class Manifest extends Gather {
       manifest: {
         raw: undefined,
         value: undefined,
-        warning: errorString
+        debugString: errorString
       }
     };
   }

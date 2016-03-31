@@ -49,7 +49,7 @@ class ManifestExists extends Audit {
     return ManifestExists.generateAuditResult(
       typeof artifacts.manifest.value !== 'undefined',
       undefined,
-      artifacts.manifest.warning
+      artifacts.manifest.debugString
     );
   }
 }

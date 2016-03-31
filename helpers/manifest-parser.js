@@ -40,13 +40,13 @@ const ALLOWED_ORIENTATION_VALUES = [
 
 function parseString(raw, trim) {
   let value;
-  let warning;
+  let debugString;
 
   if (typeof raw === 'string') {
     value = trim ? raw.trim() : raw;
   } else {
     if (raw !== undefined) {
-      warning = 'ERROR: expected a string.';
+      debugString = 'ERROR: expected a string.';
     }
     value = undefined;
   }
@@ -54,7 +54,7 @@ function parseString(raw, trim) {
   return {
     raw,
     value,
-    warning
+    debugString
   };
 }
 
@@ -77,7 +77,7 @@ function parseColor(raw) {
   const parsedColor = global.WebInspector.Color.parse(color.raw);
   if (!parsedColor) {
     color.value = undefined;
-    color.warning = 'ERROR: color parsing failed.';
+    color.debugString = 'ERROR: color parsing failed.';
   }
 
   return color;
@@ -102,7 +102,7 @@ function parseDisplay(jsonInput) {
 
   if (display.value && ALLOWED_DISPLAY_VALUES.indexOf(display.value.toLowerCase()) === -1) {
     display.value = undefined;
-    display.warning = 'ERROR: \'display\' has an invalid value, will be ignored.';
+    display.debugString = 'ERROR: \'display\' has an invalid value, will be ignored.';
   }
 
   return display;
@@ -114,7 +114,7 @@ function parseOrientation(jsonInput) {
   if (orientation.value &&
       ALLOWED_ORIENTATION_VALUES.indexOf(orientation.value.toLowerCase()) === -1) {
     orientation.value = undefined;
-    orientation.warning = 'ERROR: \'orientation\' has an invalid value, will be ignored.';
+    orientation.debugString = 'ERROR: \'orientation\' has an invalid value, will be ignored.';
   }
 
   return orientation;
@@ -128,13 +128,13 @@ function parseIcon(raw) {
   let density = {
     raw: raw.density,
     value: 1,
-    warning: undefined
+    debugString: undefined
   };
   if (density.raw !== undefined) {
     density.value = parseFloat(density.raw);
     if (isNaN(density.value) || !isFinite(density.value) || density.value <= 0) {
       density.value = 1;
-      density.warning = 'ERROR: icon density cannot be NaN, +∞, or less than or equal to +0.';
+      density.debugString = 'ERROR: icon density cannot be NaN, +∞, or less than or equal to +0.';
     }
   }
 
@@ -154,7 +154,7 @@ function parseIcon(raw) {
       density,
       sizes
     },
-    warning: undefined
+    debugString: undefined
   };
 }
 
@@ -166,7 +166,7 @@ function parseIcons(jsonInput) {
     return {
       raw,
       value,
-      warning: undefined
+      debugString: undefined
     };
   }
 
@@ -174,7 +174,7 @@ function parseIcons(jsonInput) {
     return {
       raw,
       value,
-      warning: 'ERROR: \'icons\' expected to be an array but is not.'
+      debugString: 'ERROR: \'icons\' expected to be an array but is not.'
     };
   }
 
@@ -184,7 +184,7 @@ function parseIcons(jsonInput) {
   return {
     raw,
     value,
-    warning: undefined
+    debugString: undefined
   };
 }
 
@@ -201,7 +201,7 @@ function parseApplication(raw) {
       id,
       url
     },
-    warning: undefined
+    debugString: undefined
   };
 }
 
@@ -213,7 +213,7 @@ function parseRelatedApplications(jsonInput) {
     return {
       raw,
       value,
-      warning: undefined
+      debugString: undefined
     };
   }
 
@@ -221,7 +221,7 @@ function parseRelatedApplications(jsonInput) {
     return {
       raw,
       value,
-      warning: 'ERROR: \'related_applications\' expected to be an array but is not.'
+      debugString: 'ERROR: \'related_applications\' expected to be an array but is not.'
     };
   }
 
@@ -231,20 +231,20 @@ function parseRelatedApplications(jsonInput) {
   return {
     raw,
     value,
-    warning: undefined
+    debugString: undefined
   };
 }
 
 function parsePreferRelatedApplications(jsonInput) {
   const raw = jsonInput.prefer_related_applications;
   let value;
-  let warning;
+  let debugString;
 
   if (typeof raw === 'boolean') {
     value = raw;
   } else {
     if (raw !== undefined) {
-      warning = 'ERROR: \'prefer_related_applications\' expected to be a boolean.';
+      debugString = 'ERROR: \'prefer_related_applications\' expected to be a boolean.';
     }
     value = undefined;
   }
@@ -252,7 +252,7 @@ function parsePreferRelatedApplications(jsonInput) {
   return {
     raw,
     value,
-    warning
+    debugString
   };
 }
 
@@ -273,7 +273,7 @@ function parse(string) {
     return {
       raw: string,
       value: undefined,
-      warning: 'ERROR: file isn\'t valid JSON: ' + e
+      debugString: 'ERROR: file isn\'t valid JSON: ' + e
     };
   }
 
@@ -295,7 +295,7 @@ function parse(string) {
   return {
     raw: string,
     value: manifest,
-    warning: undefined
+    debugString: undefined
   };
 }
 

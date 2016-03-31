@@ -37,7 +37,7 @@ describe('Manifest: exists audit', () => {
     assert.equal(Audit.audit({
       manifest: {
         value: {},
-        warning: debugString
+        debugString
       }
     }).debugString, debugString);
   });
