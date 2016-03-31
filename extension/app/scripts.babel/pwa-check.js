@@ -48,6 +48,7 @@ const audits = [
 ];
 const aggregators = [
   require('../../../aggregators/will-get-add-to-homescreen-prompt'),
+  require('../../../aggregators/launches-with-splash-screen'),
   require('../../../aggregators/omnibox-is-themed'),
   require('../../../aggregators/can-load-offline'),
   require('../../../aggregators/is-secure'),

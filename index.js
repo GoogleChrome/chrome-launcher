@@ -50,12 +50,14 @@ const audits = [
 ];
 const aggregators = [
   require('./aggregators/will-get-add-to-homescreen-prompt'),
+  require('./aggregators/launches-with-splash-screen'),
   require('./aggregators/omnibox-is-themed'),
   require('./aggregators/can-load-offline'),
   require('./aggregators/is-secure'),
   require('./aggregators/is-performant'),
   require('./aggregators/is-sized-for-mobile-screen')
 ];
+
 module.exports = function(opts) {
   const url = opts.url;
   return Gatherer
