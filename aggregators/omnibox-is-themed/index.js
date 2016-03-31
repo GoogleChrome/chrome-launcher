@@ -19,7 +19,7 @@
 
 const Aggregate = require('../aggregate');
 
-class AddToHomescreen extends Aggregate {
+class OmniboxThemeColor extends Aggregate {
 
   static get name() {
     return 'Omnibox Matches Brand Colors';
@@ -30,6 +30,11 @@ class AddToHomescreen extends Aggregate {
    *   - has valid manifest
    *   - valid theme_color in manifest
    *   - valid theme-color <meta> element
+   *
+   * The <meta> theme-color is required as Chrome doesn't yet proactively fetch the
+   * manifest. Once fetched, the manifest theme_color will be used unless a <meta>
+   * overrides it.
+   *
    * More details: https://github.com/GoogleChrome/lighthouse/issues/25
    */
   static get criteria() {
@@ -57,4 +62,4 @@ class AddToHomescreen extends Aggregate {
   }
 }
 
-module.exports = AddToHomescreen;
+module.exports = OmniboxThemeColor;
