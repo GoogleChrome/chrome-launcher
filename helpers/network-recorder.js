@@ -16,98 +16,15 @@
  */
 'use strict';
 
-/* global WebInspector:false */
+const NetworkManager = require('./web-inspector').NetworkManager;
 
-// Required for a select portion DevTools frontend to work (in node)
-global.self = global;
-global.Protocol = {
-  Agents() {}
-};
-global.WebInspector = global.WebInspector || {};
-global.WebInspector._moduleSettings = {
-  cacheDisabled: {
-    addChangeListener() {},
-    get() {
-      return false;
-    }
-  },
-  monitoringXHREnabled: {
-    addChangeListener() {},
-    get() {
-      return false;
-    }
-  }
-};
-global.WebInspector.moduleSetting = function(settingName) {
-  return this._moduleSettings[settingName];
-};
-// Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
-global.NetworkAgent = {
-  RequestMixedContentType: {
-    Blockable: 'blockable',
-    OptionallyBlockable: 'optionally-blockable',
-    None: 'none'
-  }
-};
-// Enum from SecurityState enum in protocol's Security domain
-global.SecurityAgent = {
-  SecurityState: {
-    Unknown: 'unknown',
-    Neutral: 'neutral',
-    Insecure: 'insecure',
-    Warning: 'warning',
-    Secure: 'secure',
-    Info: 'info'
-  }
-};
-
-// From https://chromium.googlesource.com/chromium/src/third_party/WebKit/Source/devtools/+/master/protocol.json#93
-global.PageAgent = {
-  ResourceType: {
-    Document: 'document',
-    Stylesheet: 'stylesheet',
-    Image: 'image',
-    Media: 'media',
-    Font: 'font',
-    Script: 'script',
-    TextTrack: 'texttrack',
-    XHR: 'xhr',
-    Fetch: 'fetch',
-    EventSource: 'eventsource',
-    WebSocket: 'websocket',
-    Manifest: 'manifest',
-    Other: 'other'
-  }
-};
-
-require('chrome-devtools-frontend/front_end/common/Object.js');
-require('chrome-devtools-frontend/front_end/common/ParsedURL.js');
-require('chrome-devtools-frontend/front_end/common/ResourceType.js');
-require('chrome-devtools-frontend/front_end/common/UIString.js');
-require('chrome-devtools-frontend/front_end/platform/utilities.js');
-require('chrome-devtools-frontend/front_end/sdk/Target.js');
-require('chrome-devtools-frontend/front_end/sdk/NetworkManager.js');
-require('chrome-devtools-frontend/front_end/sdk/NetworkRequest.js');
-
-// Mocked-up WebInspector Target for NetworkManager
-let fakeNetworkAgent = {
-  enable() {}
-};
-let fakeTarget = {
-  _modelByConstructor: new Map(),
-  networkAgent() {
-    return fakeNetworkAgent;
-  },
-  registerNetworkDispatcher() {}
-};
-
-const REQUEST_FINISHED = WebInspector.NetworkManager.EventTypes.RequestFinished;
+const REQUEST_FINISHED = NetworkManager.EventTypes.RequestFinished;
 
 class NetworkRecorder {
   constructor(recordArray) {
     this._records = recordArray;
 
-    this.networkManager = new WebInspector.NetworkManager(fakeTarget);
+    this.networkManager = NetworkManager.createWithFakeTarget();
 
     // TODO(bckenny): loadingFailed calls are not recorded in REQUEST_FINISHED.
     this.networkManager.addEventListener(REQUEST_FINISHED, request => {
