@@ -16,6 +16,7 @@
  */
 'use strict';
 
+const validColor = require('../../helpers/web-inspector').Color.parse;
 const Audit = require('../audit');
 
 class ThemeColor extends Audit {
@@ -46,8 +47,17 @@ class ThemeColor extends Audit {
    */
   static audit(artifacts) {
     const themeColorMeta = artifacts.themeColorMeta;
-    // TODO: Verify this is a valid CSS color. Issue #92
-    return ThemeColor.generateAuditResult(!!themeColorMeta, themeColorMeta);
+    if (!themeColorMeta) {
+      return ThemeColor.generateAuditResult(false, undefined,
+          'No valid theme-color meta tag found.');
+    }
+
+    if (!validColor(themeColorMeta)) {
+      return ThemeColor.generateAuditResult(false, themeColorMeta,
+          'The theme-color meta tag did not contain a valid CSS color.');
+    }
+
+    return ThemeColor.generateAuditResult(true, themeColorMeta);
   }
 }
 

@@ -31,9 +31,9 @@ gulp.task('js-compile', function() {
     'metrics/performance/first-meaningful-paint.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.
-    .pipe(replace(
-        'const DevtoolsTimelineModel = require(\'devtools-timeline-model\');',
-        ''))
+    .pipe(replace('const DevtoolsTimelineModel = require(\'devtools-timeline-model\');', ''))
+    .pipe(replace('require(\'../../helpers/web-inspector\').Color.parse;',
+        'WebInspector.Color.parse;'))
 
     .pipe(closureCompiler({
       compilation_level: 'SIMPLE',
