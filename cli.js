@@ -39,8 +39,8 @@ const cli = meow(`
 const defaultUrl = 'https://operasoftware.github.io/pwa-list/';
 const url = cli.input[0] || defaultUrl;
 
-if (semver.lt(process.version, '5.9.0')) {
-  console.error('Lighthouse requires node version 5.9 or newer');
+if (semver.lt(process.version, '5.0.0')) {
+  console.error('Lighthouse requires node version 5.0 or newer');
   process.exit(1);
 }
 
