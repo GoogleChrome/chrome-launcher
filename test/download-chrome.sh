@@ -2,8 +2,13 @@
 
 # Download chrome inside of our CI env.
 
-chromepath=chrome-linux/chrome
-if [ -e "$chromepath" ]
+if [ x"$LIGHTHOUSE_CHROMIUM_PATH" == x ]
+then
+    echo "Error: Environment variable LIGHTHOUSE_CHROMIUM_PATH not set"
+    exit 1
+fi
+
+if [ -e "$LIGHTHOUSE_CHROMIUM_PATH" ]
 then
   echo "cached chrome found"
 else
