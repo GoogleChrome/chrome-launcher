@@ -1,4 +1,5 @@
 # lighthouse
+> Stops you crashing into the rocks; lights the way
 
 <p align="center">
 <img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px">
@@ -7,11 +8,9 @@
 
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 
-_status: very early. mostly not working_
+_status: early. sorta working_
 
 ## Running
-
-Will run the audits defined in the `audits/` folder against a demo app. Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface). Start Chrome manually; we can pursue [auto-launching](https://www.npmjs.com/package/chrome-launch) it later.
 
 #### Setup
 ```sh
@@ -32,12 +31,11 @@ lighthouse https://airhorner.com/
 # see flags and options
 lighthouse --help
 ```
-
-
+ 
 
 ## Chrome Extension
 
-See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extension).
+The same audits are run against from a Chrome extension. See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extension).
 
 ## Tests
 
@@ -67,6 +65,7 @@ _It's a moving target, but here's a recent attempt at capturing..._
 
 ### Gatherers
 
+* _Interacting with Chrome:_ The Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface) for the CLI and `chrome.debuggger` API when in the Chrome extension. 
 * _Reading the DOM:_ We prefer reading the DOM right from the browser (See #77). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values. 
 
 ## Code Style
