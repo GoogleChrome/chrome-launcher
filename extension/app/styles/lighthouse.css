@@ -28,6 +28,8 @@ header {
   background: url(../images/header.jpg) center center no-repeat;
   position: relative;
   box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.28);
+  width: 100%;
+  overflow: hidden;
 }
 
 header h1 {
@@ -52,6 +54,27 @@ header h2 {
   left: 16px;
   bottom: 10px;
   font-weight: 300;
+}
+
+header a {
+  text-decoration: none;
+  text-transform: uppercase;
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 32px;
+  font-size: 14px;
+  background: linear-gradient(to bottom, #D0021B 0%, #B30419 100%);
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
+  line-height: 32px;
+  text-align: center;
+  width: 140px;
+  outline: none;
+  transform-origin: 50% 50%;
+  transform: translate(36px, 20px) rotate(45deg);
 }
 
 .results {
