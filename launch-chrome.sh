@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+CHROME_ARGS=$@
+
 launch_osx() {
   CHROME_CANARY_PATH="/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"
   if [ ! -f "$CHROME_CANARY_PATH" ]; then
@@ -12,6 +14,7 @@ launch_osx() {
     --no-first-run \
     --enable-gpu-benchmarking \
     --user-data-dir="/tmp/lighthouse-profile" \
+    $CHROME_ARGS \ 
     "about:blank"
 }
 
@@ -28,6 +31,7 @@ launch_linux() {
     --no-first-run \
     --enable-gpu-benchmarking \
     --user-data-dir="/tmp/lighthouse-profile" \
+    $CHROME_ARGS \
     "about:blank"
 }
 

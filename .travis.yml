@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+  - "5.0"
   - "node"
 sudo: false
 cache:
@@ -8,7 +9,8 @@ cache:
      - chrome-linux
 before_script:
   - export DISPLAY=:99.0
+  - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./test/download-chrome.sh
-  - start-stop-daemon --start --background --exec $(pwd)/chrome-linux/chrome -- --remote-debugging-port=9222 --no-first-run --enable-gpu-benchmarking --user-data-dir="/tmp/lighthouse-profile" --disable-setuid-sandbox "about:blank"
+  - start-stop-daemon --start --background --exec $(pwd)/launch-chrome.sh -- --disable-setuid-sandbox
   - sleep 5
