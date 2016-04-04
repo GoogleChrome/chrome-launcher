@@ -37,7 +37,7 @@ class Viewport extends Audit {
    * @override
    */
   static get description() {
-    return 'Site has a viewport meta tag';
+    return 'HTML has a viewport <meta>';
   }
 
   /**

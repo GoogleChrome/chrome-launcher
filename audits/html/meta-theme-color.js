@@ -37,7 +37,7 @@ class ThemeColor extends Audit {
    * @override
    */
   static get description() {
-    return 'Site has a theme-color meta tag';
+    return 'HTML has a theme-color <meta>';
   }
 
   /**
