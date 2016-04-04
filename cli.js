@@ -49,6 +49,13 @@ lighthouse({
   flags: cli.flags
 }).then(results => {
   Printer[cli.flags.json ? 'json' : 'prettyPrint'](log, console, url, results);
+}).catch(err => {
+  if (err.code === 'ECONNREFUSED') {
+    console.error('Unable to connect to Chrome. Have you run ./launch-chrome.sh?');
+  } else {
+    console.error('Runtime error encountered:', err);
+    console.error(err.stack);
+  }
 });
 
 if (cli.flags.verbose) {

@@ -63,10 +63,5 @@ module.exports = function(opts) {
   return Gatherer
       .gather(gatherers, {url, driver})
       .then(artifacts => Auditor.audit(artifacts, audits))
-      .then(results => Aggregator.aggregate(aggregators, results))
-      .catch(function(err) {
-        console.log('error encountered', err);
-        console.log(err.stack);
-        throw err;
-      });
+      .then(results => Aggregator.aggregate(aggregators, results));
 };
