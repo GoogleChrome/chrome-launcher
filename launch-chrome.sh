@@ -14,7 +14,6 @@ launch_osx() {
   "$CHROME_CANARY_PATH" \
     --remote-debugging-port=9222 \
     --no-first-run \
-    --enable-gpu-benchmarking \
     --user-data-dir="/tmp/lighthouse-profile" \
     $CHROME_ARGS \
     "about:blank"
@@ -31,7 +30,6 @@ launch_linux() {
   "$LIGHTHOUSE_CHROMIUM_PATH" \
     --remote-debugging-port=9222 \
     --no-first-run \
-    --enable-gpu-benchmarking \
     --user-data-dir="/tmp/lighthouse-profile" \
     $CHROME_ARGS \
     "about:blank"
