@@ -16,9 +16,7 @@
  */
 'use strict';
 
-// Required to initialize WebInspector.Color.
-global.WebInspector = global.WebInspector || {};
-require('chrome-devtools-frontend/front_end/common/Color.js');
+const validateColor = require('./web-inspector').Color.parse;
 
 const ALLOWED_DISPLAY_VALUES = [
   'fullscreen',
@@ -74,8 +72,8 @@ function parseColor(raw) {
   }
 
   // Use DevTools's color parser to check CSS3 Color parsing.
-  const parsedColor = global.WebInspector.Color.parse(color.raw);
-  if (!parsedColor) {
+  const validatedColor = validateColor(color.raw);
+  if (!validatedColor) {
     color.value = undefined;
     color.debugString = 'ERROR: color parsing failed.';
   }
