@@ -31,11 +31,14 @@ const gatherers = [
   require('./gatherers/viewport'),
   require('./gatherers/theme-color'),
   require('./gatherers/html'),
-  require('./gatherers/manifest')
+  require('./gatherers/manifest'),
+  require('./gatherers/offline')
 ];
+
 const audits = [
   require('./audits/security/is-on-https'),
   require('./audits/offline/service-worker'),
+  require('./audits/offline/works-offline'),
   require('./audits/mobile-friendly/viewport'),
   require('./audits/performance/first-meaningful-paint'),
   require('./audits/manifest/exists'),
@@ -48,6 +51,7 @@ const audits = [
   require('./audits/manifest/start-url'),
   require('./audits/html/meta-theme-color')
 ];
+
 const aggregators = [
   require('./aggregators/will-get-add-to-homescreen-prompt'),
   require('./aggregators/launches-with-splash-screen'),

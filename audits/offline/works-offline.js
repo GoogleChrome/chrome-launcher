@@ -14,33 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
-const Aggregate = require('../aggregate');
+const Audit = require('../audit');
 
-class WorksOffline extends Aggregate {
-
-  static get name() {
-    return 'Works Offline';
+class WorksOffline extends Audit {
+  /**
+   * @override
+   */
+  static get tags() {
+    return ['Offline'];
   }
 
-  static get criteria() {
-    const serviceWorker = require('../../audits/offline/service-worker').name;
-    const worksOffline = require('../../audits/offline/works-offline').name;
+  /**
+   * @override
+   */
+  static get name() {
+    return 'works offline';
+  }
 
-    const criteria = {};
-    criteria[serviceWorker] = {
-      value: true,
-      weight: 1
-    };
+  /**
+   * @override
+   */
+  static get description() {
+    return 'URL responds with a 200 when offline';
+  }
 
-    criteria[worksOffline] = {
-      value: true,
-      weight: 1
-    };
-
-    return criteria;
+  /**
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
+   */
+  static audit(artifacts) {
+    return WorksOffline.generateAuditResult(artifacts.responseCode === 200);
   }
 }
 
