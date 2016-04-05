@@ -269,12 +269,12 @@ class ChromeProtocol {
   }
 
   beginEmulation() {
-    return new Promise((resolve, reject) => {
-      emulation.enableNexus5X(this);
-      emulation.enableNetworkThrottling(this);
-      emulation.disableCache(this);
-      this.pendingCommandsComplete().then(_ => resolve());
-    });
+    return Promise.all([
+      emulation.enableNexus5X(this),
+      emulation.enableNetworkThrottling(this),
+      emulation.disableCache(this),
+      this.pendingCommandsComplete()
+    ]);
   }
 }
 
