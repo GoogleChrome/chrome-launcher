@@ -33,7 +33,7 @@ class Offline extends Gather {
   static goOffline(driver) {
     return driver.sendCommand('Network.emulateNetworkConditions', {
       offline: true,
-      // values of 0 remove any active throttling
+      // values of 0 remove any active throttling. crbug.com/456324#c9
       latency: 0,
       downloadThroughput: 0,
       uploadThroughput: 0
