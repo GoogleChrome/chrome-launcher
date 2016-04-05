@@ -4,7 +4,6 @@ import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
 import browserify from 'gulp-browserify';
 import runSequence from 'run-sequence';
-import {stream as wiredep} from 'wiredep';
 
 var debug = require('gulp-debug');
 
@@ -128,20 +127,6 @@ gulp.task('watch', ['lint', 'babel', 'html'], () => {
     '../gatherers/**/*.js',
     '../metrics/**/*.js'
   ], ['babel', 'lint']);
-
-  gulp.watch('bower.json', ['wiredep']);
-});
-
-gulp.task('size', () => {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
-});
-
-gulp.task('wiredep', () => {
-  gulp.src('app/*.html')
-  .pipe(wiredep({
-    ignorePath: /^(\.\.\/)*\.\./
-  }))
-  .pipe(gulp.dest('app'));
 });
 
 gulp.task('package', function () {
@@ -154,8 +139,7 @@ gulp.task('package', function () {
 gulp.task('build', (cb) => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
-    ['html', 'images', 'extras'],
-    'size', cb);
+    ['html', 'images', 'extras'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {

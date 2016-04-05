@@ -4,7 +4,7 @@
 
 ### Dev
 
-* `npm i && bower i`
+* `npm i`
 * `npm run watch`
 * Load `/app` as Unpacked extension.
 
