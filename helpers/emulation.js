@@ -49,13 +49,6 @@ const TYPICAL_MOBILE_THROTTLING_METRICS = {
 };
 
 function enableNexus5X(driver) {
-  driver.sendCommand('Emulation.setDeviceMetricsOverride', NEXUS5X_EMULATION_METRICS);
-  driver.sendCommand('Network.setUserAgentOverride', NEXUS5X_USERAGENT);
-  driver.sendCommand('Emulation.setTouchEmulationEnabled', {
-    enabled: true,
-    configuration: 'mobile'
-  });
-
   /**
    * Finalizes touch emulation by enabling `"ontouchstart" in window` feature detect
    * to work. Messy hack, though copied verbatim from DevTools' emulation/TouchModel.js
@@ -77,17 +70,26 @@ function enableNexus5X(driver) {
     }
   };
   /* eslint-enable */
-  driver.sendCommand('Page.addScriptToEvaluateOnLoad', {
-    scriptSource: '(' + injectedTouchEventsFunction.toString() + ')()'
-  });
+
+  return Promise.all([
+    driver.sendCommand('Emulation.setDeviceMetricsOverride', NEXUS5X_EMULATION_METRICS),
+    driver.sendCommand('Network.setUserAgentOverride', NEXUS5X_USERAGENT),
+    driver.sendCommand('Emulation.setTouchEmulationEnabled', {
+      enabled: true,
+      configuration: 'mobile'
+    }),
+    driver.sendCommand('Page.addScriptToEvaluateOnLoad', {
+      scriptSource: '(' + injectedTouchEventsFunction.toString() + ')()'
+    })
+  ]);
 }
 
 function disableCache(driver) {
-  driver.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
+  return driver.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
 }
 
 function enableNetworkThrottling(driver) {
-  driver.sendCommand('Network.emulateNetworkConditions', TYPICAL_MOBILE_THROTTLING_METRICS);
+  return driver.sendCommand('Network.emulateNetworkConditions', TYPICAL_MOBILE_THROTTLING_METRICS);
 }
 
 module.exports = {
