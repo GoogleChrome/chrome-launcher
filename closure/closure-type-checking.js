@@ -43,13 +43,25 @@ gulp.task('js-compile', function() {
       language_in: 'ECMASCRIPT6_STRICT',
       language_out: 'ECMASCRIPT5_STRICT',
       warning_level: 'VERBOSE',
+      jscomp_error: [
+        'checkTypes',
+        'conformanceViolations'
+      ],
       jscomp_warning: [
         // https://github.com/google/closure-compiler/wiki/Warnings
         'accessControls',
+        'checkRegExp',
         'const',
+        // 'reportUnknownTypes',
+        'missingProperties',
+        'missingReturn',
+        'newCheckTypes',
+        'strictModuleDepCheck',
+        'typeInvalidation',
+        'undefinedNames',
         'visibility'
-        // 'reportUnknownTypes'
-      ]
+      ],
+      conformance_configs: 'closure/conformance_config.textproto'
     }))
     .on('end', () => {
       gutil.log('Closure compilation successful.');

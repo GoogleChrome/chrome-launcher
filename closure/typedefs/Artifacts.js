@@ -49,3 +49,9 @@ Artifacts.prototype.themeColorMeta;
 
 /** @type {string} */
 Artifacts.prototype.url;
+
+/** @type {?string} */
+Artifacts.prototype.viewport;
+
+/** @type {number} */
+Artifacts.prototype.responseCode
