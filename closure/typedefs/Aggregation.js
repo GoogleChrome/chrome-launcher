@@ -24,34 +24,39 @@
  * @struct
  * @record
  */
-function Artifacts() {}
-
-/** @type {string} */
-Artifacts.prototype.html;
-
-/** @type {boolean} */
-Artifacts.prototype.https;
-
-/** @type {!Array<!Object>} */
-Artifacts.prototype.networkRecords;
-
-/** @type {?} */
-Artifacts.prototype.traceContents;
-
-/** @type {!ManifestNode<(!Manifest|undefined)>} */
-Artifacts.prototype.manifest;
-
-/** @type {!ServiceWorkerVersions} */
-Artifacts.prototype.serviceWorkers;
-
-/** @type {?string} */
-Artifacts.prototype.themeColorMeta;
-
-/** @type {string} */
-Artifacts.prototype.url;
-
-/** @type {?string} */
-Artifacts.prototype.viewport;
+function AggregationItem() {}
 
 /** @type {number} */
-Artifacts.prototype.responseCode;
+AggregationItem.prototype.overall;
+
+/** @type {!Array<!AuditResult>} */
+AggregationItem.prototype.subItems;
+
+/**
+ * @struct
+ * @record
+ */
+function Aggregation() {}
+
+/** @type {string} */
+Aggregation.prototype.name;
+
+/** @type {!AggregationItem} */
+Aggregation.prototype.score;
+
+/**
+ * @struct
+ * @record
+ */
+function AggregationCriterion() {}
+
+/** @type {(boolean|number|undefined)} */
+AggregationCriterion.prototype.value;
+
+/** @type {number} */
+AggregationCriterion.prototype.weight;
+
+/**
+ * @typedef {!Object<!AggregationCriterion>}
+ */
+var AggregationCriteria;

@@ -19,14 +19,24 @@
 
 const Aggregate = require('../aggregate');
 
+/** @type {string} */
+const isOnHTTPS = require('../../audits/security/is-on-https').name;
+
 class IsSecure extends Aggregate {
 
+  /**
+   * @override
+   * @return {string}
+   */
   static get name() {
     return 'Is Secure';
   }
 
+  /**
+   * @override
+   * @return {!AggregationCriteria}
+   */
   static get criteria() {
-    const isOnHTTPS = require('../../audits/security/is-on-https').name;
     const criteria = {};
     criteria[isOnHTTPS] = {
       value: true,

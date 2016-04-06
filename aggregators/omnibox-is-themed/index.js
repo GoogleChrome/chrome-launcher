@@ -19,8 +19,21 @@
 
 const Aggregate = require('../aggregate');
 
+/** @type {string} */
+const manifestExists = require('../../audits/manifest/exists').name;
+
+/** @type {string} */
+const manifestThemeColor = require('../../audits/manifest/theme-color').name;
+
+/** @type {string} */
+const metaThemeColor = require('../../audits/html/meta-theme-color').name;
+
 class OmniboxThemeColor extends Aggregate {
 
+  /**
+   * @override
+   * @return {string}
+   */
   static get name() {
     return 'Omnibox Matches Brand Colors';
   }
@@ -35,13 +48,11 @@ class OmniboxThemeColor extends Aggregate {
    * manifest. Once fetched, the manifest theme_color will be used unless a <meta>
    * overrides it.
    *
-   * More details: https://github.com/GoogleChrome/lighthouse/issues/25
+   * @see https://github.com/GoogleChrome/lighthouse/issues/25
+   * @override
+   * @return {!AggregationCriteria}
    */
   static get criteria() {
-    const manifestExists = require('../../audits/manifest/exists').name;
-    const manifestThemeColor = require('../../audits/manifest/theme-color').name;
-    const metaThemeColor = require('../../audits/html/meta-theme-color').name;
-
     const criteria = {};
     criteria[manifestExists] = {
       value: true,

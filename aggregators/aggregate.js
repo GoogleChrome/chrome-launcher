@@ -19,19 +19,38 @@
 
 class Aggregate {
 
+  /**
+   * @throws {Error}
+   * @return {string} The name for this aggregation.
+   */
   static get name() {
     throw new Error('Aggregate name must be overridden');
   }
 
+  /**
+   * @throws {Error}
+   * @return {!AggregationCriteria} The criteria for this aggregation.
+   */
   static get criteria() {
     throw new Error('Aggregate criteria must be overridden');
   }
 
+  /**
+   * @private
+   * @param {!Array<!AuditResult>} results
+   * @param {!AggregationCriteria} expected
+   * @return {!Array<!AuditResult>}
+   */
   static _filterResultsByAuditNames(results, expected) {
     const expectedNames = Object.keys(expected);
     return results.filter(r => expectedNames.indexOf(r.name) !== -1);
   }
 
+  /**
+   * @private
+   * @param {!AggregationCriteria} expected
+   * @return {number}
+   */
   static _getTotalWeight(expected) {
     const expectedNames = Object.keys(expected);
     let weight = expectedNames.reduce((last, e) => last + expected[e].weight, 0);
@@ -42,6 +61,11 @@ class Aggregate {
     return weight;
   }
 
+  /**
+   * @private
+   * @param {!Array<!AuditResult>} results
+   * @return {!Object<!AuditResult>}
+   */
   static _remapResultsByName(results) {
     const remapped = {};
     results.forEach(r => {
@@ -54,6 +78,13 @@ class Aggregate {
     return remapped;
   }
 
+  /**
+   * Converts each raw audit output to a weighted value for the aggregation.
+   * @private
+   * @param {!AuditResult} result The audit's output value.
+   * @param {!AggregationCriterion} expected The aggregation's expected value and weighting for this result.
+   * @return {number} The weighted result.
+   */
   static _convertToWeight(result, expected) {
     let weight = 0;
 
@@ -74,11 +105,11 @@ class Aggregate {
 
     switch (typeof expected.value) {
       case 'boolean':
-        weight = (result.value === expected.value) ? expected.weight : 0;
+        weight = this._convertBooleanToWeight(result.value, expected.value, expected.weight);
         break;
 
       case 'number':
-        weight = (result.value / expected.value) * expected.weight;
+        weight = this._convertNumberToWeight(result.value, expected.value, expected.weight);
         break;
 
       default:
@@ -89,6 +120,34 @@ class Aggregate {
     return weight;
   }
 
+  /**
+   * Converts a numeric result to a weight.
+   * @param {number} resultValue The result.
+   * @param {number} expectedValue The expected value.
+   * @param {number} weight The weight to assign.
+   * @return {number} The final weight.
+   */
+  static _convertNumberToWeight(resultValue, expectedValue, weight) {
+    return (resultValue / expectedValue) * weight;
+  }
+
+  /**
+   * Converts a boolean result to a weight.
+   * @param {boolean} resultValue The result.
+   * @param {boolean} expectedValue The expected value.
+   * @param {number} weight The weight to assign.
+   * @return {number} The final weight.
+   */
+  static _convertBooleanToWeight(resultValue, expectedValue, weight) {
+    return (resultValue === expectedValue) ? weight : 0;
+  }
+
+  /**
+   * Compares the set of audit results to the expected values.
+   * @param {!Array<!AuditResult>} results The audit results.
+   * @param {!AggregationCriteria} expected The aggregation's expected values and weighting.
+   * @return {!AggregationItem} The aggregation score.
+   */
   static compare(results, expected) {
     const expectedNames = Object.keys(expected);
 
@@ -121,6 +180,11 @@ class Aggregate {
     };
   }
 
+  /**
+   * Aggregates all the results.
+   * @param {!Array<!AuditResult>} results
+   * @return {!Aggregation}
+   */
   static aggregate(results) {
     return {
       name: this.name,

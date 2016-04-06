@@ -19,14 +19,24 @@
 
 const Aggregate = require('../aggregate');
 
+/** @type {string} */
+const viewport = require('../../audits/mobile-friendly/viewport').name;
+
 class MobileFriendly extends Aggregate {
 
+  /**
+   * @override
+   * @return {string}
+   */
   static get name() {
     return 'Is Mobile Friendly';
   }
 
+  /**
+   * @override
+   * @return {!AggregationCriteria}
+   */
   static get criteria() {
-    const viewport = require('../../audits/mobile-friendly/viewport').name;
     const criteria = {};
     criteria[viewport] = {
       value: true,
