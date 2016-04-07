@@ -64,6 +64,6 @@ function sizeAtLeast(sizeRequirement, manifest) {
 }
 
 module.exports = {
-  doExist: doExist,
-  sizeAtLeast: sizeAtLeast
+  doExist,
+  sizeAtLeast
 };
