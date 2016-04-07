@@ -139,8 +139,7 @@ function parseIcon(raw) {
   let sizes = parseString(raw.sizes);
   if (sizes.value !== undefined) {
     let set = new Set();
-    sizes.value.split(/\s/).forEach(size => set.add(size.toLowerCase()));
-
+    sizes.value.trim().split(/\s+/).forEach(size => set.add(size.toLowerCase()));
     sizes.value = set.size > 0 ? Array.from(set) : undefined;
   }
 

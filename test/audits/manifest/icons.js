@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,36 +14,94 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/manifest/icons.js');
+
+const Audit144 = require('../../../audits/manifest/icons-min-144.js');
+const Audit192 = require('../../../audits/manifest/icons-min-192.js');
 const assert = require('assert');
-const manifestSrc = JSON.stringify(require('./manifest.json'));
 const manifestParser = require('../../../helpers/manifest-parser');
-const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
-describe('Manifest: icons audit', () => {
-  it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      value: undefined
-    }}).value, false);
+describe('Manifest: icons audits', () => {
+  describe('icons exist check', () => {
+    it('fails when a manifest contains no icons array', () => {
+      const manifestSrc = JSON.stringify({
+        name: 'NoIconsHere'
+      });
+      const manifest = manifestParser(manifestSrc);
+      assert.equal(Audit144.audit({manifest}).value, false);
+      assert.equal(Audit192.audit({manifest}).value, false);
+    });
+
+    it('fails when a manifest contains no icons', () => {
+      const manifestSrc = JSON.stringify({
+        icons: []
+      });
+      const manifest = manifestParser(manifestSrc);
+      assert.equal(Audit144.audit({manifest}).value, false);
+      assert.equal(Audit192.audit({manifest}).value, false);
+    });
   });
 
-  it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({manifest: {}}).value, false);
-  });
+  describe('icons at least X size check', () => {
+    it('fails when a manifest contains an icon with no size', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: 'icon.png'
+        }]
+      });
+      const manifest = manifestParser(manifestSrc);
 
-  it('fails when a manifest contains no icons', () => {
-    const inputs = {
-      manifest: {
-        icons: null
-      }
-    };
+      assert.equal(Audit144.audit({manifest}).value, false);
+      assert.equal(Audit192.audit({manifest}).value, false);
+    });
 
-    return assert.equal(Audit.audit(inputs).value, false);
-  });
+    it('succeeds when a manifest contains icons that are large enough', () => {
+      // stub manifest contains a 192 icon
+      const manifestSrc = JSON.stringify(require('./manifest.json'));
+      const manifest = manifestParser(manifestSrc);
+      assert.equal(Audit144.audit({manifest}).value, true);
+      assert.equal(Audit192.audit({manifest}).value, true);
+    });
 
-  it('succeeds when a manifest contains icons', () => {
-    return assert.equal(Audit.audit({manifest: manifest}).value, true);
+    it('succeeds when there\'s one icon with multiple sizes, and one is valid', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: 'icon.png',
+          sizes: '72x72 96x96 128x128 256x256'
+        }]
+      });
+      const manifest = manifestParser(manifestSrc);
+
+      assert.equal(Audit144.audit({manifest}).value, true);
+      assert.equal(Audit192.audit({manifest}).value, true);
+    });
+
+    it('succeeds when there\'s two icons, one without sizes; the other with a valid size', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: 'icon.png'
+        }, {
+          src: 'icon2.png',
+          sizes: '256x256'
+        }]
+      });
+      const manifest = manifestParser(manifestSrc);
+      assert.equal(Audit144.audit({manifest}).value, true);
+      assert.equal(Audit192.audit({manifest}).value, true);
+    });
+
+    it('fails when an icon has a valid size, though it\'s non-square.', () => {
+      // See also: https://code.google.com/p/chromium/codesearch#chromium/src/chrome/browser/banners/app_banner_data_fetcher_unittest.cc&sq=package:chromium&type=cs&q=%22Non-square%20is%20okay%22%20file:%5Esrc/chrome/browser/banners/
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: 'icon-non-square.png',
+          sizes: '200x220'
+        }]
+      });
+      const manifest = manifestParser(manifestSrc);
+      assert.equal(Audit144.audit({manifest}).value, false);
+      assert.equal(Audit192.audit({manifest}).value, false);
+    });
   });
 });
