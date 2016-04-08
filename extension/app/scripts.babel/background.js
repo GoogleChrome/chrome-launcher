@@ -17,6 +17,12 @@
 
 'use strict';
 
+import {runPwaAudits} from './pwa-check.js';
+
+window.runAudits = function() {
+  return runPwaAudits(chrome);
+};
+
 chrome.runtime.onInstalled.addListener(details => {
   console.log('previousVersion', details.previousVersion);
 });
