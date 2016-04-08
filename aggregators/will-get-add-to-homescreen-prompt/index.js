@@ -34,6 +34,9 @@ const manifestIconsMin144 = require('../../audits/manifest/icons-min-144').name;
 /** @type {string} */
 const manifestShortName = require('../../audits/manifest/short-name').name;
 
+/** @type {string} */
+const manifestShortNameLength = require('../../audits/manifest/short-name-length').name;
+
 class AddToHomescreen extends Aggregate {
 
   /**
@@ -52,6 +55,7 @@ class AddToHomescreen extends Aggregate {
    *   - valid start_url
    *   - valid name
    *   - valid short_name
+   *   - short_name of reasonable length
    *   - icon of size >= 144x144 and png (either type `image/png` or filename ending in `.png`
    * @see https://github.com/GoogleChrome/lighthouse/issues/23
    *
@@ -82,6 +86,11 @@ class AddToHomescreen extends Aggregate {
     };
 
     criteria[manifestShortName] = {
+      value: true,
+      weight: 0
+    };
+
+    criteria[manifestShortNameLength] = {
       value: true,
       weight: 0
     };

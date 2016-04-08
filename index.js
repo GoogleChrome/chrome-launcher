@@ -49,6 +49,7 @@ const audits = [
   require('./audits/manifest/icons-min-144'),
   require('./audits/manifest/name'),
   require('./audits/manifest/short-name'),
+  require('./audits/manifest/short-name-length'),
   require('./audits/manifest/start-url'),
   require('./audits/html/meta-theme-color')
 ];
