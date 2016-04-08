@@ -14,54 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
 const ExtensionProtocol = require('../../../helpers/extension/driver.js');
-const Auditor = require('../../../auditor');
-const GatherScheduler = require('../../../gather-scheduler');
-const Aggregator = require('../../../aggregator');
+const runner = require('../../../runner');
 
 const driver = new ExtensionProtocol();
-const gathererClasses = [
-  require('../../../gatherers/url'),
-  require('../../../gatherers/https'),
-  require('../../../gatherers/offline'),
-  require('../../../gatherers/service-worker'),
-  require('../../../gatherers/viewport'),
-  require('../../../gatherers/theme-color'),
-  require('../../../gatherers/html'),
-  require('../../../gatherers/manifest')
-];
-const gatherers = gathererClasses.map(G => new G());
-const audits = [
-  require('../../../audits/security/is-on-https'),
-  require('../../../audits/offline/service-worker'),
-  require('../../../audits/offline/works-offline'),
-  require('../../../audits/mobile-friendly/viewport'),
-  require('../../../audits/manifest/exists'),
-  require('../../../audits/manifest/background-color'),
-  require('../../../audits/manifest/theme-color'),
-  require('../../../audits/manifest/icons-min-192'),
-  require('../../../audits/manifest/icons-min-144'),
-  require('../../../audits/manifest/name'),
-  require('../../../audits/manifest/short-name'),
-  require('../../../audits/manifest/short-name-length'),
-  require('../../../audits/manifest/start-url'),
-  require('../../../audits/html/meta-theme-color')
-];
-const aggregators = [
-  require('../../../aggregators/will-get-add-to-homescreen-prompt'),
-  require('../../../aggregators/launches-with-splash-screen'),
-  require('../../../aggregators/omnibox-is-themed'),
-  require('../../../aggregators/can-load-offline'),
-  require('../../../aggregators/is-secure'),
-  require('../../../aggregators/is-sized-for-mobile-screen')
-];
 
 export function runPwaAudits() {
-  return GatherScheduler
-    .run(gatherers, {driver, url: driver.getCurrentTabURL()})
-    .then(artifacts => Auditor.audit(artifacts, audits))
-    .then(results => Aggregator.aggregate(aggregators, results));
+  return runner(driver, {url: driver.getCurrentTabURL()});
 }
