@@ -64,13 +64,13 @@ class Manifest extends Gather {
     return driver.querySelector('head link[rel="manifest"]')
       .then(node => {
         if (!node) {
-          this.artifact = this._errorManifest('No <link rel="manifest"> found in DOM.');
+          this.artifact = Manifest._errorManifest('No <link rel="manifest"> found in DOM.');
           return;
         }
 
         return node.getAttribute('href').then(manifestURL => {
           if (!manifestURL) {
-            this.artifact = this._errorManifest('No href found on <link rel="manifest">.');
+            this.artifact = Manifest._errorManifest('No href found on <link rel="manifest">.');
             return;
           }
 
@@ -81,7 +81,7 @@ class Manifest extends Gather {
               };
             })
             .catch(reason => {
-              this.artifact = this._errorManifest(
+              this.artifact = Manifest._errorManifest(
                 `Unable to fetch manifest at ${manifestURL}: ${reason}.`
               );
             });
