@@ -26,6 +26,7 @@ const driver = new ExtensionProtocol();
 const gathererClasses = [
   require('../../../gatherers/url'),
   require('../../../gatherers/https'),
+  require('../../../gatherers/offline'),
   require('../../../gatherers/service-worker'),
   require('../../../gatherers/viewport'),
   require('../../../gatherers/theme-color'),
@@ -36,6 +37,7 @@ const gatherers = gathererClasses.map(G => new G());
 const audits = [
   require('../../../audits/security/is-on-https'),
   require('../../../audits/offline/service-worker'),
+  require('../../../audits/offline/works-offline'),
   require('../../../audits/mobile-friendly/viewport'),
   require('../../../audits/manifest/exists'),
   require('../../../audits/manifest/background-color'),
