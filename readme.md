@@ -63,9 +63,24 @@ _It's a moving target, but here's a recent attempt at capturing..._
 * **Diagnoses** - The perf problems that affect those metrics
 * **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
 
+### Protocol
+
+* _Interacting with Chrome:_ The Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface) for the CLI and [`chrome.debuggger` API](https://developer.chrome.com/extensions/debugger) when in the Chrome extension. 
+* _Event binding & domains_: Some domains must be `enable()`d so they issue events. Once enabled, they flush any events that represent state. As such, network events will only issue after the domain is enabled. All the protocol agents resolve their `Domain.enable()` callback _after_ they have flushed any pending events. See example:
+
+```js
+// will NOT work
+driver.sendCommand('Security.enable').then(_ => {
+	driver.on('Security.securityStateChanged', state => { /* ... */ });
+})
+
+// WILL work! happy happy. :)
+driver.on('Security.securityStateChanged', state => { /* ... */ }); // event binding is synchronous
+driver.sendCommand('Security.enable');
+```
+
 ### Gatherers
 
-* _Interacting with Chrome:_ The Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface) for the CLI and `chrome.debuggger` API when in the Chrome extension. 
 * _Reading the DOM:_ We prefer reading the DOM right from the browser (See #77). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values. 
 
 ### Audits
