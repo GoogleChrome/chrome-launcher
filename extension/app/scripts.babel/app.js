@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-import {runPwaAudits} from './pwa-check.js';
-
 document.addEventListener('DOMContentLoaded', _ => {
+  const background = chrome.extension.getBackgroundPage();
   const siteNameEl = window.document.querySelector('header h2');
   const resultsEl = document.body.querySelector('.results');
+
+  background.runAudits().then(ret => {
+    resultsEl.innerHTML = ret;
+  });
 
   chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs) {
     if (tabs.length === 0) {
@@ -30,17 +33,13 @@ document.addEventListener('DOMContentLoaded', _ => {
     siteNameEl.textContent = siteURL.origin;
   });
 
-  runPwaAudits(chrome).then(ret => {
-    resultsEl.innerHTML = ret;
+  document.addEventListener('click', evt => {
+    const targetClassName = evt.target.parentNode.classList;
+
+    if (!targetClassName.contains('group')) {
+      return;
+    }
+
+    targetClassName.toggle('expanded');
   });
-});
-
-document.addEventListener('click', evt => {
-  const targetClassName = evt.target.parentNode.classList;
-
-  if (!targetClassName.contains('group')) {
-    return;
-  }
-
-  targetClassName.toggle('expanded');
 });
