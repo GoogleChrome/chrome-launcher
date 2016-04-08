@@ -19,13 +19,12 @@
 const ChromeProtocol = require('./helpers/browser/driver');
 
 const Auditor = require('./auditor');
-const Gatherer = require('./gatherer');
+const GatherScheduler = require('./gather-scheduler');
 const Aggregator = require('./aggregator');
 
 const driver = new ChromeProtocol();
-const gatherers = [
+const gathererClasses = [
   require('./gatherers/url'),
-  require('./gatherers/load'),
   require('./gatherers/https'),
   require('./gatherers/service-worker'),
   require('./gatherers/viewport'),
@@ -34,6 +33,8 @@ const gatherers = [
   require('./gatherers/manifest'),
   require('./gatherers/offline')
 ];
+
+const gatherers = gathererClasses.map(G => new G());
 
 const audits = [
   require('./audits/security/is-on-https'),
@@ -64,8 +65,9 @@ const aggregators = [
 
 module.exports = function(opts) {
   const url = opts.url;
-  return Gatherer
-      .gather(gatherers, {url, driver})
+
+  return GatherScheduler
+      .run(gatherers, {url, driver})
       .then(artifacts => Auditor.audit(artifacts, audits))
       .then(results => Aggregator.aggregate(aggregators, results));
 };

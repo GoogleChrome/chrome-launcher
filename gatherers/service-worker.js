@@ -20,15 +20,14 @@ const Gather = require('./gather');
 
 class ServiceWorker extends Gather {
 
-  static gather(options) {
+  beforePageLoad(options) {
     const driver = options.driver;
 
     return new Promise((resolve, reject) => {
       // Register for the event.
       driver.on('ServiceWorker.workerVersionUpdated', data => {
-        resolve({
-          serviceWorkers: data
-        });
+        this.artifact = {serviceWorkers: data};
+        resolve();
       });
 
       driver.sendCommand('ServiceWorker.enable');

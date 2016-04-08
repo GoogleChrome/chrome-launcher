@@ -19,11 +19,11 @@
 
 const ExtensionProtocol = require('../../../helpers/extension/driver.js');
 const Auditor = require('../../../auditor');
-const Gatherer = require('../../../gatherer');
+const GatherScheduler = require('../../../gather-scheduler');
 const Aggregator = require('../../../aggregator');
 
 const driver = new ExtensionProtocol();
-const gatherers = [
+const gathererClasses = [
   require('../../../gatherers/url'),
   require('../../../gatherers/https'),
   require('../../../gatherers/service-worker'),
@@ -32,6 +32,7 @@ const gatherers = [
   require('../../../gatherers/html'),
   require('../../../gatherers/manifest')
 ];
+const gatherers = gathererClasses.map(G => new G());
 const audits = [
   require('../../../audits/security/is-on-https'),
   require('../../../audits/offline/service-worker'),
@@ -98,8 +99,8 @@ function createResultsHTML(results) {
 }
 
 export function runPwaAudits() {
-  return Gatherer
-    .gather(gatherers, {driver})
+  return GatherScheduler
+    .run(gatherers, {driver, url: driver.getCurrentTabURL()})
     .then(artifacts => Auditor.audit(artifacts, audits))
     .then(results => Aggregator.aggregate(aggregators, results))
     .then(results => {

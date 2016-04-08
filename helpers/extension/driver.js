@@ -26,10 +26,15 @@ class ExtensionProtocol extends ChromeProtocol {
     super();
     this._listeners = {};
     this._tabId = null;
+    this._debuggerConnected = false;
     chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
   }
 
   connect() {
+    if (this._debuggerConnected) {
+      return Promise.resolve();
+    }
+
     return this.queryCurrentTab_()
       .then(tabId => {
         this._tabId = tabId;
@@ -46,6 +51,7 @@ class ExtensionProtocol extends ChromeProtocol {
         .then(_ => {
           this._tabId = null;
           this.url = null;
+          this._debuggerConnected = false;
         });
   }
 
@@ -111,12 +117,21 @@ class ExtensionProtocol extends ChromeProtocol {
     });
   }
 
+  getCurrentTabURL() {
+    if (this.url === undefined || this.url === null) {
+      return this.queryCurrentTab_().then(_ => this.url);
+    }
+
+    return this.url;
+  }
+
   attachDebugger_(tabId) {
     return new Promise((resolve, reject) => {
       chrome.debugger.attach({tabId}, '1.1', _ => {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
+        this._debuggerConnected = true;
 
         resolve(tabId);
       });
@@ -134,6 +149,21 @@ class ExtensionProtocol extends ChromeProtocol {
       });
     });
   }
+
+  // Stubs to bypass a page reload for now.
+  /* eslint-disable no-unused-vars */
+  off(eventName, cb) {
+    return undefined;
+  }
+
+  gotoURL(url, waitForLoad) {
+    return Promise.resolve();
+  }
+
+  pendingCommandsComplete() {
+    return Promise.resolve();
+  }
+  /* eslint-enable no-unused-vars */
 }
 
 module.exports = ExtensionProtocol;

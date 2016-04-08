@@ -24,13 +24,13 @@ class Viewport extends Gather {
    * @param {!{driver: !Object}} options Run options
    * @return {!Promise<{viewport: !string}>} The value of the viewport meta's content attribute, or null
    */
-  static gather(options) {
+  afterPageLoad(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="viewport"]')
       .then(node => node && node.getAttribute('content'))
       .then(viewport => {
-        return {viewport};
+        this.artifact = {viewport};
       });
   }
 }

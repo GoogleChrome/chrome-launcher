@@ -20,14 +20,13 @@ const Gather = require('./gather');
 
 class HTTPS extends Gather {
 
-  static gather(options) {
+  afterPageLoad(options) {
     const driver = options.driver;
-
     return driver
         .sendCommand('Runtime.evaluate', {
           expression: 'window.location.protocol'
         }).then(options => {
-          return {
+          this.artifact = {
             https: options.result.value === 'https:'
           };
         });

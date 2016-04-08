@@ -26,12 +26,13 @@ const log = (typeof process === 'undefined') ? console.log.bind(console) : requi
 
 class ChromeProtocol {
 
-  get WAIT_FOR_LOAD() {
+  get WAIT_FOR_LOADED() {
     return true;
   }
 
   constructor() {
     this._url = null;
+    this.PAUSE_AFTER_LOAD = 3000;
     this._chrome = null;
     this._traceEvents = [];
     this._traceCategories = [
@@ -149,7 +150,7 @@ class ChromeProtocol {
     });
   }
 
-  gotoURL(url, waitForLoad) {
+  gotoURL(url, waitForLoaded) {
     const sendCommand = this.sendCommand.bind(this);
 
     return new Promise((resolve, reject) => {
@@ -159,10 +160,14 @@ class ChromeProtocol {
       .then(response => {
         this.url = url;
 
-        if (!waitForLoad) {
+        if (!waitForLoaded) {
           return resolve(response);
         }
-        this.on('Page.loadEventFired', response => resolve(response));
+        this.on('Page.loadEventFired', response => {
+          setTimeout(_ => {
+            resolve(response);
+          }, this.PAUSE_AFTER_LOAD);
+        });
       });
     });
   }
@@ -240,8 +245,7 @@ class ChromeProtocol {
         this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
         this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        this.sendCommand('Network.enable');
-        this.pendingCommandsComplete().then(_ => {
+        this.sendCommand('Network.enable').then(_ => {
           resolve();
         });
       });
@@ -258,8 +262,7 @@ class ChromeProtocol {
         this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
         this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        this.sendCommand('Network.disable');
-        this.pendingCommandsComplete().then(_ => {
+        this.sendCommand('Network.disable').then(_ => {
           resolve(this._networkRecords);
           this._networkRecorder = null;
           this._networkRecords = [];
@@ -272,8 +275,7 @@ class ChromeProtocol {
     return Promise.all([
       emulation.enableNexus5X(this),
       emulation.enableNetworkThrottling(this),
-      emulation.disableCache(this),
-      this.pendingCommandsComplete()
+      emulation.disableCache(this)
     ]);
   }
 }

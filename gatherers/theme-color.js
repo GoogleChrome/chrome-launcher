@@ -20,13 +20,13 @@ const Gather = require('./gather');
 
 class ThemeColor extends Gather {
 
-  static gather(options) {
+  afterPageLoad(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="theme-color"]')
       .then(node => node && node.getAttribute('content'))
       .then(themeColorMeta => {
-        return {themeColorMeta};
+        this.artifact = {themeColorMeta};
       });
   }
 }

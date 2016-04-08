@@ -20,7 +20,7 @@ const Gather = require('./gather');
 
 class HTML extends Gather {
 
-  static gather(options) {
+  afterPageLoad(options) {
     const driver = options.driver;
 
     return driver.sendCommand('DOM.getDocument')
@@ -28,7 +28,9 @@ class HTML extends Gather {
         .then(nodeId => driver.sendCommand('DOM.getOuterHTML', {
           nodeId: nodeId
         }))
-        .then(nodeHTML => ({html: nodeHTML.outerHTML}));
+        .then(nodeHTML => {
+          this.artifact = {html: nodeHTML.outerHTML};
+        });
   }
 }
 

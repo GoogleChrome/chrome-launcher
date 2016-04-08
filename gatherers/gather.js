@@ -17,9 +17,25 @@
 'use strict';
 
 class Gather {
-  static gather() {
-    throw new Error('Must be overridden');
+
+  constructor() {
+    this.artifact = {};
   }
+
+  /* eslint-disable no-unused-vars */
+
+  setup(options) { }
+
+  beforePageLoad(options) { }
+
+  afterPageLoad(options) { }
+
+  afterTraceCollected(options, tracingData) { }
+
+  tearDown(options, tracingData) { }
+
+  /* eslint-enable no-unused-vars */
+
 }
 
 module.exports = Gather;

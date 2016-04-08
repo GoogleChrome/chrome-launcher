@@ -54,7 +54,7 @@ class Manifest extends Gather {
     };
   }
 
-  static gather(options) {
+  afterPageLoad(options) {
     const driver = options.driver;
     /**
      * This re-fetches the manifest separately, which could
@@ -64,22 +64,26 @@ class Manifest extends Gather {
     return driver.querySelector('head link[rel="manifest"]')
       .then(node => {
         if (!node) {
-          return this._errorManifest('No <link rel="manifest"> found in DOM.');
+          this.artifact = this._errorManifest('No <link rel="manifest"> found in DOM.');
+          return;
         }
 
         return node.getAttribute('href').then(manifestURL => {
           if (!manifestURL) {
-            return this._errorManifest('No href found on <link rel="manifest">.');
+            this.artifact = this._errorManifest('No href found on <link rel="manifest">.');
+            return;
           }
 
           return Manifest._loadFromURL(options, manifestURL)
             .then(manifestContent => {
-              return {
+              this.artifact = {
                 manifest: manifestParser(manifestContent)
               };
             })
             .catch(reason => {
-              return this._errorManifest(`Unable to fetch manifest at ${manifestURL}: ${reason}.`);
+              this.artifact = this._errorManifest(
+                `Unable to fetch manifest at ${manifestURL}: ${reason}.`
+              );
             });
         });
       });
