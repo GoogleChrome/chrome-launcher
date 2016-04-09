@@ -20,11 +20,15 @@ const Gather = require('./gather');
 
 class ServiceWorker extends Gather {
   setup(options) {
+    this.resolved = false;
+
     this.artifactsResolved = new Promise((res, _) => {
       options.driver.on(
           'ServiceWorker.workerVersionUpdated', data => {
-            if (ServiceWorker.getActivatedServiceWorker(data.versions) !== undefined) {
+            if (ServiceWorker.getActivatedServiceWorker(data.versions) !== undefined &&
+                !this.resolved) {
               this.artifact = {serviceWorkers: data};
+              this.resolved = true;
               res();
             }
           });
