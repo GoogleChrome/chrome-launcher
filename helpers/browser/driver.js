@@ -262,11 +262,9 @@ class ChromeProtocol {
         this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
         this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        this.sendCommand('Network.disable').then(_ => {
-          resolve(this._networkRecords);
-          this._networkRecorder = null;
-          this._networkRecords = [];
-        });
+        resolve(this._networkRecords);
+        this._networkRecorder = null;
+        this._networkRecords = [];
       });
     });
   }
