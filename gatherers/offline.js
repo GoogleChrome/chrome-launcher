@@ -18,14 +18,14 @@
 
 const Gather = require('./gather');
 
-// Request the current page by issuing a fetch request to ''
-// and storing the status code on the window.
+// Request the current page by issuing a sync request to ''.
 const requestPage = `
-  fetch('').then(r => window._offlineRequestStatus = r.status)
-`;
-
-const unsetPageStatusVar = `
-  delete window._offlineRequestStatus
+  (function() {
+    var request = new XMLHttpRequest();
+    request.open('GET', '', false);
+    request.send(null);
+    return request.status;
+  })();
 `;
 
 class Offline extends Gather {
@@ -49,41 +49,9 @@ class Offline extends Gather {
     });
   }
 
-  static pollForOfflineResponseStatus(driver, retryCount) {
-    return driver.sendCommand('Runtime.evaluate', {
-      expression: 'window._offlineRequestStatus'
-    }).then(r => {
-      if (r.result.type !== 'undefined' || retryCount > 9) {
-        return r;
-      }
-
-      // Wait for 1.5 seconds and retry
-      return new Promise((res, _) => {
-        setTimeout(_ => {
-          res(Offline.pollForOfflineResponseStatus(driver, retryCount + 1));
-        }, 1500);
-      });
-    });
-  }
-
-  static _unsetOfflineValue(driver) {
-    return driver.sendCommand('Runtime.evaluate', {
-      expression: unsetPageStatusVar});
-  }
-
   static getOfflinePageStatus(driver) {
-    /**
-     * Phases to check if we are offline:
-     * 1. Issue fetch request for current url and set the status code in a var.
-     * 2. Poll the window for that var to be set (since async).
-     * 3. Unset the var (so things are reentrant) and return the val.
-     */
     return driver.sendCommand('Runtime.evaluate', {
       expression: requestPage
-    }).then(_ => {
-      return Offline.pollForOfflineResponseStatus(driver, 0);
-    }).then(ret => {
-      return Offline._unsetOfflineValue(driver).then(_ => ret);
     });
   }
 
