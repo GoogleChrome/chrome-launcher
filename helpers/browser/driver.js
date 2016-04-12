@@ -309,6 +309,12 @@ class ChromeProtocol {
   disableBrowserCache() {
     return this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
   }
+
+  forceUpdateServiceWorkers() {
+    return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
+      forceUpdateOnPageLoad: true
+    });
+  }
 }
 
 function _log(level, prefix, data) {
