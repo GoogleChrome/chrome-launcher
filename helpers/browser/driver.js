@@ -22,7 +22,8 @@ const emulation = require('../emulation');
 const Element = require('../element.js');
 const port = process.env.PORT || 9222;
 
-const log = (typeof process === 'undefined') ? console.log.bind(console) : require('npmlog').log;
+const log = (typeof process !== 'undefined' && 'version' in process) ?
+    require('npmlog').log : console.log.bind(console);
 
 class ChromeProtocol {
 

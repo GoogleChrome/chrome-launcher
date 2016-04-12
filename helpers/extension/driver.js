@@ -17,6 +17,8 @@
 'use strict';
 
 const ChromeProtocol = require('../browser/driver.js');
+const log = (typeof process !== 'undefined' && 'version' in process) ?
+    require('npmlog').log : console.log.bind(console);
 
 /* globals chrome */
 
@@ -38,6 +40,7 @@ class ExtensionProtocol extends ChromeProtocol {
     return this.queryCurrentTab_()
       .then(tabId => {
         this._tabId = tabId;
+        this.beginLogging();
         return this.attachDebugger_(tabId);
       });
   }
@@ -55,6 +58,13 @@ class ExtensionProtocol extends ChromeProtocol {
         });
   }
 
+  beginLogging() {
+    // log events received
+    chrome.debugger.onEvent.addListener((source, method, params) =>
+     log('<=', method, params)
+    );
+  }
+
   /**
    * Bind listeners for protocol events
    * @param {!string} eventName
@@ -64,7 +74,8 @@ class ExtensionProtocol extends ChromeProtocol {
     if (typeof this._listeners[eventName] === 'undefined') {
       this._listeners[eventName] = [];
     }
-
+    // log event listeners being bound
+    log('listen for event =>', eventName);
     this._listeners[eventName].push(cb);
   }
 
@@ -89,6 +100,7 @@ class ExtensionProtocol extends ChromeProtocol {
    */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
+      log('method => browser', command, params);
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
