@@ -97,8 +97,8 @@ function enableNetworkThrottling(driver) {
 }
 
 module.exports = {
-  enableNexus5X: enableNexus5X,
-  enableNetworkThrottling: enableNetworkThrottling,
-  clearCache: clearCache,
-  disableCache: disableCache
+  enableNexus5X,
+  enableNetworkThrottling,
+  clearCache,
+  disableCache
 };
