@@ -24,6 +24,8 @@ const port = process.env.PORT || 9222;
 
 const log = (typeof process === 'undefined') ? console.log.bind(console) : require('npmlog').log;
 
+const TRACE_RETRIEVAL_TIMEOUT = 15000;
+
 class ChromeProtocol {
 
   get WAIT_FOR_LOADED() {
@@ -47,8 +49,6 @@ class ChromeProtocol {
       'disabled-by-default-devtools.screenshot',
       'disabled-by-default-v8.cpu_profile'
     ];
-
-    this.timeoutID = null;
   }
 
   get url() {
@@ -81,11 +81,6 @@ class ChromeProtocol {
   disconnect() {
     if (this._chrome === null) {
       return;
-    }
-
-    if (this.timeoutID) {
-      clearTimeout(this.timeoutID);
-      this.timeoutID = null;
     }
 
     this._chrome.close();
@@ -191,21 +186,8 @@ class ChromeProtocol {
       });
   }
 
-  _resetFailureTimeout(reject) {
-    if (this.timeoutID) {
-      clearTimeout(this.timeoutID);
-      this.timeoutID = null;
-    }
-
-    this.timeoutID = setTimeout(_ => {
-      this.disconnect();
-      reject(new Error('Trace retrieval timed out'));
-    }, 15000);
-  }
-
   beginTrace() {
     this._traceEvents = [];
-    const sendCommand = this.sendCommand.bind(this);
     const tracingOpts = {
       categories: this._traceCategories.join(','),
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
@@ -216,18 +198,25 @@ class ChromeProtocol {
     });
 
     return this.connect()
-      .then(_ => sendCommand('Page.enable'))
-      .then(_ => sendCommand('Tracing.start', tracingOpts));
+      .then(_ => this.sendCommand('Page.enable'))
+      .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
 
   endTrace() {
-    return new Promise((resolve, reject) => {
-      // When all Tracing.dataCollected events have finished, this event fires
-      this.on('Tracing.tracingComplete', _ => resolve(this._traceEvents));
+    return this.connect().then(_ => {
+      return new Promise((resolve, reject) => {
+        // Limit trace retrieval execution time.
+        const traceTimeoutId = setTimeout(_ => {
+          reject(new Error('Trace retrieval timed out'));
+        }, TRACE_RETRIEVAL_TIMEOUT);
 
-      return this.connect().then(_ => {
+        // When all Tracing.dataCollected events have finished, this event fires.
+        this.on('Tracing.tracingComplete', _ => {
+          clearTimeout(traceTimeoutId);
+          resolve(this._traceEvents);
+        });
+
         this.sendCommand('Tracing.end');
-        this._resetFailureTimeout(reject);
       });
     });
   }
