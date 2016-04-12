@@ -18,10 +18,14 @@
 
 const Gather = require('./gather');
 
-// Request the current page by issuing a fetch request to ''
+// *WARNING* do not use fetch.. due to it requiring window focus to fire.
+// Request the current page by issuing a XMLHttpRequest request to ''
 // and storing the status code on the window.
 const requestPage = `
-  fetch('').then(r => window._offlineRequestStatus = r.status)
+  const oReq = new XMLHttpRequest();
+  oReq.onload = e => window._offlineRequestStatus = e.currentTarget.status;
+  oReq.open('GET', '');
+  oReq.send();
 `;
 
 const unsetPageStatusVar = `
