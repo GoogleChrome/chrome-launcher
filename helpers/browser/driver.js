@@ -144,7 +144,23 @@ class ChromeProtocol {
     return new Promise((resolve, reject) => {
       Promise.resolve()
       .then(_ => this.sendCommand('Page.enable'))
-      .then(_ => this.sendCommand('Page.navigate', {url: url}))
+      .then(_ => this.sendCommand('Page.getNavigationHistory'))
+      .then(navHistory => {
+        const currentURL = navHistory.entries[navHistory.currentIndex].url;
+
+        // Because you can give https://example.com and the browser will
+        // silently redirect to https://example.com/ we need to check the match
+        // with a trailing slash on it.
+        //
+        // If the URL matches then we need to issue a reload not navigate
+        // @see https://github.com/GoogleChrome/lighthouse/issues/183
+        const shouldReload = (currentURL === url || currentURL === url + '/');
+        if (shouldReload) {
+          return this.sendCommand('Page.reload', {ignoreCache: true});
+        }
+
+        return this.sendCommand('Page.navigate', {url});
+      })
       .then(response => {
         this.url = url;
 
