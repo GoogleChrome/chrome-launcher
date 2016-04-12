@@ -18,49 +18,60 @@
 
 const DevtoolsTimelineModel = require('devtools-timeline-model');
 
+const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
+
 class FirstMeaningfulPaint {
+
   /**
    * @param {!Array<!Object>} traceData
    */
   static parse(traceData) {
     return new Promise((resolve, reject) => {
-      const model = new DevtoolsTimelineModel(traceData);
-      const events = model.timelineModel().mainThreadEvents();
-      const ret = {};
-
-      const navStartEvent = events
-          .filter(FirstMeaningfulPaint._filterEventsForNavStart);
-      const firstTextPaintEvent = events
-          .filter(FirstMeaningfulPaint._filterEventsForFirstTextPaint);
-
-      if (firstTextPaintEvent.length && navStartEvent.length) {
-        ret.duration = firstTextPaintEvent[0].startTime - navStartEvent[0].startTime;
-      } else {
-        ret.err = new Error('First meaningful paint metric not found');
+      if (!traceData || !Array.isArray(traceData)) {
+        return reject(new Error(FAILURE_MESSAGE));
       }
 
-      resolve(ret);
+      const model = new DevtoolsTimelineModel(traceData);
+      const events = model.timelineModel().mainThreadEvents();
+
+      // Identify the frameID of the main frame
+      const startedInPage = model.tracingModel().devToolsMetadataEvents()
+        .filter(e => e.name === 'TracingStartedInPage')
+        .sort((a, b) => b.startTime - a.startTime);
+      const frameID = startedInPage[0].args.data.page;
+
+      // Find the start of navigation and our meaningful paint
+      const userTiming = events
+        .filter(e => e.categoriesString.includes('blink.user_timing'))
+        // Events can be unsorted, so we put in descending order.
+        .sort((a, b) => b.startTime - a.startTime);
+
+      // navigationStart == the network begins fetching the page URL
+      // CommitLoad == the first bytes of HTML are returned and Chrome considers
+      //   the navigation a success. A 'isMainFrame' boolean is attached to those events
+      //   However, that flag may be incorrect now, so we're ignoring it.
+      const navStart = userTiming.filter(e => {
+        return e.name === 'navigationStart' && e.args.frame === frameID;
+      })[0];
+
+      // firstContentfulPaint == the first time that text or image content was
+      // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
+      const conPaint = userTiming.filter(e => {
+        return e.name === 'firstContentfulPaint' && e.args.frame === frameID;
+      })[0];
+
+      // report the raw numbers
+      if (conPaint && navStart) {
+        const navigationStart = navStart.startTime;
+        const firstMeaningfulPaint = conPaint.startTime;
+
+        return resolve({
+          navigationStart,
+          firstMeaningfulPaint
+        });
+      }
+      return reject(new Error(FAILURE_MESSAGE));
     });
-  }
-
-  /**
-   * @param {!DevtoolsTimelineModel.MainThreadEvent} e
-   * @return {boolean}
-   * @private
-   */
-  static _filterEventsForNavStart(e) {
-    return e.categoriesString.includes('blink.user_timing') &&
-        e.name === 'navigationStart';
-  }
-
-  /**
-   * @param {!DevtoolsTimelineModel.MainThreadEvent} e
-   * @return {boolean}
-   * @private
-   */
-  static _filterEventsForFirstTextPaint(e) {
-    return e.categoriesString.includes('blink.user_timing') &&
-        e.name === 'firstTextPaint';
   }
 }
 

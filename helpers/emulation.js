@@ -84,6 +84,10 @@ function enableNexus5X(driver) {
   ]);
 }
 
+function clearCache(driver) {
+  driver.sendCommand('Network.clearBrowserCache');
+}
+
 function disableCache(driver) {
   return driver.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
 }
@@ -93,7 +97,8 @@ function enableNetworkThrottling(driver) {
 }
 
 module.exports = {
-  enableNexus5X,
-  enableNetworkThrottling,
-  disableCache
+  enableNexus5X: enableNexus5X,
+  enableNetworkThrottling: enableNetworkThrottling,
+  clearCache: clearCache,
+  disableCache: disableCache
 };

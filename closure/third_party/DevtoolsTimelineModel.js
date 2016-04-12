@@ -28,20 +28,26 @@
 function DevtoolsTimelineModel(traceData) {};
 
 /**
- * @return {!DevtoolsTimelineModel.Model}
+ * @return {!DevtoolsTimelineModel.TimelineModel}
  */
 DevtoolsTimelineModel.prototype.timelineModel = function() {};
 
 /**
+ * @return {!DevtoolsTimelineModel.TracingModel}
+ */
+DevtoolsTimelineModel.prototype.tracingModel = function() {};
+
+/**
+ * @see chrome-devtools-frontend/front_end/timeline/TimelineModel.js:
  * @struct
  * @record
  */
-DevtoolsTimelineModel.Model = function() {};
+DevtoolsTimelineModel.TimelineModel = function() {};
 
 /**
  * @return {!Array<!DevtoolsTimelineModel.MainThreadEvent>}
  */
-DevtoolsTimelineModel.Model.prototype.mainThreadEvents = function() {};
+DevtoolsTimelineModel.TimelineModel.prototype.mainThreadEvents = function() {};
 
 /**
  * @struct
@@ -57,3 +63,34 @@ DevtoolsTimelineModel.MainThreadEvent.prototype.name;
 
 /** @type {number} */
 DevtoolsTimelineModel.MainThreadEvent.prototype.startTime;
+
+/** @type {!Object} */
+DevtoolsTimelineModel.MainThreadEvent.prototype.args;
+
+/**
+ * @see chrome-devtools-frontend/front_end/sdk/TracingModel.js
+ * @struct
+ * @record
+ */
+DevtoolsTimelineModel.TracingModel = function() {};
+
+/**
+ * @return {!Array.<!DevtoolsTimelineModel.TracingModel.Event>}
+ */
+DevtoolsTimelineModel.TracingModel.prototype.devToolsMetadataEvents = function() {};
+
+/**
+ * @see chrome-devtools-frontend/front_end/sdk/TracingModel.js
+ * @struct
+ * @record
+ */
+DevtoolsTimelineModel.TracingModel.Event = function() {};
+
+/** @type {string} */
+DevtoolsTimelineModel.TracingModel.Event.prototype.name;
+
+/** @type {number} */
+DevtoolsTimelineModel.TracingModel.Event.prototype.startTime;
+
+/** @type {!Object} */
+DevtoolsTimelineModel.TracingModel.Event.prototype.args;

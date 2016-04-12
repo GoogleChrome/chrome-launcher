@@ -49,20 +49,16 @@ class FirstMeaningfulPaint extends Audit {
    * @return {!AuditResult} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    return FMPMetric
-        .parse(artifacts.traceContents)
+    return FMPMetric.parse(artifacts.traceContents)
         .then(fmp => {
-          if (fmp.err) {
-            return {
-              score: -1
-            };
-          }
+          // The fundamental Time To fMP metric
+          const firstMeaningfulPaint = fmp.firstMeaningfulPaint - fmp.navigationStart;
 
           // Roughly an exponential curve.
-          // < 1000ms: penalty=0
-          // 3000ms: penalty=90
-          // >= 5000ms: penalty=100
-          const power = (fmp.duration - 1000) * 0.001 * 0.5;
+          //   < 1000ms: penalty=0
+          //   3000ms: penalty=90
+          //   >= 5000ms: penalty=100
+          const power = (firstMeaningfulPaint - 1000) * 0.001 * 0.5;
           const penalty = power > 0 ? Math.pow(10, power) : 0;
           let score = 100 - penalty;
 
@@ -71,17 +67,19 @@ class FirstMeaningfulPaint extends Audit {
           score = Math.max(0, score);
 
           return {
-            duration: `${fmp.duration.toFixed(2)}ms`,
+            duration: `${firstMeaningfulPaint.toFixed(2)}ms`,
             score: Math.round(score)
           };
-        }, _ => {
+        }).catch(err => {
           // Recover from trace parsing failures.
           return {
-            score: -1
+            score: -1,
+            debugString: err.message
           };
         })
         .then(result => {
-          return FirstMeaningfulPaint.generateAuditResult(result.score, result.duration);
+          return FirstMeaningfulPaint.generateAuditResult(result.score,
+              result.duration, result.debugString);
         });
   }
 }

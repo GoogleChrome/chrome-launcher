@@ -46,8 +46,7 @@ class ChromeProtocol {
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',
       'disabled-by-default-devtools.timeline.stack',
-      'disabled-by-default-devtools.screenshot',
-      'disabled-by-default-v8.cpu_profile'
+      'disabled-by-default-devtools.screenshot'
     ];
   }
 
@@ -71,9 +70,10 @@ class ChromeProtocol {
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
-        this.beginEmulation().then(_ => {
-          resolve();
-        });
+
+        this.beginEmulation()
+          .then(_ => this.cleanCaches())
+          .then(resolve);
       }).on('error', e => reject(e));
     });
   }
@@ -261,9 +261,22 @@ class ChromeProtocol {
   beginEmulation() {
     return Promise.all([
       emulation.enableNexus5X(this),
-      emulation.enableNetworkThrottling(this),
-      emulation.disableCache(this)
+      emulation.enableNetworkThrottling(this)
     ]);
+  }
+
+  cleanCaches() {
+    return Promise.all([
+      emulation.clearCache(this),
+      emulation.disableCache(this),
+      this.forceUpdateServiceWorkers()
+    ]);
+  }
+
+  forceUpdateServiceWorkers() {
+    return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
+      forceUpdateOnPageLoad: true
+    });
   }
 }
 

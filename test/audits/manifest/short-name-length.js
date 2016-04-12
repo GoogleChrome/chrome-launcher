@@ -22,7 +22,6 @@ const manifestParser = require('../../../helpers/manifest-parser');
 describe('Manifest: short_name_length audit', () => {
   it('fails when an empty manifest is present', () => {
     const manifest = manifestParser('{}');
-    console.info('got empty manifest', manifest);
     return assert.equal(Audit.audit({manifest}).value, false);
   });
 
