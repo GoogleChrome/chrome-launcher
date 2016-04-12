@@ -51,6 +51,9 @@ class GatherScheduler {
       // Clean all browser caches.
       .then(_ => driver.cleanAndDisableBrowserCaches())
 
+      // Force SWs to update on load.
+      .then(_ => driver.forceUpdateServiceWorkers())
+
       // Gather: setup phase.
       .then(_ => this._runPhase(gatherers,
           gatherer => gatherer.setup(options)))
