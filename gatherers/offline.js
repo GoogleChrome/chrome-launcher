@@ -22,10 +22,12 @@ const Gather = require('./gather');
 // Request the current page by issuing a XMLHttpRequest request to ''
 // and storing the status code on the window.
 const requestPage = `
-  const oReq = new XMLHttpRequest();
-  oReq.onload = e => window._offlineRequestStatus = e.currentTarget.status;
-  oReq.open('GET', '');
-  oReq.send();
+  (function () {
+    const oReq = new XMLHttpRequest();
+    oReq.onload = oReq.onerror = e => window._offlineRequestStatus = e.currentTarget.status;
+    oReq.open('GET', '');
+    oReq.send();
+  })();
 `;
 
 const unsetPageStatusVar = `
@@ -86,6 +88,15 @@ class Offline extends Gather {
       expression: requestPage
     }).then(_ => {
       return Offline.pollForOfflineResponseStatus(driver, 0);
+    }, _ => {
+      // Account for execution errors.
+      return {
+        result: {
+          description: '-1',
+          type: 'number',
+          value: -1
+        }
+      };
     }).then(ret => {
       return Offline._unsetOfflineValue(driver).then(_ => ret);
     });

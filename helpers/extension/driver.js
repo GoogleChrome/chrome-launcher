@@ -94,6 +94,10 @@ class ExtensionProtocol extends ChromeProtocol {
           return reject(chrome.runtime.lastError);
         }
 
+        if (result.wasThrown) {
+          return reject(result.exceptionDetails);
+        }
+
         resolve(result);
       });
     });
