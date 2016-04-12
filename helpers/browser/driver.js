@@ -24,8 +24,6 @@ const port = process.env.PORT || 9222;
 
 const log = (typeof process === 'undefined') ? console.log.bind(console) : require('npmlog').log;
 
-const TRACE_RETRIEVAL_TIMEOUT = 15000;
-
 class ChromeProtocol {
 
   get WAIT_FOR_LOADED() {
@@ -70,10 +68,7 @@ class ChromeProtocol {
       chromeRemoteInterface({port: port}, chrome => {
         this._chrome = chrome;
         this.beginLogging();
-
-        this.beginEmulation()
-          .then(_ => this.cleanCaches())
-          .then(resolve);
+        resolve();
       }).on('error', e => reject(e));
     });
   }
@@ -146,12 +141,10 @@ class ChromeProtocol {
   }
 
   gotoURL(url, waitForLoaded) {
-    const sendCommand = this.sendCommand.bind(this);
-
     return new Promise((resolve, reject) => {
       Promise.resolve()
-      .then(_ => sendCommand('Page.enable'))
-      .then(_ => sendCommand('Page.navigate', {url: url}))
+      .then(_ => this.sendCommand('Page.enable'))
+      .then(_ => this.sendCommand('Page.navigate', {url: url}))
       .then(response => {
         this.url = url;
 
@@ -187,15 +180,11 @@ class ChromeProtocol {
   }
 
   beginTrace() {
-    this._traceEvents = [];
     const tracingOpts = {
       categories: this._traceCategories.join(','),
+      transferMode: 'ReturnAsStream',
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
     };
-
-    this.on('Tracing.dataCollected', data => {
-      this._traceEvents.push(...data.value);
-    });
 
     return this.connect()
       .then(_ => this.sendCommand('Page.enable'))
@@ -203,21 +192,45 @@ class ChromeProtocol {
   }
 
   endTrace() {
-    return this.connect().then(_ => {
-      return new Promise((resolve, reject) => {
-        // Limit trace retrieval execution time.
-        const traceTimeoutId = setTimeout(_ => {
-          reject(new Error('Trace retrieval timed out'));
-        }, TRACE_RETRIEVAL_TIMEOUT);
-
-        // When all Tracing.dataCollected events have finished, this event fires.
-        this.on('Tracing.tracingComplete', _ => {
-          clearTimeout(traceTimeoutId);
-          resolve(this._traceEvents);
-        });
-
-        this.sendCommand('Tracing.end');
+    return new Promise((resolve, reject) => {
+      // When the tracing has ended this will fire with a stream handle.
+      this.on('Tracing.tracingComplete', streamHandle => {
+        this._readTraceFromStream(streamHandle)
+            .then(traceContents => resolve(traceContents));
       });
+
+      // Issue the command to stop tracing.
+      this.connect().then(_ => this.sendCommand('Tracing.end'));
+    });
+  }
+
+  _readTraceFromStream(streamHandle) {
+    return new Promise((resolve, reject) => {
+      // With our stream we can read a bunch, and if its taking too long,
+      // take a break to the next event cycle and then go again.
+      let isEOF = false;
+      let result = '';
+
+      const readArguments = {
+        handle: streamHandle.stream
+      };
+
+      const onChunkRead = response => {
+        if (isEOF) {
+          return;
+        }
+
+        result += response.data;
+
+        if (response.eof) {
+          isEOF = true;
+          resolve(JSON.parse(result));
+        }
+
+        return this.sendCommand('IO.read', readArguments).then(onChunkRead);
+      };
+
+      this.sendCommand('IO.read', readArguments).then(onChunkRead);
     });
   }
 
@@ -265,18 +278,19 @@ class ChromeProtocol {
     ]);
   }
 
-  cleanCaches() {
+  cleanAndDisableBrowserCaches() {
     return Promise.all([
-      emulation.clearCache(this),
-      emulation.disableCache(this),
-      this.forceUpdateServiceWorkers()
+      this.clearBrowserCache(),
+      this.disableBrowserCache()
     ]);
   }
 
-  forceUpdateServiceWorkers() {
-    return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
-      forceUpdateOnPageLoad: true
-    });
+  clearBrowserCache() {
+    return this.sendCommand('Network.clearBrowserCache');
+  }
+
+  disableBrowserCache() {
+    return this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
   }
 }
 

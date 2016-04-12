@@ -162,3 +162,17 @@ header a {
   text-align: center;
   color: #D0021B;
 }
+
+.reload-all {
+  display: block;
+  font-size: 14px;
+  padding: 5px;
+  border-radius: 2px;
+  background: none;
+  border: 1px solid rgba(255,255,255,0.4);
+  position: absolute;
+  color: #CCC;
+  right: 32px;
+  bottom: 16px;
+  cursor: pointer;
+}

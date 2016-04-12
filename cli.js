@@ -33,7 +33,8 @@ const cli = meow(`
     --verbose      Displays verbose logging
     --quiet        Displays no progress or debug logs
     --json         Output results as JSON
-
+    --mobile       Emulates a Nexus 5X (default=true)
+    --load-page    Loads the page (default=true)
 `);
 
 const defaultUrl = 'https://operasoftware.github.io/pwa-list/';

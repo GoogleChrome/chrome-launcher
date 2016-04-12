@@ -17,12 +17,20 @@
 
 'use strict';
 
-import {runPwaAudits} from './pwa-check.js';
+const ExtensionProtocol = require('../../../helpers/extension/driver.js');
+const runner = require('../../../runner');
+const driver = new ExtensionProtocol();
+const NO_SCORE_PROVIDED = '-1';
 
-window.runAudits = function() {
-  return runPwaAudits(chrome).then(results => {
-    return createResultsHTML(results);
-  }).catch(returnError);
+window.runAudits = function(options) {
+  return driver.getCurrentTabURL()
+      .then(url => {
+        // Add in the URL to the options.
+        Object.assign(options, {url});
+        return runner(driver, options);
+      })
+      .then(results => createResultsHTML(results))
+      .catch(returnError);
 };
 
 function returnError(err) {
@@ -46,6 +54,11 @@ function createResultsHTML(results) {
     const groupHasErrors = (score < 100);
     const groupClass = 'group ' +
         (groupHasErrors ? 'errors expanded' : 'no-errors collapsed');
+
+    // Skip any tests that didn't run.
+    if (score === NO_SCORE_PROVIDED) {
+      return;
+    }
 
     let groupHTML = '';
     item.score.subItems.forEach(subitem => {

@@ -28,6 +28,8 @@ class GatherScheduler {
   static run(gatherers, options) {
     const driver = options.driver;
     const url = options.url;
+    const loadPage = options.flags.loadPage;
+    const emulateMobileDevice = options.flags.mobile;
     const tracingData = {};
     const artifacts = [];
 
@@ -36,33 +38,68 @@ class GatherScheduler {
     }
 
     return driver.connect()
+
+      // Enable emulation.
+      .then(_ => {
+        if (emulateMobileDevice) {
+          return driver.beginEmulation();
+        }
+
+        return Promise.resolve();
+      })
+
+      // Clean all browser caches.
+      .then(_ => driver.cleanAndDisableBrowserCaches())
+
+      // Gather: setup phase.
       .then(_ => this._runPhase(gatherers,
           gatherer => gatherer.setup(options)))
+
+      // Enable tracing and network record collection.
       .then(_ => driver.beginTrace())
       .then(_ => driver.beginNetworkCollect())
 
+      // Gather: beforePageLoad phase.
       .then(_ => this._runPhase(gatherers,
           gatherer => gatherer.beforePageLoad(options)))
 
-      .then(_ => driver.gotoURL(url, driver.WAIT_FOR_LOADED))
+      // Load the page (if the CLI / extension want it loaded).
+      .then(_ => {
+        if (loadPage) {
+          return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
+        }
 
+        return Promise.resolve();
+      })
+
+      // Gather: afterPageLoad phase
       .then(_ => this._runPhase(gatherers,
           gatherer => gatherer.afterPageLoad(options)))
+
+      // Disable network collection; grab records.
       .then(_ => driver.endNetworkCollect())
       .then(networkRecords => {
         tracingData.networkRecords = networkRecords;
       })
+
+      // Disable tracing; grab records.
       .then(_ => driver.endTrace())
       .then(traceContents => {
         tracingData.traceContents = traceContents;
       })
 
+      // Gather: afterTraceCollected phase.
       .then(_ => this._runPhase(gatherers,
           gatherer => gatherer.afterTraceCollected(options, tracingData)))
+
+      // Disconnect the driver.
       .then(_ => driver.disconnect())
 
+      // Gather: tearDown phase.
       .then(_ => this._runPhase(gatherers,
         gatherer => gatherer.tearDown(options, tracingData)))
+
+      // Collate all the gatherer results.
       .then(_ => {
         artifacts.push(...gatherers.map(g => g.artifact));
         artifacts.push(

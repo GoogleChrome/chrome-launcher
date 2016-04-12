@@ -126,7 +126,7 @@ class ExtensionProtocol extends ChromeProtocol {
       return this.queryCurrentTab_().then(_ => this.url);
     }
 
-    return this.url;
+    return Promise.resolve(this.url);
   }
 
   attachDebugger_(tabId) {
@@ -154,20 +154,23 @@ class ExtensionProtocol extends ChromeProtocol {
     });
   }
 
-  // Stubs to bypass a page reload for now.
-  /* eslint-disable no-unused-vars */
   off(eventName, cb) {
-    return undefined;
-  }
+    if (typeof this._listeners[eventName] === 'undefined') {
+      console.warn(`Unable to remove listener ${eventName}; no such listener found.`);
+      return;
+    }
 
-  gotoURL(url, waitForLoad) {
-    return Promise.resolve();
+    const callbackIndex = this._listeners[eventName].indexOf(cb);
+    if (callbackIndex === -1) {
+      return;
+    }
+
+    this._listeners[eventName].splice(callbackIndex, 1);
   }
 
   pendingCommandsComplete() {
     return Promise.resolve();
   }
-  /* eslint-enable no-unused-vars */
 }
 
 module.exports = ExtensionProtocol;

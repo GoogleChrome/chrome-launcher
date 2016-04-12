@@ -24,19 +24,25 @@ class ServiceWorker extends Gather {
     this.resolved = false;
 
     this.artifactsResolved = new Promise((res, _) => {
-      driver.on(
-          'ServiceWorker.workerVersionUpdated', data => {
-            if (ServiceWorker.getActivatedServiceWorker(data.versions) !== undefined &&
-                !this.resolved) {
-              this.artifact = {serviceWorkers: data};
-              this.resolved = true;
-              res();
-            }});
+      driver.on('ServiceWorker.workerVersionUpdated', data => {
+        if (!this.resolved) {
+          const controlledClients =
+              ServiceWorker.getActivatedServiceWorker(data.versions, options.url);
+
+          this.artifact = {
+            serviceWorkers: {
+              versions: controlledClients ? [controlledClients] : []
+            }
+          };
+          this.resolved = (typeof this.artifact.serviceWorkers.versions !== 'undefined');
+          res();
+        }
+      });
     });
   }
 
-  static getActivatedServiceWorker(versions) {
-    return versions.find(v => v.status === 'activated');
+  static getActivatedServiceWorker(versions, url) {
+    return versions.find(v => v.status === 'activated' && v.scriptURL.startsWith(url));
   }
 
   beforePageLoad(options) {
@@ -44,6 +50,10 @@ class ServiceWorker extends Gather {
     driver.sendCommand('ServiceWorker.enable');
 
     return this.artifactsResolved;
+  }
+
+  tearDown() {
+    this.resolved = false;
   }
 }
 
