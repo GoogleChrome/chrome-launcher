@@ -8,7 +8,7 @@ const Printer = {
    * @param {!Array<?>} results
    */
   json: function(debugLog, output, url, results) {
-    debugLog.info('\n\n\nJSON Lighthouse results:', url);
+    debugLog.info('\n\n\nLighthouse results (JSON):', url);
 
     output.log(JSON.stringify(results, null, 2));
   },
@@ -20,7 +20,7 @@ const Printer = {
    * @param {!Array<?>} results
    */
   prettyPrint: function(debugLog, output, url, results) {
-    debugLog.info('\n\n\nPretty Print Lighthouse results:', url);
+    debugLog.info('\n\n\nLighthouse results:', url);
 
     // TODO: colorise
     results.forEach(item => {
