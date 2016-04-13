@@ -66,11 +66,21 @@ class ChromeProtocol {
         return resolve();
       }
 
-      chromeRemoteInterface({port: port}, chrome => {
-        this._chrome = chrome;
-        this.beginLogging();
-        resolve();
-      }).on('error', e => reject(e));
+      // Make a new tab, stopping Chrome from accidentally giving CRI an "Other" tab.
+      // Also disable the lint check because CRI uses "New" for the function name.
+      /* eslint-disable new-cap */
+      chromeRemoteInterface.New((err, tab) => {
+        if (err) {
+          return reject(err);
+        }
+
+        chromeRemoteInterface({port: port, chooseTab: tab}, chrome => {
+          this._chrome = chrome;
+          this.beginLogging();
+          resolve();
+        }).on('error', e => reject(e));
+      });
+      /* eslint-enable new-cap */
     });
   }
 
