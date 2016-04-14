@@ -51,10 +51,6 @@ class ServiceWorker extends Gather {
 
     return this.artifactsResolved;
   }
-
-  tearDown() {
-    this.resolved = false;
-  }
 }
 
 module.exports = ServiceWorker;
