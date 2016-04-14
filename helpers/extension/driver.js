@@ -179,10 +179,6 @@ class ExtensionProtocol extends ChromeProtocol {
 
     this._listeners[eventName].splice(callbackIndex, 1);
   }
-
-  pendingCommandsComplete() {
-    return Promise.resolve();
-  }
 }
 
 module.exports = ExtensionProtocol;

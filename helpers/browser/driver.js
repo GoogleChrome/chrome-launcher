@@ -106,7 +106,7 @@ class ChromeProtocol {
    */
   on(eventName, cb) {
     if (this._chrome === null) {
-      throw new Error('Trying to call on() but no cri instance available yet');
+      throw new Error('connect() must be called before attempting to listen to events.');
     }
     // log event listeners being bound
     _log('info', 'listen for event =>', {method: eventName});
@@ -119,6 +119,10 @@ class ChromeProtocol {
    * @param {function(...)} cb
    */
   off(eventName, cb) {
+    if (this._chrome === null) {
+      throw new Error('connect() must be called before attempting to remove an event listener.');
+    }
+
     this._chrome.removeListener(eventName, cb);
   }
 
@@ -129,6 +133,10 @@ class ChromeProtocol {
    * @return {!Promise}
    */
   sendCommand(command, params) {
+    if (this._chrome === null) {
+      throw new Error('connect() must be called before attempting to send a command.');
+    }
+
     return new Promise((resolve, reject) => {
       _log('info', 'method => browser', {method: command, params: params});
 
@@ -138,16 +146,6 @@ class ChromeProtocol {
         }
         resolve(result);
       });
-    });
-  }
-
-  /**
-   * Resolves when all outstanding protocol methods have returned.
-   * @return {!Promise}
-   */
-  pendingCommandsComplete() {
-    return new Promise((resolve, reject) => {
-      this._chrome.once('ready', _ => resolve());
     });
   }
 
@@ -213,8 +211,7 @@ class ChromeProtocol {
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
     };
 
-    return this.connect()
-      .then(_ => this.sendCommand('Page.enable'))
+    return this.sendCommand('Page.enable')
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
 
@@ -227,7 +224,7 @@ class ChromeProtocol {
       });
 
       // Issue the command to stop tracing.
-      this.connect().then(_ => this.sendCommand('Tracing.end'));
+      this.sendCommand('Tracing.end');
     });
   }
 
@@ -262,39 +259,35 @@ class ChromeProtocol {
   }
 
   beginNetworkCollect() {
-    return this.connect().then(_ => {
-      return new Promise((resolve, reject) => {
-        this._networkRecords = [];
-        this._networkRecorder = new NetworkRecorder(this._networkRecords);
+    return new Promise((resolve, reject) => {
+      this._networkRecords = [];
+      this._networkRecorder = new NetworkRecorder(this._networkRecords);
 
-        this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
-        this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
-        this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
-        this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
-        this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
-        this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
+      this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
+      this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
+      this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
+      this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
+      this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
+      this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        this.sendCommand('Network.enable').then(_ => {
-          resolve();
-        });
+      this.sendCommand('Network.enable').then(_ => {
+        resolve();
       });
     });
   }
 
   endNetworkCollect() {
-    return this.connect().then(_ => {
-      return new Promise((resolve, reject) => {
-        this.off('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
-        this.off('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
-        this.off('Network.responseReceived', this._networkRecorder.onResponseReceived);
-        this.off('Network.dataReceived', this._networkRecorder.onDataReceived);
-        this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
-        this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
+    return new Promise((resolve, reject) => {
+      this.off('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
+      this.off('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
+      this.off('Network.responseReceived', this._networkRecorder.onResponseReceived);
+      this.off('Network.dataReceived', this._networkRecorder.onDataReceived);
+      this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
+      this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
 
-        resolve(this._networkRecords);
-        this._networkRecorder = null;
-        this._networkRecords = [];
-      });
+      resolve(this._networkRecords);
+      this._networkRecorder = null;
+      this._networkRecords = [];
     });
   }
 

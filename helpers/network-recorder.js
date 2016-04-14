@@ -28,7 +28,7 @@ class NetworkRecorder {
 
     // TODO(bckenny): loadingFailed calls are not recorded in REQUEST_FINISHED.
     this.networkManager.addEventListener(REQUEST_FINISHED, request => {
-      this._records.push(request);
+      this._records.push(request.data);
     });
 
     this.onRequestWillBeSent = this.onRequestWillBeSent.bind(this);
