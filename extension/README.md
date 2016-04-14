@@ -7,6 +7,7 @@
 * `npm i`
 * `npm run watch`
 * Load `/app` as Unpacked extension.
+* Saved changes _should_ trigger a recompile followed by browsersync automatically refreshing the extension. 
 
 
 ## Manual Deploy to CWS
