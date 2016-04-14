@@ -33,41 +33,34 @@ class FirstMeaningfulPaint {
 
       const model = new DevtoolsTimelineModel(traceData);
       const events = model.timelineModel().mainThreadEvents();
-
-      // Identify the frameID of the main frame
-      const startedInPage = model.tracingModel().devToolsMetadataEvents()
-        .filter(e => e.name === 'TracingStartedInPage')
-        .sort((a, b) => b.startTime - a.startTime);
-      const frameID = startedInPage[0].args.data.page;
+      let mainFrameID;
+      let navigationStart;
+      let firstContentfulPaint;
 
       // Find the start of navigation and our meaningful paint
-      const userTiming = events
+      events
         .filter(e => e.categoriesString.includes('blink.user_timing'))
-        // Events can be unsorted, so we put in descending order.
-        .sort((a, b) => b.startTime - a.startTime);
-
-      // navigationStart == the network begins fetching the page URL
-      // CommitLoad == the first bytes of HTML are returned and Chrome considers
-      //   the navigation a success. A 'isMainFrame' boolean is attached to those events
-      //   However, that flag may be incorrect now, so we're ignoring it.
-      const navStart = userTiming.filter(e => {
-        return e.name === 'navigationStart' && e.args.frame === frameID;
-      })[0];
-
-      // firstContentfulPaint == the first time that text or image content was
-      // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
-      const conPaint = userTiming.filter(e => {
-        return e.name === 'firstContentfulPaint' && e.args.frame === frameID;
-      })[0];
+        .forEach(event => {
+          // navigationStart == the network begins fetching the page URL
+          // CommitLoad == the first bytes of HTML are returned and Chrome considers
+          //   the navigation a success. A 'isMainFrame' boolean is attached to those events
+          //   However, that flag may be incorrect now, so we're ignoring it.
+          if (event.name === 'navigationStart' && !navigationStart) {
+            mainFrameID = event.args.frame;
+            navigationStart = event;
+          }
+          // firstContentfulPaint == the first time that text or image content was
+          // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
+          if (event.name === 'firstContentfulPaint' && event.args.frame === mainFrameID) {
+            firstContentfulPaint = event;
+          }
+        });
 
       // report the raw numbers
-      if (conPaint && navStart) {
-        const navigationStart = navStart.startTime;
-        const firstMeaningfulPaint = conPaint.startTime;
-
+      if (firstContentfulPaint && navigationStart) {
         return resolve({
-          navigationStart,
-          firstMeaningfulPaint
+          navigationStart: /** @type {number} */ (navigationStart.startTime),
+          firstMeaningfulPaint: /** @type {number} */ (firstContentfulPaint.startTime)
         });
       }
       return reject(new Error(FAILURE_MESSAGE));
