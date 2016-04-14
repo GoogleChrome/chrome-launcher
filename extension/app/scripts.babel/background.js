@@ -64,11 +64,11 @@ function createResultsHTML(results) {
     item.score.subItems.forEach(subitem => {
       const debugString = subitem.debugString ? ` title="${escapeHTML(subitem.debugString)}"` : '';
 
-      // TODO: make this work with numeric values.
       const status = subitem.value ?
           `<span class="pass" ${debugString}>Pass</span>` :
           `<span class="fail" ${debugString}>Fail</span>`;
-      groupHTML += `<li>${escapeHTML(subitem.description)}: ${status}</li>`;
+      const rawValue = subitem.rawValue ? `(${escapeHTML(subitem.rawValue)})` : '';
+      groupHTML += `<li>${escapeHTML(subitem.description)}: ${status} ${rawValue}</li>`;
     });
 
     resultsHTML +=

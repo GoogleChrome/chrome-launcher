@@ -58,10 +58,8 @@ gulp.task('images', () => {
 gulp.task('html',  () => {
   return gulp.src('app/*.html')
   .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
-  .pipe($.sourcemaps.init())
   .pipe($.if('*.js', $.uglify()))
   .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
-  .pipe($.sourcemaps.write())
   .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
   .pipe(gulp.dest('dist'));
 });
@@ -79,8 +77,6 @@ gulp.task('chromeManifest', () => {
   return gulp.src('app/manifest.json')
   .pipe($.chromeManifest(manifestOpts))
   .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
-  .pipe($.if('*.js',  $.sourcemaps.init()))
-  .pipe($.if('*.js',  $.sourcemaps.write('.')))
   .pipe(gulp.dest('dist'));
 });
 
@@ -89,17 +85,13 @@ gulp.task('babel', () => {
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
     'app/scripts.babel/background.js'])
-    .pipe($.sourcemaps.init())
-    .pipe($.rollup({
-      sourceMap: true
-    }))
+    .pipe($.rollup())
     .pipe($.babel({
       presets: ['es2015']
     }))
     .pipe(browserify({
       ignore: ['npmlog']
     }))
-    .pipe($.sourcemaps.write())
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
 });

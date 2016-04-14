@@ -38,7 +38,7 @@ class ManifestShortNameLength extends Audit {
    * @override
    */
   static get description() {
-    return 'App short_name won\'t be truncated on the homescreen';
+    return 'App short_name won\'t be truncated';
   }
 
   /**
@@ -56,7 +56,8 @@ class ManifestShortNameLength extends Audit {
       // See #69 for more discussion.
       isShortNameShortEnough = (manifest.short_name.value.length <= suggestedLength);
       if (!isShortNameShortEnough) {
-        debugString = `${suggestedLength} chars is the suggested maximum length`;
+        debugString = `${suggestedLength} chars is the suggested maximum homescreen label length`;
+        debugString += ` (Found: ${manifest.short_name.value.length} chars).`;
       }
     }
 
