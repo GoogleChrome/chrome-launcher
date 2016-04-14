@@ -10,28 +10,33 @@
 
 _status: early. sorta working_
 
-## Running
-
-#### Setup
+## Install
 ```sh
-npm install
-
-npm link
-
-# Start Chrome with a few flags
-npm run chrome
+npm install -g lighthouse@latest
 ```
 
-#### Run
+## Run
 ```sh
+# Start Chrome with a few flags
+npm run chrome
+
 # Kick off a lighthouse run
-lighthouse
 lighthouse https://airhorner.com/
 
 # see flags and options
 lighthouse --help
 ```
- 
+
+## Develop
+
+#### Setup
+```sh
+git clone https://github.com/GoogleChrome/lighthouse
+cd lighthouse
+
+npm install
+npm link
+```
 
 ## Chrome Extension
 
