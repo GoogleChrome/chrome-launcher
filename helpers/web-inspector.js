@@ -24,8 +24,15 @@
 // Global pollution.
 global.self = global;
 global.WebInspector = {};
+if (typeof global.window === 'undefined') {
+  global.window = global.self = global;
+}
 
 // Initialize WebInspector.NetworkManager.
+global.Runtime = {};
+global.TreeElement = {};
+global.WorkerRuntime = {};
+
 global.Protocol = {
   Agents() {}
 };
@@ -46,12 +53,28 @@ global.WebInspector._moduleSettings = {
 global.WebInspector.moduleSetting = function(settingName) {
   return this._moduleSettings[settingName];
 };
+global.insertionIndexForObjectInListSortedByFunction =
+    function(object, list, comparator, insertionIndexAfter) {
+      if (insertionIndexAfter) {
+        return list.upperBound(object, comparator);
+      }
+
+      return list.lowerBound(object, comparator);
+    };
+
 // Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
 global.NetworkAgent = {
   RequestMixedContentType: {
     Blockable: 'blockable',
     OptionallyBlockable: 'optionally-blockable',
     None: 'none'
+  },
+  BlockedReason: {
+    CSP: 'csp',
+    MixedContent: 'mixed-content',
+    Origin: 'origin',
+    Inspector: 'inspector',
+    Other: 'other'
   }
 };
 // Enum from SecurityState enum in protocol's Security domain
@@ -83,7 +106,7 @@ global.PageAgent = {
     Other: 'other'
   }
 };
-
+// Dependencies for network-recorder
 require('chrome-devtools-frontend/front_end/common/Object.js');
 require('chrome-devtools-frontend/front_end/common/ParsedURL.js');
 require('chrome-devtools-frontend/front_end/common/ResourceType.js');
@@ -92,6 +115,23 @@ require('chrome-devtools-frontend/front_end/platform/utilities.js');
 require('chrome-devtools-frontend/front_end/sdk/Target.js');
 require('chrome-devtools-frontend/front_end/sdk/NetworkManager.js');
 require('chrome-devtools-frontend/front_end/sdk/NetworkRequest.js');
+
+// deps for timeline-model
+require('devtools-timeline-model/lib/api-stubs.js');
+require('chrome-devtools-frontend/front_end/common/SegmentedRange.js');
+require('chrome-devtools-frontend/front_end/bindings/TempFile.js');
+require('chrome-devtools-frontend/front_end/sdk/TracingModel.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineJSProfile.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineUIUtils.js');
+require('chrome-devtools-frontend/front_end/sdk/CPUProfileDataModel.js');
+require('chrome-devtools-frontend/front_end/timeline/LayerTreeModel.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineModel.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineTreeView.js');
+require('chrome-devtools-frontend/front_end/ui_lazy/SortableDataGrid.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineProfileTree.js');
+require('chrome-devtools-frontend/front_end/components_lazy/FilmStripModel.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineIRModel.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineFrameModel.js');
 
 /**
  * Creates a new WebInspector NetworkManager using a mocked Target.
@@ -108,6 +148,10 @@ global.WebInspector.NetworkManager.createWithFakeTarget = function() {
       return fakeNetworkAgent;
     },
     registerNetworkDispatcher() {}
+  };
+
+  global.WebInspector.moduleSetting = function(settingName) {
+    return this._moduleSettings[settingName];
   };
 
   return new global.WebInspector.NetworkManager(fakeTarget);

@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const DevtoolsTimelineModel = require('devtools-timeline-model');
+const DevtoolsTimelineModel = require('../../helpers/traces/devtools-timeline-model');
 
 const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
 

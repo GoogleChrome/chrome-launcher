@@ -21,6 +21,8 @@ const closureCompiler = require('google-closure-compiler').gulp();
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const replace = require('gulp-replace');
+const devtoolsRequire =
+    'const DevtoolsTimelineModel = require(\'../../helpers/traces/devtools-timeline-model\');';
 
 /* eslint-disable camelcase */
 gulp.task('js-compile', function() {
@@ -33,7 +35,7 @@ gulp.task('js-compile', function() {
     'metrics/performance/first-meaningful-paint.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.
-    .pipe(replace('const DevtoolsTimelineModel = require(\'devtools-timeline-model\');', ''))
+    .pipe(replace(devtoolsRequire, ''))
     .pipe(replace('require(\'../../helpers/web-inspector\').Color.parse;',
         'WebInspector.Color.parse;'))
 
