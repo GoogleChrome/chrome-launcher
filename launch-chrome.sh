@@ -11,28 +11,32 @@ launch_osx() {
     echo "You can download it from https://www.google.com/chrome/browser/canary.html"
     exit 1
   fi
+  TMP_PROFILE_DIR=$(mktemp -d -t lighthouse)
   "$CHROME_CANARY_PATH" \
     --remote-debugging-port=9222 \
     --no-first-run \
-    --user-data-dir="/tmp/lighthouse-profile" \
+    --user-data-dir=$TMP_PROFILE_DIR \
     $CHROME_ARGS \
     "about:blank"
+  rm -r $TMP_PROFILE_DIR
 }
 
 launch_linux() {
   if [[ x"$LIGHTHOUSE_CHROMIUM_PATH" == x ]]; then
-    echo "The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to executable of a build of Chromium version 51.0 or later."
+    echo "The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to executable of a build of Chromium version 52.0 or later."
     echo "If you do not have a recent build of chromium, you can get one from https://download-chromium.appspot.com/"
     exit 1
   fi
 
+  TMP_PROFILE_DIR=$(mktemp -d -t lighthouse.XXXXXXXXXX)
   echo "Launching Google Chrome from $LIGHTHOUSE_CHROMIUM_PATH"
   "$LIGHTHOUSE_CHROMIUM_PATH" \
     --remote-debugging-port=9222 \
     --no-first-run \
-    --user-data-dir="/tmp/lighthouse-profile" \
+    --user-data-dir=$TMP_PROFILE_DIR \
     $CHROME_ARGS \
     "about:blank"
+  rm -r $TMP_PROFILE_DIR
 }
 
 
