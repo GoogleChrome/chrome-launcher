@@ -32,6 +32,12 @@ class Gather {
 
   afterTraceCollected(options, tracingData) { }
 
+  reloadSetup(options) { }
+
+  beforeReloadPageLoad(options) { }
+
+  afterReloadPageLoad(options) { }
+
   tearDown(options, tracingData) { }
 
   /* eslint-enable no-unused-vars */

@@ -104,6 +104,10 @@ class GatherScheduler {
       self._phase('afterPageLoad'),
       self.endPassiveCollection,
       self._phase('afterTraceCollected'),
+      self._phase('reloadSetup'),
+      self._phase('beforeReloadPageLoad'),
+      self.loadPage,
+      self._phase('afterReloadPageLoad'),
       driver.disconnect.bind(driver),
       self._phase('tearDown')
     ], driver, gatherers, options, tracingData).then(_ => {
