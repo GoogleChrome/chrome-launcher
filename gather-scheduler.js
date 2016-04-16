@@ -18,99 +18,101 @@
 
 class GatherScheduler {
 
+  static runSeries(fns) {
+    const args = Array.from(arguments).slice(1);
+
+    return fns.reduce((prev, curr) => {
+      return prev.then(_ => curr(...args));
+    }, Promise.resolve());
+  }
+
+  static loadPage(driver, gatherers, options) {
+    const loadPage = options.flags.loadPage;
+    const url = options.url;
+
+    if (loadPage) {
+      return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
+    }
+
+    return Promise.resolve();
+  }
+
+  static setupDriver(driver, gatherers, options) {
+    return new Promise((resolve, reject) => {
+      // Enable emulation.
+      if (options.flags.emulateMobileDevice) {
+        return resolve(driver.beginEmulation());
+      }
+
+      // noop if no mobile emulation
+      resolve();
+    }).then(_ => {
+      return driver.cleanAndDisableBrowserCaches();
+    }).then(_ => {
+      // Force SWs to update on load.
+      return driver.forceUpdateServiceWorkers();
+    });
+  }
+
+  // Enable tracing and network record collection.
+  static beginPassiveCollection(driver) {
+    return driver.beginTrace().then(_ => {
+      return driver.beginNetworkCollect();
+    });
+  }
+
+  static endPassiveCollection(driver, gatherers, options, tracingData) {
+    return driver.endNetworkCollect().then(networkRecords => {
+      tracingData.networkRecords = networkRecords;
+    }).then(_ => {
+      return driver.endTrace();
+    }).then(traceContents => {
+      tracingData.traceContents = traceContents;
+    });
+  }
+
+  static _phase(phaseName) {
+    return function(driver, gatherers, options, tracingData) {
+      return GatherScheduler._runPhase(gatherers, gatherer => {
+        return gatherer[phaseName](options, tracingData);
+      });
+    };
+  }
+
   static _runPhase(gatherers, gatherFun) {
-    return gatherers.reduce(
-      (chain, gatherer) => chain.then(_ => gatherFun(gatherer)),
-      Promise.resolve()
-    );
+    return gatherers.reduce((chain, gatherer) => {
+      return chain.then(_ => gatherFun(gatherer));
+    }, Promise.resolve());
   }
 
   static run(gatherers, options) {
     const driver = options.driver;
-    const url = options.url;
-    const loadPage = options.flags.loadPage;
-    const emulateMobileDevice = options.flags.mobile;
     const tracingData = {};
-    const artifacts = [];
+    const self = GatherScheduler;
 
-    if (url === undefined || url === null) {
+    if (options.url === undefined || options.url === null) {
       throw new Error('You must provide a url to scheduler');
     }
 
-    return driver.connect()
-
-      // Enable emulation.
-      .then(_ => {
-        if (emulateMobileDevice) {
-          return driver.beginEmulation();
-        }
-
-        return Promise.resolve();
-      })
-
-      // Clean all browser caches.
-      .then(_ => driver.cleanAndDisableBrowserCaches())
-
-      // Force SWs to update on load.
-      .then(_ => driver.forceUpdateServiceWorkers())
-
-      // Gather: setup phase.
-      .then(_ => this._runPhase(gatherers,
-          gatherer => gatherer.setup(options)))
-
-      // Enable tracing and network record collection.
-      .then(_ => driver.beginTrace())
-      .then(_ => driver.beginNetworkCollect())
-
-      // Gather: beforePageLoad phase.
-      .then(_ => this._runPhase(gatherers,
-          gatherer => gatherer.beforePageLoad(options)))
-
-      // Load the page (if the CLI / extension want it loaded).
-      .then(_ => {
-        if (loadPage) {
-          return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
-        }
-
-        return Promise.resolve();
-      })
-
-      // Gather: afterPageLoad phase
-      .then(_ => this._runPhase(gatherers,
-          gatherer => gatherer.afterPageLoad(options)))
-
-      // Disable network collection; grab records.
-      .then(_ => driver.endNetworkCollect())
-      .then(networkRecords => {
-        tracingData.networkRecords = networkRecords;
-      })
-
-      // Disable tracing; grab records.
-      .then(_ => driver.endTrace())
-      .then(traceContents => {
-        tracingData.traceContents = traceContents;
-      })
-
-      // Gather: afterTraceCollected phase.
-      .then(_ => this._runPhase(gatherers,
-          gatherer => gatherer.afterTraceCollected(options, tracingData)))
-
-      // Disconnect the driver.
-      .then(_ => driver.disconnect())
-
-      // Gather: tearDown phase.
-      .then(_ => this._runPhase(gatherers,
-        gatherer => gatherer.tearDown(options, tracingData)))
-
+    return GatherScheduler.runSeries([
+      driver.connect.bind(driver),
+      self.setupDriver,
+      self._phase('setup'),
+      self.beginPassiveCollection,
+      self._phase('beforePageLoad'),
+      self.loadPage,
+      self._phase('afterPageLoad'),
+      self.endPassiveCollection,
+      self._phase('afterTraceCollected'),
+      driver.disconnect.bind(driver),
+      self._phase('tearDown')
+    ], driver, gatherers, options, tracingData).then(_ => {
       // Collate all the gatherer results.
-      .then(_ => {
-        artifacts.push(...gatherers.map(g => g.artifact));
-        artifacts.push(
-          {networkRecords: tracingData.networkRecords},
-          {traceContents: tracingData.traceContents}
-        );
-      })
-      .then(_ => artifacts);
+      return gatherers.map(g => g.artifact).concat(
+        {networkRecords: tracingData.networkRecords},
+        {traceContents: tracingData.traceContents}
+      );
+    });
   }
 }
 

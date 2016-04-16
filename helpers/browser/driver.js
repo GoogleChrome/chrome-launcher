@@ -150,9 +150,9 @@ class ChromeProtocol {
   }
 
   gotoURL(url, waitForLoaded) {
-    return this.sendCommand('Page.enable').then(_ => {
-      return this.sendCommand('Page.getNavigationHistory')
-    }).then(navHistory => {
+    return this.sendCommand('Page.enable')
+    .then(_ => this.sendCommand('Page.getNavigationHistory'))
+    .then(navHistory => {
       const currentURL = navHistory.entries[navHistory.currentIndex].url;
 
       // Because you can give https://example.com and the browser will
@@ -168,15 +168,15 @@ class ChromeProtocol {
 
       return this.sendCommand('Page.navigate', {url});
     }).then(response => {
-      return new Promise((res, _) => {
+      return new Promise((resolve, reject) => {
         this.url = url;
 
         if (!waitForLoaded) {
-          return res(response);
+          return resolve(response);
         }
         this.on('Page.loadEventFired', response => {
           setTimeout(_ => {
-            res(response);
+            resolve(response);
           }, this.PAUSE_AFTER_LOAD);
         });
       });
