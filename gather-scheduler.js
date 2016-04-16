@@ -37,6 +37,15 @@ class GatherScheduler {
     return Promise.resolve();
   }
 
+  static reloadPage(driver, gatherers, options) {
+    // Such a hack... since a Page.reload command does not let
+    // a service worker take over we have to trick the browser into going away
+    // and then coming back.
+    return driver.sendCommand('Page.navigate', {url: 'about:blank'}).then(_ => {
+      return driver.gotoURL(options.url, driver.WAIT_FOR_LOADED);
+    });
+  }
+
   static setupDriver(driver, gatherers, options) {
     return new Promise((resolve, reject) => {
       // Enable emulation.
@@ -106,7 +115,7 @@ class GatherScheduler {
       self._phase('afterTraceCollected'),
       self._phase('reloadSetup'),
       self._phase('beforeReloadPageLoad'),
-      self.loadPage,
+      self.reloadPage,
       self._phase('afterReloadPageLoad'),
       driver.disconnect.bind(driver),
       self._phase('tearDown')
