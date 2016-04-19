@@ -90,7 +90,10 @@ gulp.task('babel', () => {
       presets: ['es2015']
     }))
     .pipe(browserify({
-      ignore: ['npmlog']
+      ignore: [
+        'npmlog',
+        'chrome-remote-interface'
+      ]
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
