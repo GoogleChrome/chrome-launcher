@@ -55,10 +55,13 @@ class ManifestDisplay extends Audit {
    */
   static audit(artifacts) {
     const manifest = artifacts.manifest.value;
+    const displayValue = (!manifest || !manifest.display) ? undefined : manifest.display.value;
+
+    const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
 
     return ManifestDisplay.generateAuditResult(
-      ManifestDisplay.hasRecommendedValue(manifest.display.value),
-      manifest.display.value,
+      hasRecommendedValue,
+      displayValue,
       'Manifest display property should be standalone or fullscreen.'
     );
   }
