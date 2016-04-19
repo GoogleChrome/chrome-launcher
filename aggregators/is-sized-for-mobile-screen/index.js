@@ -22,6 +22,9 @@ const Aggregate = require('../aggregate');
 /** @type {string} */
 const viewport = require('../../audits/mobile-friendly/viewport').name;
 
+/** @type {string} */
+const display = require('../../audits/mobile-friendly/display').name;
+
 class MobileFriendly extends Aggregate {
 
   /**
@@ -41,6 +44,11 @@ class MobileFriendly extends Aggregate {
     criteria[viewport] = {
       value: true,
       weight: 1
+    };
+
+    criteria[display] = {
+      value: true,
+      weight: 0
     };
 
     return criteria;

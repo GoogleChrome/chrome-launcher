@@ -36,6 +36,7 @@ const audits = [
   require('./audits/offline/service-worker'),
   require('./audits/offline/works-offline'),
   require('./audits/mobile-friendly/viewport'),
+  require('./audits/mobile-friendly/display'),
   require('./audits/performance/first-meaningful-paint'),
   require('./audits/manifest/exists'),
   require('./audits/manifest/background-color'),
