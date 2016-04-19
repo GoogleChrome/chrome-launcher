@@ -18,14 +18,6 @@
 
 class GatherScheduler {
 
-  static runSeries(fns) {
-    const args = Array.from(arguments).slice(1);
-
-    return fns.reduce((prev, curr) => {
-      return prev.then(_ => curr(...args));
-    }, Promise.resolve());
-  }
-
   static loadPage(driver, gatherers, options) {
     const loadPage = options.flags.loadPage;
     const url = options.url;
@@ -37,7 +29,7 @@ class GatherScheduler {
     return Promise.resolve();
   }
 
-  static reloadPage(driver, gatherers, options) {
+  static reloadPage(driver, options) {
     // Such a hack... since a Page.reload command does not let
     // a service worker take over we have to trick the browser into going away
     // and then coming back.
@@ -70,7 +62,7 @@ class GatherScheduler {
     });
   }
 
-  static endPassiveCollection(driver, gatherers, options, tracingData) {
+  static endPassiveCollection(driver, tracingData) {
     return driver.endNetworkCollect().then(networkRecords => {
       tracingData.networkRecords = networkRecords;
     }).then(_ => {
@@ -78,14 +70,6 @@ class GatherScheduler {
     }).then(traceContents => {
       tracingData.traceContents = traceContents;
     });
-  }
-
-  static _phase(phaseName) {
-    return function(driver, gatherers, options, tracingData) {
-      return GatherScheduler._runPhase(gatherers, gatherer => {
-        return gatherer[phaseName](options, tracingData);
-      });
-    };
   }
 
   static _runPhase(gatherers, gatherFun) {
@@ -97,34 +81,52 @@ class GatherScheduler {
   static run(gatherers, options) {
     const driver = options.driver;
     const tracingData = {};
-    const self = GatherScheduler;
 
     if (options.url === undefined || options.url === null) {
       throw new Error('You must provide a url to scheduler');
     }
 
-    return GatherScheduler.runSeries([
-      driver.connect.bind(driver),
-      self.setupDriver,
-      self._phase('setup'),
-      self.beginPassiveCollection,
-      self._phase('beforePageLoad'),
-      self.loadPage,
-      self._phase('afterPageLoad'),
-      self.endPassiveCollection,
-      self._phase('afterTraceCollected'),
-      self._phase('reloadSetup'),
-      self._phase('beforeReloadPageLoad'),
-      self.reloadPage,
-      self._phase('afterReloadPageLoad'),
-      driver.disconnect.bind(driver),
-      self._phase('tearDown')
-    ], driver, gatherers, options, tracingData).then(_ => {
+    return driver.connect().then(_ => {
+      return GatherScheduler.setupDriver(driver, gatherers, options);
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.setup(options));
+    }).then(_ => {
+      return GatherScheduler.beginPassiveCollection(driver);
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.beforePageLoad(options));
+    }).then(_ => {
+      return GatherScheduler.loadPage(driver, gatherers, options);
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.afterPageLoad(options));
+    }).then(_ => {
+      return GatherScheduler.endPassiveCollection(driver, tracingData);
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.afterTraceCollected(options, tracingData));
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.reloadSetup(options));
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.beforeReloadPageLoad(options));
+    }).then(_ => {
+      return GatherScheduler.reloadPage(driver, options);
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.afterReloadPageLoad(options));
+    }).then(_ => {
+      return driver.disconnect();
+    }).then(_ => {
+      return GatherScheduler._runPhase(gatherers,
+          gatherer => gatherer.tearDown(options));
+    }).then(_ => {
       // Collate all the gatherer results.
       return gatherers.map(g => g.artifact).concat(
-        {networkRecords: tracingData.networkRecords},
-        {traceContents: tracingData.traceContents}
-      );
+          {networkRecords: tracingData.networkRecords},
+          {traceContents: tracingData.traceContents});
     });
   }
 }
