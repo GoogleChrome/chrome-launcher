@@ -12,6 +12,7 @@
     "test": "npm run lint --silent && npm run unit && npm run closure",
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
     "chrome": "./launch-chrome.sh",
+    "smoke": "./run-smoke-tests.sh",
     "start": "node cli.js"
   },
   "repository": "googlechrome/lighthouse",

@@ -19,7 +19,7 @@
 const Gather = require('./gather');
 
 class ServiceWorker extends Gather {
-  setup(options) {
+  reloadSetup(options) {
     const driver = options.driver;
     this.resolved = false;
 
@@ -45,7 +45,7 @@ class ServiceWorker extends Gather {
     return versions.find(v => v.status === 'activated' && v.scriptURL.startsWith(url));
   }
 
-  beforePageLoad(options) {
+  beforeReloadPageLoad(options) {
     const driver = options.driver;
     driver.sendCommand('ServiceWorker.enable');
 

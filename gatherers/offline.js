@@ -102,7 +102,7 @@ class Offline extends Gather {
     });
   }
 
-  afterTraceCollected(options) {
+  afterReloadPageLoad(options) {
     const driver = options.driver;
 
     // TODO eventually we will want to walk all network
@@ -110,14 +110,13 @@ class Offline extends Gather {
     return Offline.goOffline(driver).then(_ => {
       let responseCode;
 
-      return Offline.getOfflinePageStatus(driver)
-        .then(ret => {
-          responseCode = ret.result.value;
-        })
-        .then(_ => Offline.goOnline(driver))
-        .then(_ => {
-          this.artifact = {responseCode};
-        });
+      return Offline.getOfflinePageStatus(driver).then(ret => {
+        responseCode = ret.result.value;
+      }).then(_ => {
+        return Offline.goOnline(driver);
+      }).then(_ => {
+        this.artifact = {responseCode};
+      });
     });
   }
 }

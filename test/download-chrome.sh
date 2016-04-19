@@ -12,5 +12,5 @@ if [ -e "$LIGHTHOUSE_CHROMIUM_PATH" ]
 then
   echo "cached chrome found"
 else
-  wget 'https://download-chromium.appspot.com/dl/Linux_x64?type=continuous' -O chrome.zip && unzip chrome.zip
+  wget 'https://download-chromium.appspot.com/dl/Linux_x64?type=snapshots' -O chrome.zip && unzip chrome.zip
 fi
