@@ -83,6 +83,7 @@ driver.sendCommand('Security.enable').then(_ => {
 driver.on('Security.securityStateChanged', state => { /* ... */ }); // event binding is synchronous
 driver.sendCommand('Security.enable');
 ```
+* _Debugging the protocol_: Read [Better debugging of the Protocol](https://github.com/GoogleChrome/lighthouse/issues/184).
 
 ### Gatherers
 
