@@ -35,6 +35,7 @@ const cli = meow(`
     --json         Output results as JSON
     --mobile       Emulates a Nexus 5X (default=true)
     --load-page    Loads the page (default=true)
+    --save-trace   Save the trace contents to disk
 `);
 
 const defaultUrl = 'https://operasoftware.github.io/pwa-list/';

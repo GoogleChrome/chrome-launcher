@@ -16,6 +16,9 @@
  */
 'use strict';
 
+const log = (typeof process !== 'undefined' && 'version' in process) ?
+    require('npmlog').log : console.log.bind(console);
+
 class GatherScheduler {
 
   static loadPage(driver, gatherers, options) {
@@ -62,13 +65,17 @@ class GatherScheduler {
     });
   }
 
-  static endPassiveCollection(driver, tracingData) {
+  static endPassiveCollection(options, tracingData) {
+    const driver = options.driver;
+    const saveTrace = options.flags.saveTrace;
     return driver.endNetworkCollect().then(networkRecords => {
       tracingData.networkRecords = networkRecords;
     }).then(_ => {
       return driver.endTrace();
     }).then(traceContents => {
       tracingData.traceContents = traceContents;
+    }).then(_ => {
+      return saveTrace && this.saveAssets(tracingData, options.url);
     });
   }
 
@@ -102,7 +109,7 @@ class GatherScheduler {
       return GatherScheduler._runPhase(gatherers,
           gatherer => gatherer.afterPageLoad(options));
     }).then(_ => {
-      return GatherScheduler.endPassiveCollection(driver, tracingData);
+      return GatherScheduler.endPassiveCollection(options, tracingData);
     }).then(_ => {
       return GatherScheduler._runPhase(gatherers,
           gatherer => gatherer.afterTraceCollected(options, tracingData));
@@ -128,6 +135,15 @@ class GatherScheduler {
           {networkRecords: tracingData.networkRecords},
           {traceContents: tracingData.traceContents});
     });
+  }
+
+  static saveAssets(tracingData, url) {
+    const date = new Date();
+    const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
+    const filename = (hostname + '_' + date.toISOString() + '.trace.json')
+        .replace(/[\/\?<>\\:\*\|":]/g, '-');
+    require('fs').writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
+    log('info', 'trace file saved to disk', filename);
   }
 }
 
