@@ -41,7 +41,7 @@ class GatherScheduler {
   static setupDriver(driver, gatherers, options) {
     return new Promise((resolve, reject) => {
       // Enable emulation.
-      if (options.flags.emulateMobileDevice) {
+      if (options.flags.mobile) {
         return resolve(driver.beginEmulation());
       }
 
