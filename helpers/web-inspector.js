@@ -23,20 +23,32 @@
 
 // Global pollution.
 global.self = global;
-global.WebInspector = {};
 if (typeof global.window === 'undefined') {
-  global.window = global.self = global;
+  global.window = global;
 }
 
-// Initialize WebInspector.NetworkManager.
 global.Runtime = {};
+global.Runtime.experiments = {
+  isEnabled(experimentName) {
+    switch (experimentName) {
+      case 'timelineLatencyInfo':
+        return true;
+      default:
+        return false;
+    }
+  }
+};
+
 global.TreeElement = {};
 global.WorkerRuntime = {};
 
 global.Protocol = {
   Agents() {}
 };
-global.WebInspector._moduleSettings = {
+
+global.WebInspector = {};
+const WebInspector = global.WebInspector;
+WebInspector._moduleSettings = {
   cacheDisabled: {
     addChangeListener() {},
     get() {
@@ -48,11 +60,18 @@ global.WebInspector._moduleSettings = {
     get() {
       return false;
     }
+  },
+  showNativeFunctionsInJSProfile: {
+    addChangeListener() {},
+    get() {
+      return true;
+    }
   }
 };
-global.WebInspector.moduleSetting = function(settingName) {
+WebInspector.moduleSetting = function(settingName) {
   return this._moduleSettings[settingName];
 };
+
 global.insertionIndexForObjectInListSortedByFunction =
     function(object, list, comparator, insertionIndexAfter) {
       if (insertionIndexAfter) {
@@ -116,8 +135,22 @@ require('chrome-devtools-frontend/front_end/sdk/Target.js');
 require('chrome-devtools-frontend/front_end/sdk/NetworkManager.js');
 require('chrome-devtools-frontend/front_end/sdk/NetworkRequest.js');
 
-// deps for timeline-model
-require('devtools-timeline-model/lib/api-stubs.js');
+// Dependencies for timeline-model
+WebInspector.targetManager = {
+  observeTargets() {}
+};
+WebInspector.settings = {
+  createSetting() {}
+};
+WebInspector.console = {
+  error() {}
+};
+WebInspector.VBox = function() {};
+WebInspector.HBox = function() {};
+WebInspector.ViewportDataGrid = function() {};
+WebInspector.ViewportDataGridNode = function() {};
+global.WorkerRuntime.Worker = function() {};
+
 require('chrome-devtools-frontend/front_end/common/SegmentedRange.js');
 require('chrome-devtools-frontend/front_end/bindings/TempFile.js');
 require('chrome-devtools-frontend/front_end/sdk/TracingModel.js');
@@ -126,18 +159,28 @@ require('chrome-devtools-frontend/front_end/timeline/TimelineUIUtils.js');
 require('chrome-devtools-frontend/front_end/sdk/CPUProfileDataModel.js');
 require('chrome-devtools-frontend/front_end/timeline/LayerTreeModel.js');
 require('chrome-devtools-frontend/front_end/timeline/TimelineModel.js');
-require('chrome-devtools-frontend/front_end/timeline/TimelineTreeView.js');
 require('chrome-devtools-frontend/front_end/ui_lazy/SortableDataGrid.js');
+require('chrome-devtools-frontend/front_end/timeline/TimelineTreeView.js');
 require('chrome-devtools-frontend/front_end/timeline/TimelineProfileTree.js');
 require('chrome-devtools-frontend/front_end/components_lazy/FilmStripModel.js');
 require('chrome-devtools-frontend/front_end/timeline/TimelineIRModel.js');
 require('chrome-devtools-frontend/front_end/timeline/TimelineFrameModel.js');
 
+// DevTools makes a few assumptions about using backing storage to hold traces.
+WebInspector.DeferredTempFile = function() {};
+WebInspector.DeferredTempFile.prototype = {
+  write: function() {},
+  finishWriting: function() {}
+};
+
+// Dependencies for color parsing.
+require('chrome-devtools-frontend/front_end/common/Color.js');
+
 /**
  * Creates a new WebInspector NetworkManager using a mocked Target.
  * @return {!WebInspector.NetworkManager}
  */
-global.WebInspector.NetworkManager.createWithFakeTarget = function() {
+WebInspector.NetworkManager.createWithFakeTarget = function() {
   // Mocked-up WebInspector Target for NetworkManager
   const fakeNetworkAgent = {
     enable() {}
@@ -150,14 +193,7 @@ global.WebInspector.NetworkManager.createWithFakeTarget = function() {
     registerNetworkDispatcher() {}
   };
 
-  global.WebInspector.moduleSetting = function(settingName) {
-    return this._moduleSettings[settingName];
-  };
-
-  return new global.WebInspector.NetworkManager(fakeTarget);
+  return new WebInspector.NetworkManager(fakeTarget);
 };
 
-// Initialize WebInspector.Color.
-require('chrome-devtools-frontend/front_end/common/Color.js');
-
-module.exports = global.WebInspector;
+module.exports = WebInspector;

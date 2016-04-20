@@ -17,17 +17,15 @@
 
 'use strict';
 
-/* global WebInspector, TimelineModelTreeView */
+const WebInspector = require('../web-inspector');
 
-// minor configurations
-require('devtools-timeline-model/lib/devtools-monkeypatches.js');
-// polyfill the bottom-up and topdown tree sorting
-require('devtools-timeline-model/lib/timeline-model-treeview.js');
+// Polyfill the bottom-up and topdown tree sorting.
+const TimelineModelTreeView =
+    require('devtools-timeline-model/lib/timeline-model-treeview.js')(WebInspector);
 
 class TimelineModel {
 
   constructor(events) {
-    this.WI = WebInspector;
     this.init(events);
   }
 
