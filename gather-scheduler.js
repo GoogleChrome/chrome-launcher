@@ -21,132 +21,128 @@ const fs = require('fs');
 const log = (typeof process !== 'undefined' && 'version' in process) ?
     require('npmlog').log : console.log.bind(console);
 
-class GatherScheduler {
+function loadPage(driver, gatherers, options) {
+  const loadPage = options.flags.loadPage;
+  const url = options.url;
 
-  static loadPage(driver, gatherers, options) {
-    const loadPage = options.flags.loadPage;
-    const url = options.url;
+  if (loadPage) {
+    return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
+  }
 
-    if (loadPage) {
-      return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
+  return Promise.resolve();
+}
+
+function reloadPage(driver, options) {
+  // Such a hack... since a Page.reload command does not let
+  // a service worker take over we have to trick the browser into going away
+  // and then coming back.
+  return driver.sendCommand('Page.navigate', {url: 'about:blank'}).then(_ => {
+    return driver.gotoURL(options.url, driver.WAIT_FOR_LOADED);
+  });
+}
+
+function setupDriver(driver, gatherers, options) {
+  return new Promise((resolve, reject) => {
+    // Enable emulation.
+    if (options.flags.mobile) {
+      return resolve(driver.beginEmulation());
     }
 
-    return Promise.resolve();
-  }
+    // noop if no mobile emulation
+    resolve();
+  }).then(_ => {
+    return driver.cleanAndDisableBrowserCaches();
+  }).then(_ => {
+    // Force SWs to update on load.
+    return driver.forceUpdateServiceWorkers();
+  });
+}
 
-  static reloadPage(driver, options) {
-    // Such a hack... since a Page.reload command does not let
-    // a service worker take over we have to trick the browser into going away
-    // and then coming back.
-    return driver.sendCommand('Page.navigate', {url: 'about:blank'}).then(_ => {
-      return driver.gotoURL(options.url, driver.WAIT_FOR_LOADED);
-    });
-  }
+// Enable tracing and network record collection.
+function beginPassiveCollection(driver) {
+  return driver.beginTrace().then(_ => {
+    return driver.beginNetworkCollect();
+  });
+}
 
-  static setupDriver(driver, gatherers, options) {
-    return new Promise((resolve, reject) => {
-      // Enable emulation.
-      if (options.flags.mobile) {
-        return resolve(driver.beginEmulation());
-      }
+function endPassiveCollection(options, tracingData) {
+  const driver = options.driver;
+  const saveTrace = options.flags.saveTrace;
+  return driver.endNetworkCollect().then(networkRecords => {
+    tracingData.networkRecords = networkRecords;
+  }).then(_ => {
+    return driver.endTrace();
+  }).then(traceContents => {
+    tracingData.traceContents = traceContents;
+  }).then(_ => {
+    return saveTrace && saveAssets(tracingData, options.url);
+  });
+}
 
-      // noop if no mobile emulation
-      resolve();
-    }).then(_ => {
-      return driver.cleanAndDisableBrowserCaches();
-    }).then(_ => {
-      // Force SWs to update on load.
-      return driver.forceUpdateServiceWorkers();
-    });
-  }
-
-  // Enable tracing and network record collection.
-  static beginPassiveCollection(driver) {
-    return driver.beginTrace().then(_ => {
-      return driver.beginNetworkCollect();
-    });
-  }
-
-  static endPassiveCollection(options, tracingData) {
-    const driver = options.driver;
-    const saveTrace = options.flags.saveTrace;
-    return driver.endNetworkCollect().then(networkRecords => {
-      tracingData.networkRecords = networkRecords;
-    }).then(_ => {
-      return driver.endTrace();
-    }).then(traceContents => {
-      tracingData.traceContents = traceContents;
-    }).then(_ => {
-      return saveTrace && this.saveAssets(tracingData, options.url);
-    });
-  }
-
-  static _runPhase(gatherers, gatherFun) {
+function phaseRunner(gatherers) {
+  return function runPhase(gatherFun) {
     return gatherers.reduce((chain, gatherer) => {
       return chain.then(_ => gatherFun(gatherer));
     }, Promise.resolve());
+  };
+}
+
+function run(gatherers, options) {
+  const driver = options.driver;
+  const tracingData = {};
+
+  if (options.url === undefined || options.url === null) {
+    throw new Error('You must provide a url to scheduler');
   }
 
-  static run(gatherers, options) {
-    const driver = options.driver;
-    const tracingData = {};
+  const runPhase = phaseRunner(gatherers);
 
-    if (options.url === undefined || options.url === null) {
-      throw new Error('You must provide a url to scheduler');
-    }
+  return driver.connect()
+    // Initial prep before the page load.
+    .then(_ => setupDriver(driver, gatherers, options))
+    .then(_ => runPhase(gatherer => gatherer.setup(options)))
+    .then(_ => beginPassiveCollection(driver))
+    .then(_ => runPhase(gatherer => gatherer.beforePageLoad(options)))
 
-    return driver.connect().then(_ => {
-      return GatherScheduler.setupDriver(driver, gatherers, options);
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.setup(options));
-    }).then(_ => {
-      return GatherScheduler.beginPassiveCollection(driver);
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.beforePageLoad(options));
-    }).then(_ => {
-      return GatherScheduler.loadPage(driver, gatherers, options);
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.afterPageLoad(options));
-    }).then(_ => {
-      return GatherScheduler.endPassiveCollection(options, tracingData);
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.afterTraceCollected(options, tracingData));
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.reloadSetup(options));
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.beforeReloadPageLoad(options));
-    }).then(_ => {
-      return GatherScheduler.reloadPage(driver, options);
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.afterReloadPageLoad(options));
-    }).then(_ => {
-      return driver.disconnect();
-    }).then(_ => {
-      return GatherScheduler._runPhase(gatherers,
-          gatherer => gatherer.tearDown(options));
-    }).then(_ => {
+    // Load page, gather from browser, stop profilers.
+    .then(_ => loadPage(driver, gatherers, options))
+    .then(_ => runPhase(gatherer => gatherer.afterPageLoad(options)))
+    .then(_ => endPassiveCollection(options, tracingData))
+    .then(_ => runPhase(gatherer => gatherer.afterTraceCollected(options, tracingData)))
+
+    // Reload page for SW, etc.
+    .then(_ => runPhase(gatherer => gatherer.reloadSetup(options)))
+    .then(_ => runPhase(gatherer => gatherer.beforeReloadPageLoad(options)))
+    .then(_ => reloadPage(driver, options))
+    .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)))
+
+    // Finish and teardown.
+    .then(_ => driver.disconnect())
+    .then(_ => runPhase(gatherer => gatherer.tearDown(options)))
+    .then(_ => {
       // Collate all the gatherer results.
       return gatherers.map(g => g.artifact).concat(
           {networkRecords: tracingData.networkRecords},
           {traceContents: tracingData.traceContents});
     });
-  }
-
-  static saveAssets(tracingData, url) {
-    const date = new Date();
-    const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
-    const filename = (hostname + '_' + date.toISOString() + '.trace.json')
-        .replace(/[\/\?<>\\:\*\|":]/g, '-');
-    fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
-    log('info', 'trace file saved to disk', filename);
-  }
 }
 
-module.exports = GatherScheduler;
+function saveAssets(tracingData, url) {
+  const date = new Date();
+  const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
+  const filename = (hostname + '_' + date.toISOString() + '.trace.json')
+      .replace(/[\/\?<>\\:\*\|":]/g, '-');
+  fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
+  log('info', 'trace file saved to disk', filename);
+}
+
+module.exports = {
+  loadPage,
+  reloadPage,
+  setupDriver,
+  beginPassiveCollection,
+  endPassiveCollection,
+  phaseRunner,
+  run,
+  saveAssets
+};
