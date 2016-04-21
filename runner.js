@@ -76,5 +76,11 @@ module.exports = function(driver, opts) {
   return GatherScheduler
       .run(gatherers, Object.assign({}, opts, {driver}))
       .then(artifacts => Auditor.audit(artifacts, audits))
-      .then(results => Aggregator.aggregate(aggregators, results));
+      .then(results => Aggregator.aggregate(aggregators, results))
+      .then(aggregations => {
+        return {
+          url: opts.url,
+          aggregations
+        };
+      });
 };

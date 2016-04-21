@@ -43,6 +43,13 @@ class FirstMeaningfulPaint extends Audit {
   }
 
   /**
+   * @override
+   */
+  static get optimalValue() {
+    return '1,000ms';
+  }
+
+  /**
    * Audits the page to give a score for First Meaningful Paint.
    * @see  https://github.com/GoogleChrome/lighthouse/issues/26
    * @param {!Artifacts} artifacts The artifacts from the gather phase.
@@ -79,7 +86,7 @@ class FirstMeaningfulPaint extends Audit {
         })
         .then(result => {
           return FirstMeaningfulPaint.generateAuditResult(result.score,
-              result.duration, result.debugString);
+              result.duration, result.debugString, this.optimalValue);
         });
   }
 }

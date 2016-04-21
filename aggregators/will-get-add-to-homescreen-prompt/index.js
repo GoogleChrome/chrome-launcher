@@ -48,6 +48,14 @@ class AddToHomescreen extends Aggregate {
   }
 
   /**
+   * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Add to Homescreen';
+  }
+
+  /**
    * For the install-to-homescreen / install-app-banner prompt to show,
    * Chrome needs the following:
    *   - has a registered SW

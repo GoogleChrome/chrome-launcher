@@ -19,22 +19,15 @@ limitations under the License.
 <html>
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="author" content="Lighthouse Team" />
   <meta name="viewport" content="width=device-width">
-  <title>Lighthouse Report</title>
-  <!-- build:css styles/lighthouse.css -->
-  <link rel="stylesheet" href="styles/lighthouse.css">
-  <!-- endbuild -->
+  <title>Lighthouse report</title>
+  <link rel="stylesheet" href="/pages/styles/report.css">
 </head>
 <body>
-  <header>
-    <h1>Lighthouse</h1>
-    <h2>...</h2>
-    <a href="https://github.com/googlechrome/lighthouse" target="_blank">Beta</a>
-    <button class="generate-full-report">Generate full report</button>
-  </header>
-  <div class="results"></div>
-  <script src="scripts/app.js"></script>
+<div class="spinner-container">
+  <div class="js-spinner spinner"></div>
+</div>
+
+<script src="/scripts/report.js"></script>
 </body>
 </html>

@@ -24,9 +24,14 @@ describe('Aggregate', () => {
         'Aggregate name must be overridden');
   });
 
+  it('throws when shortName is called directly', () => {
+    return assert.throws(_ => Aggregate.shortName,
+        'Aggregate name must be overridden');
+  });
+
   it('throws when criteria is called directly', () => {
     return assert.throws(_ => Aggregate.criteria,
-        'Aggregate name must be overridden');
+        'Aggregate criteria must be overridden');
   });
 
   it('filters empty results', () => {

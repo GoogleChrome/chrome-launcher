@@ -16,6 +16,8 @@
  */
 'use strict';
 
+const fs = require('fs');
+
 const log = (typeof process !== 'undefined' && 'version' in process) ?
     require('npmlog').log : console.log.bind(console);
 
@@ -142,7 +144,7 @@ class GatherScheduler {
     const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
     const filename = (hostname + '_' + date.toISOString() + '.trace.json')
         .replace(/[\/\?<>\\:\*\|":]/g, '-');
-    require('fs').writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
+    fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
     log('info', 'trace file saved to disk', filename);
   }
 }

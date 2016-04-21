@@ -37,6 +37,14 @@ class MobileFriendly extends Aggregate {
 
   /**
    * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Mobile Friendly';
+  }
+
+  /**
+   * @override
    * @return {!AggregationCriteria}
    */
   static get criteria() {

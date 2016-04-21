@@ -47,6 +47,14 @@ describe('Aggregators', () => {
     });
   });
 
+  it('has no aggregators failing when shortName is called', () => {
+    return walkTree.then(aggregators => {
+      aggregators.forEach(aggregator => {
+        assert.doesNotThrow(_ => aggregator.shortName);
+      });
+    });
+  });
+
   it('has no aggregators failing when criteria is called', () => {
     return walkTree.then(aggregators => {
       aggregators.forEach(aggregator => {

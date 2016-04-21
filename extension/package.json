@@ -15,6 +15,7 @@
     "eslint-config-google": "^0.4.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-brfs": "^0.1.0",
     "gulp-browserify": "^0.5.1",
     "gulp-cache": "^0.4.2",
     "gulp-chrome-manifest": "0.0.13",

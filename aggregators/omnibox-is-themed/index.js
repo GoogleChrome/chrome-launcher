@@ -39,6 +39,14 @@ class OmniboxThemeColor extends Aggregate {
   }
 
   /**
+   * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Omnibox';
+  }
+
+  /**
    * For the omnibox to adopt a theme color, Chrome needs the following:
    *   - has valid manifest
    *   - valid theme_color in manifest

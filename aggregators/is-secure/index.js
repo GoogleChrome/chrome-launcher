@@ -34,6 +34,14 @@ class IsSecure extends Aggregate {
 
   /**
    * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Secure';
+  }
+
+  /**
+   * @override
    * @return {!AggregationCriteria}
    */
   static get criteria() {

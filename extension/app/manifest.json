@@ -17,7 +17,8 @@
   },
   "permissions": [
     "activeTab",
-    "debugger"
+    "debugger",
+    "tabs"
   ],
   "browser_action": {
     "default_icon": {
@@ -25,5 +26,6 @@
     },
     "default_title": "Lighthouse",
     "default_popup": "popup.html"
-  }
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'none'"
 }

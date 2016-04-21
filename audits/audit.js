@@ -39,16 +39,25 @@ class Audit {
   }
 
   /**
+   * @return {?(boolean|number|string|undefined)}
+   */
+  static get optimalValue() {
+    return undefined;
+  }
+
+  /**
    * @param {(boolean|number|string)} value
    * @param {?(boolean|number|string)=} rawValue
    * @param {string=} debugString Optional string to describe any error condition encountered.
+   * @param {?(boolean|number|string)=} optimalValue
    * @return {!AuditResult}
    */
-  static generateAuditResult(value, rawValue, debugString) {
+  static generateAuditResult(value, rawValue, debugString, optimalValue) {
     return {
       value,
       rawValue,
       debugString,
+      optimalValue,
       name: this.name,
       tags: this.tags,
       description: this.description

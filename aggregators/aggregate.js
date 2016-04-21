@@ -29,6 +29,14 @@ class Aggregate {
 
   /**
    * @throws {Error}
+   * @return {string} The short name for this aggregation.
+   */
+  static get shortName() {
+    throw new Error('Aggregate shortName must be overridden');
+  }
+
+  /**
+   * @throws {Error}
    * @return {!AggregationCriteria} The criteria for this aggregation.
    */
   static get criteria() {
@@ -188,6 +196,7 @@ class Aggregate {
   static aggregate(results) {
     return {
       name: this.name,
+      shortName: this.shortName,
       score: Aggregate.compare(results, this.criteria)
     };
   }

@@ -31,6 +31,7 @@
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
     "devtools-timeline-model": "1.0.19",
+    "handlebars": "^4.0.5",
     "meow": "^3.7.0",
     "npmlog": "^2.0.3",
     "semver": "^5.1.0",

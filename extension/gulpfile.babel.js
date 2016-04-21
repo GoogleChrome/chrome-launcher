@@ -3,6 +3,7 @@ import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
 import browserify from 'gulp-browserify';
+import brfs from 'brfs';
 import runSequence from 'run-sequence';
 
 var debug = require('gulp-debug');
@@ -84,7 +85,8 @@ gulp.task('babel', () => {
   return gulp.src([
     'app/scripts.babel/app.js',
     'app/scripts.babel/chromereload.js',
-    'app/scripts.babel/background.js'])
+    'app/scripts.babel/background.js',
+    'app/scripts.babel/report.js'])
     .pipe($.rollup())
     .pipe($.babel({
       presets: ['es2015']
@@ -93,7 +95,8 @@ gulp.task('babel', () => {
       ignore: [
         'npmlog',
         'chrome-remote-interface'
-      ]
+      ],
+      transform: ['brfs']
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));

@@ -34,6 +34,14 @@ class IsPerformant extends Aggregate {
 
   /**
    * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Performance';
+  }
+
+  /**
+   * @override
    * @return {!AggregationCriteria}
    */
   static get criteria() {

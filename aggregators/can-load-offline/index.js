@@ -41,6 +41,14 @@ class WorksOffline extends Aggregate {
 
   /**
    * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Works Offline';
+  }
+
+  /**
+   * @override
    * @return {!AggregationCriteria}
    */
   static get criteria() {

@@ -45,6 +45,14 @@ class SplashScreen extends Aggregate {
   }
 
   /**
+   * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Splash Screen';
+  }
+
+  /**
    * An app that was installed to homescreen can get a custom splash screen
    * while launching.
    * Chrome needs the following:
