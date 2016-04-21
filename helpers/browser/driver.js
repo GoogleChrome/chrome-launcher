@@ -27,10 +27,6 @@ const log = (typeof process !== 'undefined' && 'version' in process) ?
 
 class ChromeProtocol {
 
-  get WAIT_FOR_LOADED() {
-    return true;
-  }
-
   constructor() {
     this._url = null;
     this.PAUSE_AFTER_LOAD = 3000;
@@ -151,7 +147,7 @@ class ChromeProtocol {
     });
   }
 
-  gotoURL(url, waitForLoaded) {
+  gotoURL(url) {
     return this.sendCommand('Page.enable')
     .then(_ => this.sendCommand('Page.getNavigationHistory'))
     .then(navHistory => {
@@ -169,13 +165,10 @@ class ChromeProtocol {
       }
 
       return this.sendCommand('Page.navigate', {url});
-    }).then(response => {
+    }).then(_ => {
       return new Promise((resolve, reject) => {
         this.url = url;
 
-        if (!waitForLoaded) {
-          return resolve(response);
-        }
         this.on('Page.loadEventFired', response => {
           setTimeout(_ => {
             resolve(response);
