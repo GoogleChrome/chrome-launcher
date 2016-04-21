@@ -18,22 +18,32 @@
 document.addEventListener('DOMContentLoaded', _ => {
   const background = chrome.extension.getBackgroundPage();
   const siteNameEl = window.document.querySelector('header h2');
-  const resultsEl = document.body.querySelector('.results');
-  const generateFullReportEl = document.body.querySelector('.generate-full-report');
+  const generateReportEl = document.body.querySelector('.generate-report');
 
-  background.runAudits({
-    flags: {
-      mobile: false,
-      loadPage: false
-    }
-  })
-  .then(results => {
-    resultsEl.innerHTML = background.createResultsHTML(results);
-  }).catch(err => {
-    resultsEl.textContent = err;
-  });
+  const statusEl = document.body.querySelector('.status');
+  const spinnerEl = document.body.querySelector('.status__spinner');
+  const feedbackEl = document.body.querySelector('.feedback');
+  let spinnerAnimation;
 
-  generateFullReportEl.addEventListener('click', () => {
+  const startSpinner = _ => {
+    statusEl.classList.add('status--visible');
+    spinnerAnimation = spinnerEl.animate([
+      {transform: 'rotate(0deg)'},
+      {transform: 'rotate(359deg)'}
+    ], {
+      duration: 1000,
+      iterations: Infinity
+    });
+  };
+
+  const stopSpinner = _ => {
+    spinnerAnimation.cancel();
+    statusEl.classList.remove('status--visible');
+  };
+
+  generateReportEl.addEventListener('click', () => {
+    startSpinner();
+    feedbackEl.textContent = '';
     background.runAudits({
       flags: {
         mobile: true,
@@ -42,6 +52,10 @@ document.addEventListener('DOMContentLoaded', _ => {
     })
     .then(results => {
       background.createPageAndPopulate(results);
+    })
+    .catch(err => {
+      feedbackEl.textContent = err.message;
+      stopSpinner();
     });
   });
 
@@ -52,15 +66,5 @@ document.addEventListener('DOMContentLoaded', _ => {
 
     const siteURL = new URL(tabs[0].url);
     siteNameEl.textContent = siteURL.origin;
-  });
-
-  document.addEventListener('click', evt => {
-    const targetClassName = evt.target.parentNode.classList;
-
-    if (!targetClassName.contains('group')) {
-      return;
-    }
-
-    targetClassName.toggle('expanded');
   });
 });
