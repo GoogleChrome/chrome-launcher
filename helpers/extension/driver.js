@@ -172,7 +172,7 @@ class ExtensionProtocol extends ChromeProtocol {
   handleUnexpectedDetach() {
     chrome.debugger.onDetach.addListener((debuggee, detachReason) => {
       this._debuggerConnected = false;
-      throw new Error('Lighthouse detached from browser' + detachReason);
+      throw new Error('Lighthouse detached from browser: ' + detachReason);
     });
   }
 
