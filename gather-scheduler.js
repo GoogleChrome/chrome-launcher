@@ -28,7 +28,7 @@ class GatherScheduler {
     const url = options.url;
 
     if (loadPage) {
-      return driver.gotoURL(url, driver.WAIT_FOR_LOADED);
+      return driver.gotoURL(url);
     }
 
     return Promise.resolve();
@@ -39,7 +39,7 @@ class GatherScheduler {
     // a service worker take over we have to trick the browser into going away
     // and then coming back.
     return driver.sendCommand('Page.navigate', {url: 'about:blank'}).then(_ => {
-      return driver.gotoURL(options.url, driver.WAIT_FOR_LOADED);
+      return driver.gotoURL(options.url);
     });
   }
 
