@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', _ => {
   })
   .then(results => {
     resultsEl.innerHTML = background.createResultsHTML(results);
+  }).catch(err => {
+    resultsEl.textContent = err;
   });
 
   generateFullReportEl.addEventListener('click', () => {
