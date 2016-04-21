@@ -40,17 +40,17 @@ class ReportLoader {
 
   write(results) {
     const report = new Report();
-    report.generateHTML(results).then(html => {
-      this.stopSpinner();
-      document.documentElement.innerHTML = html;
-    });
+    const html = report.generateHTML(results);
+
+    this.stopSpinner();
+    document.documentElement.innerHTML = html;
   }
 }
 
-const report = new ReportLoader();
+const reportLoader = new ReportLoader();
 
 if (chrome && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener(data => {
-    report.write(data);
+    reportLoader.write(data);
   });
 }
