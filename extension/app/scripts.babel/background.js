@@ -40,13 +40,8 @@ window.runAudits = function(options) {
       .then(url => {
         // Add in the URL to the options.
         return runner(driver, Object.assign({}, options, {url}));
-      })
-      .catch(returnError);
+      });
 };
-
-function returnError(err) {
-  return `<div class="error">Unable to audit page: ${escapeHTML(err.message)}</div>`;
-}
 
 function escapeHTML(str) {
   return str.replace(/&/g, '&amp;')

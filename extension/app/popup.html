@@ -28,13 +28,26 @@ limitations under the License.
   <!-- endbuild -->
 </head>
 <body>
-  <header>
-    <h1>Lighthouse</h1>
-    <h2>...</h2>
-    <a href="https://github.com/googlechrome/lighthouse" target="_blank">Beta</a>
-    <button class="generate-full-report">Generate full report</button>
+
+  <header class="header">
+    <img src="images/icon.svg" class="header__icon" width="75" height="75" alt="Lighthouse Icon">
+    <div class="header-titles">
+      <h1 class="header-titles__main">Lighthouse</h1>
+      <h2 class="header-titles__url">...</h2>
+    </div>
+    <a class="beta" href="https://github.com/googlechrome/lighthouse" target="_blank">Beta</a>
   </header>
-  <div class="results"></div>
+
+  <main class="main" role="main">
+    <div class="feedback"></div>
+    <button class="generate-report">Generate report</button>
+  </main>
+
+  <aside class="status">
+    <div class="status__spinner"></div>
+    <div class="status__msg">Auditing page...</div>
+  </aside>
+
   <script src="scripts/app.js"></script>
 </body>
 </html>
