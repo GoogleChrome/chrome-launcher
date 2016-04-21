@@ -103,13 +103,16 @@ class ExtensionProtocol extends ChromeProtocol {
       log('method => browser', command, params);
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
+          log('error', 'method <= browser', command, result);
           return reject(chrome.runtime.lastError);
         }
 
         if (result.wasThrown) {
+          log('error', 'method <= browser', command, result);
           return reject(result.exceptionDetails);
         }
 
+        log('method <= browser OK', command, result);
         resolve(result);
       });
     });

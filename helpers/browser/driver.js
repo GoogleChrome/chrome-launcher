@@ -138,12 +138,14 @@ class ChromeProtocol {
     }
 
     return new Promise((resolve, reject) => {
-      _log('info', 'method => browser', {method: command, params: params});
+      _log('http', 'method => browser', {method: command, params: params});
 
       this._chrome.send(command, params, (err, result) => {
         if (err) {
+          _log('error', 'method <= browser', {method: command, params: result});
           return reject(result);
         }
+        _log('http', 'method <= browser OK', {method: command, params: result});
         resolve(result);
       });
     });
