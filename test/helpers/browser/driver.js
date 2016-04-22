@@ -17,7 +17,7 @@
 
 'use strict';
 
-const Driver = require('../../../helpers/browser/driver.js');
+const Driver = require('../../../helpers/drivers/cri.js');
 const Element = require('../../../helpers/element.js');
 const assert = require('assert');
 

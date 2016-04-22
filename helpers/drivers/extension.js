@@ -16,13 +16,13 @@
  */
 'use strict';
 
-const ChromeProtocol = require('../browser/driver.js');
+const Driver = require('./driver.js');
 const log = (typeof process !== 'undefined' && 'version' in process) ?
     require('npmlog').log : console.log.bind(console);
 
 /* globals chrome */
 
-class ExtensionProtocol extends ChromeProtocol {
+class ExtensionDriver extends Driver {
 
   constructor() {
     super();
@@ -191,4 +191,4 @@ class ExtensionProtocol extends ChromeProtocol {
   }
 }
 
-module.exports = ExtensionProtocol;
+module.exports = ExtensionDriver;
