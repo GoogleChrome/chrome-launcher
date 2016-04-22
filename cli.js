@@ -41,6 +41,7 @@ const cli = meow(`
 
 const defaultUrl = 'https://operasoftware.github.io/pwa-list/';
 const url = cli.input[0] || defaultUrl;
+const outputPath = cli.flags.outputPath || 'stdout';
 
 if (semver.lt(process.version, '5.0.0')) {
   console.error('Lighthouse requires node version 5.0 or newer');
@@ -52,11 +53,10 @@ lighthouse({
   flags: cli.flags
 }).then(results => {
   const outputMode = cli.flags.output || 'pretty';
-  const outputPath = cli.flags.outputPath || 'stdout';
   return Printer.write(results, outputMode, outputPath);
 })
 .then(status => {
-  if (status) {
+  if (outputPath !== 'stdout') {
     log.info('printer', status);
   }
 })
