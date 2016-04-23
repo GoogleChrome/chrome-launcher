@@ -37,6 +37,7 @@
     "meow": "^3.7.0",
     "npmlog": "^2.0.3",
     "semver": "^5.1.0",
+    "speedline": "^0.1.2",
     "traceviewer": "^1.0.8"
   },
   "devDependencies": {
