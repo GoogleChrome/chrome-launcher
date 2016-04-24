@@ -28,6 +28,7 @@ const gathererClasses = [
   require('./gatherers/theme-color'),
   require('./gatherers/html'),
   require('./gatherers/manifest'),
+  require('./gatherers/accessibility'),
   require('./gatherers/offline')
 ];
 
@@ -47,7 +48,8 @@ const audits = [
   require('./audits/manifest/short-name'),
   require('./audits/manifest/short-name-length'),
   require('./audits/manifest/start-url'),
-  require('./audits/html/meta-theme-color')
+  require('./audits/html/meta-theme-color'),
+  require('./audits/accessibility/aria-valid-attr')
 ];
 
 const aggregators = [
@@ -57,7 +59,8 @@ const aggregators = [
   require('./aggregators/can-load-offline'),
   require('./aggregators/is-secure'),
   require('./aggregators/is-performant'),
-  require('./aggregators/is-sized-for-mobile-screen')
+  require('./aggregators/is-sized-for-mobile-screen'),
+  require('./aggregators/is-accessible')
 ];
 
 module.exports = function(driver, opts) {
