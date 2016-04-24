@@ -4,3 +4,7 @@ node_modules
 dist
 init.sh
 npm-debug.log
+artifacts.log
+clovis-trace.log
+network-dependency-graph.png
+

@@ -18,15 +18,8 @@
 
 class Auditor {
 
-  static _flattenArtifacts(artifacts) {
-    return artifacts.reduce(function(prev, curr) {
-      return Object.assign(prev, curr);
-    }, {});
-  }
-
   static audit(artifacts, audits) {
-    const flattenedArtifacts = Auditor._flattenArtifacts(artifacts);
-    return Promise.all(audits.map(audit => audit.audit(flattenedArtifacts)));
+    return Promise.all(audits.map(audit => audit.audit(artifacts)));
   }
 }
 

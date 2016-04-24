@@ -60,22 +60,27 @@ function setupDriver(driver, gatherers, options) {
 
 // Enable tracing and network record collection.
 function beginPassiveCollection(driver) {
-  return driver.beginTrace().then(_ => {
-    return driver.beginNetworkCollect();
-  });
+  return driver.beginTrace()
+    .then(_ => driver.beginNetworkCollect())
+    .then(_ => driver.beginFrameLoadCollect());
 }
 
 function endPassiveCollection(options, tracingData) {
   const driver = options.driver;
   const saveTrace = options.flags.saveTrace;
-  return driver.endNetworkCollect().then(networkRecords => {
-    tracingData.networkRecords = networkRecords;
+  return driver.endNetworkCollect().then(networkData => {
+    tracingData.networkRecords = networkData.networkRecords;
+    tracingData.rawNetworkEvents = networkData.rawNetworkEvents;
   }).then(_ => {
     return driver.endTrace();
   }).then(traceContents => {
     tracingData.traceContents = traceContents;
   }).then(_ => {
-    return saveTrace && saveAssets(tracingData, options.url);
+    return driver.endFrameLoadCollect();
+  }).then(frameLoadEvents => {
+    tracingData.frameLoadEvents = frameLoadEvents;
+  }).then(_ => {
+    return saveTrace && this.saveAssets(tracingData, options.url);
   });
 }
 
@@ -85,6 +90,27 @@ function phaseRunner(gatherers) {
       return chain.then(_ => gatherFun(gatherer));
     }, Promise.resolve());
   };
+}
+
+function flattenArtifacts(artifacts) {
+  return artifacts.reduce(function(prev, curr) {
+    return Object.assign(prev, curr);
+  }, {});
+}
+
+function saveArtifacts(artifacts) {
+  const artifactsFilename = 'artifacts.log';
+  fs.writeFileSync(artifactsFilename, JSON.stringify(artifacts));
+  log('info', 'artifacts file saved to disk', artifactsFilename);
+}
+
+function saveAssets(tracingData, url) {
+  const date = new Date();
+  const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
+  const filename = (hostname + '_' + date.toISOString() + '.trace.json')
+      .replace(/[\/\?<>\\:\*\|":]/g, '-');
+  fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
+  log('info', 'trace file saved to disk', filename);
 }
 
 function run(gatherers, options) {
@@ -121,19 +147,20 @@ function run(gatherers, options) {
     .then(_ => runPhase(gatherer => gatherer.tearDown(options)))
     .then(_ => {
       // Collate all the gatherer results.
-      return gatherers.map(g => g.artifact).concat(
+      const unflattenedArtifacts = gatherers.map(g => g.artifact).concat(
           {networkRecords: tracingData.networkRecords},
-          {traceContents: tracingData.traceContents});
-    });
-}
+          {rawNetworkEvents: tracingData.rawNetworkEvents},
+          {traceContents: tracingData.traceContents},
+          {frameLoadEvents: tracingData.frameLoadEvents});
 
-function saveAssets(tracingData, url) {
-  const date = new Date();
-  const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
-  const filename = (hostname + '_' + date.toISOString() + '.trace.json')
-      .replace(/[\/\?<>\\:\*\|":]/g, '-');
-  fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
-  log('info', 'trace file saved to disk', filename);
+      const artifacts = flattenArtifacts(unflattenedArtifacts);
+
+      if (options.flags.saveArtifacts) {
+        saveArtifacts(artifacts);
+      }
+
+      return artifacts;
+    });
 }
 
 module.exports = {
