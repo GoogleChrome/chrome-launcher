@@ -13,7 +13,7 @@ before_script:
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
-  - ./test/download-chrome.sh
+  - ./scripts/download-chrome.sh
   - start-stop-daemon --start --background --exec $(pwd)/scripts/launch-chrome.sh -- --disable-setuid-sandbox
   - sleep 5
 script:

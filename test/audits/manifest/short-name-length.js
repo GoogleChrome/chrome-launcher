@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/manifest/short-name-length.js');
+const Audit = require('../../../src/audits/manifest/short-name-length.js');
 const assert = require('assert');
-const manifestParser = require('../../../lib/manifest-parser');
+const manifestParser = require('../../../src/lib/manifest-parser');
 
 /* global describe, it*/
 

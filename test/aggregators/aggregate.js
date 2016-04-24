@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Aggregate = require('../../aggregators/aggregate');
+const Aggregate = require('../../src/aggregators/aggregate');
 const assert = require('assert');
 
 /* global describe, it*/

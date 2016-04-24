@@ -18,7 +18,7 @@ const walk = require('walk');
 const path = require('path');
 
 const walkTree = new Promise((resolve, reject) => {
-  const fullFilePath = path.join(__dirname, '../../aggregators/');
+  const fullFilePath = path.join(__dirname, '../../src/aggregators/');
   const walker = walk.walk(fullFilePath);
   const aggregators = [];
 

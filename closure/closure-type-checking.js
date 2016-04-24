@@ -22,7 +22,7 @@ const gulp = require('gulp');
 const gutil = require('gulp-util');
 const replace = require('gulp-replace');
 const devtoolsRequire =
-    'const DevtoolsTimelineModel = require(\'../../lib/traces/devtools-timeline-model\');';
+    'const DevtoolsTimelineModel = require(\'../lib/traces/devtools-timeline-model\');';
 
 /* eslint-disable camelcase */
 gulp.task('js-compile', function() {
@@ -32,7 +32,7 @@ gulp.task('js-compile', function() {
     'audits/**/*.js',
     'lib/icons.js',
     'aggregators/**/*.js',
-    'metrics/performance/first-meaningful-paint.js'
+    'metrics/first-meaningful-paint.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.
     .pipe(replace(devtoolsRequire, ''))

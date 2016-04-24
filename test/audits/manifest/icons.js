@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-const Audit144 = require('../../../audits/manifest/icons-min-144.js');
-const Audit192 = require('../../../audits/manifest/icons-min-192.js');
+const Audit144 = require('../../../src/audits/manifest/icons-min-144.js');
+const Audit192 = require('../../../src/audits/manifest/icons-min-192.js');
 const assert = require('assert');
-const manifestParser = require('../../../lib/manifest-parser');
+const manifestParser = require('../../../src/lib/manifest-parser');
 
 /* global describe, it*/
 
