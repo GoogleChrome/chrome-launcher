@@ -16,17 +16,12 @@
  */
 'use strict';
 
-const chromeRemoteInterface = require('chrome-remote-interface');
 const FrameLoadRecorder = require('../frame-load-recorder');
 const NetworkRecorder = require('../network-recorder');
 const emulation = require('../emulation');
 const Element = require('../element.js');
-const port = process.env.PORT || 9222;
 
-const log = (typeof process !== 'undefined' && 'version' in process) ?
-    require('npmlog').log : console.log.bind(console);
-
-class ChromeProtocol {
+class DriverBase {
 
   constructor() {
     this._url = null;
@@ -62,94 +57,33 @@ class ChromeProtocol {
    * @return {!Promise<null>}
    */
   connect() {
-    return new Promise((resolve, reject) => {
-      if (this._chrome) {
-        return resolve();
-      }
-
-      // Make a new tab, stopping Chrome from accidentally giving CRI an "Other" tab.
-      // Also disable the lint check because CRI uses "New" for the function name.
-      /* eslint-disable new-cap */
-      chromeRemoteInterface.New((err, tab) => {
-        if (err) {
-          return reject(err);
-        }
-
-        chromeRemoteInterface({port: port, chooseTab: tab}, chrome => {
-          this._chrome = chrome;
-          this.beginLogging();
-          resolve();
-        }).on('error', e => reject(e));
-      });
-      /* eslint-enable new-cap */
-    });
+    return Promise.reject(new Error('Not implemented'));
   }
 
   disconnect() {
-    if (this._chrome === null) {
-      return;
-    }
-
-    this._chrome.close();
-    this._chrome = null;
-    this.url = null;
-  }
-
-  beginLogging() {
-    // log events received
-    this._chrome.on('event', req => _log('verbose', '<=', req));
+    return Promise.reject(new Error('Not implemented'));
   }
 
   /**
    * Bind listeners for protocol events
-   * @param {!string} eventName
-   * @param {function(...)} cb
    */
-  on(eventName, cb) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to listen to events.');
-    }
-    // log event listeners being bound
-    _log('info', 'listen for event =>', {method: eventName});
-    this._chrome.on(eventName, cb);
+  on() {
+    return Promise.reject(new Error('Not implemented'));
   }
 
   /**
    * Unbind event listeners
-   * @param {!string} eventName
-   * @param {function(...)} cb
    */
-  off(eventName, cb) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to remove an event listener.');
-    }
-
-    this._chrome.removeListener(eventName, cb);
+  off() {
+    return Promise.reject(new Error('Not implemented'));
   }
 
   /**
    * Call protocol methods
-   * @param {!string} command
-   * @param {!Object} params
    * @return {!Promise}
    */
-  sendCommand(command, params) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to send a command.');
-    }
-
-    return new Promise((resolve, reject) => {
-      _log('http', 'method => browser', {method: command, params: params});
-
-      this._chrome.send(command, params, (err, result) => {
-        if (err) {
-          _log('error', 'method <= browser', {method: command, params: result});
-          return reject(result);
-        }
-        _log('http', 'method <= browser OK', {method: command, params: result});
-        resolve(result);
-      });
-    });
+  sendCommand() {
+    return Promise.reject(new Error('Not implemented'));
   }
 
   gotoURL(url) {
@@ -338,11 +272,4 @@ class ChromeProtocol {
   }
 }
 
-function _log(level, prefix, data) {
-  const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
-  const maxLength = columns - data.method.length - prefix.length - 7;
-  const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
-  log(level, prefix, data.method, snippet);
-}
-
-module.exports = ChromeProtocol;
+module.exports = DriverBase;

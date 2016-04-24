@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const ChromeProtocol = require('./helpers/browser/driver');
+const ChromeProtocol = require('./helpers/drivers/cri.js');
 const driver = new ChromeProtocol();
 const runner = require('./runner');
 

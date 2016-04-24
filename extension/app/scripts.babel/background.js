@@ -17,7 +17,7 @@
 
 'use strict';
 
-const ExtensionProtocol = require('../../../helpers/extension/driver.js');
+const ExtensionProtocol = require('../../../helpers/drivers/extension.js');
 const runner = require('../../../runner');
 const NO_SCORE_PROVIDED = '-1';
 
