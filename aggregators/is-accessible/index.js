@@ -35,6 +35,14 @@ class IsAccessible extends Aggregate {
 
   /**
    * @override
+   * @return {string}
+   */
+  static get shortName() {
+    return 'Accessibility';
+  }
+
+  /**
+   * @override
    * @return {!AggregationCriteria}
    */
   static get criteria() {
