@@ -28,19 +28,21 @@ const cli = meow(`
     lighthouse [url]
 
   Options
-    --help         Show this help
-    --version      Current version of package
-    --verbose      Displays verbose logging
-    --quiet        Displays no progress or debug logs
-    --mobile       Emulates a Nexus 5X (default=true)
-    --load-page    Loads the page (default=true)
-    --save-trace   Save the trace contents to disk
-    --output       How to output the page(default=pretty)
-    --output-path  The location to output the response(default=stdout)
+    --help            Show this help
+    --version         Current version of package
+    --verbose         Displays verbose logging
+    --quiet           Displays no progress or debug logs
+    --mobile          Emulates a Nexus 5X (default=true)
+    --load-page       Loads the page (default=true)
+    --save-trace      Save the trace contents to disk
+    --save-artifacts  Generate network dependency graph
+    --output          How to output the page(default=pretty)
+    --output-path     The location to output the response(default=stdout)
 `);
 
 const defaultUrl = 'https://operasoftware.github.io/pwa-list/';
 const url = cli.input[0] || defaultUrl;
+const outputPath = cli.flags.outputPath || 'stdout';
 
 if (semver.lt(process.version, '5.0.0')) {
   console.error('Lighthouse requires node version 5.0 or newer');
@@ -52,11 +54,10 @@ lighthouse({
   flags: cli.flags
 }).then(results => {
   const outputMode = cli.flags.output || 'pretty';
-  const outputPath = cli.flags.outputPath || 'stdout';
   return Printer.write(results, outputMode, outputPath);
 })
 .then(status => {
-  if (status) {
+  if (outputPath !== 'stdout') {
     log.info('printer', status);
   }
 })

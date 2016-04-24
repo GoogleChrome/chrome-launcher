@@ -86,7 +86,7 @@ function createOutput(results, outputMode) {
   }
 
   // Pretty printed.
-  let output = '';
+  let output = `Lighthouse results: ${results.url}\n\n`;
   results.aggregations.forEach(item => {
     let score = (item.score.overall * 100).toFixed(0);
     output += `${item.name}: ${score}%\n`;

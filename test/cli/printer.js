@@ -72,7 +72,7 @@ describe('Printer', () => {
 
     // Now do a second pass where the file is written out.
     return Printer.write(sampleResults, mode, path).then(_ => {
-      const fileContents = fs.readFileSync(path);
+      const fileContents = fs.readFileSync(path, 'utf8');
       fs.unlinkSync(path);
       assert.equal(fileContents, htmlOutput);
     });

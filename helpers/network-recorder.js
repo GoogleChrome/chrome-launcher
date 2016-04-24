@@ -21,8 +21,9 @@ const NetworkManager = require('./web-inspector').NetworkManager;
 const REQUEST_FINISHED = NetworkManager.EventTypes.RequestFinished;
 
 class NetworkRecorder {
-  constructor(recordArray) {
+  constructor(recordArray, rawEventsArray) {
     this._records = recordArray;
+    this._rawEvents = rawEventsArray;
 
     this.networkManager = NetworkManager.createWithFakeTarget();
 
@@ -43,6 +44,7 @@ class NetworkRecorder {
   // the parameter naming used in NetworkManager. These are noted below.
 
   onRequestWillBeSent(data) {
+    this._rawEvents.push({method: 'Network.requestWillBeSent', params: data});
     // NOTE: data.timestamp -> time, data.type -> resourceType
     this.networkManager._dispatcher.requestWillBeSent(data.requestId,
         data.frameId, data.loaderId, data.documentURL, data.request,
@@ -51,28 +53,33 @@ class NetworkRecorder {
   }
 
   onRequestServedFromCache(data) {
+    this._rawEvents.push({method: 'Network.requestServedFromCache', params: data});
     this.networkManager._dispatcher.requestServedFromCache(data.requestId);
   }
 
   onResponseReceived(data) {
+    this._rawEvents.push({method: 'Network.responseReceived', params: data});
     // NOTE: data.timestamp -> time, data.type -> resourceType
     this.networkManager._dispatcher.responseReceived(data.requestId,
         data.frameId, data.loaderId, data.timestamp, data.type, data.response);
   }
 
   onDataReceived(data) {
+    this._rawEvents.push({method: 'Network.dataReceived', params: data});
     // NOTE: data.timestamp -> time
     this.networkManager._dispatcher.dataReceived(data.requestId, data.timestamp,
         data.dataLength, data.encodedDataLength);
   }
 
   onLoadingFinished(data) {
+    this._rawEvents.push({method: 'Network.loadingFinished', params: data});
     // NOTE: data.timestamp -> finishTime
     this.networkManager._dispatcher.loadingFinished(data.requestId,
         data.timestamp, data.encodedDataLength);
   }
 
   onLoadingFailed(data) {
+    this._rawEvents.push({method: 'Network.loadingFailed', params: data});
     // NOTE: data.timestamp -> time, data.type -> resourceType,
     // data.errorText -> localizedDescription
     this.networkManager._dispatcher.loadingFailed(data.requestId,

@@ -12,7 +12,7 @@ _status: early. sorta working_
 
 ## Install
 ```sh
-npm install -g lighthouse
+npm install -g GoogleChrome/lighthouse
 ```
 
 ## Run

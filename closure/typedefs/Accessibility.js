@@ -24,37 +24,22 @@
  * @struct
  * @record
  */
-function Artifacts() {}
+function AccessibilityRule() {}
 
 /** @type {string} */
-Artifacts.prototype.html;
+AccessibilityRule.prototype.id;
 
-/** @type {boolean} */
-Artifacts.prototype.https;
+/** @type {string} */
+AccessibilityRule.prototype.help;
 
 /** @type {!Array<!Object>} */
-Artifacts.prototype.networkRecords;
+AccessibilityRule.prototype.nodes;
 
-/** @type {?} */
-Artifacts.prototype.traceContents;
+/**
+ * @struct
+ * @record
+ */
+function Accessibility() {}
 
-/** @type {!ManifestNode<(!Manifest|undefined)>} */
-Artifacts.prototype.manifest;
-
-/** @type {!ServiceWorkerVersions} */
-Artifacts.prototype.serviceWorkers;
-
-/** @type {?string} */
-Artifacts.prototype.themeColorMeta;
-
-/** @type {string} */
-Artifacts.prototype.url;
-
-/** @type {?string} */
-Artifacts.prototype.viewport;
-
-/** @type {number} */
-Artifacts.prototype.responseCode;
-
-/** @type {!Accessibility} */
-Artifacts.prototype.accessibility;
+/** @type {!Array<!AccessibilityRule>} */
+Accessibility.prototype.violations;

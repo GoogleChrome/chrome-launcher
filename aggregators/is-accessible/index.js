@@ -14,13 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-class Auditor {
+const Aggregate = require('../aggregate');
 
-  static audit(artifacts, audits) {
-    return Promise.all(audits.map(audit => audit.audit(artifacts)));
+/** @type {string} */
+const ARIAValidAttr =
+    require('../../audits/accessibility/aria-valid-attr').name;
+
+class IsAccessible extends Aggregate {
+
+  /**
+   * @override
+   * @return {string}
+   */
+  static get name() {
+    return 'Has No Accessibility Violations';
+  }
+
+  /**
+   * @override
+   * @return {!AggregationCriteria}
+   */
+  static get criteria() {
+    const criteria = {};
+    criteria[ARIAValidAttr] = {
+      value: 100,
+      weight: 1
+    };
+
+    return criteria;
   }
 }
 
-module.exports = Auditor;
+module.exports = IsAccessible;
