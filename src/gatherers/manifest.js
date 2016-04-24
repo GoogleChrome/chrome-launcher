@@ -17,7 +17,7 @@
 'use strict';
 
 const Gather = require('./gather');
-const manifestParser = require('../helpers/manifest-parser');
+const manifestParser = require('../lib/manifest-parser');
 
 /* global document, XMLHttpRequest */
 

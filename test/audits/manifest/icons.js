@@ -18,7 +18,7 @@
 const Audit144 = require('../../../audits/manifest/icons-min-144.js');
 const Audit192 = require('../../../audits/manifest/icons-min-192.js');
 const assert = require('assert');
-const manifestParser = require('../../../helpers/manifest-parser');
+const manifestParser = require('../../../lib/manifest-parser');
 
 /* global describe, it*/
 

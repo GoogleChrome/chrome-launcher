@@ -17,7 +17,7 @@
 
 /* global describe, it */
 
-var manifestParser = require('../helpers/manifest-parser');
+var manifestParser = require('../lib/manifest-parser');
 var assert = require('assert');
 const manifestStub = require('./audits/manifest/manifest.json');
 

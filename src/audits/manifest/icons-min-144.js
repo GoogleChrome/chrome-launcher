@@ -18,7 +18,7 @@
 'use strict';
 
 const Audit = require('../audit');
-const icons = require('../../helpers/icons');
+const icons = require('../../lib/icons');
 
 class ManifestIconsMin144 extends Audit {
   /**

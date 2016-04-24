@@ -16,7 +16,7 @@
 const Audit = require('../../../audits/manifest/name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('./manifest.json'));
-const manifestParser = require('../../../helpers/manifest-parser');
+const manifestParser = require('../../../lib/manifest-parser');
 const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/

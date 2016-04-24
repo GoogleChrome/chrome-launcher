@@ -15,7 +15,7 @@
  */
 const Audit = require('../../../audits/manifest/short-name-length.js');
 const assert = require('assert');
-const manifestParser = require('../../../helpers/manifest-parser');
+const manifestParser = require('../../../lib/manifest-parser');
 
 /* global describe, it*/
 

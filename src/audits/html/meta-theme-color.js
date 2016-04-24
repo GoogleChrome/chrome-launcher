@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const validColor = require('../../helpers/web-inspector').Color.parse;
+const validColor = require('../../lib/web-inspector').Color.parse;
 const Audit = require('../audit');
 
 class ThemeColor extends Audit {

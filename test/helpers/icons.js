@@ -17,9 +17,9 @@
 
 'use strict';
 
-const icons = require('../../helpers/icons');
+const icons = require('../../lib/icons');
 const assert = require('assert');
-const manifestParser = require('../../helpers/manifest-parser');
+const manifestParser = require('../../lib/manifest-parser');
 
 /* global describe, it */
 describe('Icons helper', () => {

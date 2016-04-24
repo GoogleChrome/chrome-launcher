@@ -118,7 +118,7 @@ gulp.task('watch', ['lint', 'babel', 'html'], () => {
   gulp.watch([
     '*.js',
     'app/scripts.babel/**/*.js',
-    '../helpers/**/*.js',
+    '../lib/**/*.js',
     '../audits/**/*.js',
     '../aggregators/**/*.js',
     '../gatherers/**/*.js',

@@ -17,7 +17,7 @@
 
 'use strict';
 
-const ExtensionProtocol = require('../../../src/helpers/drivers/extension.js');
+const ExtensionProtocol = require('../../../src/lib/drivers/extension.js');
 const runner = require('../../../src/lighthouse');
 const NO_SCORE_PROVIDED = '-1';
 
