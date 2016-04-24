@@ -17,8 +17,8 @@
 
 'use strict';
 
-const Driver = require('../../../helpers/drivers/cri.js');
-const Element = require('../../../helpers/element.js');
+const Driver = require('../../../src/lib/drivers/cri.js');
+const Element = require('../../../src/lib/element.js');
 const assert = require('assert');
 
 let DriverStub = new Driver();

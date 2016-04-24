@@ -14,31 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-const validColor = require('../../helpers/web-inspector').Color.parse;
 const Audit = require('../audit');
+const icons = require('../../lib/icons');
 
-class ThemeColor extends Audit {
+class ManifestIconsMin192 extends Audit {
   /**
    * @override
    */
   static get tags() {
-    return ['HTML'];
+    return ['Manifest'];
   }
 
   /**
    * @override
    */
   static get name() {
-    return 'theme-color-meta';
+    return 'manifest-icons-min-192';
   }
 
   /**
    * @override
    */
   static get description() {
-    return 'HTML has a theme-color <meta>';
+    return 'Manifest contains icons at least 192px';
   }
 
   /**
@@ -46,19 +47,20 @@ class ThemeColor extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const themeColorMeta = artifacts.themeColorMeta;
-    if (!themeColorMeta) {
-      return ThemeColor.generateAuditResult(false, undefined,
-          'No valid theme-color meta tag found.');
+    const manifest = artifacts.manifest.value;
+
+    if (icons.doExist(manifest) === false) {
+      return ManifestIconsMin192.generateAuditResult(false, undefined,
+          'WARNING: No icons found in the manifest');
     }
 
-    if (!validColor(themeColorMeta)) {
-      return ThemeColor.generateAuditResult(false, themeColorMeta,
-          'The theme-color meta tag did not contain a valid CSS color.');
-    }
+    const matchingIcons = icons.sizeAtLeast(192, /** @type {!Manifest} */ (manifest));
 
-    return ThemeColor.generateAuditResult(true, themeColorMeta);
+    const foundSizesDebug = matchingIcons.length ?
+        `Found icons of sizes: ${matchingIcons}` : undefined;
+    return ManifestIconsMin192.generateAuditResult(!!matchingIcons.length, undefined,
+        foundSizesDebug);
   }
 }
 
-module.exports = ThemeColor;
+module.exports = ManifestIconsMin192;

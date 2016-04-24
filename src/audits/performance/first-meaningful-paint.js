@@ -17,7 +17,7 @@
 
 'use strict';
 
-const FMPMetric = require('../../metrics/performance/first-meaningful-paint');
+const FMPMetric = require('../../metrics/first-meaningful-paint');
 const Audit = require('../audit');
 
 class FirstMeaningfulPaint extends Audit {

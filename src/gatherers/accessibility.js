@@ -21,7 +21,7 @@
 const Gather = require('./gather');
 const fs = require('fs');
 const path = require('path');
-const axe = fs.readFileSync(path.join(__dirname, '../node_modules/axe-core/axe.min.js'));
+const axe = fs.readFileSync(path.join(__dirname, '../../node_modules/axe-core/axe.min.js'));
 
 function runA11yChecks() {
   axe.a11yCheck(document, function(results) {

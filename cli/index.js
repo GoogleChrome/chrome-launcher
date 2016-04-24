@@ -19,10 +19,10 @@
 'use strict';
 
 const meow = require('meow');
-const lighthouse = require('./');
+const lighthouse = require('../');
 const log = require('npmlog');
 const semver = require('semver');
-const Printer = require('./cli/printer');
+const Printer = require('./printer');
 const cli = meow(`
   Usage
     lighthouse [url]

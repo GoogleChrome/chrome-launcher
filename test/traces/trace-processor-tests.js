@@ -4,7 +4,7 @@
 
 var fs = require('fs');
 var assert = require('assert');
-var traceProcessor = require('../../helpers/traces/processor');
+var traceProcessor = require('../../src/lib/traces/processor');
 
 describe('Trace Processor', function() {
   it('throws if no processes are found', function() {

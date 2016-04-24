@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/performance/first-meaningful-paint.js');
+const Audit = require('../../../src/audits/performance/first-meaningful-paint.js');
 const assert = require('assert');
 
 /* global describe, it*/

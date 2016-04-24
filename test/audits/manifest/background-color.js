@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../audits/manifest/background-color.js');
+const Audit = require('../../../src/audits/manifest/background-color.js');
 const assert = require('assert');
 
 /* global describe, it*/
