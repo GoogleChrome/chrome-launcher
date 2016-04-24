@@ -17,7 +17,7 @@
 'use strict';
 
 const Auditor = require('./auditor');
-const GatherScheduler = require('./gather-scheduler');
+const Scheduler = require('./scheduler');
 const Aggregator = require('./aggregator');
 
 const gathererClasses = [
@@ -76,7 +76,7 @@ module.exports = function(driver, opts) {
 
   const gatherers = gathererClasses.map(G => new G());
 
-  return GatherScheduler
+  return Scheduler
       .run(gatherers, Object.assign({}, opts, {driver}))
       .then(artifacts => Auditor.audit(artifacts, audits))
       .then(results => Aggregator.aggregate(aggregators, results))

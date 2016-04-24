@@ -17,8 +17,8 @@
 
 'use strict';
 
-const ExtensionProtocol = require('../../../helpers/drivers/extension.js');
-const runner = require('../../../runner');
+const ExtensionProtocol = require('../../../src/helpers/drivers/extension.js');
+const runner = require('../../../src/lighthouse');
 const NO_SCORE_PROVIDED = '-1';
 
 window.createPageAndPopulate = function(results) {

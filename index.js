@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const ChromeProtocol = require('./helpers/drivers/cri.js');
+const ChromeProtocol = require('./src/helpers/drivers/cri.js');
 const driver = new ChromeProtocol();
-const runner = require('./runner');
+const runner = require('./src/lighthouse');
 
 module.exports = function(opts) {
   return runner(driver, opts);
