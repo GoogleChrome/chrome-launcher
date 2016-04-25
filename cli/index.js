@@ -19,7 +19,7 @@
 'use strict';
 
 const meow = require('meow');
-const log = require('npmlog');
+const log = require('../src/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 

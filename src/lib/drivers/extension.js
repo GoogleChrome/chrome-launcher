@@ -17,8 +17,7 @@
 'use strict';
 
 const Driver = require('./driver.js');
-const log = (typeof process !== 'undefined' && 'version' in process) ?
-    require('npmlog').log : console.log.bind(console);
+const log = require('../log.js');
 
 /* globals chrome */
 

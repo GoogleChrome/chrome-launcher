@@ -5,7 +5,7 @@ const del = require('del');
 const gutil = require('gulp-util');
 const runSequence = require('run-sequence');
 const gulp = require('gulp');
-const browserify = require('gulp-browserify');
+const browserify = require('browserify');
 const chromeManifest = require('gulp-chrome-manifest');
 const debug = require('gulp-debug');
 const eslint = require('gulp-eslint');
@@ -13,6 +13,7 @@ const gulpIf = require('gulp-if');
 const livereload = require('gulp-livereload');
 const cleanCss = require('gulp-clean-css');
 const minifyHtml = require('gulp-minify-html');
+const tap = require('gulp-tap');
 const useref = require('gulp-useref');
 const zip = require('gulp-zip');
 
@@ -75,13 +76,15 @@ gulp.task('browserify', () => {
     'app/src/popup.js',
     'app/src/chromereload.js',
     'app/src/lighthouse-background.js',
-    'app/src/report.js'])
-    .pipe(browserify({
-      ignore: [
-        'npmlog',
-        'chrome-remote-interface'
-      ],
-      transform: ['brfs']
+    'app/src/report.js'
+  ], {read: false})
+    .pipe(tap(file => {
+      file.contents = browserify(file.path, {
+        transform: ['brfs']
+      })
+      .ignore('npmlog')
+      .ignore('chrome-remote-interface')
+      .bundle();
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));

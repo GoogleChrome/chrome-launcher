@@ -20,8 +20,7 @@
 const fs = require('fs');
 const Report = require('../report/report');
 
-const log = (typeof process !== 'undefined' && 'version' in process) ?
-    require('npmlog').log : console.log.bind(console);
+const log = require('../src/lib/log.js');
 
 /**
  * An enumeration of acceptable output modes:
