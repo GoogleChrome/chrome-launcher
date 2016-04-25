@@ -86,7 +86,8 @@ class DriverBase {
     return Promise.reject(new Error('Not implemented'));
   }
 
-  gotoURL(url) {
+  gotoURL(url, options) {
+    const waitForLoad = (options && options.waitForLoad) || false;
     return this.sendCommand('Page.enable')
     .then(_ => this.sendCommand('Page.getNavigationHistory'))
     .then(navHistory => {
@@ -107,6 +108,10 @@ class DriverBase {
     }).then(_ => {
       return new Promise((resolve, reject) => {
         this.url = url;
+
+        if (!waitForLoad) {
+          return resolve();
+        }
 
         this.on('Page.loadEventFired', response => {
           setTimeout(_ => {

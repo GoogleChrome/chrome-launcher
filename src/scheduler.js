@@ -26,7 +26,7 @@ function loadPage(driver, gatherers, options) {
   const url = options.url;
 
   if (loadPage) {
-    return driver.gotoURL(url);
+    return driver.gotoURL(url, {waitForLoad: true});
   }
 
   return Promise.resolve();
@@ -36,9 +36,7 @@ function reloadPage(driver, options) {
   // Such a hack... since a Page.reload command does not let
   // a service worker take over we have to trick the browser into going away
   // and then coming back.
-  return driver.sendCommand('Page.navigate', {url: 'about:blank'}).then(_ => {
-    return driver.gotoURL(options.url);
-  });
+  return driver.gotoURL('about:blank').then(_ => driver.gotoURL(options.url, {waitForLoad: true}));
 }
 
 function setupDriver(driver, gatherers, options) {
