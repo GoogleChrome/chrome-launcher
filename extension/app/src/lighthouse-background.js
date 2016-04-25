@@ -18,7 +18,7 @@
 'use strict';
 
 const ExtensionProtocol = require('../../../src/lib/drivers/extension.js');
-const runner = require('../../../src/lighthouse');
+const lighthouse = require('../../../src/lighthouse');
 const NO_SCORE_PROVIDED = '-1';
 
 window.createPageAndPopulate = function(results) {
@@ -39,7 +39,7 @@ window.runAudits = function(options) {
   return driver.getCurrentTabURL()
       .then(url => {
         // Add in the URL to the options.
-        return runner(driver, Object.assign({}, options, {url}));
+        return lighthouse(driver, Object.assign({}, options, {url}));
       });
 };
 

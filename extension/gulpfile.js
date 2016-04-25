@@ -3,6 +3,7 @@
 'use strict';
 const gulp = require('gulp');
 const del = require('del');
+const gutil = require('gulp-util');
 const runSequence = require('run-sequence');
 
 const gulpLoadPlugins = require('gulp-load-plugins');
@@ -69,7 +70,7 @@ gulp.task('chromeManifest', () => {
   var manifestOpts = {
     buildnumber: true,
     background: {
-      target: 'scripts/background.js',
+      target: 'scripts/lighthouse-background.js',
       exclude: [
         'scripts/chromereload.js'
       ]
@@ -83,9 +84,9 @@ gulp.task('chromeManifest', () => {
 
 gulp.task('browserify', () => {
   return gulp.src([
-    'app/src/app.js',
+    'app/src/popup.js',
     'app/src/chromereload.js',
-    'app/src/background.js',
+    'app/src/lighthouse-background.js',
     'app/src/report.js'])
     .pipe($.browserify({
       ignore: [
@@ -98,7 +99,11 @@ gulp.task('browserify', () => {
     .pipe(gulp.dest('dist/scripts'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
+gulp.task('clean', () => {
+  return del(['.tmp', 'dist', 'app/scripts']).then(paths =>
+    paths.forEach(path => gutil.log('deleted:', gutil.colors.blue(path)))
+  );
+});
 
 gulp.task('watch', ['lint', 'browserify', 'html'], () => {
   $.livereload.listen();

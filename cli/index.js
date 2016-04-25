@@ -19,10 +19,19 @@
 'use strict';
 
 const meow = require('meow');
-const lighthouse = require('../');
 const log = require('npmlog');
 const semver = require('semver');
 const Printer = require('./printer');
+
+const ChromeProtocol = require('../src/lib/drivers/cri.js');
+const lighthouse = require('../src/lighthouse');
+
+// node 5.x required due to use of ES2015 features
+if (semver.lt(process.version, '5.0.0')) {
+  console.error('Lighthouse requires node version 5.0 or newer');
+  process.exit(1);
+}
+
 const cli = meow(`
   Usage
     lighthouse [url]
@@ -40,39 +49,34 @@ const cli = meow(`
     --output-path     The location to output the response(default=stdout)
 `);
 
-const defaultUrl = 'https://operasoftware.github.io/pwa-list/';
-const url = cli.input[0] || defaultUrl;
+const url = cli.input[0] || 'https://pwa.rocks/';
+const outputMode = cli.flags.output || 'pretty';
 const outputPath = cli.flags.outputPath || 'stdout';
+const flags = cli.flags;
 
-if (semver.lt(process.version, '5.0.0')) {
-  console.error('Lighthouse requires node version 5.0 or newer');
-  process.exit(1);
-}
+const driver = new ChromeProtocol();
 
-lighthouse({
-  url: url,
-  flags: cli.flags
-}).then(results => {
-  const outputMode = cli.flags.output || 'pretty';
-  return Printer.write(results, outputMode, outputPath);
-})
-.then(status => {
-  if (outputPath !== 'stdout') {
-    log.info('printer', status);
-  }
-})
-.catch(err => {
-  if (err.code === 'ECONNREFUSED') {
-    console.error('Unable to connect to Chrome. Did you run ./launch-chrome.sh?');
-  } else {
-    console.error('Runtime error encountered:', err);
-    console.error(err.stack);
-  }
-  process.exit(1);
-});
-
+// set logging preferences
 if (cli.flags.verbose) {
   log.level = 'verbose';
 } else if (cli.flags.quiet) {
   log.level = 'error';
 }
+
+// kick off a lighthouse run
+lighthouse(driver, {url, flags})
+  .then(results => {
+    return Printer.write(results, outputMode, outputPath);
+  })
+  .then(status => {
+    outputPath !== 'stdout' && log.info('printer', status);
+  })
+  .catch(err => {
+    if (err.code === 'ECONNREFUSED') {
+      console.error('Unable to connect to Chrome. Did you run ./launch-chrome.sh?');
+    } else {
+      console.error('Runtime error encountered:', err);
+      console.error(err.stack);
+    }
+    process.exit(1);
+  });

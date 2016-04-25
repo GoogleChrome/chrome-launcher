@@ -12,7 +12,7 @@
   "background": {
     "scripts": [
       "scripts/chromereload.js",
-      "scripts/background.js"
+      "scripts/lighthouse-background.js"
     ]
   },
   "permissions": [
