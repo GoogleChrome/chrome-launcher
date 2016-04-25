@@ -48,7 +48,7 @@ class IsAccessible extends Aggregate {
   static get criteria() {
     const criteria = {};
     criteria[ARIAValidAttr] = {
-      value: 100,
+      value: true,
       weight: 1
     };
 

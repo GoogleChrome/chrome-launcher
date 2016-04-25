@@ -16,16 +16,16 @@
  */
 'use strict';
 
-/* global document, window, __dirname */
+/* global document, window */
 
 const Gather = require('./gather');
 const fs = require('fs');
-const path = require('path');
-const axe = fs.readFileSync(path.join(__dirname, '../../node_modules/axe-core/axe.min.js'));
+const axe = fs.readFileSync(
+  require.resolve('axe-core/axe.min.js')
+);
 
 function runA11yChecks() {
   axe.a11yCheck(document, function(results) {
-    console.log('Checking axe');
     window.__axeResults = results;
   });
 }
@@ -42,7 +42,7 @@ class Accessibility extends Gather {
 
   static _errorAccessibility(errorString) {
     return {
-      manifest: {
+      accessibility: {
         raw: undefined,
         value: undefined,
         debugString: errorString
@@ -50,41 +50,41 @@ class Accessibility extends Gather {
     };
   }
 
+  fetchResults(driver, count) {
+    if (count === 0) {
+      return Promise.resolve({
+        result: {
+          value: null
+        }
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      setTimeout(_ => {
+        driver.sendCommand('Runtime.evaluate', {
+          expression: `(${fetchA11yResults.toString()}())`,
+          returnByValue: true
+        }).then(response => {
+          // If the axe results aren't in try again.
+          if (response.result.value === null) {
+            return resolve(this.fetchResults(driver, count - 1));
+          }
+
+          resolve(response);
+        });
+      }, 100);
+    });
+  }
+
   afterPageLoad(options) {
     const driver = options.driver;
-
-    const fetchResults = count => {
-      if (count === 0) {
-        return Promise.resolve({
-          result: {
-            value: null
-          }
-        });
-      }
-
-      return new Promise((resolve, reject) => {
-        setTimeout(_ => {
-          driver.sendCommand('Runtime.evaluate', {
-            expression: `(${fetchA11yResults.toString()}())`,
-            returnByValue: true
-          }).then(response => {
-            // If the axe results aren't in try again.
-            if (response.result.value === null) {
-              return resolve(fetchResults(count - 1));
-            }
-
-            resolve(response);
-          });
-        }, 100);
-      });
-    };
 
     return driver.sendCommand('Runtime.evaluate', {
       expression: `${axe};(${runA11yChecks.toString()}())`
     })
 
     // Goes into a 'busy wait' for axe results to land.
-    .then(_ => fetchResults(10))
+    .then(_ => this.fetchResults(driver, 10))
     .then(returnedData => {
       if (returnedData.result.value === undefined ||
           returnedData.result.value === null ||

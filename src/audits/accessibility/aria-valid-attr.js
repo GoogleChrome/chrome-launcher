@@ -52,12 +52,19 @@ class ARIAValidAttr extends Audit {
     return ARIAValidAttr.generateAuditResult(
       typeof rule === 'undefined',
       undefined,
-      typeof rule === 'undefined' ? '' :
-          rule.help + ' (Failed on ' +
-          rule.nodes.reduce((prev, node) => {
-            return prev + `"${node.target.join(', ')}"`;
-          }, '') + ')'
+      this.createDebugString(rule)
     );
+  }
+
+  static createDebugString(rule) {
+    if (typeof rule === 'undefined') {
+      return '';
+    }
+
+    return rule.help + ' (Failed on ' +
+      rule.nodes.reduce((prev, node) => {
+        return prev + `"${node.target.join(', ')}"`;
+      }, '') + ')';
   }
 }
 
