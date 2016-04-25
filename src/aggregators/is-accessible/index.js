@@ -30,7 +30,7 @@ class IsAccessible extends Aggregate {
    * @return {string}
    */
   static get name() {
-    return 'Has No Accessibility Violations';
+    return 'Is Accessible';
   }
 
   /**
