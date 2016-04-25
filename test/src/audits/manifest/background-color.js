@@ -13,36 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/manifest/name.js');
+const Audit = require('../../../../src/audits/manifest/background-color.js');
 const assert = require('assert');
-const manifestSrc = JSON.stringify(require('./manifest.json'));
-const manifestParser = require('../../../src/lib/manifest-parser');
-const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
-describe('Manifest: name audit', () => {
+// Need to disable camelcase check for dealing with background_color.
+/* eslint-disable camelcase */
+describe('Manifest: background color audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({manifest: {
       value: undefined
     }}).value, false);
   });
 
-  it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({manifest: {}}).value, false);
-  });
-
-  it('fails when a manifest contains no name', () => {
-    const inputs = {
-      manifest: {
-        name: null
+  it('fails when no background color present', () => {
+    return assert.equal(Audit.audit({manifest: {
+      value: {
+        foo: 1
       }
-    };
-
-    return assert.equal(Audit.audit(inputs).value, false);
+    }}).value, false);
   });
 
-  it('succeeds when a manifest contains a name', () => {
-    return assert.equal(Audit.audit({manifest: manifest}).value, true);
+  it('fails when no background color value present', () => {
+    return assert.equal(Audit.audit({manifest: {
+      value: {
+        background_color: 'no'
+      }
+    }}).value, false);
+  });
+
+  it('passes when color is present', () => {
+    return assert.equal(Audit.audit({manifest: {
+      value: {
+        background_color: {value: 'black'}
+      }
+    }}).value, true);
   });
 });
+/* eslint-enable */

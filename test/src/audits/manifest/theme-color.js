@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/manifest/short-name.js');
+const Audit = require('../../../../src/audits/manifest/theme-color.js');
 const assert = require('assert');
-const manifestSrc = JSON.stringify(require('./manifest.json'));
-const manifestParser = require('../../../src/lib/manifest-parser');
+const manifestSrc = JSON.stringify(require('../../../fixtures/manifest.json'));
+const manifestParser = require('../../../../src/lib/manifest-parser');
 const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
-describe('Manifest: short_name audit', () => {
+describe('Manifest: theme_color audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({manifest: {
       value: undefined
@@ -32,20 +32,21 @@ describe('Manifest: short_name audit', () => {
     return assert.equal(Audit.audit({manifest: {}}).value, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
+  // Need to disable camelcase check for dealing with theme_color.
   /* eslint-disable camelcase */
-  it('fails when a manifest contains no short_name', () => {
+  it('fails when a manifest contains no theme_color', () => {
     const inputs = {
       manifest: {
-        short_name: null
+        theme_color: null
       }
     };
 
     return assert.equal(Audit.audit(inputs).value, false);
   });
+
   /* eslint-enable camelcase */
 
-  it('succeeds when a manifest contains a short_name', () => {
+  it('succeeds when a manifest contains a theme_color', () => {
     return assert.equal(Audit.audit({manifest: manifest}).value, true);
   });
 });

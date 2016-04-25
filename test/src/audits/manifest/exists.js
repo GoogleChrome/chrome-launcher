@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/mobile-friendly/viewport.js');
+const Audit = require('../../../../src/audits/manifest/exists.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
-describe('Mobile-friendly: viewport audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+describe('Manifest: exists audit', () => {
+  it('fails when no manifest present', () => {
+    return assert.equal(Audit.audit({manifest: {
+      value: undefined
+    }}).value, false);
   });
 
-  it('fails when HTML does not contain a viewport meta tag', () => {
-    return assert.equal(Audit.audit({
-      viewport: ''
-    }).value, false);
+  it('succeeds when a manifest is present', () => {
+    return assert.equal(Audit.audit({manifest: {
+      value: {}
+    }}).value, true);
   });
 
-  it('passes when a viewport is provided', () => {
-    return assert.equal(Audit.audit({
-      viewport: 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
-    }).value, true);
+  it('correctly passes through debug strings', () => {
+    const debugString = 'No href found on <link rel="manifest">.';
+
+    assert.equal(Audit.audit({
+      manifest: {
+        value: {},
+        debugString
+      }
+    }).debugString, debugString);
   });
 });

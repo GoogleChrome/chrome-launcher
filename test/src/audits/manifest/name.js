@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/manifest/start-url.js');
+const Audit = require('../../../../src/audits/manifest/name.js');
 const assert = require('assert');
-const manifestSrc = JSON.stringify(require('./manifest.json'));
-const manifestParser = require('../../../src/lib/manifest-parser');
+const manifestSrc = JSON.stringify(require('../../../fixtures/manifest.json'));
+const manifestParser = require('../../../../src/lib/manifest-parser');
 const manifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
-describe('Manifest: start_url audit', () => {
+describe('Manifest: name audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({manifest: {
       value: undefined
@@ -32,21 +32,17 @@ describe('Manifest: start_url audit', () => {
     return assert.equal(Audit.audit({manifest: {}}).value, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
-  /* eslint-disable camelcase */
-  it('fails when a manifest contains no start_url', () => {
+  it('fails when a manifest contains no name', () => {
     const inputs = {
       manifest: {
-        start_url: null
+        name: null
       }
     };
 
     return assert.equal(Audit.audit(inputs).value, false);
   });
 
-  /* eslint-enable camelcase */
-
-  it('succeeds when a manifest contains a start_url', () => {
+  it('succeeds when a manifest contains a name', () => {
     return assert.equal(Audit.audit({manifest: manifest}).value, true);
   });
 });

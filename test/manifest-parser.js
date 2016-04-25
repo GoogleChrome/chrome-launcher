@@ -19,7 +19,7 @@
 
 var manifestParser = require('../src/lib/manifest-parser');
 var assert = require('assert');
-const manifestStub = require('./audits/manifest/manifest.json');
+const manifestStub = require('./fixtures/manifest.json');
 
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {

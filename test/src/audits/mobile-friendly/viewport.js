@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/security/is-on-https.js');
+const Audit = require('../../../../src/audits/mobile-friendly/viewport.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
-describe('Security: HTTPS audit', () => {
+describe('Mobile-friendly: viewport audit', () => {
   it('fails when no input present', () => {
     return assert.equal(Audit.audit({}).value, false);
   });
 
-  it('fails when invalid HTML given', () => {
+  it('fails when HTML does not contain a viewport meta tag', () => {
     return assert.equal(Audit.audit({
-      html: null
+      viewport: ''
     }).value, false);
   });
 
-  it('fails when not on HTTPS', () => {
+  it('passes when a viewport is provided', () => {
     return assert.equal(Audit.audit({
-      https: false
-    }).value, false);
-  });
-
-  it('passes when on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      https: true
+      viewport: 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
     }).value, true);
   });
 });

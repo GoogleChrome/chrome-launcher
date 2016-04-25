@@ -13,32 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/manifest/exists.js');
+const Audit = require('../../../../src/audits/security/is-on-https.js');
 const assert = require('assert');
 
 /* global describe, it*/
 
-describe('Manifest: exists audit', () => {
-  it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      value: undefined
-    }}).value, false);
+describe('Security: HTTPS audit', () => {
+  it('fails when no input present', () => {
+    return assert.equal(Audit.audit({}).value, false);
   });
 
-  it('succeeds when a manifest is present', () => {
-    return assert.equal(Audit.audit({manifest: {
-      value: {}
-    }}).value, true);
+  it('fails when invalid HTML given', () => {
+    return assert.equal(Audit.audit({
+      html: null
+    }).value, false);
   });
 
-  it('correctly passes through debug strings', () => {
-    const debugString = 'No href found on <link rel="manifest">.';
+  it('fails when not on HTTPS', () => {
+    return assert.equal(Audit.audit({
+      https: false
+    }).value, false);
+  });
 
-    assert.equal(Audit.audit({
-      manifest: {
-        value: {},
-        debugString
-      }
-    }).debugString, debugString);
+  it('passes when on HTTPS', () => {
+    return assert.equal(Audit.audit({
+      https: true
+    }).value, true);
   });
 });
