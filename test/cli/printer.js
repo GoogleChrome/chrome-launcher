@@ -68,13 +68,12 @@ describe('Printer', () => {
   it('writes file for results', () => {
     const mode = 'html';
     const path = './.test-file.html';
-    const htmlOutput = Printer.createOutput(sampleResults, mode);
 
     // Now do a second pass where the file is written out.
     return Printer.write(sampleResults, mode, path).then(_ => {
       const fileContents = fs.readFileSync(path, 'utf8');
       fs.unlinkSync(path);
-      assert.equal(fileContents, htmlOutput);
+      assert.ok(/<!doctype/gim.test(fileContents));
     });
   });
 
