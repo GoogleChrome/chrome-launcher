@@ -24,7 +24,7 @@ class Viewport extends Gather {
    * @param {!{driver: !Object}} options Run options
    * @return {!Promise<{viewport: !string}>} The value of the viewport meta's content attribute, or null
    */
-  afterPageLoad(options) {
+  postProfiling(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="viewport"]')

@@ -20,7 +20,7 @@ const Gather = require('./gather');
 
 class ThemeColor extends Gather {
 
-  afterPageLoad(options) {
+  postProfiling(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="theme-color"]')
