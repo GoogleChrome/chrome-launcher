@@ -20,7 +20,7 @@ const Gather = require('./gather');
 
 class HTTPS extends Gather {
 
-  afterPageLoad(options) {
+  postProfiling(options) {
     const driver = options.driver;
     return driver
         .sendCommand('Runtime.evaluate', {

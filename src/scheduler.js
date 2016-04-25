@@ -134,9 +134,9 @@ function run(gatherers, options) {
 
     // Load page, gather from browser, stop profilers.
     .then(_ => loadPage(driver, gatherers, options))
-    .then(_ => runPhase(gatherer => gatherer.afterPageLoad(options)))
+    .then(_ => runPhase(gatherer => gatherer.profiledPostPageLoad(options)))
     .then(_ => endPassiveCollection(options, tracingData))
-    .then(_ => runPhase(gatherer => gatherer.afterTraceCollected(options, tracingData)))
+    .then(_ => runPhase(gatherer => gatherer.postProfiling(options, tracingData)))
 
     // Reload page for SW, etc.
     .then(_ => runPhase(gatherer => gatherer.reloadSetup(options)))

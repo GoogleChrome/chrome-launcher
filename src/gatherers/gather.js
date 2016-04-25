@@ -28,9 +28,9 @@ class Gather {
 
   beforePageLoad(options) { }
 
-  afterPageLoad(options) { }
+  profiledPostPageLoad(options) { }
 
-  afterTraceCollected(options, tracingData) { }
+  postProfiling(options, tracingData) { }
 
   reloadSetup(options) { }
 
