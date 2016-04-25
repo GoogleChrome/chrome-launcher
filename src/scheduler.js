@@ -36,7 +36,11 @@ function reloadPage(driver, options) {
   // Such a hack... since a Page.reload command does not let
   // a service worker take over we have to trick the browser into going away
   // and then coming back.
-  return driver.gotoURL('about:blank').then(_ => driver.gotoURL(options.url, {waitForLoad: true}));
+  return driver
+          .gotoURL('about:blank')
+          .then(_ => 
+            driver.gotoURL(options.url, {waitForLoad: true})
+          );
 }
 
 function setupDriver(driver, gatherers, options) {
