@@ -107,11 +107,7 @@ gulp.task('watch', ['lint', 'browserify', 'html'], () => {
   gulp.watch([
     '*.js',
     'app/src/**/*.js',
-    '../lib/**/*.js',
-    '../audits/**/*.js',
-    '../aggregators/**/*.js',
-    '../gatherers/**/*.js',
-    '../metrics/**/*.js'
+    '../src/**/*.js'
   ], ['browserify', 'lint']);
 });
 
