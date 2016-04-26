@@ -7,4 +7,4 @@ npm-debug.log
 artifacts.log
 clovis-trace.log
 network-dependency-graph.png
-
+dependency-graph.json
