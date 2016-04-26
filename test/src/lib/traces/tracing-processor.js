@@ -4,7 +4,11 @@
 
 var fs = require('fs');
 var assert = require('assert');
-var traceProcessor = require('../../src/lib/traces/processor');
+var traceProcessor = require('../../../../src/lib/traces/tracing-processor');
+
+function readTrace(filename, cb) {
+  return fs.readFile('./test/fixtures/traces/' + filename, 'utf8', cb);
+}
 
 describe('Trace Processor', function() {
   it('throws if no processes are found', function() {
@@ -19,7 +23,7 @@ describe('Trace Processor', function() {
 
   it('throws if given a trace with extensions and strict mode is enabled',
     function(done) {
-      fs.readFile('./test/traces/data/load-extensions.json', 'utf8',
+      readTrace('load-extensions.json',
 
         function(err, data) {
           if (err) {
@@ -42,7 +46,7 @@ describe('Trace Processor', function() {
   // TODO(paullewis) Add multiprocess test.
 
   it('returns JSON for a file with a single process', function(done) {
-    fs.readFile('./test/traces/data/load.json', 'utf8',
+    readTrace('load.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -57,7 +61,7 @@ describe('Trace Processor', function() {
   });
 
   it('generates valid JSON', function(done) {
-    fs.readFile('./test/traces/data/load.json', 'utf8',
+    readTrace('load.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -72,7 +76,7 @@ describe('Trace Processor', function() {
   });
 
   it('supports timed ranges', function(done) {
-    fs.readFile('./test/traces/data/animation.json', 'utf8',
+    readTrace('animation.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -92,7 +96,7 @@ describe('Trace Processor', function() {
   it('correctly applies RAIL type when time range is specified',
 
     function(done) {
-      fs.readFile('./test/traces/data/animation.json', 'utf8',
+      readTrace('animation.json',
         function(err, data) {
           if (err) {
             throw err;
@@ -111,7 +115,7 @@ describe('Trace Processor', function() {
 
   it('correctly infers RAIL Load when time range not specified',
     function(done) {
-      fs.readFile('./test/traces/data/load.json', 'utf8',
+      readTrace('load.json',
         function(err, data) {
           if (err) {
             throw err;
@@ -126,7 +130,7 @@ describe('Trace Processor', function() {
 
   it('correctly infers RAIL Response when time range not specified',
     function(done) {
-      fs.readFile('./test/traces/data/response.json', 'utf8',
+      readTrace('response.json',
         function(err, data) {
           if (err) {
             throw err;
@@ -141,7 +145,7 @@ describe('Trace Processor', function() {
 
   it('correctly infers RAIL Animation when time range not specified',
     function(done) {
-      fs.readFile('./test/traces/data/animation.json', 'utf8',
+      readTrace('animation.json',
         function(err, data) {
           if (err) {
             throw err;
@@ -155,7 +159,7 @@ describe('Trace Processor', function() {
     });
 
   it('correctly infers multiple RAIL regions', function(done) {
-    fs.readFile('./test/traces/data/response-animation.json', 'utf8',
+    readTrace('response-animation.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -176,7 +180,7 @@ describe('Trace Processor', function() {
   });
 
   it('returns the correct fps for animations', function(done) {
-    fs.readFile('./test/traces/data/animation.json', 'utf8',
+    readTrace('animation.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -190,7 +194,7 @@ describe('Trace Processor', function() {
   });
 
   it('returns the correct JS breakdown', function(done) {
-    fs.readFile('./test/traces/data/load.json', 'utf8',
+    readTrace('load.json',
       function(err, data) {
         if (err) {
           throw err;
@@ -206,7 +210,7 @@ describe('Trace Processor', function() {
   });
 
   it('correctly captures forced layouts and recalcs', function(done) {
-    fs.readFile('./test/traces/data/forced-recalc-layout.json', 'utf8',
+    readTrace('forced-recalc-layout.json',
       function(err, data) {
         if (err) {
           throw err;
