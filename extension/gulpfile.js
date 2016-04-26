@@ -1,13 +1,17 @@
 // generated on 2016-03-19 using generator-chrome-extension 0.5.4
 
 'use strict';
-const gulp = require('gulp');
 const del = require('del');
 const gutil = require('gulp-util');
 const runSequence = require('run-sequence');
-
-const gulpLoadPlugins = require('gulp-load-plugins');
-const $ = gulpLoadPlugins();
+const gulp = require('gulp');
+const browserify = require('browserify');
+const chromeManifest = require('gulp-chrome-manifest');
+const debug = require('gulp-debug');
+const eslint = require('gulp-eslint');
+const livereload = require('gulp-livereload');
+const tap = require('gulp-tap');
+const zip = require('gulp-zip');
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -21,48 +25,31 @@ gulp.task('extras', () => {
     base: 'app',
     dot: true
   })
-  .pipe($.debug({title: 'copying to dist:'}))
+  .pipe(debug({title: 'copying to dist:'}))
   .pipe(gulp.dest('dist'));
 });
 
-function lint(files, options) {
-  return () => {
-    return gulp.src(files)
-    .pipe($.eslint(options))
-    .pipe($.eslint.format());
-  };
-}
-
-gulp.task('lint', lint([
-  'app/src/**/*.js',
-  'gulpfile.js'
-], {
-  env: {
-    es6: true
-  }
-}));
+gulp.task('lint', () => {
+  return gulp.src([
+    'app/src/**/*.js',
+    'gulpfile.js'
+  ])
+  .pipe(eslint())
+  .pipe(eslint.format());
+});
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-  .pipe($.if($.if.isFile, $.cache($.imagemin({
-    progressive: true,
-    interlaced: true,
-    // don't remove IDs from SVGs, they are often used
-    // as hooks for embedding and styling
-    svgoPlugins: [{cleanupIDs: false}]
-  }))
-  .on('error', function(err) {
-    console.log(err);
-    this.end();
-  })))
   .pipe(gulp.dest('dist/images'));
+});
+
+gulp.task('css', () => {
+  return gulp.src('app/styles/**/*.css')
+  .pipe(gulp.dest('dist/styles'));
 });
 
 gulp.task('html', () => {
   return gulp.src('app/*.html')
-  .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
-  .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
-  .pipe($.if('*.html', $.minifyHtml({conditionals: true, loose: true})))
   .pipe(gulp.dest('dist'));
 });
 
@@ -77,8 +64,7 @@ gulp.task('chromeManifest', () => {
     }
   };
   return gulp.src('app/manifest.json')
-  .pipe($.chromeManifest(manifestOpts))
-  .pipe($.if('*.css', $.minifyCss({compatibility: '*'})))
+  .pipe(chromeManifest(manifestOpts))
   .pipe(gulp.dest('dist'));
 });
 
@@ -87,13 +73,15 @@ gulp.task('browserify', () => {
     'app/src/popup.js',
     'app/src/chromereload.js',
     'app/src/lighthouse-background.js',
-    'app/src/report.js'])
-    .pipe($.browserify({
-      ignore: [
-        'npmlog',
-        'chrome-remote-interface'
-      ],
-      transform: ['brfs']
+    'app/src/report.js'
+  ], {read: false})
+    .pipe(tap(file => {
+      file.contents = browserify(file.path, {
+        transform: ['brfs']
+      })
+      .ignore('npmlog')
+      .ignore('chrome-remote-interface')
+      .bundle();
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
@@ -106,7 +94,7 @@ gulp.task('clean', () => {
 });
 
 gulp.task('watch', ['lint', 'browserify', 'html'], () => {
-  $.livereload.listen();
+  livereload.listen();
 
   gulp.watch([
     'app/*.html',
@@ -114,7 +102,7 @@ gulp.task('watch', ['lint', 'browserify', 'html'], () => {
     'app/images/**/*',
     'app/styles/**/*',
     'app/_locales/**/*.json'
-  ]).on('change', $.livereload.reload);
+  ]).on('change', livereload.reload);
 
   gulp.watch([
     '*.js',
@@ -130,14 +118,14 @@ gulp.task('watch', ['lint', 'browserify', 'html'], () => {
 gulp.task('package', function() {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-  .pipe($.zip('lighthouse-' + manifest.version + '.zip'))
+  .pipe(zip('lighthouse-' + manifest.version + '.zip'))
   .pipe(gulp.dest('package'));
 });
 
 gulp.task('build', cb => {
   runSequence(
     'lint', 'browserify', 'chromeManifest',
-    ['html', 'images', 'extras'], cb);
+    ['html', 'images', 'css', 'extras'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {

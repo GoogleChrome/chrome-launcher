@@ -18,8 +18,7 @@
 
 const fs = require('fs');
 
-const log = (typeof process !== 'undefined' && 'version' in process) ?
-    require('npmlog').log : console.log.bind(console);
+const log = require('./lib/log.js');
 
 function loadPage(driver, gatherers, options) {
   const loadPage = options.flags.loadPage;

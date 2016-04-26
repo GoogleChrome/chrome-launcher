@@ -20,8 +20,7 @@ const Driver = require('./driver.js');
 const chromeRemoteInterface = require('chrome-remote-interface');
 const port = process.env.PORT || 9222;
 
-const log = (typeof process !== 'undefined' && 'version' in process) ?
-    require('npmlog').log : console.log.bind(console);
+const log = require('../log.js');
 
 class CriDriver extends Driver {
 
