@@ -44,22 +44,25 @@ limitations under the License.
 
   <section class="report-body">
     <div class="report-body__header">
+      <button class="print js-print"></button>
     </div>
     <div class="report-body__content">
-      <div class="report-body__menu">
-        <div class="menu__header">
-          In this report:
+      <div class="js-menu-container report-body__menu-container">
+        <div class="js-menu menu">
+          <div class="menu__header">
+            In this report:
+          </div>
+          <ul class="menu__nav">
+            {{#each aggregations}}
+            <li class="menu__nav-item">
+              <a class="menu__link" href="#{{ generateAnchor this.shortName }}">
+                <span class="menu__link-label">{{ this.shortName }}</span>
+                <span class="menu__link-score menu__link-score--{{ getItemRating this.score.overall }}">{{ convertToPercentage this.score.overall }}</span>
+              </a>
+            </li>
+            {{/each}}
+          </ul>
         </div>
-        <ul class="js-menu menu__nav">
-          {{#each aggregations}}
-          <li class="menu__nav-item">
-            <a class="menu__link" href="#{{ generateAnchor this.shortName }}">
-              <span class="menu__link-label">{{ this.shortName }}</span>
-              <span class="menu__link-score menu__link-score--{{ getItemRating this.score.overall }}">{{ convertToPercentage this.score.overall }}</span>
-            </a>
-          </li>
-          {{/each}}
-        </ul>
       </div>
       <div class="js-breakdown report-body__breakdown">
         {{#each aggregations}}
@@ -89,5 +92,6 @@ limitations under the License.
     </footer>
   </section>
 </div>
+<script>{{{ script }}}</script>
 </body>
 </html>

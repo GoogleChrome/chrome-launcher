@@ -90,6 +90,10 @@ class Report {
     return fs.readFileSync(path.join(__dirname, './styles/report.css'), 'utf8');
   }
 
+  getReportJS() {
+    return fs.readFileSync(path.join(__dirname, './scripts/report.js'), 'utf8');
+  }
+
   generateHTML(results) {
     const totalScore =
         (results.aggregations.reduce((prev, aggregation) => {
@@ -98,11 +102,11 @@ class Report {
         results.aggregations.length);
 
     const template = Handlebars.compile(this.getReportHTML());
-    // TODO(bckenny): is this async?
     return template({
       url: results.url,
       totalScore: Math.round(totalScore * 100),
       css: this.getReportCSS(),
+      script: this.getReportJS(),
       aggregations: results.aggregations
     });
   }
