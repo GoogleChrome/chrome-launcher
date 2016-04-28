@@ -31,21 +31,25 @@ import request_dependencies_lens
 import loading_graph_view
 
 def get_network_dependency_graph(json_dict):
-    trace = loading_trace.LoadingTrace.FromJsonDict(json_dict)
-    content_lens = (
-        content_classification_lens.ContentClassificationLens.WithRulesFiles(
-            trace, '', ''))
-    frame_lens = frame_load_lens.FrameLoadLens(trace)
-    activity = activity_lens.ActivityLens(trace)
-    deps_lens = request_dependencies_lens.RequestDependencyLens(trace)
-    graph_view = loading_graph_view.LoadingGraphView(
-        trace, deps_lens, content_lens, frame_lens, activity)
-    return graph_view
+  trace = loading_trace.LoadingTrace.FromJsonDict(json_dict)
+  content_lens = (
+      content_classification_lens.ContentClassificationLens.WithRulesFiles(
+          trace, '', ''))
+  frame_lens = frame_load_lens.FrameLoadLens(trace)
+  activity = activity_lens.ActivityLens(trace)
+  deps_lens = request_dependencies_lens.RequestDependencyLens(trace)
+  graph_view = loading_graph_view.LoadingGraphView(
+      trace, deps_lens, content_lens, frame_lens, activity)
+  return graph_view
 
-with open('clovis-trace.log') as f:
-	graph = get_network_dependency_graph(json.load(f))
+def main():
+  with open('clovis-trace.log') as f:
+    graph = get_network_dependency_graph(json.load(f))
 
-output_file = "dependency-graph.json"
-with open(output_file ,'w') as f: 
-	json.dump(graph.deps_graph.ToJsonDict(), f)
-	print 'Wrote dependency graph to {0}'.format(output_file)
+  output_file = "dependency-graph.json"
+  with open(output_file, 'w') as f:
+    json.dump(graph.deps_graph.ToJsonDict(), f)
+    print 'Wrote dependency graph to {0}'.format(output_file)
+
+if __name__ == '__main__':
+  main()

@@ -30,12 +30,12 @@ from request_track import RequestTrack
 CLOVIS_TRACE_CATEGORIES = clovis_tracing.INITIAL_CATEGORIES
 
 def create_tracing_track(trace_events):
-  return {'events': [event for event in trace_events 
+  return {'events': [event for event in trace_events
             if event['cat'] in CLOVIS_TRACE_CATEGORIES
             or event['cat'] == '__metadata']}
 
 def create_page_track(frame_load_events):
-  events = [{'frame_id': e['frameId'], 'method': e['method']} 
+  events = [{'frame_id': e['frameId'], 'method': e['method']}
             for e in frame_load_events]
   return {'events': events}
 
@@ -45,23 +45,26 @@ def create_request_track(raw_network_events):
     request_track.Handle(event['method'], event)
   return request_track.ToJsonDict()
 
+def main():
+  with open('artifacts.log', 'r') as f:
+    artifacts = json.load(f)
 
+  clovis_trace = {}
+  clovis_trace['url'] = artifacts['url']
+  clovis_trace['tracing_track'] = create_tracing_track(
+    artifacts['traceContents'])
+  clovis_trace['page_track'] = create_page_track(artifacts['frameLoadEvents'])
+  clovis_trace['request_track'] = create_request_track(
+                                    artifacts['rawNetworkEvents'])
 
-with open('artifacts.log', 'r') as f:
-  artifacts = json.load(f)
+  # Stubbing this to pass assertion for now
+  # If the metadata is critical we can replicate the functionality of
+  # `controller.ChromeControllerBase._StartConnection`
+  # in lighthouse.
+  clovis_trace['metadata'] = {}
 
-clovis_trace = {}
-clovis_trace['url'] = artifacts['url']
-clovis_trace['tracing_track'] = create_tracing_track(artifacts['traceContents'])
-clovis_trace['page_track'] = create_page_track(artifacts['frameLoadEvents'])
-clovis_trace['request_track'] = create_request_track(
-                                  artifacts['rawNetworkEvents'])
+  with open('clovis-trace.log', 'w') as f:
+    json.dump(clovis_trace, f)
 
-# Stubbing this to pass assertion for now
-# If the metadata is critical we can replicate the functionality of 
-# `controller.ChromeControllerBase._StartConnection`
-# in lighthouse.
-clovis_trace['metadata'] = {}
-
-with open('clovis-trace.log', 'w') as f:
-  json.dump(clovis_trace, f)
+if __name__ == '__main__':
+  main()
