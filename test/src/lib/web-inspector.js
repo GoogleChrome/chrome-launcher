@@ -42,10 +42,10 @@ describe('Web Inspector lib', function() {
 
   // Same story, but with some global variables
   it.skip('WebInspector global doesn\'t leak', () => {
-    assert.fail('WebInspector' in global);
-    assert.fail('Runtime' in global);
-    assert.fail('TreeElement' in global);
-    assert.fail('WorkerRuntime' in global);
-    assert.fail('Protocol' in global);
+    assert.equal('WebInspector' in global, false);
+    assert.equal('Runtime' in global, false);
+    assert.equal('TreeElement' in global, false);
+    assert.equal('WorkerRuntime' in global, false);
+    assert.equal('Protocol' in global, false);
   });
 });
