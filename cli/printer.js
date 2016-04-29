@@ -44,7 +44,7 @@ const OUTPUT_MODE = {
  */
 function checkOutputMode(mode) {
   if (!OUTPUT_MODE.hasOwnProperty(mode)) {
-    log('warn', `Unknown output mode ${mode}; using pretty`);
+    log.log('warn', `Unknown output mode ${mode}; using pretty`);
     return OUTPUT_MODE.pretty;
   }
 
@@ -57,7 +57,7 @@ function checkOutputMode(mode) {
  */
 function checkOutputPath(path) {
   if (!path) {
-    log('warn', 'No output path set; using stdout');
+    log.log('warn', 'No output path set; using stdout');
     return 'stdout';
   }
 
