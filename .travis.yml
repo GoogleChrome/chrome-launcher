@@ -2,7 +2,8 @@ language: node_js
 node_js:
   - "5.0"
   - "node"
-sudo: false
+sudo: required
+dist: trusty
 cache:
    directories:
      - node_modules
