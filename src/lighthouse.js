@@ -39,6 +39,7 @@ const audits = [
   require('./audits/mobile-friendly/viewport'),
   require('./audits/mobile-friendly/display'),
   require('./audits/performance/first-meaningful-paint'),
+  require('./audits/performance/speed-index-metric'),
   require('./audits/manifest/exists'),
   require('./audits/manifest/background-color'),
   require('./audits/manifest/theme-color'),
