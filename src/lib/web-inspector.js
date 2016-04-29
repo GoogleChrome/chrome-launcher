@@ -173,6 +173,16 @@ WebInspector.DeferredTempFile.prototype = {
   finishWriting: function() {}
 };
 
+// add support for groupBy('EventName')
+WebInspector.TimelineAggregator.GroupBy.EventName = 'EventName';
+const oldNodeToGroupIdFunction = WebInspector.TimelineAggregator.prototype._nodeToGroupIdFunction;
+WebInspector.TimelineAggregator.prototype._nodeToGroupIdFunction = function(groupBy) {
+  if (groupBy === WebInspector.TimelineAggregator.GroupBy.EventName) {
+    return node => node.event.name;
+  }
+  return oldNodeToGroupIdFunction.call(this, groupBy);
+};
+
 // Mock for WebInspector code that writes to console.
 WebInspector.ConsoleMessage = function() {};
 WebInspector.ConsoleMessage.MessageSource = {
