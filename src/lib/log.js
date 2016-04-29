@@ -18,7 +18,7 @@
 
 const npmlog = require('npmlog');
 
-// Use `npmlog` in node, `console.log` in browser and electron.
+// Use `npmlog` in node, `console` in browser and electron.
 const isNode = !!process && !process.browser && !process.versions.electron;
 
-module.exports = isNode ? npmlog.log : console.log.bind(console);
+module.exports = isNode ? npmlog : console;
