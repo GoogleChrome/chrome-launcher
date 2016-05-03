@@ -43,6 +43,8 @@ class DriverBase {
       'java',
       'v8'
     ];
+
+    this._asyncTimeout = undefined;
   }
 
   get url() {
@@ -51,6 +53,10 @@ class DriverBase {
 
   set url(_url) {
     this._url = _url;
+  }
+
+  enableRuntimeEvents() {
+    return this.sendCommand('Runtime.enable');
   }
 
   /**
@@ -84,6 +90,42 @@ class DriverBase {
    */
   sendCommand() {
     return Promise.reject(new Error('Not implemented'));
+  }
+
+  evaluateAsync(asyncExpression) {
+    return new Promise((resolve, reject) => {
+      // Inject the call to capture inspection.
+      const expression = `(function() {
+        const __inspect = inspect;
+        const __returnResults = function(results) {
+          __inspect(JSON.stringify(results));
+        };
+        ${asyncExpression}
+      })()`;
+
+      this.on('Runtime.inspectRequested', value => {
+        if (this._asyncTimeout !== undefined) {
+          clearTimeout(this._asyncTimeout);
+        }
+
+        // If the returned object doesn't meet the expected pattern bail with an undefined.
+        if (typeof value === 'undefined' ||
+            typeof value.object === 'undefined' ||
+            typeof value.object.value === 'undefined') {
+          return resolve(undefined);
+        }
+
+        return resolve(JSON.parse(value.object.value));
+      });
+
+      this.sendCommand('Runtime.evaluate', {
+        expression,
+        includeCommandLineAPI: true
+      });
+
+      // If this gets to 15s and it hasn't been resolved, reject the Promise.
+      this._asyncTimeout = setTimeout(reject, 15000);
+    });
   }
 
   gotoURL(url, options) {
