@@ -18,7 +18,7 @@ npm install -g GoogleChrome/lighthouse
 ## Run
 ```sh
 # Start Chrome with a few flags
-npm run chrome
+npm explore -g lighthouse -- npm run chrome
 
 # Kick off a lighthouse run
 lighthouse https://airhorner.com/
