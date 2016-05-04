@@ -48,10 +48,10 @@ class ExtensionDriver extends Driver {
 
   disconnect() {
     if (this._tabId === null) {
-      return;
+      return Promise.resolve();
     }
 
-    this.detachDebugger_(this._tabId)
+    return this.detachDebugger_(this._tabId)
         .then(_ => {
           this._tabId = null;
           this.url = null;
