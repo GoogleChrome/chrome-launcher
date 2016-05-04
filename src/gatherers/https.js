@@ -19,17 +19,16 @@
 const Gather = require('./gather');
 
 class HTTPS extends Gather {
-
-  postProfiling(options) {
+  beforePageLoad(options) {
     const driver = options.driver;
-    return driver
-        .sendCommand('Runtime.evaluate', {
-          expression: 'window.location.protocol'
-        }).then(options => {
-          this.artifact = {
-            https: options.result.value === 'https:'
-          };
-        });
+    driver.on('Security.securityStateChanged', data => {
+      this.artifact = {
+        https: (data.securityState === 'secure' &&
+            data.schemeIsCryptographic)
+      };
+    });
+
+    driver.enableSecurityEvents();
   }
 }
 

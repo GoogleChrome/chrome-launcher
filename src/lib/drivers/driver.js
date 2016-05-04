@@ -59,6 +59,10 @@ class DriverBase {
     return this.sendCommand('Runtime.enable');
   }
 
+  enableSecurityEvents() {
+    return this.sendCommand('Security.enable');
+  }
+
   /**
    * @return {!Promise<null>}
    */
