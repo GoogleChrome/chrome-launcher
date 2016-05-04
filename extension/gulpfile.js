@@ -17,6 +17,7 @@ gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
+    'app/pages/**',
     '!app/src',
     '!app/.DS_Store',
     '!app/*.json',
