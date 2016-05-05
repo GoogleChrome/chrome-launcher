@@ -80,6 +80,11 @@ gulp.task('browserify', () => {
       file.contents = browserify(file.path, {
         transform: ['brfs']
       })
+      // Do the additional transform to convert references to devtools-timeline-model
+      // to the modified version internal to Lighthouse.
+      .transform('./dtm-transform.js', {
+        global: true
+      })
       .ignore('npmlog')
       .ignore('chrome-remote-interface')
       .bundle();
