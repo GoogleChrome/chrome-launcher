@@ -14,53 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
-const Aggregate = require('../aggregate');
+const Audit = require('../audit');
 
-/** @type {string} */
-const isOnHTTPS = require('../../audits/security/is-on-https').name;
-
-/** @type {string} */
-const redirectsHTTP = require('../../audits/security/redirects-http').name;
-
-class IsSecure extends Aggregate {
+class RedirectsHTTP extends Audit {
+  /**
+   * @override
+   */
+  static get tags() {
+    return ['Security'];
+  }
 
   /**
    * @override
-   * @return {string}
    */
   static get name() {
-    return 'Is Secure';
+    return 'redirects-http';
   }
 
   /**
    * @override
-   * @return {string}
    */
-  static get shortName() {
-    return 'Secure';
+  static get description() {
+    return 'Site redirects HTTP traffic to HTTPS';
   }
 
   /**
-   * @override
-   * @return {!AggregationCriteria}
+   * @param {!Artifacts} artifacts
+   * @return {!AuditResult}
    */
-  static get criteria() {
-    const criteria = {};
-    criteria[isOnHTTPS] = {
-      value: true,
-      weight: 1
-    };
-
-    criteria[redirectsHTTP] = {
-      value: true,
-      weight: 1
-    };
-
-    return criteria;
+  static audit(artifacts) {
+    return RedirectsHTTP.generateAuditResult({
+      value: artifacts.redirectsHTTP.value,
+      debugString: artifacts.redirectsHTTP.debugString
+    });
   }
 }
 
-module.exports = IsSecure;
+module.exports = RedirectsHTTP;

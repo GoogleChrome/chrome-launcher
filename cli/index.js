@@ -53,6 +53,12 @@ const outputMode = cli.flags.output || 'pretty';
 const outputPath = cli.flags.outputPath || 'stdout';
 const flags = cli.flags;
 
+// If the URL isn't https or localhost complain to the user.
+if (url.indexOf('https') !== 0 && url.indexOf('http://localhost') !== 0) {
+  log.warn('Lighthouse', 'The URL provided should be on HTTPS');
+  log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
+}
+
 // set logging preferences
 flags.logLevel = 'info';
 if (cli.flags.verbose) {

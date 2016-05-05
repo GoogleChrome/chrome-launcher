@@ -140,6 +140,10 @@ function run(gatherers, options) {
     .then(_ => reloadPage(driver, options))
     .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)))
 
+    // Reload page again for HTTPS redirect
+    .then(_ => reloadPage(driver, options))
+    .then(_ => runPhase(gatherer => gatherer.afterSecondReloadPageLoad(options)))
+
     // Finish and teardown.
     .then(_ => driver.disconnect())
     .then(_ => runPhase(gatherer => gatherer.tearDown(options)))

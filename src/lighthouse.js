@@ -23,6 +23,7 @@ const Aggregator = require('./aggregator');
 const gathererClasses = [
   require('./gatherers/url'),
   require('./gatherers/https'),
+  require('./gatherers/http-redirect'),
   require('./gatherers/service-worker'),
   require('./gatherers/viewport'),
   require('./gatherers/theme-color'),
@@ -34,6 +35,7 @@ const gathererClasses = [
 
 const audits = [
   require('./audits/security/is-on-https'),
+  require('./audits/security/redirects-http'),
   require('./audits/offline/service-worker'),
   require('./audits/offline/works-offline'),
   require('./audits/mobile-friendly/viewport'),

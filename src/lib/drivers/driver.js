@@ -140,6 +140,17 @@ class DriverBase {
     });
   }
 
+  getSecurityState() {
+    return new Promise((resolve, reject) => {
+      this.once('Security.securityStateChanged', data => {
+        this.sendCommand('Security.disable');
+        resolve(data);
+      });
+
+      this.sendCommand('Security.enable');
+    });
+  }
+
   gotoURL(url, options) {
     const waitForLoad = (options && options.waitForLoad) || false;
     return this.sendCommand('Page.enable')
