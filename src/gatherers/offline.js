@@ -14,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* global XMLHttpRequest, __returnResults */
+
 'use strict';
 
 const Gather = require('./gather');
@@ -21,18 +24,15 @@ const Gather = require('./gather');
 // *WARNING* do not use fetch.. due to it requiring window focus to fire.
 // Request the current page by issuing a XMLHttpRequest request to ''
 // and storing the status code on the window.
-const requestPage = `
-  (function () {
-    const oReq = new XMLHttpRequest();
-    oReq.onload = oReq.onerror = e => window._offlineRequestStatus = e.currentTarget.status;
-    oReq.open('GET', '');
-    oReq.send();
-  })();
-`;
-
-const unsetPageStatusVar = `
-  delete window._offlineRequestStatus
-`;
+const requestPage = function() {
+  const oReq = new XMLHttpRequest();
+  oReq.onload = oReq.onerror = e => {
+    // __returnResults is injected by driver.evaluateAsync
+    __returnResults(e.currentTarget.status);
+  };
+  oReq.open('GET', '');
+  oReq.send();
+};
 
 class Offline extends Gather {
 
@@ -55,69 +55,18 @@ class Offline extends Gather {
     });
   }
 
-  static pollForOfflineResponseStatus(driver, retryCount) {
-    return driver.sendCommand('Runtime.evaluate', {
-      expression: 'window._offlineRequestStatus'
-    }).then(r => {
-      if (r.result.type !== 'undefined' || retryCount > 9) {
-        return r;
-      }
-
-      // Wait for 1.5 seconds and retry
-      return new Promise((res, _) => {
-        setTimeout(_ => {
-          res(Offline.pollForOfflineResponseStatus(driver, retryCount + 1));
-        }, 1500);
-      });
-    });
-  }
-
-  static _unsetOfflineValue(driver) {
-    return driver.sendCommand('Runtime.evaluate', {
-      expression: unsetPageStatusVar});
-  }
-
-  static getOfflinePageStatus(driver) {
-    /**
-     * Phases to check if we are offline:
-     * 1. Issue fetch request for current url and set the status code in a var.
-     * 2. Poll the window for that var to be set (since async).
-     * 3. Unset the var (so things are reentrant) and return the val.
-     */
-    return driver.sendCommand('Runtime.evaluate', {
-      expression: requestPage
-    }).then(_ => {
-      return Offline.pollForOfflineResponseStatus(driver, 0);
-    }, _ => {
-      // Account for execution errors.
-      return {
-        result: {
-          description: '-1',
-          type: 'number',
-          value: -1
-        }
-      };
-    }).then(ret => {
-      return Offline._unsetOfflineValue(driver).then(_ => ret);
-    });
-  }
-
   afterReloadPageLoad(options) {
     const driver = options.driver;
 
     // TODO eventually we will want to walk all network
     // requests that the page initially made and retry them.
-    return Offline.goOffline(driver).then(_ => {
-      let responseCode;
-
-      return Offline.getOfflinePageStatus(driver).then(ret => {
-        responseCode = ret.result.value;
-      }).then(_ => {
-        return Offline.goOnline(driver);
-      }).then(_ => {
-        this.artifact = {responseCode};
-      });
-    });
+    return Offline
+        .goOffline(driver)
+        .then(_ => driver.evaluateAsync(`(${requestPage.toString()}())`))
+        .then(offlineResponseCode => {
+          this.artifact = {offlineResponseCode};
+        })
+        .then(_ => Offline.goOnline(driver));
   }
 }
 

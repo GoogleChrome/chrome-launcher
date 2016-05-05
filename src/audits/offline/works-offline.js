@@ -45,7 +45,7 @@ class WorksOffline extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return WorksOffline.generateAuditResult(artifacts.responseCode === 200);
+    return WorksOffline.generateAuditResult(artifacts.offlineResponseCode === 200);
   }
 }
 
