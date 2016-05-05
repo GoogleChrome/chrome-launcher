@@ -14,7 +14,7 @@
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
     "chrome": "./scripts/launch-chrome.sh",
     "smoke": "./scripts/run-smoke-tests.sh",
-    "start": "node cli.js"
+    "start": "node ./cli/index.js"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [
