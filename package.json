@@ -2,6 +2,7 @@
   "name": "lighthouse",
   "version": "1.0.0",
   "description": "",
+  "main": "./module/",
   "bin": "./cli/index.js",
   "engines": {
     "node": ">=5"

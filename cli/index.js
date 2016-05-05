@@ -23,8 +23,7 @@ const log = require('../src/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 
-const ChromeProtocol = require('../src/lib/drivers/cri.js');
-const lighthouse = require('../src/lighthouse');
+const lighthouse = require('../module');
 
 // node 5.x required due to use of ES2015 features
 if (semver.lt(process.version, '5.0.0')) {
@@ -54,17 +53,16 @@ const outputMode = cli.flags.output || 'pretty';
 const outputPath = cli.flags.outputPath || 'stdout';
 const flags = cli.flags;
 
-const driver = new ChromeProtocol();
-
 // set logging preferences
+flags.logLevel = 'info';
 if (cli.flags.verbose) {
-  log.level = 'verbose';
+  flags.logLevel = 'verbose';
 } else if (cli.flags.quiet) {
-  log.level = 'error';
+  flags.logLevel = 'error';
 }
 
 // kick off a lighthouse run
-lighthouse(driver, {url, flags})
+lighthouse(url, flags)
   .then(results => {
     return Printer.write(results, outputMode, outputPath);
   })
