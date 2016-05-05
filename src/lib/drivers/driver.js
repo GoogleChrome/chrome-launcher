@@ -43,8 +43,6 @@ class DriverBase {
       'java',
       'v8'
     ];
-
-    this._asyncTimeout = undefined;
   }
 
   get url() {
@@ -82,6 +80,14 @@ class DriverBase {
   }
 
   /**
+   * Bind a one-time listener for protocol events. Listener is removed once it
+   * has been called.
+   */
+  once() {
+    return Promise.reject(new Error('Not implemented'));
+  }
+
+  /**
    * Unbind event listeners
    */
   off() {
@@ -98,6 +104,8 @@ class DriverBase {
 
   evaluateAsync(asyncExpression) {
     return new Promise((resolve, reject) => {
+      let asyncTimeout;
+
       // Inject the call to capture inspection.
       const expression = `(function() {
         const __inspect = inspect;
@@ -107,16 +115,16 @@ class DriverBase {
         ${asyncExpression}
       })()`;
 
-      this.on('Runtime.inspectRequested', value => {
-        if (this._asyncTimeout !== undefined) {
-          clearTimeout(this._asyncTimeout);
+      this.once('Runtime.inspectRequested', value => {
+        if (asyncTimeout !== undefined) {
+          clearTimeout(asyncTimeout);
         }
 
-        // If the returned object doesn't meet the expected pattern bail with an undefined.
-        if (typeof value === 'undefined' ||
-            typeof value.object === 'undefined' ||
-            typeof value.object.value === 'undefined') {
-          return resolve(undefined);
+        // If the returned object doesn't meet the expected pattern, bail with an undefined.
+        if (value === undefined ||
+            value.object === undefined ||
+            value.object.value === undefined) {
+          return resolve();
         }
 
         return resolve(JSON.parse(value.object.value));
@@ -128,7 +136,7 @@ class DriverBase {
       });
 
       // If this gets to 15s and it hasn't been resolved, reject the Promise.
-      this._asyncTimeout = setTimeout(reject, 15000);
+      asyncTimeout = setTimeout(reject, 15000);
     });
   }
 

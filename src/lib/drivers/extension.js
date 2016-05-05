@@ -80,17 +80,34 @@ class ExtensionDriver extends Driver {
     this._listeners[eventName].push(cb);
   }
 
+  /**
+   * Bind a one-time listener for protocol events. Listener is removed once it
+   * has been called.
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
+  once(eventName, cb) {
+    // Create a replacement listener that will immediately remove itself after calling cb once.
+    const cbGuard = function() {
+      cb(...arguments);
+      this.off(eventName, cbGuard);
+    }.bind(this);
+
+    this.on(eventName, cbGuard);
+  }
+
   _onEvent(source, method, params) {
-    if (typeof this._listeners[method] === 'undefined') {
+    if (this._listeners[method] === undefined) {
       return;
     }
 
-    this._listeners[method].forEach(cb => {
+    // Copy array of listeners so all listeners are called, even if some removed
+    // during loop over listeners. Consistent with node's removeListener behavior:
+    // https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
+    const listenersCopy = Array.from(this._listeners[method]);
+    listenersCopy.forEach(cb => {
       cb(params);
     });
-
-    // Reset the listeners;
-    this._listeners[method].length = 0;
   }
 
   /**

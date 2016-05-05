@@ -102,6 +102,21 @@ class CriDriver extends Driver {
   }
 
   /**
+   * Bind a one-time listener for protocol events. Listener is removed once it
+   * has been called.
+   * @param {!string} eventName
+   * @param {function(...)} cb
+   */
+  once(eventName, cb) {
+    if (this._chrome === null) {
+      throw new Error('connect() must be called before attempting to listen to events.');
+    }
+    // log event listeners being bound
+    _log('info', 'listen once for event =>', {method: eventName});
+    this._chrome.once(eventName, cb);
+  }
+
+  /**
    * Unbind event listeners
    * @param {!string} eventName
    * @param {function(...)} cb
