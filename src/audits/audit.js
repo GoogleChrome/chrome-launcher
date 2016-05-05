@@ -46,18 +46,19 @@ class Audit {
   }
 
   /**
-   * @param {(boolean|number|string)} value
-   * @param {?(boolean|number|string)=} rawValue
-   * @param {string=} debugString Optional string to describe any error condition encountered.
-   * @param {?(boolean|number|string)=} optimalValue
+   * @param {!AuditResultInput} result
    * @return {!AuditResult}
    */
-  static generateAuditResult(value, rawValue, debugString, optimalValue) {
+  static generateAuditResult(result) {
+    if (typeof result.value === 'undefined') {
+      throw new Error('generateAuditResult requires a value');
+    }
+
     return {
-      value,
-      rawValue,
-      debugString,
-      optimalValue,
+      value: result.value,
+      rawValue: result.rawValue,
+      debugString: result.debugString,
+      optimalValue: result.optimalValue,
       name: this.name,
       tags: this.tags,
       description: this.description

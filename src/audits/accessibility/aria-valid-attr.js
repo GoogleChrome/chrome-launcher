@@ -49,11 +49,10 @@ class ARIAValidAttr extends Audit {
     const rule =
         artifacts.accessibility.violations.find(result => result.id === 'aria-valid-attr');
 
-    return ARIAValidAttr.generateAuditResult(
-      typeof rule === 'undefined',
-      undefined,
-      this.createDebugString(rule)
-    );
+    return ARIAValidAttr.generateAuditResult({
+      value: typeof rule === 'undefined',
+      debugString: this.createDebugString(rule)
+    });
   }
 
   static createDebugString(rule) {

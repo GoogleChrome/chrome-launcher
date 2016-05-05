@@ -77,8 +77,8 @@ class SpeedIndexMetric extends Audit {
       score = Math.max(0, score);
 
       return {
-        duration: `${results.speedIndex.toFixed(2)}ms`,
-        score: Math.round(score)
+        score: Math.round(score),
+        duration: `${results.speedIndex.toFixed(2)}ms`
       };
     }).catch(err => {
       // Recover from trace parsing failures.
@@ -88,8 +88,12 @@ class SpeedIndexMetric extends Audit {
       };
     })
     .then(result => {
-      return SpeedIndexMetric.generateAuditResult(result.score,
-          result.duration, result.debugString, this.optimalValue);
+      return SpeedIndexMetric.generateAuditResult({
+        value: result.score,
+        rawValue: result.duration,
+        debugString: result.debugString,
+        optimalValue: this.optimalValue
+      });
     });
   }
 }

@@ -53,7 +53,9 @@ class ManifestStartUrl extends Audit {
       hasStartUrl = (!!manifest.start_url.value);
     }
 
-    return ManifestStartUrl.generateAuditResult(hasStartUrl);
+    return ManifestStartUrl.generateAuditResult({
+      value: hasStartUrl
+    });
   }
 }
 

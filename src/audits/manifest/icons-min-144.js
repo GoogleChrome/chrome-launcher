@@ -50,15 +50,19 @@ class ManifestIconsMin144 extends Audit {
     const manifest = artifacts.manifest.value;
 
     if (icons.doExist(manifest) === false) {
-      return ManifestIconsMin144.generateAuditResult(false, undefined,
-          'WARNING: No icons found in the manifest');
+      return ManifestIconsMin144.generateAuditResult({
+        value: false,
+        debugString: 'WARNING: No icons found in the manifest'
+      });
     }
 
     const matchingIcons = icons.sizeAtLeast(144, /** @type {!Manifest} */ (manifest));
     const foundSizesDebug = matchingIcons.length ?
         `Found icons of sizes: ${matchingIcons}` : undefined;
-    return ManifestIconsMin144.generateAuditResult(!!matchingIcons.length, undefined,
-        foundSizesDebug);
+    return ManifestIconsMin144.generateAuditResult({
+      value: !!matchingIcons.length,
+      debugString: foundSizesDebug
+    });
   }
 }
 

@@ -59,11 +59,11 @@ class ManifestDisplay extends Audit {
 
     const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
 
-    return ManifestDisplay.generateAuditResult(
-      hasRecommendedValue,
-      displayValue,
-      'Manifest display property should be standalone or fullscreen.'
-    );
+    return ManifestDisplay.generateAuditResult({
+      value: hasRecommendedValue,
+      rawValue: displayValue,
+      debugString: 'Manifest display property should be standalone or fullscreen.'
+    });
   }
 }
 

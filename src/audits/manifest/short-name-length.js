@@ -61,11 +61,10 @@ class ManifestShortNameLength extends Audit {
       }
     }
 
-    return ManifestShortNameLength.generateAuditResult(
-      isShortNameShortEnough,
-      undefined,
+    return ManifestShortNameLength.generateAuditResult({
+      value: isShortNameShortEnough,
       debugString
-    );
+    });
   }
 }
 

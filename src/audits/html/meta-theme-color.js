@@ -48,16 +48,24 @@ class ThemeColor extends Audit {
   static audit(artifacts) {
     const themeColorMeta = artifacts.themeColorMeta;
     if (!themeColorMeta) {
-      return ThemeColor.generateAuditResult(false, undefined,
-          'No valid theme-color meta tag found.');
+      return ThemeColor.generateAuditResult({
+        value: false,
+        debugString: 'No valid theme-color meta tag found.'
+      });
     }
 
     if (!validColor(themeColorMeta)) {
-      return ThemeColor.generateAuditResult(false, themeColorMeta,
-          'The theme-color meta tag did not contain a valid CSS color.');
+      return ThemeColor.generateAuditResult({
+        value: false,
+        rawValue: themeColorMeta,
+        debugString: 'The theme-color meta tag did not contain a valid CSS color.'
+      });
     }
 
-    return ThemeColor.generateAuditResult(true, themeColorMeta);
+    return ThemeColor.generateAuditResult({
+      value: true,
+      rawValue: themeColorMeta
+    });
   }
 }
 

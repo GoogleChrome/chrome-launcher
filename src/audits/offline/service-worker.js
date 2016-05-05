@@ -52,7 +52,9 @@ class ServiceWorker extends Audit {
           reg.scriptURL.startsWith(artifacts.url);
     });
 
-    return ServiceWorker.generateAuditResult(activatedRegistrations.length > 0);
+    return ServiceWorker.generateAuditResult({
+      value: activatedRegistrations.length > 0
+    });
   }
 }
 

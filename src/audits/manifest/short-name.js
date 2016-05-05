@@ -53,7 +53,9 @@ class ManifestShortName extends Audit {
       hasShortName = (!!manifest.short_name.value);
     }
 
-    return ManifestShortName.generateAuditResult(hasShortName);
+    return ManifestShortName.generateAuditResult({
+      value: hasShortName
+    });
   }
 }
 
