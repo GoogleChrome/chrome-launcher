@@ -29,7 +29,7 @@ if (semver.lt(process.version, '5.0.0')) {
 
 module.exports = function(url, flags) {
   if (!url) {
-    throw new Error('Lighthouse requires a URL');
+    return Promise.reject(new Error('Lighthouse requires a URL'));
   }
   flags = flags || {};
 
