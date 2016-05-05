@@ -46,11 +46,7 @@ class ServiceWorker extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const registrations = artifacts.serviceWorkers.versions;
-    const activatedRegistrations = registrations.filter(reg => {
-      return reg.status === 'activated' &&
-          reg.scriptURL.startsWith(artifacts.url);
-    });
+    const activatedRegistrations = artifacts.serviceWorkers.versions;
 
     return ServiceWorker.generateAuditResult({
       value: activatedRegistrations.length > 0
