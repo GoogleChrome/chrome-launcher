@@ -64,9 +64,13 @@ class AddToHomescreen extends Aggregate {
    *   - valid name
    *   - valid short_name
    *   - short_name of reasonable length
-   *   - icon of size >= 144x144 and png (either type `image/png` or filename ending in `.png`
+   *   - icon of size >= 144x144 (technically 48dp)
+   *       and png (either type `image/png` or filename ending in `.png`
    * @see https://github.com/GoogleChrome/lighthouse/issues/23
-   *
+
+   * If you'd like to provide native rendering of icon for homescreen and
+   * splashscreen across supported screen densities, provide in these sizes:
+   *   72, 96, 144, 192, 256, 384, 512
 
    * @override
    * @return {!AggregationCriteria}

@@ -60,7 +60,7 @@ class SplashScreen extends Aggregate {
    *   - manifest has valid name
    *   - manifest has valid background_color
    *   - manifest has valid theme_color
-   *   - icon of size >= 192x192
+   *   - icon of size >= 192x192 (technically minimum is 48dp and ideal/non-scaled is 128dp)
    *     - while optional, icons at 256, 384 and 512 will be used when appropriate
    * @see https://github.com/GoogleChrome/lighthouse/issues/24
    *
