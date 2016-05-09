@@ -66,7 +66,7 @@ gulp.task('html', () => {
 
 gulp.task('chromeManifest', () => {
   var manifestOpts = {
-    buildnumber: true,
+    buildnumber: false,
     background: {
       target: 'scripts/lighthouse-background.js',
       exclude: [
