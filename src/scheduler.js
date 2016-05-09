@@ -115,8 +115,8 @@ function run(gatherers, options) {
   const driver = options.driver;
   const tracingData = {};
 
-  if (options.url === undefined || options.url === null) {
-    throw new Error('You must provide a url to scheduler');
+  if (typeof options.url !== 'string' || options.url.length === 0) {
+    return Promise.reject(new Error('You must provide a url to scheduler'));
   }
 
   const runPhase = phaseRunner(gatherers);
