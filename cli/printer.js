@@ -162,5 +162,6 @@ module.exports = {
   checkOutputMode,
   checkOutputPath,
   createOutput,
-  write
+  write,
+  OUTPUT_MODE
 };
