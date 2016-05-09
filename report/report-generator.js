@@ -22,7 +22,7 @@ const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 
-class Report {
+class ReportGenerator {
 
   constructor() {
     Handlebars.registerHelper('generated', _ => {
@@ -94,10 +94,11 @@ class Report {
     // If this is for the extension we won't be able to run JS inline to the page so we will
     // return a path to a JS file that will be copied in from ./scripts/report.js by gulp.
     if (inline) {
-      const reportScript = fs.readFileSync(path.join(__dirname, './scripts/report.js'), 'utf8');
+      const reportScript =
+          fs.readFileSync(path.join(__dirname, './scripts/lighthouse-report.js'), 'utf8');
       return `<script>${reportScript}</script>`;
     }
-    return '<script src="/pages/scripts/report.js"></script>';
+    return '<script src="/pages/scripts/lighthouse-report.js"></script>';
   }
 
   generateHTML(results, options) {
@@ -119,4 +120,4 @@ class Report {
   }
 }
 
-module.exports = Report;
+module.exports = ReportGenerator;

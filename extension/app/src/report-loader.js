@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Report = require('../../../report/report.js');
+const ReportGenerator = require('../../../report/report-generator.js');
 
 class ReportLoader {
   constructor() {
@@ -39,8 +39,8 @@ class ReportLoader {
   }
 
   write(results) {
-    const report = new Report();
-    const html = report.generateHTML(results);
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(results);
 
     this.stopSpinner();
     document.documentElement.innerHTML = html;

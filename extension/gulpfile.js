@@ -33,9 +33,9 @@ gulp.task('extras', () => {
 
 gulp.task('copyReportScripts', () => {
   return gulp.src([
-    '../report/scripts/report.js'
+    '../report/scripts/lighthouse-report.js'
   ])
-  .pipe(rename('pages/scripts/report.js'))
+  .pipe(rename('pages/scripts/lighthouse-report.js'))
   .pipe(gulp.dest('app'))
   .pipe(gulp.dest('dist'));
 });
@@ -84,7 +84,7 @@ gulp.task('browserify', () => {
     'app/src/popup.js',
     'app/src/chromereload.js',
     'app/src/lighthouse-background.js',
-    'app/src/report.js'
+    'app/src/report-loader.js'
   ], {read: false})
     .pipe(tap(file => {
       file.contents = browserify(file.path, {
@@ -109,7 +109,7 @@ gulp.task('clean', () => {
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'html'], () => {
+gulp.task('watch', ['lint', 'browserify', 'html', 'copyReportScripts'], () => {
   livereload.listen();
 
   gulp.watch([
