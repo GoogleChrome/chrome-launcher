@@ -1,0 +1,28 @@
+<style>
+.axe-violation {
+  color: #D0021B;
+}
+
+.axe-violation__help {
+  color: #76B530;
+}
+
+.axe-violation__help-minor,
+.axe-violation__help-moderate {
+  color: #F5A623;
+}
+
+.axe-violation__help-serious,
+.axe-violation__help--critical {
+  color: #D0021B;
+}
+</style>
+<div class="axe-violation">
+  <a class="axe-violation__help--{{ this.impact }}" href="{{ this.helpUrl }}" target="_blank">{{ this.help }}</a>
+
+  <ul>
+  {{#each this.nodes}}
+    <li><code>{{ this.target }}</code></li>
+  {{/each}}
+  </ul>
+</div>

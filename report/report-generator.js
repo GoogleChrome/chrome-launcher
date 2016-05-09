@@ -18,6 +18,7 @@
 
 /* global Intl */
 
+const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
@@ -108,6 +109,18 @@ class ReportGenerator {
           return prev + aggregation.score.overall;
         }, 0) /
         results.aggregations.length);
+
+    // Ensure the formatter for each extendedInfo is registered.
+    results.aggregations.forEach(aggregation => {
+      aggregation.score.subItems.forEach(subItem => {
+        if (!subItem.extendedInfo) {
+          return;
+        }
+
+        const formatter = Formatter.getByName(subItem.extendedInfo.formatter).getFormatter('html');
+        Handlebars.registerPartial(subItem.name, formatter);
+      });
+    });
 
     const template = Handlebars.compile(this.getReportHTML());
     return template({

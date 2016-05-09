@@ -38,6 +38,17 @@ AuditResultInput.prototype.debugString;
 /** @type {(boolean|number|string|undefined|null)} */
 AuditResultInput.prototype.optimalValue;
 
+/**
+ * @struct
+ * @record
+ */
+function AuditExtendedInfo() {}
+
+/** @type {!string} */
+AuditExtendedInfo.prototype.formatter;
+
+/** @type {!Object} */
+AuditExtendedInfo.prototype.value;
 
 /**
  * @struct
@@ -55,7 +66,10 @@ AuditResult.prototype.rawValue;
 AuditResult.prototype.debugString;
 
 /** @type {(boolean|number|string|undefined|null)} */
-AuditResultInput.prototype.optimalValue;
+AuditResult.prototype.optimalValue;
+
+/** @type {(AuditExtendedInfo|undefined|null)} */
+AuditResult.prototype.extendedInfo;
 
 /** @type {string} */
 AuditResult.prototype.name;

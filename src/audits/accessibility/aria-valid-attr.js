@@ -18,6 +18,7 @@
 'use strict';
 
 const Audit = require('../audit');
+const Formatter = require('../../../formatters/formatter');
 
 class ARIAValidAttr extends Audit {
   /**
@@ -51,7 +52,11 @@ class ARIAValidAttr extends Audit {
 
     return ARIAValidAttr.generateAuditResult({
       value: typeof rule === 'undefined',
-      debugString: this.createDebugString(rule)
+      debugString: this.createDebugString(rule),
+      extendedInfo: {
+        formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
+        value: rule
+      }
     });
   }
 

@@ -19,6 +19,7 @@
 
 const fs = require('fs');
 const ReportGenerator = require('../report/report-generator');
+const Formatter = require('../formatters/formatter');
 
 const log = require('../src/lib/log.js');
 
@@ -98,6 +99,12 @@ function createOutput(results, outputMode) {
       output += `${lineItem}\n`;
       if (subitem.debugString) {
         output += `    ${subitem.debugString}\n`;
+      }
+
+      if (subitem.extendedInfo && subitem.extendedInfo.value) {
+        const formatter =
+            Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');
+        output += `${formatter(subitem.extendedInfo.value)}`;
       }
     });
 

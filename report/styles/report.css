@@ -326,10 +326,20 @@ a {
 }
 
 .report-section__item {
-  display: flex;
   padding-left: 32px;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjVweCIgdmlld0JveD0iMCAwIDUgNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxjaXJjbGUgaWQ9Ik92YWwtNzAiIHN0cm9rZT0ibm9uZSIgZmlsbD0iIzY0NjQ2NCIgZmlsbC1ydWxlPSJldmVub2RkIiBjeD0iMi41IiBjeT0iMi41IiByPSIyLjUiPjwvY2lyY2xlPgo8L3N2Zz4K') 14px center no-repeat;
+  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNXB4IiBoZWlnaHQ9IjVweCIgdmlld0JveD0iMCAwIDUgNSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxjaXJjbGUgaWQ9Ik92YWwtNzAiIHN0cm9rZT0ibm9uZSIgZmlsbD0iIzY0NjQ2NCIgZmlsbC1ydWxlPSJldmVub2RkIiBjeD0iMi41IiBjeT0iMi41IiByPSIyLjUiPjwvY2lyY2xlPgo8L3N2Zz4K') 14px 8px no-repeat;
   line-height: 24px;
+}
+
+.report-section__item-details {
+  display: flex;
+}
+
+.report-section__item-extended-info {
+  font-size: 15px;
+  color: #555;
+  font-style: italic;
+  padding: 6px 6px 20px 6px;
 }
 
 .report-section__item-raw-value {

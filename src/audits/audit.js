@@ -59,6 +59,7 @@ class Audit {
       rawValue: result.rawValue,
       debugString: result.debugString,
       optimalValue: result.optimalValue,
+      extendedInfo: result.extendedInfo,
       name: this.name,
       tags: this.tags,
       description: this.description

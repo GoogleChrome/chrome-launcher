@@ -76,9 +76,16 @@ limitations under the License.
             <ul class="report-section__individual-results">
               {{#each this.score.subItems }}
                 <li class="report-section__item">
-                  <span class="report-section__item-description">{{ this.description }}</span>
-                  <span class="report-section__item-value report-section__item-value--{{ getItemRating this.value }}">{{ getItemValue this.value }}</span>
-                  <span class="report-section__item-raw-value">{{{ getItemRawValue this }}}</span>
+                  <div class="report-section__item-details">
+                    <span class="report-section__item-description">{{ this.description }}</span>
+                    <span class="report-section__item-value report-section__item-value--{{ getItemRating this.value }}">{{ getItemValue this.value }}</span>
+                    <span class="report-section__item-raw-value">{{{ getItemRawValue this }}}</span>
+                  </div>
+                  {{#if this.extendedInfo}}
+                    <div class="report-section__item-extended-info">
+                    {{> (lookup . 'name') this.extendedInfo.value }}
+                    </div>
+                  {{/if}}
                 </li>
               {{/each}}
             </ul>
