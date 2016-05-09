@@ -44,6 +44,19 @@ class ReportLoader {
 
     this.stopSpinner();
     document.documentElement.innerHTML = html;
+
+    // Find and replace all the scripts that have been injected so that they get evaluated.
+    const scripts = document.querySelectorAll('script');
+    scripts.forEach(this.replaceScript);
+  }
+
+  /**
+   * Replaces the script injected by innerHTML so that it actually gets evaluated and executed.
+   */
+  replaceScript(script) {
+    const newScript = document.createElement('script');
+    newScript.src = script.src;
+    document.body.appendChild(newScript);
   }
 }
 

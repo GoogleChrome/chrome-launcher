@@ -90,11 +90,18 @@ class Report {
     return fs.readFileSync(path.join(__dirname, './styles/report.css'), 'utf8');
   }
 
-  getReportJS() {
-    return fs.readFileSync(path.join(__dirname, './scripts/report.js'), 'utf8');
+  getReportJS(inline) {
+    // If this is for the extension we won't be able to run JS inline to the page so we will
+    // return a path to a JS file that will be copied in from ./scripts/report.js by gulp.
+    if (inline) {
+      const reportScript = fs.readFileSync(path.join(__dirname, './scripts/report.js'), 'utf8');
+      return `<script>${reportScript}</script>`;
+    }
+    return '<script src="/pages/scripts/report.js"></script>';
   }
 
-  generateHTML(results) {
+  generateHTML(results, options) {
+    const inline = (options && options.inline) || false;
     const totalScore =
         (results.aggregations.reduce((prev, aggregation) => {
           return prev + aggregation.score.overall;
@@ -105,8 +112,8 @@ class Report {
     return template({
       url: results.url,
       totalScore: Math.round(totalScore * 100),
-      css: this.getReportCSS(),
-      script: this.getReportJS(),
+      css: this.getReportCSS(inline),
+      script: this.getReportJS(inline),
       aggregations: results.aggregations
     });
   }

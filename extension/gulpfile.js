@@ -12,6 +12,7 @@ const eslint = require('gulp-eslint');
 const livereload = require('gulp-livereload');
 const tap = require('gulp-tap');
 const zip = require('gulp-zip');
+const rename = require('gulp-rename');
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -27,6 +28,15 @@ gulp.task('extras', () => {
     dot: true
   })
   .pipe(debug({title: 'copying to dist:'}))
+  .pipe(gulp.dest('dist'));
+});
+
+gulp.task('copyReportScripts', () => {
+  return gulp.src([
+    '../report/scripts/report.js'
+  ])
+  .pipe(rename('pages/scripts/report.js'))
+  .pipe(gulp.dest('app'))
   .pipe(gulp.dest('dist'));
 });
 
@@ -127,7 +137,7 @@ gulp.task('package', function() {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'browserify', 'chromeManifest',
-    ['html', 'images', 'css', 'extras'], cb);
+    ['html', 'images', 'css', 'extras', 'copyReportScripts'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {

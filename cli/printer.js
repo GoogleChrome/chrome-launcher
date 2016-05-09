@@ -76,7 +76,7 @@ function createOutput(results, outputMode) {
 
   // HTML report.
   if (outputMode === 'html') {
-    return report.generateHTML(results);
+    return report.generateHTML(results, {inline: true});
   }
 
   // JSON report.
