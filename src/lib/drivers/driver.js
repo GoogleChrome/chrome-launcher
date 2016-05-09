@@ -115,7 +115,7 @@ class DriverBase {
         ${asyncExpression}
       })()`;
 
-      this.once('Runtime.inspectRequested', value => {
+      const inspectHandler = value => {
         if (asyncTimeout !== undefined) {
           clearTimeout(asyncTimeout);
         }
@@ -128,7 +128,13 @@ class DriverBase {
         }
 
         return resolve(JSON.parse(value.object.value));
-      });
+      };
+
+      // COMPAT: Chrome 52 is when Runtime.inspectRequested became available
+      //   https://codereview.chromium.org/1866213002
+      // Previously, a similar-looking Inspector.inspect event was available, but unfortunately
+      // it will not fire in this scenario.
+      this.once('Runtime.inspectRequested', inspectHandler);
 
       this.sendCommand('Runtime.evaluate', {
         expression,
@@ -232,8 +238,8 @@ class DriverBase {
 
   _readTraceFromStream(streamHandle) {
     return new Promise((resolve, reject) => {
-      // With our stream we can read a bunch, and if its taking too long,
-      // take a break to the next event cycle and then go again.
+      // COMPAT: Chrome 50's implementation of `let` had some bugs which
+      // get triggered in this scenario. To fix for m50, use `var` for result
       let isEOF = false;
       let result = '';
 
@@ -250,7 +256,7 @@ class DriverBase {
 
         if (response.eof) {
           isEOF = true;
-          resolve(JSON.parse(result));
+          return resolve(JSON.parse(result));
         }
 
         return this.sendCommand('IO.read', readArguments).then(onChunkRead);
@@ -336,6 +342,8 @@ class DriverBase {
   }
 
   forceUpdateServiceWorkers() {
+    // COMPAT: This command will trigger this registrationId error in Chrome 50 (51 undetermined):
+    //   "{"code":-32602,"message":"Missing or invalid 'registrationId' parameter"}"
     return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
       forceUpdateOnPageLoad: true
     });
