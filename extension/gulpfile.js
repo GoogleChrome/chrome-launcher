@@ -12,6 +12,7 @@ const eslint = require('gulp-eslint');
 const livereload = require('gulp-livereload');
 const tap = require('gulp-tap');
 const zip = require('gulp-zip');
+const rename = require('gulp-rename');
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -27,6 +28,15 @@ gulp.task('extras', () => {
     dot: true
   })
   .pipe(debug({title: 'copying to dist:'}))
+  .pipe(gulp.dest('dist'));
+});
+
+gulp.task('copyReportScripts', () => {
+  return gulp.src([
+    '../report/scripts/lighthouse-report.js'
+  ])
+  .pipe(rename('pages/scripts/lighthouse-report.js'))
+  .pipe(gulp.dest('app'))
   .pipe(gulp.dest('dist'));
 });
 
@@ -74,7 +84,7 @@ gulp.task('browserify', () => {
     'app/src/popup.js',
     'app/src/chromereload.js',
     'app/src/lighthouse-background.js',
-    'app/src/report.js'
+    'app/src/report-loader.js'
   ], {read: false})
     .pipe(tap(file => {
       file.contents = browserify(file.path, {
@@ -99,7 +109,7 @@ gulp.task('clean', () => {
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'html'], () => {
+gulp.task('watch', ['lint', 'browserify', 'html', 'copyReportScripts'], () => {
   livereload.listen();
 
   gulp.watch([
@@ -127,7 +137,7 @@ gulp.task('package', function() {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'browserify', 'chromeManifest',
-    ['html', 'images', 'css', 'extras'], cb);
+    ['html', 'images', 'css', 'extras', 'copyReportScripts'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {

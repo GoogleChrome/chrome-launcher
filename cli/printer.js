@@ -18,7 +18,7 @@
 'use strict';
 
 const fs = require('fs');
-const Report = require('../report/report');
+const ReportGenerator = require('../report/report-generator');
 
 const log = require('../src/lib/log.js');
 
@@ -72,11 +72,11 @@ function checkOutputPath(path) {
  * @return {string}
  */
 function createOutput(results, outputMode) {
-  const report = new Report();
+  const reportGenerator = new ReportGenerator();
 
   // HTML report.
   if (outputMode === 'html') {
-    return report.generateHTML(results);
+    return reportGenerator.generateHTML(results, {inline: true});
   }
 
   // JSON report.

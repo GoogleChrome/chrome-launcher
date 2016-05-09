@@ -20,7 +20,7 @@
 'use strict';
 
 /* Using ES5 to broaden support */
-function Report() {
+function LighthouseReport() {
   // A Magic value for the menu top.
   var MENU_PADDING_TOP = 29;
 
@@ -36,7 +36,7 @@ function Report() {
   this.onResize();
 }
 
-Report.prototype = {
+LighthouseReport.prototype = {
   onScroll: function() {
     this.handleMenuStickiness();
   },
@@ -77,5 +77,5 @@ Report.prototype = {
 };
 
 (function() {
-  return new Report();
+  return new LighthouseReport();
 })();
