@@ -238,10 +238,11 @@ class DriverBase {
 
   _readTraceFromStream(streamHandle) {
     return new Promise((resolve, reject) => {
-      // COMPAT: Chrome 50's implementation of `let` had some bugs which
-      // get triggered in this scenario. To fix for m50, use `var` for result
-      let isEOF = false;
-      let result = '';
+      // COMPAT: We've found `result` not retaining its value in this scenario when it's
+      // declared with `let`. Observed in Chrome 50 and 52. While investigating the V8 bug
+      // further, we'll use a plain `var` declaration.
+      var isEOF = false;
+      var result = '';
 
       const readArguments = {
         handle: streamHandle.stream
