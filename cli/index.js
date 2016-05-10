@@ -31,25 +31,35 @@ if (semver.lt(process.version, '5.0.0')) {
   process.exit(1);
 }
 
+const formatOptions = Object.values(Printer.OUTPUT_MODE).join(', ');
+
 const cli = meow(`
-  Usage
+Usage:
     lighthouse [url]
 
-  Options
-    --help            Show this help
-    --version         Current version of package
-    --verbose         Displays verbose logging
-    --quiet           Displays no progress or debug logs
-    --mobile          Emulates a Nexus 5X (default=true)
-    --load-page       Loads the page (default=true)
-    --save-trace      Save the trace contents to disk
-    --save-artifacts  Generate network dependency graph
-    --output          How to output the page(default=pretty)
-    --output-path     The location to output the response(default=stdout)
+Basic:
+    --help             Show this help
+    --version          Current version of package
+
+Logging:
+    --verbose          Displays verbose logging
+    --quiet            Displays no progress or debug logs
+
+Run Configuration:
+    --mobile           Emulates a Nexus 5X (default=true)
+    --load-page        Loads the page (default=true)
+    --save-trace       Save the trace contents to disk
+    --save-artifacts   Generate network dependency graph
+
+Output:
+    --output           Reporter for the results
+                       Reporter options: ${formatOptions}  (default=pretty)
+    --output-path      The file path to output the results (default=stdout)
+                       Example: --output-path=./lighthouse-results.html
 `);
 
 const url = cli.input[0] || 'https://pwa.rocks/';
-const outputMode = cli.flags.output || 'pretty';
+const outputMode = cli.flags.output || Printer.OUTPUT_MODE.pretty;
 const outputPath = cli.flags.outputPath || 'stdout';
 const flags = cli.flags;
 
