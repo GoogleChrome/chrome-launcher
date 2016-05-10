@@ -35,15 +35,23 @@ class OmniboxThemeColor extends Aggregate {
    * @return {string}
    */
   static get name() {
-    return 'Omnibox Matches Brand Colors';
+    return 'Omnibox matches brand colors';
   }
 
   /**
    * @override
    * @return {string}
    */
-  static get shortName() {
-    return 'Omnibox';
+  static get description() {
+    return '';
+  }
+
+  /**
+   * @override
+   * @return {!AggregationType}
+   */
+  static get type() {
+    return Aggregate.TYPES.PWA;
   }
 
   /**

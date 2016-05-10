@@ -24,8 +24,8 @@ class FirstMeaningfulPaint extends Audit {
   /**
    * @override
    */
-  static get tags() {
-    return ['Performance'];
+  static get category() {
+    return 'Performance';
   }
 
   /**

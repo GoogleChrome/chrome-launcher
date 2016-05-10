@@ -36,15 +36,25 @@ class WorksOffline extends Aggregate {
    * @return {string}
    */
   static get name() {
-    return 'Works Offline';
+    return 'App can load on offline/flaky connections';
   }
 
   /**
    * @override
    * @return {string}
    */
-  static get shortName() {
-    return 'Works Offline';
+  static get description() {
+    return `Ensuring your web app can respond when the network connection is unavailable or flaky is
+            critical to providing your users a good experience. This is achieved through use of a
+            <a href="https://developers.google.com/web/fundamentals/primers/service-worker/">Service Worker</a>.`;
+  }
+
+  /**
+   * @override
+   * @return {!AggregationType}
+   */
+  static get type() {
+    return Aggregate.TYPES.PWA;
   }
 
   /**

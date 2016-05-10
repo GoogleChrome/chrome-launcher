@@ -74,8 +74,8 @@ AuditResult.prototype.extendedInfo;
 /** @type {string} */
 AuditResult.prototype.name;
 
-/** @type {!Array<string>} */
-AuditResult.prototype.tags;
+/** @type {string} */
+AuditResult.prototype.category;
 
 /** @type {string} */
 AuditResult.prototype.description;

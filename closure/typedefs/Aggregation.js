@@ -36,13 +36,31 @@ AggregationItem.prototype.subItems;
  * @struct
  * @record
  */
+function AggregationType() {}
+
+/** @type {string} */
+AggregationType.prototype.name;
+
+/** @type {boolean} */
+AggregationType.prototype.contributesToScore;
+
+/**
+ * @struct
+ * @record
+ */
 function Aggregation() {}
 
 /** @type {string} */
 Aggregation.prototype.name;
 
+/** @type {string} */
+Aggregation.prototype.description;
+
 /** @type {!AggregationItem} */
 Aggregation.prototype.score;
+
+/** @type {!AggregationType} */
+Aggregation.prototype.type;
 
 /**
  * @struct

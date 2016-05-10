@@ -63,7 +63,7 @@ const aggregators = [
   require('./aggregators/is-secure'),
   require('./aggregators/is-performant'),
   require('./aggregators/is-sized-for-mobile-screen'),
-  require('./aggregators/is-accessible')
+  require('./aggregators/best-practices')
 ];
 
 module.exports = function(driver, opts) {

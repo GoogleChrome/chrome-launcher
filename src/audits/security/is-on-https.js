@@ -22,8 +22,8 @@ class HTTPS extends Audit {
   /**
    * @override
    */
-  static get tags() {
-    return ['Security'];
+  static get category() {
+    return 'Security';
   }
 
   /**

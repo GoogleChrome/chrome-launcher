@@ -26,8 +26,8 @@ class SpeedIndexMetric extends Audit {
   /**
    * @override
    */
-  static get tags() {
-    return ['Performance'];
+  static get category() {
+    return 'Performance';
   }
 
   /**
@@ -78,7 +78,7 @@ class SpeedIndexMetric extends Audit {
 
       return {
         score: Math.round(score),
-        duration: `${results.speedIndex.toFixed(2)}ms`
+        rawValue: Math.round(results.speedIndex)
       };
     }).catch(err => {
       // Recover from trace parsing failures.
@@ -90,7 +90,7 @@ class SpeedIndexMetric extends Audit {
     .then(result => {
       return SpeedIndexMetric.generateAuditResult({
         value: result.score,
-        rawValue: result.duration,
+        rawValue: result.rawValue,
         debugString: result.debugString,
         optimalValue: this.optimalValue
       });

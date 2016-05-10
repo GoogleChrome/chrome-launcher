@@ -22,8 +22,8 @@ class WorksOffline extends Audit {
   /**
    * @override
    */
-  static get tags() {
-    return ['Offline'];
+  static get category() {
+    return 'Offline';
   }
 
   /**

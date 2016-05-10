@@ -18,7 +18,7 @@ const walk = require('walk');
 const path = require('path');
 
 const walkTree = new Promise((resolve, reject) => {
-  const fullFilePath = path.join(__dirname, '../../audits/');
+  const fullFilePath = path.join(__dirname, '../../../src/audits/');
   const walker = walk.walk(fullFilePath);
   const audits = [];
 
@@ -39,10 +39,18 @@ const walkTree = new Promise((resolve, reject) => {
 /* global describe, it*/
 
 describe('Audits', () => {
-  it('has no audits failing when tags is called', () => {
+  it('has no audits failing when category is called', () => {
     return walkTree.then(audits => {
       audits.forEach(audit => {
-        assert.doesNotThrow(_ => audit.tags);
+        assert.doesNotThrow(_ => audit.category);
+      });
+    });
+  });
+
+  it('has audits returning strings for their category', () => {
+    return walkTree.then(audits => {
+      audits.forEach(audit => {
+        assert.equal(typeof audit.category, 'string');
       });
     });
   });

@@ -23,6 +23,12 @@ const Aggregate = require('../aggregate');
 const ARIAValidAttr =
     require('../../audits/accessibility/aria-valid-attr').name;
 
+/** @type {string} */
+const manifestShortNameLength = require('../../audits/manifest/short-name-length').name;
+
+/** @type {string} */
+const display = require('../../audits/mobile-friendly/display').name;
+
 class IsAccessible extends Aggregate {
 
   /**
@@ -30,15 +36,23 @@ class IsAccessible extends Aggregate {
    * @return {string}
    */
   static get name() {
-    return 'Is Accessible';
+    return 'Best Practices';
   }
 
   /**
    * @override
    * @return {string}
    */
-  static get shortName() {
-    return 'Accessibility';
+  static get description() {
+    return '';
+  }
+
+  /**
+   * @override
+   * @return {!AggregationType}
+   */
+  static get type() {
+    return Aggregate.TYPES.BEST_PRACTICE;
   }
 
   /**
@@ -50,6 +64,16 @@ class IsAccessible extends Aggregate {
     criteria[ARIAValidAttr] = {
       value: true,
       weight: 1
+    };
+
+    criteria[manifestShortNameLength] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[display] = {
+      value: true,
+      weight: 0
     };
 
     return criteria;

@@ -1,1 +1,338 @@
-{"url":"https://voice-memos.appspot.com/","aggregations":[{"name":"Will Get Add to Homescreen Prompt","shortName":"Add to Homescreen","score":{"overall":1,"subItems":[{"value":true,"name":"service-worker","tags":["Offline"],"description":"Has a registered Service Worker"},{"value":true,"name":"manifest-exists","tags":["Manifest"],"description":"Manifest exists"},{"value":true,"name":"manifest-start-url","tags":["Manifest"],"description":"Manifest contains start_url"},{"value":true,"debugString":"Found icons of sizes: 192x192,384x384","name":"manifest-icons-min-144","tags":["Manifest"],"description":"Manifest contains icons at least 144px"},{"value":true,"name":"manifest-short-name","tags":["Manifest"],"description":"Manifest contains short_name"},{"value":true,"name":"manifest-short-name-length","tags":["Manifest"],"description":"App short_name won't be truncated"}]}},{"name":"Will Launch With A Splash Screen","shortName":"Splash Screen","score":{"overall":1,"subItems":[{"value":true,"name":"manifest-exists","tags":["Manifest"],"description":"Manifest exists"},{"value":true,"name":"manifest-name","tags":["Manifest"],"description":"Manifest contains name"},{"value":true,"name":"manifest-background-color","tags":["Manifest"],"description":"Manifest contains background_color"},{"value":true,"name":"manifest-theme-color","tags":["Manifest"],"description":"Manifest contains theme_color"},{"value":true,"debugString":"Found icons of sizes: 192x192,384x384","name":"manifest-icons-min-192","tags":["Manifest"],"description":"Manifest contains icons at least 192px"}]}},{"name":"Omnibox Matches Brand Colors","shortName":"Omnibox","score":{"overall":1,"subItems":[{"value":true,"name":"manifest-exists","tags":["Manifest"],"description":"Manifest exists"},{"value":true,"name":"manifest-theme-color","tags":["Manifest"],"description":"Manifest contains theme_color"},{"value":true,"rawValue":"#4527A0","name":"theme-color-meta","tags":["HTML"],"description":"HTML has a theme-color <meta>"}]}},{"name":"Works Offline","shortName":"Works Offline","score":{"overall":1,"subItems":[{"value":true,"name":"service-worker","tags":["Offline"],"description":"Has a registered Service Worker"},{"value":true,"name":"works offline","tags":["Offline"],"description":"URL responds with a 200 when offline"}]}},{"name":"Is Secure","shortName":"Secure","score":{"overall":1,"subItems":[{"value":true,"name":"is-on-https","tags":["Security"],"description":"Site is on HTTPS"}]}},{"name":"Is Performant","shortName":"Performance","score":{"overall":1,"subItems":[{"value":100,"rawValue":"557.55ms","optimalValue":"1,000ms","name":"first-contentful-paint","tags":["Performance"],"description":"Fast first paint of content"}]}},{"name":"Is Mobile Friendly","shortName":"Mobile Friendly","score":{"overall":1,"subItems":[{"value":true,"name":"viewport","tags":["Mobile Friendly"],"description":"HTML has a viewport <meta>"},{"value":true,"rawValue":"standalone","debugString":"Manifest display property should be standalone or fullscreen.","name":"manifest-display","tags":["Manifest"],"description":"Manifest has suggested display property"}]}}]}
+{
+  "url": "https://example.com",
+  "aggregations": [
+    {
+      "name": "Will Get Add to Homescreen Prompt",
+      "description": "While users can manually add your site to their homescreen in the browser menu, the\n            <a href=\"https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android?hl=en\">prompt\n            (aka app install banner)</a> will proactively prompt the user to install the\n            app if the below requirements are met and the user has visited your site at\n            least twice (with at least five minutes between visits).",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 0.75,
+        "subItems": [
+          {
+            "value": false,
+            "name": "service-worker",
+            "tags": [
+              "Offline"
+            ],
+            "description": "Has a registered Service Worker"
+          },
+          {
+            "value": true,
+            "name": "manifest-exists",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest exists"
+          },
+          {
+            "value": true,
+            "name": "manifest-start-url",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains start_url"
+          },
+          {
+            "value": true,
+            "debugString": "Found icons of sizes: 144x144,180x180,192x192,228x228",
+            "name": "manifest-icons-min-144",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains icons at least 144px"
+          },
+          {
+            "value": true,
+            "name": "manifest-short-name",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains short_name"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Installed web app will launch with custom splash screen",
+      "description": "A default splash screen will be constructed, but meeting these requirements guarantee a\n            high-quality and customizable <a href=\"https://developers.google.com/web/updates/2015/10/splashscreen?hl=en\">splash screen</a>\n            the user sees between tapping the home screen icon and your app’s first paint.",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 1,
+        "subItems": [
+          {
+            "value": true,
+            "name": "manifest-exists",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest exists"
+          },
+          {
+            "value": true,
+            "name": "manifest-name",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains name"
+          },
+          {
+            "value": true,
+            "name": "manifest-background-color",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains background_color"
+          },
+          {
+            "value": true,
+            "name": "manifest-theme-color",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains theme_color"
+          },
+          {
+            "value": true,
+            "debugString": "Found icons of sizes: 192x192,228x228",
+            "name": "manifest-icons-min-192",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains icons at least 192px"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Omnibox matches brand colors",
+      "description": "This is the description of the test",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 0.6666666666666666,
+        "subItems": [
+          {
+            "value": true,
+            "name": "manifest-exists",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest exists"
+          },
+          {
+            "value": true,
+            "name": "manifest-theme-color",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest contains theme_color"
+          },
+          {
+            "value": false,
+            "debugString": "No valid theme-color meta tag found.",
+            "name": "theme-color-meta",
+            "tags": [
+              "HTML"
+            ],
+            "description": "HTML has a theme-color <meta>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "App can load on offline/flaky connections",
+      "description": "This is the description of the test",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 0,
+        "subItems": [
+          {
+            "value": false,
+            "name": "service-worker",
+            "tags": [
+              "Offline"
+            ],
+            "description": "Has a registered Service Worker"
+          },
+          {
+            "value": false,
+            "name": "works offline",
+            "tags": [
+              "Offline"
+            ],
+            "description": "URL responds with a 200 when offline"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Network connection is secure",
+      "description": "This is the description of the test",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 1,
+        "subItems": [
+          {
+            "value": true,
+            "name": "is-on-https",
+            "tags": [
+              "Security"
+            ],
+            "description": "Site is on HTTPS"
+          },
+          {
+            "value": true,
+            "name": "redirects-http",
+            "tags": [
+              "Security"
+            ],
+            "description": "Site redirects HTTP traffic to HTTPS"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Page load performance is fast",
+      "description": "This is the description of the test",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 1,
+        "subItems": [
+          {
+            "value": 100,
+            "rawValue": "466.45ms",
+            "optimalValue": "1,000ms",
+            "name": "first-contentful-paint",
+            "tags": [
+              "Performance"
+            ],
+            "description": "Fast first paint of content"
+          },
+          {
+            "value": 100,
+            "rawValue": "546",
+            "optimalValue": "1,000ms",
+            "name": "speed-index-metric",
+            "tags": [
+              "Performance"
+            ],
+            "description": "Speed Index Metric"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Design is mobile-friendly",
+      "description": "This is the description of the test",
+      "type": {
+        "name": "Progressive Web App",
+        "contributesToScore": true,
+        "display": {
+          "tags": false,
+          "title": true
+        }
+      },
+      "score": {
+        "overall": 1,
+        "subItems": [
+          {
+            "value": true,
+            "name": "viewport",
+            "tags": [
+              "Mobile Friendly"
+            ],
+            "description": "HTML has a viewport <meta>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Best Practices",
+      "description": "These audits do not affect your score but are worth a look.",
+      "type": {
+        "name": "Best Practices",
+        "contributesToScore": false,
+        "display": {
+          "tags": true,
+          "title": false
+        }
+      },
+      "score": {
+        "overall": 1,
+        "subItems": [
+          {
+            "value": true,
+            "debugString": "",
+            "extendedInfo": {
+              "formatter": "accessibility"
+            },
+            "name": "aria-valid-attr",
+            "tags": [
+              "Accessibility"
+            ],
+            "description": "Ensures attributes that begin with aria- are valid ARIA attributes"
+          },
+          {
+            "value": true,
+            "name": "manifest-short-name-length",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "App short_name won't be truncated"
+          },
+          {
+            "value": true,
+            "rawValue": "standalone",
+            "debugString": "Manifest display property should be standalone or fullscreen.",
+            "name": "manifest-display",
+            "tags": [
+              "Manifest"
+            ],
+            "description": "Manifest has suggested display property"
+          }
+        ]
+      }
+    }
+  ]
+}

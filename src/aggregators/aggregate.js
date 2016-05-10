@@ -20,6 +20,25 @@
 class Aggregate {
 
   /**
+   * The types of aggregation supported by Lighthouse. These are used by the HTML Report
+   * to broadly classify the outputs. Most of the audits will be included in aggregations
+   * that are of TYPES.PWA, but any non-PWA best practices should be in aggregators of
+   * TYPES.BEST_PRACTICE.
+   */
+  static get TYPES() {
+    return {
+      PWA: {
+        name: 'Progressive Web App',
+        contributesToScore: true
+      },
+      BEST_PRACTICE: {
+        name: 'Best Practices',
+        contributesToScore: false
+      }
+    };
+  }
+
+  /**
    * @throws {Error}
    * @return {string} The name for this aggregation.
    */
@@ -31,8 +50,16 @@ class Aggregate {
    * @throws {Error}
    * @return {string} The short name for this aggregation.
    */
-  static get shortName() {
-    throw new Error('Aggregate shortName must be overridden');
+  static get description() {
+    throw new Error('Aggregate description must be overridden');
+  }
+
+  /**
+   * @throws {Error}
+   * @return {Object} The type of aggregation.
+   */
+  static get type() {
+    throw new Error('Aggregate type must be overridden');
   }
 
   /**
@@ -197,6 +224,8 @@ class Aggregate {
     return {
       name: this.name,
       shortName: this.shortName,
+      description: this.description,
+      type: this.type,
       score: Aggregate.compare(results, this.criteria)
     };
   }

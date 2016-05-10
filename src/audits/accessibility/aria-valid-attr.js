@@ -24,8 +24,8 @@ class ARIAValidAttr extends Audit {
   /**
    * @override
    */
-  static get tags() {
-    return ['Accessibility'];
+  static get category() {
+    return 'Accessibility';
   }
 
   /**

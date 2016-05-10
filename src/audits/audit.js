@@ -18,10 +18,10 @@
 
 class Audit {
   /**
-   * @return {!Array<string>}
+   * @return {string}
    */
-  static get tags() {
-    throw new Error('Audit tags must be overridden');
+  static get category() {
+    throw new Error('Audit category must be overridden');
   }
 
   /**
@@ -61,7 +61,7 @@ class Audit {
       optimalValue: result.optimalValue,
       extendedInfo: result.extendedInfo,
       name: this.name,
-      tags: this.tags,
+      category: this.category,
       description: this.description
     };
   }

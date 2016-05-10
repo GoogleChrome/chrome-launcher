@@ -27,10 +27,16 @@ function LighthouseReport() {
   this.menu = document.querySelector('.js-menu');
   this.menuContainer = document.querySelector('.js-menu-container');
   this.printButton = document.querySelector('.js-print');
+  this.radioButtonToggleViewUser = document.querySelector('.js-toggle-user');
+  this.radioButtonToggleViewTechnology = document.querySelector('.js-toggle-technology');
+  this.viewUserFeature = document.querySelector('.js-report-by-user-feature');
+  this.viewTechnology = document.querySelector('.js-report-by-technology');
+
   this.menuBCR = this.menuContainer.getBoundingClientRect();
   this.menuTopPosition = this.menuBCR.top + window.scrollY - MENU_PADDING_TOP;
   this.onScroll = this.onScroll.bind(this);
   this.onResize = this.onResize.bind(this);
+  this.updateView = this.updateView.bind(this);
 
   this.addEventListeners();
   this.onResize();
@@ -69,10 +75,22 @@ LighthouseReport.prototype = {
     window.print();
   },
 
+  updateView: function() {
+    if (this.radioButtonToggleViewUser.checked) {
+      this.viewUserFeature.removeAttribute('hidden');
+      this.viewTechnology.setAttribute('hidden', 'hidden');
+    } else if (this.radioButtonToggleViewTechnology.checked) {
+      this.viewUserFeature.setAttribute('hidden', 'hidden');
+      this.viewTechnology.removeAttribute('hidden');
+    }
+  },
+
   addEventListeners: function() {
     window.addEventListener('scroll', this.onScroll);
     window.addEventListener('resize', this.onResize);
     this.printButton.addEventListener('click', this.onPrint);
+    this.radioButtonToggleViewUser.addEventListener('change', this.updateView);
+    this.radioButtonToggleViewTechnology.addEventListener('change', this.updateView);
   }
 };
 

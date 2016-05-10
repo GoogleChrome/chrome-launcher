@@ -18,7 +18,7 @@ const walk = require('walk');
 const path = require('path');
 
 const walkTree = new Promise((resolve, reject) => {
-  const fullFilePath = path.join(__dirname, '../../src/aggregators/');
+  const fullFilePath = path.join(__dirname, '../../../src/aggregators/');
   const walker = walk.walk(fullFilePath);
   const aggregators = [];
 
@@ -47,18 +47,26 @@ describe('Aggregators', () => {
     });
   });
 
-  it('has no aggregators failing when shortName is called', () => {
-    return walkTree.then(aggregators => {
-      aggregators.forEach(aggregator => {
-        assert.doesNotThrow(_ => aggregator.shortName);
-      });
-    });
-  });
-
   it('has no aggregators failing when criteria is called', () => {
     return walkTree.then(aggregators => {
       aggregators.forEach(aggregator => {
         assert.doesNotThrow(_ => aggregator.criteria);
+      });
+    });
+  });
+
+  it('has no aggregators failing when description is called', () => {
+    return walkTree.then(aggregators => {
+      aggregators.forEach(aggregator => {
+        assert.doesNotThrow(_ => aggregator.description);
+      });
+    });
+  });
+
+  it('has no aggregators failing when type is called', () => {
+    return walkTree.then(aggregators => {
+      aggregators.forEach(aggregator => {
+        assert.doesNotThrow(_ => aggregator.type);
       });
     });
   });

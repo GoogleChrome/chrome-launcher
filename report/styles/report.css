@@ -43,11 +43,11 @@ html, body {
   background: #FAFAFA;
   color: #444;
   font-family: Arial, sans-serif;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 body {
-  min-width: 600px;
+  min-width: 640px;
   padding: 0 16px;
 }
 
@@ -147,6 +147,29 @@ a {
   background: url('data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjNDQ0IiBoZWlnaHQ9IjI0IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHdpZHRoPSIyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxwYXRoIGQ9Ik0xOSA4SDVjLTEuNjYgMC0zIDEuMzQtMyAzdjZoNHY0aDEydi00aDR2LTZjMC0xLjY2LTEuMzQtMy0zLTN6bS0zIDExSDh2LTVoOHY1em0zLTdjLS41NSAwLTEtLjQ1LTEtMXMuNDUtMSAxLTEgMSAuNDUgMSAxLS40NSAxLTEgMXptLTEtOUg2djRoMTJWM3oiLz4KICAgIDxwYXRoIGQ9Ik0wIDBoMjR2MjRIMHoiIGZpbGw9Im5vbmUiLz4KPC9zdmc+Cg==');
   border: none;
   cursor: pointer;
+}
+
+.toggle {
+  height: 44px;
+  border-top: 1px solid #F3E9CF;
+  border-bottom: 1px solid #F3E9CF;
+  line-height: 44px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  background: #FFF9E8;
+}
+
+.toggle__label {
+  padding: 0 10px 0 20px;
+}
+
+.toggle__title {
+  margin: 0;
+  font-weight: bold;
+  font-size: 13px;
 }
 
 .score-container__overall-score {
@@ -280,8 +303,7 @@ a {
 }
 
 .report-body__breakdown-item {
-  padding-bottom: 40px;
-  border-bottom: 1px solid #EBEBEB;
+  padding-bottom: 20px;
 }
 
 .report-body__breakdown-item:last-of-type {
@@ -302,17 +324,37 @@ a {
   -webkit-font-smoothing: antialiased;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 500;
   color: #49525F;
   display: flex;
+  margin: 1em 0 0.3em 0;
 }
 
 .report-section__subtitle {
   -webkit-font-smoothing: antialiased;
   font-family: 'Roboto', Arial, sans-serif;
-  font-size: 16px;
-  font-weight: normal;
+  font-size: 18px;
+  font-weight: 500;
   color: #719EA8;
+  display: flex;
+  margin: 24px 0 6px 0;
+}
+
+.report-section__description {
+  color: #5F6875;
+  font-size: 16px;
+  margin: 0 0 2em 0;
+  line-height: 1.4;
+  max-width: 750px;
+}
+
+.report-section__aggregation-description {
+  font-style: italic;
+  color: #777;
+  font-size: 14px;
+  margin: 0.6em 0 1.5em 0;
+  line-height: 1.4;
+  max-width: 750px;
 }
 
 .report-section__label {
