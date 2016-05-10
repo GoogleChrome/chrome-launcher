@@ -16,9 +16,35 @@
  */
 
 'use strict';
-
-const traceviewer = require('traceviewer');
 const URL = require('url');
+
+/* global window */
+window.global = window;
+
+// we need gl-matrix and jszip for traceviewer
+// since it has internal forks for isNode and they get mixed up during
+// browserify, we require them locally here and global-ize them.
+
+// from catapult/tracing/tracing/base/math.html
+const glMatrixModule = require('gl-matrix');
+Object.keys(glMatrixModule).forEach(exportName => {
+  global[exportName] = glMatrixModule[exportName];
+});
+// from catapult/tracing/tracing/extras/importer/jszip.html
+global.JSZip = require('jszip/dist/jszip.min.js');
+
+global.HTMLImportsLoader = {};
+global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
+  if (path === '/gl-matrix-min.js') {
+    return 'empty-module';
+  }
+  if (path === '/jszip.min.js') {
+    return 'jszip/dist/jszip.min.js';
+  }
+};
+
+require('../../../third_party/traceviewer-js/');
+const traceviewer = global.tr;
 
 class TraceProcessor {
   get RESPONSE() {
@@ -33,7 +59,7 @@ class TraceProcessor {
     return 'Load';
   }
 
-  analyzeTrace(contents, opts) {
+  init(contents) {
     let contentsJSON = null;
 
     try {
@@ -47,16 +73,20 @@ class TraceProcessor {
         contentsJSON = contentsJSON.traceEvents;
       }
     } catch (e) {
-      throw new Error('Invalid trace contents; not JSON');
+      throw new Error('Invalid trace contents: ' + e.message);
     }
 
     const events = [JSON.stringify({
       traceEvents: contentsJSON
     })];
 
-    // Switch on all the globals we need, and import tracing.
-    const model = this.convertEventsToModel(events);
-    const processes = model.getAllProcesses();
+    return this.convertEventsToModel(events);
+  }
+
+  analyzeTrace(contents, opts) {
+    this.model = this.init(contents);
+
+    const processes = this.model.getAllProcesses();
     let summarizable = [];
     let traceProcess = null;
 
@@ -89,9 +119,10 @@ class TraceProcessor {
     }
 
     traceProcess = summarizable.pop();
-    return this.processTrace(model, traceProcess, opts);
+    return this.processTrace(this.model, traceProcess, opts);
   }
 
+  // Create the importer and import the trace contents to a model.
   convertEventsToModel(events) {
     const io = new traceviewer.importer.ImportOptions();
     io.showImportWarnings = false;
@@ -103,6 +134,21 @@ class TraceProcessor {
     importer.importTraces(events);
 
     return model;
+  }
+
+  getInputReadiness(model) {
+    // Now set up the user expectations model.
+    // TODO(paullewis) confirm these values are meaningful.
+    const idle = new traceviewer.model.um.IdleExpectation(model, 'test', 0, 10000);
+    model.userModel.expectations.push(idle);
+
+    // Set up a value list for the hazard metric.
+    // TODO use new approach from ben
+    //   https://github.com/GoogleChrome/lighthouse/pull/284#issuecomment-217263964
+    const valueList = new traceviewer.metrics.ValueList();
+    traceviewer.metrics.sh.hazardMetric(valueList, model);
+    const metricValue = valueList.valueDicts[0];
+    return metricValue;
   }
 
   processTrace(model, traceProcess, opts) {
