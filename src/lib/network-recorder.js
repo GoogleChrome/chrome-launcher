@@ -38,6 +38,7 @@ class NetworkRecorder {
     this.onDataReceived = this.onDataReceived.bind(this);
     this.onLoadingFinished = this.onLoadingFinished.bind(this);
     this.onLoadingFailed = this.onLoadingFailed.bind(this);
+    this.onResourceChangedPriority = this.onResourceChangedPriority.bind(this);
   }
 
   // There are a few differences between the debugging protocol naming and
@@ -85,6 +86,10 @@ class NetworkRecorder {
     this.networkManager._dispatcher.loadingFailed(data.requestId,
         data.timestamp, data.type, data.errorText, data.canceled,
         data.blockedReason);
+  }
+
+  onResourceChangedPriority(data) {
+    this._rawEvents.push({method: 'Network.resourceChangedPriority', params: data});
   }
 }
 

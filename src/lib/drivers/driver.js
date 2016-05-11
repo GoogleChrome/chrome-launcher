@@ -280,6 +280,7 @@ class DriverBase {
       this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
       this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
       this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
+      this.on('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
 
       this.sendCommand('Network.enable').then(_ => {
         resolve();
@@ -295,6 +296,7 @@ class DriverBase {
       this.off('Network.dataReceived', this._networkRecorder.onDataReceived);
       this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
       this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
+      this.off('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
 
       resolve({
         networkRecords: this._networkRecords,

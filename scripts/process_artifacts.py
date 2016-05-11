@@ -35,18 +35,25 @@ def create_tracing_track(trace_events):
             or event['cat'] == '__metadata']}
 
 def create_page_track(frame_load_events):
-  events = [{'frame_id': e['frameId'], 'method': e['method']}
-            for e in frame_load_events]
+  events = []
+  for event in frame_load_events:
+    clovis_event = {
+      'frame_id': event['frameId'],
+      'method': event['method'],
+      'parent_frame_id': event.get('parentFrameId', None)
+    }
+    events.append(clovis_event)
   return {'events': events}
 
 def create_request_track(raw_network_events):
   request_track = RequestTrack(None)
   for event in raw_network_events:
-    request_track.Handle(event['method'], event)
+    if event['method'] in RequestTrack._METHOD_TO_HANDLER:  # pylint: disable=protected-access
+      request_track.Handle(event['method'], event)
   return request_track.ToJsonDict()
 
 def main():
-  with open('artifacts.log', 'r') as f:
+  with open('clovisData.json', 'r') as f:
     artifacts = json.load(f)
 
   clovis_trace = {}

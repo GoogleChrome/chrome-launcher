@@ -30,7 +30,8 @@ const gathererClasses = [
   require('./gatherers/html'),
   require('./gatherers/manifest'),
   require('./gatherers/accessibility'),
-  require('./gatherers/offline')
+  require('./gatherers/offline'),
+  require('./gatherers/critical-network-chains')
 ];
 
 const audits = [

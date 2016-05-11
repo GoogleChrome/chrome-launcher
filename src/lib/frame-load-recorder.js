@@ -38,7 +38,10 @@ class FrameLoadRecorder {
   }
 
   onFrameAttached(data) {
-    this._events.push({frameId: data.frameId, method: 'Page.frameAttached'});
+    this._events.push({
+      frameId: data.frameId,
+      method: 'Page.frameAttached',
+      parentFrameId: data.parentFrameId});
   }
 
 }

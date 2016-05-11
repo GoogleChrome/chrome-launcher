@@ -17,7 +17,6 @@
 'use strict';
 
 const fs = require('fs');
-
 const log = require('./lib/log.js');
 
 function loadPage(driver, gatherers, options) {

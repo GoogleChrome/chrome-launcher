@@ -94,8 +94,15 @@ global.NetworkAgent = {
     Origin: 'origin',
     Inspector: 'inspector',
     Other: 'other'
+  },
+  InitiatorType: {
+    Other: 'other',
+    Parser: 'parser',
+    Redirect: 'redirect',
+    Script: 'script'
   }
 };
+
 // Enum from SecurityState enum in protocol's Security domain
 global.SecurityAgent = {
   SecurityState: {
@@ -195,6 +202,24 @@ WebInspector.ConsoleMessage.MessageType = {
   Log: 'log'
 };
 
+// Mock NetworkLog
+WebInspector.NetworkLog = function(target) {
+  this._requests = new Map();
+  target.networkManager.addEventListener(
+    WebInspector.NetworkManager.EventTypes.RequestStarted, this._onRequestStarted, this);
+};
+
+WebInspector.NetworkLog.prototype = {
+  requestForURL: function(url) {
+    return this._requests.get(url) || null;
+  },
+
+  _onRequestStarted: function(event) {
+    var request = event.data;
+    this._requests.set(request.url, request);
+  }
+};
+
 // Dependencies for color parsing.
 require('chrome-devtools-frontend/front_end/common/Color.js');
 
@@ -222,7 +247,10 @@ WebInspector.NetworkManager.createWithFakeTarget = function() {
     registerNetworkDispatcher() {}
   };
 
-  return new WebInspector.NetworkManager(fakeTarget);
+  fakeTarget.networkManager = new WebInspector.NetworkManager(fakeTarget);
+  fakeTarget.networkLog = new WebInspector.NetworkLog(fakeTarget);
+
+  return fakeTarget.networkManager;
 };
 
 module.exports = WebInspector;
