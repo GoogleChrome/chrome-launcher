@@ -58,12 +58,12 @@ const audits = [
 ];
 
 const aggregators = [
+  require('./aggregators/can-load-offline'),
+  require('./aggregators/is-performant'),
+  require('./aggregators/is-secure'),
   require('./aggregators/will-get-add-to-homescreen-prompt'),
   require('./aggregators/launches-with-splash-screen'),
-  require('./aggregators/omnibox-is-themed'),
-  require('./aggregators/can-load-offline'),
-  require('./aggregators/is-secure'),
-  require('./aggregators/is-performant'),
+  require('./aggregators/address-bar-is-themed'),
   require('./aggregators/is-sized-for-mobile-screen'),
   require('./aggregators/best-practices')
 ];

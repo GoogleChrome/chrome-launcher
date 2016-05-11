@@ -28,14 +28,14 @@ const manifestThemeColor = require('../../audits/manifest/theme-color').name;
 /** @type {string} */
 const metaThemeColor = require('../../audits/html/meta-theme-color').name;
 
-class OmniboxThemeColor extends Aggregate {
+class AddressBarThemeColor extends Aggregate {
 
   /**
    * @override
    * @return {string}
    */
   static get name() {
-    return 'Omnibox matches brand colors';
+    return 'Address bar matches brand colors';
   }
 
   /**
@@ -43,7 +43,11 @@ class OmniboxThemeColor extends Aggregate {
    * @return {string}
    */
   static get description() {
-    return '';
+    return `The browser address bar can be themed to match your site. A theme-color
+            <a href="https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android">meta tag</a>
+            will upgrade the address bar when a user browses the site, and the
+            <a href="https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color">manifest theme-color</a>
+            will apply the same theme site-wide once it's been added to homescreen.`;
   }
 
   /**
@@ -55,7 +59,7 @@ class OmniboxThemeColor extends Aggregate {
   }
 
   /**
-   * For the omnibox to adopt a theme color, Chrome needs the following:
+   * For the address bar to adopt a theme color, Chrome needs the following:
    *   - has valid manifest
    *   - valid theme_color in manifest
    *   - valid theme-color <meta> element
@@ -89,4 +93,4 @@ class OmniboxThemeColor extends Aggregate {
   }
 }
 
-module.exports = OmniboxThemeColor;
+module.exports = AddressBarThemeColor;

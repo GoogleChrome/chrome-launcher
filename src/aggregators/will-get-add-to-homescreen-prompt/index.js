@@ -41,7 +41,7 @@ class AddToHomescreen extends Aggregate {
    * @return {string}
    */
   static get name() {
-    return 'Will Get Add to Homescreen Prompt';
+    return 'User can be prompted to Add to Homescreen';
   }
 
   /**

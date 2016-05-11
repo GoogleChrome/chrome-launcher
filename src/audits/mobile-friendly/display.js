@@ -38,7 +38,8 @@ class ManifestDisplay extends Audit {
    * @override
    */
   static get description() {
-    return 'Manifest has suggested display property';
+    return `Manifest's display property set to “standalone” or “fullscreen” to
+            allow launching without address bar.`;
   }
 
   /**

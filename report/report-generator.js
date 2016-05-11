@@ -56,13 +56,27 @@ class ReportGenerator {
       return value;
     });
 
+    // Converts the total score to a rating that can be used for styling.
+    Handlebars.registerHelper('getTotalScoreRating', totalScore => {
+      let rating = 'poor';
+      if (totalScore > 45) {
+        rating = 'average';
+      }
+      if (totalScore > 75) {
+        rating = 'good';
+      }
+
+      return rating;
+    });
+
     // Converts a value to a rating string, which can be used inside the report for color styling.
-    Handlebars.registerHelper('getItemRating', value => {
+    Handlebars.registerHelper('getItemRating', (value, aggregatorType) => {
       if (typeof value === 'boolean') {
         return value ? 'good' : 'poor';
       }
 
-      let rating = 'poor';
+      // Limit the rating to average if this is a rating for Best Practices.
+      let rating = aggregatorType === Aggregate.TYPES.BEST_PRACTICE ? 'average' : 'poor';
       if (value > 0.33) {
         rating = 'average';
       }

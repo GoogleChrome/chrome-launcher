@@ -43,7 +43,8 @@ class IsPerformant extends Aggregate {
    * @return {string}
    */
   static get description() {
-    return '';
+    return `Users notice if sites and apps don't perform well. These top-level metrics capture
+            the most important perceived performance concerns.`;
   }
 
   /**
