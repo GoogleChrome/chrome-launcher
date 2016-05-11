@@ -1,0 +1,93 @@
+/**
+Copyright (c) 2014 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./base.js");
+
+'use strict';
+
+global.tr.exportTo('tr.b', function() {
+
+  function Base64() {
+  }
+
+  function b64ToUint6(nChr) {
+    if (nChr > 64 && nChr < 91)
+      return nChr - 65;
+    if (nChr > 96 && nChr < 123)
+      return nChr - 71;
+    if (nChr > 47 && nChr < 58)
+      return nChr + 4;
+    if (nChr === 43)
+      return 62;
+    if (nChr === 47)
+      return 63;
+    return 0;
+  }
+
+  Base64.getDecodedBufferLength = function(input) {
+    return input.length * 3 + 1 >> 2;
+  };
+
+  Base64.EncodeArrayBufferToString = function(input) {
+    // http://stackoverflow.com/questions/9267899/
+    var binary = '';
+    var bytes = new Uint8Array(input);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++)
+      binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  };
+
+  Base64.DecodeToTypedArray = function(input, output) {
+
+    var nInLen = input.length;
+    var nOutLen = nInLen * 3 + 1 >> 2;
+    var nMod3 = 0;
+    var nMod4 = 0;
+    var nUint24 = 0;
+    var nOutIdx = 0;
+
+    if (nOutLen > output.byteLength)
+      throw new Error('Output buffer too small to decode.');
+
+    for (var nInIdx = 0; nInIdx < nInLen; nInIdx++) {
+      nMod4 = nInIdx & 3;
+      nUint24 |= b64ToUint6(input.charCodeAt(nInIdx)) << 18 - 6 * nMod4;
+      if (nMod4 === 3 || nInLen - nInIdx === 1) {
+        for (nMod3 = 0; nMod3 < 3 && nOutIdx < nOutLen; nMod3++, nOutIdx++) {
+          output.setUint8(nOutIdx, nUint24 >>> (16 >>> nMod3 & 24) & 255);
+        }
+        nUint24 = 0;
+      }
+    }
+    return nOutIdx - 1;
+  };
+
+  /*
+   * Wrapper of btoa
+   * The reason is that window object has a builtin btoa,
+   * but we also want to use btoa when it is headless.
+   * For example we want to use it in a mapper
+   */
+  Base64.btoa = function(input) {
+    return btoa(input);
+  };
+
+  /*
+   * Wrapper of atob
+   * The reason is that window object has a builtin atob,
+   * but we also want to use atob when it is headless.
+   * For example we want to use it in a mapper
+   */
+  Base64.atob = function(input) {
+    return atob(input);
+  };
+
+  return {
+    Base64: Base64
+  };
+
+});

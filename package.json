@@ -34,12 +34,14 @@
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
     "devtools-timeline-model": "1.0.19",
+    "empty-module": "0.0.2",
+    "gl-matrix": "2.3.2",
     "handlebars": "^4.0.5",
+    "jszip": "2.6.0",
     "meow": "^3.7.0",
     "npmlog": "^2.0.3",
     "semver": "^5.1.0",
-    "speedline": "^0.1.2",
-    "traceviewer": "^1.0.8"
+    "speedline": "^0.1.2"
   },
   "devDependencies": {
     "eslint": "^2.4.0",
@@ -48,6 +50,8 @@
     "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-util": "^3.0.7",
+    "jsdom": "^9.0.0",
+    "mkdirp": "^0.5.1",
     "mocha": "^2.3.3",
     "request": "^2.69.0",
     "walk": "^2.3.9"

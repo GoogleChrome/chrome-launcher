@@ -2,7 +2,7 @@ node_modules
 *.pyc
 .DS_Store
 dist
-init.sh
+third_party/src
 npm-debug.log
 artifacts.log
 clovis-trace.log

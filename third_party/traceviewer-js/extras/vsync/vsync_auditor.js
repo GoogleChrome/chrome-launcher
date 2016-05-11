@@ -1,0 +1,125 @@
+/**
+Copyright (c) 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../core/auditor.js");
+
+'use strict';
+
+global.tr.exportTo('tr.e.audits', function() {
+
+  var VSYNC_COUNTER_PRECISIONS = {
+    // Android. Some versions have VSYNC split out into VSYNC-app and VSYNC-sf.
+    // Requires "gfx" systrace category to be enabled.
+    'android.VSYNC-app': 15,
+    'android.VSYNC': 15
+  };
+
+  var VSYNC_SLICE_PRECISIONS = {
+    // Android.
+    'RenderWidgetHostViewAndroid::OnVSync': 5,
+    // Android. Very precise. Requires "gfx" systrace category to be enabled.
+    'VSYNC': 10,
+    // Linux. Very precise. Requires "gpu" tracing category to be enabled.
+    'vblank': 10,
+    // Mac. Derived from a Mac callback (CVDisplayLinkSetOutputCallback).
+    'DisplayLinkMac::GetVSyncParameters': 5
+  };
+
+  var BEGIN_FRAME_SLICE_PRECISION = {
+    'Scheduler::BeginFrame': 10
+  };
+
+  /**
+   * Auditor that analyzes the model and, if possible, adds data to it
+   * indicating when vertical sync events took place.
+   *
+   * @constructor
+   * @extends {tr.c.Auditor}
+   */
+  function VSyncAuditor(model) {
+    tr.c.Auditor.call(this, model);
+  };
+
+  VSyncAuditor.prototype = {
+    __proto__: tr.c.Auditor.prototype,
+
+    runAnnotate: function() {
+      this.model.device.vSyncTimestamps = this.findVSyncTimestamps(this.model);
+    },
+
+    /**
+     * Returns an array of the most accurate VSync times available in the model.
+     */
+    findVSyncTimestamps: function(model) {
+      var times = [];
+
+      // Only keep the most precise VSync data.
+      var maxPrecision = Number.NEGATIVE_INFINITY;
+      var maxTitle = undefined;
+
+      function useInstead(title, precisions) {
+        var precision = precisions[title];
+        if (precision === undefined)
+          return false;
+
+        if (title === maxTitle)
+          return true;
+
+        if (precision <= maxPrecision) {
+          if (precision === maxPrecision) {
+            console.warn('Encountered two different VSync events (' +
+                maxTitle + ', ' + title + ') with the same precision, ' +
+               'ignoring the newer one (' + title + ')');
+          }
+          return false;
+        }
+        maxPrecision = precision;
+        maxTitle = title;
+        times = [];
+
+        return true;
+      }
+
+      for (var pid in model.processes) {
+        var process = model.processes[pid];
+        // Traverse process counters.
+        for (var cid in process.counters) {
+          if (useInstead(cid, VSYNC_COUNTER_PRECISIONS)) {
+            var counter = process.counters[cid];
+            for (var i = 0; i < counter.series.length; i++) {
+              var series = counter.series[i];
+              Array.prototype.push.apply(times, series.timestamps);
+            }
+          }
+        }
+
+        // Traverse thread slices.
+        for (var tid in process.threads) {
+          var thread = process.threads[tid];
+          for (var i = 0; i < thread.sliceGroup.slices.length; i++) {
+            var slice = thread.sliceGroup.slices[i];
+            if (useInstead(slice.title, VSYNC_SLICE_PRECISIONS))
+              times.push(slice.start);
+            // We need to check not only that we have a Scheduler::BeginFrame
+            // event, but also that we have one that has a frame time associated
+            // with it. Older versions of Scheduler::BeginFrame don't have one.
+            else if (useInstead(slice.title, BEGIN_FRAME_SLICE_PRECISION) &&
+                slice.args.args && slice.args.args.frame_time_us)
+              times.push(slice.args.args.frame_time_us / 1000.0);
+          }
+        }
+      }
+      times.sort(function(x, y) { return x - y; });
+      return times;
+    }
+  };
+
+  tr.c.Auditor.register(VSyncAuditor);
+
+  return {
+    VSyncAuditor: VSyncAuditor
+  };
+});

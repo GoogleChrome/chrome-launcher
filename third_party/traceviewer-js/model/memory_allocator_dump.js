@@ -1,0 +1,213 @@
+/**
+Copyright (c) 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/iteration_helpers.js");
+require("../value/numeric.js");
+require("../value/unit.js");
+
+'use strict';
+
+/**
+ * @fileoverview Provides the MemoryAllocatorDump class.
+ */
+global.tr.exportTo('tr.model', function() {
+  /**
+   * @constructor
+   */
+  function MemoryAllocatorDump(containerMemoryDump, fullName, opt_guid) {
+    this.fullName = fullName;
+    this.parent = undefined;
+    this.children = [];
+
+    // String -> ScalarNumeric.
+    this.numerics = {};
+
+    // String -> string.
+    this.diagnostics = {};
+
+    // The associated container memory dump.
+    this.containerMemoryDump = containerMemoryDump;
+
+    // Ownership relationship between memory allocator dumps.
+    this.owns = undefined;
+    this.ownedBy = [];
+
+    // Map from sibling dumps (other children of this dump's parent) to the
+    // proportion of this dump's size which they (or their descendants) own.
+    this.ownedBySiblingSizes = new Map();
+
+    // Retention relationship between memory allocator dumps.
+    this.retains = [];
+    this.retainedBy = [];
+
+    // Weak memory allocator dumps are removed from the model after import in
+    // tr.model.GlobalMemoryDump.removeWeakDumps(). See
+    // base::trace_event::MemoryAllocatorDump::Flags::WEAK in the Chromium
+    // codebase.
+    this.weak = false;
+
+    // A list of information about the memory allocator dump (e.g. about how
+    // its fields were calculated). Each item should be an object with
+    // a mandatory 'type' property and type-specific extra arguments (see
+    // MemoryAllocatorDumpInfoType).
+    this.infos = [];
+
+    // For debugging purposes.
+    this.guid = opt_guid;
+  };
+
+  /**
+   * Size numeric names. Please refer to the Memory Dump Graph Metric
+   * Calculation design document for more details (https://goo.gl/fKg0dt).
+   */
+  MemoryAllocatorDump.SIZE_NUMERIC_NAME = 'size';
+  MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME = 'effective_size';
+  MemoryAllocatorDump.RESIDENT_SIZE_NUMERIC_NAME = 'resident_size';
+  MemoryAllocatorDump.DISPLAYED_SIZE_NUMERIC_NAME =
+      MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME;
+
+  MemoryAllocatorDump.prototype = {
+    get name() {
+      return this.fullName.substring(this.fullName.lastIndexOf('/') + 1);
+    },
+
+    get quantifiedName() {
+      return '\'' + this.fullName + '\' in ' +
+          this.containerMemoryDump.containerName;
+    },
+
+    isDescendantOf: function(otherDump) {
+      var dump = this;
+      while (dump !== undefined) {
+        if (dump === otherDump)
+          return true;
+        dump = dump.parent;
+      }
+      return false;
+    },
+
+    addNumeric: function(name, numeric) {
+      if (!(numeric instanceof tr.v.ScalarNumeric))
+        throw new Error('Numeric value must be an instance of ScalarNumeric.');
+      if (name in this.numerics)
+        throw new Error('Duplicate numeric name: ' + name + '.');
+      this.numerics[name] = numeric;
+    },
+
+    addDiagnostic: function(name, text) {
+      if (typeof text !== 'string')
+        throw new Error('Diagnostic text must be a string.');
+      if (name in this.diagnostics)
+        throw new Error('Duplicate diagnostic name: ' + name + '.');
+      this.diagnostics[name] = text;
+    },
+
+    aggregateNumericsRecursively: function(opt_model) {
+      var numericNames = new Set();
+
+      // Aggregate descendants's numerics recursively and gather children's
+      // numeric names.
+      this.children.forEach(function(child) {
+        child.aggregateNumericsRecursively(opt_model);
+        tr.b.iterItems(child.numerics, numericNames.add, numericNames);
+      }, this);
+
+      // Aggregate children's numerics.
+      numericNames.forEach(function(numericName) {
+        if (numericName === MemoryAllocatorDump.SIZE_NUMERIC_NAME ||
+            numericName === MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME ||
+            this.numerics[numericName] !== undefined) {
+            // Don't aggregate size and effective size numerics. These are
+            // calculated in GlobalMemoryDump.prototype.calculateSizes() and
+            // GlobalMemoryDump.prototype.calculateEffectiveSizes respectively.
+            // Also don't aggregate numerics that the parent already has.
+          return;
+        }
+
+        this.numerics[numericName] = MemoryAllocatorDump.aggregateNumerics(
+            this.children.map(function(child) {
+              return child.numerics[numericName];
+            }), opt_model);
+      }, this);
+    }
+  };
+
+  // TODO(petrcermak): Consider moving this to tr.v.Numeric.
+  MemoryAllocatorDump.aggregateNumerics = function(numerics, opt_model) {
+    var shouldLogWarning = !!opt_model;
+    var aggregatedUnit = undefined;
+    var aggregatedValue = 0;
+
+    // Aggregate the units and sum up the values of the numerics.
+    numerics.forEach(function(numeric) {
+      if (numeric === undefined)
+        return;
+
+      var unit = numeric.unit;
+      if (aggregatedUnit === undefined) {
+        aggregatedUnit = unit;
+      } else if (aggregatedUnit !== unit) {
+        if (shouldLogWarning) {
+          opt_model.importWarning({
+            type: 'numeric_parse_error',
+            message: 'Multiple units provided for numeric: \'' +
+                aggregatedUnit.unitName + '\' and \'' + unit.unitName + '\'.'
+          });
+          shouldLogWarning = false;  // Don't log multiple warnings.
+        }
+        // Use the most generic unit when the numerics don't agree (best
+        // effort).
+        aggregatedUnit = tr.v.Unit.byName.unitlessNumber_smallerIsBetter;
+      }
+
+      aggregatedValue += numeric.value;
+    }, this);
+
+    if (aggregatedUnit === undefined)
+      return undefined;
+
+    return new tr.v.ScalarNumeric(aggregatedUnit, aggregatedValue);
+  };
+
+  /**
+   * @constructor
+   */
+  function MemoryAllocatorDumpLink(source, target, opt_importance) {
+    this.source = source;
+    this.target = target;
+    this.importance = opt_importance;
+    this.size = undefined;
+  }
+
+  /**
+   * Types of size numeric information.
+   *
+   * @enum
+   */
+  var MemoryAllocatorDumpInfoType = {
+    // The provided size of a MemoryAllocatorDump was less than the aggregated
+    // size of its children.
+    //
+    // Mandatory extra args:
+    //   * providedSize: The inconsistent provided size.
+    //   * dependencySize: The aggregated size of the children.
+    PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN: 0,
+
+    // The provided size of a MemoryAllocatorDump was less than the size of its
+    // largest owner.
+    //
+    // Mandatory extra args:
+    //   * providedSize: The inconsistent provided size.
+    //   * dependencySize: The size of the largest owner.
+    PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER: 1
+  };
+
+  return {
+    MemoryAllocatorDump: MemoryAllocatorDump,
+    MemoryAllocatorDumpLink: MemoryAllocatorDumpLink,
+    MemoryAllocatorDumpInfoType: MemoryAllocatorDumpInfoType
+  };
+});

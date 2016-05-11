@@ -1,0 +1,169 @@
+/**
+Copyright (c) 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/base.js");
+require("../base/range_utils.js");
+require("../core/auditor.js");
+require("../model/event_info.js");
+require("../model/user_model/animation_expectation.js");
+require("../model/user_model/response_expectation.js");
+
+'use strict';
+
+global.tr.exportTo('tr.importer', function() {
+  // This is an intermediate data format between InputLatencyAsyncSlices and
+  // Response and Animation IRs.
+  function ProtoExpectation(irType, name) {
+    this.irType = irType;
+    this.names = new Set(name ? [name] : undefined);
+    this.start = Infinity;
+    this.end = -Infinity;
+    this.associatedEvents = new tr.model.EventSet();
+    this.isAnimationBegin = false;
+  }
+
+  ProtoExpectation.RESPONSE_TYPE = 'r';
+  ProtoExpectation.ANIMATION_TYPE = 'a';
+
+  // Explicitly ignore some input events to allow
+  // UserModelBuilder.checkAllInputEventsHandled() to determine which events
+  // were unintentionally ignored due to a bug.
+  ProtoExpectation.IGNORED_TYPE = 'ignored';
+
+  ProtoExpectation.prototype = {
+    get isValid() {
+      return this.end > this.start;
+    },
+
+    // Return true if any associatedEvent's typeName is in typeNames.
+    containsTypeNames: function(typeNames) {
+      for (var i = 0; i < this.associatedEvents.length; ++i) {
+        if (typeNames.indexOf(this.associatedEvents[i].typeName) >= 0)
+          return true;
+      }
+      return false;
+    },
+
+    containsSliceTitle: function(title) {
+      for (var i = 0; i < this.associatedEvents.length; ++i) {
+        if (title === this.associatedEvents[i].title)
+          return true;
+      }
+      return false;
+    },
+
+    createInteractionRecord: function(model) {
+      if (!this.isValid) {
+        console.error('Invalid ProtoExpectation: ' + this.debug() +
+                      ' File a bug with this trace!');
+        return undefined;
+      }
+
+      var initiatorTitles = [];
+      this.names.forEach(function(name) {
+        initiatorTitles.push(name);
+      });
+      initiatorTitles = initiatorTitles.sort().join(',');
+
+      var duration = this.end - this.start;
+
+      var ir = undefined;
+      switch (this.irType) {
+        case ProtoExpectation.RESPONSE_TYPE:
+          ir = new tr.model.um.ResponseExpectation(
+              model, initiatorTitles, this.start, duration,
+              this.isAnimationBegin);
+          break;
+        case ProtoExpectation.ANIMATION_TYPE:
+          ir = new tr.model.um.AnimationExpectation(
+              model, initiatorTitles, this.start, duration);
+          break;
+      }
+      if (!ir)
+        return undefined;
+
+      ir.sourceEvents.addEventSet(this.associatedEvents);
+
+      function pushAssociatedEvents(event) {
+        ir.associatedEvents.push(event);
+
+        // |event| is either an InputLatencyAsyncSlice (which collects all of
+        // its associated events transitively) or a CSS Animation (which doesn't
+        // have any associated events). So this does not need to recurse.
+        if (event.associatedEvents)
+          ir.associatedEvents.addEventSet(event.associatedEvents);
+      }
+
+      this.associatedEvents.forEach(function(event) {
+        pushAssociatedEvents(event);
+
+        // Old-style InputLatencyAsyncSlices have subSlices.
+        if (event.subSlices)
+          event.subSlices.forEach(pushAssociatedEvents);
+      });
+
+      return ir;
+    },
+
+    // Merge the other ProtoExpectation into this one.
+    // The irTypes need not match: ignored ProtoExpectations might be merged
+    // into overlapping ProtoExpectations, and Touch-only Animations are merged
+    // into Tap Responses.
+    merge: function(other) {
+      other.names.forEach(function(name) { this.names.add(name); }.bind(this));
+
+      // Don't use pushEvent(), which would lose special start, end.
+      this.associatedEvents.addEventSet(other.associatedEvents);
+      this.start = Math.min(this.start, other.start);
+      this.end = Math.max(this.end, other.end);
+      if (other.isAnimationBegin)
+        this.isAnimationBegin = true;
+    },
+
+    // Include |event| in this ProtoExpectation, expanding start/end to include
+    // it.
+    pushEvent: function(event) {
+      // Usually, this method will be called while iterating over a list of
+      // events sorted by start time, so this method won't usually change
+      // this.start. However, this will sometimes be called for
+      // ProtoExpectations created by previous handlers, in which case
+      // event.start could possibly be before this.start.
+      this.start = Math.min(this.start, event.start);
+      this.end = Math.max(this.end, event.end);
+      this.associatedEvents.push(event);
+    },
+
+    // Returns true if timestamp is contained in this ProtoExpectation.
+    containsTimestampInclusive: function(timestamp) {
+      return (this.start <= timestamp) && (timestamp <= this.end);
+    },
+
+    // Return true if the other event intersects this ProtoExpectation.
+    intersects: function(other) {
+      // http://stackoverflow.com/questions/325933
+      return (other.start < this.end) && (other.end > this.start);
+    },
+
+    isNear: function(event, threshold) {
+      return (this.end + threshold) > event.start;
+    },
+
+    // Return a string describing this ProtoExpectation for debugging.
+    debug: function() {
+      var debugString = this.irType + '(';
+      debugString += parseInt(this.start) + ' ';
+      debugString += parseInt(this.end);
+      this.associatedEvents.forEach(function(event) {
+        debugString += ' ' + event.typeName;
+      });
+      return debugString + ')';
+    }
+  };
+
+  return {
+    ProtoExpectation: ProtoExpectation
+  };
+});

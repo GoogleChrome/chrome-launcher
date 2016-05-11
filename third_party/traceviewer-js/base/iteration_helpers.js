@@ -1,0 +1,390 @@
+/**
+Copyright (c) 2014 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./base.js");
+
+'use strict';
+
+global.tr.exportTo('tr.b', function() {
+  function asArray(arrayish) {
+    var values = [];
+    for (var i = 0; i < arrayish.length; i++)
+      values.push(arrayish[i]);
+    return values;
+  }
+
+  function compareArrays(x, y, elementCmp) {
+    var minLength = Math.min(x.length, y.length);
+    for (var i = 0; i < minLength; i++) {
+      var tmp = elementCmp(x[i], y[i]);
+      if (tmp)
+        return tmp;
+    }
+    if (x.length == y.length)
+      return 0;
+
+    if (x[i] === undefined)
+      return -1;
+
+    return 1;
+  }
+
+  /**
+   * Compares two values when one or both might be undefined. Undefined
+   * values are sorted after defined.
+   */
+  function comparePossiblyUndefinedValues(x, y, cmp, opt_this) {
+    if (x !== undefined && y !== undefined)
+      return cmp.call(opt_this, x, y);
+    if (x !== undefined)
+      return -1;
+    if (y !== undefined)
+      return 1;
+    return 0;
+  }
+
+  /**
+   * Compares two numeric values when one or both might be undefined or NaNs.
+   * Undefined / NaN values are sorted after others.
+   */
+  function compareNumericWithNaNs(x, y) {
+    if (!isNaN(x) && !isNaN(y))
+      return x - y;
+    if (isNaN(x))
+      return 1;
+    if (isNaN(y))
+      return -1;
+    return 0;
+  }
+
+  function concatenateArrays(/*arguments*/) {
+    var values = [];
+    for (var i = 0; i < arguments.length; i++) {
+      if (!(arguments[i] instanceof Array))
+        throw new Error('Arguments ' + i + 'is not an array');
+      values.push.apply(values, arguments[i]);
+    }
+    return values;
+  }
+
+  function concatenateObjects(/*arguments*/) {
+    var result = {};
+    for (var i = 0; i < arguments.length; i++) {
+      var object = arguments[i];
+      for (var j in object) {
+        result[j] = object[j];
+      }
+    }
+    return result;
+  }
+
+  function cloneDictionary(dict) {
+    var clone = {};
+    for (var k in dict) {
+      clone[k] = dict[k];
+    }
+    return clone;
+  }
+
+  function dictionaryKeys(dict) {
+    var keys = [];
+    for (var key in dict)
+      keys.push(key);
+    return keys;
+  }
+
+  function dictionaryValues(dict) {
+    var values = [];
+    for (var key in dict)
+      values.push(dict[key]);
+    return values;
+  }
+
+  function dictionaryLength(dict) {
+    var n = 0;
+    for (var key in dict)
+      n++;
+    return n;
+  }
+
+  function dictionaryContainsValue(dict, value) {
+    for (var key in dict)
+      if (dict[key] === value)
+        return true;
+    return false;
+  }
+
+  /**
+   * Returns a new dictionary with items grouped by the return value of the
+   * specified function being called on each item.
+   * @param {!Array.<Object>} ary The array being iterated through
+   * @param {!Function} fn The mapping function between the array value and the
+   * map key.
+   */
+  function group(ary, fn) {
+    return ary.reduce(function(accumulator, curr) {
+      var key = fn(curr);
+
+      if (key in accumulator)
+        accumulator[key].push(curr);
+      else
+        accumulator[key] = [curr];
+
+      return accumulator;
+    }, {});
+  }
+
+  function iterItems(dict, fn, opt_this) {
+    opt_this = opt_this || this;
+    var keys = Object.keys(dict);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      fn.call(opt_this, key, dict[key]);
+    }
+  }
+
+  /**
+   * Create a new dictionary with the same keys as the original dictionary
+   * mapped to the results of the provided function called on the corresponding
+   * entries in the original dictionary, i.e. result[key] = fn(key, dict[key])
+   * for all keys in dict (own enumerable properties only).
+   *
+   * Example:
+   *   var srcDict = {a: 10, b: 15};
+   *   var dstDict = mapItems(srcDict, function(k, v) { return 2 * v; });
+   *   // srcDict is unmodified and dstDict is now equal to {a: 20, b: 30}.
+   */
+  function mapItems(dict, fn, opt_this) {
+    opt_this = opt_this || this;
+    var result = {};
+    var keys = Object.keys(dict);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      result[key] = fn.call(opt_this, key, dict[key]);
+    }
+    return result;
+  }
+
+  function filterItems(dict, predicate, opt_this) {
+    opt_this = opt_this || this;
+    var result = {};
+    var keys = Object.keys(dict);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var value = dict[key];
+      if (predicate.call(opt_this, key, value))
+        result[key] = value;
+    }
+    return result;
+  }
+
+  function iterObjectFieldsRecursively(object, func) {
+    if (!(object instanceof Object))
+      return;
+
+    if (object instanceof Array) {
+      for (var i = 0; i < object.length; i++) {
+        func(object, i, object[i]);
+        iterObjectFieldsRecursively(object[i], func);
+      }
+      return;
+    }
+
+    for (var key in object) {
+      var value = object[key];
+      func(object, key, value);
+      iterObjectFieldsRecursively(value, func);
+    }
+  }
+
+  /**
+   * Convert an array of dictionaries to a dictionary of arrays.
+   *
+   * The keys of the resulting dictionary are a union of the keys of all
+   * dictionaries in the provided array. Each array in the resulting dictionary
+   * has the same length as the provided array and contains the values of its
+   * key in the dictionaries in the provided array. Example:
+   *
+   *   INPUT:
+   *
+   *     [
+   *       {a: 6, b: 5      },
+   *       undefined,
+   *       {a: 4, b: 3, c: 2},
+   *       {      b: 1, c: 0}
+   *     ]
+   *
+   *   OUTPUT:
+   *
+   *     {
+   *       a: [6,         undefined, 4, undefined],
+   *       b: [5,         undefined, 3, 1        ],
+   *       c: [undefined, undefined, 2, 0        ]
+   *     }
+   *
+   * @param {!Array} array Array of items to be inverted. If opt_dictGetter
+   *     is not provided, all elements of the array must be either undefined,
+   *     or dictionaries.
+   * @param {?(function(*): (!Object|undefined))=} opt_dictGetter Optional
+   *     function mapping defined elements of array to dictionaries.
+   * @param {*=} opt_this Optional 'this' context for opt_dictGetter.
+   */
+  function invertArrayOfDicts(array, opt_dictGetter, opt_this) {
+    opt_this = opt_this || this;
+    var result = {};
+    for (var i = 0; i < array.length; i++) {
+      var item = array[i];
+      if (item === undefined)
+        continue;
+      var dict = opt_dictGetter ? opt_dictGetter.call(opt_this, item) : item;
+      if (dict === undefined)
+        continue;
+      for (var key in dict) {
+        var valueList = result[key];
+        if (valueList === undefined)
+          result[key] = valueList = new Array(array.length);
+        valueList[i] = dict[key];
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Convert an array to a dictionary.
+   *
+   * Every element in the array is mapped in the dictionary to the key returned
+   * by the provided function:
+   *
+   *   dictionary[valueToKeyFn(element)] = element;
+   *
+   * @param {!Array} array Arbitrary array.
+   * @param {function(*): string} valueToKeyFn Function mapping array elements
+   *     to dictionary keys.
+   * @param {*=} opt_this Optional 'this' context for valueToKeyFn.
+   */
+  function arrayToDict(array, valueToKeyFn, opt_this) {
+    opt_this = opt_this || this;
+    var result = {};
+    var length = array.length;
+    for (var i = 0; i < length; i++) {
+      var value = array[i];
+      var key = valueToKeyFn.call(opt_this, value);
+      result[key] = value;
+    }
+    return result;
+  }
+
+  /** Returns the value passed in. */
+  function identity(d) {
+    return d;
+  }
+
+  /**
+   * Returns the index of the first element in |ary| for which |opt_func|
+   * returns a truthy value.
+   *
+   * @param {!Array} ary The array being searched
+   * @param {function(*): *=} opt_func The test function which accepts an array
+   *     element and returns a value that is coerced to a boolean. Defaults to
+   *     the identity function.
+   * @param {*=} opt_this Optional 'this' context for opt_func.
+   */
+  function findFirstIndexInArray(ary, opt_func, opt_this) {
+    var func = opt_func || identity;
+    for (var i = 0; i < ary.length; i++) {
+      if (func.call(opt_this, ary[i], i))
+        return i;
+    }
+    return -1;
+  }
+
+  /**
+   * Returns the value of the first element in |ary| for which |opt_func|
+   * returns a truthy value.
+   *
+   * @param {!Array} ary The array being searched.
+   * @param {function(*): *=} opt_func The test function which accepts an array
+   *     element and returns a value that is coerced to a boolean. Defaults to
+   *     the identity function.
+   * @param {*=} opt_this Optional 'this' context for opt_func.
+   */
+  function findFirstInArray(ary, opt_func, opt_this) {
+    var i = findFirstIndexInArray(ary, opt_func, opt_func);
+    if (i === -1)
+      return undefined;
+    return ary[i];
+  }
+
+  /**
+   * Returns the key of the first dictionary entry for which |opt_func| returns
+   * a truthy value.
+   *
+   * @param {!Object} dict The dictionary being searched.
+   * @param {function(*, *): *=} opt_func The test function which accepts a
+   *     dictionary key as its first parameter, the corresponding dictionary
+   *     value as its second parameter, and returns a value that is coerced to a
+   *     boolean. Defaults to the identity function (which returns the key).
+   * @param {*=} opt_this Optional 'this' context for opt_func.
+   */
+  function findFirstKeyInDictMatching(dict, opt_func, opt_this) {
+    var func = opt_func || identity;
+    for (var key in dict) {
+      if (func.call(opt_this, key, dict[key]))
+        return key;
+    }
+    return undefined;
+  }
+
+  /** Returns the values in an ES6 Map object. */
+  function mapValues(map) {
+    var values = [];
+    for (var value of map.values())
+      values.push(value);
+    return values;
+  }
+
+  /**
+   * Calls |fn| on each entry in an ES6 Map.
+   *
+   * @param {!Map} The map whose entries are being processed.
+   * @param {function(*, *): *} The function which accepts a map key as its
+   *     first parameter and a map value as its second parameter. Any return
+   *     value is ignored.
+   * @param {*=} opt_this Optional 'this' context for fn.
+   */
+  function iterMapItems(map, fn, opt_this) {
+    opt_this = opt_this || this;
+    for (var key of map.keys())
+      fn.call(opt_this, key, map.get(key));
+  }
+
+  return {
+    asArray: asArray,
+    concatenateArrays: concatenateArrays,
+    concatenateObjects: concatenateObjects,
+    compareArrays: compareArrays,
+    comparePossiblyUndefinedValues: comparePossiblyUndefinedValues,
+    compareNumericWithNaNs: compareNumericWithNaNs,
+    cloneDictionary: cloneDictionary,
+    dictionaryLength: dictionaryLength,
+    dictionaryKeys: dictionaryKeys,
+    dictionaryValues: dictionaryValues,
+    dictionaryContainsValue: dictionaryContainsValue,
+    group: group,
+    iterItems: iterItems,
+    mapItems: mapItems,
+    filterItems: filterItems,
+    iterObjectFieldsRecursively: iterObjectFieldsRecursively,
+    invertArrayOfDicts: invertArrayOfDicts,
+    arrayToDict: arrayToDict,
+    identity: identity,
+    findFirstIndexInArray: findFirstIndexInArray,
+    findFirstInArray: findFirstInArray,
+    findFirstKeyInDictMatching: findFirstKeyInDictMatching,
+    mapValues: mapValues,
+    iterMapItems: iterMapItems
+  };
+});

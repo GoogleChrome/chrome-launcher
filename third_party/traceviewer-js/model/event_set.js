@@ -1,0 +1,301 @@
+/**
+Copyright (c) 2012 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/event.js");
+require("../base/guid.js");
+require("../base/iteration_helpers.js");
+require("../base/range.js");
+require("./event_registry.js");
+
+'use strict';
+
+global.tr.exportTo('tr.model', function() {
+
+  var EventRegistry = tr.model.EventRegistry;
+
+  var RequestSelectionChangeEvent = tr.b.Event.bind(
+      undefined, 'requestSelectionChange', true, false);
+
+  /**
+   * Represents a event set within a  and its associated set of tracks.
+   * @constructor
+   */
+  function EventSet(opt_events) {
+    this.bounds_dirty_ = true;
+    this.bounds_ = new tr.b.Range();
+    this.length_ = 0;
+    this.guid_ = tr.b.GUID.allocateSimple();
+    this.pushed_guids_ = {};
+
+    if (opt_events) {
+      if (opt_events instanceof Array) {
+        for (var i = 0; i < opt_events.length; i++)
+          this.push(opt_events[i]);
+      } else if (opt_events instanceof EventSet) {
+        this.addEventSet(opt_events);
+      } else {
+        this.push(opt_events);
+      }
+    }
+  }
+  EventSet.prototype = {
+    __proto__: Object.prototype,
+
+    get bounds() {
+      if (this.bounds_dirty_)
+        this.resolveBounds_();
+      return this.bounds_;
+    },
+
+    get duration() {
+      if (this.bounds_.isEmpty)
+        return 0;
+      return this.bounds_.max - this.bounds_.min;
+    },
+
+    get length() {
+      return this.length_;
+    },
+
+    get guid() {
+      return this.guid_;
+    },
+
+    clear: function() {
+      for (var i = 0; i < this.length_; ++i)
+        delete this[i];
+      this.length_ = 0;
+      this.bounds_dirty_ = true;
+    },
+
+    resolveBounds_: function() {
+      this.bounds_.reset();
+      for (var i = 0; i < this.length_; i++)
+        this[i].addBoundsToRange(this.bounds_);
+      this.bounds_dirty_ = false;
+    },
+
+    // push pushes only unique events.
+    // If an event has been already pushed, do nothing.
+    push: function(event) {
+      if (event.guid == undefined)
+        throw new Error('Event must have a GUID');
+
+      if (this.contains(event))
+        return event;
+
+      this.pushed_guids_[event.guid] = true;
+      this[this.length_++] = event;
+      this.bounds_dirty_ = true;
+      return event;
+    },
+
+    contains: function(event) {
+      return this.pushed_guids_[event.guid];
+    },
+
+    indexOf: function(event) {
+      for (var i = 0; i < this.length; i++) {
+        if (this[i].guid === event.guid)
+          return i;
+      }
+      return -1;
+    },
+
+    addEventSet: function(eventSet) {
+      for (var i = 0; i < eventSet.length; i++)
+        this.push(eventSet[i]);
+    },
+
+    subEventSet: function(index, count) {
+      count = count || 1;
+
+      var eventSet = new EventSet();
+      eventSet.bounds_dirty_ = true;
+      if (index < 0 || index + count > this.length_)
+        throw new Error('Index out of bounds');
+
+      for (var i = index; i < index + count; i++)
+        eventSet.push(this[i]);
+
+      return eventSet;
+    },
+
+    intersectionIsEmpty: function(otherEventSet) {
+      return !this.some(function(event) {
+        return otherEventSet.contains(event);
+      });
+    },
+
+    equals: function(that) {
+      if (this.length !== that.length)
+        return false;
+      for (var i = 0; i < this.length; i++) {
+        var event = this[i];
+        if (that.pushed_guids_[event.guid] === undefined)
+          return false;
+      }
+      return true;
+    },
+
+    getEventsOrganizedByBaseType: function(opt_pruneEmpty) {
+      var allTypeInfos = EventRegistry.getAllRegisteredTypeInfos();
+
+      var events = this.getEventsOrganizedByCallback(function(event) {
+        var maxEventIndex = -1;
+        var maxEventTypeInfo = undefined;
+
+        allTypeInfos.forEach(function(eventTypeInfo, eventIndex) {
+          if (!(event instanceof eventTypeInfo.constructor))
+            return;
+          if (eventIndex > maxEventIndex) {
+            maxEventIndex = eventIndex;
+            maxEventTypeInfo = eventTypeInfo;
+          }
+        });
+
+        if (maxEventIndex == -1) {
+          console.log(event);
+          throw new Error('Unrecognized event type');
+        }
+
+        return maxEventTypeInfo.metadata.name;
+      });
+
+      if (!opt_pruneEmpty) {
+        allTypeInfos.forEach(function(eventTypeInfo) {
+          if (events[eventTypeInfo.metadata.name] === undefined)
+            events[eventTypeInfo.metadata.name] = new EventSet();
+        });
+      }
+
+      return events;
+    },
+
+    getEventsOrganizedByTitle: function() {
+      return this.getEventsOrganizedByCallback(function(event) {
+        if (event.title === undefined)
+          throw new Error('An event didn\'t have a title!');
+        return event.title;
+      });
+    },
+
+    getEventsOrganizedByCallback: function(cb) {
+      var eventsByCallback = {};
+      for (var i = 0; i < this.length; i++) {
+        var event = this[i];
+        var key = cb(event);
+
+        if (key === undefined)
+          throw new Error('An event could not be organized');
+
+        if (eventsByCallback[key] === undefined)
+          eventsByCallback[key] = new EventSet();
+
+        eventsByCallback[key].push(event);
+      }
+      return eventsByCallback;
+    },
+
+    enumEventsOfType: function(type, func) {
+      for (var i = 0; i < this.length_; i++)
+        if (this[i] instanceof type)
+          func(this[i]);
+    },
+
+    get userFriendlyName() {
+      if (this.length === 0) {
+        throw new Error('Empty event set');
+      }
+
+      var eventsByBaseType = this.getEventsOrganizedByBaseType(true);
+      var eventTypeName = tr.b.dictionaryKeys(eventsByBaseType)[0];
+
+      if (this.length === 1) {
+        var tmp = EventRegistry.getUserFriendlySingularName(eventTypeName);
+        return this[0].userFriendlyName;
+      }
+
+      var numEventTypes = tr.b.dictionaryLength(eventsByBaseType);
+      if (numEventTypes !== 1) {
+        return this.length + ' events of various types';
+      }
+
+      var tmp = EventRegistry.getUserFriendlyPluralName(eventTypeName);
+      return this.length + ' ' + tmp;
+    },
+
+    filter: function(fn, opt_this) {
+      var res = new EventSet();
+
+      this.forEach(function(slice) {
+        if (fn.call(this, slice))
+          res.push(slice);
+      }, opt_this);
+
+      return res;
+    },
+
+    toArray: function() {
+      var ary = [];
+      for (var i = 0; i < this.length; i++)
+        ary.push(this[i]);
+      return ary;
+    },
+
+    forEach: function(fn, opt_this) {
+      for (var i = 0; i < this.length; i++)
+        fn.call(opt_this, this[i], i);
+    },
+
+    map: function(fn, opt_this) {
+      var res = [];
+      for (var i = 0; i < this.length; i++)
+        res.push(fn.call(opt_this, this[i], i));
+      return res;
+    },
+
+    every: function(fn, opt_this) {
+      for (var i = 0; i < this.length; i++)
+        if (!fn.call(opt_this, this[i], i))
+          return false;
+      return true;
+    },
+
+    some: function(fn, opt_this) {
+      for (var i = 0; i < this.length; i++)
+        if (fn.call(opt_this, this[i], i))
+          return true;
+      return false;
+    },
+
+    asDict: function() {
+      var stable_ids = [];
+      this.forEach(function(event) {
+        stable_ids.push(event.stableId);
+      });
+      return {'events': stable_ids};
+    }
+  };
+
+  EventSet.IMMUTABLE_EMPTY_SET = (function() {
+    var s = new EventSet();
+    s.resolveBounds_();
+    s.push = function() {
+      throw new Error('Cannot push to an immutable event set');
+    };
+    s.addEventSet = function() {
+      throw new Error('Cannot add to an immutable event set');
+    };
+    Object.freeze(s);
+    return s;
+  })();
+
+  return {
+    EventSet: EventSet,
+    RequestSelectionChangeEvent: RequestSelectionChangeEvent
+  };
+});

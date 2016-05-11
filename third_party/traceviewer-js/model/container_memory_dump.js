@@ -1,0 +1,90 @@
+/**
+Copyright (c) 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./timed_event.js");
+
+'use strict';
+
+/**
+ * @fileoverview Provides the ContainerMemoryDump class.
+ */
+global.tr.exportTo('tr.model', function() {
+  /**
+   * The ContainerMemoryDump represents an abstract container memory dump.
+   * @constructor
+   */
+  function ContainerMemoryDump(start) {
+    tr.model.TimedEvent.call(this, start);
+
+    this.levelOfDetail = undefined;
+
+    this.memoryAllocatorDumps_ = undefined;
+    this.memoryAllocatorDumpsByFullName_ = undefined;
+  };
+
+  /**
+   * Memory dump level of detail. See base::trace_event::MemoryDumpLevelOfDetail
+   * in the Chromium repository.
+   *
+   * @enum
+   */
+  ContainerMemoryDump.LevelOfDetail = {
+    LIGHT: 0,
+    DETAILED: 1
+  };
+
+  ContainerMemoryDump.prototype = {
+    __proto__: tr.model.TimedEvent.prototype,
+
+    shiftTimestampsForward: function(amount) {
+      this.start += amount;
+    },
+
+    get memoryAllocatorDumps() {
+      return this.memoryAllocatorDumps_;
+    },
+
+    set memoryAllocatorDumps(memoryAllocatorDumps) {
+      this.memoryAllocatorDumps_ = memoryAllocatorDumps;
+      this.forceRebuildingMemoryAllocatorDumpByFullNameIndex();
+    },
+
+    getMemoryAllocatorDumpByFullName: function(fullName) {
+      if (this.memoryAllocatorDumps_ === undefined)
+        return undefined;
+
+      // Lazily generate the index if necessary.
+      if (this.memoryAllocatorDumpsByFullName_ === undefined) {
+        var index = {};
+        function addDumpsToIndex(dumps) {
+          dumps.forEach(function(dump) {
+            index[dump.fullName] = dump;
+            addDumpsToIndex(dump.children);
+          });
+        };
+        addDumpsToIndex(this.memoryAllocatorDumps_);
+        this.memoryAllocatorDumpsByFullName_ = index;
+      }
+
+      return this.memoryAllocatorDumpsByFullName_[fullName];
+    },
+
+    forceRebuildingMemoryAllocatorDumpByFullNameIndex: function() {
+      // Clear the index and generate it lazily.
+      this.memoryAllocatorDumpsByFullName_ = undefined;
+    },
+
+    iterateRootAllocatorDumps: function(fn, opt_this) {
+      if (this.memoryAllocatorDumps === undefined)
+        return;
+      this.memoryAllocatorDumps.forEach(fn, opt_this || this);
+    }
+  };
+
+  return {
+    ContainerMemoryDump: ContainerMemoryDump
+  };
+});

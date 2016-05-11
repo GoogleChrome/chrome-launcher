@@ -1,0 +1,307 @@
+/**
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../base/range.js");
+require("../metric_registry.js");
+require("./utils.js");
+require("../../value/numeric.js");
+require("../../value/unit.js");
+require("../../value/value.js");
+
+'use strict';
+
+global.tr.exportTo('tr.metrics.v8', function() {
+  // The time window size for mutator utilization computation.
+  // It is equal to the duration of one frame corresponding to 60 FPS rendering.
+  var TARGET_FPS = 60;
+  var MS_PER_SECOND = 1000;
+  var WINDOW_SIZE_MS = MS_PER_SECOND / TARGET_FPS;
+
+  function gcMetric(valueList, model) {
+    addDurationOfTopEvents(valueList, model);
+    addTotalDurationOfTopEvents(valueList, model);
+    addDurationOfSubEvents(valueList, model);
+    addIdleTimesOfTopEvents(valueList, model);
+    addTotalIdleTimesOfTopEvents(valueList, model);
+    addV8ExecuteMutatorUtilization(valueList, model);
+  }
+
+  gcMetric.prototype = {
+    __proto__: Function.prototype
+  };
+
+  tr.metrics.MetricRegistry.register(gcMetric);
+
+  var timeDurationInMs_smallerIsBetter =
+      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter;
+  var percentage_biggerIsBetter =
+      tr.v.Unit.byName.normalizedPercentage_biggerIsBetter;
+
+  var numericBuilder = new tr.v.NumericBuilder(
+      timeDurationInMs_smallerIsBetter, 0);
+  // 0.1 steps from 0 to 20 since it is the most common range.
+  numericBuilder.addLinearBins(20, 200);
+  // Exponentially increasing steps from 20 to 200.
+  numericBuilder.addExponentialBins(200, 100);
+
+  function createNumericForTopEventTime() {
+    var n = numericBuilder.build();
+    n.customizeSummaryOptions({
+        avg: true,
+        count: true,
+        max: true,
+        min: false,
+        std: true,
+        sum: true,
+        percentile: [0.90]});
+    return n;
+  }
+
+  function createNumericForSubEventTime() {
+    var n = numericBuilder.build();
+    n.customizeSummaryOptions({
+        avg: true,
+        count: false,
+        max: true,
+        min: false,
+        std: false,
+        sum: false,
+        percentile: [0.90]
+    });
+    return n;
+  }
+
+  function createNumericForIdleTime() {
+    var n = numericBuilder.build();
+    n.customizeSummaryOptions({
+        avg: true,
+        count: false,
+        max: true,
+        min: false,
+        std: false,
+        sum: true,
+        percentile: []
+    });
+    return n;
+  }
+
+  function createPercentage(numerator, denominator) {
+    var percentage = denominator === 0 ? 0 : numerator / denominator * 100;
+    return new tr.v.ScalarNumeric(percentage_biggerIsBetter, percentage);
+  }
+
+  /**
+   * Example output:
+   * - Animation-v8_gc_full_mark_compactor.
+   */
+  function addDurationOfTopEvents(valueList, model) {
+    groupAndProcessEvents(model,
+      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+      tr.metrics.v8.utils.topGarbageCollectionEventName,
+      function(stageTitle, name, events) {
+        var cpuDuration = createNumericForTopEventTime();
+        events.forEach(function(event) {
+          cpuDuration.add(event.cpuDuration);
+        });
+        valueList.addValue(
+          new tr.v.NumericValue(model.canonicalUrl,
+            stageTitle + '-' + name, cpuDuration));
+      }
+    );
+  }
+
+  /**
+   * Example output:
+   * - Animation:v8_gc_total
+   */
+  function addTotalDurationOfTopEvents(valueList, model) {
+    groupAndProcessEvents(model,
+      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+      event => 'v8-gc-total',
+      function(stageTitle, name, events) {
+        var cpuDuration = createNumericForTopEventTime();
+        events.forEach(function(event) {
+          cpuDuration.add(event.cpuDuration);
+        });
+        valueList.addValue(
+          new tr.v.NumericValue(model.canonicalUrl,
+            stageTitle + '-' + name, cpuDuration));
+      }
+    );
+  }
+
+  /**
+   * Example output:
+   * - Animation-v8-gc-full-mark-compactor-evacuate.
+   */
+  function addDurationOfSubEvents(valueList, model) {
+    groupAndProcessEvents(model,
+      tr.metrics.v8.utils.isSubGarbageCollectionEvent,
+      tr.metrics.v8.utils.subGarbageCollectionEventName,
+      function(stageTitle, name, events) {
+        var cpuDuration = createNumericForSubEventTime();
+        events.forEach(function(event) {
+          cpuDuration.add(event.cpuDuration);
+        });
+        valueList.addValue(
+          new tr.v.NumericValue(model.canonicalUrl,
+            stageTitle + '-' + name, cpuDuration));
+      }
+    );
+  }
+
+  /**
+   * Example output:
+   * - Animation-v8-gc-full-mark-compactor_idle_deadline_overrun,
+   * - Animation-v8-gc-full-mark-compactor_outside_idle,
+   * - Animation-v8-gc-full-mark-compactor_percentage_idle.
+   */
+  function addIdleTimesOfTopEvents(valueList, model) {
+    groupAndProcessEvents(model,
+      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+      tr.metrics.v8.utils.topGarbageCollectionEventName,
+      function(stageTitle, name, events) {
+        addIdleTimes(valueList, model, stageTitle, name, events);
+      }
+    );
+  }
+
+  /**
+   * Example output:
+   * - Animation-v8-gc-total_idle_deadline_overrun,
+   * - Animation-v8-gc-total_outside_idle,
+   * - Animation-v8-gc-total_percentage_idle.
+   */
+  function addTotalIdleTimesOfTopEvents(valueList, model) {
+    groupAndProcessEvents(model,
+      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+      event => 'v8-gc-total',
+      function(stageTitle, name, events) {
+        addIdleTimes(valueList, model, stageTitle, name, events);
+      }
+    );
+  }
+
+  function addIdleTimes(valueList, model, stageTitle, name, events) {
+    var cpuDuration = createNumericForIdleTime();
+    var insideIdle = createNumericForIdleTime();
+    var outsideIdle = createNumericForIdleTime();
+    var idleDeadlineOverrun = createNumericForIdleTime();
+    events.forEach(function(event) {
+      var idleTask = tr.metrics.v8.utils.findParent(
+          event, tr.metrics.v8.utils.isIdleTask);
+      var inside = 0;
+      var overrun = 0;
+      if (idleTask) {
+        var allottedTime = idleTask['args']['allotted_time_ms'];
+        if (event.duration > allottedTime) {
+          overrun = event.duration - allottedTime;
+          // Don't count time over the deadline as being inside idle time.
+          // Since the deadline should be relative to wall clock we
+          // compare allotted_time_ms with wall duration instead of thread
+          // duration, and then assume the thread duration was inside idle
+          // for the same percentage of time.
+          inside = event.cpuDuration * allottedTime / event.duration;
+        } else {
+          inside = event.cpuDuration;
+        }
+      }
+      cpuDuration.add(event.cpuDuration);
+      insideIdle.add(inside);
+      outsideIdle.add(event.cpuDuration - inside);
+      idleDeadlineOverrun.add(overrun);
+    });
+    valueList.addValue(
+      new tr.v.NumericValue(model.canonicalUrl,
+        stageTitle + '-' + name + '_idle_deadline_overrun',
+        idleDeadlineOverrun));
+    valueList.addValue(
+      new tr.v.NumericValue(model.canonicalUrl,
+        stageTitle + '-' + name + '_outside_idle', outsideIdle));
+    var percentage = createPercentage(insideIdle.sum,
+                                      cpuDuration.sum);
+    valueList.addValue(
+      new tr.v.NumericValue(model.canonicalUrl,
+        stageTitle + '-' + name + '_percentage_idle', percentage));
+  }
+
+  function addV8ExecuteMutatorUtilization(valueList, model) {
+    groupAndProcessEvents(model,
+        tr.metrics.v8.utils.isTopV8ExecuteEvent,
+        event => 'v8-execute',
+        function(stageTitle, name, events) {
+          events.sort((a, b) => a.start - b.start);
+          var time = 0;
+          var pauses = [];
+          // Glue together the v8.execute events and adjust the GC pause
+          // times accordingly.
+          events.forEach(function(topEvent) {
+            topEvent.findTopmostSlicesRelativeToThisSlice(function(e) {
+              if (tr.metrics.v8.utils.isTopGarbageCollectionEvent(e)) {
+                pauses.push({ start: e.start - topEvent.start + time,
+                              end: e.end - topEvent.start + time });
+              }
+            });
+            time += topEvent.duration;
+          });
+          // Now we have one big v8.execute interval from 0 to |time| and
+          // a list of GC pauses.
+          var mutatorUtilization = tr.metrics.v8.utils.mutatorUtilization(
+              0, time, WINDOW_SIZE_MS, pauses);
+          [0.90, 0.95, 0.99].forEach(function(percent) {
+            var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
+                mutatorUtilization.percentile(1.0 - percent) * 100);
+            valueList.addValue(new tr.v.NumericValue(model.canonicalUrl,
+                stageTitle + '-v8-execute-mutator-utilization_pct_0' +
+                percent * 100,
+                value));
+          });
+          var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
+              mutatorUtilization.min);
+          valueList.addValue(new tr.v.NumericValue(model.canonicalUrl,
+              stageTitle + '-v8-execute-mutator-utilization_min', value));
+        }
+    );
+  }
+
+  /**
+   * Filters events using the |filterCallback|, then groups events by the user
+   * expectation stage title and the name computed using the |nameCallback|,
+   * and then invokes the |processCallback| with the grouped events.
+   * @param {Function} filterCallback Takes an event and returns a boolean.
+   * @param {Function} nameCallback Takes event and returns a string.
+   * @param {Function} processCallback Takes a stage title, a name, and
+   *                   an array of events.
+   */
+  function groupAndProcessEvents(model, filterCallback,
+                                 nameCallback, processCallback) {
+    // Two level map: stageTitle -> name -> [events].
+    var stageTitleToNameToEvents = {};
+    model.userModel.expectations.forEach(function(ue) {
+      stageTitleToNameToEvents[ue.stageTitle] =
+        stageTitleToNameToEvents[ue.stageTitle] || {};
+      var nameToEvents = stageTitleToNameToEvents[ue.stageTitle];
+      ue.associatedEvents.forEach(function(event) {
+        if (!filterCallback(event)) return;
+        var name = nameCallback(event);
+        nameToEvents[name] = nameToEvents[name] || [];
+        nameToEvents[name].push(event);
+      });
+    });
+    tr.b.iterItems(stageTitleToNameToEvents,
+      function(stageTitle, nameToEvents) {
+        tr.b.iterItems(nameToEvents, function(name, events) {
+          processCallback(stageTitle, name, events);
+        });
+      }
+    );
+  }
+
+  return {
+    gcMetric: gcMetric,
+    WINDOW_SIZE_MS: WINDOW_SIZE_MS // For testing purposes only.
+  };
+});

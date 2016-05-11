@@ -1,0 +1,213 @@
+/**
+Copyright (c) 2014 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./utils.js");
+
+'use strict';
+
+global.tr.exportTo('tr.b', function() {
+  var ESTIMATED_IDLE_PERIOD_LENGTH_MILLISECONDS = 10;
+  // The maximum amount of time that we allow for a task to get scheduled
+  // in idle time before forcing the task to run.
+  var REQUEST_IDLE_CALLBACK_TIMEOUT_MILLISECONDS = 100;
+
+  // Setting this to true will cause stack traces to get dumped into the
+  // tasks. When an exception happens the original stack will be printed.
+  //
+  // NOTE: This should never be set committed as true.
+  var recordRAFStacks = false;
+
+  var pendingPreAFs = [];
+  var pendingRAFs = [];
+  var pendingIdleCallbacks = [];
+  var currentRAFDispatchList = undefined;
+
+  var rafScheduled = false;
+  var idleWorkScheduled = false;
+
+  function scheduleRAF() {
+    if (rafScheduled)
+      return;
+    rafScheduled = true;
+    if (tr.isHeadless) {
+      Promise.resolve().then(function() {
+        processRequests(false, 0);
+      }, function(e) {
+        console.log(e.stack);
+        throw e;
+      });
+    } else {
+      if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(processRequests.bind(this, false));
+      } else {
+        var delta = Date.now() - window.performance.now();
+        window.webkitRequestAnimationFrame(function(domTimeStamp) {
+          processRequests(false, domTimeStamp - delta);
+        });
+      }
+    }
+  }
+
+  function nativeRequestIdleCallbackSupported() {
+    return !tr.isHeadless && window.requestIdleCallback;
+  }
+
+  function scheduleIdleWork() {
+    if (idleWorkScheduled)
+      return;
+    if (!nativeRequestIdleCallbackSupported()) {
+      scheduleRAF();
+      return;
+    }
+    idleWorkScheduled = true;
+    window.requestIdleCallback(function(deadline, didTimeout) {
+      processIdleWork(false /* forceAllTasksToRun */, deadline);
+    }, { timeout: REQUEST_IDLE_CALLBACK_TIMEOUT_MILLISECONDS });
+  }
+
+  function onAnimationFrameError(e, opt_stack) {
+    console.log(e.stack);
+    if (tr.isHeadless)
+      throw e;
+
+    if (opt_stack)
+      console.log(opt_stack);
+
+    if (e.message)
+      console.error(e.message, e.stack);
+    else
+      console.error(e);
+  }
+
+  function runTask(task, frameBeginTime) {
+    try {
+      task.callback.call(task.context, frameBeginTime);
+    } catch (e) {
+      tr.b.onAnimationFrameError(e, task.stack);
+    }
+  }
+
+  function processRequests(forceAllTasksToRun, frameBeginTime) {
+    rafScheduled = false;
+
+    var currentPreAFs = pendingPreAFs;
+    currentRAFDispatchList = pendingRAFs;
+    pendingPreAFs = [];
+    pendingRAFs = [];
+    var hasRAFTasks = currentPreAFs.length || currentRAFDispatchList.length;
+
+    for (var i = 0; i < currentPreAFs.length; i++)
+      runTask(currentPreAFs[i], frameBeginTime);
+
+    while (currentRAFDispatchList.length > 0)
+      runTask(currentRAFDispatchList.shift(), frameBeginTime);
+    currentRAFDispatchList = undefined;
+
+    if ((!hasRAFTasks && !nativeRequestIdleCallbackSupported()) ||
+        forceAllTasksToRun) {
+      // We assume that we want to do a fixed maximum amount of optional work
+      // per frame. Hopefully rAF will eventually pass this in for us.
+      var rafCompletionDeadline =
+          frameBeginTime + ESTIMATED_IDLE_PERIOD_LENGTH_MILLISECONDS;
+      processIdleWork(
+          forceAllTasksToRun, {
+            timeRemaining: function() {
+              return rafCompletionDeadline - window.performance.now();
+            }
+          }
+      );
+    }
+
+    if (pendingIdleCallbacks.length > 0)
+      scheduleIdleWork();
+  }
+
+  function processIdleWork(forceAllTasksToRun, deadline) {
+    idleWorkScheduled = false;
+    while (pendingIdleCallbacks.length > 0) {
+      runTask(pendingIdleCallbacks.shift());
+      // Check timer after running at least one idle task to avoid buggy
+      // window.performance.now() on some platforms from blocking the idle
+      // task queue.
+      if (!forceAllTasksToRun &&
+          (tr.isHeadless || deadline.timeRemaining() <= 0)) {
+        break;
+      }
+    }
+
+    if (pendingIdleCallbacks.length > 0)
+      scheduleIdleWork();
+  }
+
+  function getStack_() {
+    if (!recordRAFStacks)
+      return '';
+
+    var stackLines = tr.b.stackTrace();
+    // Strip off getStack_.
+    stackLines.shift();
+    return stackLines.join('\n');
+  }
+
+  function requestPreAnimationFrame(callback, opt_this) {
+    pendingPreAFs.push({
+      callback: callback,
+      context: opt_this || global,
+      stack: getStack_()});
+    scheduleRAF();
+  }
+
+  function requestAnimationFrameInThisFrameIfPossible(callback, opt_this) {
+    if (!currentRAFDispatchList) {
+      requestAnimationFrame(callback, opt_this);
+      return;
+    }
+    currentRAFDispatchList.push({
+      callback: callback,
+      context: opt_this || global,
+      stack: getStack_()});
+    return;
+  }
+
+  function requestAnimationFrame(callback, opt_this) {
+    pendingRAFs.push({
+      callback: callback,
+      context: opt_this || global,
+      stack: getStack_()});
+    scheduleRAF();
+  }
+
+  function requestIdleCallback(callback, opt_this) {
+    pendingIdleCallbacks.push({
+      callback: callback,
+      context: opt_this || global,
+      stack: getStack_()});
+    scheduleIdleWork();
+  }
+
+  function forcePendingRAFTasksToRun(frameBeginTime) {
+    if (!rafScheduled)
+      return;
+    processRequests(false, frameBeginTime);
+  }
+
+  function forceAllPendingTasksToRunForTest() {
+    if (!rafScheduled && !idleWorkScheduled)
+      return;
+    processRequests(true, 0);
+  }
+
+  return {
+    onAnimationFrameError: onAnimationFrameError,
+    requestPreAnimationFrame: requestPreAnimationFrame,
+    requestAnimationFrame: requestAnimationFrame,
+    requestAnimationFrameInThisFrameIfPossible:
+        requestAnimationFrameInThisFrameIfPossible,
+    requestIdleCallback: requestIdleCallback,
+    forcePendingRAFTasksToRun: forcePendingRAFTasksToRun,
+    forceAllPendingTasksToRunForTest: forceAllPendingTasksToRunForTest
+  };
+});

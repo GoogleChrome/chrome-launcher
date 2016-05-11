@@ -1,0 +1,205 @@
+/**
+Copyright (c) 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../base/event.js");
+require("../../base/iteration_helpers.js");
+
+'use strict';
+
+global.tr.exportTo('tr.e.chrome', function() {
+  var SAME_AS_PARENT = 'same-as-parent';
+
+  var TITLES_FOR_USER_FRIENDLY_CATEGORY = {
+    composite: [
+      'CompositingInputsUpdater::update',
+      'ThreadProxy::SetNeedsUpdateLayers',
+      'LayerTreeHost::UpdateLayers::CalcDrawProps',
+      'UpdateLayerTree'
+    ],
+
+    gc: [
+      'minorGC',
+      'majorGC',
+      'MajorGC',
+      'MinorGC',
+      'V8.GCScavenger',
+      'V8.GCIncrementalMarking',
+      'V8.GCIdleNotification',
+      'V8.GCContext',
+      'V8.GCCompactor',
+      'V8GCController::traceDOMWrappers'
+    ],
+
+    iframe_creation: [
+      'WebLocalFrameImpl::createChildframe'
+    ],
+
+    imageDecode: [
+      'Decode Image',
+      'ImageFrameGenerator::decode',
+      'ImageFrameGenerator::decodeAndScale'
+    ],
+
+    input: [
+      'HitTest',
+      'ScrollableArea::scrollPositionChanged',
+      'EventHandler::handleMouseMoveEvent'
+    ],
+
+    layout: [
+      'FrameView::invalidateTree',
+      'FrameView::layout',
+      'FrameView::performLayout',
+      'FrameView::performPostLayoutTasks',
+      'FrameView::performPreLayoutTasks',
+      'Layer::updateLayerPositionsAfterLayout',
+      'Layout',
+      'LayoutView::hitTest',
+      'ResourceLoadPriorityOptimizer::updateAllImageResourcePriorities',
+      'WebViewImpl::layout'
+    ],
+
+    parseHTML: [
+      'ParseHTML',
+      'HTMLDocumentParser::didReceiveParsedChunkFromBackgroundParser',
+      'HTMLDocumentParser::processParsedChunkFromBackgroundParser'
+    ],
+
+    raster: [
+      'DisplayListRasterSource::PerformSolidColorAnalysis',
+      'Picture::Raster',
+      'RasterBufferImpl::Playback',
+      'RasterTask',
+      'RasterizerTaskImpl::RunOnWorkerThread',
+      'SkCanvas::drawImageRect()',
+      'SkCanvas::drawPicture()',
+      'SkCanvas::drawTextBlob()',
+      'TileTaskWorkerPool::PlaybackToMemory'
+    ],
+
+    record: [
+      'ContentLayerDelegate::paintContents',
+      'DeprecatedPaintLayerCompositor::updateIfNeededRecursive',
+      'DeprecatedPaintLayerCompositor::updateLayerPositionsAfterLayout',
+      'Paint',
+      'Picture::Record',
+      'PictureLayer::Update',
+      'RenderLayer::updateLayerPositionsAfterLayout'
+    ],
+
+    script: [
+      'EvaluateScript',
+      'FunctionCall',
+      'ScheduledAction::execute',
+      'Script',
+      'V8.Execute',
+      'v8.run',
+      'v8.callModuleMethod',
+      'v8.callFunction',
+      'WindowProxy::initialize'
+    ],
+
+    style: [
+      'CSSParserImpl::parseStyleSheet.parse',
+      'CSSParserImpl::parseStyleSheet.tokenize',
+      'Document::updateStyle',
+      'Document::updateStyleInvalidationIfNeeded',
+      'ParseAuthorStyleSheet',
+      'RuleSet::addRulesFromSheet',
+      'StyleElement::processStyleSheet',
+      'StyleEngine::createResolver',
+      'StyleSheetContents::parseAuthorStyleSheet',
+      'UpdateLayoutTree'
+    ],
+
+    script_parse_and_compile: [
+      'V8.RecompileSynchronous',
+      'V8.RecompileConcurrent',
+      'V8.PreParseMicroSeconds',
+      'v8.parseOnBackground',
+      'V8.ParseMicroSeconds',
+      'V8.ParseLazyMicroSeconds',
+      'V8.CompileScriptMicroSeconds',
+      'V8.CompileMicroSeconds',
+      'V8.CompileFullCode',
+      'V8.CompileEvalMicroSeconds',
+      'v8.compile'
+    ],
+
+    script_parse: [
+      'V8Test.ParseScript',
+      'V8Test.ParseFunction',
+    ],
+
+    script_compile: [
+      'V8Test.Compile',
+      'V8Test.CompileFullCode',
+    ],
+
+    resource_loading: [
+      'ResourceFetcher::requestResource',
+      'ResourceDispatcher::OnReceivedData',
+      'ResourceDispatcher::OnRequestComplete',
+      'ResourceDispatcher::OnReceivedResponse',
+      'Resource::appendData'
+    ],
+
+    // Where do these go?
+    renderer_misc: [
+      'DecodeFont',
+      'ThreadState::completeSweep' // blink_gc
+    ],
+
+    [SAME_AS_PARENT]: [
+      'SyncChannel::Send'
+    ]
+  };
+
+  var USER_FRIENDLY_CATEGORY_FOR_TITLE = {};
+
+  for (var category in TITLES_FOR_USER_FRIENDLY_CATEGORY) {
+    TITLES_FOR_USER_FRIENDLY_CATEGORY[category].forEach(function(title) {
+      USER_FRIENDLY_CATEGORY_FOR_TITLE[title] = category;
+    });
+  }
+
+  var USER_FRIENDLY_CATEGORY_FOR_EVENT_CATEGORY = {
+    netlog: 'net',
+    overhead: 'overhead',
+    startup: 'startup',
+    gpu: 'gpu'
+  };
+
+  function ChromeUserFriendlyCategoryDriver() {
+  }
+
+  ChromeUserFriendlyCategoryDriver.fromEvent = function(event) {
+    var userFriendlyCategory = USER_FRIENDLY_CATEGORY_FOR_TITLE[event.title];
+    if (userFriendlyCategory) {
+      if (userFriendlyCategory == SAME_AS_PARENT) {
+        if (event.parentSlice)
+          return ChromeUserFriendlyCategoryDriver.fromEvent(event.parentSlice);
+      } else {
+        return userFriendlyCategory;
+      }
+    }
+
+    var eventCategoryParts = tr.b.getCategoryParts(event.category);
+    for (var i = 0; i < eventCategoryParts.length; ++i) {
+      var eventCategory = eventCategoryParts[i];
+      userFriendlyCategory = USER_FRIENDLY_CATEGORY_FOR_EVENT_CATEGORY[
+          eventCategory];
+      if (userFriendlyCategory)
+        return userFriendlyCategory;
+    }
+
+    return undefined;
+  };
+
+  return {
+    ChromeUserFriendlyCategoryDriver: ChromeUserFriendlyCategoryDriver
+  };
+});

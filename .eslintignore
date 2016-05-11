@@ -3,6 +3,7 @@
 
 /node_modules/
 /extension/
+/third_party/
 
 /dist/
 

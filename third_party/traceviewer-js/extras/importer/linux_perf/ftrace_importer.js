@@ -1,0 +1,909 @@
+/**
+Copyright (c) 2012 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../../base/color_scheme.js");
+require("../../../base/iteration_helpers.js");
+require("./android_parser.js");
+require("./binder_parser.js");
+require("./bus_parser.js");
+require("./clock_parser.js");
+require("./cpufreq_parser.js");
+require("./disk_parser.js");
+require("./drm_parser.js");
+require("./exynos_parser.js");
+require("./gesture_parser.js");
+require("./i915_parser.js");
+require("./irq_parser.js");
+require("./kfunc_parser.js");
+require("./mali_parser.js");
+require("./memreclaim_parser.js");
+require("./power_parser.js");
+require("./regulator_parser.js");
+require("./sched_parser.js");
+require("./sync_parser.js");
+require("./workqueue_parser.js");
+require("../../../importer/importer.js");
+require("../../../importer/simple_line_reader.js");
+require("../../../model/clock_sync_manager.js");
+require("../../../model/model.js");
+
+/**
+ * @fileoverview Imports text files in the Linux event trace format into the
+ * Model. This format is output both by sched_trace and by Linux's perf tool.
+ *
+ * This importer assumes the events arrive as a string. The unit tests provide
+ * examples of the trace format.
+ *
+ * Linux scheduler traces use a definition for 'pid' that is different than
+ * tracing uses. Whereas tracing uses pid to identify a specific process, a pid
+ * in a linux trace refers to a specific thread within a process. Within this
+ * file, we the definition used in Linux traces, as it improves the importing
+ * code's readability.
+ */
+'use strict';
+
+global.tr.exportTo('tr.e.importer.linux_perf', function() {
+  var MONOTONIC_TO_FTRACE_GLOBAL_SYNC_ID =
+      'linux_clock_monotonic_to_ftrace_global';
+
+  /**
+   * Imports linux perf events into a specified model.
+   * @constructor
+   */
+  function FTraceImporter(model, events) {
+    this.importPriority = 2;
+    this.model_ = model;
+    this.events_ = events;
+    this.wakeups_ = [];
+    this.blocked_reasons_ = [];
+    this.kernelThreadStates_ = {};
+    this.buildMapFromLinuxPidsToThreads_();
+    this.lines_ = [];
+    this.pseudoThreadCounter = 1;
+    this.parsers_ = [];
+    this.eventHandlers_ = {};
+  }
+
+  var TestExports = {};
+
+  // Matches the trace record in 3.2 and later with the print-tgid option:
+  //          <idle>-0    0 [001] d...  1.23: sched_switch
+  //
+  // A TGID (Thread Group ID) is basically what the Linux kernel calls what
+  // userland refers to as a process ID (as opposed to a Linux pid, which is
+  // what userland calls a thread ID).
+  var lineREWithTGID = new RegExp(
+      '^\\s*(.+)-(\\d+)\\s+\\(\\s*(\\d+|-+)\\)\\s\\[(\\d+)\\]' +
+      '\\s+[dX.][Nnp.][Hhs.][0-9a-f.]' +
+      '\\s+(\\d+\\.\\d+):\\s+(\\S+):\\s(.*)$');
+  var lineParserWithTGID = function(line) {
+    var groups = lineREWithTGID.exec(line);
+    if (!groups) {
+      return groups;
+    }
+
+    var tgid = groups[3];
+    if (tgid[0] === '-')
+      tgid = undefined;
+
+    return {
+      threadName: groups[1],
+      pid: groups[2],
+      tgid: tgid,
+      cpuNumber: groups[4],
+      timestamp: groups[5],
+      eventName: groups[6],
+      details: groups[7]
+    };
+  };
+  TestExports.lineParserWithTGID = lineParserWithTGID;
+
+  // Matches the default trace record in 3.2 and later (includes irq-info):
+  //          <idle>-0     [001] d...  1.23: sched_switch
+  var lineREWithIRQInfo = new RegExp(
+      '^\\s*(.+)-(\\d+)\\s+\\[(\\d+)\\]' +
+      '\\s+[dX.][Nnp.][Hhs.][0-9a-f.]' +
+      '\\s+(\\d+\\.\\d+):\\s+(\\S+):\\s(.*)$');
+  var lineParserWithIRQInfo = function(line) {
+    var groups = lineREWithIRQInfo.exec(line);
+    if (!groups) {
+      return groups;
+    }
+    return {
+      threadName: groups[1],
+      pid: groups[2],
+      cpuNumber: groups[3],
+      timestamp: groups[4],
+      eventName: groups[5],
+      details: groups[6]
+    };
+  };
+  TestExports.lineParserWithIRQInfo = lineParserWithIRQInfo;
+
+  // Matches the default trace record pre-3.2:
+  //          <idle>-0     [001]  1.23: sched_switch
+  var lineREWithLegacyFmt =
+      /^\s*(.+)-(\d+)\s+\[(\d+)\]\s*(\d+\.\d+):\s+(\S+):\s(.*)$/;
+  var lineParserWithLegacyFmt = function(line) {
+    var groups = lineREWithLegacyFmt.exec(line);
+    if (!groups) {
+      return groups;
+    }
+    return {
+      threadName: groups[1],
+      pid: groups[2],
+      cpuNumber: groups[3],
+      timestamp: groups[4],
+      eventName: groups[5],
+      details: groups[6]
+    };
+  };
+  TestExports.lineParserWithLegacyFmt = lineParserWithLegacyFmt;
+
+  // Matches the trace_event_clock_sync marker:
+  //  0: trace_event_clock_sync: parent_ts=19581477508
+  var traceEventClockSyncRE = /trace_event_clock_sync: parent_ts=(\d+\.?\d*)/;
+  TestExports.traceEventClockSyncRE = traceEventClockSyncRE;
+
+  var realTimeClockSyncRE = /trace_event_clock_sync: realtime_ts=(\d+)/;
+  var genericClockSyncRE = /trace_event_clock_sync: name=(\w+)/;
+
+  // Some kernel trace events are manually classified in slices and
+  // hand-assigned a pseudo PID.
+  var pseudoKernelPID = 0;
+
+  /**
+   * Deduce the format of trace data. Linux kernels prior to 3.3 used one
+   * format (by default); 3.4 and later used another.  Additionally, newer
+   * kernels can optionally trace the TGID.
+   *
+   * @return {function} the function for parsing data when the format is
+   * recognized; otherwise undefined.
+   */
+  function autoDetectLineParser(line) {
+    if (line[0] == '{')
+      return false;
+    if (lineREWithTGID.test(line))
+      return lineParserWithTGID;
+    if (lineREWithIRQInfo.test(line))
+      return lineParserWithIRQInfo;
+    if (lineREWithLegacyFmt.test(line))
+      return lineParserWithLegacyFmt;
+    return undefined;
+  };
+  TestExports.autoDetectLineParser = autoDetectLineParser;
+
+  /**
+   * Guesses whether the provided events is a Linux perf string.
+   * Looks for the magic string "# tracer" at the start of the file,
+   * or the typical task-pid-cpu-timestamp-function sequence of a typical
+   * trace's body.
+   *
+   * @return {boolean} True when events is a linux perf array.
+   */
+  FTraceImporter.canImport = function(events) {
+    if (!(typeof(events) === 'string' || events instanceof String))
+      return false;
+
+    if (FTraceImporter._extractEventsFromSystraceHTML(events, false).ok)
+      return true;
+
+    if (FTraceImporter._extractEventsFromSystraceMultiHTML(events, false).ok)
+      return true;
+
+    if (/^# tracer:/.test(events))
+      return true;
+
+    var lineBreakIndex = events.indexOf('\n');
+    if (lineBreakIndex > -1)
+      events = events.substring(0, lineBreakIndex);
+
+    if (autoDetectLineParser(events))
+      return true;
+
+    return false;
+  };
+
+  FTraceImporter._extractEventsFromSystraceHTML = function(
+      incoming_events, produce_result) {
+    var failure = {ok: false};
+    if (produce_result === undefined)
+      produce_result = true;
+
+    if (/^<!DOCTYPE html>/.test(incoming_events) == false)
+      return failure;
+    var r = new tr.importer.SimpleLineReader(incoming_events);
+
+    // Try to find the data...
+    if (!r.advanceToLineMatching(/^  <script>$/))
+      return failure;
+    if (!r.advanceToLineMatching(/^  var linuxPerfData = "\\$/))
+      return failure;
+
+    var events_begin_at_line = r.curLineNumber + 1;
+    r.beginSavingLines();
+    if (!r.advanceToLineMatching(/^  <\/script>$/))
+      return failure;
+
+    var raw_events = r.endSavingLinesAndGetResult();
+
+    // Drop off first and last event as it contains the tag.
+    raw_events = raw_events.slice(1, raw_events.length - 1);
+
+    if (!r.advanceToLineMatching(/^<\/body>$/))
+      return failure;
+    if (!r.advanceToLineMatching(/^<\/html>$/))
+      return failure;
+
+    function endsWith(str, suffix) {
+      return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    }
+    function stripSuffix(str, suffix) {
+      if (!endsWith(str, suffix))
+        return str;
+      return str.substring(str, str.length - suffix.length);
+    }
+
+    // Strip off escaping in the file needed to preserve linebreaks.
+    var events = [];
+    if (produce_result) {
+      for (var i = 0; i < raw_events.length; i++) {
+        var event = raw_events[i];
+        event = stripSuffix(event, '\\n\\');
+        events.push(event);
+      }
+    } else {
+      events = [raw_events[raw_events.length - 1]];
+    }
+
+    // Last event ends differently. Strip that off too,
+    // treating absence of that trailing string as a failure.
+    var oldLastEvent = events[events.length - 1];
+    var newLastEvent = stripSuffix(oldLastEvent, '\\n";');
+    if (newLastEvent == oldLastEvent)
+      return failure;
+    events[events.length - 1] = newLastEvent;
+
+    return {ok: true,
+      lines: produce_result ? events : undefined,
+      events_begin_at_line: events_begin_at_line};
+  };
+
+  FTraceImporter._extractEventsFromSystraceMultiHTML = function(
+      incoming_events, produce_result) {
+    var failure = {ok: false};
+    if (produce_result === undefined)
+      produce_result = true;
+
+    if (new RegExp('^<!DOCTYPE HTML>', 'i').test(incoming_events) == false)
+      return failure;
+
+    var r = new tr.importer.SimpleLineReader(incoming_events);
+
+    // Try to find the Linux perf trace in any of the trace-data tags
+    var events = [];
+    while (!/^# tracer:/.test(events)) {
+      if (!r.advanceToLineMatching(
+          /^  <script class="trace-data" type="application\/text">$/))
+        return failure;
+
+      var events_begin_at_line = r.curLineNumber + 1;
+
+      r.beginSavingLines();
+      if (!r.advanceToLineMatching(/^  <\/script>$/))
+        return failure;
+
+      events = r.endSavingLinesAndGetResult();
+
+      // Drop off first and last event as it contains the tag.
+      events = events.slice(1, events.length - 1);
+    }
+
+    if (!r.advanceToLineMatching(/^<\/body>$/))
+      return failure;
+    if (!r.advanceToLineMatching(/^<\/html>$/))
+      return failure;
+
+    return {ok: true,
+      lines: produce_result ? events : undefined,
+      events_begin_at_line: events_begin_at_line};
+  };
+
+  FTraceImporter.prototype = {
+    __proto__: tr.importer.Importer.prototype,
+
+    get importerName() {
+      return 'FTraceImporter';
+    },
+
+    get model() {
+      return this.model_;
+    },
+
+    /**
+     * Imports clock sync markers into model_.
+     */
+    importClockSyncMarkers: function() {
+      this.lazyInit_();
+
+      this.forEachLine_(function(text, eventBase, cpuNumber, pid, ts) {
+        var eventName = eventBase.eventName;
+        if (eventName !== 'tracing_mark_write' && eventName !== '0')
+          return;
+
+        if (traceEventClockSyncRE.exec(eventBase.details) ||
+            genericClockSyncRE.exec(eventBase.details)) {
+          this.traceClockSyncEvent_(eventName, cpuNumber, pid, ts, eventBase);
+        } else if (realTimeClockSyncRE.exec(eventBase.details)) {
+          // TODO(charliea): Migrate this sync to ClockSyncManager.
+          // This entry syncs CLOCK_REALTIME with CLOCK_MONOTONIC. Store the
+          // offset between the two in the model so that importers parsing files
+          // with CLOCK_REALTIME timestamps can map back to CLOCK_MONOTONIC.
+          var match = realTimeClockSyncRE.exec(eventBase.details);
+          this.model_.realtime_to_monotonic_offset_ms = ts - match[1];
+        }
+      }.bind(this));
+    },
+
+    /**
+     * Imports the data in this.events_ into model_.
+     */
+    importEvents: function() {
+      var modelTimeTransformer =
+          this.model_.clockSyncManager.getModelTimeTransformer(
+            tr.model.ClockDomainId.LINUX_FTRACE_GLOBAL);
+
+      this.importCpuData_(modelTimeTransformer);
+      this.buildMapFromLinuxPidsToThreads_();
+      this.buildPerThreadCpuSlicesFromCpuState_();
+    },
+
+    /**
+     * Registers a linux perf event parser used by importCpuData_.
+     */
+    registerEventHandler: function(eventName, handler) {
+      // TODO(sleffler) how to handle conflicts?
+      this.eventHandlers_[eventName] = handler;
+    },
+
+    /**
+     * @return {Cpu} A Cpu corresponding to the given cpuNumber.
+     */
+    getOrCreateCpu: function(cpuNumber) {
+      return this.model_.kernel.getOrCreateCpu(cpuNumber);
+    },
+
+    /**
+     * @return {TimelineThread} A thread corresponding to the kernelThreadName.
+     */
+    getOrCreateKernelThread: function(kernelThreadName, pid, tid) {
+      if (!this.kernelThreadStates_[kernelThreadName]) {
+        var thread = this.model_.getOrCreateProcess(pid).getOrCreateThread(tid);
+        thread.name = kernelThreadName;
+        this.kernelThreadStates_[kernelThreadName] = {
+          pid: pid,
+          thread: thread,
+          openSlice: undefined,
+          openSliceTS: undefined
+        };
+        this.threadsByLinuxPid[pid] = thread;
+      }
+      return this.kernelThreadStates_[kernelThreadName];
+    },
+
+    /**
+     * Processes can have multiple binder threads.
+     * Binder thread names are not unique across processes we therefore need to
+     * keep more information in order to return the correct threads.
+     */
+    getOrCreateBinderKernelThread: function(kernelThreadName, pid, tid) {
+      var key = kernelThreadName + pid + tid;
+      if (!this.kernelThreadStates_[key]) {
+        var thread = this.model_.getOrCreateProcess(pid).getOrCreateThread(tid);
+        thread.name = kernelThreadName;
+        this.kernelThreadStates_[key] = {
+          pid: pid,
+          thread: thread,
+          openSlice: undefined,
+          openSliceTS: undefined
+        };
+        this.threadsByLinuxPid[pid] = thread;
+      }
+      return this.kernelThreadStates_[key];
+    },
+
+    /**
+     * @return {TimelineThread} A pseudo thread corresponding to the
+     * threadName.  Pseudo threads are for events that we want to break
+     * out to a separate timeline but would not otherwise happen.
+     * These threads are assigned to pseudoKernelPID and given a
+     * unique (incrementing) TID.
+     */
+    getOrCreatePseudoThread: function(threadName) {
+      var thread = this.kernelThreadStates_[threadName];
+      if (!thread) {
+        thread = this.getOrCreateKernelThread(threadName, pseudoKernelPID,
+            this.pseudoThreadCounter);
+        this.pseudoThreadCounter++;
+      }
+      return thread;
+    },
+
+    /**
+     * Records the fact that a pid has become runnable. This data will
+     * eventually get used to derive each thread's timeSlices array.
+     */
+    markPidRunnable: function(ts, pid, comm, prio, fromPid) {
+      // The the pids that get passed in to this function are Linux kernel
+      // pids, which identify threads.  The rest of trace-viewer refers to
+      // these as tids, so the change of nomenclature happens in the following
+      // construction of the wakeup object.
+      this.wakeups_.push({ts: ts, tid: pid, fromTid: fromPid});
+    },
+
+    /**
+     * Records the reason why a pid has gone into uninterruptible sleep.
+     */
+    addPidBlockedReason: function(ts, pid, iowait, caller) {
+      // The the pids that get passed in to this function are Linux kernel
+      // pids, which identify threads.  The rest of trace-viewer refers to
+      // these as tids, so the change of nomenclature happens in the following
+      // construction of the wakeup object.
+      this.blocked_reasons_.push({ts: ts, tid: pid, iowait: iowait,
+                                  caller: caller});
+    },
+
+    /**
+     * Precomputes a lookup table from linux pids back to existing
+     * Threads. This is used during importing to add information to each
+     * thread about whether it was running, descheduled, sleeping, et
+     * cetera.
+     */
+    buildMapFromLinuxPidsToThreads_: function() {
+      this.threadsByLinuxPid = {};
+      this.model_.getAllThreads().forEach(
+          function(thread) {
+            this.threadsByLinuxPid[thread.tid] = thread;
+          }.bind(this));
+    },
+
+    /**
+     * Builds the timeSlices array on each thread based on our knowledge of what
+     * each Cpu is doing.  This is done only for Threads that are
+     * already in the model, on the assumption that not having any traced data
+     * on a thread means that it is not of interest to the user.
+     */
+    buildPerThreadCpuSlicesFromCpuState_: function() {
+      var SCHEDULING_STATE = tr.model.SCHEDULING_STATE;
+
+      // Push the cpu slices to the threads that they run on.
+      for (var cpuNumber in this.model_.kernel.cpus) {
+        var cpu = this.model_.kernel.cpus[cpuNumber];
+
+        for (var i = 0; i < cpu.slices.length; i++) {
+          var cpuSlice = cpu.slices[i];
+
+          var thread = this.threadsByLinuxPid[cpuSlice.args.tid];
+          if (!thread)
+            continue;
+
+          cpuSlice.threadThatWasRunning = thread;
+
+          if (!thread.tempCpuSlices)
+            thread.tempCpuSlices = [];
+          thread.tempCpuSlices.push(cpuSlice);
+        }
+      }
+
+      for (var i in this.wakeups_) {
+        var wakeup = this.wakeups_[i];
+        var thread = this.threadsByLinuxPid[wakeup.tid];
+        if (!thread)
+          continue;
+        thread.tempWakeups = thread.tempWakeups || [];
+        thread.tempWakeups.push(wakeup);
+      }
+      for (var i in this.blocked_reasons_) {
+        var reason = this.blocked_reasons_[i];
+        var thread = this.threadsByLinuxPid[reason.tid];
+        if (!thread)
+          continue;
+        thread.tempBlockedReasons = thread.tempBlockedReasons || [];
+        thread.tempBlockedReasons.push(reason);
+      }
+
+      // Create slices for when the thread is not running.
+      this.model_.getAllThreads().forEach(function(thread) {
+        if (thread.tempCpuSlices === undefined)
+          return;
+        var origSlices = thread.tempCpuSlices;
+        delete thread.tempCpuSlices;
+
+        origSlices.sort(function(x, y) {
+          return x.start - y.start;
+        });
+
+        var wakeups = thread.tempWakeups || [];
+        delete thread.tempWakeups;
+        wakeups.sort(function(x, y) {
+          return x.ts - y.ts;
+        });
+
+        var reasons = thread.tempBlockedReasons || [];
+        delete thread.tempBlockedReasons;
+        reasons.sort(function(x, y) {
+          return x.ts - y.ts;
+        });
+
+        // Walk the slice list and put slices between each original slice to
+        // show when the thread isn't running.
+        var slices = [];
+
+        if (origSlices.length) {
+          var slice = origSlices[0];
+
+          if (wakeups.length && wakeups[0].ts < slice.start) {
+            var wakeup = wakeups.shift();
+            var wakeupDuration = slice.start - wakeup.ts;
+            var args = {'wakeup from tid': wakeup.fromTid};
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.RUNNABLE, '',
+                wakeup.ts, args, wakeupDuration));
+          }
+
+          var runningSlice = new tr.model.ThreadTimeSlice(
+              thread, SCHEDULING_STATE.RUNNING, '',
+              slice.start, {}, slice.duration);
+          runningSlice.cpuOnWhichThreadWasRunning = slice.cpu;
+          slices.push(runningSlice);
+        }
+
+        var wakeup = undefined;
+        for (var i = 1; i < origSlices.length; i++) {
+          var prevSlice = origSlices[i - 1];
+          var nextSlice = origSlices[i];
+          var midDuration = nextSlice.start - prevSlice.end;
+          while (wakeups.length && wakeups[0].ts < nextSlice.start) {
+            var w = wakeups.shift();
+            if (wakeup === undefined && w.ts > prevSlice.end) {
+              wakeup = w;
+            }
+          }
+          var blocked_reason = undefined;
+          while (reasons.length && reasons[0].ts < prevSlice.end) {
+            var r = reasons.shift();
+          }
+          if (wakeup !== undefined &&
+              reasons.length &&
+              reasons[0].ts < wakeup.ts) {
+            blocked_reason = reasons.shift();
+          }
+
+          // Push a sleep slice onto the slices list, interrupting it with a
+          // wakeup if appropriate.
+          var pushSleep = function(state) {
+            if (wakeup !== undefined) {
+              midDuration = wakeup.ts - prevSlice.end;
+            }
+
+            if (blocked_reason !== undefined) {
+              var args = {
+                'kernel callsite when blocked:' : blocked_reason.caller
+              };
+              if (blocked_reason.iowait) {
+                switch (state) {
+                  case SCHEDULING_STATE.UNINTR_SLEEP:
+                    state = SCHEDULING_STATE.UNINTR_SLEEP_IO;
+                    break;
+                  case SCHEDULING_STATE.UNINTR_SLEEP_WAKE_KILL:
+                    state = SCHEDULING_STATE.UNINTR_SLEEP_WAKE_KILL_IO;
+                    break;
+                  case SCHEDULING_STATE.UNINTR_SLEEP_WAKING:
+                    state = SCHEDULING_STATE.UNINTR_SLEEP_WAKE_KILL_IO;
+                    break;
+                  default:
+                }
+              }
+              slices.push(new tr.model.ThreadTimeSlice(
+                  thread,
+                  state, '', prevSlice.end, args, midDuration));
+            } else {
+              slices.push(new tr.model.ThreadTimeSlice(
+                  thread,
+                  state, '', prevSlice.end, {}, midDuration));
+            }
+            if (wakeup !== undefined) {
+              var wakeupDuration = nextSlice.start - wakeup.ts;
+              var args = {'wakeup from tid': wakeup.fromTid};
+              slices.push(new tr.model.ThreadTimeSlice(
+                  thread, SCHEDULING_STATE.RUNNABLE, '',
+                  wakeup.ts, args, wakeupDuration));
+              wakeup = undefined;
+            }
+          };
+
+          if (prevSlice.args.stateWhenDescheduled == 'S') {
+            pushSleep(SCHEDULING_STATE.SLEEPING);
+          } else if (prevSlice.args.stateWhenDescheduled == 'R' ||
+                     prevSlice.args.stateWhenDescheduled == 'R+') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.RUNNABLE, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'D') {
+            pushSleep(SCHEDULING_STATE.UNINTR_SLEEP);
+          } else if (prevSlice.args.stateWhenDescheduled == 'T') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.STOPPED, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 't') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.DEBUG, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'Z') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.ZOMBIE, '', ioWaitId,
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'X') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.EXIT_DEAD, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'x') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.TASK_DEAD, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'K') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.WAKE_KILL, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'W') {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.WAKING, '',
+                prevSlice.end, {}, midDuration));
+          } else if (prevSlice.args.stateWhenDescheduled == 'D|K') {
+            pushSleep(SCHEDULING_STATE.UNINTR_SLEEP_WAKE_KILL);
+          } else if (prevSlice.args.stateWhenDescheduled == 'D|W') {
+            pushSleep(SCHEDULING_STATE.UNINTR_SLEEP_WAKING);
+          } else {
+            slices.push(new tr.model.ThreadTimeSlice(
+                thread, SCHEDULING_STATE.UNKNOWN, '',
+                prevSlice.end, {}, midDuration));
+            this.model_.importWarning({
+              type: 'parse_error',
+              message: 'Unrecognized sleep state: ' +
+                  prevSlice.args.stateWhenDescheduled
+            });
+          }
+
+          var runningSlice = new tr.model.ThreadTimeSlice(
+              thread, SCHEDULING_STATE.RUNNING, '',
+              nextSlice.start, {}, nextSlice.duration);
+          runningSlice.cpuOnWhichThreadWasRunning = prevSlice.cpu;
+          slices.push(runningSlice);
+        }
+        thread.timeSlices = slices;
+      }, this);
+    },
+
+    /**
+     * Creates an instance of each registered linux perf event parser.
+     * This allows the parsers to register handlers for the events they
+     * understand.  We also register our own special handlers (for the
+     * timestamp synchronization markers).
+     */
+    createParsers_: function() {
+      // Instantiate the parsers; this will register handlers for known events
+      var allTypeInfos = tr.e.importer.linux_perf.
+          Parser.getAllRegisteredTypeInfos();
+      var parsers = allTypeInfos.map(
+          function(typeInfo) {
+            return new typeInfo.constructor(this);
+          }, this);
+
+      return parsers;
+    },
+
+    registerDefaultHandlers_: function() {
+      this.registerEventHandler('tracing_mark_write',
+          FTraceImporter.prototype.traceMarkingWriteEvent_.bind(this));
+      // NB: old-style trace markers; deprecated
+      this.registerEventHandler('0',
+          FTraceImporter.prototype.traceMarkingWriteEvent_.bind(this));
+      // Register dummy clock sync handlers to avoid warnings in the log.
+      this.registerEventHandler('tracing_mark_write:trace_event_clock_sync',
+          function() { return true; });
+      this.registerEventHandler('0:trace_event_clock_sync',
+          function() { return true; });
+    },
+
+    /**
+     * Processes a trace_event_clock_sync event.
+     */
+    traceClockSyncEvent_: function(eventName, cpuNumber, pid, ts, eventBase) {
+      // Check to see if we have a normal clock sync marker that contains a
+      // sync ID and the current time according to the "ftrace global" clock.
+      var event = /name=(\w+?)\s(.+)/.exec(eventBase.details);
+      if (event) {
+        var name = event[1];
+        var pieces = event[2].split(' ');
+        var args = {
+          perfTs: ts
+        };
+        for (var i = 0; i < pieces.length; i++) {
+          var parts = pieces[i].split('=');
+          if (parts.length != 2)
+            throw new Error('omgbbq');
+          args[parts[0]] = parts[1];
+        }
+
+        this.model_.clockSyncManager.addClockSyncMarker(
+            tr.model.ClockDomainId.LINUX_FTRACE_GLOBAL, name, ts);
+        return true;
+      }
+
+      // Check to see if we have a special clock sync marker that contains both
+      // the current "ftrace global" time and the current CLOCK_MONOTONIC time.
+      event = /parent_ts=(\d+\.?\d*)/.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var monotonicTs = event[1] * 1000;
+      // A monotonic timestamp of zero is used as a sentinel value to indicate
+      // that CLOCK_MONOTONIC and the ftrace global clock are identical.
+      if (monotonicTs === 0)
+        monotonicTs = ts;
+
+      // We have a clock sync event that contains two timestamps: a timestamp
+      // according to the ftrace 'global' clock, and that same timestamp
+      // according to clock_gettime(CLOCK_MONOTONIC).
+      this.model_.clockSyncManager.addClockSyncMarker(
+          tr.model.ClockDomainId.LINUX_FTRACE_GLOBAL,
+          MONOTONIC_TO_FTRACE_GLOBAL_SYNC_ID, ts);
+      this.model_.clockSyncManager.addClockSyncMarker(
+          tr.model.ClockDomainId.LINUX_CLOCK_MONOTONIC,
+          MONOTONIC_TO_FTRACE_GLOBAL_SYNC_ID, monotonicTs);
+
+      return true;
+    },
+
+    /**
+     * Processes a trace_marking_write event.
+     */
+    traceMarkingWriteEvent_: function(eventName, cpuNumber, pid, ts, eventBase,
+                                     threadName) {
+
+      // Some profiles end up with a \n\ on the end of each line. Strip it
+      // before we do the comparisons.
+      eventBase.details = eventBase.details.replace(/\\n.*$/, '');
+
+      var event = /^\s*(\w+):\s*(.*)$/.exec(eventBase.details);
+      if (!event) {
+        // Check if the event matches events traced by the Android framework
+        var tag = eventBase.details.substring(0, 2);
+        if (tag == 'B|' || tag == 'E' || tag == 'E|' || tag == 'X|' ||
+            tag == 'C|' || tag == 'S|' || tag == 'F|') {
+          eventBase.subEventName = 'android';
+        } else {
+          return false;
+        }
+      } else {
+        eventBase.subEventName = event[1];
+        eventBase.details = event[2];
+      }
+
+      var writeEventName = eventName + ':' + eventBase.subEventName;
+      var handler = this.eventHandlers_[writeEventName];
+      if (!handler) {
+        this.model_.importWarning({
+          type: 'parse_error',
+          message: 'Unknown trace_marking_write event ' + writeEventName
+        });
+        return true;
+      }
+      return handler(writeEventName, cpuNumber, pid, ts, eventBase, threadName);
+    },
+
+    /**
+     * Walks the this.events_ structure and creates Cpu objects.
+     */
+    importCpuData_: function(modelTimeTransformer) {
+      this.forEachLine_(function(text, eventBase, cpuNumber, pid, ts) {
+        var eventName = eventBase.eventName;
+        var handler = this.eventHandlers_[eventName];
+        if (!handler) {
+          this.model_.importWarning({
+            type: 'parse_error',
+            message: 'Unknown event ' + eventName + ' (' + text + ')'
+          });
+          return;
+        }
+        ts = modelTimeTransformer(ts);
+        if (!handler(eventName, cpuNumber, pid, ts, eventBase)) {
+          this.model_.importWarning({
+            type: 'parse_error',
+            message: 'Malformed ' + eventName + ' event (' + text + ')'
+          });
+        }
+      }.bind(this));
+    },
+
+    /**
+     * Walks the this.events_ structure and populates this.lines_.
+     */
+    parseLines_: function() {
+      var lines = [];
+      var extractResult = FTraceImporter._extractEventsFromSystraceHTML(
+          this.events_, true);
+      if (!extractResult.ok)
+        extractResult = FTraceImporter._extractEventsFromSystraceMultiHTML(
+            this.events_, true);
+      var lines = extractResult.ok ?
+        extractResult.lines : this.events_.split('\n');
+
+      var lineParser = undefined;
+      for (var lineNumber = 0; lineNumber < lines.length; ++lineNumber) {
+        var line = lines[lineNumber].trim();
+        if (line.length == 0 || /^#/.test(line))
+          continue;
+
+        if (!lineParser) {
+          lineParser = autoDetectLineParser(line);
+          if (!lineParser) {
+            this.model_.importWarning({
+              type: 'parse_error',
+              message: 'Cannot parse line: ' + line
+            });
+            continue;
+          }
+        }
+
+        var eventBase = lineParser(line);
+        if (!eventBase) {
+          this.model_.importWarning({
+            type: 'parse_error',
+            message: 'Unrecognized line: ' + line
+          });
+          continue;
+        }
+
+        this.lines_.push([
+          line,
+          eventBase,
+          parseInt(eventBase.cpuNumber),
+          parseInt(eventBase.pid),
+          parseFloat(eventBase.timestamp) * 1000
+        ]);
+      }
+    },
+
+    /**
+     * Calls |handler| for every parsed line.
+     */
+    forEachLine_: function(handler) {
+      for (var i = 0; i < this.lines_.length; ++i) {
+        var line = this.lines_[i];
+        handler.apply(this, line);
+      }
+    },
+
+    /**
+     * Initializes the ftrace importer. This initialization can't be done in the
+     * constructor because all trace event handlers may not have been registered
+     * by that point.
+     */
+    lazyInit_: function() {
+      this.parsers_ = this.createParsers_();
+      this.registerDefaultHandlers_();
+      this.parseLines_();
+    }
+  };
+
+  tr.importer.Importer.register(FTraceImporter);
+
+  return {
+    FTraceImporter: FTraceImporter,
+    _FTraceImporterTestExports: TestExports
+  };
+});

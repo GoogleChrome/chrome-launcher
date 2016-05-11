@@ -1,0 +1,152 @@
+/**
+Copyright (c) 2012 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./parser.js");
+
+'use strict';
+
+/**
+ * @fileoverview Parses drm driver events in the Linux event trace format.
+ */
+global.tr.exportTo('tr.e.importer.linux_perf', function() {
+  var Parser = tr.e.importer.linux_perf.Parser;
+
+  /**
+   * Parses linux vmscan trace events.
+   * @constructor
+   */
+  function MemReclaimParser(importer) {
+    Parser.call(this, importer);
+
+    importer.registerEventHandler('mm_vmscan_kswapd_wake',
+        MemReclaimParser.prototype.kswapdWake.bind(this));
+    importer.registerEventHandler('mm_vmscan_kswapd_sleep',
+        MemReclaimParser.prototype.kswapdSleep.bind(this));
+    importer.registerEventHandler('mm_vmscan_direct_reclaim_begin',
+        MemReclaimParser.prototype.reclaimBegin.bind(this));
+    importer.registerEventHandler('mm_vmscan_direct_reclaim_end',
+        MemReclaimParser.prototype.reclaimEnd.bind(this));
+  }
+
+  // Matches the mm_vmscan_kswapd_wake record
+  //  mm_vmscan_kswapd_wake: nid=%d order=%d
+  var kswapdWakeRE = /nid=(\d+) order=(\d+)/;
+
+  // Matches the mm_vmscan_kswapd_sleep record
+  //  mm_vmscan_kswapd_sleep: order=%d
+  var kswapdSleepRE = /nid=(\d+)/;
+
+  // Matches the mm_vmscan_direct_reclaim_begin record
+  //  mm_vmscan_direct_reclaim_begin: order=%d may_writepage=%d gfp_flags=%s
+  var reclaimBeginRE = /order=(\d+) may_writepage=\d+ gfp_flags=(.+)/;
+
+  // Matches the mm_vmscan_direct_reclaim_end record
+  //  mm_vmscan_direct_reclaim_end: nr_reclaimed=%lu
+  var reclaimEndRE = /nr_reclaimed=(\d+)/;
+
+  MemReclaimParser.prototype = {
+    __proto__: Parser.prototype,
+
+    /**
+     * Parses memreclaim events and sets up state in the importer.
+     */
+    kswapdWake: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = kswapdWakeRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var tgid = parseInt(eventBase.tgid);
+
+      var nid = parseInt(event[1]);
+      var order = parseInt(event[2]);
+
+      var kthread = this.importer.getOrCreateKernelThread(
+          eventBase.threadName, tgid, pid);
+
+      if (kthread.openSliceTS) {
+        if (order > kthread.order) {
+          kthread.order = order;
+        }
+      } else {
+        kthread.openSliceTS = ts;
+        kthread.order = order;
+      }
+      return true;
+    },
+
+    kswapdSleep: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var tgid = parseInt(eventBase.tgid);
+
+      var kthread = this.importer.getOrCreateKernelThread(
+          eventBase.threadName, tgid, pid);
+
+      if (kthread.openSliceTS) {
+
+        kthread.thread.sliceGroup.pushCompleteSlice(
+            'memreclaim', eventBase.threadName, kthread.openSliceTS,
+            ts - kthread.openSliceTS, 0, 0,
+            {
+              order: kthread.order
+            });
+      }
+      kthread.openSliceTS = undefined;
+      kthread.order = undefined;
+      return true;
+    },
+
+    reclaimBegin: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = reclaimBeginRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var order = parseInt(event[1]);
+      var gfp = event[2];
+      var tgid = parseInt(eventBase.tgid);
+
+      var kthread = this.importer.getOrCreateKernelThread(
+          eventBase.threadName, tgid, pid);
+
+      kthread.openSliceTS = ts;
+      kthread.order = order;
+      kthread.gfp = gfp;
+      return true;
+    },
+
+    reclaimEnd: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = reclaimEndRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var nr_reclaimed = parseInt(event[1]);
+      var tgid = parseInt(eventBase.tgid);
+
+      var kthread = this.importer.getOrCreateKernelThread(
+          eventBase.threadName, tgid, pid);
+
+      if (kthread.openSliceTS !== undefined) {
+        kthread.thread.sliceGroup.pushCompleteSlice('memreclaim',
+            'direct reclaim', kthread.openSliceTS, ts - kthread.openSliceTS,
+            0, 0,
+            {
+              order: kthread.order,
+              gfp: kthread.gfp,
+              nr_reclaimed: nr_reclaimed
+            });
+      }
+      kthread.openSliceTS = undefined;
+      kthread.order = undefined;
+      kthread.gfp = undefined;
+      return true;
+    }
+
+  };
+
+  Parser.register(MemReclaimParser);
+
+  return {
+    MemReclaimParser: MemReclaimParser
+  };
+});

@@ -25,6 +25,9 @@ const firstMeaningfulPaint = require('../../audits/performance/first-meaningful-
 /** @type {string} */
 const speedIndexMetric = require('../../audits/performance/speed-index-metric').name;
 
+/** @type {string} */
+const inputReadinessMetric = require('../../audits/performance/input-readiness-metric').name;
+
 class IsPerformant extends Aggregate {
 
   /**
@@ -62,6 +65,10 @@ class IsPerformant extends Aggregate {
       weight: 1
     };
     criteria[speedIndexMetric] = {
+      value: 100,
+      weight: 1
+    };
+    criteria[inputReadinessMetric] = {
       value: 100,
       weight: 1
     };

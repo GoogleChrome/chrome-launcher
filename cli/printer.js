@@ -93,7 +93,7 @@ function createOutput(results, outputMode) {
 
     item.score.subItems.forEach(subitem => {
       let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
-      if (subitem.rawValue) {
+      if (typeof subitem.rawValue !== 'undefined') {
         lineItem += ` (${subitem.rawValue})`;
       }
       output += `${lineItem}\n`;

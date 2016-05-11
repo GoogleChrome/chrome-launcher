@@ -1,0 +1,146 @@
+/**
+Copyright (c) 2012 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("./parser.js");
+require("../../../model/counter.js");
+
+'use strict';
+
+/**
+ * @fileoverview Parses scheduler events in the Linux event trace format.
+ */
+global.tr.exportTo('tr.e.importer.linux_perf', function() {
+
+  var Parser = tr.e.importer.linux_perf.Parser;
+
+  /**
+   * Parses linux sched trace events.
+   * @constructor
+   */
+  function SchedParser(importer) {
+    Parser.call(this, importer);
+
+    importer.registerEventHandler('sched_switch',
+        SchedParser.prototype.schedSwitchEvent.bind(this));
+    importer.registerEventHandler('sched_wakeup',
+        SchedParser.prototype.schedWakeupEvent.bind(this));
+    importer.registerEventHandler('sched_blocked_reason',
+        SchedParser.prototype.schedBlockedEvent.bind(this));
+    importer.registerEventHandler('sched_cpu_hotplug',
+        SchedParser.prototype.schedCpuHotplugEvent.bind(this));
+  }
+
+  var TestExports = {};
+
+  // Matches the sched_switch record
+  var schedSwitchRE = new RegExp(
+      'prev_comm=(.+) prev_pid=(\\d+) prev_prio=(\\d+) ' +
+      'prev_state=(\\S\\+?|\\S\\|\\S) ==> ' +
+      'next_comm=(.+) next_pid=(\\d+) next_prio=(\\d+)');
+
+  // Matches sched_blocked_reason record
+  var schedBlockedRE = new RegExp('pid=(\\d+) iowait=(\\d) caller=(.+)');
+  TestExports.schedSwitchRE = schedSwitchRE;
+
+  // Matches the sched_wakeup record
+  var schedWakeupRE =
+      /comm=(.+) pid=(\d+) prio=(\d+) success=(\d+) target_cpu=(\d+)/;
+  TestExports.schedWakeupRE = schedWakeupRE;
+
+  SchedParser.prototype = {
+    __proto__: Parser.prototype,
+
+    /**
+     * Parses scheduler events and sets up state in the CPUs of the importer.
+     */
+    schedSwitchEvent: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = schedSwitchRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var prevState = event[4];
+      var nextComm = event[5];
+      var nextPid = parseInt(event[6]);
+      var nextPrio = parseInt(event[7]);
+
+      var nextThread = this.importer.threadsByLinuxPid[nextPid];
+      var nextName;
+      if (nextThread)
+        nextName = nextThread.userFriendlyName;
+      else
+        nextName = nextComm;
+
+      var cpu = this.importer.getOrCreateCpu(cpuNumber);
+      cpu.switchActiveThread(
+          ts,
+          {stateWhenDescheduled: prevState},
+          nextPid,
+          nextName,
+          {
+            comm: nextComm,
+            tid: nextPid,
+            prio: nextPrio
+          });
+
+      return true;
+    },
+
+    schedWakeupEvent: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = schedWakeupRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var fromPid = pid;
+      var comm = event[1];
+      var pid = parseInt(event[2]);
+      var prio = parseInt(event[3]);
+      this.importer.markPidRunnable(ts, pid, comm, prio, fromPid);
+      return true;
+    },
+
+    schedCpuHotplugEvent: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = /cpu (\d+) (.+) error=(\d+)/.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var cpuNumber = event[1];
+      var state = event[2];
+      var targetCpu = this.importer.getOrCreateCpu(cpuNumber);
+
+      var powerCounter = targetCpu.getOrCreateCounter('', 'Cpu Hotplug');
+      if (powerCounter.numSeries === 0) {
+        powerCounter.addSeries(new tr.model.CounterSeries('State',
+            tr.b.ColorScheme.getColorIdForGeneralPurposeString(
+                powerCounter.name + '.' + 'State')));
+      }
+      powerCounter.series.forEach(function(series) {
+        if (series.name == 'State')
+          series.addCounterSample(ts, state.localeCompare('offline') ? 0 : 1);
+      });
+      return true;
+    },
+
+    schedBlockedEvent: function(eventName, cpuNumber, pid, ts, eventBase) {
+      var event = schedBlockedRE.exec(eventBase.details);
+      if (!event)
+        return false;
+
+      var pid = parseInt(event[1]);
+      var iowait = parseInt(event[2]);
+      var caller = event[3];
+
+      this.importer.addPidBlockedReason(ts, pid, iowait, caller);
+      return true;
+    }
+  };
+
+  Parser.register(SchedParser);
+
+  return {
+    SchedParser: SchedParser,
+    _SchedParserTestExports: TestExports
+  };
+});

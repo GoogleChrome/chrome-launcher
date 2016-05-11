@@ -1,0 +1,261 @@
+/**
+Copyright 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/event.js");
+require("../base/event_target.js");
+require("./time_display_mode.js");
+
+'use strict';
+
+global.tr.exportTo('tr.v', function() {
+  var TimeDisplayModes = tr.v.TimeDisplayModes;
+
+  var BINARY_PREFIXES = ['', 'Ki', 'Mi', 'Gi', 'Ti'];
+
+  var PLUS_MINUS_SIGN = String.fromCharCode(177);
+
+  function max(a, b) {
+    if (a === undefined)
+      return b;
+    if (b === undefined)
+      return a;
+    return a.scale > b.scale ? a : b;
+  }
+
+  /** @enum */
+  var ImprovementDirection = {
+    DONT_CARE: 0,
+    BIGGER_IS_BETTER: 1,
+    SMALLER_IS_BETTER: 2
+  };
+
+  /** @constructor */
+  function Unit(unitName, jsonName, isDelta, improvementDirection,
+      formatValue) {
+    this.unitName = unitName;
+    this.jsonName = jsonName;
+    this.isDelta = isDelta;
+    this.improvementDirection = improvementDirection;
+    this.formatValue_ = formatValue;
+    this.correspondingDeltaUnit = undefined;
+  }
+
+  Unit.prototype = {
+    asJSON: function() {
+      return this.jsonName;
+    },
+
+    format: function(value) {
+      var formattedValue = this.formatValue_(value);
+      if (!this.isDelta || value < 0 /* already contains negative sign */)
+        return formattedValue;
+      if (value === 0)
+        return PLUS_MINUS_SIGN + formattedValue;
+      else
+        return '+' + formattedValue;
+    }
+  };
+
+  Unit.reset = function() {
+    Unit.currentTimeDisplayMode = TimeDisplayModes.ms;
+  };
+
+  Unit.timestampFromUs = function(us) {
+    return us / 1000;
+  };
+
+  Unit.maybeTimestampFromUs = function(us) {
+    return us === undefined ? undefined : us / 1000;
+  };
+
+  Object.defineProperty(Unit, 'currentTimeDisplayMode', {
+    get: function() {
+      return Unit.currentTimeDisplayMode_;
+    },
+    // Use tr-v-ui-preferred-display-unit element instead of directly setting.
+    set: function(value) {
+      if (Unit.currentTimeDisplayMode_ === value)
+        return;
+
+      Unit.currentTimeDisplayMode_ = value;
+      Unit.dispatchEvent(new tr.b.Event('display-mode-changed'));
+    }
+  });
+
+  Unit.didPreferredTimeDisplayUnitChange = function() {
+    var largest = undefined;
+    var els = tr.b.findDeepElementsMatching(document.body,
+        'tr-v-ui-preferred-display-unit');
+    els.forEach(function(el) {
+      largest = max(largest, el.preferredTimeDisplayMode);
+    });
+
+    Unit.currentDisplayUnit = largest === undefined ?
+        TimeDisplayModes.ms : largest;
+  };
+
+  Unit.byName = {};
+  Unit.byJSONName = {};
+
+  Unit.fromJSON = function(object) {
+    var u = Unit.byJSONName[object];
+    if (u) {
+      return u;
+    }
+    throw new Error('Unrecognized unit');
+  };
+
+  /**
+   * Define all combinations of a unit with isDelta and improvementDirection
+   * flags. For example, the following code:
+   *
+   *   Unit.define({
+   *     baseUnitName: 'powerInWatts'
+   *     baseJsonName: 'W'
+   *     formatValue: function(value) {
+   *       // Code for formatting the unit (independent of isDelta and
+   *       // improvementDirection flags).
+   *      }
+   *   });
+   *
+   * generates the following six units (JSON names shown in parentheses):
+   *
+   *   Unit.byName.powerInWatts (W)
+   *   Unit.byName.powerInWatts_smallerIsBetter (W_smallerIsBetter)
+   *   Unit.byName.powerInWatts_biggerIsBetter (W_biggerIsBetter)
+   *   Unit.byName.powerInWattsDelta (WDelta)
+   *   Unit.byName.powerInWattsDelta_smallerIsBetter (WDelta_smallerIsBetter)
+   *   Unit.byName.powerInWattsDelta_biggerIsBetter (WDelta_biggerIsBetter)
+   *
+   * with the appropriate flags and formatting code (including +/- prefixes
+   * for deltas).
+   */
+  Unit.define = function(params) {
+    tr.b.iterItems(ImprovementDirection, function(_, improvementDirection) {
+      var regularUnit =
+          Unit.defineUnitVariant_(params, false, improvementDirection);
+      var deltaUnit =
+          Unit.defineUnitVariant_(params, true, improvementDirection);
+
+      regularUnit.correspondingDeltaUnit = deltaUnit;
+      deltaUnit.correspondingDeltaUnit = deltaUnit;
+    });
+  };
+
+  Unit.defineUnitVariant_ = function(params, isDelta, improvementDirection) {
+    var nameSuffix = isDelta ? 'Delta' : '';
+    switch (improvementDirection) {
+      case ImprovementDirection.DONT_CARE:
+        break;
+      case ImprovementDirection.BIGGER_IS_BETTER:
+        nameSuffix += '_biggerIsBetter';
+        break;
+      case ImprovementDirection.SMALLER_IS_BETTER:
+        nameSuffix += '_smallerIsBetter';
+        break;
+      default:
+        throw new Error(
+            'Unknown improvement direction: ' + improvementDirection);
+    }
+
+    var unitName = params.baseUnitName + nameSuffix;
+    var jsonName = params.baseJsonName + nameSuffix;
+    if (Unit.byName[unitName] !== undefined)
+      throw new Error('Unit \'' + unitName + '\' already exists');
+    if (Unit.byJSONName[jsonName] !== undefined)
+      throw new Error('JSON unit \'' + jsonName + '\' alread exists');
+
+    var unit = new Unit(
+        unitName, jsonName, isDelta, improvementDirection, params.formatValue);
+    Unit.byName[unitName] = unit;
+    Unit.byJSONName[jsonName] = unit;
+
+    return unit;
+  };
+
+  tr.b.EventTarget.decorate(Unit);
+  Unit.reset();
+
+  // Known display units follow.
+  //////////////////////////////////////////////////////////////////////////////
+
+  Unit.define({
+    baseUnitName: 'timeDurationInMs',
+    baseJsonName: 'ms',
+    formatValue: function(value) {
+      return Unit.currentTimeDisplayMode_.format(value);
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'timeStampInMs',
+    baseJsonName: 'tsMs',
+    formatValue: function(value) {
+      return Unit.currentTimeDisplayMode_.format(value);
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'normalizedPercentage',
+    baseJsonName: 'n%',
+    formatValue: function(value) {
+      var tmp = new Number(Math.round(value * 100000) / 1000);
+      return tmp.toLocaleString(undefined, { minimumFractionDigits: 3 }) + '%';
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'sizeInBytes',
+    baseJsonName: 'sizeInBytes',
+    formatValue: function(value) {
+      var signPrefix = '';
+      if (value < 0) {
+        signPrefix = '-';
+        value = -value;
+      }
+
+      var i = 0;
+      while (value >= 1024 && i < BINARY_PREFIXES.length - 1) {
+        value /= 1024;
+        i++;
+      }
+
+      return signPrefix + value.toFixed(1) + ' ' + BINARY_PREFIXES[i] + 'B';
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'energyInJoules',
+    baseJsonName: 'J',
+    formatValue: function(value) {
+      return value.toLocaleString(
+          undefined, { minimumFractionDigits: 3 }) + ' J';
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'powerInWatts',
+    baseJsonName: 'W',
+    formatValue: function(value) {
+      return value.toLocaleString(
+          undefined, { minimumFractionDigits: 3 }) + ' W';
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'unitlessNumber',
+    baseJsonName: 'unitless',
+    formatValue: function(value) {
+      return value.toLocaleString(
+          undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+    }
+  });
+
+  return {
+    ImprovementDirection: ImprovementDirection,
+    Unit: Unit
+  };
+});

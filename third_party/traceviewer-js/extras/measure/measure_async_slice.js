@@ -1,0 +1,49 @@
+/**
+Copyright (c) 2013 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../model/async_slice.js");
+
+'use strict';
+
+global.tr.exportTo('tr.e.measure', function() {
+  var AsyncSlice = tr.model.AsyncSlice;
+
+  function MeasureAsyncSlice() {
+    this.groupTitle_ = 'Ungrouped Measure';
+    var matched = /([^\/:]+):([^\/:]+)\/?(.*)/.exec(arguments[1]);
+    if (matched !== null) {
+      arguments[1] = matched[2];
+      this.groupTitle_ = matched[1];
+    }
+    AsyncSlice.apply(this, arguments);
+  }
+
+  MeasureAsyncSlice.prototype = {
+    __proto__: AsyncSlice.prototype,
+
+    get viewSubGroupTitle() {
+      return this.groupTitle_;
+    },
+
+    get title() {
+      return this.title_;
+    },
+
+    set title(title) {
+      this.title_ = title;
+    }
+  };
+
+  AsyncSlice.register(
+    MeasureAsyncSlice,
+    {
+      categoryParts: ['blink.user_timing']
+    });
+
+  return {
+    MeasureAsyncSlice: MeasureAsyncSlice
+  };
+});

@@ -1,0 +1,381 @@
+/**
+Copyright (c) 2013 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../../base/color_scheme.js");
+require("./codemap.js");
+require("./log_reader.js");
+require("../../../importer/importer.js");
+require("../../../model/model.js");
+require("../../../model/slice.js");
+
+
+'use strict';
+
+/**
+ * @fileoverview V8LogImporter imports v8.log files into the provided model.
+ */
+global.tr.exportTo('tr.e.importer.v8', function() {
+  var CodeEntry = tr.e.importer.v8.CodeMap.CodeEntry;
+  var CodeMap = tr.e.importer.v8.CodeMap;
+  var ColorScheme = tr.b.ColorScheme;
+  var DynamicFuncCodeEntry = tr.e.importer.v8.CodeMap.DynamicFuncCodeEntry;
+  var FunctionEntry = tr.e.importer.v8.CodeMap.FunctionEntry;
+
+  function V8LogImporter(model, eventData) {
+    this.importPriority = 3;
+    this.model_ = model;
+
+    this.logData_ = eventData;
+
+    this.code_map_ = new CodeMap();
+    this.v8_timer_thread_ = undefined;
+    this.v8_thread_ = undefined;
+
+    this.root_stack_frame_ = new tr.model.StackFrame(
+        undefined, 'v8-root-stack-frame', 'v8-root-stack-frame', 0);
+
+    // We reconstruct the stack timeline from ticks.
+    this.v8_stack_timeline_ = new Array();
+  }
+
+  var kV8BinarySuffixes = ['/d8', '/libv8.so'];
+
+
+  var TimerEventDefaultArgs = {
+    'V8.Execute': { pause: false, no_execution: false},
+    'V8.External': { pause: false, no_execution: true},
+    'V8.CompileFullCode': { pause: true, no_execution: true},
+    'V8.RecompileSynchronous': { pause: true, no_execution: true},
+    'V8.RecompileParallel': { pause: false, no_execution: false},
+    'V8.CompileEval': { pause: true, no_execution: true},
+    'V8.Parse': { pause: true, no_execution: true},
+    'V8.PreParse': { pause: true, no_execution: true},
+    'V8.ParseLazy': { pause: true, no_execution: true},
+    'V8.GCScavenger': { pause: true, no_execution: true},
+    'V8.GCCompactor': { pause: true, no_execution: true},
+    'V8.GCContext': { pause: true, no_execution: true}
+  };
+
+  /**
+   * @return {boolean} Whether obj is a V8 log string.
+   */
+  V8LogImporter.canImport = function(eventData) {
+    if (typeof(eventData) !== 'string' && !(eventData instanceof String))
+      return false;
+
+    return eventData.substring(0, 11) == 'v8-version,' ||
+           eventData.substring(0, 12) == 'timer-event,' ||
+           eventData.substring(0, 5) == 'tick,' ||
+           eventData.substring(0, 15) == 'shared-library,' ||
+           eventData.substring(0, 9) == 'profiler,' ||
+           eventData.substring(0, 14) == 'code-creation,';
+  };
+
+  V8LogImporter.prototype = {
+
+    __proto__: tr.importer.Importer.prototype,
+
+    get importerName() {
+      return 'V8LogImporter';
+    },
+
+    processTimerEvent_: function(name, start, length) {
+      var args = TimerEventDefaultArgs[name];
+      if (args === undefined) return;
+      start /= 1000;  // Convert to milliseconds.
+      length /= 1000;
+      var colorId = ColorScheme.getColorIdForGeneralPurposeString(name);
+      var slice = new tr.model.Slice('v8', name, colorId, start,
+          args, length);
+      this.v8_timer_thread_.sliceGroup.pushSlice(slice);
+    },
+
+    processTimerEventStart_: function(name, start) {
+      var args = TimerEventDefaultArgs[name];
+      if (args === undefined) return;
+      start /= 1000;  // Convert to milliseconds.
+      this.v8_timer_thread_.sliceGroup.beginSlice('v8', name, start, args);
+    },
+
+    processTimerEventEnd_: function(name, end) {
+      end /= 1000;  // Convert to milliseconds.
+      this.v8_timer_thread_.sliceGroup.endSlice(end);
+    },
+
+    processCodeCreateEvent_: function(type, kind, address, size, name,
+                                      maybe_func) {
+      function parseState(s) {
+        switch (s) {
+          case '': return CodeMap.CodeState.COMPILED;
+          case '~': return CodeMap.CodeState.OPTIMIZABLE;
+          case '*': return CodeMap.CodeState.OPTIMIZED;
+        }
+        throw new Error('unknown code state: ' + s);
+      }
+
+      if (maybe_func.length) {
+        var funcAddr = parseInt(maybe_func[0]);
+        var state = parseState(maybe_func[1]);
+        var func = this.code_map_.findDynamicEntryByStartAddress(funcAddr);
+        if (!func) {
+          func = new FunctionEntry(name);
+          func.kind = kind;
+          this.code_map_.addCode(funcAddr, func);
+        } else if (func.name !== name) {
+          // Function object has been overwritten with a new one.
+          func.name = name;
+        }
+        var entry = this.code_map_.findDynamicEntryByStartAddress(address);
+        if (entry) {
+          if (entry.size === size && entry.func === func) {
+            // Entry state has changed.
+            entry.state = state;
+          }
+        } else {
+          entry = new DynamicFuncCodeEntry(size, type, func, state);
+          entry.kind = kind;
+          this.code_map_.addCode(address, entry);
+        }
+      } else {
+        var code_entry = new CodeEntry(size, name);
+        code_entry.kind = kind;
+        this.code_map_.addCode(address, code_entry);
+      }
+    },
+
+    processCodeMoveEvent_: function(from, to) {
+      this.code_map_.moveCode(from, to);
+    },
+
+    processCodeDeleteEvent_: function(address) {
+      this.code_map_.deleteCode(address);
+    },
+
+    processSharedLibrary_: function(name, start, end) {
+      var code_entry = new CodeEntry(end - start, name,
+                                     CodeEntry.TYPE.SHARED_LIB);
+      code_entry.kind = -3;  // External code kind.
+      for (var i = 0; i < kV8BinarySuffixes.length; i++) {
+        var suffix = kV8BinarySuffixes[i];
+        if (name.indexOf(suffix, name.length - suffix.length) >= 0) {
+          code_entry.kind = -1;  // V8 runtime code kind.
+          break;
+        }
+      }
+      this.code_map_.addLibrary(start, code_entry);
+    },
+
+    processCppSymbol_: function(address, size, name) {
+      var code_entry = new CodeEntry(size, name, CodeEntry.TYPE.CPP);
+      code_entry.kind = -1;
+      this.code_map_.addStaticCode(address, code_entry);
+    },
+
+    findCodeKind_: function(kind) {
+      for (name in CodeKinds) {
+        if (CodeKinds[name].kinds.indexOf(kind) >= 0) {
+          return CodeKinds[name];
+        }
+      }
+    },
+
+    processTickEvent_: function(pc, start, is_external_callback,
+                                tos_or_external_callback, vmstate, stack) {
+      start /= 1000;
+
+      function findChildWithEntryID(stackFrame, entryID) {
+        for (var i = 0; i < stackFrame.children.length; i++) {
+          if (stackFrame.children[i].entryID == entryID)
+            return stackFrame.children[i];
+        }
+        return undefined;
+      }
+
+      function processStack(pc, func, stack) {
+        var fullStack = func ? [pc, func] : [pc];
+        var prevFrame = pc;
+        for (var i = 0, n = stack.length; i < n; ++i) {
+          var frame = stack[i];
+          var firstChar = frame.charAt(0);
+          if (firstChar === '+' || firstChar === '-') {
+            // An offset from the previous frame.
+            prevFrame += parseInt(frame, 16);
+            fullStack.push(prevFrame);
+            // Filter out possible 'overflow' string.
+          } else if (firstChar !== 'o') {
+            fullStack.push(parseInt(frame, 16));
+          }
+          // Otherwise, they will be skipped.
+        }
+        return fullStack;
+      }
+
+      if (is_external_callback) {
+        // Don't use PC when in external callback code, as it can point
+        // inside callback's code, and we will erroneously report
+        // that a callback calls itself. Instead use tos_or_external_callback,
+        // as simply resetting PC will produce unaccounted ticks.
+        pc = tos_or_external_callback;
+        tos_or_external_callback = 0;
+      } else if (tos_or_external_callback) {
+        // Find out, if top of stack was pointing inside a JS function
+        // meaning that we have encountered a frameless invocation.
+        var funcEntry = this.code_map_.findEntry(tos_or_external_callback);
+        if (!funcEntry || !funcEntry.isJSFunction || !funcEntry.isJSFunction())
+          tos_or_external_callback = 0;
+      }
+
+      var processedStack = processStack(pc, tos_or_external_callback, stack);
+      var lastStackFrame = this.root_stack_frame_;
+      // v8 log stacks are inverted, leaf first and the root at the end.
+      processedStack = processedStack.reverse();
+      for (var i = 0, n = processedStack.length; i < n; i++) {
+        var frame = processedStack[i];
+        if (!frame)
+          break;
+        var entry = this.code_map_.findEntry(frame);
+
+        if (!entry && i !== 0) {
+          continue;
+        }
+
+        var sourceInfo = undefined;
+        if (entry && entry.type === CodeEntry.TYPE.CPP) {
+          var libEntry = this.code_map_.findEntryInLibraries(frame);
+          if (libEntry)
+            sourceInfo = libEntry.name;
+        }
+
+        var entryID = entry ? entry.id : 'Unknown';
+        var childFrame = findChildWithEntryID(lastStackFrame, entryID);
+        if (childFrame === undefined) {
+          var entryName = entry ? entry.name : 'Unknown';
+          lastStackFrame = new tr.model.StackFrame(
+            lastStackFrame, 'v8sf-' + tr.b.GUID.allocateSimple(), entryName,
+            ColorScheme.getColorIdForGeneralPurposeString(entryName),
+            sourceInfo);
+          lastStackFrame.entryID = entryID;
+          this.model_.addStackFrame(lastStackFrame);
+        } else {
+          lastStackFrame = childFrame;
+        }
+      }
+
+      if (lastStackFrame !== this.root_stack_frame_) {
+        var sample = new tr.model.Sample(
+          undefined, this.v8_thread_, 'V8 PC',
+          start, lastStackFrame, 1);
+        this.model_.samples.push(sample);
+      }
+    },
+
+    processDistortion_: function(distortion_in_picoseconds) {
+      distortion_per_entry = distortion_in_picoseconds / 1000000;
+    },
+
+    processPlotRange_: function(start, end) {
+      xrange_start_override = start;
+      xrange_end_override = end;
+    },
+
+    processV8Version_: function(major, minor, build, patch, candidate) {
+      // do nothing.
+    },
+
+    /**
+     * Walks through the events_ list and outputs the structures discovered to
+     * model_.
+     */
+    importEvents: function() {
+      var logreader = new tr.e.importer.v8.LogReader(
+          { 'timer-event' : {
+            parsers: [null, parseInt, parseInt],
+            processor: this.processTimerEvent_.bind(this)
+          },
+          'shared-library': {
+            parsers: [null, parseInt, parseInt],
+            processor: this.processSharedLibrary_.bind(this)
+          },
+          'timer-event-start' : {
+            parsers: [null, parseInt],
+            processor: this.processTimerEventStart_.bind(this)
+          },
+          'timer-event-end' : {
+            parsers: [null, parseInt],
+            processor: this.processTimerEventEnd_.bind(this)
+          },
+          'code-creation': {
+            parsers: [null, parseInt, parseInt, parseInt, null, 'var-args'],
+            processor: this.processCodeCreateEvent_.bind(this)
+          },
+          'code-move': {
+            parsers: [parseInt, parseInt],
+            processor: this.processCodeMoveEvent_.bind(this)
+          },
+          'code-delete': {
+            parsers: [parseInt],
+            processor: this.processCodeDeleteEvent_.bind(this)
+          },
+          'cpp': {
+            parsers: [parseInt, parseInt, null],
+            processor: this.processCppSymbol_.bind(this)
+          },
+          'tick': {
+            parsers: [parseInt, parseInt, parseInt, parseInt, parseInt,
+                      'var-args'],
+            processor: this.processTickEvent_.bind(this)
+          },
+          'distortion': {
+            parsers: [parseInt],
+            processor: this.processDistortion_.bind(this)
+          },
+          'plot-range': {
+            parsers: [parseInt, parseInt],
+            processor: this.processPlotRange_.bind(this)
+          },
+          'v8-version': {
+            parsers: [parseInt, parseInt, parseInt, parseInt, parseInt],
+            processor: this.processV8Version_.bind(this)
+          }
+          });
+
+      this.v8_timer_thread_ =
+          this.model_.getOrCreateProcess(-32).getOrCreateThread(1);
+      this.v8_timer_thread_.name = 'V8 Timers';
+      this.v8_thread_ =
+          this.model_.getOrCreateProcess(-32).getOrCreateThread(2);
+      this.v8_thread_.name = 'V8';
+
+      var lines = this.logData_.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        logreader.processLogLine(lines[i]);
+      }
+
+      // The processing of samples adds all the root stack frame to
+      // this.root_stack_frame_. But, we don't want that stack frame in the real
+      // model. So get rid of it.
+      this.root_stack_frame_.removeAllChildren();
+
+      function addSlices(slices, thread) {
+        for (var i = 0; i < slices.length; i++) {
+          var duration = slices[i].end - slices[i].start;
+          var slice = new tr.model.Slice('v8', slices[i].name,
+              ColorScheme.getColorIdForGeneralPurposeString(slices[i].name),
+              slices[i].start, {}, duration);
+          thread.sliceGroup.pushSlice(slice);
+          addSlices(slices[i].children, thread);
+        }
+      }
+      addSlices(this.v8_stack_timeline_, this.v8_thread_);
+    }
+  };
+
+  tr.importer.Importer.register(V8LogImporter);
+
+  return {
+    V8LogImporter: V8LogImporter
+  };
+});

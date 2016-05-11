@@ -1,0 +1,84 @@
+/**
+Copyright (c) 2013 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/base.js");
+require("../base/extension_registry.js");
+
+'use strict';
+
+/**
+ * @fileoverview Base class for trace data importers.
+ */
+global.tr.exportTo('tr.importer', function() {
+  function Importer() { }
+
+  Importer.prototype = {
+    __proto__: Object.prototype,
+
+    get importerName() {
+      return 'Importer';
+    },
+
+    /**
+     * Called by the Model to check whether the importer type stores the actual
+     * trace data or just holds it as container for further extraction.
+     */
+    isTraceDataContainer: function() {
+      return false;
+    },
+
+    /**
+     * Called by the Model to extract one or more subtraces from the event data.
+     */
+    extractSubtraces: function() {
+      return [];
+    },
+
+    /**
+     * Called to import clock sync markers into the Model.
+     */
+    importClockSyncMarkers: function() {
+    },
+
+    /**
+     * Called to import events into the Model.
+     */
+    importEvents: function() {
+    },
+
+    /**
+     * Called to import sample data into the Model.
+     */
+    importSampleData: function() {
+    },
+
+    /**
+     * Called by the Model after all other importers have imported their
+     * events.
+     */
+    finalizeImport: function() {
+    }
+  };
+
+
+  var options = new tr.b.ExtensionRegistryOptions(tr.b.BASIC_REGISTRY_MODE);
+  options.defaultMetadata = {};
+  options.mandatoryBaseClass = Importer;
+  tr.b.decorateExtensionRegistry(Importer, options);
+
+  Importer.findImporterFor = function(eventData) {
+    var typeInfo = Importer.findTypeInfoMatching(function(ti) {
+      return ti.constructor.canImport(eventData);
+    });
+    if (typeInfo)
+      return typeInfo.constructor;
+    return undefined;
+  };
+
+  return {
+    Importer: Importer
+  };
+});

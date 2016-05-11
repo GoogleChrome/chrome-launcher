@@ -1,0 +1,64 @@
+/**
+Copyright 2015 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/base.js");
+
+'use strict';
+
+global.tr.exportTo('tr.model', function() {
+
+  /**
+   * HeapEntry represents a single value describing the state of the heap of an
+   * allocator in a single process.
+   *
+   * An entry specifies how much space (e.g. 19 MiB) was allocated in a
+   * particular context, which consists of a codepath (e.g. drawQuad <- draw <-
+   * MessageLoop::RunTask) and an object type (e.g. HTMLImportLoader).
+   *
+   * @{constructor}
+   */
+  function HeapEntry(heapDump, leafStackFrame, objectTypeName, size, count) {
+    this.heapDump = heapDump;
+
+    // The leaf stack frame of the associated backtrace (e.g. drawQuad for the
+    // drawQuad <- draw <- MessageLoop::RunTask backtrace). If undefined, the
+    // backtrace is empty.
+    this.leafStackFrame = leafStackFrame;
+
+    // The name of the allocated object type (e.g. 'HTMLImportLoader'). If
+    // undefined, the entry represents the sum over all object types.
+    this.objectTypeName = objectTypeName;
+
+    this.size = size;
+    this.count = count;
+  }
+
+  /**
+   * HeapDump represents a dump of the heap of an allocator in a single process
+   * at a particular timestamp.
+   *
+   * @{constructor}
+   */
+  function HeapDump(processMemoryDump, allocatorName) {
+    this.processMemoryDump = processMemoryDump;
+    this.allocatorName = allocatorName;
+    this.entries = [];
+  }
+
+  HeapDump.prototype = {
+    addEntry: function(leafStackFrame, objectTypeName, size, count) {
+      var entry = new HeapEntry(
+          this, leafStackFrame, objectTypeName, size, count);
+      this.entries.push(entry);
+      return entry;
+    }
+  };
+
+  return {
+    HeapEntry: HeapEntry,
+    HeapDump: HeapDump
+  };
+});

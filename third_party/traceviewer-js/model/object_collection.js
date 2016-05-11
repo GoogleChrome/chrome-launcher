@@ -1,0 +1,244 @@
+/**
+Copyright (c) 2013 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/range.js");
+require("../base/sorted_array_utils.js");
+require("../base/utils.js");
+require("./event_container.js");
+require("./object_instance.js");
+require("./time_to_object_instance_map.js");
+
+'use strict';
+
+/**
+ * @fileoverview Provides the ObjectCollection class.
+ */
+global.tr.exportTo('tr.model', function() {
+  var ObjectInstance = tr.model.ObjectInstance;
+  var ObjectSnapshot = tr.model.ObjectSnapshot;
+
+  /**
+   * A collection of object instances and their snapshots, accessible by id and
+   * time, or by object name.
+   *
+   * @constructor
+   */
+  function ObjectCollection(parent) {
+    tr.model.EventContainer.call(this);
+    this.parent = parent;
+    // scope -> {id -> TimeToObjectInstanceMap}
+    this.instanceMapsByScopedId_ = {};
+    this.instancesByTypeName_ = {};
+    this.createObjectInstance_ = this.createObjectInstance_.bind(this);
+  }
+
+  ObjectCollection.prototype = {
+    __proto__: tr.model.EventContainer.prototype,
+
+    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
+                                               opt_this) {
+    },
+
+    iterateAllChildEventContainers: function(callback, opt_this) {
+    },
+
+    iterateAllEventsInThisContainer: function(eventTypePredicate,
+                                              callback, opt_this) {
+      var bI = !!eventTypePredicate.call(opt_this, ObjectInstance);
+      var bS = !!eventTypePredicate.call(opt_this, ObjectSnapshot);
+      if (bI === false && bS === false)
+        return;
+      this.iterObjectInstances(function(instance) {
+        if (bI)
+          callback.call(opt_this, instance);
+        if (bS)
+          instance.snapshots.forEach(callback, opt_this);
+      }, opt_this);
+    },
+
+    createObjectInstance_: function(
+        parent, scopedId, category, name, creationTs, opt_baseTypeName) {
+      var constructor = tr.model.ObjectInstance.getConstructor(
+          category, name);
+      var instance = new constructor(
+          parent, scopedId, category, name, creationTs, opt_baseTypeName);
+      var typeName = instance.typeName;
+      var instancesOfTypeName = this.instancesByTypeName_[typeName];
+      if (!instancesOfTypeName) {
+        instancesOfTypeName = [];
+        this.instancesByTypeName_[typeName] = instancesOfTypeName;
+      }
+      instancesOfTypeName.push(instance);
+      return instance;
+    },
+
+    getOrCreateInstanceMap_: function(scopedId) {
+      var dict;
+      if (scopedId.scope in this.instanceMapsByScopedId_) {
+        dict = this.instanceMapsByScopedId_[scopedId.scope];
+      } else {
+        dict = {};
+        this.instanceMapsByScopedId_[scopedId.scope] = dict;
+      }
+      var instanceMap = dict[scopedId.id];
+      if (instanceMap)
+        return instanceMap;
+      instanceMap = new tr.model.TimeToObjectInstanceMap(
+          this.createObjectInstance_, this.parent, scopedId);
+      dict[scopedId.id] = instanceMap;
+      return instanceMap;
+    },
+
+    idWasCreated: function(scopedId, category, name, ts) {
+      var instanceMap = this.getOrCreateInstanceMap_(scopedId);
+      return instanceMap.idWasCreated(category, name, ts);
+    },
+
+    addSnapshot: function(
+        scopedId, category, name, ts, args, opt_baseTypeName) {
+      var instanceMap = this.getOrCreateInstanceMap_(scopedId);
+      var snapshot = instanceMap.addSnapshot(
+          category, name, ts, args, opt_baseTypeName);
+      if (snapshot.objectInstance.category != category) {
+        var msg = 'Added snapshot name=' + name + ' with cat=' + category +
+            ' impossible. It instance was created/snapshotted with cat=' +
+            snapshot.objectInstance.category + ' name=' +
+            snapshot.objectInstance.name;
+        throw new Error(msg);
+      }
+      if (opt_baseTypeName &&
+          snapshot.objectInstance.baseTypeName != opt_baseTypeName) {
+        throw new Error('Could not add snapshot with baseTypeName=' +
+                        opt_baseTypeName + '. It ' +
+                        'was previously created with name=' +
+                        snapshot.objectInstance.baseTypeName);
+      }
+      if (snapshot.objectInstance.name != name) {
+        throw new Error('Could not add snapshot with name=' + name + '. It ' +
+                        'was previously created with name=' +
+                        snapshot.objectInstance.name);
+      }
+      return snapshot;
+    },
+
+    idWasDeleted: function(scopedId, category, name, ts) {
+      var instanceMap = this.getOrCreateInstanceMap_(scopedId);
+      var deletedInstance = instanceMap.idWasDeleted(category, name, ts);
+      if (!deletedInstance)
+        return;
+      if (deletedInstance.category != category) {
+        var msg = 'Deleting object ' + deletedInstance.name +
+            ' with a different category ' +
+            'than when it was created. It previous had cat=' +
+            deletedInstance.category + ' but the delete command ' +
+            'had cat=' + category;
+        throw new Error(msg);
+      }
+      if (deletedInstance.baseTypeName != name) {
+        throw new Error('Deletion requested for name=' +
+                        name + ' could not proceed: ' +
+                        'An existing object with baseTypeName=' +
+                        deletedInstance.baseTypeName + ' existed.');
+      }
+    },
+
+    autoDeleteObjects: function(maxTimestamp) {
+      tr.b.iterItems(this.instanceMapsByScopedId_, function(scope, imapById) {
+        tr.b.iterItems(imapById, function(id, i2imap) {
+          var lastInstance = i2imap.lastInstance;
+          if (lastInstance.deletionTs != Number.MAX_VALUE)
+            return;
+          i2imap.idWasDeleted(
+              lastInstance.category, lastInstance.name, maxTimestamp);
+          // idWasDeleted will cause lastInstance.deletionTsWasExplicit to be
+          // set to true. Unset it here.
+          lastInstance.deletionTsWasExplicit = false;
+        });
+      });
+    },
+
+    getObjectInstanceAt: function(scopedId, ts) {
+      var instanceMap;
+      if (scopedId.scope in this.instanceMapsByScopedId_)
+        instanceMap = this.instanceMapsByScopedId_[scopedId.scope][scopedId.id];
+      if (!instanceMap)
+        return undefined;
+      return instanceMap.getInstanceAt(ts);
+    },
+
+    getSnapshotAt: function(scopedId, ts) {
+      var instance = this.getObjectInstanceAt(scopedId, ts);
+      if (!instance)
+        return undefined;
+      return instance.getSnapshotAt(ts);
+    },
+
+    iterObjectInstances: function(iter, opt_this) {
+      opt_this = opt_this || this;
+      tr.b.iterItems(this.instanceMapsByScopedId_, function(scope, imapById) {
+        tr.b.iterItems(imapById, function(id, i2imap) {
+          i2imap.instances.forEach(iter, opt_this);
+        });
+      });
+    },
+
+    getAllObjectInstances: function() {
+      var instances = [];
+      this.iterObjectInstances(function(i) { instances.push(i); });
+      return instances;
+    },
+
+    getAllInstancesNamed: function(name) {
+      return this.instancesByTypeName_[name];
+    },
+
+    getAllInstancesByTypeName: function() {
+      return this.instancesByTypeName_;
+    },
+
+    preInitializeAllObjects: function() {
+      this.iterObjectInstances(function(instance) {
+        instance.preInitialize();
+      });
+    },
+
+    initializeAllObjects: function() {
+      this.iterObjectInstances(function(instance) {
+        instance.initialize();
+      });
+    },
+
+    initializeInstances: function() {
+      this.iterObjectInstances(function(instance) {
+        instance.initialize();
+      });
+    },
+
+    updateBounds: function() {
+      this.bounds.reset();
+      this.iterObjectInstances(function(instance) {
+        instance.updateBounds();
+        this.bounds.addRange(instance.bounds);
+      }, this);
+    },
+
+    shiftTimestampsForward: function(amount) {
+      this.iterObjectInstances(function(instance) {
+        instance.shiftTimestampsForward(amount);
+      });
+    },
+
+    addCategoriesToDict: function(categoriesDict) {
+      this.iterObjectInstances(function(instance) {
+        categoriesDict[instance.category] = true;
+      });
+    }
+  };
+
+  return {
+    ObjectCollection: ObjectCollection
+  };
+});

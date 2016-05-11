@@ -1,0 +1,361 @@
+/**
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../base/iteration_helpers.js");
+
+'use strict';
+
+global.tr.exportTo('tr.model', function() {
+  var ClockDomainId = {
+    BATTOR: 'BATTOR',
+
+    // NOTE: Exists for backwards compatibility with old Chrome traces which
+    // didn't explicitly specify the clock being used.
+    UNKNOWN_CHROME_LEGACY: 'UNKNOWN_CHROME_LEGACY',
+
+    LINUX_CLOCK_MONOTONIC: 'LINUX_CLOCK_MONOTONIC',
+    LINUX_FTRACE_GLOBAL: 'LINUX_FTRACE_GLOBAL',
+    MAC_MACH_ABSOLUTE_TIME: 'MAC_MACH_ABSOLUTE_TIME',
+    WIN_ROLLOVER_PROTECTED_TIME_GET_TIME:
+        'WIN_ROLLOVER_PROTECTED_TIME_GET_TIME',
+    WIN_QPC: 'WIN_QPC'
+  };
+
+  var POSSIBLE_CHROME_CLOCK_DOMAINS = new Set([
+    ClockDomainId.UNKNOWN_CHROME_LEGACY,
+    ClockDomainId.LINUX_CLOCK_MONOTONIC,
+    ClockDomainId.MAC_MACH_ABSOLUTE_TIME,
+    ClockDomainId.WIN_ROLLOVER_PROTECTED_TIME_GET_TIME,
+    ClockDomainId.WIN_QPC
+  ]);
+
+  // The number of milliseconds above which the BattOr sync is no longer
+  // considered "fast", and it's more accurate to use the sync start timestamp
+  // instead of the normal sync timestamp due to a bug in the Chrome serial code
+  // making serial reads too slow.
+  var BATTOR_FAST_SYNC_THRESHOLD_MS = 3;
+
+  /**
+   * Returns a function that, given a timestamp in |fromMarker|'s domain,
+   * returns a timestamp in |toMarker|'s domain.
+   */
+  function createTransformer(fromMarker, toMarker) {
+    var fromTs = fromMarker.ts, toTs = toMarker.ts;
+
+    // TODO(charliea): Usually, we estimate that the clock sync marker is
+    // issued by the agent exactly in the middle of the controller's start and
+    // end timestamps. However, there's currently a bug in the Chrome serial
+    // code that's making the clock sync ack for BattOr take much longer to
+    // read than it should (by about 8ms). This is causing the above estimate
+    // of the controller's sync timestamp to be off by a substantial enough
+    // amount that it makes traces hard to read. For now, make an exception
+    // for BattOr and just use the controller's start timestamp as the sync
+    // time. In the medium term, we should fix the Chrome serial code in order
+    // to remove this special logic and get an even more accurate estimate.
+    if (fromMarker.domainId === ClockDomainId.BATTOR &&
+        toMarker.duration > BATTOR_FAST_SYNC_THRESHOLD_MS) {
+      toTs = toMarker.startTs;
+    } else if (toMarker.domainId === ClockDomainId.BATTOR &&
+        fromMarker.duration > BATTOR_FAST_SYNC_THRESHOLD_MS) {
+      fromTs = fromMarker.startTs;
+    }
+
+    var tsShift = toTs - fromTs;
+    return function(ts) { return ts + tsShift; };
+  }
+
+  /**
+   * Given two transformers, creates a third that's a composition of the two.
+   *
+   * @param {function(Number): Number} aToB A function capable of converting a
+   *     timestamp from domain A to domain B.
+   * @param {function(Number): Number} bToC A function capable of converting a
+   *     timestamp from domain B to domain C.
+   *
+   * @return {function(Number): Number} A function capable of converting a
+   *     timestamp from domain A to domain C.
+   */
+  function composeTransformers(aToB, bToC) {
+    return function(ts) {
+      return bToC(aToB(ts));
+    };
+  }
+
+  /**
+   * A ClockSyncManager holds clock sync markers and uses them to shift
+   * timestamps from agents' clock domains onto the model's clock domain.
+   *
+   * In this context, a "clock domain" is a single perspective on the passage
+   * of time. A single computer can have multiple clock domains because it
+   * can have multiple methods of retrieving a timestamp (e.g.
+   * clock_gettime(CLOCK_MONOTONIC) and clock_gettime(CLOCK_REALTIME) on Linux).
+   * Another common reason for multiple clock domains within a single trace
+   * is that traces can span devices (e.g. a laptop collecting a Chrome trace
+   * can have its power consumption recorded by a second device and the two
+   * traces can be viewed alongside each other).
+   *
+   * For more information on how to synchronize multiple time domains using this
+   * method, see: http://bit.ly/1OVkqju.
+   *
+   * @constructor
+   */
+  function ClockSyncManager() {
+    // A set of all domains seen by the ClockSyncManager.
+    this.domainsSeen_ = new Set();
+    this.markersBySyncId_ = new Map();
+    // transformerMapByDomainId_[fromDomainId][toDomainId] returns the function
+    // that converts timestamps in the "from" domain to timestamps in the "to"
+    // domain.
+    this.transformerMapByDomainId_ = {};
+  }
+
+  ClockSyncManager.prototype = {
+    /**
+     * Adds a clock sync marker to the list of known markers.
+     *
+     * @param {string} domainId The clock domain that the marker is in.
+     * @param {string} syncId The identifier shared by both sides of the clock
+     *                 sync marker.
+     * @param {number} startTs The time (in ms) at which the sync started.
+     * @param {number=} opt_endTs The time (in ms) at which the sync ended. If
+     *                  unspecified, it's assumed to be the same as the start,
+     *                  indicating an instantaneous sync.
+     */
+    addClockSyncMarker: function(domainId, syncId, startTs, opt_endTs) {
+      this.onDomainSeen_(domainId);
+
+      if (tr.b.dictionaryValues(ClockDomainId).indexOf(domainId) < 0) {
+        throw new Error('"' + domainId + '" is not in the list of known ' +
+            'clock domain IDs.');
+      }
+
+      if (this.modelDomainId_) {
+        throw new Error('Cannot add new clock sync markers after getting ' +
+            'a model time transformer.');
+      }
+
+      var marker = new ClockSyncMarker(domainId, startTs, opt_endTs);
+
+      if (!this.markersBySyncId_.has(syncId)) {
+        this.markersBySyncId_.set(syncId, [marker]);
+        return;
+      }
+
+      var markers = this.markersBySyncId_.get(syncId);
+
+      if (markers.length === 2) {
+        throw new Error('Clock sync with ID "' + syncId + '" is already ' +
+            'complete - cannot add a third clock sync marker to it.');
+      }
+
+      if (markers[0].domainId === domainId)
+        throw new Error('A clock domain cannot sync with itself.');
+
+      // TODO(charliea): Allow multiple paths between clock domains by selecting
+      // the path with the least potential error.
+      if (this.getTransformerBetween_(markers[0].domainId, domainId)) {
+        throw new Error('The current code cannot handle multiple paths ' +
+            'between the same clock domains. However, this is a valid ' +
+            'operation.');
+      }
+
+      markers.push(marker);
+
+      this.getOrCreateTransformerMap_(markers[0].domainId)[domainId] =
+          createTransformer(markers[0], marker);
+      this.getOrCreateTransformerMap_(domainId)[markers[0].domainId] =
+          createTransformer(marker, markers[0]);
+    },
+
+    /**
+     * Returns a function that, given a timestamp in the domain with |domainId|,
+     * returns a timestamp in the model's clock domain.
+     *
+     * NOTE: All clock sync markers should be added before calling this function
+     * for the first time. This is because the first time that this function is
+     * called, a model clock domain is selected. This clock domain must have
+     * syncs connecting it with all other clock domains. If multiple clock
+     * domains are viable candidates, the one with the clock domain ID that is
+     * the first alphabetically is selected.
+     */
+    getModelTimeTransformer: function(domainId) {
+      this.onDomainSeen_(domainId);
+
+      if (!this.modelDomainId_)
+        this.selectModelDomainId_();
+
+      var transformer =
+          this.getTransformerBetween_(domainId, this.modelDomainId_);
+      if (!transformer) {
+        throw new Error('No clock sync markers exist pairing clock domain "' +
+            domainId + '" ' + 'with model clock domain "' +
+            this.modelDomainId_ + '".');
+      }
+
+      return transformer;
+    },
+
+    /**
+     * Returns a function that, given a timestamp in the "from" domain, returns
+     * a timestamp in the "to" domain.
+     */
+    getTransformerBetween_: function(fromDomainId, toDomainId) {
+      // Do a breadth-first search from the "from" domain until we reach the
+      // "to" domain.
+      var visitedDomainIds = new Set();
+      // Keep a queue of nodes to visit, starting with the "from" domain.
+      var queue = [];
+      queue.push({ domainId: fromDomainId, transformer: tr.b.identity });
+
+      while (queue.length > 0) {
+        var current = queue.shift();
+
+        if (current.domainId === toDomainId)
+          return current.transformer;
+
+        if (visitedDomainIds.has(current.domainId))
+          continue;
+        visitedDomainIds.add(current.domainId);
+
+        var outgoingTransformers =
+            this.transformerMapByDomainId_[current.domainId];
+
+        if (!outgoingTransformers)
+          continue;
+
+        // Add all nodes that are directly connected to this one to the queue.
+        for (var outgoingDomainId in outgoingTransformers) {
+          // We have two transformers: one to get us from the "from" domain to
+          // the current domain, and another to get us from the current domain
+          // to the next domain. By composing those two transformers, we can
+          // create one that gets us from the "from" domain to the next domain.
+          var toNextDomainTransformer = outgoingTransformers[outgoingDomainId];
+          var toCurrentDomainTransformer = current.transformer;
+
+          queue.push({
+            domainId: outgoingDomainId,
+            transformer: composeTransformers(
+                toNextDomainTransformer, toCurrentDomainTransformer)
+          });
+        }
+      }
+
+      return undefined;
+    },
+
+    /**
+     * Selects the domain to use as the model domain from among the domains
+     * with registered markers.
+     *
+     * This is necessary because some common domain must be chosen before all
+     * timestamps can be shifted onto the same domain.
+     *
+     * For the time being, preference is given to Chrome clock domains. If no
+     * Chrome clock domain is present, the first clock domain alphabetically
+     * is selected.
+     */
+    selectModelDomainId_: function() {
+      this.ensureAllDomainsAreConnected_();
+
+      // While we're migrating to the new clock sync system, we have to make
+      // sure to prefer the Chrome clock domain because legacy clock sync
+      // mechanisms assume that's the case.
+      for (var chromeDomainId of POSSIBLE_CHROME_CLOCK_DOMAINS) {
+        if (this.domainsSeen_.has(chromeDomainId)) {
+          this.modelDomainId_ = chromeDomainId;
+          return;
+        }
+      }
+
+      var domainsSeenArray = Array.from(this.domainsSeen_);
+      domainsSeenArray.sort();
+      this.modelDomainId_ = domainsSeenArray[0];
+    },
+
+    /** Throws an error if all domains are not connected. */
+    ensureAllDomainsAreConnected_: function() {
+      // NOTE: this is a ridiculously inefficient way to do this. Given how few
+      // clock domains we're likely to have, this shouldn't be a problem.
+      var firstDomainId = undefined;
+      for (var domainId of this.domainsSeen_) {
+        if (!firstDomainId) {
+          firstDomainId = domainId;
+          continue;
+        }
+
+        if (!this.getTransformerBetween_(firstDomainId, domainId)) {
+          throw new Error('Unable to select a master clock domain because no ' +
+              'path can be found from "' + firstDomainId + '" to "' + domainId +
+              '".');
+        }
+      }
+
+      return true;
+    },
+
+    /** Observer called each time that a clock domain is seen. */
+    onDomainSeen_: function(domainId) {
+      if (domainId === ClockDomainId.UNKNOWN_CHROME_LEGACY &&
+          !this.domainsSeen_.has(ClockDomainId.UNKNOWN_CHROME_LEGACY)) {
+        // UNKNOWN_CHROME_LEGACY was just seen for the first time: collapse it
+        // and the other Chrome clock domains into one.
+        //
+        // This makes sure that we don't have two separate clock sync graphs:
+        // one attached to UNKNOWN_CHROME_LEGACY and the other attached to the
+        // real Chrome clock domain.
+        for (var domainId of POSSIBLE_CHROME_CLOCK_DOMAINS) {
+          if (domainId === ClockDomainId.UNKNOWN_CHROME_LEGACY)
+            continue;
+
+          this.collapseDomains_(ClockDomainId.UNKNOWN_CHROME_LEGACY, domainId);
+        }
+      }
+
+      this.domainsSeen_.add(domainId);
+    },
+
+    /** Makes timestamps in the two clock domains interchangeable. */
+    collapseDomains_: function(domain1Id, domain2Id) {
+      this.getOrCreateTransformerMap_(domain1Id)[domain2Id] =
+          this.getOrCreateTransformerMap_(domain2Id)[domain1Id] = tr.b.identity;
+    },
+
+    /**
+     * Returns (and creates if it doesn't exist) the transformer map describing
+     * how to transform timestamps between directly connected clock domains.
+     */
+    getOrCreateTransformerMap_: function(domainId) {
+      if (!this.transformerMapByDomainId_[domainId])
+        this.transformerMapByDomainId_[domainId] = {};
+
+      return this.transformerMapByDomainId_[domainId];
+    }
+  };
+
+  /**
+   * A ClockSyncMarker is an internal entity that represents a marker in a
+   * trace log indicating that a clock sync happened at a specified time.
+   *
+   * If no end timestamp argument is specified in the constructor, it's assumed
+   * that the end timestamp is the same as the start (i.e. the clock sync
+   * was instantaneous).
+   */
+  function ClockSyncMarker(domainId, startTs, opt_endTs) {
+    this.domainId = domainId;
+    this.startTs = startTs;
+    this.endTs = opt_endTs === undefined ? startTs : opt_endTs;
+  }
+
+  ClockSyncMarker.prototype = {
+    get duration() { return this.endTs - this.startTs; },
+    get ts() { return this.startTs + this.duration / 2; }
+  };
+
+  return {
+    ClockDomainId: ClockDomainId,
+    ClockSyncManager: ClockSyncManager
+  };
+});

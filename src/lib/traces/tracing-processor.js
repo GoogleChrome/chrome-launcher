@@ -96,6 +96,7 @@ class TraceProcessor {
     const io = new traceviewer.importer.ImportOptions();
     io.showImportWarnings = false;
     io.pruneEmptyContainers = false;
+    io.shiftWorldToZero = true;
 
     const model = new traceviewer.Model();
     const importer = new traceviewer.importer.Import(model, io);
