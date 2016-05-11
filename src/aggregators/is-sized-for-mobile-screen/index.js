@@ -37,7 +37,8 @@ class MobileFriendly extends Aggregate {
    * @return {string}
    */
   static get description() {
-    return '';
+    return `Users increasingly experience your app on mobile devices, so it's important to
+            ensure that the experience can adapt to smaller screens.`;
   }
 
   /**

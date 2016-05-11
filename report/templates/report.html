@@ -27,30 +27,27 @@ limitations under the License.
 </head>
 <body>
 <div class="js-report report">
-  <header class="header">
-    <div class="header-titles">
-      <h1 class="header-titles__main">Lighthouse</h1>
-      <h2 class="header-titles__url">{{ url }}</h2>
-    </div>
-
-    <aside class="header__score">
-      <div class="score-container">
-        <span class="score-container__overall-score">{{ totalScore }}</span>
-        <span class="score-container__max-score">/&nbsp;100</span>
-      </div>
-    </aside>
-
-  </header>
 
   <section class="report-body">
     <div class="report-body__header">
+      <div class="toggle">
+        <h1 class="toggle__title">Toggle view:</h1>
+
+        <label class="toggle__label" for="user-feature">User feature</label>
+        <input name="view-toggle" class="js-toggle-user" id="user-feature" type="radio" value="user" checked>
+
+        <label class="toggle__label" for="technology">Technology</label>
+        <input name="view-toggle" class="js-toggle-technology" id="technology" type="radio" value="technology">
+      </div>
+
       <button class="print js-print"></button>
     </div>
     <div class="report-body__content">
-      <div class="js-menu-container report-body__menu-container">
-        <div class="js-menu menu">
+      <div class="report-body__menu-container">
+        <div class="menu">
           <div class="menu__header">
-            In this report:
+            <h1 class="menu__header-title">Lighthouse</h1>
+            <h2 class="menu__header-url">{{ url }}</h2>
           </div>
           <ul class="menu__nav">
             <li class="menu__nav-item">
@@ -68,20 +65,16 @@ limitations under the License.
         </div>
       </div>
       <div class="js-breakdown report-body__breakdown">
-        <h1 class="report-section__title" id="progressive-web-app">Progressive Web App</h1>
+        <h1 class="report-section__title" id="progressive-web-app">
+          <span class="report-section__title-main">Progressive Web App</span>
+          <span class="report-section__title-score">
+            <span class="report-section__title-score-total report-section__title-score-total--{{ getTotalScoreRating totalScore }}">{{ totalScore }}</span>
+            <span class="report-section__title-score-max"> / 100</span>
+          </span>
+        </h1>
         <p class="report-section__description">
-          These audits check for various aspects of creating a Progressive Web App, and they affect your overall score.
+          These audits validate the aspects of a Progressive Web App.
         </p>
-
-        <div class="toggle">
-          <h1 class="toggle__title">Toggle view:</h1>
-
-          <label class="toggle__label" for="user-feature">User feature</label>
-          <input name="view-toggle" class="js-toggle-user" id="user-feature" type="radio" value="user" checked>
-
-          <label class="toggle__label" for="technology">Technology</label>
-          <input name="view-toggle" class="js-toggle-technology" id="technology" type="radio" value="technology">
-        </div>
 
         <div class="js-report-by-user-feature">
           {{#each aggregations as |aggregation|}}
@@ -98,7 +91,7 @@ limitations under the License.
                       <span class="report-section__item-description">
                         {{ subItem.description }}
                         {{#if subItem.optimalValue }}
-                        (target: {{ subItem.optimalValue }})
+                        (target value: {{ subItem.optimalValue }})
                         {{/if}}
                       </span>
                       <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
@@ -165,12 +158,12 @@ limitations under the License.
                 <li class="report-section__item">
                   <div class="report-section__item-details">
                     <span class="report-section__item-description">
-                      {{ subItem.category }}: {{ subItem.description }}
+                      <span class="report-section__item-category">{{ subItem.category }}:</span> {{ subItem.description }}
                       {{#if subItem.optimalValue }}
                       (target: {{ subItem.optimalValue }})
                       {{/if}}
                     </span>
-                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
+                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value aggregation.type.name }}</span>
                     {{#if subItem.rawValue }}
                     <span class="report-section__item-raw-value">&nbsp;({{ subItem.rawValue }})</span>
                     {{/if }}

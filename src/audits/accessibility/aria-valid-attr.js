@@ -39,7 +39,7 @@ class ARIAValidAttr extends Audit {
    * @override
    */
   static get description() {
-    return 'Ensures attributes that begin with aria- are valid ARIA attributes';
+    return 'Element aria-* attributes are valid ARIA attributes';
   }
 
   /**

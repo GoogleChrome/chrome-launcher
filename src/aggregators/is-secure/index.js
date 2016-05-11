@@ -40,7 +40,8 @@ class IsSecure extends Aggregate {
    * @return {string}
    */
   static get description() {
-    return '';
+    return `Security is an important part of the web for both developers and users. Moving forward,
+            Transport Layer Security (TLS) support will be required for many APIs.`;
   }
 
   /**
