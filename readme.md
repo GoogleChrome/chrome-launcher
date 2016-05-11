@@ -8,7 +8,7 @@
 
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 
-_status: early. sorta working_
+_status: not the worst thing_
 
 ## Install
 ```sh
