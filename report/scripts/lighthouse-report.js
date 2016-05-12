@@ -22,8 +22,7 @@
 /* Using ES5 to broaden support */
 function LighthouseReport() {
   this.printButton = document.querySelector('.js-print');
-  this.radioButtonToggleViewUser = document.querySelector('.js-toggle-user');
-  this.radioButtonToggleViewTechnology = document.querySelector('.js-toggle-technology');
+  this.checkboxToggleView = document.querySelector('.js-toggle-view');
   this.viewUserFeature = document.querySelector('.js-report-by-user-feature');
   this.viewTechnology = document.querySelector('.js-report-by-technology');
 
@@ -39,19 +38,18 @@ LighthouseReport.prototype = {
   },
 
   updateView: function() {
-    if (this.radioButtonToggleViewUser.checked) {
-      this.viewUserFeature.removeAttribute('hidden');
-      this.viewTechnology.setAttribute('hidden', 'hidden');
-    } else if (this.radioButtonToggleViewTechnology.checked) {
+    if (this.checkboxToggleView.checked) {
       this.viewUserFeature.setAttribute('hidden', 'hidden');
       this.viewTechnology.removeAttribute('hidden');
+    } else {
+      this.viewUserFeature.removeAttribute('hidden');
+      this.viewTechnology.setAttribute('hidden', 'hidden');
     }
   },
 
   addEventListeners: function() {
     this.printButton.addEventListener('click', this.onPrint);
-    this.radioButtonToggleViewUser.addEventListener('change', this.updateView);
-    this.radioButtonToggleViewTechnology.addEventListener('change', this.updateView);
+    this.checkboxToggleView.addEventListener('change', this.updateView);
   }
 };
 

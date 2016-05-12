@@ -33,11 +33,13 @@ limitations under the License.
       <div class="toggle">
         <h1 class="toggle__title">Toggle view:</h1>
 
-        <label class="toggle__label" for="user-feature">User feature</label>
-        <input name="view-toggle" class="js-toggle-user" id="user-feature" type="radio" value="user" checked>
-
-        <label class="toggle__label" for="technology">Technology</label>
-        <input name="view-toggle" class="js-toggle-technology" id="technology" type="radio" value="technology">
+        <label class="toggle__label" for="user-feature" aria-label="User feature">
+          <input name="view-toggle" class="js-toggle-view toggle-view" id="user-feature" type="checkbox" value="toggle">
+          <div role="presentation" class="toggle__display" data-on="Technology" data-off="User feature">
+            <div aria-hidden class="toggle__slider"></div>
+          </div>
+          <div role="presentation" class="toggle__focus-ring"></div>
+        </label>
       </div>
 
       <button class="print js-print"></button>
