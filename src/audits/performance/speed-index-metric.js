@@ -41,14 +41,14 @@ class SpeedIndexMetric extends Audit {
    * @override
    */
   static get description() {
-    return 'Speed Index Metric';
+    return 'Speed Index';
   }
 
   /**
    * @override
    */
   static get optimalValue() {
-    return '1,000ms';
+    return '1,000';
   }
 
   /**

@@ -39,7 +39,7 @@ class FirstMeaningfulPaint extends Audit {
    * @override
    */
   static get description() {
-    return 'Fast first paint of content';
+    return 'First paint of content';
   }
 
   /**

@@ -39,7 +39,7 @@ class InputReadinessMetric extends Audit {
    * @override
    */
   static get description() {
-    return 'Input Readiness';
+    return 'Input readiness - main thread availability';
   }
 
   /**

@@ -38,7 +38,7 @@ class ManifestShortNameLength extends Audit {
    * @override
    */
   static get description() {
-    return 'App\'s short_name won\'t be truncated when displayed on homescreen';
+    return 'Manifest\'s short_name won\'t be truncated when displayed on homescreen';
   }
 
   /**
