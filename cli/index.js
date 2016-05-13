@@ -23,7 +23,7 @@ const log = require('../src/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 
-const lighthouse = require('../module');
+const lighthouse = require('../');
 
 // node 5.x required due to use of ES2015 features
 if (semver.lt(process.version, '5.0.0')) {

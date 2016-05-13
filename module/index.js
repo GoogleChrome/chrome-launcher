@@ -28,19 +28,21 @@ if (semver.lt(process.version, '5.0.0')) {
 }
 
 module.exports = function(url, flags) {
-  if (!url) {
-    return Promise.reject(new Error('Lighthouse requires a URL'));
-  }
-  flags = flags || {};
+  return new Promise((resolve, reject) => {
+    if (!url) {
+      return reject(new Error('Lighthouse requires a URL'));
+    }
+    flags = flags || {};
 
-  const driver = new ChromeProtocol();
+    const driver = new ChromeProtocol();
 
-  // set logging preferences, assume quiet
-  log.level = 'error';
-  if (flags.logLevel) {
-    log.level = flags.logLevel;
-  }
+    // set logging preferences, assume quiet
+    log.level = 'error';
+    if (flags.logLevel) {
+      log.level = flags.logLevel;
+    }
 
-  // kick off a lighthouse run
-  return lighthouse(driver, {url, flags});
+    // kick off a lighthouse run
+    resolve(lighthouse(driver, {url, flags}));
+  });
 };
