@@ -2,6 +2,8 @@
 
 * chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk
 
+(If the warning bar about the conected debugging agent bothers you, it can be disabled at chrome://flags/#silent-debugger-extension-api )
+
 ### Dev
 
 * `npm i`
