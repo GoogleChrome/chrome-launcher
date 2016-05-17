@@ -20,8 +20,28 @@
 const Aggregate = require('../aggregate');
 
 /** @type {string} */
+const ARIAAllowedAttr =
+    require('../../audits/accessibility/aria-allowed-attr').name;
+
+/** @type {string} */
 const ARIAValidAttr =
     require('../../audits/accessibility/aria-valid-attr').name;
+
+/** @type {string} */
+const ColorContrast =
+    require('../../audits/accessibility/color-contrast').name;
+
+/** @type {string} */
+const ImageAlt =
+    require('../../audits/accessibility/image-alt').name;
+
+/** @type {string} */
+const Label =
+    require('../../audits/accessibility/label').name;
+
+/** @type {string} */
+const TabIndex =
+    require('../../audits/accessibility/tabindex').name;
 
 /** @type {string} */
 const manifestShortNameLength = require('../../audits/manifest/short-name-length').name;
@@ -61,7 +81,32 @@ class IsAccessible extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
+    criteria[ARIAAllowedAttr] = {
+      value: true,
+      weight: 1
+    };
+
     criteria[ARIAValidAttr] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[ColorContrast] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[ImageAlt] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[Label] = {
+      value: true,
+      weight: 1
+    };
+
+    criteria[TabIndex] = {
       value: true,
       weight: 1
     };

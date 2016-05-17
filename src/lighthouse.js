@@ -54,7 +54,12 @@ const audits = [
   require('./audits/manifest/short-name-length'),
   require('./audits/manifest/start-url'),
   require('./audits/html/meta-theme-color'),
-  require('./audits/accessibility/aria-valid-attr')
+  require('./audits/accessibility/aria-valid-attr'),
+  require('./audits/accessibility/aria-allowed-attr'),
+  require('./audits/accessibility/color-contrast'),
+  require('./audits/accessibility/image-alt'),
+  require('./audits/accessibility/label'),
+  require('./audits/accessibility/tabindex')
 ];
 
 const aggregators = [
