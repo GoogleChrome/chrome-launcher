@@ -18,8 +18,9 @@
 'use strict';
 const URL = require('url');
 
-/* global window */
-window.global = window;
+if (typeof global.window === 'undefined') {
+  global.window = global;
+}
 
 // we need gl-matrix and jszip for traceviewer
 // since it has internal forks for isNode and they get mixed up during
@@ -477,6 +478,33 @@ class TraceProcessor {
 
     return timeRanges;
   }
+
+  /**
+   * Uses traceviewer's statistics package to create a log-normal distribution.
+   * Specified by providing the median value, at which the score will be 0.5,
+   * and the falloff, the initial point of diminishing returns where any
+   * improvement in value will yield increasingly smaller gains in score. Both
+   * values should be in the same units (e.g. milliseconds). See
+   *   https://www.desmos.com/calculator/tx1wcjk8ch
+   * for an interactive view of the relationship between these parameters and
+   * the typical parameterization (location and shape) of the log-normal
+   * distribution.
+   * @param {number} median
+   * @param {number} falloff
+   * @return {!Statistics.LogNormalDistribution}
+   */
+  static getLogNormalDistribution(median, falloff) {
+    const location = Math.log(median);
+
+    // The "falloff" value specified the location of the smaller of the positive
+    // roots of the third derivative of the log-normal CDF. Calculate the shape
+    // parameter in terms of that value and the median.
+    const logRatio = Math.log(falloff / median);
+    const shape = 0.5 * Math.sqrt(1 - 3 * logRatio -
+        Math.sqrt((logRatio - 3) * (logRatio - 3) - 8));
+
+    return new traceviewer.b.Statistics.LogNormalDistribution(location, shape);
+  }
 }
 
-module.exports = new TraceProcessor();
+module.exports = TraceProcessor;

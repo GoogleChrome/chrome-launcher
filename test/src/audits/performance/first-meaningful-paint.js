@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
 const Audit = require('../../../../src/audits/performance/first-meaningful-paint.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 describe('Performance: first-meaningful-paint audit', () => {
   it('scores a -1 when no trace data is present', () => {
     return Audit.audit({}).then(response => {
@@ -44,15 +46,15 @@ describe('Performance: first-meaningful-paint audit', () => {
     });
   });
 
-  it('scores a 90 when FMP is 3,000ms', () => {
-    const traceData = require('./trace-3000ms.json');
+  it('scores a 50 when FMP is 4,000ms', () => {
+    const traceData = require('./trace-4000ms.json');
     return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 90);
+      return assert.equal(response.value, 50);
     });
   });
 
-  it('scores a 0 when FMP is 10,000ms', () => {
-    const traceData = require('./trace-10000ms.json');
+  it('scores a 0 when FMP is 15,000ms', () => {
+    const traceData = require('./trace-15000ms.json');
     return Audit.audit({traceContents: traceData}).then(response => {
       return assert.equal(response.value, 0);
     });

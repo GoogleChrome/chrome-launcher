@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../src/audits/performance/speed-index-metric.js');
+const Audit = require('../../../../src/audits/performance/speed-index-metric.js');
 const assert = require('assert');
 
 /* global describe, it*/
@@ -31,10 +31,10 @@ describe('Performance: speed-index-metric audit', () => {
   });
 
   // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
-  it('scores a 99 when speedIndex is 1294ms', () => {
+  it('scores a 98 when speedIndex is 1294', () => {
     const traceData = require('./progressive-app.json');
     return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 99);
+      return assert.equal(response.value, 98);
     });
   });
 });

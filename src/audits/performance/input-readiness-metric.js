@@ -18,7 +18,7 @@
 'use strict';
 
 const Audit = require('../audit');
-const tracingProcessor = require('../../lib/traces/tracing-processor');
+const TracingProcessor = require('../../lib/traces/tracing-processor');
 
 class InputReadinessMetric extends Audit {
   /**
@@ -57,6 +57,7 @@ class InputReadinessMetric extends Audit {
    */
   static audit(artifacts) {
     try {
+      const tracingProcessor = new TracingProcessor();
       const model = tracingProcessor.init(artifacts.traceContents);
       const hazardMetric = tracingProcessor.getInputReadiness(model);
 
