@@ -19,16 +19,45 @@
 const Gather = require('./gather');
 
 class HTTPS extends Gather {
-  beforePageLoad(options) {
-    const driver = options.driver;
-    driver.on('Security.securityStateChanged', data => {
-      this.artifact = {
-        https: (data.securityState === 'secure' &&
-            data.schemeIsCryptographic)
-      };
-    });
+  constructor() {
+    super();
+    this._noSecurityChangesTimeout = undefined;
+  }
 
-    driver.enableSecurityEvents();
+  postProfiling(options) {
+    const driver = options.driver;
+
+    return new Promise((resolve, reject) => {
+      // Set up a timeout for ten seconds in case we don't get any
+      // security events at all. If that happens, bail.
+      this._noSecurityChangesTimeout = setTimeout(_ => {
+        this.artifact = {
+          https: {
+            value: false,
+            debugString: 'Timed out waiting for security event.'
+          }
+        };
+
+        resolve();
+      }, 10000);
+
+      driver.getSecurityState()
+        .then(state => {
+          // We've received a security event, so this needs
+          // to be canceled, otherwise we resolve the promise with an error.
+          if (this._noSecurityChangesTimeout !== undefined) {
+            clearTimeout(this._noSecurityChangesTimeout);
+          }
+
+          this.artifact = {
+            https: {
+              value: state.schemeIsCryptographic
+            }
+          };
+
+          resolve();
+        });
+    });
   }
 }
 
