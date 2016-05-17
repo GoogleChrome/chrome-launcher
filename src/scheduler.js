@@ -140,6 +140,9 @@ function run(gatherers, options) {
     .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)))
 
     // Reload page again for HTTPS redirect
+    .then(_ => {
+      options.url = options.url.replace(/^https/, 'http');
+    })
     .then(_ => reloadPage(driver, options))
     .then(_ => runPhase(gatherer => gatherer.afterSecondReloadPageLoad(options)))
 
