@@ -73,6 +73,14 @@ class WorksOffline extends Aggregate {
       weight: 1
     };
 
+    criteria['manifest-start-url'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Manifest\'s start_url is in cache storage for offline use',
+      category: 'Offline'
+    };
+
     return criteria;
   }
 }

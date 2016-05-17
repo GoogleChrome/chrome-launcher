@@ -76,6 +76,46 @@ class IsAccessible extends Aggregate {
       weight: 0
     };
 
+    criteria['serviceworker-push'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Service worker makes use of push notifications, if appropriate',
+      category: 'UX'
+    };
+
+    criteria['tap-targets'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Tap targets are appropriately sized for touch',
+      category: 'UX'
+    };
+
+    criteria['payments-autocomplete'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Payment forms marked up with [autocomplete] attributes',
+      category: 'UX'
+    };
+
+    criteria['login-autocomplete'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Login forms marked up with [autocomplete] attributes',
+      category: 'UX'
+    };
+
+    criteria['input-type'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Input fields use appropriate [type] attributes for custom keyboards',
+      category: 'UX'
+    };
+
     return criteria;
   }
 }

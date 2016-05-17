@@ -196,8 +196,21 @@ class Aggregate {
     const subItems = [];
     let overallScore = 0;
 
-    // Step through each item in the expected results, and
+    // Step through each item in the expected results
     expectedNames.forEach(e => {
+      // TODO(paullewis): Remove once coming soon audits have landed.
+      if (expected[e].comingSoon) {
+        subItems.push({
+          value: String.raw`¯\_(ツ)_/¯`,
+          name: 'coming-soon',
+          category: expected[e].category,
+          description: expected[e].description,
+          comingSoon: true
+        });
+
+        return;
+      }
+
       if (!filteredAndRemappedResults[e]) {
         return;
       }

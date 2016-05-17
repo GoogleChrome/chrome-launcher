@@ -74,6 +74,30 @@ class IsPerformant extends Aggregate {
       weight: 1
     };
 
+    criteria['scrolling-60fps'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Content scrolls at 60fps',
+      category: 'UX'
+    };
+
+    criteria['touch-150ms'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'Touch input gets a response in < 150ms',
+      category: 'UX'
+    };
+
+    criteria['fmp-no-jank'] = {
+      value: true,
+      weight: 0,
+      comingSoon: true,
+      description: 'App is interactive without jank after the first meaningful paint',
+      category: 'UX'
+    };
+
     return criteria;
   }
 }

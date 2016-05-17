@@ -484,6 +484,14 @@ a {
   transform: translateX(96px);
 }
 
+.coming-soon, .coming-soon * {
+  color: #AAA;
+}
+
+.coming-soon .report-section__item-value {
+  font-size: 70%;
+}
+
 @media print {
   .report {
     box-shadow: none;

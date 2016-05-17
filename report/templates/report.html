@@ -88,12 +88,15 @@ limitations under the License.
 
               <ul class="report-section__individual-results">
                 {{#each aggregation.score.subItems as |subItem| }}
-                  <li class="report-section__item">
+                  <li class="report-section__item {{#if subItem.comingSoon}}coming-soon{{/if}}">
                     <div class="report-section__item-details">
                       <span class="report-section__item-description">
                         {{ subItem.description }}
                         {{#if subItem.optimalValue }}
                         (target value: {{ subItem.optimalValue }})
+                        {{/if}}
+                        {{#if subItem.comingSoon}}
+                        (Coming soon)
                         {{/if}}
                       </span>
                       <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
@@ -121,12 +124,15 @@ limitations under the License.
 
               <ul class="report-section__individual-results">
                 {{#each this as |subItem| }}
-                  <li class="report-section__item">
+                  <li class="report-section__item {{#if subItem.comingSoon}}coming-soon{{/if}}">
                     <div class="report-section__item-details">
                       <span class="report-section__item-description">
                         {{ subItem.description }}
                         {{#if subItem.optimalValue }}
                         (target value: {{ subItem.optimalValue }} )
+                        {{/if}}
+                        {{#if subItem.comingSoon}}
+                        (Coming soon)
                         {{/if}}
                       </span>
                       <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
@@ -157,12 +163,15 @@ limitations under the License.
 
             <ul class="report-section__individual-results">
               {{#each aggregation.score.subItems as |subItem| }}
-                <li class="report-section__item">
+                <li class="report-section__item {{#if subItem.comingSoon}}coming-soon{{/if}}">
                   <div class="report-section__item-details">
                     <span class="report-section__item-description">
                       <!-- <span class="report-section__item-category">{{ subItem.category }}:</span> --> {{ subItem.description }}
                       {{#if subItem.optimalValue }}
                       (target: {{ subItem.optimalValue }})
+                      {{/if}}
+                      {{#if subItem.comingSoon}}
+                      (Coming soon)
                       {{/if}}
                     </span>
                     <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value aggregation.type.name }}</span>
