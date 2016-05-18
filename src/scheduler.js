@@ -77,7 +77,7 @@ function endPassiveCollection(options, tracingData) {
   }).then(frameLoadEvents => {
     tracingData.frameLoadEvents = frameLoadEvents;
   }).then(_ => {
-    return saveTrace && this.saveAssets(tracingData, options.url);
+    return saveTrace && saveAssets(tracingData, options.url);
   });
 }
 
