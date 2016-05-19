@@ -9,11 +9,13 @@
 
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 
-_status: actually launched_
+_status: prototype extension and CLI available for testing_
 
-Try the Chrome extension here: [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
+## Install Chrome extension
 
-## Install
+ [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
+
+## Install CLI
 ```sh
 npm install -g GoogleChrome/lighthouse
 ```
