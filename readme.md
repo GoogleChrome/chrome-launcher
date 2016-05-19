@@ -1,14 +1,17 @@
 # lighthouse
 > Stops you crashing into the rocks; lights the way
 
-<p align="center">
-<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px">
-</p>
+![image](https://cloud.githubusercontent.com/assets/39191/15410166/30c658e2-1dcd-11e6-99da-8996be5429b6.png)
+
+![image](https://cloud.githubusercontent.com/assets/39191/15410190/502b2d52-1dcd-11e6-9d82-5de8742180bd.png)
+
 
 
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 
-_status: not the worst thing_
+_status: actually launched_
+
+Try the Chrome extension here: [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
 ## Install
 ```sh
@@ -141,3 +144,8 @@ git -C "./third_party/src/catapult/" pull
 # run our conversion script
 node scripts/build-traceviewer-module.js
 ```
+
+
+<p align="center">
+<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px">
+</p>
