@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', _ => {
       background.createPageAndPopulate(results);
     })
     .catch(err => {
-      feedbackEl.textContent = err;
+      feedbackEl.textContent = err.message;
       stopSpinner();
     });
   });

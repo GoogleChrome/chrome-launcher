@@ -145,7 +145,7 @@ class ExtensionDriver extends Driver {
     return new Promise((resolve, reject) => {
       chrome.tabs.query(currentTab, tabs => {
         if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError.message);
+          return reject(chrome.runtime.lastError);
         }
 
         this.url = tabs[0].url;
