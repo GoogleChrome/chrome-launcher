@@ -4,8 +4,9 @@ CHROME_ARGS=$@
 
 launch_osx() {
   LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
-  CHROME_CANARY_APPDIR=$($LSREGISTER -dump | grep -i "google chrome canary.app$" | awk '{$1=""; print $0}' | xargs)
+  CHROME_CANARY_APPDIR=$($LSREGISTER -dump | grep -i "/Applications/google chrome canary.app$" | awk '{$1=""; print $0}' | xargs)
   CHROME_CANARY_PATH="${CHROME_CANARY_APPDIR}/Contents/MacOS/Google Chrome Canary"
+  echo "Starting: $CHROME_CANARY_PATH"
   if [ ! -f "$CHROME_CANARY_PATH" ]; then
     echo "You must install Google Chrome Canary to use lighthouse"
     echo "You can download it from https://www.google.com/chrome/browser/canary.html"
