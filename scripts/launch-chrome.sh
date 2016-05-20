@@ -4,16 +4,16 @@ CHROME_ARGS=$@
 
 launch_osx() {
   LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
-  CHROME_CANARY_APPDIR=$($LSREGISTER -dump | grep -i "/Applications/google chrome canary.app$" | awk '{$1=""; print $0}' | xargs)
-  CHROME_CANARY_PATH="${CHROME_CANARY_APPDIR}/Contents/MacOS/Google Chrome Canary"
-  echo "Starting: $CHROME_CANARY_PATH"
-  if [ ! -f "$CHROME_CANARY_PATH" ]; then
+  CHROME_CANARY_PATH=${CHROME_CANARY_PATH:-$($LSREGISTER -dump | grep -i "google chrome canary.app$" | awk '{$1=""; print $0}' | head -n1 | xargs)}
+  CHROME_CANARY_EXEC_PATH="${CHROME_CANARY_PATH}/Contents/MacOS/Google Chrome Canary"
+  echo "Using Chrome Canary from path ${CHROME_CANARY_PATH}"
+  if [ ! -f "$CHROME_CANARY_EXEC_PATH" ]; then
     echo "You must install Google Chrome Canary to use lighthouse"
     echo "You can download it from https://www.google.com/chrome/browser/canary.html"
     exit 1
   fi
   TMP_PROFILE_DIR=$(mktemp -d -t lighthouse)
-  "$CHROME_CANARY_PATH" \
+  "$CHROME_CANARY_EXEC_PATH" \
     --remote-debugging-port=9222 \
     --no-first-run \
     --user-data-dir=$TMP_PROFILE_DIR \
