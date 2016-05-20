@@ -13,9 +13,14 @@ _status: prototype extension and CLI available for testing_
 
 ## Install Chrome extension
 
- [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
+Requires Chrome version 52 or higher
+
+[chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
 ## Install CLI
+
+Requires Node version 5 or higher
+
 ```sh
 npm install -g GoogleChrome/lighthouse
 ```
