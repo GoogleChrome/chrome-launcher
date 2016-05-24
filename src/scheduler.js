@@ -97,7 +97,10 @@ function flattenArtifacts(artifacts) {
 
 function saveArtifacts(artifacts) {
   const artifactsFilename = 'artifacts.log';
-  fs.writeFileSync(artifactsFilename, JSON.stringify(artifacts));
+  // The _target property of NetworkRequest is circular.
+  // We skip it when stringifying.
+  const replacer = (key, value) => key === '_target' ? undefined : value;
+  fs.writeFileSync(artifactsFilename, JSON.stringify(artifacts, replacer));
   log.log('info', 'artifacts file saved to disk', artifactsFilename);
 }
 

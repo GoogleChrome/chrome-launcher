@@ -89,9 +89,14 @@ describe('Module Tests', function() {
 
   it('should be able to run lighthouse with just a url and options', function() {
     const lighthouse = require('../..');
-    return lighthouse(VALID_TEST_URL, {})
+    return lighthouse(VALID_TEST_URL, {
+      // Prevent regression of github.com/GoogleChrome/lighthouse/issues/345
+      saveArtifacts: true
+    })
     .then(results => {
       assert.ok(results);
+    }).then(_ => {
+      fs.unlinkSync('artifacts.log');
     });
   });
 
