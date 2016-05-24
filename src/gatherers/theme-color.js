@@ -19,6 +19,9 @@
 const Gather = require('./gather');
 
 class ThemeColor extends Gather {
+  get name() {
+    return 'themeColorMeta';
+  }
 
   postProfiling(options) {
     const driver = options.driver;
@@ -26,7 +29,7 @@ class ThemeColor extends Gather {
     return driver.querySelector('head meta[name="theme-color"]')
       .then(node => node && node.getAttribute('content'))
       .then(themeColorMeta => {
-        this.artifact = {themeColorMeta};
+        this.artifact = themeColorMeta;
       });
   }
 }

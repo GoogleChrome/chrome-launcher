@@ -89,12 +89,6 @@ function phaseRunner(gatherers) {
   };
 }
 
-function flattenArtifacts(artifacts) {
-  return artifacts.reduce(function(prev, curr) {
-    return Object.assign(prev, curr);
-  }, {});
-}
-
 function saveArtifacts(artifacts) {
   const artifactsFilename = 'artifacts.log';
   // The _target property of NetworkRequest is circular.
@@ -154,13 +148,15 @@ function run(gatherers, options) {
     .then(_ => runPhase(gatherer => gatherer.tearDown(options)))
     .then(_ => {
       // Collate all the gatherer results.
-      const unflattenedArtifacts = gatherers.map(g => g.artifact).concat(
-          {networkRecords: tracingData.networkRecords},
-          {rawNetworkEvents: tracingData.rawNetworkEvents},
-          {traceContents: tracingData.traceContents},
-          {frameLoadEvents: tracingData.frameLoadEvents});
-
-      const artifacts = flattenArtifacts(unflattenedArtifacts);
+      const artifacts = gatherers.reduce((artifacts, gatherer) => {
+        artifacts[gatherer.name] = gatherer.artifact;
+        return artifacts;
+      }, {
+        networkRecords: tracingData.networkRecords,
+        rawNetworkEvents: tracingData.rawNetworkEvents,
+        traceContents: tracingData.traceContents,
+        frameLoadEvents: tracingData.frameLoadEvents
+      });
 
       if (options.flags.saveArtifacts) {
         saveArtifacts(artifacts);

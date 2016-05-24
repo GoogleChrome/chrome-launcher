@@ -32,14 +32,15 @@ function runA11yChecks() {
 }
 
 class Accessibility extends Gather {
+  get name() {
+    return 'accessibility';
+  }
 
   static _errorAccessibility(errorString) {
     return {
-      accessibility: {
-        raw: undefined,
-        value: undefined,
-        debugString: errorString
-      }
+      raw: undefined,
+      value: undefined,
+      debugString: errorString
     };
   }
 
@@ -57,9 +58,7 @@ class Accessibility extends Gather {
           if (returnedValue.error) {
             this.artifact = Accessibility._errorAccessibility(returnedValue.error);
           } else {
-            this.artifact = {
-              accessibility: returnedValue
-            };
+            this.artifact = returnedValue;
           }
         });
   }

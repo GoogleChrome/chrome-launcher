@@ -53,14 +53,15 @@ function getManifestContent() {
 }
 
 class Manifest extends Gather {
+  get name() {
+    return 'manifest';
+  }
 
   static _errorManifest(errorString) {
     return {
-      manifest: {
-        raw: undefined,
-        value: undefined,
-        debugString: errorString
-      }
+      raw: undefined,
+      value: undefined,
+      debugString: errorString
     };
   }
 
@@ -82,9 +83,7 @@ class Manifest extends Gather {
       if (returnedValue.error) {
         this.artifact = Manifest._errorManifest(returnedValue.error);
       } else {
-        this.artifact = {
-          manifest: manifestParser(returnedValue.manifestContent)
-        };
+        this.artifact = manifestParser(returnedValue.manifestContent);
       }
     });
   }

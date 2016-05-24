@@ -19,6 +19,10 @@
 const Gather = require('./gather');
 
 class ServiceWorker extends Gather {
+  get name() {
+    return 'serviceWorkers';
+  }
+
   reloadSetup(options) {
     const driver = options.driver;
     this.resolved = false;
@@ -30,11 +34,9 @@ class ServiceWorker extends Gather {
               ServiceWorker.getActivatedServiceWorker(data.versions, options.url);
 
           this.artifact = {
-            serviceWorkers: {
-              versions: controlledClients ? [controlledClients] : []
-            }
+            versions: controlledClients ? [controlledClients] : []
           };
-          this.resolved = (typeof this.artifact.serviceWorkers.versions !== 'undefined');
+          this.resolved = (typeof this.artifact.versions !== 'undefined');
           res();
         }
       });

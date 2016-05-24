@@ -22,6 +22,13 @@ class Gather {
     this.artifact = {};
   }
 
+  /**
+   * @return {string}
+   */
+  get name() {
+    throw new Error('Gather name must be overridden.');
+  }
+
   /* eslint-disable no-unused-vars */
 
   setup(options) { }
