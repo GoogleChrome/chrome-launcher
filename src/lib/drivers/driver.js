@@ -16,7 +16,6 @@
  */
 'use strict';
 
-const FrameLoadRecorder = require('../frame-load-recorder');
 const NetworkRecorder = require('../network-recorder');
 const emulation = require('../emulation');
 const Element = require('../element.js');
@@ -31,9 +30,7 @@ class DriverBase {
     this._traceCategories = [
       '-*', // exclude default
       'toplevel',
-      'blink',
       'blink.console',
-      'blink.net',
       'blink.user_timing',
       'benchmark',
       'devtools.timeline',
@@ -41,9 +38,7 @@ class DriverBase {
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',
       'disabled-by-default-devtools.timeline.stack',
-      'disabled-by-default-devtools.screenshot',
-      'java',
-      'v8'
+      'disabled-by-default-devtools.screenshot'
     ];
   }
 
@@ -275,9 +270,7 @@ class DriverBase {
   beginNetworkCollect() {
     return new Promise((resolve, reject) => {
       this._networkRecords = [];
-      this._rawNetworkEvents = [];
-      this._networkRecorder = new NetworkRecorder(
-          this._networkRecords, this._rawNetworkEvents);
+      this._networkRecorder = new NetworkRecorder(this._networkRecords);
 
       this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
       this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
@@ -303,28 +296,11 @@ class DriverBase {
       this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
       this.off('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
 
-      resolve({
-        networkRecords: this._networkRecords,
-        rawNetworkEvents: this._rawNetworkEvents
-      });
+      resolve(this._networkRecords);
 
       this._networkRecorder = null;
       this._networkRecords = [];
     });
-  }
-
-  beginFrameLoadCollect() {
-    this._frameLoadRecorder = new FrameLoadRecorder();
-    this.on('Page.frameStartedLoading', this._frameLoadRecorder.onFrameStartedLoading);
-    this.on('Page.frameStoppedLoading', this._frameLoadRecorder.onFrameStoppedLoading);
-    this.on('Page.frameAttached', this._frameLoadRecorder.onFrameAttached);
-  }
-
-  endFrameLoadCollect() {
-    this.off('Page.frameStartedLoading', this._frameLoadRecorder.onFrameStartedLoading);
-    this.off('Page.frameStoppedLoading', this._frameLoadRecorder.onFrameStoppedLoading);
-    this.off('Page.frameAttached', this._frameLoadRecorder.onFrameAttached);
-    return this._frameLoadRecorder.getEvents();
   }
 
   beginEmulation() {

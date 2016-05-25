@@ -58,24 +58,18 @@ function setupDriver(driver, gatherers, options) {
 // Enable tracing and network record collection.
 function beginPassiveCollection(driver) {
   return driver.beginTrace()
-    .then(_ => driver.beginNetworkCollect())
-    .then(_ => driver.beginFrameLoadCollect());
+    .then(_ => driver.beginNetworkCollect());
 }
 
 function endPassiveCollection(options, tracingData) {
   const driver = options.driver;
   const saveTrace = options.flags.saveTrace;
-  return driver.endNetworkCollect().then(networkData => {
-    tracingData.networkRecords = networkData.networkRecords;
-    tracingData.rawNetworkEvents = networkData.rawNetworkEvents;
+  return driver.endNetworkCollect().then(networkRecords => {
+    tracingData.networkRecords = networkRecords;
   }).then(_ => {
     return driver.endTrace();
   }).then(traceContents => {
     tracingData.traceContents = traceContents;
-  }).then(_ => {
-    return driver.endFrameLoadCollect();
-  }).then(frameLoadEvents => {
-    tracingData.frameLoadEvents = frameLoadEvents;
   }).then(_ => {
     return saveTrace && saveAssets(tracingData, options.url);
   });

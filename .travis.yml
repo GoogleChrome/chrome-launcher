@@ -11,7 +11,6 @@ cache:
      - extension/node_modules
 before_script:
   - npm --prefix ./extension install ./extension
-  - pip install --user pylint
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
@@ -24,4 +23,3 @@ script:
   - npm run closure
   - npm run smoke
   - (cd extension && gulp build)
-  - pylint --rcfile=scripts/pylint.conf scripts/*.py

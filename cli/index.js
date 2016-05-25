@@ -49,7 +49,7 @@ Run Configuration:
     --mobile           Emulates a Nexus 5X (default=true)
     --load-page        Loads the page (default=true)
     --save-trace       Save the trace contents to disk
-    --save-artifacts   Generate network dependency graph
+    --save-artifacts   Save all gathered artifacts to disk
 
 Output:
     --output           Reporter for the results
