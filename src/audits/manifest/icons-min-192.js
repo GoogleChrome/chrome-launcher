@@ -43,6 +43,13 @@ class ManifestIconsMin192 extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['manifest'];
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */

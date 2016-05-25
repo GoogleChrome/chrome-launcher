@@ -57,6 +57,13 @@ class FirstMeaningfulPaint extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['traceContents'];
+  }
+
+  /**
    * Audits the page to give a score for First Meaningful Paint.
    * @see https://github.com/GoogleChrome/lighthouse/issues/26
    * @see https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view

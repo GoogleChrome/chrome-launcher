@@ -42,6 +42,13 @@ class ServiceWorker extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['serviceWorkers'];
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */

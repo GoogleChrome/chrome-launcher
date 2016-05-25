@@ -43,6 +43,13 @@ class ColorContrast extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['accessibility'];
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */

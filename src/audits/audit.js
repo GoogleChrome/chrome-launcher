@@ -46,6 +46,13 @@ class Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    throw new Error('Audit requiredArtifacts must be overriden.');
+  }
+
+  /**
    * @param {!AuditResultInput} result
    * @return {!AuditResult}
    */

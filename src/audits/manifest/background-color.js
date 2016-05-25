@@ -42,6 +42,13 @@ class ManifestBackgroundColor extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['manifest'];
+  }
+
+  /**
    * @param {!Manifest=} manifest
    * @return {boolean}
    */

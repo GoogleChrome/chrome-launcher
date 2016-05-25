@@ -41,6 +41,13 @@ class RedirectsHTTP extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['redirectsHTTP'];
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */

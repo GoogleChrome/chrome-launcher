@@ -42,6 +42,13 @@ class ThemeColor extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['themeColorMeta'];
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */

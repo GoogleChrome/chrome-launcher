@@ -58,6 +58,13 @@ class SpeedIndexMetric extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['traceContents'];
+  }
+
+  /**
    * Audits the page to give a score for the Speed Index.
    * @see  https://github.com/GoogleChrome/lighthouse/issues/197
    * @param {!Artifacts} artifacts The artifacts from the gather phase.
