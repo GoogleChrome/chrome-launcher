@@ -145,7 +145,7 @@ class DriverBase {
 
       // If this gets to 60s and it hasn't been resolved, reject the Promise.
       asyncTimeout = setTimeout(
-        _ => reject(new Error('aXe did not complete in the allotted time of 60s')),
+        (_ => reject(new Error('The asynchronous expression exceeded the allotted time of 60s'))),
         60000
       );
     });
