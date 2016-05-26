@@ -114,3 +114,11 @@ module.exports = function(driver, opts) {
         };
       });
 };
+
+/**
+ * Returns list of audit names for external querying.
+ * @return {!Array<string>}
+ */
+module.exports.getAuditList = function() {
+  return AUDITS.map(audit => audit.name);
+};
