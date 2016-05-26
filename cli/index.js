@@ -23,7 +23,7 @@ const log = require('../src/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 
-const lighthouse = require('../');
+const lighthouseModule = require('../');
 
 // node 5.x required due to use of ES2015 features
 if (semver.lt(process.version, '5.0.0')) {
@@ -50,6 +50,7 @@ Run Configuration:
     --load-page        Loads the page (default=true)
     --save-trace       Save the trace contents to disk
     --save-artifacts   Save all gathered artifacts to disk
+    --audit-whitelist  Comma separated list of audits to run (default=all)
 
 Output:
     --output           Reporter for the results
@@ -77,8 +78,15 @@ if (cli.flags.verbose) {
   flags.logLevel = 'error';
 }
 
+// Normalize audit whitelist.
+if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
+  flags.auditWhitelist = null;
+} else {
+  flags.auditWhitelist = new Set(flags.auditWhitelist.split(','));
+}
+
 // kick off a lighthouse run
-lighthouse(url, flags)
+lighthouseModule(url, flags)
   .then(results => {
     return Printer.write(results, outputMode, outputPath);
   })

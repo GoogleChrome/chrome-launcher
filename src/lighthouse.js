@@ -20,7 +20,7 @@ const Auditor = require('./auditor');
 const Scheduler = require('./scheduler');
 const Aggregator = require('./aggregator');
 
-const gathererClasses = [
+const GATHERER_CLASSES = [
   require('./gatherers/url'),
   require('./gatherers/https'),
   require('./gatherers/http-redirect'),
@@ -34,7 +34,7 @@ const gathererClasses = [
   require('./gatherers/critical-request-chains')
 ];
 
-const audits = [
+const AUDITS = [
   require('./audits/security/is-on-https'),
   require('./audits/security/redirects-http'),
   require('./audits/offline/service-worker'),
@@ -64,7 +64,7 @@ const audits = [
   require('./audits/accessibility/tabindex')
 ];
 
-const aggregators = [
+const AGGREGATORS = [
   require('./aggregators/can-load-offline'),
   require('./aggregators/is-performant'),
   require('./aggregators/is-secure'),
@@ -87,19 +87,26 @@ module.exports = function(driver, opts) {
     opts.flags.loadPage = true;
   }
 
+  // Discard any audits not whitelisted.
+  let audits = AUDITS;
+  if (opts.flags.auditWhitelist) {
+    const whitelist = opts.flags.auditWhitelist;
+    audits = audits.filter(audit => whitelist.has(audit.name));
+  }
+
   // Collate all artifacts required by audits to be run.
   const auditArtifacts = audits.map(audit => audit.requiredArtifacts);
   const requiredArtifacts = new Set([].concat(...auditArtifacts));
 
   // Instantiate gatherers and discard any not needed by requested audits.
   // For now, the trace and network records are assumed to be required.
-  const gatherers = gathererClasses.map(G => new G())
+  const gatherers = GATHERER_CLASSES.map(G => new G())
     .filter(gatherer => requiredArtifacts.has(gatherer.name));
 
   return Scheduler
       .run(gatherers, Object.assign({}, opts, {driver}))
       .then(artifacts => Auditor.audit(artifacts, audits))
-      .then(results => Aggregator.aggregate(aggregators, results))
+      .then(results => Aggregator.aggregate(AGGREGATORS, results))
       .then(aggregations => {
         return {
           url: opts.url,
