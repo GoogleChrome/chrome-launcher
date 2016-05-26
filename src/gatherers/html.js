@@ -19,6 +19,9 @@
 const Gather = require('./gather');
 
 class HTML extends Gather {
+  get name() {
+    return 'html';
+  }
 
   postProfiling(options) {
     const driver = options.driver;
@@ -29,7 +32,7 @@ class HTML extends Gather {
           nodeId: nodeId
         }))
         .then(nodeHTML => {
-          this.artifact = {html: nodeHTML.outerHTML};
+          this.artifact = nodeHTML.outerHTML;
         });
   }
 }

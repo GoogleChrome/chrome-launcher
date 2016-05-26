@@ -19,6 +19,9 @@
 const Gather = require('./gather');
 
 class HTTPRedirect extends Gather {
+  get name() {
+    return 'redirectsHTTP';
+  }
 
   constructor() {
     super();
@@ -33,10 +36,8 @@ class HTTPRedirect extends Gather {
       // security events at all. If that happens, bail.
       this._noSecurityChangesTimeout = setTimeout(_ => {
         this.artifact = {
-          redirectsHTTP: {
-            value: false,
-            debugString: 'Timed out waiting for HTTP redirection.'
-          }
+          value: false,
+          debugString: 'Timed out waiting for HTTP redirection.'
         };
 
         resolve();
@@ -51,9 +52,7 @@ class HTTPRedirect extends Gather {
           }
 
           this.artifact = {
-            redirectsHTTP: {
-              value: state.schemeIsCryptographic
-            }
+            value: state.schemeIsCryptographic
           };
 
           resolve();

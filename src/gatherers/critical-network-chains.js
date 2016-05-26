@@ -67,6 +67,10 @@ class RequestNode {
 }
 
 class CriticalNetworkChains extends Gather {
+  get name() {
+    return 'criticalNetworkChains';
+  }
+
   /**
    * A sequential chain of RequestNodes
    * @typedef {!Array<RequestNode>} RequestNodeChain
@@ -169,7 +173,7 @@ class CriticalNetworkChains extends Gather {
       log.log('info', 'lengths of critical chains', debuggingData.map(d => d.totalRequests));
     }
 
-    this.artifacts = {CriticalNetworkChains: chains};
+    this.artifact = chains;
   }
 
   /**

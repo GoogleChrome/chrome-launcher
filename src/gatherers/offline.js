@@ -35,6 +35,9 @@ const requestPage = function() {
 };
 
 class Offline extends Gather {
+  get name() {
+    return 'offlineResponseCode';
+  }
 
   static goOffline(driver) {
     return driver.sendCommand('Network.emulateNetworkConditions', {
@@ -64,7 +67,7 @@ class Offline extends Gather {
         .goOffline(driver)
         .then(_ => driver.evaluateAsync(`(${requestPage.toString()}())`))
         .then(offlineResponseCode => {
-          this.artifact = {offlineResponseCode};
+          this.artifact = offlineResponseCode;
         })
         .then(_ => Offline.goOnline(driver));
   }

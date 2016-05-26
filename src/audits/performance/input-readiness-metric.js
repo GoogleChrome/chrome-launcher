@@ -50,6 +50,13 @@ class InputReadinessMetric extends Audit {
   }
 
   /**
+   * @return {!Array<string>}
+   */
+  static requiredArtifacts() {
+    return ['traceContents'];
+  }
+
+  /**
    * Audits the page to give a score for Input Readiness.
    * @see https://github.com/GoogleChrome/lighthouse/issues/26
    * @param {!Artifacts} artifacts The artifacts from the gather phase.

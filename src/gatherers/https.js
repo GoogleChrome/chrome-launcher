@@ -19,6 +19,10 @@
 const Gather = require('./gather');
 
 class HTTPS extends Gather {
+  get name() {
+    return 'https';
+  }
+
   constructor() {
     super();
     this._noSecurityChangesTimeout = undefined;
@@ -32,10 +36,8 @@ class HTTPS extends Gather {
       // security events at all. If that happens, bail.
       this._noSecurityChangesTimeout = setTimeout(_ => {
         this.artifact = {
-          https: {
-            value: false,
-            debugString: 'Timed out waiting for security event.'
-          }
+          value: false,
+          debugString: 'Timed out waiting for security event.'
         };
 
         resolve();
@@ -50,9 +52,7 @@ class HTTPS extends Gather {
           }
 
           this.artifact = {
-            https: {
-              value: state.schemeIsCryptographic
-            }
+            value: state.schemeIsCryptographic
           };
 
           resolve();
