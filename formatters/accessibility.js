@@ -29,10 +29,9 @@ class Accessibilty extends Formatter {
         return function(info) {
           let output = `      - Rating: ${info.impact}\n` +
           `      - See: ${info.helpUrl}\n` +
-          '      - Nodes:\n';
-
+          '      - Nodes:\n' +
           info.nodes.reduce((prev, node) => {
-            return prev + `      - ${node.target}\n`;
+            return prev + `        - ${node.target}\n`;
           }, '');
 
           return output;
