@@ -87,7 +87,14 @@ module.exports = function(driver, opts) {
     opts.flags.loadPage = true;
   }
 
-  const gatherers = gathererClasses.map(G => new G());
+  // Collate all artifacts required by audits to be run.
+  const auditArtifacts = audits.map(audit => audit.requiredArtifacts);
+  const requiredArtifacts = new Set([].concat(...auditArtifacts));
+
+  // Instantiate gatherers and discard any not needed by requested audits.
+  // For now, the trace and network records are assumed to be required.
+  const gatherers = gathererClasses.map(G => new G())
+    .filter(gatherer => requiredArtifacts.has(gatherer.name));
 
   return Scheduler
       .run(gatherers, Object.assign({}, opts, {driver}))
