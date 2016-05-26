@@ -62,8 +62,8 @@ class ReportLoader {
 
 const reportLoader = new ReportLoader();
 
-if (chrome && chrome.runtime && chrome.runtime.onMessage) {
-  chrome.runtime.onMessage.addListener(data => {
-    reportLoader.write(data);
+if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+  chrome.runtime.sendMessage({ready: true}, response => {
+    reportLoader.write(response);
   });
 }

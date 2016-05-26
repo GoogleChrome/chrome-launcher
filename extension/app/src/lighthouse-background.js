@@ -24,12 +24,14 @@ const NO_SCORE_PROVIDED = '-1';
 window.createPageAndPopulate = function(results) {
   const tabURL = chrome.extension.getURL('/pages/report.html');
   chrome.tabs.create({url: tabURL}, tab => {
-    // Have a timeout here so that the receiving side has time to load
-    // and register an event listener for onMessage. Otherwise the
-    // message sent with the results will be lost.
-    setTimeout(_ => {
-      chrome.tabs.sendMessage(tab.id, results);
-    }, 1000);
+    // Results will be lost when using sendMessage without waiting for the
+    // receiving side to load. Once it loads, we get a message -
+    // ready=true. Respond to this message with the results.
+    chrome.runtime.onMessage.addListener((message, sender, respond) => {
+      if (message && message.ready && sender.tab.id === tab.id) {
+        return respond(results);
+      }
+    });
   });
 };
 
