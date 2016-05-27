@@ -32,6 +32,7 @@ launch_linux() {
   TMP_PROFILE_DIR=$(mktemp -d -t lighthouse.XXXXXXXXXX)
   echo "Launching Google Chrome from $LIGHTHOUSE_CHROMIUM_PATH"
   "$LIGHTHOUSE_CHROMIUM_PATH" \
+    --disable-setuid-sandbox \
     --remote-debugging-port=9222 \
     --no-first-run \
     --user-data-dir=$TMP_PROFILE_DIR \

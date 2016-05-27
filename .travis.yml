@@ -15,7 +15,7 @@ before_script:
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./scripts/download-chrome.sh
-  - start-stop-daemon --start --background --exec $(pwd)/scripts/launch-chrome.sh -- --disable-setuid-sandbox
+  - start-stop-daemon --start --background --exec $(pwd)/scripts/launch-chrome.sh
   - sleep 5
 script:
   - npm run lint
