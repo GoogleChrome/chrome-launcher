@@ -35,6 +35,8 @@ function reloadPage(driver, options) {
   // navigate away and then come back to reload. We do not `waitForLoad` on
   // about:blank since a page load event is never fired on it.
   return driver.gotoURL('about:blank')
+    // Wait one second for about:blank to "take hold" before switching back to the page.
+    .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
     .then(_ => driver.gotoURL(options.url, {waitForLoad: true}));
 }
 
