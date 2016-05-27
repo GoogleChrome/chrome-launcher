@@ -20,51 +20,8 @@
 
 const pkg = require('../../package.json');
 const assert = require('assert');
-const path = require('path');
-const http = require('http');
-const fs = require('fs');
 
 describe('Module Tests', function() {
-  this.timeout(60000);
-
-  const PORT = 8180;
-  const VALID_TEST_URL = 'http://localhost:' + PORT +
-    '/test/fixtures/online-only.html';
-  let testServer;
-  const serverConnections = [];
-
-  before(function() {
-    testServer = http.createServer(function(request, response) {
-      try {
-        const assetPath = path.join('.', request.url);
-
-        // lstatSync throws if the file doesn't exist.
-        fs.lstatSync(assetPath);
-        const readStream = fs.createReadStream(assetPath);
-        readStream.pipe(response);
-      } catch (err) {
-        response.end();
-      }
-    });
-
-    const listener = testServer.listen(PORT, function() {
-      console.log('Server listening on: http://localhost:%s', PORT);
-    });
-    listener.on('connection', function(socket) {
-      serverConnections.push(socket);
-      socket.on('close', function() {
-        serverConnections.splice(serverConnections.indexOf(socket), 1);
-      });
-    });
-  });
-
-  after(function(cb) {
-    serverConnections.forEach(function(connection) {
-      connection.destroy();
-    });
-    testServer.close(cb);
-  });
-
   it('should have a main attribute defined in the package.json', function() {
     assert.ok(pkg.main);
   });
@@ -77,27 +34,6 @@ describe('Module Tests', function() {
   it('should require lighthouse as a function', function() {
     const lighthouse = require('../..');
     assert.ok(typeof lighthouse === 'function');
-  });
-
-  it('should be able to run lighthouse with just a url', function() {
-    const lighthouse = require('../..');
-    return lighthouse(VALID_TEST_URL)
-    .then(results => {
-      assert.ok(results);
-    });
-  });
-
-  it('should be able to run lighthouse with just a url and options', function() {
-    const lighthouse = require('../..');
-    return lighthouse(VALID_TEST_URL, {
-      // Prevent regression of github.com/GoogleChrome/lighthouse/issues/345
-      saveArtifacts: true
-    })
-    .then(results => {
-      assert.ok(results);
-    }).then(_ => {
-      fs.unlinkSync('artifacts.log');
-    });
   });
 
   it('should throw an error when the first parameter is not defined', function() {
@@ -132,7 +68,7 @@ describe('Module Tests', function() {
 
   it('should throw an error when the second parameter is not an object', function() {
     const lighthouse = require('../..');
-    return lighthouse(VALID_TEST_URL, 'flags')
+    return lighthouse('SOME_URL', 'flags')
       .then(() => {
         throw new Error('Should not have resolved when second arg is not an object');
       }, err => {
