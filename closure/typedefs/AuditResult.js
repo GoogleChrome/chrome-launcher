@@ -38,16 +38,20 @@ AuditResultInput.prototype.debugString;
 /** @type {(boolean|number|string|undefined|null)} */
 AuditResultInput.prototype.optimalValue;
 
+/** @type {(AuditExtendedInfo|undefined|null)} */
+AuditResultInput.prototype.extendedInfo;
+
+
 /**
  * @struct
  * @record
  */
 function AuditExtendedInfo() {}
 
-/** @type {!string} */
+/** @type {string} */
 AuditExtendedInfo.prototype.formatter;
 
-/** @type {!Object} */
+/** @type {Object|undefined} */
 AuditExtendedInfo.prototype.value;
 
 /**
@@ -71,11 +75,14 @@ AuditResult.prototype.optimalValue;
 /** @type {(AuditExtendedInfo|undefined|null)} */
 AuditResult.prototype.extendedInfo;
 
-/** @type {string} */
+/** @type {(string|undefined)} */
 AuditResult.prototype.name;
 
-/** @type {string} */
+/** @type {(string|undefined)} */
 AuditResult.prototype.category;
 
-/** @type {string} */
+/** @type {(string|undefined)} */
 AuditResult.prototype.description;
+
+/** @type {(boolean|undefined)} */
+AuditResult.prototype.contributesToScore;

@@ -63,7 +63,7 @@ class CriticalRequestChains extends Audit {
    */
   static audit(artifacts) {
     let chainCount = 0;
-    function walk(node, depth, startTime) {
+    function walk(node, depth) {
       const children = Object.keys(node);
 
       // Since a leaf node indicates the end of a chain, we can inspect the number
@@ -74,7 +74,7 @@ class CriticalRequestChains extends Audit {
 
       children.forEach(id => {
         const child = node[id];
-        walk(child.children, depth + 1, startTime);
+        walk(child.children, depth + 1);
       }, '');
     }
 

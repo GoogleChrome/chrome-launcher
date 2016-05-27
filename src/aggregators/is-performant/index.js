@@ -26,7 +26,7 @@ const firstMeaningfulPaint = require('../../audits/performance/first-meaningful-
 const speedIndexMetric = require('../../audits/performance/speed-index-metric').name;
 
 // TODO: https://github.com/GoogleChrome/lighthouse/issues/336
-/** @type {string} */
+// /** @type {string} */
 // const inputReadinessMetric = require('../../audits/performance/input-readiness-metric').name;
 
 class IsPerformant extends Aggregate {

@@ -82,7 +82,7 @@ class Aggregate {
    */
   static _filterResultsByAuditNames(results, expected) {
     const expectedNames = Object.keys(expected);
-    return results.filter(r => expectedNames.indexOf(r.name) !== -1);
+    return results.filter(r => expectedNames.indexOf(/** @type {string} */ (r.name)) !== -1);
   }
 
   /**
@@ -206,7 +206,7 @@ class Aggregate {
       // TODO(paullewis): Remove once coming soon audits have landed.
       if (expected[e].comingSoon) {
         subItems.push({
-          value: String.raw`¯\_(ツ)_/¯`,
+          value: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
           name: 'coming-soon',
           category: expected[e].category,
           description: expected[e].description,

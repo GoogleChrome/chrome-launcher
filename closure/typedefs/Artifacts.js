@@ -56,5 +56,14 @@ Artifacts.prototype.viewport;
 /** @type {number} */
 Artifacts.prototype.responseCode;
 
+/** @type {number} */
+Artifacts.prototype.offlineResponseCode;
+
+/** @type {{value: boolean, debugString: (string|undefined)}} */
+Artifacts.prototype.redirectsHTTP;
+
 /** @type {!Accessibility} */
 Artifacts.prototype.accessibility;
+
+/** @type {!Object<!Object>} */
+Artifacts.prototype.criticalRequestChains;

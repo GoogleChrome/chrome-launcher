@@ -21,22 +21,26 @@ const closureCompiler = require('google-closure-compiler').gulp();
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const replace = require('gulp-replace');
-const devtoolsRequire =
-    'const DevtoolsTimelineModel = require(\'../lib/traces/devtools-timeline-model\');';
 
 /* eslint-disable camelcase */
 gulp.task('js-compile', function() {
   return gulp.src([
     'closure/typedefs/*.js',
     'closure/third_party/*.js',
-    'audits/**/*.js',
-    'lib/icons.js',
-    'aggregators/**/*.js'
+    'src/audits/**/*.js',
+    'src/lib/icons.js',
+    'src/aggregators/**/*.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.
-    .pipe(replace(devtoolsRequire, ''))
     .pipe(replace('require(\'../../lib/web-inspector\').Color.parse;',
         'WebInspector.Color.parse;'))
+    .pipe(replace('require(\'../../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))
+    .pipe(replace('require(\'speedline\');', 'function(arg) {};'))
+    .pipe(replace('require(\'../../../formatters/formatter\');', '{};'))
+
+    // Replace any non-local import (e.g. not starting with .) with a dummy type. These are likely
+    // the built-in Node modules. But not always, so TODO(samthor): Fix this.
+    .pipe(replace(/require\(\'[^\.].*?\'\)/g, '/** @type {*} */ ({})'))
 
     .pipe(closureCompiler({
       compilation_level: 'SIMPLE',

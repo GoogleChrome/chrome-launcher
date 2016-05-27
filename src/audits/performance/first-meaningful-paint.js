@@ -68,7 +68,7 @@ class FirstMeaningfulPaint extends Audit {
    * @see https://github.com/GoogleChrome/lighthouse/issues/26
    * @see https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/view
    * @param {!Artifacts} artifacts The artifacts from the gather phase.
-   * @return {!AuditResult} The score from the audit, ranging from 0-100.
+   * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
     return new Promise((resolve, reject) => {
@@ -241,8 +241,9 @@ module.exports = FirstMeaningfulPaint;
 
 /**
  * Math.max, but with NaN values removed
+ * @param {...number} _
  */
-function max() {
+function max(_) {
   const args = [...arguments].filter(val => !isNaN(val));
   return Math.max.apply(Math, args);
 }
