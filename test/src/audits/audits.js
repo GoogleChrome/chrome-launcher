@@ -70,4 +70,12 @@ describe('Audits', () => {
       });
     });
   });
+
+  it('has no audits failing when requiredArtifacts is called', () => {
+    return walkTree.then(audits => {
+      audits.forEach(audit => {
+        assert.doesNotThrow(_ => audit.requiredArtifacts);
+      });
+    });
+  });
 });
