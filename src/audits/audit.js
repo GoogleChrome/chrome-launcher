@@ -48,7 +48,7 @@ class Audit {
   /**
    * @return {!Array<string>}
    */
-  static requiredArtifacts() {
+  static get requiredArtifacts() {
     throw new Error('Audit requiredArtifacts must be overriden.');
   }
 

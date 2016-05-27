@@ -44,7 +44,7 @@ class ManifestShortName extends Audit {
   /**
    * @return {!Array<string>}
    */
-  static requiredArtifacts() {
+  static get requiredArtifacts() {
     return ['manifest'];
   }
 
