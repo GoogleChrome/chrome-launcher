@@ -13,6 +13,7 @@
     "test": "npm run lint --silent && npm run unit && npm run closure",
     "watch": "find . -name '*.js' -not -path '*/node_modules/*' -not -path '*/extension/*' | entr npm run unit",
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
+    "coverage": "istanbul cover -x \"**/third_party/**\" _mocha -- $(find ./test -name '*.js') --timeout 60000",
     "chrome": "./scripts/launch-chrome.sh",
     "smoke": "./scripts/run-smoke-tests.sh",
     "start": "node ./cli/index.js"
@@ -50,6 +51,7 @@
     "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-util": "^3.0.7",
+    "istanbul": "^0.4.3",
     "jsdom": "^9.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.3",
