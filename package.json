@@ -14,6 +14,7 @@
     "watch": "find . -name '*.js' -not -path '*/node_modules/*' -not -path '*/extension/*' | entr npm run unit",
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
     "coverage": "istanbul cover -x \"**/third_party/**\" _mocha -- $(find ./test -name '*.js') --timeout 60000",
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
     "chrome": "./scripts/launch-chrome.sh",
     "smoke": "./scripts/run-smoke-tests.sh",
     "start": "node ./cli/index.js"
@@ -45,6 +46,7 @@
     "speedline": "^0.1.2"
   },
   "devDependencies": {
+    "coveralls": "^2.11.9",
     "eslint": "^2.4.0",
     "eslint-config-google": "^0.4.0",
     "google-closure-compiler": "^20160315.0.0",
