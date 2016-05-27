@@ -43,7 +43,7 @@ class HTTPS extends Audit {
   /**
    * @return {!Array<string>}
    */
-  static requiredArtifacts() {
+  static get requiredArtifacts() {
     return ['https'];
   }
 

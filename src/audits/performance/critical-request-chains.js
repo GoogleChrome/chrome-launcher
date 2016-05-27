@@ -52,7 +52,7 @@ class CriticalRequestChains extends Audit {
   /**
    * @return {!Array<string>}
    */
-  static requiredArtifacts() {
+  static get requiredArtifacts() {
     return ['criticalRequestChains'];
   }
 
