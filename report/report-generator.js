@@ -179,8 +179,13 @@ class ReportGenerator {
           return;
         }
 
-        const formatter = Formatter.getByName(subItem.extendedInfo.formatter).getFormatter('html');
-        Handlebars.registerPartial(subItem.name, formatter);
+        const formatter = Formatter.getByName(subItem.extendedInfo.formatter);
+        const helpers = formatter.getHelpers();
+        if (helpers) {
+          Handlebars.registerHelper(helpers);
+        }
+
+        Handlebars.registerPartial(subItem.name, formatter.getFormatter('html'));
       });
     });
 

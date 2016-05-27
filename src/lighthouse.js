@@ -31,7 +31,7 @@ const gathererClasses = [
   require('./gatherers/manifest'),
   require('./gatherers/accessibility'),
   require('./gatherers/offline'),
-  require('./gatherers/critical-network-chains')
+  require('./gatherers/critical-request-chains')
 ];
 
 const audits = [
@@ -45,6 +45,7 @@ const audits = [
   require('./audits/performance/speed-index-metric'),
   // TODO: https://github.com/GoogleChrome/lighthouse/issues/336
   // require('./audits/performance/input-readiness-metric'),
+  require('./audits/performance/critical-request-chains'),
   require('./audits/manifest/exists'),
   require('./audits/manifest/background-color'),
   require('./audits/manifest/theme-color'),
@@ -71,7 +72,8 @@ const aggregators = [
   require('./aggregators/launches-with-splash-screen'),
   require('./aggregators/address-bar-is-themed'),
   require('./aggregators/is-sized-for-mobile-screen'),
-  require('./aggregators/best-practices')
+  require('./aggregators/best-practices'),
+  require('./aggregators/performance-metrics')
 ];
 
 module.exports = function(driver, opts) {

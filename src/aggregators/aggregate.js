@@ -34,6 +34,10 @@ class Aggregate {
       BEST_PRACTICE: {
         name: 'Best Practices',
         contributesToScore: false
+      },
+      PERFORMANCE_METRICS: {
+        name: 'Performance Metrics',
+        contributesToScore: false
       }
     };
   }
@@ -196,7 +200,8 @@ class Aggregate {
     const subItems = [];
     let overallScore = 0;
 
-    // Step through each item in the expected results
+    // Step through each item in the expected results, and add them
+    // to the overall score and add each to the subItems list.
     expectedNames.forEach(e => {
       // TODO(paullewis): Remove once coming soon audits have landed.
       if (expected[e].comingSoon) {
@@ -215,11 +220,17 @@ class Aggregate {
         return;
       }
 
+      subItems.push(filteredAndRemappedResults[e]);
+
+      // Only add to the score if this aggregation contributes to the
+      // overall score.
+      if (!filteredAndRemappedResults[e].contributesToScore) {
+        return;
+      }
+
       overallScore += Aggregate._convertToWeight(
           filteredAndRemappedResults[e],
           expected[e]);
-
-      subItems.push(filteredAndRemappedResults[e]);
     });
 
     return {

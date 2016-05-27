@@ -216,6 +216,9 @@ WebInspector.NetworkLog.prototype = {
 
   _onRequestStarted: function(event) {
     var request = event.data;
+    if (this._requests.has(request.url)) {
+      return;
+    }
     this._requests.set(request.url, request);
   }
 };

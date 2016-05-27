@@ -63,6 +63,12 @@ limitations under the License.
                 Best Practices
               </a>
             </li>
+
+            <li class="menu__nav-item">
+              <a class="menu__link" href="#performance-metrics">
+                Performance Metrics
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -178,6 +184,38 @@ limitations under the License.
                     {{#if subItem.rawValue }}
                     <span class="report-section__item-raw-value">&nbsp;({{ subItem.rawValue }})</span>
                     {{/if }}
+                  </div>
+                  {{#if subItem.extendedInfo.value}}
+                    <div class="report-section__item-extended-info">
+                    {{> (lookup . 'name') subItem.extendedInfo.value }}
+                    </div>
+                  {{/if}}
+                </li>
+              {{/each}}
+            </ul>
+          </section>
+          {{/matches}}
+        {{/each}}
+
+        <h1 class="report-section__title" id="performance-metrics">Performance Metrics</h1>
+        <p class="report-section__description">
+          These encapsulate your app's performance.
+        </p>
+
+        {{#each aggregations as |aggregation|}}
+          {{#matches aggregation.type.name "Performance Metrics" }}
+            <section class="report-body__breakdown-item">
+
+            <ul class="report-section__individual-results">
+              {{#each aggregation.score.subItems as |subItem| }}
+                <li class="report-section__item">
+                  <div class="report-section__item-details">
+                    <span class="report-section__item-description">
+                      {{ subItem.description }}
+                    </span>
+                    <span class="report-section__item-value">
+                      {{ getItemValue subItem.value aggregation.type.name }}
+                    </span>
                   </div>
                   {{#if subItem.extendedInfo.value}}
                     <div class="report-section__item-extended-info">
