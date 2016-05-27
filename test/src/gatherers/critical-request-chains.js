@@ -64,20 +64,18 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [HIGH, MEDIUM, VERY_HIGH, HIGH],
       edges: [[0, 1], [1, 2], [2, 3]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {
-                  2: {
-                    request: constructEmptyRequest(),
-                    children: {
-                      3: {
-                        request: constructEmptyRequest(),
-                        children: {}
-                      }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {
+                2: {
+                  request: constructEmptyRequest(),
+                  children: {
+                    3: {
+                      request: constructEmptyRequest(),
+                      children: {}
                     }
                   }
                 }
@@ -93,14 +91,12 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [MEDIUM, HIGH, LOW, MEDIUM, HIGH, VERY_LOW],
       edges: [[0, 1], [1, 2], [2, 3], [3, 4]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {}
-              }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {}
             }
           }
         }
@@ -112,23 +108,21 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [HIGH, HIGH, HIGH, HIGH],
       edges: [[0, 2], [1, 3]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              2: {
-                request: constructEmptyRequest(),
-                children: {}
-              }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            2: {
+              request: constructEmptyRequest(),
+              children: {}
             }
-          },
-          1: {
-            request: constructEmptyRequest(),
-            children: {
-              3: {
-                request: constructEmptyRequest(),
-                children: {}
-              }
+          }
+        },
+        1: {
+          request: constructEmptyRequest(),
+          children: {
+            3: {
+              request: constructEmptyRequest(),
+              children: {}
             }
           }
         }
@@ -140,18 +134,16 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [HIGH, HIGH, HIGH],
       edges: [[0, 1], [0, 2]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {}
-              },
-              2: {
-                request: constructEmptyRequest(),
-                children: {}
-              }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {}
+            },
+            2: {
+              request: constructEmptyRequest(),
+              children: {}
             }
           }
         }
@@ -163,21 +155,19 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [HIGH, HIGH, HIGH, HIGH],
       edges: [[0, 1], [1, 2], [1, 3]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {
-                  2: {
-                    request: constructEmptyRequest(),
-                    children: {}
-                  },
-                  3: {
-                    request: constructEmptyRequest(),
-                    children: {}
-                  }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {
+                2: {
+                  request: constructEmptyRequest(),
+                  children: {}
+                },
+                3: {
+                  request: constructEmptyRequest(),
+                  children: {}
                 }
               }
             }
@@ -190,18 +180,14 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     testGetCriticalChain({
       priorityList: [LOW, LOW],
       edges: [[0, 1]],
-      expected: {
-        criticalRequestChains: {}
-      }
+      expected: {}
     }));
 
   it('returns empty chain list when no request whatsoever', () =>
     testGetCriticalChain({
       priorityList: [],
       edges: [],
-      expected: {
-        criticalRequestChains: {}
-      }
+      expected: {}
     }));
 
   it('returns two single node chains for two independent requests', () =>
@@ -209,15 +195,13 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: [HIGH, HIGH],
       edges: [],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {}
-          },
-          1: {
-            request: constructEmptyRequest(),
-            children: {}
-          }
+        0: {
+          request: constructEmptyRequest(),
+          children: {}
+        },
+        1: {
+          request: constructEmptyRequest(),
+          children: {}
         }
       }
     }));
@@ -227,44 +211,42 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       priorityList: Array(9).fill(HIGH),
       edges: [[0, 1], [1, 2], [1, 3], [4, 5], [5, 7], [7, 8], [5, 6]],
       expected: {
-        criticalRequestChains: {
-          0: {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {
-                  2: {
-                    request: constructEmptyRequest(),
-                    children: {}
-                  },
-                  3: {
-                    request: constructEmptyRequest(),
-                    children: {}
-                  }
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {
+                2: {
+                  request: constructEmptyRequest(),
+                  children: {}
+                },
+                3: {
+                  request: constructEmptyRequest(),
+                  children: {}
                 }
               }
             }
-          },
-          4: {
-            request: constructEmptyRequest(),
-            children: {
-              5: {
-                request: constructEmptyRequest(),
-                children: {
-                  7: {
-                    request: constructEmptyRequest(),
-                    children: {
-                      8: {
-                        request: constructEmptyRequest(),
-                        children: {}
-                      }
+          }
+        },
+        4: {
+          request: constructEmptyRequest(),
+          children: {
+            5: {
+              request: constructEmptyRequest(),
+              children: {
+                7: {
+                  request: constructEmptyRequest(),
+                  children: {
+                    8: {
+                      request: constructEmptyRequest(),
+                      children: {}
                     }
-                  },
-                  6: {
-                    request: constructEmptyRequest(),
-                    children: {}
                   }
+                },
+                6: {
+                  request: constructEmptyRequest(),
+                  children: {}
                 }
               }
             }
