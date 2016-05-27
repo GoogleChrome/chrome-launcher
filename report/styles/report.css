@@ -125,9 +125,6 @@ a {
 .report-body__content {
   padding: 0 4% 0 4%;
   margin-left: 22%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
   position: relative;
 }
 
