@@ -50,7 +50,7 @@ class Screenshots extends Audit {
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
+   * @return {!AuditResultInput}
    */
   static audit(artifacts) {
     const screenshots = artifacts.screenshots;
