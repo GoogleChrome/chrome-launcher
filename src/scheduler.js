@@ -17,7 +17,9 @@
 'use strict';
 
 const fs = require('fs');
+
 const log = require('./lib/log.js');
+const Gather = require('./gatherers/gather.js');
 
 function loadPage(driver, gatherers, options) {
   const loadPage = options.flags.loadPage;
@@ -103,6 +105,54 @@ function saveAssets(tracingData, url) {
   log.log('info', 'trace file saved to disk', filename);
 }
 
+function shouldRunPass(gatherers, phases) {
+  return phases.reduce((shouldRun, phase) => {
+    return shouldRun || gatherers.some(gatherer => gatherer[phase] !== Gather.prototype[phase]);
+  }, false);
+}
+
+function firstPass(driver, gatherers, options, tracingData) {
+  const runPhase = phaseRunner(gatherers);
+
+  return runPhase(gatherer => gatherer.setup(options))
+    .then(_ => beginPassiveCollection(driver))
+    .then(_ => runPhase(gatherer => gatherer.beforePageLoad(options)))
+
+    // Load page, gather from browser, stop profilers.
+    .then(_ => loadPage(driver, gatherers, options))
+    .then(_ => runPhase(gatherer => gatherer.profiledPostPageLoad(options)))
+    .then(_ => endPassiveCollection(options, tracingData))
+    .then(_ => runPhase(gatherer => gatherer.postProfiling(options, tracingData)));
+}
+
+function secondPass(driver, gatherers, options) {
+  const phases = ['reloadSetup', 'beforeReloadPageLoad', 'afterReloadPageLoad'];
+  if (!shouldRunPass(gatherers, phases)) {
+    return Promise.resolve();
+  }
+
+  const runPhase = phaseRunner(gatherers);
+
+  // Reload page for SW, etc.
+  return runPhase(gatherer => gatherer.reloadSetup(options))
+    .then(_ => runPhase(gatherer => gatherer.beforeReloadPageLoad(options)))
+    .then(_ => reloadPage(driver, options))
+    .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)));
+}
+
+function thirdPass(driver, gatherers, options) {
+  if (!shouldRunPass(gatherers, ['afterSecondReloadPageLoad'])) {
+    return Promise.resolve();
+  }
+
+  const runPhase = phaseRunner(gatherers);
+
+  // Reload page again for HTTPS redirect
+  options.url = options.url.replace(/^https/, 'http');
+  return reloadPage(driver, options)
+    .then(_ => runPhase(gatherer => gatherer.afterSecondReloadPageLoad(options)));
+}
+
 function run(gatherers, options) {
   const driver = options.driver;
   const tracingData = {};
@@ -114,30 +164,11 @@ function run(gatherers, options) {
   const runPhase = phaseRunner(gatherers);
 
   return driver.connect()
-    // Initial prep before the page load.
     .then(_ => setupDriver(driver, gatherers, options))
-    .then(_ => runPhase(gatherer => gatherer.setup(options)))
-    .then(_ => beginPassiveCollection(driver))
-    .then(_ => runPhase(gatherer => gatherer.beforePageLoad(options)))
 
-    // Load page, gather from browser, stop profilers.
-    .then(_ => loadPage(driver, gatherers, options))
-    .then(_ => runPhase(gatherer => gatherer.profiledPostPageLoad(options)))
-    .then(_ => endPassiveCollection(options, tracingData))
-    .then(_ => runPhase(gatherer => gatherer.postProfiling(options, tracingData)))
-
-    // Reload page for SW, etc.
-    .then(_ => runPhase(gatherer => gatherer.reloadSetup(options)))
-    .then(_ => runPhase(gatherer => gatherer.beforeReloadPageLoad(options)))
-    .then(_ => reloadPage(driver, options))
-    .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)))
-
-    // Reload page again for HTTPS redirect
-    .then(_ => {
-      options.url = options.url.replace(/^https/, 'http');
-    })
-    .then(_ => reloadPage(driver, options))
-    .then(_ => runPhase(gatherer => gatherer.afterSecondReloadPageLoad(options)))
+    .then(_ => firstPass(driver, gatherers, options, tracingData))
+    .then(_ => secondPass(driver, gatherers, options))
+    .then(_ => thirdPass(driver, gatherers, options))
 
     // Finish and teardown.
     .then(_ => driver.disconnect())
@@ -149,9 +180,7 @@ function run(gatherers, options) {
         return artifacts;
       }, {
         networkRecords: tracingData.networkRecords,
-        rawNetworkEvents: tracingData.rawNetworkEvents,
-        traceContents: tracingData.traceContents,
-        frameLoadEvents: tracingData.frameLoadEvents
+        traceContents: tracingData.traceContents
       });
 
       if (options.flags.saveArtifacts) {

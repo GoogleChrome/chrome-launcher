@@ -23,7 +23,8 @@ const log = require('../src/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 
-const lighthouse = require('../');
+const lighthouseModule = require('../');
+const lighthouse = require('../src/lighthouse');
 
 // node 5.x required due to use of ES2015 features
 if (semver.lt(process.version, '5.0.0')) {
@@ -50,6 +51,8 @@ Run Configuration:
     --load-page        Loads the page (default=true)
     --save-trace       Save the trace contents to disk
     --save-artifacts   Save all gathered artifacts to disk
+    --audit-whitelist  Comma separated list of audits to run (default=all)
+    --list-all-audits  Prints a list of all available audits and exits
 
 Output:
     --output           Reporter for the results
@@ -57,6 +60,11 @@ Output:
     --output-path      The file path to output the results (default=stdout)
                        Example: --output-path=./lighthouse-results.html
 `);
+
+if (cli.flags.listAllAudits) {
+  log.info('All lighthouse audits:', lighthouse.getAuditList().join(', '));
+  process.exit(0);
+}
 
 const url = cli.input[0] || 'https://platform-status.mozilla.org/';
 const outputMode = cli.flags.output || Printer.OUTPUT_MODE.pretty;
@@ -77,8 +85,15 @@ if (cli.flags.verbose) {
   flags.logLevel = 'error';
 }
 
+// Normalize audit whitelist.
+if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
+  flags.auditWhitelist = null;
+} else {
+  flags.auditWhitelist = new Set(flags.auditWhitelist.split(','));
+}
+
 // kick off a lighthouse run
-lighthouse(url, flags)
+lighthouseModule(url, flags)
   .then(results => {
     return Printer.write(results, outputMode, outputPath);
   })
