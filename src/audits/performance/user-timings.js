@@ -42,7 +42,7 @@ class UserTimings extends Audit {
    * @override
    */
   static get description() {
-    return 'window.performance.measure events fired by the site';
+    return 'User Timing measures';
   }
 
   /**
