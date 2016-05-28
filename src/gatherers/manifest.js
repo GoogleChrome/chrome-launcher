@@ -21,6 +21,7 @@ const manifestParser = require('../lib/manifest-parser');
 
 /* global document, XMLHttpRequest, __returnResults */
 
+/* istanbul ignore next */
 function getManifestContent() {
   function post(response) {
     // __returnResults is magically inserted by driver.evaluateAsync
@@ -85,6 +86,9 @@ class Manifest extends Gather {
       } else {
         this.artifact = manifestParser(returnedValue.manifestContent);
       }
+    }, _ => {
+      this.artifact = Manifest._errorManifest('Unable to retrieve manifest');
+      return;
     });
   }
 }
