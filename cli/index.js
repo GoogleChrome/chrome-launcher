@@ -100,11 +100,12 @@ if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
 
 // kick off a lighthouse run
 lighthouseModule(url, flags)
+  .then(results => Printer.write(results, outputMode, outputPath))
   .then(results => {
-    return Printer.write(results, outputMode, outputPath);
-  })
-  .then(status => {
-    outputPath !== 'stdout' && log.info('printer', status);
+    if (outputMode !== 'html') {
+      Printer.write(results, 'html', './last-run-results.html');
+    }
+    return;
   })
   .catch(err => {
     if (err.code === 'ECONNREFUSED') {

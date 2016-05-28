@@ -9,4 +9,5 @@ artifacts.log
 coverage
 
 results.html
+last-run-results.html
 .vscode

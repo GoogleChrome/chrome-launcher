@@ -180,10 +180,9 @@ class ReportGenerator {
           return;
         }
         if (!subItem.extendedInfo.formatter) {
-          log.log('warn', 'HTML formatter not provided', JSON.stringify(subItem.extendedInfo));
+          // HTML formatter not provided for this subItem
           return;
         }
-
         const formatter = Formatter.getByName(subItem.extendedInfo.formatter);
         const helpers = formatter.getHelpers();
         if (helpers) {

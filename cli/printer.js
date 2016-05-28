@@ -101,10 +101,6 @@ function createOutput(results, outputMode) {
         output += `    ${subitem.debugString}\n`;
       }
 
-      if (subitem.extendedInfo && !subitem.extendedInfo.formatter) {
-        log.log('warn', 'CLI formatter not provided', JSON.stringify(subitem.extendedInfo));
-      }
-
       if (subitem.extendedInfo && subitem.extendedInfo.value) {
         const formatter =
             Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');
@@ -125,7 +121,7 @@ function createOutput(results, outputMode) {
  * @return {!Promise}
  */
 function writeToStdout(output) {
-  return Promise.resolve(process.stdout.write(`${output}\n`));
+  return process.stdout.write(`${output}\n`);
 }
 
 /**
@@ -133,18 +129,17 @@ function writeToStdout(output) {
  *
  * @param {string} filePath The destination path
  * @param {string} output The output to write
+ * @param {string} outputMode Output mode; either 'pretty', 'json', or 'html'.
  * @return {Promise}
  */
-function writeFile(filePath, output) {
-  return new Promise((resolve, reject) => {
-    // TODO: make this mkdir to the filePath.
-    fs.writeFile(filePath, output, 'utf8', err => {
-      if (err) {
-        return reject(err);
-      }
+function writeFile(filePath, output, outputMode) {
+  // TODO: make this mkdir to the filePath.
+  fs.writeFile(filePath, output, 'utf8', err => {
+    if (err) {
+      throw err;
+    }
 
-      resolve(`Output written to ${filePath}`);
-    });
+    log.info('printer', `${outputMode} output written to ${filePath}`);
   });
 }
 
@@ -157,16 +152,20 @@ function writeFile(filePath, output) {
  * @return {!Promise}
  */
 function write(results, mode, path) {
-  const outputMode = checkOutputMode(mode);
-  const outputPath = checkOutputPath(path);
+  return new Promise((resolve, reject) => {
+    const outputMode = checkOutputMode(mode);
+    const outputPath = checkOutputPath(path);
 
-  const output = createOutput(results, outputMode);
+    const output = createOutput(results, outputMode);
 
-  if (outputPath === 'stdout') {
-    return writeToStdout(output);
-  }
+    if (outputPath === 'stdout') {
+      writeToStdout(output);
+      return resolve(results);
+    }
 
-  return writeFile(outputPath, output);
+    writeFile(outputPath, output, outputMode);
+    return resolve(results);
+  });
 }
 
 module.exports = {
