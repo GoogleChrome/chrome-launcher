@@ -19,6 +19,7 @@
 const Auditor = require('./auditor');
 const Scheduler = require('./scheduler');
 const Aggregator = require('./aggregator');
+const log = require('./lib/log.js');
 
 const GATHERER_CLASSES = [
   require('./gatherers/url'),
@@ -92,9 +93,15 @@ module.exports = function(driver, opts) {
 
   // Discard any audits not whitelisted.
   let audits = AUDITS;
+  let rejected;
   if (opts.flags.auditWhitelist) {
     const whitelist = opts.flags.auditWhitelist;
+    rejected = audits.filter(audit => !whitelist.has(audit.name));
     audits = audits.filter(audit => whitelist.has(audit.name));
+    if (rejected.length) {
+      log.log('info', 'Running these audits:', `${audits.map(a => a.name).join(', ')}`);
+      log.log('info', 'Skipping these audits:', `${rejected.map(a => a.name).join(', ')}`);
+    }
   }
 
   // Collate all artifacts required by audits to be run.
