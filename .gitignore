@@ -7,3 +7,6 @@ extension/pages/scripts/lighthouse-report.js
 npm-debug.log
 artifacts.log
 coverage
+
+results.html
+.vscode
