@@ -48,7 +48,7 @@ class UserTimings extends Audit {
   /**
    * @return {!Array<string>}
    */
-  static requiredArtifacts() {
+  static get requiredArtifacts() {
     return ['traceContents'];
   }
 

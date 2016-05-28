@@ -19,7 +19,9 @@
 const fs = require('fs');
 
 const log = require('./lib/log.js');
+const screenshotDump = require('./lib/screenshot-page.js');
 const Gather = require('./gatherers/gather.js');
+const stringify = require('json-stringify-safe');
 
 function loadPage(driver, gatherers, options) {
   const loadPage = options.flags.loadPage;
@@ -37,7 +39,7 @@ function reloadPage(driver, options) {
   // navigate away and then come back to reload. We do not `waitForLoad` on
   // about:blank since a page load event is never fired on it.
   return driver.gotoURL('about:blank')
-    // Wait one second for about:blank to "take hold" before switching back to the page.
+    // Wait a bit for about:blank to "take hold" before switching back to the page.
     .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
     .then(_ => driver.gotoURL(options.url, {waitForLoad: true}));
 }
@@ -67,15 +69,12 @@ function beginPassiveCollection(driver) {
 
 function endPassiveCollection(options, tracingData) {
   const driver = options.driver;
-  const saveTrace = options.flags.saveTrace;
   return driver.endNetworkCollect().then(networkRecords => {
     tracingData.networkRecords = networkRecords;
   }).then(_ => {
     return driver.endTrace();
   }).then(traceContents => {
     tracingData.traceContents = traceContents;
-  }).then(_ => {
-    return saveTrace && saveAssets(tracingData, options.url);
   });
 }
 
@@ -89,20 +88,28 @@ function phaseRunner(gatherers) {
 
 function saveArtifacts(artifacts) {
   const artifactsFilename = 'artifacts.log';
-  // The _target property of NetworkRequest is circular.
-  // We skip it when stringifying.
-  const replacer = (key, value) => key === '_target' ? undefined : value;
-  fs.writeFileSync(artifactsFilename, JSON.stringify(artifacts, replacer));
+  fs.writeFileSync(artifactsFilename, stringify(artifacts));
   log.log('info', 'artifacts file saved to disk', artifactsFilename);
 }
 
-function saveAssets(tracingData, url) {
+function getAssetFilename(assetName, url) {
   const date = new Date();
   const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
-  const filename = (hostname + '_' + date.toISOString() + '.trace.json')
-      .replace(/[\/\?<>\\:\*\|":]/g, '-');
-  fs.writeFileSync(filename, JSON.stringify(tracingData.traceContents, null, 2));
-  log.log('info', 'trace file saved to disk', filename);
+  const filenamePrefix = hostname + '_' + date.toISOString();
+  return (filenamePrefix + assetName).replace(/[\/\?<>\\:\*\|":]/g, '-');
+}
+
+function saveAssets(options, artifacts) {
+  const url = options.url;
+  const traceFilename = getAssetFilename('.trace.json', url);
+
+  fs.writeFileSync(traceFilename, stringify(artifacts.traceContents, null, 2));
+  log.log('info', 'trace file saved to disk', traceFilename);
+
+  const screenshotsFilename = getAssetFilename('.screenshots.html', url);
+  const html = screenshotDump(screenshotsFilename, artifacts.screenshots);
+  fs.writeFileSync(screenshotsFilename, html);
+  log.log('info', 'screenshots saved to disk', screenshotsFilename);
 }
 
 function shouldRunPass(gatherers, phases) {
@@ -186,6 +193,9 @@ function run(gatherers, options) {
       if (options.flags.saveArtifacts) {
         saveArtifacts(artifacts);
       }
+      if (options.flags.saveAssets) {
+        saveAssets(options, artifacts);
+      }
 
       return artifacts;
     });
@@ -198,6 +208,5 @@ module.exports = {
   beginPassiveCollection,
   endPassiveCollection,
   phaseRunner,
-  run,
-  saveAssets
+  run
 };

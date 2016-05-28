@@ -49,7 +49,7 @@ Logging:
 Run Configuration:
     --mobile           Emulates a Nexus 5X (default=true)
     --load-page        Loads the page (default=true)
-    --save-trace       Save the trace contents to disk
+    --save-assets      Save the trace contents & screenshots to disk
     --save-artifacts   Save all gathered artifacts to disk
     --audit-whitelist  Comma separated list of audits to run (default=all)
     --list-all-audits  Prints a list of all available audits and exits
@@ -59,14 +59,20 @@ Output:
                        Reporter options: ${formatOptions}  (default=pretty)
     --output-path      The file path to output the results (default=stdout)
                        Example: --output-path=./lighthouse-results.html
-`);
+`, {
+  // These options do not have a value
+  boolean: [
+    'save-assets', 'save-artifacts', 'list-all-audits',
+    'verbose', 'quiet', 'help', 'version'
+  ]
+});
 
 if (cli.flags.listAllAudits) {
   log.info('All lighthouse audits:', lighthouse.getAuditList().join(', '));
   process.exit(0);
 }
 
-const url = cli.input[0] || 'https://platform-status.mozilla.org/';
+const url = cli.input[0] || 'https://m.aliexpress.com/';
 const outputMode = cli.flags.output || Printer.OUTPUT_MODE.pretty;
 const outputPath = cli.flags.outputPath || 'stdout';
 const flags = cli.flags;

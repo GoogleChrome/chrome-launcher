@@ -30,6 +30,7 @@ const GATHERER_CLASSES = [
   require('./gatherers/html'),
   require('./gatherers/manifest'),
   require('./gatherers/accessibility'),
+  require('./gatherers/screenshots'),
   require('./gatherers/offline'),
   require('./gatherers/critical-request-chains')
 ];
@@ -44,6 +45,7 @@ const AUDITS = [
   require('./audits/performance/first-meaningful-paint'),
   require('./audits/performance/speed-index-metric'),
   require('./audits/performance/user-timings'),
+  require('./audits/performance/screenshots'),
   // TODO: https://github.com/GoogleChrome/lighthouse/issues/336
   // require('./audits/performance/input-readiness-metric'),
   require('./audits/performance/critical-request-chains'),

@@ -65,5 +65,8 @@ Artifacts.prototype.redirectsHTTP;
 /** @type {!Accessibility} */
 Artifacts.prototype.accessibility;
 
+/** @type {!Array<!Object>} */
+Artifacts.prototype.screenshots;
+
 /** @type {!Object<!Object>} */
 Artifacts.prototype.criticalRequestChains;

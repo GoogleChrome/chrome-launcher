@@ -2,7 +2,7 @@
   "name": "lighthouse",
   "version": "1.0.0",
   "description": "",
-  "main": "./module/",
+  "main": "./src/index.js",
   "bin": "./cli/index.js",
   "engines": {
     "node": ">=5"
@@ -39,6 +39,7 @@
     "empty-module": "0.0.2",
     "gl-matrix": "2.3.2",
     "handlebars": "^4.0.5",
+    "json-stringify-safe": "^5.0.1",
     "jszip": "2.6.0",
     "meow": "^3.7.0",
     "npmlog": "^2.0.3",
