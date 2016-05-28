@@ -185,9 +185,10 @@ class Aggregate {
    * Compares the set of audit results to the expected values.
    * @param {!Array<!AuditResult>} results The audit results.
    * @param {!AggregationCriteria} expected The aggregation's expected values and weighting.
+   * @param {!AggregationType} aggregationType The type of aggregator we have (e.g. PWA, Best Practices, etc.)
    * @return {!AggregationItem} The aggregation score.
    */
-  static compare(results, expected) {
+  static compare(results, expected, aggregationType) {
     const expectedNames = Object.keys(expected);
 
     // Filter down and remap the results to something more comparable to
@@ -224,7 +225,7 @@ class Aggregate {
 
       // Only add to the score if this aggregation contributes to the
       // overall score.
-      if (!filteredAndRemappedResults[e].contributesToScore) {
+      if (!aggregationType.contributesToScore) {
         return;
       }
 
@@ -250,7 +251,7 @@ class Aggregate {
       shortName: this.shortName,
       description: this.description,
       type: this.type,
-      score: Aggregate.compare(results, this.criteria)
+      score: Aggregate.compare(results, this.criteria, this.type)
     };
   }
 }
