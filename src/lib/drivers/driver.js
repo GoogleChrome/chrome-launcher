@@ -24,7 +24,7 @@ class DriverBase {
 
   constructor() {
     this._url = null;
-    this.PAUSE_AFTER_LOAD = 3000;
+    this.PAUSE_AFTER_LOAD = 500;
     this._chrome = null;
     this._traceEvents = [];
     this._traceCategories = [
