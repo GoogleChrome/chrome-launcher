@@ -40,7 +40,8 @@ class Formatter {
   static _getFormatters() {
     this._formatters = {
       accessibility: require('./accessibility'),
-      criticalRequestChains: require('./critical-request-chains')
+      criticalRequestChains: require('./critical-request-chains'),
+      userTimings: require('./user-timings')
     };
   }
 

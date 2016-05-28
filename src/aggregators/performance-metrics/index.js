@@ -23,6 +23,10 @@ const Aggregate = require('../aggregate');
 const CriticalRequestChains =
     require('../../audits/performance/critical-request-chains').name;
 
+/** @type {string} */
+const UserTimings =
+    require('../../audits/performance/user-timings').name;
+
 class PerformanceMetrics extends Aggregate {
 
   /**
@@ -56,6 +60,10 @@ class PerformanceMetrics extends Aggregate {
   static get criteria() {
     const criteria = {};
     criteria[CriticalRequestChains] = {
+      value: 0,
+      weight: 1
+    };
+    criteria[UserTimings] = {
       value: 0,
       weight: 1
     };

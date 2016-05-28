@@ -22,10 +22,9 @@
 
 /**
  * @constructor
- * @struct
  * @param {!Array<!Object>} traceData
  */
-function DevtoolsTimelineModel(traceData) {};
+var DevtoolsTimelineModel = function(traceData) {};
 
 /**
  * @return {!DevtoolsTimelineModel.TimelineModel}
@@ -33,12 +32,6 @@ function DevtoolsTimelineModel(traceData) {};
 DevtoolsTimelineModel.prototype.timelineModel = function() {};
 
 /**
- * @return {!DevtoolsTimelineModel.TracingModel}
- */
-DevtoolsTimelineModel.prototype.tracingModel = function() {};
-
-/**
- * @see chrome-devtools-frontend/front_end/timeline/TimelineModel.js:
  * @struct
  * @record
  */
@@ -48,6 +41,11 @@ DevtoolsTimelineModel.TimelineModel = function() {};
  * @return {!Array<!DevtoolsTimelineModel.MainThreadEvent>}
  */
 DevtoolsTimelineModel.TimelineModel.prototype.mainThreadEvents = function() {};
+
+/**
+ * @return {!DevtoolsTimelineModel.MainThreadAsyncEvents}
+ */
+DevtoolsTimelineModel.TimelineModel.prototype.mainThreadAsyncEvents = function() {};
 
 /**
  * @struct
@@ -66,6 +64,22 @@ DevtoolsTimelineModel.MainThreadEvent.prototype.startTime;
 
 /** @type {!Object} */
 DevtoolsTimelineModel.MainThreadEvent.prototype.args;
+
+/**
+ * @struct
+ * @record
+ */
+DevtoolsTimelineModel.MainThreadAsyncEvents = function() {};
+
+/**
+ * @type {function():!Array<string>}
+ */
+DevtoolsTimelineModel.MainThreadAsyncEvents.prototype.keys;
+
+/**
+ * @type {function(Object):!Array<!Object>}
+ */
+DevtoolsTimelineModel.MainThreadAsyncEvents.prototype.get;
 
 /**
  * @see chrome-devtools-frontend/front_end/sdk/TracingModel.js

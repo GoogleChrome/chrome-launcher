@@ -35,6 +35,8 @@ gulp.task('js-compile', function() {
     .pipe(replace('require(\'../../lib/web-inspector\').Color.parse;',
         'WebInspector.Color.parse;'))
     .pipe(replace('require(\'../../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))
+    .pipe(replace('require(\'../../lib/traces/devtools-timeline-model\');',
+        'DevtoolsTimelineModel'))
     .pipe(replace('require(\'speedline\');', 'function(arg) {};'))
     .pipe(replace('require(\'../../../formatters/formatter\');', '{};'))
 
