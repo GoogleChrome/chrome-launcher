@@ -121,7 +121,7 @@ function createOutput(results, outputMode) {
  * @return {!Promise}
  */
 function writeToStdout(output) {
-  return process.stdout.write(`${output}\n`);
+  return Promise.resolve(process.stdout.write(`${output}\n`));
 }
 
 /**
@@ -133,13 +133,15 @@ function writeToStdout(output) {
  * @return {Promise}
  */
 function writeFile(filePath, output, outputMode) {
-  // TODO: make this mkdir to the filePath.
-  fs.writeFile(filePath, output, 'utf8', err => {
-    if (err) {
-      throw err;
-    }
-
-    log.info('printer', `${outputMode} output written to ${filePath}`);
+  return new Promise((resolve, reject) => {
+    // TODO: make this mkdir to the filePath.
+    fs.writeFile(filePath, output, 'utf8', err => {
+      if (err) {
+        return reject(err);
+      }
+      log.info('printer', `${outputMode} output written to ${filePath}`);
+      resolve();
+    });
   });
 }
 
@@ -159,12 +161,12 @@ function write(results, mode, path) {
     const output = createOutput(results, outputMode);
 
     if (outputPath === 'stdout') {
-      writeToStdout(output);
-      return resolve(results);
+      return writeToStdout(output).then(_ => resolve(results));
     }
 
-    writeFile(outputPath, output, outputMode);
-    return resolve(results);
+    return writeFile(outputPath, output, outputMode).then(_ => {
+      resolve(results);
+    }).catch(err => reject(err));
   });
 }
 

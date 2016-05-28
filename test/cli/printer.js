@@ -72,20 +72,17 @@ describe('Printer', () => {
     // Now do a second pass where the file is written out.
     return Printer.write(sampleResults, mode, path).then(_ => {
       const fileContents = fs.readFileSync(path, 'utf8');
-      fs.unlinkSync(path);
       assert.ok(/<!doctype/gim.test(fileContents));
+      fs.unlinkSync(path);
     });
   });
 
-  it('throws for invalid paths', () => {
+  it('throws for invalid paths', done => {
     const mode = 'html';
     const path = '!/#@.html';
-    return Printer.write(sampleResults, mode, path).then(_ => {
-      // If the then is called, something went askew.
-      assert(false);
-    })
-    .catch(err => {
+    return Printer.write(sampleResults, mode, path).catch(err => {
       assert(err.code === 'ENOENT');
+      done();
     });
   });
 });

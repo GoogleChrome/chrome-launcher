@@ -21,7 +21,6 @@
 const Aggregate = require('../src/aggregators/aggregate');
 const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
-const log = require('../src/lib/log.js');
 const fs = require('fs');
 const path = require('path');
 
