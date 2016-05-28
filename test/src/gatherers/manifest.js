@@ -17,9 +17,9 @@
 
 /* eslint-env mocha */
 
-const GathererClass = require('../../../src/gatherers/manifest');
+const ManifestGather = require('../../../src/gatherers/manifest');
 const assert = require('assert');
-let Gatherer;
+let manifestGather;
 
 const isExpectedOutput = artifact => {
   return 'raw' in artifact && 'value' in artifact;
@@ -28,23 +28,23 @@ const isExpectedOutput = artifact => {
 describe('Manifest gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    Gatherer = new GathererClass();
+    manifestGather = new ManifestGather();
   });
 
   it('returns an artifact', () => {
-    return Gatherer.postProfiling({
+    return manifestGather.postProfiling({
       driver: {
         evaluateAsync() {
           return Promise.resolve('');
         }
       }
     }).then(_ => {
-      assert.ok(typeof Gatherer.artifact === 'object');
+      assert.ok(typeof manifestGather.artifact === 'object');
     });
   });
 
   it('handles driver failure', () => {
-    return Gatherer.postProfiling({
+    return manifestGather.postProfiling({
       driver: {
         evaluateAsync() {
           return Promise.reject('such a fail');
@@ -53,13 +53,13 @@ describe('Manifest gatherer', () => {
     }).then(_ => {
       assert(false);
     }).catch(_ => {
-      assert.ok(isExpectedOutput(Gatherer.artifact));
+      assert.ok(isExpectedOutput(manifestGather.artifact));
     });
   });
 
   it('propagates error retrieving the manifest', () => {
     const error = 'There was an error.';
-    return Gatherer.postProfiling({
+    return manifestGather.postProfiling({
       driver: {
         evaluateAsync() {
           return Promise.resolve({
@@ -68,7 +68,7 @@ describe('Manifest gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(Gatherer.artifact.debugString === error);
+      assert.ok(manifestGather.artifact.debugString === error);
     });
   });
 
@@ -76,7 +76,7 @@ describe('Manifest gatherer', () => {
     const manifestContent = JSON.stringify({
       name: 'App'
     });
-    return Gatherer.postProfiling({
+    return manifestGather.postProfiling({
       driver: {
         evaluateAsync() {
           return Promise.resolve({
@@ -85,7 +85,7 @@ describe('Manifest gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(typeof Gatherer.artifact.value === 'object');
+      assert.ok(typeof manifestGather.artifact.value === 'object');
     });
   });
 });
