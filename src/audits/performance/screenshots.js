@@ -18,6 +18,7 @@
 'use strict';
 
 const Audit = require('../audit');
+const Formatter = require('../../../formatters/formatter');
 
 class Screenshots extends Audit {
   /**
@@ -58,9 +59,8 @@ class Screenshots extends Audit {
     return Screenshots.generateAuditResult({
       value: screenshots.length || 0,
       extendedInfo: {
-        value: {
-          screenshots
-        }
+        formatter: Formatter.SUPPORTED_FORMATS.NULL,
+        value: screenshots
       }
     });
   }

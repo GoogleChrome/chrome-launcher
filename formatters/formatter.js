@@ -41,6 +41,7 @@ class Formatter {
     this._formatters = {
       accessibility: require('./accessibility'),
       criticalRequestChains: require('./critical-request-chains'),
+      null: require('./null-formatter'),
       userTimings: require('./user-timings')
     };
   }
