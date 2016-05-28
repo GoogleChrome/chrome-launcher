@@ -101,6 +101,10 @@ function createOutput(results, outputMode) {
         output += `    ${subitem.debugString}\n`;
       }
 
+      if (subitem.extendedInfo && !subitem.extendedInfo.formatter) {
+        log.log('warn', 'CLI formatter not provided', JSON.stringify(subitem.extendedInfo));
+      }
+
       if (subitem.extendedInfo && subitem.extendedInfo.value) {
         const formatter =
             Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');

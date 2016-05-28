@@ -27,6 +27,8 @@ const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 1600;
 const SCORING_MEDIAN = 4000;
 
+const BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN = 200;
+
 class FirstMeaningfulPaint extends Audit {
   /**
    * @override
@@ -87,13 +89,13 @@ class FirstMeaningfulPaint extends Audit {
 
       var data = {
         navStart,
-        fmpCandidates: [
+        fmpCandidates: {
           fCP,
           fMPbasic,
           fMPpageheight,
           fMPwebfont,
           fMPfull
-        ]
+        }
       };
 
       const result = this.calculateScore(data);
@@ -102,7 +104,8 @@ class FirstMeaningfulPaint extends Audit {
         value: result.score,
         rawValue: result.duration,
         debugString: result.debugString,
-        optimalValue: this.optimalValue
+        optimalValue: this.optimalValue,
+        extendedInfo: result.extendedInfo
       }));
     }).catch(err => {
       // Recover from trace parsing failures.
@@ -121,13 +124,17 @@ class FirstMeaningfulPaint extends Audit {
     // * fMP webfont: basic + waiting for in-flight webfonts to paint
     // * fMP full: considering both page height + webfont heuristics
 
-    // We're interested in the last of these
-    const lastfMPts = data.fmpCandidates
-      .map(e => e.ts)
-      .reduce((mx, c) => Math.max(mx, c));
+    // Calculate the difference from navigation and save all candidates
+    let timings = {};
+    let timingsArr = [];
+    Object.keys(data.fmpCandidates).forEach(name => {
+      const evt = data.fmpCandidates[name];
+      timings[name] = evt && ((evt.ts - data.navStart.ts) / 1000);
+      timingsArr.push(timings[name]);
+    });
 
-    // First meaningful paint
-    const firstMeaningfulPaint = (lastfMPts - data.navStart.ts) / 1000;
+    // First meaningful paint is the last timestamp observed from the candidates
+    const firstMeaningfulPaint = timingsArr.reduce((maxTimestamp, curr) => max(maxTimestamp, curr));
 
     // Use the CDF of a log-normal distribution for scoring.
     //   < 1100ms: score≈100
@@ -143,7 +150,8 @@ class FirstMeaningfulPaint extends Audit {
 
     return {
       duration: `${firstMeaningfulPaint.toFixed(2)}ms`,
-      score: Math.round(score)
+      score: Math.round(score),
+      extendedInfo: {timings}
     };
   }
 
@@ -165,11 +173,17 @@ class FirstMeaningfulPaint extends Audit {
     events.filter(e => {
       return e.cat.includes('blink.user_timing') ||
         e.name === 'FrameView::performLayout' ||
-        e.name === 'Paint';
+        e.name === 'Paint' ||
+        e.name === 'TracingStartedInPage';
     }).forEach(event => {
-      // navigationStart == the network begins fetching the page URL
-      if (event.name === 'navigationStart' && !navigationStart) {
-        mainFrameID = event.args.frame;
+      // Grab the page's ID from TracingStartedInPage
+      if (event.name === 'TracingStartedInPage' && !mainFrameID) {
+        mainFrameID = event.args.data.page;
+      }
+
+      // Record the navigationStart, but only once TracingStartedInPage has started
+      // which is when mainFrameID exists
+      if (event.name === 'navigationStart' && !!mainFrameID && !navigationStart) {
         navigationStart = event;
       }
       // firstContentfulPaint == the first time that text or image content was
@@ -212,6 +226,16 @@ class FirstMeaningfulPaint extends Audit {
         return (max(1, ratioBefore) + max(1, ratioAfter)) / 2;
       }
 
+      // If there are loading fonts when layout happened, the layout change accounting is postponed
+      // until the font is displayed. However, icon fonts shouldn't block first meaningful paint.
+      // We use a threshold that only web fonts that laid out more than 200 characters
+      // should block first meaningful paint.
+      //   https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/edit#heading=h.wjx8tsc9m27r
+      function hasTooManyBlankCharactersToBeMeaningful() {
+        return counter('approximateBlankCharacterCount') >
+            BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN;
+      }
+
       if (!counter('host') || counter('visibleHeight') === 0) {
         return;
       }
@@ -220,7 +244,7 @@ class FirstMeaningfulPaint extends Audit {
       // layout significance = number of layout objects added / max(1, page height / screen height)
       significance = (heuristics.pageHeight) ? (layoutCount / heightRatio()) : layoutCount;
 
-      if (heuristics.webFont && counter('hasBlankText')) {
+      if (heuristics.webFont && hasTooManyBlankCharactersToBeMeaningful()) {
         pending += significance;
       } else {
         significance += pending;
