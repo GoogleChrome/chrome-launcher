@@ -106,7 +106,10 @@ class ExtensionDriver extends Driver {
     // https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
     const listenersCopy = Array.from(this._listeners[method]);
     listenersCopy.forEach(cb => {
-      cb(params);
+      // despite best efforts, this still sometimes loses the context of the instance,
+      // which means sendCommand will not have this._tabId. Luckily, it doesn't need it
+      // for trace-based commands like IO.read.
+      cb.call(this, params);
     });
   }
 
@@ -119,6 +122,9 @@ class ExtensionDriver extends Driver {
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
       log.log('method => browser', command, params);
+      if (!this._tabId) {
+        log.log('error', 'No tabId set for sendCommand');
+      }
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
           log.log('error', 'method <= browser', command, result);
