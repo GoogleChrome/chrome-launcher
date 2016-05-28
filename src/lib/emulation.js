@@ -37,8 +37,8 @@ const NEXUS5X_EMULATION_METRICS = {
 };
 
 const NEXUS5X_USERAGENT = {
-  userAgent: 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36' +
-    '(KHTML, like Gecko) Chrome/51.0.2690.0 Mobile Safari/537.36'
+  userAgent: 'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5 Build/MRA58N) AppleWebKit/537.36' +
+    '(KHTML, like Gecko) Chrome/52.0.2743.8 Mobile Safari/537.36'
 };
 
 const TYPICAL_MOBILE_THROTTLING_METRICS = {
