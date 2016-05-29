@@ -268,6 +268,7 @@ a {
 .report-body__breakdown {
   flex: 1;
   padding-top: 20px;
+  max-width: 100%; 
 }
 
 .report-body__breakdown-item {
