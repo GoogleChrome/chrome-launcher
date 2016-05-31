@@ -16,8 +16,6 @@
  */
 'use strict';
 
-
-
 module.exports = function(filename, screenshots) {
   return `
   <!doctype html>

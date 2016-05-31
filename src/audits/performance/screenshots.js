@@ -56,6 +56,13 @@ class Screenshots extends Audit {
   static audit(artifacts) {
     const screenshots = artifacts.screenshots;
 
+    if (typeof artifacts.screenshots === 'undefined') {
+      return Screenshots.generateAuditResult({
+        value: -1,
+        debugString: 'No screenshot artifact'
+      });
+    }
+
     return Screenshots.generateAuditResult({
       value: screenshots.length || 0,
       extendedInfo: {

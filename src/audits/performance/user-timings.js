@@ -58,7 +58,10 @@ class UserTimings extends Audit {
    */
   static audit(artifacts) {
     if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
-      throw new Error(FAILURE_MESSAGE);
+      return UserTimings.generateAuditResult({
+        value: -1,
+        debugString: FAILURE_MESSAGE
+      });
     }
 
     let timingsCount = 0;

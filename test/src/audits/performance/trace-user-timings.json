@@ -1,0 +1,5 @@
+[{"pid":41904,"tid":1295,"ts":1676076836140,"ph":"I","cat":"disabled-by-default-devtools.timeline","name":"TracingStartedInPage","args":{"data":{"page":"0xf5fc2501e08","sessionId":"9331.8"}},"tts":432617,"s":"t"},
+{"pid":41904,"tid":1295,"ts":506085991145,"ph":"R","cat":"blink.user_timing","name":"start","args":{},"tts":314882},
+{"pid":41904,"tid":1295,"ts":506086992099,"ph":"R","cat":"blink.user_timing","name":"end","args":{},"tts":331149},
+{"pid":41904,"tid":1295,"ts":506085991147,"ph":"b","cat":"blink.user_timing","name":"elapsed","args":{},"tts":331184,"id":"0x73b016"},
+{"pid":41904,"tid":1295,"ts":506086992112,"ph":"e","cat":"blink.user_timing","name":"elapsed","args":{},"tts":331186,"id":"0x73b016"}]

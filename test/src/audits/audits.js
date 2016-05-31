@@ -63,6 +63,14 @@ describe('Audits', () => {
     });
   });
 
+  it('has no audits failing when optimalValue is called', () => {
+    return walkTree.then(audits => {
+      audits.forEach(audit => {
+        assert.doesNotThrow(_ => audit.optimalValue);
+      });
+    });
+  });
+
   it('has no audits failing when description is called', () => {
     return walkTree.then(audits => {
       audits.forEach(audit => {

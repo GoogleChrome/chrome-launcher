@@ -49,4 +49,20 @@ describe('Accessibility: image-alt audit', () => {
     assert.equal(output.value, false);
     assert.equal(output.debugString, 'http://example.com/ (Failed on 0 elements)');
   });
+
+  it('generates an audit output (single node)', () => {
+    const artifacts = {
+      accessibility: {
+        violations: [{
+          id: 'image-alt',
+          nodes: [{}],
+          help: 'http://example.com/'
+        }]
+      }
+    };
+
+    const output = Audit.audit(artifacts);
+    assert.equal(output.value, false);
+    assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
+  });
 });

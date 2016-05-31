@@ -55,7 +55,7 @@ function enableNexus5X(driver) {
    * where it's been working for years. addScriptToEvaluateOnLoad runs before any of the
    * page's JavaScript executes.
    */
-  /* eslint-disable no-proto */ /* global window, document */
+  /* eslint-disable no-proto */ /* global window, document */ /* istanbul ignore next */
   const injectedTouchEventsFunction = function() {
     const touchEvents = ['ontouchstart', 'ontouchend', 'ontouchmove', 'ontouchcancel'];
     var recepients = [window.__proto__, document.__proto__];

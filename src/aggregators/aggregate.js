@@ -204,6 +204,7 @@ class Aggregate {
     // Step through each item in the expected results, and add them
     // to the overall score and add each to the subItems list.
     expectedNames.forEach(e => {
+      /* istanbul ignore if */
       // TODO(paullewis): Remove once coming soon audits have landed.
       if (expected[e].comingSoon) {
         subItems.push({
