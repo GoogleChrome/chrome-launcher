@@ -33,6 +33,11 @@ class HTML extends Gather {
         }))
         .then(nodeHTML => {
           this.artifact = nodeHTML.outerHTML;
+        }).catch(_ => {
+          this.artifact = {
+            value: -1,
+            debugString: 'Unable to get document HTML'
+          };
         });
   }
 }

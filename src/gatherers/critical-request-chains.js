@@ -130,6 +130,11 @@ class CriticalRequestChains extends Gather {
         continue;
       }
 
+      // If the node already exists, bail.
+      if (node[request.requestId]) {
+        continue;
+      }
+
       // node should now point to the immediate parent for this request.
       node[request.requestId] = {
         request: flattenRequest(request),

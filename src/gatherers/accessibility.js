@@ -24,6 +24,8 @@ const axe = fs.readFileSync(
   require.resolve('axe-core/axe.min.js')
 );
 
+// This is run in the page, not Lighthouse itself.
+/* istanbul ignore next */
 function runA11yChecks() {
   axe.a11yCheck(document, function(results) {
     // __returnResults is magically inserted by driver.evaluateAsync
@@ -60,6 +62,8 @@ class Accessibility extends Gather {
           } else {
             this.artifact = returnedValue;
           }
+        }, _ => {
+          this.artifact = Accessibility._errorAccessibility('Axe results timed out');
         });
   }
 }

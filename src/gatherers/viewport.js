@@ -34,6 +34,9 @@ class Viewport extends Gather {
       .then(node => node && node.getAttribute('content'))
       .then(viewport => {
         this.artifact = viewport;
+      })
+      .catch(_ => {
+        this.artifact = -1;
       });
   }
 }

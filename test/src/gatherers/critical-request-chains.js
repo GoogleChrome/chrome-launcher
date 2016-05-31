@@ -31,7 +31,11 @@ function mockTracingData(prioritiesList, edges) {
   const networkRecords = prioritiesList.map((priority, index) =>
       ({requestId: index.toString(),
         initialPriority: () => priority,
-        initiatorRequest: () => null}));
+        initiatorRequest: () => null,
+        setInitialPriority: newPrio => {
+          priority = newPrio;
+        }
+      }));
 
   // add mock initiator information
   edges.forEach(edge => {
@@ -254,4 +258,50 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
         }
       }
     }));
+
+  it('handles redirects', () => {
+    const networkRecords = mockTracingData([HIGH, LOW, HIGH], [[1, 2]]);
+
+    // Make a fake redirect
+    networkRecords[0].requestId = '1:redirected.1';
+    Gatherer.postProfiling(null, {networkRecords});
+    const criticalChains = Gatherer.artifact;
+
+    assert.deepEqual(criticalChains, {
+      '1': {
+        request: constructEmptyRequest(),
+        children: {
+          2: {
+            request: constructEmptyRequest(),
+            children: {}
+          }
+        }
+      },
+      '1:redirected.1': {
+        request: constructEmptyRequest(),
+        children: {}
+      }
+    });
+  });
+
+  it('handles non-existent nodes when building the tree', () => {
+    const networkRecords = mockTracingData([HIGH, HIGH], [[0, 1]]);
+
+    // Reverse the records so we force nodes to be made early.
+    networkRecords.reverse();
+    Gatherer.postProfiling(null, {networkRecords});
+    const criticalChains = Gatherer.artifact;
+
+    assert.deepEqual(criticalChains, {
+      0: {
+        request: constructEmptyRequest(),
+        children: {
+          1: {
+            request: constructEmptyRequest(),
+            children: {}
+          }
+        }
+      }
+    });
+  });
 });
