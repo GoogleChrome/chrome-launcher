@@ -53,6 +53,11 @@ class ServiceWorker extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
+    if (!artifacts.serviceWorkers ||
+        !artifacts.serviceWorkers.versions) {
+      return ServiceWorker.generateAuditResult({value: false});
+    }
+
     const activatedRegistrations = artifacts.serviceWorkers.versions;
 
     return ServiceWorker.generateAuditResult({

@@ -22,6 +22,24 @@ const pkg = require('../../package.json');
 const assert = require('assert');
 
 describe('Module Tests', function() {
+  it('throws if node < 5 is used', () => {
+    const oldVersion = process.version;
+
+    // Override to an old version of Node.
+    Object.defineProperty(process, 'version', {
+      value: 'v0.1.0'
+    });
+
+    assert.throws(_ => {
+      require('../../src/index.js');
+    });
+
+    // Reset to the current version.
+    Object.defineProperty(process, 'version', {
+      value: oldVersion
+    });
+  });
+
   it('should have a main attribute defined in the package.json', function() {
     assert.ok(pkg.main);
   });
@@ -74,5 +92,10 @@ describe('Module Tests', function() {
       }, err => {
         assert.ok(err);
       });
+  });
+
+  it('should return a list of audits', function() {
+    const lighthouseModule = require('../../src/lighthouse');
+    assert.ok(Array.isArray(lighthouseModule.getAuditList()));
   });
 });

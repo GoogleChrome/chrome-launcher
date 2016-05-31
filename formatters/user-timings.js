@@ -27,7 +27,11 @@ class UserTimings extends Formatter {
     switch (type) {
       case 'pretty':
         return events => {
-          let output = `    - performance.measure events created by the site\n` +
+          if (!Array.isArray(events)) {
+            return '';
+          }
+
+          const output = `    - performance.measure events created by the site\n` +
           events.reduce((prev, event) => {
             return prev + `      - Measure: ${event.name}\n` +
             '        - Duration: ' + event.duration + '\n';

@@ -27,7 +27,16 @@ class Accessibilty extends Formatter {
     switch (type) {
       case 'pretty':
         return function(info) {
-          let output = `      - Rating: ${info.impact}\n` +
+          if (info === null ||
+              typeof info === 'undefined' ||
+              typeof info.impact === 'undefined' ||
+              typeof info.helpUrl === 'undefined' ||
+              typeof info.nodes === 'undefined' ||
+              !Array.isArray(info.nodes)) {
+            return '';
+          }
+
+          const output = `      - Rating: ${info.impact}\n` +
           `      - See: ${info.helpUrl}\n` +
           `      - Nodes: ${info.nodes.length} nodes identified (see HTML output for details)\n`;
           return output;

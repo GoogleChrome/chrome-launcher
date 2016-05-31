@@ -23,7 +23,7 @@ class NullFormatter extends Formatter {
   static getFormatter(type) {
     switch (type) {
       case 'pretty':
-        return '';
+        return _ => '';
 
       case 'html':
         return '';

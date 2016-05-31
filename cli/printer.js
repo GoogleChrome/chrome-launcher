@@ -114,6 +114,7 @@ function createOutput(results, outputMode) {
   return output;
 }
 
+/* istanbul ignore next */
 /**
  * Writes the output to stdout.
  *
@@ -160,6 +161,9 @@ function write(results, mode, path) {
 
     const output = createOutput(results, outputMode);
 
+    // Testing stdout is out of scope, and doesn't really achieve much besides testing Node,
+    // so we will skip this chunk of the code.
+    /* istanbul ignore if */
     if (outputPath === 'stdout') {
       return writeToStdout(output).then(_ => resolve(results));
     }

@@ -247,7 +247,17 @@
             "tags": [
               "Performance"
             ],
-            "description": "Fast first paint of content"
+            "description": "Fast first paint of content",
+            "extendedInfo": {
+              "formatter": "userTimings",
+              "value": [{
+                "name": "one",
+                "duration": 2000
+              },{
+                "name": "two",
+                "duration": 4000
+              }]
+            }
           },
           {
             "value": 100,

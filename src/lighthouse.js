@@ -94,6 +94,11 @@ module.exports = function(driver, opts) {
   // Discard any audits not whitelisted.
   let audits = AUDITS;
   let rejected;
+
+  // Testing this will require exposing the functionality at the module level, which
+  // isn't really necessary (and probably confusing for people using Lighthouse), so we'll
+  // skip this when testing coverage.
+  /* istanbul ignore if */
   if (opts.flags.auditWhitelist) {
     const whitelist = opts.flags.auditWhitelist;
     rejected = audits.filter(audit => !whitelist.has(audit.name));
@@ -113,6 +118,9 @@ module.exports = function(driver, opts) {
   const gatherers = GATHERER_CLASSES.map(G => new G())
     .filter(gatherer => requiredArtifacts.has(gatherer.name));
 
+  // The runs of Lighthouse should be tested in integration / smoke tests, so testing for coverage
+  // here, at least from a unit test POV, is relatively low merit.
+  /* istanbul ignore next */
   return Scheduler
       .run(gatherers, Object.assign({}, opts, {driver}))
       .then(artifacts => Auditor.audit(artifacts, audits))

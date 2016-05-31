@@ -85,4 +85,14 @@ describe('Printer', () => {
       done();
     });
   });
+
+  it('writes extended info', () => {
+    const mode = 'pretty';
+    const prettyOutput = Printer.createOutput(sampleResults, mode);
+
+    assert.ok(/measure: one/i.test(prettyOutput));
+    assert.ok(/duration: 2000/i.test(prettyOutput));
+    assert.ok(/measure: two/i.test(prettyOutput));
+    assert.ok(/duration: 4000/i.test(prettyOutput));
+  });
 });

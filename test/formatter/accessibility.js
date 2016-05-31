@@ -16,23 +16,18 @@
 
 'use strict';
 
-const Formatter = require('../../formatters/formatter.js');
+const AccessibilityFormatter = require('../../formatters/accessibility.js');
 const assert = require('assert');
 
 /* global describe, it */
 
 describe('Formatter', () => {
-  it('returns supported formats', () => {
-    // Force the internal _formatters to not exist
-    Formatter._formatters = null;
-    assert.notEqual(Formatter.SUPPORTED_FORMATS, undefined);
-  });
-
-  it('throws when invalid format is provided', () => {
-    assert.throws(_ => Formatter.getByName('invalid-format'), Error);
-  });
-
-  it('throws when getFormatter is called directly', () => {
-    assert.throws(_ => Formatter.getFormatter(), Error);
+  it('handles invalid input', () => {
+    const pretty = AccessibilityFormatter.getFormatter('pretty');
+    assert.doesNotThrow(_ => pretty());
+    assert.doesNotThrow(_ => pretty({}));
+    assert.doesNotThrow(_ => pretty({impact: ''}));
+    assert.doesNotThrow(_ => pretty({impact: '', helpUrl: ''}));
+    assert.doesNotThrow(_ => pretty({impact: '', helpUrl: '', nodes: []}));
   });
 });

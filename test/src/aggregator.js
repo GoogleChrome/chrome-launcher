@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-'use strict';
-
-const Formatter = require('../../formatters/formatter.js');
+const Aggregator = require('../../src/aggregator');
 const assert = require('assert');
 
-/* global describe, it */
+/* global describe, it*/
 
-describe('Formatter', () => {
-  it('returns supported formats', () => {
-    // Force the internal _formatters to not exist
-    Formatter._formatters = null;
-    assert.notEqual(Formatter.SUPPORTED_FORMATS, undefined);
-  });
-
-  it('throws when invalid format is provided', () => {
-    assert.throws(_ => Formatter.getByName('invalid-format'), Error);
-  });
-
-  it('throws when getFormatter is called directly', () => {
-    assert.throws(_ => Formatter.getFormatter(), Error);
+describe('Aggregator', () => {
+  it('maps all aggregations to an array of Promises', () => {
+    const fakeAggregators = [{
+      aggregate(results) {
+        return results.map(r => (r + 1));
+      }
+    }, {
+      aggregate(results) {
+        return results.map(r => (r - 1));
+      }
+    }];
+    return Aggregator
+      .aggregate(fakeAggregators, [1, 2, 3])
+      .then(modifiedResults => {
+        assert.ok(Array.isArray(modifiedResults));
+        assert.deepEqual(modifiedResults[0], [2, 3, 4]);
+        assert.deepEqual(modifiedResults[1], [0, 1, 2]);
+      });
   });
 });
