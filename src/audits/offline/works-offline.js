@@ -22,29 +22,13 @@ class WorksOffline extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Offline';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'works offline';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'URL responds with a 200 when offline';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['offlineResponseCode'];
+  static get meta() {
+    return {
+      category: 'Offline',
+      name: 'works offline',
+      description: 'URL responds with a 200 when offline',
+      requiredArtifacts: ['offlineResponseCode']
+    };
   }
 
   /**

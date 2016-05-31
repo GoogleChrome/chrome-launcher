@@ -110,7 +110,7 @@ module.exports = function(driver, opts) {
   }
 
   // Collate all artifacts required by audits to be run.
-  const auditArtifacts = audits.map(audit => audit.requiredArtifacts);
+  const auditArtifacts = audits.map(audit => audit.meta.requiredArtifacts);
   const requiredArtifacts = new Set([].concat(...auditArtifacts));
 
   // Instantiate gatherers and discard any not needed by requested audits.

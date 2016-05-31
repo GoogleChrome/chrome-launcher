@@ -24,29 +24,13 @@ class ColorContrast extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'color-contrast';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Background and foreground colors have a sufficient contrast ratio';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'color-contrast',
+      description: 'Background and foreground colors have a sufficient contrast ratio',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**

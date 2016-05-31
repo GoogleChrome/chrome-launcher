@@ -23,29 +23,13 @@ class ManifestBackgroundColor extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-background-color';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains background_color';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-background-color',
+      description: 'Manifest contains background_color',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

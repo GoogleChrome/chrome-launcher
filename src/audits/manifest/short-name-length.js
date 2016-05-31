@@ -23,29 +23,13 @@ class ManifestShortNameLength extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-short-name-length';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest\'s short_name won\'t be truncated when displayed on homescreen';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-short-name-length',
+      description: 'Manifest\'s short_name won\'t be truncated when displayed on homescreen',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

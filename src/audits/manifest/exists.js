@@ -23,29 +23,13 @@ class ManifestExists extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-exists';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest exists';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-exists',
+      description: 'Manifest exists',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

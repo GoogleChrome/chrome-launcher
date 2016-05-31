@@ -21,39 +21,14 @@ const Audit = require('../audit');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
 
 class InputReadinessMetric extends Audit {
-  /**
-   * @override
-   */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'input-readiness';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Input readiness - main thread availability';
-  }
-
-  /**
-   * @override
-   */
-  static get optimalValue() {
-    return '100';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['traceContents'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'input-readiness',
+      description: 'Input readiness - main thread availability',
+      optimalValue: '100',
+      requiredArtifacts: ['traceContents']
+    };
   }
 
   /**
@@ -74,7 +49,7 @@ class InputReadinessMetric extends Audit {
       return InputReadinessMetric.generateAuditResult({
         value: readinessScore,
         rawValue: rawValue,
-        optimalValue: this.optimalValue
+        optimalValue: this.meta.optimalValue
       });
     } catch (err) {
       return InputReadinessMetric.generateAuditResult({

@@ -23,30 +23,14 @@ class ManifestDisplay extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-display';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest\'s display property set to standalone/fullscreen to ' +
-            'allow launching without address bar';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-display',
+      description: 'Manifest\'s display property set to standalone/fullscreen to ' +
+            'allow launching without address bar',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

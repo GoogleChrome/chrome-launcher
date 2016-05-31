@@ -22,29 +22,13 @@ class HTTPS extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Security';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'is-on-https';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Site is on HTTPS';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['https'];
+  static get meta() {
+    return {
+      category: 'Security',
+      name: 'is-on-https',
+      description: 'Site is on HTTPS',
+      requiredArtifacts: ['https']
+    };
   }
 
   /**

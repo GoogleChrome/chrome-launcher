@@ -22,29 +22,13 @@ class Viewport extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Mobile Friendly';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'viewport';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'HTML has a viewport <meta>';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['viewport'];
+  static get meta() {
+    return {
+      category: 'Mobile Friendly',
+      name: 'viewport',
+      description: 'HTML has a viewport <meta>',
+      requiredArtifacts: ['viewport']
+    };
   }
 
   /**

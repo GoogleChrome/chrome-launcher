@@ -18,12 +18,8 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const isOnHTTPS = require('../../audits/security/is-on-https').name;
-
-/** @type {string} */
-const redirectsHTTP = require('../../audits/security/redirects-http').name;
+const isOnHTTPS = require('../../audits/security/is-on-https');
+const redirectsHTTP = require('../../audits/security/redirects-http');
 
 class IsSecure extends Aggregate {
 
@@ -58,12 +54,12 @@ class IsSecure extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[isOnHTTPS] = {
+    criteria[isOnHTTPS.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[redirectsHTTP] = {
+    criteria[redirectsHTTP.meta.name] = {
       value: true,
       weight: 1
     };

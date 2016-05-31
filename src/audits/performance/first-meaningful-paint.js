@@ -33,36 +33,14 @@ class FirstMeaningfulPaint extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'first-meaningful-paint';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'First meaningful paint';
-  }
-
-  /**
-   * @override
-   */
-  static get optimalValue() {
-    return '1,000ms';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['traceContents'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'first-meaningful-paint',
+      description: 'First meaningful paint',
+      optimalValue: '1,000ms',
+      requiredArtifacts: ['traceContents']
+    };
   }
 
   /**
@@ -104,7 +82,7 @@ class FirstMeaningfulPaint extends Audit {
         value: result.score,
         rawValue: result.duration,
         debugString: result.debugString,
-        optimalValue: this.optimalValue,
+        optimalValue: this.meta.optimalValue,
         extendedInfo: result.extendedInfo
       }));
     }).catch(err => {

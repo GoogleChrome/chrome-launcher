@@ -23,29 +23,13 @@ class ManifestThemeColor extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-theme-color';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains theme_color';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-theme-color',
+      description: 'Manifest contains theme_color',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

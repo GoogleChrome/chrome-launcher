@@ -18,21 +18,11 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const serviceWorker = require('../../audits/offline/service-worker').name;
-
-/** @type {string} */
-const manifestExists = require('../../audits/manifest/exists').name;
-
-/** @type {string} */
-const manifestStartUrl = require('../../audits/manifest/start-url').name;
-
-/** @type {string} */
-const manifestIconsMin144 = require('../../audits/manifest/icons-min-144').name;
-
-/** @type {string} */
-const manifestShortName = require('../../audits/manifest/short-name').name;
+const serviceWorker = require('../../audits/offline/service-worker');
+const manifestExists = require('../../audits/manifest/exists');
+const manifestStartUrl = require('../../audits/manifest/start-url');
+const manifestIconsMin144 = require('../../audits/manifest/icons-min-144');
+const manifestShortName = require('../../audits/manifest/short-name');
 
 class AddToHomescreen extends Aggregate {
 
@@ -86,27 +76,27 @@ class AddToHomescreen extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[serviceWorker] = {
+    criteria[serviceWorker.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestExists] = {
+    criteria[manifestExists.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestStartUrl] = {
+    criteria[manifestStartUrl.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestIconsMin144] = {
+    criteria[manifestIconsMin144.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestShortName] = {
+    criteria[manifestShortName.meta.name] = {
       value: true,
       weight: 0
     };

@@ -50,7 +50,7 @@ describe('Audits', () => {
   it('has audits returning strings for their category', () => {
     return walkTree.then(audits => {
       audits.forEach(audit => {
-        assert.equal(typeof audit.category, 'string');
+        assert.equal(typeof audit.meta.category, 'string');
       });
     });
   });
@@ -82,7 +82,7 @@ describe('Audits', () => {
   it('has no audits failing when requiredArtifacts is called', () => {
     return walkTree.then(audits => {
       audits.forEach(audit => {
-        assert.doesNotThrow(_ => audit.requiredArtifacts);
+        assert.doesNotThrow(_ => audit.meta.requiredArtifacts);
       });
     });
   });

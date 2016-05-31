@@ -23,29 +23,13 @@ class ServiceWorker extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Offline';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'service-worker';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Has a registered Service Worker';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['serviceWorkers'];
+  static get meta() {
+    return {
+      category: 'Offline',
+      name: 'service-worker',
+      description: 'Has a registered Service Worker',
+      requiredArtifacts: ['serviceWorkers']
+    };
   }
 
   /**

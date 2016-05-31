@@ -23,29 +23,13 @@ class ManifestName extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-name';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains name';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-name',
+      description: 'Manifest contains name',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

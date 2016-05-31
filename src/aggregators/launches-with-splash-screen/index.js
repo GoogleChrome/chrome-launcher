@@ -18,21 +18,11 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const manifestExists = require('../../audits/manifest/exists').name;
-
-/** @type {string} */
-const manifestName = require('../../audits/manifest/name').name;
-
-/** @type {string} */
-const manifestBackgroundColor = require('../../audits/manifest/background-color').name;
-
-/** @type {string} */
-const manifestThemeColor = require('../../audits/manifest/theme-color').name;
-
-/** @type {string} */
-const manifestIconsMin192 = require('../../audits/manifest/icons-min-192').name;
+const manifestExists = require('../../audits/manifest/exists');
+const manifestName = require('../../audits/manifest/name');
+const manifestBackgroundColor = require('../../audits/manifest/background-color');
+const manifestThemeColor = require('../../audits/manifest/theme-color');
+const manifestIconsMin192 = require('../../audits/manifest/icons-min-192');
 
 class SplashScreen extends Aggregate {
 
@@ -80,27 +70,27 @@ class SplashScreen extends Aggregate {
   static get criteria() {
     const criteria = {};
 
-    criteria[manifestExists] = {
+    criteria[manifestExists.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestName] = {
+    criteria[manifestName.meta.name] = {
       value: true,
       weight: 0
     };
 
-    criteria[manifestBackgroundColor] = {
+    criteria[manifestBackgroundColor.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestThemeColor] = {
+    criteria[manifestThemeColor.meta.name] = {
       value: true,
       weight: 0
     };
 
-    criteria[manifestIconsMin192] = {
+    criteria[manifestIconsMin192.meta.name] = {
       value: true,
       weight: 1
     };

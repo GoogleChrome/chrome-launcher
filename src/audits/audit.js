@@ -18,38 +18,26 @@
 
 class Audit {
   /**
-   * @return {string}
+   * @return {!AuditMeta}
    */
-  static get category() {
-    throw new Error('Audit category must be overridden');
-  }
-
-  /**
-   * @return {string}
-   */
-  static get name() {
-    throw new Error('Audit name must be overridden');
-  }
-
-  /**
-   * @return {string}
-   */
-  static get description() {
-    throw new Error('Audit description must be overridden');
-  }
-
-  /**
-   * @return {?(boolean|number|string|undefined)}
-   */
-  static get optimalValue() {
-    return undefined;
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    throw new Error('Audit requiredArtifacts must be overriden.');
+  static get meta() {
+    return {
+      get category() {
+        throw new Error('Audit category must be overridden');
+      },
+      get name() {
+        throw new Error('Audit name must be overridden');
+      },
+      get description() {
+        throw new Error('Audit description must be overridden');
+      },
+      get optimalValue() {
+        return undefined;
+      },
+      get requiredArtifacts() {
+        throw new Error('Audit requiredArtifacts must be overriden.');
+      }
+    };
   }
 
   /**
@@ -67,9 +55,9 @@ class Audit {
       debugString: result.debugString,
       optimalValue: result.optimalValue,
       extendedInfo: result.extendedInfo,
-      name: this.name,
-      category: this.category,
-      description: this.description
+      name: this.meta.name,
+      category: this.meta.category,
+      description: this.meta.description
     };
   }
 }

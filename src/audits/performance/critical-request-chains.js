@@ -24,36 +24,14 @@ class CriticalRequestChains extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'critical-request-chains';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Critical Request Chains';
-  }
-
-  /**
-   * @override
-   */
-  static get optimalValue() {
-    return 0;
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['criticalRequestChains'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'critical-request-chains',
+      description: 'Critical Request Chains',
+      optimalValue: 0,
+      requiredArtifacts: ['criticalRequestChains']
+    };
   }
 
   /**
@@ -82,7 +60,7 @@ class CriticalRequestChains extends Audit {
 
     return CriticalRequestChains.generateAuditResult({
       value: chainCount,
-      optimalValue: this.optimalValue,
+      optimalValue: this.meta.optimalValue,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
         value: artifacts.criticalRequestChains

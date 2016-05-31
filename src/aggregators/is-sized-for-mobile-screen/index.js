@@ -18,9 +18,7 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const viewport = require('../../audits/mobile-friendly/viewport').name;
+const viewport = require('../../audits/mobile-friendly/viewport');
 
 class MobileFriendly extends Aggregate {
 
@@ -55,7 +53,7 @@ class MobileFriendly extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[viewport] = {
+    criteria[viewport.meta.name] = {
       value: true,
       weight: 1
     };

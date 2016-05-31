@@ -22,29 +22,13 @@ class RedirectsHTTP extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Security';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'redirects-http';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Site redirects HTTP traffic to HTTPS';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['redirectsHTTP'];
+  static get meta() {
+    return {
+      category: 'Security',
+      name: 'redirects-http',
+      description: 'Site redirects HTTP traffic to HTTPS',
+      requiredArtifacts: ['redirectsHTTP']
+    };
   }
 
   /**

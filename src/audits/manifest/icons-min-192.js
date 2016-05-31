@@ -24,29 +24,13 @@ class ManifestIconsMin192 extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-icons-min-192';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains icons at least 192px';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-icons-min-192',
+      description: 'Manifest contains icons at least 192px',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

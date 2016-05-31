@@ -18,16 +18,8 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/**
- * @type {string}
- */
-const serviceWorker = require('../../audits/offline/service-worker').name;
-
-/**
- * @type {string}
- */
-const worksOffline = require('../../audits/offline/works-offline').name;
+const serviceWorker = require('../../audits/offline/service-worker');
+const worksOffline = require('../../audits/offline/works-offline');
 
 class WorksOffline extends Aggregate {
 
@@ -63,12 +55,12 @@ class WorksOffline extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[serviceWorker] = {
+    criteria[serviceWorker.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[worksOffline] = {
+    criteria[worksOffline.meta.name] = {
       value: true,
       weight: 1
     };

@@ -24,29 +24,13 @@ class TabIndex extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'tab-index';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'No element has a tabindex attribute greater than 0';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'tab-index',
+      description: 'No element has a tabindex attribute greater than 0',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**

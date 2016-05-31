@@ -18,16 +18,10 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const firstMeaningfulPaint = require('../../audits/performance/first-meaningful-paint').name;
-
-/** @type {string} */
-const speedIndexMetric = require('../../audits/performance/speed-index-metric').name;
-
+const firstMeaningfulPaint = require('../../audits/performance/first-meaningful-paint');
+const speedIndexMetric = require('../../audits/performance/speed-index-metric');
 // TODO: https://github.com/GoogleChrome/lighthouse/issues/336
-// /** @type {string} */
-// const inputReadinessMetric = require('../../audits/performance/input-readiness-metric').name;
+// const inputReadinessMetric = require('../../audits/performance/input-readiness-metric');
 
 class IsPerformant extends Aggregate {
 
@@ -62,15 +56,15 @@ class IsPerformant extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[firstMeaningfulPaint] = {
+    criteria[firstMeaningfulPaint.meta.name] = {
       value: 100,
       weight: 1
     };
-    criteria[speedIndexMetric] = {
+    criteria[speedIndexMetric.meta.name] = {
       value: 100,
       weight: 1
     };
-    // criteria[inputReadinessMetric] = {
+    // criteria[inputReadinessMetric.meta.name] = {
     //   value: 100,
     //   weight: 1
     // };

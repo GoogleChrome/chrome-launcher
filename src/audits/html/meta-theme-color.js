@@ -23,29 +23,13 @@ class ThemeColor extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'HTML';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'theme-color-meta';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'HTML has a theme-color <meta>';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['themeColorMeta'];
+  static get meta() {
+    return {
+      category: 'HTML',
+      name: 'theme-color-meta',
+      description: 'HTML has a theme-color <meta>',
+      requiredArtifacts: ['themeColorMeta']
+    };
   }
 
   /**

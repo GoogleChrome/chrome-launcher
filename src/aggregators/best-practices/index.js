@@ -18,36 +18,14 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const ARIAAllowedAttr =
-    require('../../audits/accessibility/aria-allowed-attr').name;
-
-/** @type {string} */
-const ARIAValidAttr =
-    require('../../audits/accessibility/aria-valid-attr').name;
-
-/** @type {string} */
-const ColorContrast =
-    require('../../audits/accessibility/color-contrast').name;
-
-/** @type {string} */
-const ImageAlt =
-    require('../../audits/accessibility/image-alt').name;
-
-/** @type {string} */
-const Label =
-    require('../../audits/accessibility/label').name;
-
-/** @type {string} */
-const TabIndex =
-    require('../../audits/accessibility/tabindex').name;
-
-/** @type {string} */
-const manifestShortNameLength = require('../../audits/manifest/short-name-length').name;
-
-/** @type {string} */
-const display = require('../../audits/mobile-friendly/display').name;
+const ARIAAllowedAttr = require('../../audits/accessibility/aria-allowed-attr');
+const ARIAValidAttr = require('../../audits/accessibility/aria-valid-attr');
+const ColorContrast = require('../../audits/accessibility/color-contrast');
+const ImageAlt = require('../../audits/accessibility/image-alt');
+const Label = require('../../audits/accessibility/label');
+const TabIndex = require('../../audits/accessibility/tabindex');
+const manifestShortNameLength = require('../../audits/manifest/short-name-length');
+const display = require('../../audits/mobile-friendly/display');
 
 class IsAccessible extends Aggregate {
 
@@ -81,42 +59,42 @@ class IsAccessible extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[ARIAAllowedAttr] = {
+    criteria[ARIAAllowedAttr.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[ARIAValidAttr] = {
+    criteria[ARIAValidAttr.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[ColorContrast] = {
+    criteria[ColorContrast.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[ImageAlt] = {
+    criteria[ImageAlt.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[Label] = {
+    criteria[Label.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[TabIndex] = {
+    criteria[TabIndex.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[manifestShortNameLength] = {
+    criteria[manifestShortNameLength.meta.name] = {
       value: true,
       weight: 1
     };
 
-    criteria[display] = {
+    criteria[display.meta.name] = {
       value: true,
       weight: 0
     };

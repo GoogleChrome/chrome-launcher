@@ -23,29 +23,13 @@ class ManifestShortName extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-short-name';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains short_name';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-short-name',
+      description: 'Manifest contains short_name',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

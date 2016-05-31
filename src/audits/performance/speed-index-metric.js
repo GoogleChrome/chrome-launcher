@@ -32,36 +32,14 @@ class SpeedIndexMetric extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'speed-index-metric';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Speed Index';
-  }
-
-  /**
-   * @override
-   */
-  static get optimalValue() {
-    return '1,000';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['traceContents'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'speed-index-metric',
+      description: 'Speed Index',
+      optimalValue: '1,000',
+      requiredArtifacts: ['traceContents']
+    };
   }
 
   /**
@@ -107,7 +85,7 @@ class SpeedIndexMetric extends Audit {
         value: result.score,
         rawValue: result.rawValue,
         debugString: result.debugString,
-        optimalValue: this.optimalValue
+        optimalValue: this.meta.optimalValue
       });
     });
   }

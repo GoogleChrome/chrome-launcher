@@ -27,29 +27,13 @@ class UserTimings extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'user-timings';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'User Timing measures';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['traceContents'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'user-timings',
+      description: 'User Timing measures',
+      requiredArtifacts: ['traceContents']
+    };
   }
 
   /**

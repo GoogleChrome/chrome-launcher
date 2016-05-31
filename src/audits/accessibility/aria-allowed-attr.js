@@ -24,29 +24,13 @@ class ARIAAllowedAttr extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'aria-allowed-attr';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Element aria-* roles are valid';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'aria-allowed-attr',
+      description: 'Element aria-* roles are valid',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**

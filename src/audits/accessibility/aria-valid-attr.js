@@ -24,29 +24,13 @@ class ARIAValidAttr extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'aria-valid-attr';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Element aria-* attributes are valid ARIA attributes';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'aria-valid-attr',
+      description: 'Element aria-* attributes are valid ARIA attributes',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**

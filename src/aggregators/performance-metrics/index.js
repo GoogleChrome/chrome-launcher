@@ -18,14 +18,8 @@
 'use strict';
 
 const Aggregate = require('../aggregate');
-
-/** @type {string} */
-const CriticalRequestChains =
-    require('../../audits/performance/critical-request-chains').name;
-
-/** @type {string} */
-const UserTimings =
-    require('../../audits/performance/user-timings').name;
+const CriticalRequestChains = require('../../audits/performance/critical-request-chains');
+const UserTimings = require('../../audits/performance/user-timings');
 
 class PerformanceMetrics extends Aggregate {
 
@@ -59,11 +53,11 @@ class PerformanceMetrics extends Aggregate {
    */
   static get criteria() {
     const criteria = {};
-    criteria[CriticalRequestChains] = {
+    criteria[CriticalRequestChains.meta.name] = {
       value: 0,
       weight: 1
     };
-    criteria[UserTimings] = {
+    criteria[UserTimings.meta.name] = {
       value: 0,
       weight: 1
     };

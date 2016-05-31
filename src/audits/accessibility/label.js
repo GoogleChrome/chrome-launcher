@@ -24,29 +24,13 @@ class Label extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'label';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Every form element has a label';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'label',
+      description: 'Every form element has a label',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**

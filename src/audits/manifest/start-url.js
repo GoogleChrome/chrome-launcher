@@ -23,29 +23,13 @@ class ManifestStartUrl extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Manifest';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'manifest-start-url';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Manifest contains start_url';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['manifest'];
+  static get meta() {
+    return {
+      category: 'Manifest',
+      name: 'manifest-start-url',
+      description: 'Manifest contains start_url',
+      requiredArtifacts: ['manifest']
+    };
   }
 
   /**

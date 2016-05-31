@@ -24,29 +24,13 @@ class Screenshots extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Performance';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'screenshots';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Screenshots of all captured frames';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['screenshots'];
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'screenshots',
+      description: 'Screenshots of all captured frames',
+      requiredArtifacts: ['screenshots']
+    };
   }
 
   /**

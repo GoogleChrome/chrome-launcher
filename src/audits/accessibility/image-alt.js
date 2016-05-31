@@ -24,29 +24,13 @@ class ImageAlt extends Audit {
   /**
    * @override
    */
-  static get category() {
-    return 'Accessibility';
-  }
-
-  /**
-   * @override
-   */
-  static get name() {
-    return 'image-alt';
-  }
-
-  /**
-   * @override
-   */
-  static get description() {
-    return 'Every image element has an alt attribute';
-  }
-
-  /**
-   * @return {!Array<string>}
-   */
-  static get requiredArtifacts() {
-    return ['accessibility'];
+  static get meta() {
+    return {
+      category: 'Accessibility',
+      name: 'image-alt',
+      description: 'Every image element has an alt attribute',
+      requiredArtifacts: ['accessibility']
+    };
   }
 
   /**
