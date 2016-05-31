@@ -19,23 +19,23 @@ const assert = require('assert');
 /* global describe, it*/
 describe('Audit', () => {
   it('throws when category is called directly', () => {
-    assert.throws(_ => Audit.category);
+    assert.throws(_ => Audit.meta.category);
   });
 
   it('throws when name is called directly', () => {
-    assert.throws(_ => Audit.name);
+    assert.throws(_ => Audit.meta.name);
   });
 
   it('throws when description is called directly', () => {
-    assert.throws(_ => Audit.description);
+    assert.throws(_ => Audit.meta.description);
   });
 
   it('returns undefined when optimalValue is called directly', () => {
-    assert.equal(Audit.optimalValue, undefined);
+    assert.equal(Audit.meta.optimalValue, undefined);
   });
 
   it('throws when requiredArtifacts is called directly', () => {
-    assert.throws(_ => Audit.requiredArtifacts);
+    assert.throws(_ => Audit.meta.requiredArtifacts);
   });
 
   it('throws when generateAuditResult is called without a value', () => {
