@@ -86,12 +86,16 @@ function phaseRunner(gatherers) {
   };
 }
 
+// This isn't exposed functionality, and it's not core functionality, so skipped. */
+/* istanbul ignore next */
 function saveArtifacts(artifacts) {
   const artifactsFilename = 'artifacts.log';
   fs.writeFileSync(artifactsFilename, stringify(artifacts));
   log.log('info', 'artifacts file saved to disk', artifactsFilename);
 }
 
+// This isn't exposed functionality, and it's not core functionality, so skipped. */
+/* istanbul ignore next */
 function getAssetFilename(assetName, url) {
   const date = new Date();
   const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
@@ -99,6 +103,8 @@ function getAssetFilename(assetName, url) {
   return (filenamePrefix + assetName).replace(/[\/\?<>\\:\*\|":]/g, '-');
 }
 
+// This isn't exposed functionality, and it's not core functionality, so skipped. */
+/* istanbul ignore next */
 function saveAssets(options, artifacts) {
   const url = options.url;
   const traceFilename = getAssetFilename('.trace.json', url);
@@ -190,9 +196,13 @@ function run(gatherers, options) {
         traceContents: tracingData.traceContents
       });
 
+      // Ignoring these two flags since this functionality is not exposed by the module.
+      /* istanbul ignore if */
       if (options.flags.saveArtifacts) {
         saveArtifacts(artifacts);
       }
+
+      /* istanbul ignore if */
       if (options.flags.saveAssets) {
         saveAssets(options, artifacts);
       }
