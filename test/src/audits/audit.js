@@ -16,6 +16,8 @@
 const Audit = require('../../../src/audits/audit.js');
 const assert = require('assert');
 
+'use strict';
+
 /* eslint-env mocha */
 
 // Extend the Audit class but fail to implement meta. It should throw errors.
