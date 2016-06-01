@@ -30,7 +30,7 @@ const SCORING_MEDIAN = 5500;
 
 class SpeedIndexMetric extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

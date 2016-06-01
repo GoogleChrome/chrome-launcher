@@ -20,7 +20,7 @@ const Audit = require('../audit');
 
 class RedirectsHTTP extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

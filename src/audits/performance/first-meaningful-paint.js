@@ -31,7 +31,7 @@ const BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN = 200;
 
 class FirstMeaningfulPaint extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

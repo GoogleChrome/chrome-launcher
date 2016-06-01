@@ -22,7 +22,7 @@ const icons = require('../../lib/icons');
 
 class ManifestIconsMin144 extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

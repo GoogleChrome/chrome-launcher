@@ -22,7 +22,7 @@ const Formatter = require('../../../formatters/formatter');
 
 class ARIAAllowedAttr extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

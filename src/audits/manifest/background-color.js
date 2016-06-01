@@ -21,7 +21,7 @@ const Audit = require('../audit');
 
 class ManifestBackgroundColor extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

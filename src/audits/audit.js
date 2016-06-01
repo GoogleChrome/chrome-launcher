@@ -21,23 +21,7 @@ class Audit {
    * @return {!AuditMeta}
    */
   static get meta() {
-    return {
-      get category() {
-        throw new Error('Audit category must be overridden');
-      },
-      get name() {
-        throw new Error('Audit name must be overridden');
-      },
-      get description() {
-        throw new Error('Audit description must be overridden');
-      },
-      get optimalValue() {
-        return undefined;
-      },
-      get requiredArtifacts() {
-        throw new Error('Audit requiredArtifacts must be overriden.');
-      }
-    };
+    throw new Error('Audit meta information must be overridden.');
   }
 
   /**

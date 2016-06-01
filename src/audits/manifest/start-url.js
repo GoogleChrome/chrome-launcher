@@ -21,7 +21,7 @@ const Audit = require('../audit');
 
 class ManifestStartUrl extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

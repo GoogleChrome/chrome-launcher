@@ -20,7 +20,7 @@ const Audit = require('../audit');
 
 class Viewport extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {

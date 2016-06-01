@@ -25,7 +25,7 @@ const FAILURE_MESSAGE = 'Trace data not found.';
 
 class UserTimings extends Audit {
   /**
-   * @override
+   * @return {!AuditMeta}
    */
   static get meta() {
     return {
