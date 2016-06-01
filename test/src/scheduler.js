@@ -20,6 +20,7 @@
 
 const Gather = require('../../src/gatherers/gather');
 const scheduler = require('../../src/scheduler');
+const assetSaver = require('../../src/lib/asset-saver');
 const assert = require('assert');
 
 class TestGathererOne extends Gather {
@@ -57,6 +58,23 @@ class TestGathererThree extends Gather {
   }
 }
 
+class TestScreenshotGatherer extends Gather {
+  constructor() {
+    super();
+    this.postProfilingCalled = false;
+  }
+
+  get name() {
+    return 'screenshots';
+  }
+
+  postProfiling() {
+    this.postProfilingCalled = true;
+    const screenshots = require('./audits/performance/screenshots.json');
+    this.artifact = screenshots;
+  }
+}
+
 const fakeDriver = {
   connect() {
     return Promise.resolve();
@@ -72,7 +90,7 @@ const fakeDriver = {
     return Promise.resolve();
   },
   endTrace() {
-
+    return require('./audits/performance/progressive-app.json');
   },
   beginNetworkCollect() {},
   endNetworkCollect() {
@@ -318,5 +336,42 @@ describe('Scheduler', function() {
           assert.equal(tgTwo.reloadSetupCalled, true);
           assert.equal(tgThree.afterSecondReloadPageLoadCalled, true);
         });
+  });
+
+  describe('saves assets when --save-assets is set', function() {
+    let prepareAssetsCalled = false;
+    let saveAssetsCalled = false;
+    const _prepareAssets = assetSaver.prepareAssets;
+    assetSaver.prepareAssets = function() {
+      prepareAssetsCalled = true;
+      return _prepareAssets.apply(this, arguments);
+    };
+    const _saveAssets = assetSaver.saveAssets;
+    assetSaver.saveAssets = function() {
+      saveAssetsCalled = true;
+      return _saveAssets.apply(this, arguments);
+    };
+
+    const screenshotGatherer = new TestScreenshotGatherer();
+    const gatherers = [screenshotGatherer];
+    const options = {
+      driver: fakeDriver,
+      url: 'https://testexample.com',
+      date: new Date(1464737670547),
+      flags: {
+        saveAssets: true
+      }
+    };
+
+    it('collects artifacts and goes through the scheduler', () => {
+      return scheduler.run(gatherers, options).then(_ => {
+        assert.equal(screenshotGatherer.postProfilingCalled, true);
+      });
+    });
+
+    it('asset saving functions are called from scheduler', () => {
+      assert.ok(prepareAssetsCalled);
+      assert.ok(saveAssetsCalled);
+    });
   });
 });
