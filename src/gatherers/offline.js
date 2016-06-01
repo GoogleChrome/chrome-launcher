@@ -24,6 +24,8 @@ const Gather = require('./gather');
 // *WARNING* do not use fetch.. due to it requiring window focus to fire.
 // Request the current page by issuing a XMLHttpRequest request to ''
 // and storing the status code on the window.
+// This runs in the context of the page, so we don't cover it with unit tests.
+/* istanbul ignore next */
 const requestPage = function() {
   const oReq = new XMLHttpRequest();
   oReq.onload = oReq.onerror = e => {
@@ -69,7 +71,12 @@ class Offline extends Gather {
         .then(offlineResponseCode => {
           this.artifact = offlineResponseCode;
         })
-        .then(_ => Offline.goOnline(driver));
+        .then(_ => Offline.goOnline(driver))
+        .catch(_ => {
+          this.artifact = {
+            offlineResponseCode: -1
+          };
+        });
   }
 }
 

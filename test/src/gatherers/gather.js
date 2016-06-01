@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +15,15 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+/* eslint-env mocha */
 
-class ThemeColor extends Gather {
-  get name() {
-    return 'themeColorMeta';
-  }
+const Gather = require('../../../src/gatherers/gather');
+const assert = require('assert');
 
-  postProfiling(options) {
-    const driver = options.driver;
+class TestGather extends Gather {}
 
-    return driver.querySelector('head meta[name="theme-color"]')
-      .then(node => node && node.getAttribute('content'))
-      .then(themeColorMeta => {
-        this.artifact = themeColorMeta;
-      })
-      .catch(_ => {
-        // The audit should read this as a fail since -1 is not a valid color.
-        this.artifact = -1;
-      });
-  }
-}
-
-module.exports = ThemeColor;
+describe('Gather', () => {
+  it('throws if name is not overridden', () => {
+    assert.throws(_ => new TestGather().name);
+  });
+});

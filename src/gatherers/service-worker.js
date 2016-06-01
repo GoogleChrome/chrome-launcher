@@ -55,9 +55,17 @@ class ServiceWorker extends Gather {
 
   beforeReloadPageLoad(options) {
     const driver = options.driver;
-    driver.sendCommand('ServiceWorker.enable');
-
-    return this.artifactsResolved;
+    return driver
+      .sendCommand('ServiceWorker.enable')
+      .then(_ => {
+        return this.artifactsResolved;
+      })
+      .catch(_ => {
+        this.artifact = {
+          versions: -1
+        };
+        return Promise.resolve();
+      });
   }
 }
 

@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
+const Audit = require('../../../../src/audits/security/redirects-http.js');
+const assert = require('assert');
 
-const Gather = require('./gather');
+/* global describe, it*/
 
-class ThemeColor extends Gather {
-  get name() {
-    return 'themeColorMeta';
-  }
+describe('Security: HTTP->HTTPS audit', () => {
+  it('fails when no input present', () => {
+    return assert.equal(Audit.audit({}).value, false);
+  });
 
-  postProfiling(options) {
-    const driver = options.driver;
+  it('fails when no redirect detected', () => {
+    return assert.equal(Audit.audit({
+      redirectsHTTP: {
+        value: false
+      }
+    }).value, false);
+  });
 
-    return driver.querySelector('head meta[name="theme-color"]')
-      .then(node => node && node.getAttribute('content'))
-      .then(themeColorMeta => {
-        this.artifact = themeColorMeta;
-      })
-      .catch(_ => {
-        // The audit should read this as a fail since -1 is not a valid color.
-        this.artifact = -1;
-      });
-  }
-}
-
-module.exports = ThemeColor;
+  it('passes when redirect detected', () => {
+    return assert.equal(Audit.audit({
+      redirectsHTTP: {
+        value: true
+      }
+    }).value, true);
+  });
+});

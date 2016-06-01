@@ -35,6 +35,16 @@ describe('Offline: Service Worker audit', () => {
     return assert.equal(output.value, false);
   });
 
+  it('copes when given a value of -1', () => {
+    const output = Audit.audit({
+      serviceWorkers: {
+        versions: -1
+      }
+    });
+
+    return assert.equal(output.value, false);
+  });
+
   it('creates an output when given an array of versions', () => {
     const output = Audit.audit({
       serviceWorkers: {

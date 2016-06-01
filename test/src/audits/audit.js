@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const Audit = require('../../../../src/audits/security/is-on-https.js');
+const Audit = require('../../../src/audits/audit.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
-describe('Security: HTTPS audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+// Extend the Audit class but fail to implement meta. It should throw errors.
+class A extends Audit {}
+class B extends Audit {
+  static get meta() {
+    return {};
+  }
+}
+
+describe('Audit', () => {
+  it('throws if an audit does not override the meta', () => {
+    assert.throws(_ => A.meta);
   });
 
-  it('fails when not on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      https: false
-    }).value, false);
+  it('does not throw if an audit overrides the meta', () => {
+    assert.doesNotThrow(_ => B.meta);
   });
 
-  it('passes when on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      https: true
-    }).value, true);
+  it('throws if an audit does generate a result with a value', () => {
+    assert.throws(_ => A.generateAuditResult({}));
   });
 });
