@@ -72,6 +72,8 @@ img {
   `;
 }
 
+// Set to ignore because testing it would imply testing fs, which isn't strictly necessary.
+/* istanbul ignore next */
 function saveArtifacts(artifacts) {
   const artifactsFilename = 'artifacts.log';
   fs.writeFileSync(artifactsFilename, stringify(artifacts));
