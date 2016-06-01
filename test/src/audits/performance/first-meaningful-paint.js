@@ -32,32 +32,30 @@ describe('Performance: first-meaningful-paint audit', () => {
     });
   });
 
-  // TODO: replace example traces with real ones to actually pass.
-  it.skip('scores a 100 when FMP is 500ms', () => {
-    const traceData = require('./trace-500ms.json');
-    return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 100);
-    });
-  });
+  describe('measures the pwa.rocks example correctly', () => {
+    let fmpResult;
 
-  it.skip('scores a 100 when FMP is 1,000ms', () => {
-    const traceData = require('./trace-1000ms.json');
-    return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 100);
+    it('processes a valid trace file', () => {
+      const traceData = require('./progressive-app.json');
+      return Audit.audit({traceContents: traceData}).then(response => {
+        fmpResult = response;
+      });
     });
-  });
 
-  it.skip('scores a 50 when FMP is 4,000ms', () => {
-    const traceData = require('./trace-4000ms.json');
-    return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 50);
+    it('finds the expected fMP', () => {
+      assert.equal(fmpResult.rawValue, '1099.52ms');
     });
-  });
 
-  it.skip('scores a 0 when FMP is 15,000ms', () => {
-    const traceData = require('./trace-15000ms.json');
-    return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 0);
+    it('finds the correct fCP + fMP timings', () => {
+      assert.equal(fmpResult.extendedInfo.timings.fCP, 461.901);
+      assert.equal(fmpResult.extendedInfo.timings.fMPbasic, 461.342);
+      assert.equal(fmpResult.extendedInfo.timings.fMPpageheight, 461.342);
+      assert.equal(fmpResult.extendedInfo.timings.fMPwebfont, 1099.523);
+      assert.equal(fmpResult.extendedInfo.timings.fMPfull, 1099.523);
+    });
+
+    it('scores the fMP correctly', () => {
+      assert.equal(fmpResult.value, 99);
     });
   });
 });

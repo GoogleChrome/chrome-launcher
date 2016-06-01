@@ -25,10 +25,8 @@ describe('Performance: screenshots audit', () => {
     assert.equal(output.value, -1);
   });
 
-  it('processes a trace file for screenshot data', () => {
+  it('processes an empty trace for screenshot data', () => {
     const output = Audit.audit({screenshots: []});
     assert.equal(output.value, 0);
   });
-
-  // TODO: include a trace with screenshot data.
 });

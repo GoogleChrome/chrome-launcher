@@ -31,10 +31,11 @@ describe('Performance: speed-index-metric audit', () => {
   });
 
   // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
-  it('scores a 98 when speedIndex is 1294', () => {
+  it('measures the pwa.rocks example with speed index of 831', () => {
     const traceData = require('./progressive-app.json');
     return Audit.audit({traceContents: traceData}).then(response => {
-      return assert.equal(response.value, 98);
+      assert.equal(response.value, 100);
+      return assert.equal(response.rawValue, 831);
     });
   });
 });
