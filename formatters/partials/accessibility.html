@@ -18,11 +18,14 @@
 }
 </style>
 <div class="axe-violation">
-  <a class="axe-violation__help--{{ this.impact }}" href="{{ this.helpUrl }}" target="_blank">{{ this.help }}</a>
-
-  <ul>
-  {{#each this.nodes}}
-    <li><code>{{ this.target }}</code></li>
-  {{/each}}
-  </ul>
+  <details>
+    <summary>
+      <a class="axe-violation__help--{{ this.impact }}" href="{{ this.helpUrl }}" target="_blank">{{ this.help }}</a>
+    </summary>
+    <ul>
+    {{#each this.nodes}}
+      <li><code>{{ this.target }}</code></li>
+    {{/each}}
+    </ul>
+  </details>
 </div>
