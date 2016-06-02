@@ -42,6 +42,7 @@ class Formatter {
       accessibility: require('./accessibility'),
       criticalRequestChains: require('./critical-request-chains'),
       null: require('./null-formatter'),
+      speedline: require('./speedline-formatter'),
       userTimings: require('./user-timings')
     };
   }

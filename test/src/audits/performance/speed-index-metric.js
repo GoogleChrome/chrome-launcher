@@ -13,29 +13,69 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
+/* eslint-env mocha */
+
 const Audit = require('../../../../src/audits/performance/speed-index-metric.js');
 const assert = require('assert');
 
-/* global describe, it*/
 describe('Performance: speed-index-metric audit', () => {
-  it('scores a -1 when no trace data is present', () => {
-    return Audit.audit({}).then(response => {
-      return assert.equal(response.value, -1);
+  function frame(timestamp, progress) {
+    timestamp = timestamp || 0;
+    progress = progress || 0;
+
+    return {
+      getTimeStamp: () => timestamp,
+      getProgress: () => progress
+    };
+  }
+
+  it('passes on errors from gatherer', () => {
+    const debugString = 'Real emergency here.';
+    return Audit.audit({speedline: {debugString}}).then(response => {
+      assert.equal(response.value, -1);
+      assert.equal(response.debugString, debugString);
     });
   });
 
-  it('scores a -1 when faulty trace data is present', () => {
-    return Audit.audit({boo: 'ya'}).then(response => {
-      return assert.equal(response.value, -1);
+  it('gives error string if no frames', () => {
+    const artifacts = {speedline: {frames: []}};
+    return Audit.audit(artifacts).then(response => {
+      assert.equal(response.value, -1);
+      assert(response.debugString);
     });
   });
 
-  // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
-  it('measures the pwa.rocks example with speed index of 831', () => {
-    const traceData = require('./progressive-app.json');
-    return Audit.audit({traceContents: traceData}).then(response => {
+  it('gives error string if too few frames to determine speed index', () => {
+    const artifacts = {speedline: {frames: [frame()]}};
+    return Audit.audit(artifacts).then(response => {
+      assert.equal(response.value, -1);
+      assert(response.debugString);
+    });
+  });
+
+  it('gives error string if speed index of 0', () => {
+    const speedline = {
+      frames: [frame(), frame(), frame()],
+      speedIndex: 0
+    };
+
+    return Audit.audit({speedline}).then(response => {
+      assert.equal(response.value, -1);
+      assert(response.debugString);
+    });
+  });
+
+  it('scores speed index of 831 as 100', () => {
+    const speedline = {
+      frames: [frame(), frame(), frame()],
+      speedIndex: 831
+    };
+
+    return Audit.audit({speedline}).then(response => {
+      assert.equal(response.rawValue, 831);
       assert.equal(response.value, 100);
-      return assert.equal(response.rawValue, 831);
     });
   });
 });

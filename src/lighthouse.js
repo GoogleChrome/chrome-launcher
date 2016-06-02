@@ -34,7 +34,8 @@ const GATHERER_CLASSES = [
   require('./gatherers/accessibility'),
   require('./gatherers/screenshots'),
   require('./gatherers/offline'),
-  require('./gatherers/critical-request-chains')
+  require('./gatherers/critical-request-chains'),
+  require('./gatherers/speedline')
 ];
 
 const AUDITS = [
@@ -104,11 +105,11 @@ module.exports = function(driver, opts) {
   /* istanbul ignore if */
   if (opts.flags.auditWhitelist) {
     const whitelist = opts.flags.auditWhitelist;
-    rejected = audits.filter(audit => !whitelist.has(audit.name));
-    audits = audits.filter(audit => whitelist.has(audit.name));
+    rejected = audits.filter(audit => !whitelist.has(audit.meta.name));
+    audits = audits.filter(audit => whitelist.has(audit.meta.name));
     if (rejected.length) {
-      log.log('info', 'Running these audits:', `${audits.map(a => a.name).join(', ')}`);
-      log.log('info', 'Skipping these audits:', `${rejected.map(a => a.name).join(', ')}`);
+      log.log('info', 'Running these audits:', `${audits.map(a => a.meta.name).join(', ')}`);
+      log.log('info', 'Skipping these audits:', `${rejected.map(a => a.meta.name).join(', ')}`);
     }
   }
 
@@ -141,5 +142,5 @@ module.exports = function(driver, opts) {
  * @return {!Array<string>}
  */
 module.exports.getAuditList = function() {
-  return AUDITS.map(audit => audit.name);
+  return AUDITS.map(audit => audit.meta.name);
 };
