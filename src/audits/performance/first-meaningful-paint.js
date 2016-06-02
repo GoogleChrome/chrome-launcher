@@ -38,7 +38,7 @@ class FirstMeaningfulPaint extends Audit {
       category: 'Performance',
       name: 'first-meaningful-paint',
       description: 'First meaningful paint',
-      optimalValue: '1,000ms',
+      optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
       requiredArtifacts: ['traceContents']
     };
   }
@@ -127,7 +127,7 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.max(0, score);
 
     return {
-      duration: `${firstMeaningfulPaint.toFixed(2)}ms`,
+      duration: `${firstMeaningfulPaint.toFixed(1)}ms`,
       score: Math.round(score),
       extendedInfo: {timings}
     };

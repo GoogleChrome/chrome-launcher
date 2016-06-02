@@ -99,16 +99,18 @@ limitations under the License.
                       <span class="report-section__item-description">
                         {{ subItem.description }}
                         {{#if subItem.optimalValue }}
-                        (target value: {{ subItem.optimalValue }})
+                          <small>
+                            (target: {{ subItem.optimalValue }})
+                          </small>
                         {{/if}}
                         {{#if subItem.comingSoon}}
                         (Coming soon)
                         {{/if}}
                       </span>
-                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
                       {{#if subItem.rawValue }}
-                      <span class="report-section__item-raw-value">&nbsp;({{ subItem.rawValue }})</span>
+                      <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
                       {{/if }}
+                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
                     </div>
                     {{#if subItem.extendedInfo.value}}
                       <div class="report-section__item-extended-info">
@@ -135,16 +137,16 @@ limitations under the License.
                       <span class="report-section__item-description">
                         {{ subItem.description }}
                         {{#if subItem.optimalValue }}
-                        (target value: {{ subItem.optimalValue }} )
+                          (target: {{ subItem.optimalValue }})
                         {{/if}}
                         {{#if subItem.comingSoon}}
                         (Coming soon)
                         {{/if}}
                       </span>
-                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
                       {{#if subItem.rawValue }}
-                      <span class="report-section__item-raw-value">&nbsp;({{ subItem.rawValue }})</span>
+                      <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
                       {{/if }}
+                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
                     </div>
                     {{#if subItem.extendedInfo.value}}
                       <div class="report-section__item-extended-info">
@@ -174,16 +176,18 @@ limitations under the License.
                     <span class="report-section__item-description">
                       <span class="report-section__item-category">{{ subItem.category }}:</span> {{ subItem.description }}
                       {{#if subItem.optimalValue }}
-                      (target: {{ subItem.optimalValue }})
+                        <small>
+                          (target: {{ subItem.optimalValue }})
+                        </small>
                       {{/if}}
                       {{#if subItem.comingSoon}}
                       (Coming soon)
                       {{/if}}
                     </span>
-                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value aggregation.type.name }}</span>
                     {{#if subItem.rawValue }}
-                    <span class="report-section__item-raw-value">&nbsp;({{ subItem.rawValue }})</span>
+                    <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
                     {{/if }}
+                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value aggregation.type.name }}</span>
                   </div>
                   {{#if subItem.extendedInfo.value}}
                     <div class="report-section__item-extended-info">

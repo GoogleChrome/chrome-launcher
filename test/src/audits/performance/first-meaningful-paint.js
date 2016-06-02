@@ -43,7 +43,7 @@ describe('Performance: first-meaningful-paint audit', () => {
     });
 
     it('finds the expected fMP', () => {
-      assert.equal(fmpResult.rawValue, '1099.52ms');
+      assert.equal(fmpResult.rawValue, '1099.5ms');
     });
 
     it('finds the correct fCP + fMP timings', () => {
