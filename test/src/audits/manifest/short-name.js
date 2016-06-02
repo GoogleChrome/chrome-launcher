@@ -34,14 +34,24 @@ describe('Manifest: short_name audit', () => {
 
   // Need to disable camelcase check for dealing with short_name.
   /* eslint-disable camelcase */
-  it('fails when a manifest contains no short_name', () => {
-    const inputs = {
-      manifest: {
-        short_name: null
-      }
-    };
+  it('fails when a manifest contains no short_name and no name', () => {
+    const inputs = JSON.stringify({
+      name: null,
+      short_name: null
+    });
+    const manifest = manifestParser(inputs);
 
-    return assert.equal(Audit.audit(inputs).value, false);
+    return assert.equal(Audit.audit({manifest}).value, false);
+  });
+
+  it('succeeds when a manifest contains no short_name but a name', () => {
+    const inputs = JSON.stringify({
+      short_name: undefined,
+      name: 'Example App'
+    });
+    const manifest = manifestParser(inputs);
+
+    return assert.equal(Audit.audit({manifest}).value, true);
   });
   /* eslint-enable camelcase */
 

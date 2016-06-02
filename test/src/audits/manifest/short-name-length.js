@@ -25,17 +25,19 @@ describe('Manifest: short_name_length audit', () => {
     return assert.equal(Audit.audit({manifest}).value, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
-  /* eslint-disable camelcase */
-  it('fails when a manifest contains no short_name', () => {
+  it('fails when a manifest contains no short_name and too long name', () => {
     const manifestSrc = JSON.stringify({
-      short_name: undefined
+      name: 'i\'m much longer than the recommended size'
     });
     const manifest = manifestParser(manifestSrc);
-    return assert.equal(Audit.audit({manifest}).value, false);
+    const out = Audit.audit({manifest});
+    assert.equal(out.value, false);
+    assert.notEqual(out.debugString, undefined);
   });
 
-  it('fails when a manifest contains a long short_name', () => {
+  // Need to disable camelcase check for dealing with short_name.
+  /* eslint-disable camelcase */
+  it('fails when a manifest contains a too long short_name', () => {
     const manifestSrc = JSON.stringify({
       short_name: 'i\'m much longer than the recommended size'
     });

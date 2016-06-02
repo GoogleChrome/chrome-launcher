@@ -42,13 +42,17 @@ class ManifestShortNameLength extends Audit {
     const manifest = artifacts.manifest.value;
     const suggestedLength = 12;
 
-    if (manifest && manifest.short_name && manifest.short_name.value) {
+    if (manifest) {
+      // When no shortname can be found we look for a name
       // Historically, Chrome recommended 12 chars as the maximum length to prevent truncation.
       // See #69 for more discussion.
-      isShortNameShortEnough = (manifest.short_name.value.length <= suggestedLength);
+      // https://developer.chrome.com/apps/manifest/name#short_name
+      let manifestValue = manifest.short_name.value || manifest.name.value || '';
+      isShortNameShortEnough = manifestValue && manifestValue.length <= suggestedLength;
+
       if (!isShortNameShortEnough) {
         debugString = `${suggestedLength} chars is the suggested maximum homescreen label length`;
-        debugString += ` (Found: ${manifest.short_name.value.length} chars).`;
+        debugString += ` (Found: ${manifestValue.length} chars).`;
       }
     }
 
