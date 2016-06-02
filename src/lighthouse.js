@@ -33,7 +33,8 @@ const GATHERER_CLASSES = [
   require('./gatherers/accessibility'),
   require('./gatherers/screenshots'),
   require('./gatherers/offline'),
-  require('./gatherers/critical-request-chains')
+  require('./gatherers/critical-request-chains'),
+  require('./gatherers/speedline')
 ];
 
 const AUDITS = [

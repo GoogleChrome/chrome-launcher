@@ -81,9 +81,6 @@ describe('Formatters', () => {
     return walkTree.then(formatters => {
       formatters.forEach(formatter => {
         const pretty = formatter.getFormatter('pretty');
-        assert.doesNotThrow(_ => pretty());
-        assert.doesNotThrow(_ => pretty(null));
-        assert.doesNotThrow(_ => pretty({}));
         assert.ok(typeof pretty() === 'string');
         assert.ok(typeof pretty(null) === 'string');
         assert.ok(typeof pretty({}) === 'string');

@@ -17,11 +17,9 @@
 
 'use strict';
 
-const speedline = require('speedline');
 const Audit = require('../audit');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
-
-const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
+const Formatter = require('../../../formatters/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
 // https://www.desmos.com/calculator/mdgjzchijg
@@ -38,7 +36,7 @@ class SpeedIndexMetric extends Audit {
       name: 'speed-index-metric',
       description: 'Speed Index',
       optimalValue: '1,000',
-      requiredArtifacts: ['traceContents']
+      requiredArtifacts: ['speedline']
     };
   }
 
@@ -49,12 +47,38 @@ class SpeedIndexMetric extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    return Promise.resolve(artifacts.traceContents).then(trace => {
-      if (!trace || !Array.isArray(trace)) {
-        throw new Error(FAILURE_MESSAGE);
+    return new Promise((resolve, reject) => {
+      const speedline = artifacts.speedline;
+
+      // Speedline gather failed; pass on error condition.
+      if (speedline.debugString) {
+        return resolve(SpeedIndexMetric.generateAuditResult({
+          value: -1,
+          debugString: speedline.debugString
+        }));
       }
-      return speedline(trace);
-    }).then(results => {
+
+      if (speedline.frames.length === 0) {
+        return resolve(SpeedIndexMetric.generateAuditResult({
+          value: -1,
+          debugString: 'Trace unable to find visual progress frames.'
+        }));
+      }
+
+      if (speedline.frames.length < 3) {
+        return resolve(SpeedIndexMetric.generateAuditResult({
+          value: -1,
+          debugString: 'Trace unable to find sufficient frames to evaluate Speed Index.'
+        }));
+      }
+
+      if (speedline.speedIndex === 0) {
+        return resolve(SpeedIndexMetric.generateAuditResult({
+          value: -1,
+          debugString: 'Error in Speedline calculating Speed Index (speedIndex of 0).'
+        }));
+      }
+
       // Use the CDF of a log-normal distribution for scoring.
       //  10th Percentile = 2,240
       //  25th Percentile = 3,430
@@ -63,30 +87,33 @@ class SpeedIndexMetric extends Audit {
       //  95th Percentile = 17,400
       const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
           SCORING_POINT_OF_DIMINISHING_RETURNS);
-      let score = 100 * distribution.computeComplementaryPercentile(results.speedIndex);
+      let score = 100 * distribution.computeComplementaryPercentile(speedline.speedIndex);
 
       // Clamp the score to 0 <= x <= 100.
       score = Math.min(100, score);
       score = Math.max(0, score);
 
-      return {
-        score: Math.round(score),
-        rawValue: Math.round(results.speedIndex)
+      const extendedInfo = {
+        first: speedline.first,
+        complete: speedline.complete,
+        duration: speedline.duration,
+        frames: speedline.frames.map(frame => {
+          return {
+            timestamp: frame.getTimeStamp(),
+            progress: frame.getProgress()
+          };
+        })
       };
-    }).catch(err => {
-      // Recover from trace parsing failures.
-      return {
-        score: -1,
-        debugString: err.message
-      };
-    })
-    .then(result => {
-      return SpeedIndexMetric.generateAuditResult({
-        value: result.score,
-        rawValue: result.rawValue,
-        debugString: result.debugString,
-        optimalValue: this.meta.optimalValue
-      });
+
+      resolve(SpeedIndexMetric.generateAuditResult({
+        value: Math.round(score),
+        rawValue: Math.round(speedline.speedIndex),
+        optimalValue: this.meta.optimalValue,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.SPEEDLINE,
+          value: extendedInfo
+        }
+      }));
     });
   }
 }
