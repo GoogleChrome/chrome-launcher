@@ -152,7 +152,10 @@ function run(gatherers, options) {
     .then(_ => secondPass(driver, gatherers, options))
     .then(_ => thirdPass(driver, gatherers, options))
 
-    // Finish and teardown.
+    // Reload the page to remove any side-effects of Lighthouse (like disabling JavaScript).
+    .then(_ => reloadPage(driver, options))
+
+     // Finish and teardown.
     .then(_ => driver.disconnect())
     .then(_ => runPhase(gatherer => gatherer.tearDown(options)))
     .then(_ => {
