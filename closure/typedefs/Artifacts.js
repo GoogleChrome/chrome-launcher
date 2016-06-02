@@ -29,6 +29,9 @@ function Artifacts() {}
 /** @type {string} */
 Artifacts.prototype.html;
 
+/** @type {string} */
+Artifacts.prototype.htmlWithoutJavaScript;
+
 /** @type {boolean} */
 Artifacts.prototype.https;
 

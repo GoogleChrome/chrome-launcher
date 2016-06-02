@@ -159,7 +159,9 @@ class DriverBase {
 
   gotoURL(url, options) {
     const waitForLoad = (options && options.waitForLoad) || false;
+    const disableJavaScript = (options && options.disableJavaScript) || false;
     return this.sendCommand('Page.enable')
+    .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJavaScript}))
     .then(_ => this.sendCommand('Page.getNavigationHistory'))
     .then(navHistory => {
       const currentURL = navHistory.entries[navHistory.currentIndex].url;
