@@ -34,7 +34,7 @@ class ManifestDisplay extends Audit {
   }
 
   /**
-   * @param {string|null} val
+   * @param {string|undefined} val
    * @return {boolean}
    */
   static hasRecommendedValue(val) {

@@ -47,7 +47,7 @@ gulp.task('js-compile', function() {
     .pipe(closureCompiler({
       compilation_level: 'SIMPLE',
       process_common_js_modules: true,
-      // new_type_inf: true, // Currently problematic for us
+      new_type_inf: true,
       checks_only: true,
       language_in: 'ECMASCRIPT6_STRICT',
       language_out: 'ECMASCRIPT5_STRICT',

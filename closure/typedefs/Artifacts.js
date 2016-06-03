@@ -74,5 +74,5 @@ Artifacts.prototype.screenshots;
 /** @type {!Object<!Object>} */
 Artifacts.prototype.criticalRequestChains;
 
-/** @type {{first: number, complete: number, duration: number, frames: !Array<!Object>, debugString: (string|undefined)}} */
+/** @type {!SpeedlineArtifact} */
 Artifacts.prototype.speedline;
