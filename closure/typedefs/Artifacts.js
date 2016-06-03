@@ -44,8 +44,8 @@ Artifacts.prototype.traceContents;
 /** @type {!ManifestNode<(!Manifest|undefined)>} */
 Artifacts.prototype.manifest;
 
-/** @type {!ServiceWorkerVersions} */
-Artifacts.prototype.serviceWorkers;
+/** @type {!ServiceWorkerArtifact} */
+Artifacts.prototype.serviceWorker;
 
 /** @type {?string} */
 Artifacts.prototype.themeColorMeta;

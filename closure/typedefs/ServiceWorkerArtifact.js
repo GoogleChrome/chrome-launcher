@@ -26,10 +26,13 @@
  * @struct
  * @record
  */
-function ServiceWorkerVersions() {}
+function ServiceWorkerArtifact() {}
 
-/** @type {!Array<!ServiceWorkerVersion>} */
-ServiceWorkerVersions.prototype.versions;
+/** @type {(string|undefined)} */
+ServiceWorkerArtifact.prototype.debugString;
+
+/** @type {(!ServiceWorkerVersion|undefined)} */
+ServiceWorkerArtifact.prototype.version;
 
 /**
  * @struct
