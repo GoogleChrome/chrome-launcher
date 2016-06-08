@@ -13,42 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
+/* eslint-env mocha */
+
 const Audit = require('../../../../src/audits/offline/service-worker.js');
 const assert = require('assert');
 
-/* global describe, it*/
-
 describe('Offline: Service Worker audit', () => {
-  it('copes when it is given no Service Worker versions', () => {
-    const output = Audit.audit({});
-
-    return assert.equal(output.value, false);
-  });
-
-  it('creates an output when given an empty array', () => {
+  it('creates an output when given no Service Worker version', () => {
+    const debugString = 'Error string';
     const output = Audit.audit({
-      serviceWorkers: {
-        versions: []
+      serviceWorker: {
+        version: undefined,
+        debugString
       }
     });
 
-    return assert.equal(output.value, false);
-  });
-
-  it('copes when given a value of -1', () => {
-    const output = Audit.audit({
-      serviceWorkers: {
-        versions: -1
-      }
-    });
-
-    return assert.equal(output.value, false);
+    assert.equal(output.value, false);
+    assert.equal(output.debugString, debugString);
   });
 
   it('creates an output when given an array of versions', () => {
     const output = Audit.audit({
-      serviceWorkers: {
-        versions: [{}]
+      serviceWorker: {
+        version: {}
       }
     });
 

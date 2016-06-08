@@ -157,6 +157,17 @@ class DriverBase {
     });
   }
 
+  getServiceWorkerVersions() {
+    return new Promise((resolve, reject) => {
+      this.once('ServiceWorker.workerVersionUpdated', data => {
+        this.sendCommand('ServiceWorker.disable');
+        resolve(data);
+      });
+
+      this.sendCommand('ServiceWorker.enable');
+    });
+  }
+
   gotoURL(url, options) {
     const waitForLoad = (options && options.waitForLoad) || false;
     const disableJavaScript = (options && options.disableJavaScript) || false;

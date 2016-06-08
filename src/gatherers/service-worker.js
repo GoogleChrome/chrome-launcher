@@ -20,51 +20,46 @@ const Gather = require('./gather');
 
 class ServiceWorker extends Gather {
   get name() {
-    return 'serviceWorkers';
+    return 'serviceWorker';
   }
 
-  reloadSetup(options) {
-    const driver = options.driver;
-    this.resolved = false;
-
-    this.artifactsResolved = new Promise((res, _) => {
-      driver.on('ServiceWorker.workerVersionUpdated', data => {
-        if (!this.resolved) {
-          const controlledClients =
-              ServiceWorker.getActivatedServiceWorker(data.versions, options.url);
-
-          this.artifact = {
-            versions: controlledClients ? [controlledClients] : []
-          };
-          this.resolved = (typeof this.artifact.versions !== 'undefined');
-          res();
-        }
-      });
-    });
-  }
-
+  /**
+   * @param {string} url
+   * @return {string}
+   */
   static getOrigin(url) {
     const parsedURL = require('url').parse(url);
     return `${parsedURL.protocol}//${parsedURL.hostname}`;
   }
 
+  /**
+   * @param {!Array<!ServiceWorkerVersion>} versions
+   * @param {string} url
+   * @return {(!ServiceWorkerVersion|undefined)}
+   */
   static getActivatedServiceWorker(versions, url) {
     const origin = this.getOrigin(url);
-    return versions.find(v => v.status === 'activated' && v.scriptURL.startsWith(origin));
+    return versions.find(v => v.status === 'activated' && this.getOrigin(v.scriptURL) === origin);
   }
 
-  beforeReloadPageLoad(options) {
+  afterReloadPageLoad(options) {
     const driver = options.driver;
     return driver
-      .sendCommand('ServiceWorker.enable')
-      .then(_ => {
-        return this.artifactsResolved;
-      })
-      .catch(_ => {
-        this.artifact = {
-          versions: -1
+      .getServiceWorkerVersions()
+      .then(data => {
+        const version = ServiceWorker.getActivatedServiceWorker(data.versions, options.url);
+        const debugString = version ? undefined : 'No active service worker found for this origin.';
+        return {
+          version,
+          debugString
         };
-        return Promise.resolve();
+      })
+      .catch(err => {
+        return {
+          debugString: `Error in querying Service Worker status: ${err.message}`
+        };
+      }).then(artifact => {
+        this.artifact = artifact;
       });
   }
 }
