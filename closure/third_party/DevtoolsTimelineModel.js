@@ -65,6 +65,12 @@ DevtoolsTimelineModel.MainThreadEvent.prototype.startTime;
 /** @type {!Object} */
 DevtoolsTimelineModel.MainThreadEvent.prototype.args;
 
+/** @type {!string} */
+DevtoolsTimelineModel.MainThreadEvent.prototype.phase;
+
+/** @type {function(!string):!boolean} */
+DevtoolsTimelineModel.MainThreadEvent.prototype.hasCategory;
+
 /**
  * @struct
  * @record

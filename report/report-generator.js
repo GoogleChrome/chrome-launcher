@@ -86,6 +86,11 @@ class ReportGenerator {
 
       return rating;
     });
+
+    // Convert numbers to fixed point decimals
+    Handlebars.registerHelper('decimal', number => {
+      return number.toFixed(2);
+    });
   }
 
   /**

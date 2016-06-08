@@ -251,10 +251,14 @@
             "extendedInfo": {
               "formatter": "userTimings",
               "value": [{
-                "name": "one",
-                "duration": 2000
+                "name": "mark_test",
+                "isMark": true,
+                "startTime": 2000
               },{
-                "name": "two",
+                "name": "measure_test",
+                "isMark": false,
+                "startTime": 0,
+                "endTime": 4000,
                 "duration": 4000
               }]
             }

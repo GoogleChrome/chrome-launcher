@@ -90,9 +90,9 @@ describe('Printer', () => {
     const mode = 'pretty';
     const prettyOutput = Printer.createOutput(sampleResults, mode);
 
-    assert.ok(/measure: one/i.test(prettyOutput));
-    assert.ok(/duration: 2000/i.test(prettyOutput));
-    assert.ok(/measure: two/i.test(prettyOutput));
-    assert.ok(/duration: 4000/i.test(prettyOutput));
+    assert.ok(/Mark: mark_test/i.test(prettyOutput));
+    assert.ok(/Start Time: 2000/i.test(prettyOutput));
+    assert.ok(/Measure: measure_test/i.test(prettyOutput));
+    assert.ok(/Duration: 4000/i.test(prettyOutput));
   });
 });

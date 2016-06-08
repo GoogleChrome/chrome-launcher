@@ -51,8 +51,33 @@ function AuditExtendedInfo() {}
 /** @type {string} */
 AuditExtendedInfo.prototype.formatter;
 
-/** @type {Object|undefined} */
+/** @type {Object|Array<UserTimingsExtendedInfo>|undefined} */
 AuditExtendedInfo.prototype.value;
+
+/**
+ * @struct
+ * @record
+ */
+function UserTimingsExtendedInfo() {}
+
+/** @type {!string} */
+UserTimingsExtendedInfo.prototype.name;
+
+/** @type {!boolean} */
+UserTimingsExtendedInfo.prototype.isMark;
+
+/** @type {!Object} */
+UserTimingsExtendedInfo.prototype.args;
+
+/** @type {!number} */
+UserTimingsExtendedInfo.prototype.startTime;
+
+/** @type {(number|undefined)} */
+UserTimingsExtendedInfo.prototype.endTime;
+
+/** @type {(number|undefined)} */
+UserTimingsExtendedInfo.prototype.duration;
+
 
 /**
  * @struct

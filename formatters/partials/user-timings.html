@@ -12,7 +12,11 @@
   <div class="ut-measures">
     {{#each this}}
       <div>
-        <span class="ut-measure_listing-duration">{{ this.duration }}</span> - {{ this.name }}
+        {{#if this.isMark}}
+          <span class="ut-measure_listing-duration">Mark: {{ decimal this.startTime }}ms</span> - {{ this.name }}
+        {{else}}
+          <span class="ut-measure_listing-duration">Measure {{ decimal this.duration }}ms</span> - {{ this.name }}
+        {{/if}}
       </div>
     {{/each}}
   </div>
