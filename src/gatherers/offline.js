@@ -37,9 +37,6 @@ const requestPage = function() {
 };
 
 class Offline extends Gather {
-  get name() {
-    return 'offlineResponseCode';
-  }
 
   static goOffline(driver) {
     return driver.sendCommand('Network.emulateNetworkConditions', {
@@ -60,7 +57,7 @@ class Offline extends Gather {
     });
   }
 
-  afterReloadPageLoad(options) {
+  afterPass(options) {
     const driver = options.driver;
 
     // TODO eventually we will want to walk all network

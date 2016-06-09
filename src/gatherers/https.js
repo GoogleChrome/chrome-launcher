@@ -19,16 +19,13 @@
 const Gather = require('./gather');
 
 class HTTPS extends Gather {
-  get name() {
-    return 'https';
-  }
 
   constructor() {
     super();
     this._noSecurityChangesTimeout = undefined;
   }
 
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
     const timeout = options.timeout || 10000;
 

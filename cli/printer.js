@@ -87,28 +87,37 @@ function createOutput(results, outputMode) {
 
   // Pretty printed.
   let output = `Lighthouse results: ${results.url}\n\n`;
-  results.aggregations.forEach(item => {
-    let score = (item.score.overall * 100).toFixed(0);
-    output += `${item.name}: ${score}%\n`;
 
-    item.score.subItems.forEach(subitem => {
-      let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
-      if (typeof subitem.rawValue !== 'undefined') {
-        lineItem += ` (${subitem.rawValue})`;
-      }
-      output += `${lineItem}\n`;
-      if (subitem.debugString) {
-        output += `    ${subitem.debugString}\n`;
+  results.aggregations.forEach(aggregation => {
+    output += `Name: ${aggregation.name}\n`;
+    output += `Description: ${aggregation.description}\n\n`;
+
+    aggregation.score.forEach(item => {
+      let score = (item.overall * 100).toFixed(0);
+
+      if (item.name) {
+        output += `${item.name}: ${score}%\n`;
       }
 
-      if (subitem.extendedInfo && subitem.extendedInfo.value) {
-        const formatter =
-            Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');
-        output += `${formatter(subitem.extendedInfo.value)}`;
-      }
+      item.subItems.forEach(subitem => {
+        let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
+        if (typeof subitem.rawValue !== 'undefined') {
+          lineItem += ` (${subitem.rawValue})`;
+        }
+        output += `${lineItem}\n`;
+        if (subitem.debugString) {
+          output += `    ${subitem.debugString}\n`;
+        }
+
+        if (subitem.extendedInfo && subitem.extendedInfo.value) {
+          const formatter =
+              Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');
+          output += `${formatter(subitem.extendedInfo.value)}`;
+        }
+      });
+
+      output += '\n';
     });
-
-    output += '\n';
   });
 
   return output;

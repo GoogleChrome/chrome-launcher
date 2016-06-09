@@ -17,9 +17,11 @@
 
 'use strict';
 
+const Aggregate = require('./aggregators/aggregate');
+
 class Aggregator {
-  static aggregate(aggregators, results) {
-    return Promise.all(aggregators.map(a => a.aggregate(results)));
+  static aggregate(aggregations, results) {
+    return Promise.all(aggregations.map(a => Aggregate.aggregate(a, results)));
   }
 }
 

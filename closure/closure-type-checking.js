@@ -32,13 +32,13 @@ gulp.task('js-compile', function() {
     'src/aggregators/**/*.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.
-    .pipe(replace('require(\'../../lib/web-inspector\').Color.parse;',
+    .pipe(replace('require(\'../lib/web-inspector\').Color.parse;',
         'WebInspector.Color.parse;'))
-    .pipe(replace('require(\'../../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))
-    .pipe(replace('require(\'../../lib/traces/devtools-timeline-model\');',
+    .pipe(replace('require(\'../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))
+    .pipe(replace('require(\'../lib/traces/devtools-timeline-model\');',
         'DevtoolsTimelineModel'))
     .pipe(replace('require(\'speedline\');', 'function(arg) {};'))
-    .pipe(replace('require(\'../../../formatters/formatter\');', '{};'))
+    .pipe(replace('require(\'../../formatters/formatter\');', '{};'))
 
     // Replace any non-local import (e.g. not starting with .) with a dummy type. These are likely
     // the built-in Node modules. But not always, so TODO(samthor): Fix this.

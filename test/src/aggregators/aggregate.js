@@ -19,26 +19,6 @@ const assert = require('assert');
 /* global describe, it*/
 
 describe('Aggregate', () => {
-  it('throws when name is called directly', () => {
-    return assert.throws(_ => Aggregate.name,
-        'Aggregate name must be overridden');
-  });
-
-  it('throws when criteria is called directly', () => {
-    return assert.throws(_ => Aggregate.criteria,
-        'Aggregate criteria must be overridden');
-  });
-
-  it('throws when description is called directly', () => {
-    return assert.throws(_ => Aggregate.description,
-        'Aggregate description must be overridden');
-  });
-
-  it('throws when type is called directly', () => {
-    return assert.throws(_ => Aggregate.type,
-        'Aggregate type must be overridden');
-  });
-
   it('filters empty results', () => {
     const a = [];
     const b = {
@@ -229,86 +209,90 @@ describe('Aggregate', () => {
   });
 
   it('scores a set correctly (contributesToScore: true)', () => {
-    const expected = {
-      'test': {
-        value: true,
-        weight: 1
-      },
-      'alternate-test': {
-        value: 100,
-        weight: 3
+    const items = [{
+      criteria: {
+        'test': {
+          value: true,
+          weight: 1
+        },
+        'alternate-test': {
+          value: 100,
+          weight: 3
+        }
       }
-    };
+    }];
 
     const results = [{
       name: 'test',
-      value: false,
-      contributesToScore: true
+      value: false
     }, {
       name: 'alternate-test',
-      value: 50,
-      contributesToScore: true
+      value: 50
     }];
-    const aggregationType = {contributesToScore: true};
-    return assert.deepEqual(Aggregate.compare(results, expected, aggregationType), {
+    const scored = true;
+
+    return assert.deepEqual(Aggregate.compare(results, items, scored)[0], {
       overall: 0.375,
+      name: undefined,
+      description: undefined,
       subItems: [{
         name: 'test',
-        value: false,
-        contributesToScore: true
+        value: false
       },
       {
         name: 'alternate-test',
-        value: 50,
-        contributesToScore: true
+        value: 50
       }]
     });
   });
 
   it('scores a set correctly (contributesToScore: false)', () => {
-    const expected = {
-      'test': {
-        value: true,
-        weight: 1
-      },
-      'alternate-test': {
-        value: 100,
-        weight: 3
+    const items = [{
+      criteria: {
+        'test': {
+          value: true,
+          weight: 1
+        },
+        'alternate-test': {
+          value: 100,
+          weight: 3
+        }
       }
-    };
+    }];
 
     const results = [{
       name: 'test',
-      value: false,
-      contributesToScore: true
+      value: false
     }, {
       name: 'alternate-test',
-      value: 50,
-      contributesToScore: true
+      value: 50
     }];
-    const aggregationType = {contributesToScore: false};
-    return assert.deepEqual(Aggregate.compare(results, expected, aggregationType), {
+    const scored = false;
+
+    return assert.deepEqual(Aggregate.compare(results, items, scored)[0], {
       overall: 0,
+      name: undefined,
+      description: undefined,
       subItems: [{
         name: 'test',
-        value: false,
-        contributesToScore: true
+        value: false
       },
       {
         name: 'alternate-test',
-        value: 50,
-        contributesToScore: true
+        value: 50
       }]
     });
   });
 
   it('filters a set correctly', () => {
-    const expected = {
-      test: {
-        value: true,
-        weight: 1
+    const items = [{
+      criteria: {
+        test: {
+          value: true,
+          weight: 1
+        }
       }
-    };
+    }];
 
     const results = [{
       name: 'alternate-test',
@@ -316,92 +300,82 @@ describe('Aggregate', () => {
       contributesToScore: true
     }];
 
-    const aggregationType = {contributesToScore: true};
-    const aggregation = Aggregate.compare(results, expected, aggregationType);
+    const scored = true;
+    const aggregation = Aggregate.compare(results, items, scored)[0];
     return assert.deepEqual(aggregation, {
       overall: 0,
+      name: undefined,
+      description: undefined,
       subItems: []
     });
   });
 
   it('outputs a score', () => {
-    const expected = {
-      test: {
-        value: true,
-        weight: 1
+    const items = [{
+      criteria: {
+        test: {
+          value: true,
+          weight: 1
+        }
       }
-    };
+    }];
 
     const results = [{
       name: 'test',
-      value: true,
-      contributesToScore: true
+      value: true
     }];
-    const aggregationType = {contributesToScore: true};
-    return assert.equal(Aggregate.compare(results, expected, aggregationType).overall, 1);
+    const scored = true;
+    return assert.equal(Aggregate.compare(results, items, scored)[0].overall, 1);
   });
 
   it('outputs subitems', () => {
-    const expected = {
-      test: {
-        value: true,
-        weight: 1
+    const items = [{
+      criteria: {
+        test: {
+          value: true,
+          weight: 1
+        }
       }
-    };
+    }];
 
     const results = [{
       name: 'test',
       value: true
     }];
 
-    const aggregationType = {contributesToScore: true};
-    return assert.ok(Array.isArray(Aggregate.compare(results, expected, aggregationType).subItems));
+    const scored = true;
+    return assert.ok(Array.isArray(Aggregate.compare(results, items, scored)[0].subItems));
   });
 
   it('aggregates', () => {
     'use strict';
 
     // Make a fake aggregation and test it.
-    class AggregateTest extends Aggregate {
-      static get name() {
-        return 'AggregateTest';
-      }
-
-      static get shortName() {
-        return 'a-test';
-      }
-
-      static get description() {
-        return 'AggregateTest Description';
-      }
-
-      static get type() {
-        return Aggregate.TYPES.PWA;
-      }
-
-      static get criteria() {
-        return {
+    const aggregation = {
+      name: 'name',
+      description: 'description',
+      scored: true,
+      categorizable: true,
+      items: [{
+        criteria: {
           test: {
             value: true,
             weight: 1
           }
-        };
-      }
-    }
+        }
+      }]
+    };
 
     const results = [{
       name: 'test',
       value: true
     }];
 
-    const output = AggregateTest.aggregate(results);
-    assert.equal(output.name, AggregateTest.name);
-    assert.equal(output.shortName, AggregateTest.shortName);
-    assert.equal(output.description, AggregateTest.description);
-    assert.equal(output.score.overall, 1);
-    assert.equal(output.score.subItems.length, 1);
-    return;
-
-    // return assert.ok(Array.isArray(Aggregate.compare(results, expected, aggregationType).subItems));
+    const output = Aggregate.aggregate(aggregation, results);
+    assert.equal(output.name, aggregation.name);
+    assert.equal(output.shortName, aggregation.shortName);
+    assert.equal(output.description, aggregation.description);
+    assert.equal(output.score[0].overall, 1);
+    return assert.equal(output.score[0].subItems.length, 1);
   });
 });

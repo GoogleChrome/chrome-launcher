@@ -48,7 +48,7 @@ function mockTracingData(prioritiesList, edges) {
 
 function testGetCriticalChain(data) {
   const networkRecords = mockTracingData(data.priorityList, data.edges);
-  Gatherer.postProfiling(null, {networkRecords});
+  Gatherer.afterPass(null, {networkRecords});
   const criticalChains = Gatherer.artifact;
   assert.deepEqual(criticalChains, data.expected);
 }
@@ -264,7 +264,7 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
 
     // Make a fake redirect
     networkRecords[0].requestId = '1:redirected.1';
-    Gatherer.postProfiling(null, {networkRecords});
+    Gatherer.afterPass(null, {networkRecords});
     const criticalChains = Gatherer.artifact;
 
     assert.deepEqual(criticalChains, {
@@ -289,7 +289,7 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
 
     // Reverse the records so we force nodes to be made early.
     networkRecords.reverse();
-    Gatherer.postProfiling(null, {networkRecords});
+    Gatherer.afterPass(null, {networkRecords});
     const criticalChains = Gatherer.artifact;
 
     assert.deepEqual(criticalChains, {

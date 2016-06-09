@@ -19,20 +19,18 @@
 const Gather = require('./gather');
 
 class Viewport extends Gather {
-  get name() {
-    return 'viewport';
-  }
 
   /**
    * @param {!{driver: !Object}} options Run options
    * @return {!Promise<?string>} The value of the viewport meta's content attribute, or null
    */
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="viewport"]')
       .then(node => node && node.getAttribute('content'))
       .then(viewport => {
+        console.log(viewport);
         this.artifact = viewport;
       })
       .catch(_ => {

@@ -20,10 +20,9 @@
 const Gather = require('../../../src/gatherers/gather');
 const assert = require('assert');
 
-class TestGather extends Gather {}
-
 describe('Gather', () => {
-  it('throws if name is not overridden', () => {
-    assert.throws(_ => new TestGather().name);
+  it('returns its name', () => {
+    const g = new Gather();
+    return assert.equal(g.name, 'Gather');
   });
 });

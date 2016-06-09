@@ -90,9 +90,6 @@ describe('Printer', () => {
     const mode = 'pretty';
     const prettyOutput = Printer.createOutput(sampleResults, mode);
 
-    assert.ok(/Mark: mark_test/i.test(prettyOutput));
-    assert.ok(/Start Time: 2000/i.test(prettyOutput));
-    assert.ok(/Measure: measure_test/i.test(prettyOutput));
-    assert.ok(/Duration: 4000/i.test(prettyOutput));
+    assert.ok(/━━ images\/chrome-touch-icon-384x384.png/i.test(prettyOutput));
   });
 });

@@ -19,11 +19,8 @@
 const Gather = require('./gather');
 
 class HTML extends Gather {
-  get name() {
-    return 'html';
-  }
 
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
 
     return driver.sendCommand('DOM.getDocument')

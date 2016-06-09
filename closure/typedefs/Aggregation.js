@@ -24,48 +24,6 @@
  * @struct
  * @record
  */
-function AggregationItem() {}
-
-/** @type {number} */
-AggregationItem.prototype.overall;
-
-/** @type {!Array<!AuditResult>} */
-AggregationItem.prototype.subItems;
-
-/**
- * @struct
- * @record
- */
-function AggregationType() {}
-
-/** @type {string} */
-AggregationType.prototype.name;
-
-/** @type {boolean} */
-AggregationType.prototype.contributesToScore;
-
-/**
- * @struct
- * @record
- */
-function Aggregation() {}
-
-/** @type {string} */
-Aggregation.prototype.name;
-
-/** @type {string} */
-Aggregation.prototype.description;
-
-/** @type {!AggregationItem} */
-Aggregation.prototype.score;
-
-/** @type {!AggregationType} */
-Aggregation.prototype.type;
-
-/**
- * @struct
- * @record
- */
 function AggregationCriterion() {}
 
 /** @type {(boolean|number|undefined)} */
@@ -87,3 +45,78 @@ AggregationCriterion.prototype.description;
  * @typedef {!Object<!AggregationCriterion>}
  */
 var AggregationCriteria;
+
+/**
+ * @struct
+ * @record
+ */
+function AggregationItem() {}
+
+/** @type {!Object<!AggregationCriterion>} */
+AggregationItem.prototype.criteria;
+
+/** @type {string} */
+AggregationItem.prototype.name;
+
+/** @type {string} */
+AggregationItem.prototype.description;
+
+/**
+ * @struct
+ * @record
+ */
+function Aggregation() {}
+
+/** @type {string} */
+Aggregation.prototype.name;
+
+/** @type {string} */
+Aggregation.prototype.description;
+
+/** @type {boolean} */
+Aggregation.prototype.scored;
+
+/** @type {boolean} */
+Aggregation.prototype.categorizable;
+
+/** @type {!Array<!AggregationItem>} */
+Aggregation.prototype.items;
+
+/**
+ * @struct
+ * @record
+ */
+function AggregationResultItem() {}
+
+/** @type {number} */
+AggregationResultItem.prototype.overall;
+
+/** @type {string} */
+AggregationResultItem.prototype.name;
+
+/** @type {string} */
+AggregationResultItem.prototype.description;
+
+/** @type {!Array<!AuditResult>} */
+AggregationResultItem.prototype.subItems;
+
+/**
+ * @struct
+ * @record
+ */
+function AggregationResult() {}
+
+/** @type {string} */
+AggregationResult.prototype.name;
+
+/** @type {string} */
+AggregationResult.prototype.description;
+
+/** @type {boolean} */
+AggregationResult.prototype.scored;
+
+/** @type {boolean} */
+AggregationResult.prototype.categorizable;
+
+/** @type {!Array<!AggregationResultItem>} */
+AggregationResult.prototype.score;

@@ -19,11 +19,8 @@
 const Gather = require('./gather');
 
 class URL extends Gather {
-  get name() {
-    return 'url';
-  }
 
-  setup(options) {
+  beforePass(options) {
     this.artifact = options.url || options.driver.url;
   }
 }

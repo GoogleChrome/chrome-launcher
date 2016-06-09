@@ -28,7 +28,7 @@ describe('Theme Color gatherer', () => {
   });
 
   it('returns the correct URL from options', () => {
-    return themeColorGather.postProfiling({
+    return themeColorGather.afterPass({
       driver: {
         querySelector() {
           return Promise.resolve({
@@ -44,7 +44,7 @@ describe('Theme Color gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return themeColorGather.postProfiling({
+    return themeColorGather.afterPass({
       driver: {
         querySelector() {
           return Promise.reject('such a fail');

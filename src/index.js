@@ -21,18 +21,24 @@ const semver = require('semver');
 const log = require('../src/lib/log.js');
 const ChromeProtocol = require('../src/lib/drivers/cri.js');
 const lighthouse = require('../src/lighthouse');
+const defaultConfig = require('../config/default.json');
 
 // node 5.x required due to use of ES2015 features
 if (semver.lt(process.version, '5.0.0')) {
   throw new Error('Lighthouse requires node version 5.0 or newer');
 }
 
-module.exports = function(url, flags) {
+module.exports = function(url, flags, config) {
   return new Promise((resolve, reject) => {
     if (!url) {
       return reject(new Error('Lighthouse requires a URL'));
     }
     flags = flags || {};
+
+    // Override the default config with any user config.
+    if (!config) {
+      config = defaultConfig;
+    }
 
     const driver = new ChromeProtocol();
 
@@ -46,6 +52,6 @@ module.exports = function(url, flags) {
     }
 
     // kick off a lighthouse run
-    resolve(lighthouse(driver, {url, flags}));
+    resolve(lighthouse(driver, {url, flags, config}));
   });
 };

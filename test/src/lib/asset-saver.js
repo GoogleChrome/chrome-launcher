@@ -21,8 +21,8 @@ const assetSaver = require('../../../src/lib/asset-saver');
 const assert = require('assert');
 const fs = require('fs');
 
-const screenshots = require('../audits/performance/screenshots.json');
-const traceContents = require('../audits/performance/progressive-app.json');
+const screenshots = require('../../fixtures/traces/screenshots.json');
+const traceContents = require('../../fixtures/traces/progressive-app.json');
 
 /* eslint-env mocha */
 describe('asset-saver helper', () => {

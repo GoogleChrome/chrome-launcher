@@ -26,28 +26,20 @@ class Gather {
    * @return {string}
    */
   get name() {
-    throw new Error('Gather name must be overridden.');
+    return this.constructor.name;
   }
 
   /* eslint-disable no-unused-vars */
 
   setup(options) { }
 
-  beforePageLoad(options) { }
+  beforePass(options) { }
 
-  profiledPostPageLoad(options) { }
+  pass(options) { }
 
-  postProfiling(options, tracingData) { }
+  afterPass(options) { }
 
-  reloadSetup(options) { }
-
-  beforeReloadPageLoad(options) { }
-
-  afterReloadPageLoad(options) { }
-
-  afterSecondReloadPageLoad(options) { }
-
-  tearDown(options, tracingData) { }
+  tearDown(options) { }
 
   /* eslint-enable no-unused-vars */
 

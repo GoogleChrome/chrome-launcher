@@ -28,7 +28,7 @@ describe('HTTP Redirect gatherer', () => {
   });
 
   it('returns an artifact', () => {
-    return offlineGather.afterReloadPageLoad({
+    return offlineGather.afterPass({
       driver: {
         sendCommand() {
           return Promise.resolve();
@@ -43,7 +43,7 @@ describe('HTTP Redirect gatherer', () => {
   });
 
   it('handles driver sendCommand() failure', () => {
-    return offlineGather.afterReloadPageLoad({
+    return offlineGather.afterPass({
       driver: {
         sendCommand() {
           return Promise.reject('such a fail');
@@ -57,7 +57,7 @@ describe('HTTP Redirect gatherer', () => {
   });
 
   it('handles driver evaluateAsync() failure', () => {
-    return offlineGather.afterReloadPageLoad({
+    return offlineGather.afterPass({
       driver: {
         sendCommand() {
           return Promise.resolve();

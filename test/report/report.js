@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 const ReportGenerator = require('../../report/report-generator.js');
+const sampleResults = require('../results/sample.json');
 const assert = require('assert');
 
 /* global describe, it*/
@@ -26,32 +27,7 @@ extension, which is relatively minor stuff.
 describe('Report', () => {
   it('generates extension HTML', () => {
     const reportGenerator = new ReportGenerator();
-
-    const html = reportGenerator.generateHTML({
-      aggregations: [{
-        score: {
-          overall: 0,
-          subItems: [{
-            extendedInfo: {}
-          }]
-        },
-        type: {
-          contributesToScore: true
-        }
-      }, {
-        score: {
-          overall: 0,
-          subItems: [{
-            extendedInfo: {
-              formatter: 'criticalRequestChains'
-            }
-          }]
-        },
-        type: {
-          contributesToScore: false
-        }
-      }]
-    });
+    const html = reportGenerator.generateHTML(sampleResults);
 
     return assert(/<!doctype/gim.test(html));
   });

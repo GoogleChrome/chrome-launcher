@@ -28,7 +28,7 @@ describe('HTTPS gatherer', () => {
   });
 
   it('returns an artifact', () => {
-    return httpsGather.postProfiling({
+    return httpsGather.afterPass({
       driver: {
         getSecurityState() {
           return Promise.resolve({
@@ -42,7 +42,7 @@ describe('HTTPS gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return httpsGather.postProfiling({
+    return httpsGather.afterPass({
       driver: {
         getSecurityState() {
           return Promise.reject('such a fail');
@@ -56,7 +56,7 @@ describe('HTTPS gatherer', () => {
   });
 
   it('handles driver timeout', () => {
-    return httpsGather.postProfiling({
+    return httpsGather.afterPass({
       driver: {
         getSecurityState() {
           return new Promise((resolve, reject) => {

@@ -20,11 +20,8 @@ const Gather = require('./gather');
 const speedline = require('speedline');
 
 class Speedline extends Gather {
-  get name() {
-    return 'speedline';
-  }
 
-  postProfiling(options, tracingData) {
+  afterPass(options, tracingData) {
     return speedline(tracingData.traceContents).then(results => {
       this.artifact = results;
     }).catch(err => {

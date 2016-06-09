@@ -27,8 +27,38 @@ describe('HTML without JavaScript gatherer', () => {
     htmlWithoutJavaScriptGather = new HTMLWithoutJavaScriptGather();
   });
 
+  it('updates the options', () => {
+    const opts = {disableJavaScript: false};
+    htmlWithoutJavaScriptGather.beforePass(opts);
+
+    return assert.equal(opts.disableJavaScript, true);
+  });
+
+  it('updates the options', () => {
+    const opts = {disableJavaScript: false};
+    htmlWithoutJavaScriptGather.beforePass(opts);
+
+    return assert.equal(opts.disableJavaScript, true);
+  });
+
+  it('resets the options', () => {
+    const opts = {
+      disableJavaScript: true,
+      driver: {
+        evaluateAsync() {
+          return Promise.resolve('Hello!');
+        }
+      }
+    };
+    return htmlWithoutJavaScriptGather
+        .afterPass(opts)
+        .then(_ => {
+          assert.equal(opts.disableJavaScript, false);
+        });
+  });
+
   it('returns an artifact', () => {
-    return htmlWithoutJavaScriptGather.afterSecondReloadPageLoad({
+    return htmlWithoutJavaScriptGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve('Hello!');
@@ -41,7 +71,7 @@ describe('HTML without JavaScript gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return htmlWithoutJavaScriptGather.afterSecondReloadPageLoad({
+    return htmlWithoutJavaScriptGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.reject('such a fail');

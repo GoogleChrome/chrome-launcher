@@ -32,7 +32,7 @@ describe('Accessibility gatherer', () => {
   });
 
   it('fails gracefully', () => {
-    return accessibilityGather.postProfiling({
+    return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve();
@@ -44,7 +44,7 @@ describe('Accessibility gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return accessibilityGather.postProfiling({
+    return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.reject('such a fail');
@@ -59,7 +59,7 @@ describe('Accessibility gatherer', () => {
 
   it('propagates error retrieving the results', () => {
     const error = 'There was an error.';
-    return accessibilityGather.postProfiling({
+    return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve({
@@ -73,7 +73,7 @@ describe('Accessibility gatherer', () => {
   });
 
   it('creates an object for valid results', () => {
-    return accessibilityGather.postProfiling({
+    return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve({

@@ -27,8 +27,36 @@ describe('HTTP Redirect gatherer', () => {
     httpRedirectGather = new HTTPRedirectGather();
   });
 
+  it('sets the URL to HTTP', () => {
+    const opts = {
+      url: 'https://example.com'
+    };
+    httpRedirectGather.beforePass(opts);
+    return assert.equal(opts.url, 'http://example.com');
+  });
+
+  it('resets the URL', () => {
+    const opts = {
+      url: 'https://example.com',
+      driver: {
+        getSecurityState() {
+          return Promise.resolve({
+            schemeIsCryptographic: true
+          });
+        }
+      }
+    };
+
+    httpRedirectGather.beforePass(opts);
+    return httpRedirectGather
+        .afterPass(opts)
+        .then(_ => {
+          assert.equal(opts.url, 'https://example.com');
+        });
+  });
+
   it('returns an artifact', () => {
-    return httpRedirectGather.afterSecondReloadPageLoad({
+    return httpRedirectGather.afterPass({
       driver: {
         getSecurityState() {
           return Promise.resolve({
@@ -42,7 +70,7 @@ describe('HTTP Redirect gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return httpRedirectGather.afterSecondReloadPageLoad({
+    return httpRedirectGather.afterPass({
       driver: {
         getSecurityState() {
           return Promise.reject('such a fail');
@@ -57,7 +85,7 @@ describe('HTTP Redirect gatherer', () => {
   });
 
   it('handles driver timeout', () => {
-    return httpRedirectGather.afterSecondReloadPageLoad({
+    return httpRedirectGather.afterPass({
       driver: {
         getSecurityState() {
           return new Promise((resolve, reject) => {

@@ -68,7 +68,13 @@ Output:
 });
 
 if (cli.flags.listAllAudits) {
-  log.info('All lighthouse audits:', lighthouse.getAuditList().join(', '));
+  const audits = lighthouse
+      .getAuditList()
+      .map(i => {
+        return i.replace(/\.js$/, '');
+      });
+
+  log.info('All lighthouse audits:', audits.join(', '));
   process.exit(0);
 }
 
@@ -95,7 +101,7 @@ if (cli.flags.verbose) {
 if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
   flags.auditWhitelist = null;
 } else {
-  flags.auditWhitelist = new Set(flags.auditWhitelist.split(','));
+  flags.auditWhitelist = new Set(flags.auditWhitelist.split(',').map(a => a.toLowerCase()));
 }
 
 // kick off a lighthouse run

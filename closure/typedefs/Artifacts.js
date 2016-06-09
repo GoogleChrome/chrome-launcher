@@ -27,13 +27,13 @@
 function Artifacts() {}
 
 /** @type {string} */
-Artifacts.prototype.html;
+Artifacts.prototype.HTML;
 
 /** @type {string} */
-Artifacts.prototype.htmlWithoutJavaScript;
+Artifacts.prototype.HTMLWithoutJavaScript;
 
 /** @type {boolean} */
-Artifacts.prototype.https;
+Artifacts.prototype.HTTPS;
 
 /** @type {!Array<!Object>} */
 Artifacts.prototype.networkRecords;
@@ -42,37 +42,34 @@ Artifacts.prototype.networkRecords;
 Artifacts.prototype.traceContents;
 
 /** @type {!ManifestNode<(!Manifest|undefined)>} */
-Artifacts.prototype.manifest;
+Artifacts.prototype.Manifest;
 
 /** @type {!ServiceWorkerArtifact} */
-Artifacts.prototype.serviceWorker;
+Artifacts.prototype.ServiceWorker;
 
 /** @type {?string} */
-Artifacts.prototype.themeColorMeta;
+Artifacts.prototype.ThemeColor;
 
 /** @type {string} */
-Artifacts.prototype.url;
+Artifacts.prototype.URL;
 
 /** @type {?string} */
-Artifacts.prototype.viewport;
+Artifacts.prototype.Viewport;
 
 /** @type {number} */
-Artifacts.prototype.responseCode;
-
-/** @type {number} */
-Artifacts.prototype.offlineResponseCode;
+Artifacts.prototype.Offline;
 
 /** @type {{value: boolean, debugString: (string|undefined)}} */
-Artifacts.prototype.redirectsHTTP;
+Artifacts.prototype.HTTPRedirect;
 
 /** @type {!Accessibility} */
-Artifacts.prototype.accessibility;
+Artifacts.prototype.Accessibility;
 
 /** @type {!Array<!Object>} */
-Artifacts.prototype.screenshots;
+Artifacts.prototype.ScreenshotFilmstrip;
 
 /** @type {!Object<!Object>} */
-Artifacts.prototype.criticalRequestChains;
+Artifacts.prototype.CriticalRequestChains;
 
-/** @type {!SpeedlineArtifact} */
-Artifacts.prototype.speedline;
+/** @type {{first: number, complete: number, duration: number, frames: !Array<!Object>, debugString: (string|undefined)}} */
+Artifacts.prototype.Speedline;

@@ -20,61 +20,6 @@
 class Aggregate {
 
   /**
-   * The types of aggregation supported by Lighthouse. These are used by the HTML Report
-   * to broadly classify the outputs. Most of the audits will be included in aggregations
-   * that are of TYPES.PWA, but any non-PWA best practices should be in aggregators of
-   * TYPES.BEST_PRACTICE.
-   */
-  static get TYPES() {
-    return {
-      PWA: {
-        name: 'Progressive Web App',
-        contributesToScore: true
-      },
-      BEST_PRACTICE: {
-        name: 'Best Practices',
-        contributesToScore: false
-      },
-      PERFORMANCE_METRICS: {
-        name: 'Performance Metrics',
-        contributesToScore: false
-      }
-    };
-  }
-
-  /**
-   * @throws {Error}
-   * @return {string} The name for this aggregation.
-   */
-  static get name() {
-    throw new Error('Aggregate name must be overridden');
-  }
-
-  /**
-   * @throws {Error}
-   * @return {string} The short name for this aggregation.
-   */
-  static get description() {
-    throw new Error('Aggregate description must be overridden');
-  }
-
-  /**
-   * @throws {Error}
-   * @return {Object} The type of aggregation.
-   */
-  static get type() {
-    throw new Error('Aggregate type must be overridden');
-  }
-
-  /**
-   * @throws {Error}
-   * @return {!AggregationCriteria} The criteria for this aggregation.
-   */
-  static get criteria() {
-    throw new Error('Aggregate criteria must be overridden');
-  }
-
-  /**
    * @private
    * @param {!Array<!AuditResult>} results
    * @param {!AggregationCriteria} expected
@@ -184,75 +129,80 @@ class Aggregate {
   /**
    * Compares the set of audit results to the expected values.
    * @param {!Array<!AuditResult>} results The audit results.
-   * @param {!AggregationCriteria} expected The aggregation's expected values and weighting.
-   * @param {!AggregationType} aggregationType The type of aggregator we have (e.g. PWA, Best Practices, etc.)
-   * @return {!AggregationItem} The aggregation score.
+   * @param {!Array<!AggregationItem>} items The aggregation's expected values and weighting.
+   * @param {!boolean} aggregationIsScored Whether or not the aggregation is scored.
+   * @return {!Array<!AggregationResultItem>} The aggregation score.
    */
-  static compare(results, expected, aggregationType) {
-    const expectedNames = Object.keys(expected);
+  static compare(results, items, aggregationIsScored) {
+    return items.map(item => {
+      const expectedNames = Object.keys(item.criteria);
 
-    // Filter down and remap the results to something more comparable to
-    // the expected set of results.
-    const filteredAndRemappedResults =
-        Aggregate._remapResultsByName(
-          Aggregate._filterResultsByAuditNames(results, expected)
-        );
-    const maxScore = Aggregate._getTotalWeight(expected);
-    const subItems = [];
-    let overallScore = 0;
+      // Filter down and remap the results to something more comparable to
+      // the expected set of results.
+      const filteredAndRemappedResults =
+          Aggregate._remapResultsByName(
+            Aggregate._filterResultsByAuditNames(results, item.criteria)
+          );
+      const maxScore = Aggregate._getTotalWeight(item.criteria);
+      const subItems = [];
+      let overallScore = 0;
 
-    // Step through each item in the expected results, and add them
-    // to the overall score and add each to the subItems list.
-    expectedNames.forEach(e => {
-      /* istanbul ignore if */
-      // TODO(paullewis): Remove once coming soon audits have landed.
-      if (expected[e].comingSoon) {
-        subItems.push({
-          value: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
-          name: 'coming-soon',
-          category: expected[e].category,
-          description: expected[e].description,
-          comingSoon: true
-        });
+      // Step through each item in the expected results, and add them
+      // to the overall score and add each to the subItems list.
+      expectedNames.forEach(e => {
+        /* istanbul ignore if */
+        // TODO(paullewis): Remove once coming soon audits have landed.
+        if (item.criteria[e].comingSoon) {
+          subItems.push({
+            value: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
+            name: 'coming-soon',
+            category: item.criteria[e].category,
+            description: item.criteria[e].description,
+            comingSoon: true
+          });
 
-        return;
-      }
+          return;
+        }
 
-      if (!filteredAndRemappedResults[e]) {
-        return;
-      }
+        if (!filteredAndRemappedResults[e]) {
+          return;
+        }
 
-      subItems.push(filteredAndRemappedResults[e]);
+        subItems.push(filteredAndRemappedResults[e]);
 
-      // Only add to the score if this aggregation contributes to the
-      // overall score.
-      if (!aggregationType.contributesToScore) {
-        return;
-      }
+        // Only add to the score if this aggregation contributes to the
+        // overall score.
+        if (!aggregationIsScored) {
+          return;
+        }
 
-      overallScore += Aggregate._convertToWeight(
-          filteredAndRemappedResults[e],
-          expected[e]);
+        overallScore += Aggregate._convertToWeight(
+            filteredAndRemappedResults[e],
+            item.criteria[e]);
+      });
+
+      return {
+        overall: (overallScore / maxScore),
+        name: item.name,
+        description: item.description,
+        subItems: subItems
+      };
     });
-
-    return {
-      overall: (overallScore / maxScore),
-      subItems: subItems
-    };
   }
 
   /**
    * Aggregates all the results.
+   * @param {!Aggregation} aggregation
    * @param {!Array<!AuditResult>} results
-   * @return {!Aggregation}
+   * @return {!AggregationResult}
    */
-  static aggregate(results) {
+  static aggregate(aggregation, results) {
     return {
-      name: this.name,
-      shortName: this.shortName,
-      description: this.description,
-      type: this.type,
-      score: Aggregate.compare(results, this.criteria, this.type)
+      name: aggregation.name,
+      description: aggregation.description,
+      scored: aggregation.scored,
+      categorizable: aggregation.categorizable,
+      score: Aggregate.compare(results, aggregation.items, aggregation.scored)
     };
   }
 }

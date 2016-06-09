@@ -19,18 +19,24 @@
 const Gather = require('./gather');
 
 class HTTPRedirect extends Gather {
-  get name() {
-    return 'redirectsHTTP';
-  }
 
   constructor() {
     super();
     this._noSecurityChangesTimeout = undefined;
+    this._preRedirectURL = undefined;
   }
 
-  afterSecondReloadPageLoad(options) {
+  beforePass(options) {
+    this._preRedirectURL = options.url;
+    options.url = this._preRedirectURL.replace(/^https/, 'http');
+  }
+
+  afterPass(options) {
     const driver = options.driver;
     const timeout = options.timeout || 10000;
+
+    // Reset the options.
+    options.url = this._preRedirectURL;
 
     return new Promise((resolve, reject) => {
       // Set up a timeout for ten seconds in case we don't get any

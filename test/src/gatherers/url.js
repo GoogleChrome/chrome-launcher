@@ -29,7 +29,7 @@ describe('URL gatherer', () => {
 
   it('returns the correct URL from options', () => {
     const url = 'https://example.com';
-    urlGather.setup({
+    urlGather.beforePass({
       url
     });
 
@@ -38,7 +38,7 @@ describe('URL gatherer', () => {
 
   it('returns the correct URL from options.driver', () => {
     const url = 'https://example.com';
-    urlGather.setup({
+    urlGather.beforePass({
       driver: {
         url
       }
@@ -50,7 +50,7 @@ describe('URL gatherer', () => {
   it('chooses the URL from options over options.driver', () => {
     const url = 'https://example.com';
     const driverUrl = 'https://example2.com';
-    urlGather.setup({
+    urlGather.beforePass({
       url,
       driver: {
         url: driverUrl

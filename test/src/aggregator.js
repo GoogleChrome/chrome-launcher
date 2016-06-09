@@ -19,22 +19,30 @@ const assert = require('assert');
 /* global describe, it*/
 
 describe('Aggregator', () => {
-  it('maps all aggregations to an array of Promises', () => {
-    const fakeAggregators = [{
-      aggregate(results) {
-        return results.map(r => (r + 1));
-      }
-    }, {
-      aggregate(results) {
-        return results.map(r => (r - 1));
-      }
+  it('aggregates', () => {
+    const fakeAggregations = [{
+      name: 'name',
+      description: 'description',
+      scored: true,
+      items: [{
+        name: 'item name',
+        description: 'item description',
+        criteria: {
+          'first-meaningful-paint': {
+            value: 100,
+            weight: 1
+          }
+        }
+      }]
     }];
     return Aggregator
-      .aggregate(fakeAggregators, [1, 2, 3])
+      .aggregate(fakeAggregations, [{
+        name: 'first-meaningful-paint',
+        value: 90
+      }])
       .then(modifiedResults => {
-        assert.ok(Array.isArray(modifiedResults));
-        assert.deepEqual(modifiedResults[0], [2, 3, 4]);
-        assert.deepEqual(modifiedResults[1], [0, 1, 2]);
+        assert.equal(modifiedResults[0].name, fakeAggregations[0].name);
+        assert.equal(modifiedResults[0].score[0].overall, 0.9);
       });
   });
 });

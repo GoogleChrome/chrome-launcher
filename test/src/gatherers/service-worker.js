@@ -34,7 +34,7 @@ describe('Service Worker gatherer', () => {
       scriptURL: url
     }];
 
-    return serviceWorkerGatherer.afterReloadPageLoad({
+    return serviceWorkerGatherer.beforePass({
       driver: {
         getServiceWorkerVersions() {
           return Promise.resolve({versions});
@@ -57,7 +57,7 @@ describe('Service Worker gatherer', () => {
       scriptURL: 'https://other-example.com'
     }];
 
-    return serviceWorkerGatherer.afterReloadPageLoad({
+    return serviceWorkerGatherer.beforePass({
       driver: {
         getServiceWorkerVersions() {
           return Promise.resolve({versions});
@@ -71,7 +71,7 @@ describe('Service Worker gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return serviceWorkerGatherer.afterReloadPageLoad({
+    return serviceWorkerGatherer.beforePass({
       driver: {
         getServiceWorkerVersions() {
           return Promise.reject('fail');

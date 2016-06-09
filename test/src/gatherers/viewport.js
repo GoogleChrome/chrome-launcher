@@ -28,7 +28,7 @@ describe('Viewport gatherer', () => {
   });
 
   it('returns an artifact', () => {
-    return viewportGather.postProfiling({
+    return viewportGather.afterPass({
       driver: {
         querySelector() {
           return Promise.resolve({
@@ -43,7 +43,7 @@ describe('Viewport gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return viewportGather.postProfiling({
+    return viewportGather.afterPass({
       driver: {
         querySelector() {
           return Promise.reject('such a fail');

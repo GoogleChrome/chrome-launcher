@@ -31,11 +31,15 @@ function getBodyText() {
 }
 
 class HTMLWithoutJavaScript extends HTML {
-  get name() {
-    return 'htmlWithoutJavaScript';
+
+  beforePass(options) {
+    options.disableJavaScript = true;
   }
 
-  afterSecondReloadPageLoad(options) {
+  afterPass(options) {
+    // Reset the JS disable.
+    options.disableJavaScript = false;
+
     const driver = options.driver;
 
     this.artifact = {};

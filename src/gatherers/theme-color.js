@@ -19,11 +19,8 @@
 const Gather = require('./gather');
 
 class ThemeColor extends Gather {
-  get name() {
-    return 'themeColorMeta';
-  }
 
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="theme-color"]')

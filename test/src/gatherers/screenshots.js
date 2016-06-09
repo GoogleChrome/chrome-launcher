@@ -23,11 +23,11 @@ let screenshotsGather = new ScreenshotsGather();
 
 describe('Screenshot gatherer', () => {
   it('returns an artifact for a real trace', () => {
-    const traceData = require('../audits/performance/progressive-app.json');
+    const traceData = require('../../fixtures/traces/progressive-app.json');
     // Currently this test must rely on knowing the phase hook for the gatherer.
     // A little unfortunate, but we need a "run scheduler with this gatherer, this mocked driver,
     // and this trace" test class to do that right
-    return screenshotsGather.postProfiling(undefined, {traceContents: traceData}).then(_ => {
+    return screenshotsGather.afterPass(undefined, {traceContents: traceData}).then(_ => {
       assert.ok(Array.isArray(screenshotsGather.artifact));
       assert.equal(screenshotsGather.artifact.length, 7);
 

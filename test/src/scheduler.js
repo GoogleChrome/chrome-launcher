@@ -19,58 +19,38 @@
 /* eslint-env mocha */
 
 const Gather = require('../../src/gatherers/gather');
-const scheduler = require('../../src/scheduler');
 const assetSaver = require('../../src/lib/asset-saver');
+const scheduler = require('../../src/scheduler');
 const assert = require('assert');
 
-class TestGathererOne extends Gather {
-  get name() {
-    return 'TestGathererOne';
-  }
-}
-
-class TestGathererTwo extends Gather {
+class TestGatherer extends Gather {
   constructor() {
     super();
-    this.reloadSetupCalled = false;
-  }
-  get name() {
-    return 'TestGathererTwo';
-  }
-
-  reloadSetup() {
-    this.reloadSetupCalled = true;
-  }
-}
-
-class TestGathererThree extends Gather {
-  constructor() {
-    super();
-    this.afterSecondReloadPageLoadCalled = false;
+    this.called = false;
   }
 
   get name() {
-    return 'TestGathererThree';
+    return 'test';
   }
 
-  afterSecondReloadPageLoad() {
-    this.afterSecondReloadPageLoadCalled = true;
+  setup() {
+    this.called = true;
   }
 }
 
 class TestScreenshotGatherer extends Gather {
   constructor() {
     super();
-    this.postProfilingCalled = false;
+    this.afterPassCalled = false;
   }
 
   get name() {
     return 'screenshots';
   }
 
-  postProfiling() {
-    this.postProfilingCalled = true;
-    const screenshots = require('./audits/performance/screenshots.json');
+  afterPass() {
+    this.afterPassCalled = true;
+    const screenshots = require('../fixtures/traces/screenshots.json');
     this.artifact = screenshots;
   }
 }
@@ -90,7 +70,9 @@ const fakeDriver = {
     return Promise.resolve();
   },
   endTrace() {
-    return require('./audits/performance/progressive-app.json');
+    return Promise.resolve(
+      require('../fixtures/traces/progressive-app.json')
+    );
   },
   beginNetworkCollect() {},
   endNetworkCollect() {
@@ -99,18 +81,7 @@ const fakeDriver = {
 };
 
 describe('Scheduler', function() {
-  it('does not load a page by default', () => {
-    const driver = {
-      gotoURL() {
-        // If the driver is called, this test fails.
-        assert.ok(false);
-      }
-    };
-
-    return scheduler.loadPage(driver, {}, {flags: {}}).then(_ => assert.ok(true));
-  });
-
-  it('loads a page when told to do so', () => {
+  it('loads a page', () => {
     const driver = {
       gotoURL() {
         return Promise.resolve(true);
@@ -138,13 +109,10 @@ describe('Scheduler', function() {
       }
     };
 
-    return scheduler.reloadPage(driver, {url: 'https://example.com'}, {
-      flags: {
-        loadPage: true
-      }
-    }).then(res => {
-      assert.equal(res, true);
-    });
+    return scheduler.loadPage(driver, {url: 'https://example.com'})
+        .then(res => {
+          assert.equal(res, true);
+        });
   });
 
   it('sets up the driver to begin emulation when mobile == true', () => {
@@ -183,76 +151,89 @@ describe('Scheduler', function() {
     });
   });
 
-  it('tells the driver to begin passive collection', () => {
+  it('tells the driver to begin tracing', () => {
     let calledTrace = false;
-    let calledNetworkCollect = false;
     const driver = {
       beginTrace() {
         calledTrace = true;
         return Promise.resolve();
-      },
+      }
+    };
+
+    const config = {
+      trace: true,
+      gatherers: [{
+        setup() {}
+      }]
+    };
+
+    return scheduler.setup({driver, config}).then(_ => {
+      assert.equal(calledTrace, true);
+    });
+  });
+
+  it('tells the driver to end tracing', () => {
+    let calledTrace = false;
+    const driver = {
+      endTrace() {
+        calledTrace = true;
+        return Promise.resolve({x: 1});
+      }
+    };
+
+    const config = {
+      trace: true,
+      gatherers: [{
+        afterPass() {}
+      }]
+    };
+
+    return scheduler.afterPass({driver, config}).then(vals => {
+      assert.equal(calledTrace, true);
+      assert.deepEqual(vals.traceContents, {x: 1});
+    });
+  });
+
+  it('tells the driver to begin network collection', () => {
+    let calledNetworkCollect = false;
+    const driver = {
       beginNetworkCollect() {
         calledNetworkCollect = true;
         return Promise.resolve();
       }
     };
 
-    return scheduler.beginPassiveCollection(driver).then(_ => {
-      assert.equal(calledTrace, true);
+    const config = {
+      network: true,
+      gatherers: [{
+        setup() {}
+      }]
+    };
+
+    return scheduler.setup({driver, config}).then(_ => {
       assert.equal(calledNetworkCollect, true);
     });
   });
 
-  it('tells the driver to end passive collection', () => {
-    let calledTrace = false;
+  it('tells the driver to end network collection', () => {
     let calledNetworkCollect = false;
     const driver = {
-      endTrace() {
-        calledTrace = true;
-        return Promise.resolve({
-          x: 1
-        });
-      },
       endNetworkCollect() {
         calledNetworkCollect = true;
-        return Promise.resolve({
-          y: 2
-        });
+        return Promise.resolve({x: 1});
       }
     };
 
-    const vals = {};
-    return scheduler.endPassiveCollection({driver}, vals).then(_ => {
-      assert.equal(calledTrace, true);
+    const config = {
+      network: true,
+      gatherers: [{
+        afterPass() {}
+      }]
+    };
+
+    return scheduler.afterPass({driver, config}).then(vals => {
       assert.equal(calledNetworkCollect, true);
-      assert.deepEqual(vals.traceContents, {x: 1});
-      assert.deepEqual(vals.networkRecords, {y: 2});
-    });
-  });
-
-  it('creates a chain for phase', () => {
-    const gatherers = [{
-      changeValue(x) {
-        x.value += 1;
-      }
-    }, {
-      changeValue(x) {
-        x.value += 2;
-      }
-    }, {
-      changeValue(x) {
-        x.value *= 2;
-      }
-    }];
-
-    let target = {
-      value: 0
-    };
-    const phase = scheduler.phaseRunner(gatherers);
-    return phase(g => {
-      return g.changeValue(target);
-    }).then(_ => {
-      assert.equal(target.value, 6);
+      assert.deepEqual(vals.networkRecords, {x: 1});
     });
   });
 
@@ -264,96 +245,50 @@ describe('Scheduler', function() {
     return scheduler.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
   });
 
-  it('does the first pass when future passes are not required', () => {
-    // If, in this phase reloadSetup is called then it's called second phase code,
-    // which would be incorrect here.
-    const origReloadSetup = Gather.prototype.reloadSetup;
-    const origAfterSecondReloadPageLoad = Gather.prototype.afterSecondReloadPageLoad;
+  it('does as many passes as are required', () => {
+    const t1 = new TestGatherer();
+    const t2 = new TestGatherer();
 
-    // If either of these are called then the test should fail.
-    Gather.prototype.reloadSetup = Gather.prototype.afterSecondReloadPageLoad = () => {
-      assert.ok(false);
-    };
+    const passes = [{
+      network: true,
+      trace: true,
+      loadDataName: 'first-pass',
+      loadPage: true,
+      gatherers: [
+        t1
+      ]
+    }, {
+      loadPage: true,
+      gatherers: [
+        t2
+      ]
+    }];
 
-    const gatherers = [new TestGathererOne()];
-
-    return scheduler.run(gatherers, {driver: fakeDriver, url: 'https://example.com', flags: {}})
+    return scheduler.run(passes, {driver: fakeDriver, url: 'https://example.com', flags: {}})
         .then(_ => {
-          assert.ok(true);
-
-          // Reset the proto methods.
-          Gather.prototype.reloadSetup = origReloadSetup;
-          Gather.prototype.afterSecondReloadPageLoad = origAfterSecondReloadPageLoad;
-        });
-  });
-
-  it('does a second pass when required', () => {
-    // Fail the test if afterSecondReloadPageLoad is called, but look for reloadPage to be called
-    // and, if it is, consider this test good.
-    const origAfterSecondReloadPageLoad = Gather.prototype.afterSecondReloadPageLoad;
-    Gather.prototype.afterSecondReloadPageLoad = () => {
-      assert.ok(false);
-    };
-    const tgTwo = new TestGathererTwo();
-    const gatherers = [tgTwo];
-
-    return scheduler.run(gatherers, {driver: fakeDriver, url: 'https://example.com', flags: {}})
-        .then(_ => {
-          assert.equal(tgTwo.reloadSetupCalled, true);
-
-          // Reset the proto method.
-          Gather.prototype.afterSecondReloadPageLoad = origAfterSecondReloadPageLoad;
-        });
-  });
-
-  it('does a third pass when required', () => {
-    const origReloadSetup = Gather.prototype.reloadSetup;
-    const tgThree = new TestGathererThree();
-    const gatherers = [tgThree];
-
-    // If reloadSetup is called for this gatherer then fail the test.
-    Gather.prototype.reloadSetup = () => {
-      assert.ok(false);
-    };
-
-    return scheduler.run(gatherers, {driver: fakeDriver, url: 'https://example.com', flags: {}})
-        .then(_ => {
-          assert.equal(tgThree.afterSecondReloadPageLoadCalled, true);
-
-          // Reset.
-          Gather.prototype.reloadSetup = origReloadSetup;
-        });
-  });
-
-  it('does all three passes when required', () => {
-    const tgOne = new TestGathererOne();
-    const tgTwo = new TestGathererTwo();
-    const tgThree = new TestGathererThree();
-    const gatherers = [tgOne, tgTwo, tgThree];
-
-    return scheduler.run(gatherers, {driver: fakeDriver, url: 'https://example.com', flags: {}})
-        .then(_ => {
-          assert.equal(tgTwo.reloadSetupCalled, true);
-          assert.equal(tgThree.afterSecondReloadPageLoadCalled, true);
+          assert.ok(t1.called);
+          assert.ok(t2.called);
         });
   });
 
   describe('saves assets when --save-assets is set', function() {
-    let prepareAssetsCalled = false;
     let saveAssetsCalled = false;
-    const _prepareAssets = assetSaver.prepareAssets;
-    assetSaver.prepareAssets = function() {
-      prepareAssetsCalled = true;
-      return _prepareAssets.apply(this, arguments);
-    };
     const _saveAssets = assetSaver.saveAssets;
     assetSaver.saveAssets = function() {
       saveAssetsCalled = true;
       return _saveAssets.apply(this, arguments);
     };
-
     const screenshotGatherer = new TestScreenshotGatherer();
-    const gatherers = [screenshotGatherer];
+    const passes = [{
+      network: true,
+      trace: true,
+      loadDataName: 'first-pass',
+      loadPage: true,
+      gatherers: [
+        screenshotGatherer
+      ]
+    }];
+
     const options = {
       driver: fakeDriver,
       url: 'https://testexample.com',
@@ -364,13 +299,12 @@ describe('Scheduler', function() {
     };
 
     it('collects artifacts and goes through the scheduler', () => {
-      return scheduler.run(gatherers, options).then(_ => {
-        assert.equal(screenshotGatherer.postProfilingCalled, true);
+      return scheduler.run(passes, options).then(_ => {
+        assert.equal(screenshotGatherer.afterPassCalled, true);
       });
     });
 
     it('asset saving functions are called from scheduler', () => {
-      assert.ok(prepareAssetsCalled);
       assert.ok(saveAssetsCalled);
     });
   });

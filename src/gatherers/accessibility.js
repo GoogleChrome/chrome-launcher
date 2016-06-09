@@ -34,10 +34,6 @@ function runA11yChecks() {
 }
 
 class Accessibility extends Gather {
-  get name() {
-    return 'accessibility';
-  }
-
   static _errorAccessibility(errorString) {
     return {
       raw: undefined,
@@ -46,7 +42,7 @@ class Accessibility extends Gather {
     };
   }
 
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
 
     return driver

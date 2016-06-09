@@ -17,20 +17,8 @@
 'use strict';
 
 const assetSaver = require('./lib/asset-saver.js');
-const Gather = require('./gatherers/gather.js');
 
-function loadPage(driver, gatherers, options) {
-  const loadPage = options.flags.loadPage;
-  const url = options.url;
-
-  if (loadPage) {
-    return driver.gotoURL(url, {waitForLoad: true});
-  }
-
-  return Promise.resolve();
-}
-
-function reloadPage(driver, options) {
+function loadPage(driver, options) {
   // Since a Page.reload command does not let a service worker take over, we
   // navigate away and then come back to reload. We do not `waitForLoad` on
   // about:blank since a page load event is never fired on it.
@@ -59,83 +47,86 @@ function setupDriver(driver, gatherers, options) {
   });
 }
 
-// Enable tracing and network record collection.
-function beginPassiveCollection(driver) {
-  return driver.beginTrace()
-    .then(_ => driver.beginNetworkCollect());
-}
-
-function endPassiveCollection(options, tracingData) {
+function setup(options) {
   const driver = options.driver;
-  return driver.endNetworkCollect().then(networkRecords => {
-    tracingData.networkRecords = networkRecords;
-  }).then(_ => {
-    return driver.endTrace();
-  }).then(traceContents => {
-    tracingData.traceContents = traceContents;
-  });
-}
+  const config = options.config;
+  const gatherers = config.gatherers;
+  let pass = Promise.resolve();
 
-function phaseRunner(gatherers) {
-  return function runPhase(gatherFun) {
-    return gatherers.reduce((chain, gatherer) => {
-      return chain.then(_ => gatherFun(gatherer));
-    }, Promise.resolve());
-  };
-}
-
-function shouldRunPass(gatherers, phases) {
-  return phases.reduce((shouldRun, phase) => {
-    return shouldRun || gatherers.some(gatherer => gatherer[phase] !== Gather.prototype[phase]);
-  }, false);
-}
-
-function firstPass(driver, gatherers, options, tracingData) {
-  const runPhase = phaseRunner(gatherers);
-
-  return runPhase(gatherer => gatherer.setup(options))
-    .then(_ => beginPassiveCollection(driver))
-    .then(_ => runPhase(gatherer => gatherer.beforePageLoad(options)))
-
-    // Load page, gather from browser, stop profilers.
-    .then(_ => loadPage(driver, gatherers, options))
-    .then(_ => runPhase(gatherer => gatherer.profiledPostPageLoad(options)))
-    .then(_ => endPassiveCollection(options, tracingData))
-    .then(_ => runPhase(gatherer => gatherer.postProfiling(options, tracingData)));
-}
-
-function secondPass(driver, gatherers, options) {
-  const phases = ['reloadSetup', 'beforeReloadPageLoad', 'afterReloadPageLoad'];
-  if (!shouldRunPass(gatherers, phases)) {
-    return Promise.resolve();
+  if (config.trace) {
+    pass = pass.then(_ => driver.beginTrace());
   }
 
-  const runPhase = phaseRunner(gatherers);
-
-  // Reload page for SW, etc.
-  return runPhase(gatherer => gatherer.reloadSetup(options))
-    .then(_ => runPhase(gatherer => gatherer.beforeReloadPageLoad(options)))
-    .then(_ => reloadPage(driver, options))
-    .then(_ => runPhase(gatherer => gatherer.afterReloadPageLoad(options)));
-}
-
-// Another pass to check for HTTPS redirect, and with JS disabled
-function thirdPass(driver, gatherers, options) {
-  if (!shouldRunPass(gatherers, ['afterSecondReloadPageLoad'])) {
-    return Promise.resolve();
+  if (config.network) {
+    pass = pass.then(_ => driver.beginNetworkCollect());
   }
 
-  const runPhase = phaseRunner(gatherers);
-
-  const redirectedOptions = Object.assign({}, options, {
-    url: options.url.replace(/^https/, 'http'),
-    disableJavaScript: true
-  });
-  return reloadPage(driver, redirectedOptions)
-    .then(_ => runPhase(gatherer => gatherer.afterSecondReloadPageLoad(options)));
+  return gatherers.reduce((chain, gatherer) => {
+    return chain.then(_ => gatherer.setup(options));
+  }, pass);
 }
 
-function run(gatherers, options) {
+function beforePass(options) {
+  const config = options.config;
+  const gatherers = config.gatherers;
+
+  return gatherers.reduce((chain, gatherer) => {
+    return chain.then(_ => {
+      return gatherer.beforePass(options);
+    });
+  }, Promise.resolve());
+}
+
+function pass(options) {
+  const driver = options.driver;
+  const config = options.config;
+  const gatherers = config.gatherers;
+  let pass = Promise.resolve();
+
+  if (config.loadPage) {
+    pass = pass.then(_ => loadPage(driver, options));
+  }
+
+  return gatherers.reduce((chain, gatherer) => {
+    return chain.then(_ => gatherer.pass(options));
+  }, pass);
+}
+
+function afterPass(options) {
+  const driver = options.driver;
+  const config = options.config;
+  const gatherers = config.gatherers;
+  const loadData = {};
+  let pass = Promise.resolve();
+
+  if (config.trace) {
+    pass = pass.then(_ => driver.endTrace().then(traceContents => {
+      loadData.traceContents = traceContents;
+    }));
+  }
+
+  if (config.network) {
+    pass = pass.then(_ => driver.endNetworkCollect().then(networkRecords => {
+      loadData.networkRecords = networkRecords;
+    }));
+  }
+
+  return gatherers
+      .reduce((chain, gatherer) => {
+        return chain.then(_ => gatherer.afterPass(options, loadData));
+      }, pass)
+      .then(_ => loadData);
+}
+
+function tearDown(options) {
+  const config = options.config;
+  const gatherers = config.gatherers;
+  return gatherers.reduce((chain, gatherer) => {
+    return chain.then(_ => gatherer.tearDown(options));
+  }, Promise.resolve());
+}
+
+function run(passes, options) {
   const driver = options.driver;
   const tracingData = {};
 
@@ -143,38 +134,45 @@ function run(gatherers, options) {
     return Promise.reject(new Error('You must provide a url to scheduler'));
   }
 
-  const runPhase = phaseRunner(gatherers);
-
   return driver.connect()
-    .then(_ => setupDriver(driver, gatherers, options))
+    .then(_ => setupDriver(driver, 1, options))
 
-    .then(_ => firstPass(driver, gatherers, options, tracingData))
-    .then(_ => secondPass(driver, gatherers, options))
-    .then(_ => thirdPass(driver, gatherers, options))
+    // Run each pass
+    .then(_ => {
+      return passes.reduce((chain, config) => {
+        const runOptions = Object.assign({}, options, {config});
+        return chain
+            .then(_ => setup(runOptions))
+            .then(_ => beforePass(runOptions))
+            .then(_ => pass(runOptions))
+            .then(_ => afterPass(runOptions))
+            .then(loadData => {
+              Object.assign(tracingData, loadData);
+            })
+            .then(_ => tearDown(runOptions));
+      }, Promise.resolve());
+    })
 
     // Reload the page to remove any side-effects of Lighthouse (like disabling JavaScript).
-    .then(_ => reloadPage(driver, options))
+    .then(_ => loadPage(driver, options))
 
      // Finish and teardown.
     .then(_ => driver.disconnect())
-    .then(_ => runPhase(gatherer => gatherer.tearDown(options)))
     .then(_ => {
       // Collate all the gatherer results.
-      const artifacts = gatherers.reduce((artifacts, gatherer) => {
-        artifacts[gatherer.name] = gatherer.artifact;
-        return artifacts;
-      }, {
-        networkRecords: tracingData.networkRecords,
-        traceContents: tracingData.traceContents
+      const artifacts = Object.assign({}, tracingData);
+      passes.forEach(pass => {
+        pass.gatherers.forEach(gatherer => {
+          artifacts[gatherer.name] = gatherer.artifact;
+        });
       });
 
       // Ignoring these two flags since this functionality is not exposed by the module.
-      /* istanbul ignore if */
+      /* istanbul ignore next */
       if (options.flags.saveArtifacts) {
         assetSaver.saveArtifacts(artifacts);
       }
 
-      /* istanbul ignore if */
       if (options.flags.saveAssets) {
         assetSaver.saveAssets(options, artifacts);
       }
@@ -184,11 +182,9 @@ function run(gatherers, options) {
 }
 
 module.exports = {
+  run,
   loadPage,
-  reloadPage,
   setupDriver,
-  beginPassiveCollection,
-  endPassiveCollection,
-  phaseRunner,
-  run
+  setup,
+  afterPass
 };

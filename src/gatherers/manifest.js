@@ -54,9 +54,6 @@ function getManifestContent() {
 }
 
 class Manifest extends Gather {
-  get name() {
-    return 'manifest';
-  }
 
   static _errorManifest(errorString) {
     return {
@@ -66,7 +63,7 @@ class Manifest extends Gather {
     };
   }
 
-  postProfiling(options) {
+  afterPass(options) {
     const driver = options.driver;
     /**
      * This re-fetches the manifest separately, which could

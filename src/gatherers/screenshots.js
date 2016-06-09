@@ -21,9 +21,6 @@ const Gather = require('./gather');
 const DevtoolsTimelineModel = require('../lib/traces/devtools-timeline-model');
 
 class ScreenshotFilmstrip extends Gather {
-  get name() {
-    return 'screenshots';
-  }
 
   fetchScreenshot(frame) {
     return frame
@@ -48,7 +45,7 @@ class ScreenshotFilmstrip extends Gather {
     });
   }
 
-  postProfiling(options, tracingData) {
+  afterPass(options, tracingData) {
     return this.getScreenshots(tracingData.traceContents).then(screenshots => {
       this.artifact = screenshots;
     });

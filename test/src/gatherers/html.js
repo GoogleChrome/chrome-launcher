@@ -28,7 +28,7 @@ describe('HTML gatherer', () => {
   });
 
   it('returns an artifact', () => {
-    return htmlGather.postProfiling({
+    return htmlGather.afterPass({
       driver: {
         sendCommand(cmd) {
           switch (cmd) {
@@ -63,7 +63,7 @@ describe('HTML gatherer', () => {
   });
 
   it('handles driver failure', () => {
-    return htmlGather.postProfiling({
+    return htmlGather.afterPass({
       driver: {
         sendCommand() {
           return Promise.reject('such a fail');
