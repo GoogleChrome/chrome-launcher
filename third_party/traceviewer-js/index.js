@@ -5,6 +5,7 @@ found in the LICENSE file.
 **/
 
 require("./importer/import.js");
+tr.isHeadless = true;
 require("./model/model.js");
 require("./extras/full_config.js");
 require("./metrics/value_list.js");

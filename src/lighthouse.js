@@ -44,7 +44,7 @@ function filterAndExpandAudits(audits, whitelist) {
     try {
       return require(`./audits/${audit}`);
     } catch (requireError) {
-      throw new Error(`Unable to locate audit: ${audit}`);
+      throw new Error(`Unable to load audit: ${audit}`);
     }
   });
 }
@@ -69,7 +69,7 @@ function expandPasses(audits, passes) {
             const gathererNecessary = requiredGatherers.has(GathererClass.name);
             return gathererNecessary;
           } catch (requireError) {
-            throw new Error(`Unable to locate gatherer: ${gatherer}`);
+            throw new Error(`Unable to load gatherer: ${gatherer}`);
           }
         })
 

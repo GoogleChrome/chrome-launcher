@@ -1,6 +1,8 @@
 // generated on 2016-03-19 using generator-chrome-extension 0.5.4
 
 'use strict';
+const fs = require('fs');
+const path = require('path');
 const del = require('del');
 const gutil = require('gulp-util');
 const runSequence = require('run-sequence');
@@ -13,6 +15,14 @@ const livereload = require('gulp-livereload');
 const tap = require('gulp-tap');
 const zip = require('gulp-zip');
 const rename = require('gulp-rename');
+
+const audits = fs.readdirSync(path.join(__dirname, '../', 'src/audits/'))
+    .filter(f => /\.js$/.test(f))
+    .map(f => `../src/audits/${f.replace(/\.js$/, '')}`);
+
+const gatherers = fs.readdirSync(path.join(__dirname, '../', 'src/gatherers/'))
+    .filter(f => /\.js$/.test(f))
+    .map(f => `../src/gatherers/${f.replace(/\.js$/, '')}`);
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -87,8 +97,8 @@ gulp.task('browserify', () => {
     'app/src/report-loader.js'
   ], {read: false})
     .pipe(tap(file => {
-      file.contents = browserify(file.path, {
-        transform: ['brfs']
+      let bundle = browserify(file.path, {
+        transform: ['brfs'],
       })
       // Do the additional transform to convert references to devtools-timeline-model
       // to the modified version internal to Lighthouse.
@@ -96,8 +106,20 @@ gulp.task('browserify', () => {
         global: true
       })
       .ignore('npmlog')
-      .ignore('chrome-remote-interface')
-      .bundle();
+      .ignore('chrome-remote-interface');
+
+      const srcPath = /\.\.\/src\//;
+
+      // Expose the audits and gatherers so they can be dynamically loaded.
+      audits.forEach(audit => {
+        bundle = bundle.require(audit, {expose: audit.replace(srcPath, './')});
+      });
+
+      gatherers.forEach(gatherer => {
+        bundle = bundle.require(gatherer, {expose: gatherer.replace(srcPath, './')});
+      });
+
+      file.contents = bundle.bundle();
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
