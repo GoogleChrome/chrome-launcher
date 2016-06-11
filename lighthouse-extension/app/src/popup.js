@@ -54,7 +54,12 @@ document.addEventListener('DOMContentLoaded', _ => {
       background.createPageAndPopulate(results);
     })
     .catch(err => {
-      feedbackEl.textContent = err.message;
+      let {message} = err;
+      if (err.message.toLowerCase().startsWith('another debugger')) {
+        message = 'You probably have DevTools open.' +
+          ' Close DevTools to use lighthouse';
+      }
+      feedbackEl.textContent = message;
       stopSpinner();
     });
   });
