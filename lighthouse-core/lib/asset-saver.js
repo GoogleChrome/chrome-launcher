@@ -82,7 +82,7 @@ function saveArtifacts(artifacts, filename) {
 
 function prepareAssets(options, artifacts) {
   const traceData = filterForSize(artifacts.traceContents);
-  const html = screenshotDump(options, artifacts.screenshots);
+  const html = screenshotDump(options, artifacts.ScreenshotFilmstrip);
   return {traceData, html};
 }
 
