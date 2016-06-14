@@ -42,6 +42,7 @@
     "without-javascript",
     "first-meaningful-paint",
     "speed-index-metric",
+    "estimated-input-latency",
     "user-timings",
     "screenshots",
     "critical-request-chains",
@@ -97,6 +98,10 @@
           "weight": 1
         },
         "speed-index-metric": {
+          "value": 100,
+          "weight": 1
+        },
+        "estimated-input-latency": {
           "value": 100,
           "weight": 1
         },
