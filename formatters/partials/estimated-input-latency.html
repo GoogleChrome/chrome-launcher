@@ -1,0 +1,13 @@
+<style>
+  .input-latency-measures {
+    font-size: 14px
+  }
+</style>
+
+<div>
+  <div class="input-latency-measures">
+    {{#each this}}
+      <div>{{percentile this.percentile}}%: <strong>{{fixedTenths this.time}}ms</strong></div>
+    {{/each}}
+  </div>
+</div>
