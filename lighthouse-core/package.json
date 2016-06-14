@@ -41,7 +41,7 @@
     "json-stringify-safe": "^5.0.1",
     "jszip": "2.6.0",
     "npmlog": "^2.0.3",
-    "semver": "^5.1.0",
+    "semver": ">=4.3.3",
     "speedline": "^0.1.2"
   },
   "devDependencies": {
