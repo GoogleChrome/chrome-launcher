@@ -37,6 +37,9 @@ class Runner {
   static run(driver, opts) {
     const config = opts.config;
 
+    // Filter out any audits by the whitelist.
+    config.audits = Core.filterAudits(config.audits, opts.flags.auditWhitelist);
+
     // Make a run, which can be .then()'d with whatever needs to run (based on the config).
     let run = Promise.resolve();
 
