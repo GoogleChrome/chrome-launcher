@@ -50,8 +50,8 @@ class Runner {
 
       // Make sure we only have the gatherers that are needed by the audits
       // that have been listed in the config.
-      config.passes = config.passes.map(pass => {
-        pass.gatherers.filter(gatherer => {
+      const filteredPasses = config.passes.map(pass => {
+        pass.gatherers = pass.gatherers.filter(gatherer => {
           try {
             const GathererClass = Driver.getGathererClass(gatherer);
             const gathererNecessary = requiredGatherers.has(GathererClass.name);
@@ -68,7 +68,7 @@ class Runner {
       .filter(p => p.gatherers.length > 0);
 
       // Finally set up the driver to gather.
-      run = run.then(_ => Driver.run(config.passes, Object.assign({}, opts, {driver})));
+      run = run.then(_ => Driver.run(filteredPasses, Object.assign({}, opts, {driver})));
     } else {
       if (!config.artifacts) {
         throw new Error('Neither passes nor artifacts has been included in the config.');
