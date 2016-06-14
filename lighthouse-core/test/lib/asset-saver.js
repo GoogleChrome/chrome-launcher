@@ -21,7 +21,7 @@ const assetSaver = require('../../lib/asset-saver');
 const assert = require('assert');
 const fs = require('fs');
 
-const screenshots = require('../fixtures/traces/screenshots.json');
+const ScreenshotFilmstrip = require('../fixtures/traces/screenshots.json');
 const traceContents = require('../fixtures/traces/progressive-app.json');
 
 /* eslint-env mocha */
@@ -43,7 +43,7 @@ describe('asset-saver helper', () => {
     };
     const artifacts = {
       traceContents,
-      screenshots
+      ScreenshotFilmstrip
     };
 
     assetSaver.saveAssets(options, artifacts);
