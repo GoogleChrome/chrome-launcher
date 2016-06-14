@@ -121,14 +121,13 @@ class TraceProcessor {
   /**
    * Calculate duration at specified percentiles for given population of
    * durations.
-   * @param {!Array<number>} durations
-   * @param {number} totalTime
-   * @param {!Array<number>} percentiles
+   * @param {!Array<number>} durations Array of durations, sorted in ascending order.
+   * @param {number} totalTime Total time (in ms) of interval containing durations.
+   * @param {!Array<number>} percentiles Array of percentiles of interest, in ascending order.
    * @return {!Array<{percentile: number, time: number}>}
    * @private
    */
   static _riskPercentiles(durations, totalTime, percentiles) {
-    durations.sort((a, b) => a - b);
     let busyTime = 0;
     for (let i = 0; i < durations.length; i++) {
       busyTime += durations[i];
@@ -169,15 +168,11 @@ class TraceProcessor {
    * Calculates the maximum queueing time (in ms) of high priority tasks for
    * selected percentiles within a window of the main thread.
    * @param {!Array<!Object>} trace
-   * @param {number=} startTime Optional start time of range of interest. Defaults to trace start.
-   * @param {number=} endTime Optional end time of range of interest. Defaults to trace end.
+   * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
+   * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
    * @return {!Array<{percentile: number, time: number}>}
    */
-  static getRiskToResponsiveness(trace, startTime, endTime) {
-    // TODO(bckenny): filter for top level slices ourselves?
-    const tracingProcessor = new TraceProcessor();
-    const model = tracingProcessor.init(trace);
-
+  static getRiskToResponsiveness(model, trace, startTime, endTime) {
     // Range of responsiveness we care about. Default to bounds of model.
     startTime = startTime === undefined ? model.bounds.min : startTime;
     endTime = endTime === undefined ? model.bounds.max : endTime;
@@ -190,6 +185,7 @@ class TraceProcessor {
     const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);
 
     // Find durations of all slices in range of interest.
+    // TODO(bckenny): filter for top level slices ourselves?
     const durations = [];
     mainThread.sliceGroup.topLevelSlices.forEach(slice => {
       // Discard slices outside range.
@@ -210,6 +206,7 @@ class TraceProcessor {
 
       durations.push(duration);
     });
+    durations.sort((a, b) => a - b);
 
     const percentiles = [0.5, 0.75, 0.9, 0.99, 1];
     return TraceProcessor._riskPercentiles(durations, totalTime, percentiles);

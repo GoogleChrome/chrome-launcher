@@ -45,8 +45,10 @@ class EstimatedInputLatency extends Audit {
       // Use speedline's first paint as start of range for input readiness check.
       const startTime = artifacts.speedline.first;
 
-      const readiness = TracingProcessor.getRiskToResponsiveness(artifacts.traceContents,
-          startTime);
+      const trace = artifacts.traceContents;
+      const tracingProcessor = new TracingProcessor();
+      const model = tracingProcessor.init(artifacts.traceContents);
+      const readiness = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
 
       const median = readiness.find(result => result.percentile === 0.5);
       const rawValue = median.time.toFixed(1) + 'ms';
