@@ -16,6 +16,8 @@
  */
 'use strict';
 
+const log = require('./lib/log');
+
 class Core {
   static audit(artifacts, audits) {
     audits = this.expandAudits(audits);
@@ -39,14 +41,29 @@ class Core {
   }
 
   static filterAudits(audits, whitelist) {
-    return audits.filter(a => {
+    const rejected = [];
+    const filteredAudits = audits.filter(a => {
       // If there is no whitelist, assume all.
       if (!whitelist) {
         return true;
       }
 
-      return whitelist.has(a.toLowerCase());
+      const auditName = a.toLowerCase();
+      const inWhitelist = whitelist.has(auditName);
+
+      if (!inWhitelist) {
+        rejected.push(auditName);
+      }
+
+      return inWhitelist;
     });
+
+    if (rejected.length) {
+      log.log('info', 'Running these audits:', `${filteredAudits.join(', ')}`);
+      log.log('info', 'Skipping these audits:', `${rejected.join(', ')}`);
+    }
+
+    return filteredAudits;
   }
 }
 
