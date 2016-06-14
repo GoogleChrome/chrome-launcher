@@ -1,0 +1,678 @@
+{
+  "url": "https://example.com/",
+  "aggregations": [
+    {
+      "name": "Progressive Web App",
+      "description": "These audits validate the aspects of a Progressive Web App.",
+      "scored": true,
+      "categorizable": true,
+      "score": [
+        {
+          "overall": 1,
+          "name": "App can load on offline/flaky connections",
+          "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "service-worker",
+              "category": "Offline",
+              "description": "Has a registered Service Worker"
+            },
+            {
+              "value": true,
+              "name": "works-offline",
+              "category": "Offline",
+              "description": "URL responds with a 200 when offline"
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "Offline",
+              "description": "Manifest's start_url is in cache storage for offline use",
+              "comingSoon": true
+            }
+          ]
+        },
+        {
+          "overall": 0.995,
+          "name": "Page load performance is fast",
+          "description": "Users notice if sites and apps don't perform well. These top-level metrics capture the most important perceived performance concerns.",
+          "subItems": [
+            {
+              "value": 100,
+              "rawValue": "920.5ms",
+              "optimalValue": "1,600ms",
+              "extendedInfo": {
+                "timings": {
+                  "fCP": 920.461,
+                  "fMPbasic": 920.29,
+                  "fMPpageheight": 920.29,
+                  "fMPwebfont": 920.29,
+                  "fMPfull": 920.29
+                }
+              },
+              "name": "first-meaningful-paint",
+              "category": "Performance",
+              "description": "First meaningful paint"
+            },
+            {
+              "value": 99,
+              "rawValue": 1068,
+              "optimalValue": "1,250",
+              "extendedInfo": {
+                "formatter": "speedline",
+                "value": {
+                  "first": 947,
+                  "complete": 1389,
+                  "duration": 1577,
+                  "frames": [
+                    {
+                      "timestamp": 16312479.258,
+                      "progress": 0
+                    },
+                    {
+                      "timestamp": 16312482.307,
+                      "progress": 0
+                    },
+                    {
+                      "timestamp": 16312501.893,
+                      "progress": 0
+                    },
+                    {
+                      "timestamp": 16313426.565,
+                      "progress": 61
+                    },
+                    {
+                      "timestamp": 16313449.263,
+                      "progress": 63
+                    },
+                    {
+                      "timestamp": 16313451.491,
+                      "progress": 63
+                    },
+                    {
+                      "timestamp": 16313518.357,
+                      "progress": 63
+                    },
+                    {
+                      "timestamp": 16313545.809,
+                      "progress": 63
+                    },
+                    {
+                      "timestamp": 16313568.167,
+                      "progress": 70
+                    },
+                    {
+                      "timestamp": 16313601.086,
+                      "progress": 73
+                    },
+                    {
+                      "timestamp": 16313633.991,
+                      "progress": 74
+                    },
+                    {
+                      "timestamp": 16313667.799,
+                      "progress": 74
+                    },
+                    {
+                      "timestamp": 16313701.52,
+                      "progress": 76
+                    },
+                    {
+                      "timestamp": 16313734.599,
+                      "progress": 81
+                    },
+                    {
+                      "timestamp": 16313767.473,
+                      "progress": 79
+                    },
+                    {
+                      "timestamp": 16313801.593,
+                      "progress": 81
+                    },
+                    {
+                      "timestamp": 16313834.816,
+                      "progress": 87
+                    },
+                    {
+                      "timestamp": 16313852.25,
+                      "progress": 89
+                    },
+                    {
+                      "timestamp": 16313869.201,
+                      "progress": 100
+                    },
+                    {
+                      "timestamp": 16313885.567,
+                      "progress": 100
+                    },
+                    {
+                      "timestamp": 16314056.839,
+                      "progress": 100
+                    }
+                  ]
+                }
+              },
+              "name": "speed-index-metric",
+              "category": "Performance",
+              "description": "Speed Index"
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Content scrolls at 60fps",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Touch input gets a response in < 150ms",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "App is interactive without jank after the first meaningful paint",
+              "comingSoon": true
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "Site is progressively enhanced",
+          "description": "Progressive enhancement means that everyone can access the basic content and functionality of a page in any browser, and those without certain browser features may receive a reduced but not unfunctioning experience.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "without-javascript",
+              "category": "JavaScript",
+              "description": "Page contains some content when its scripts are not available"
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "Network connection is secure",
+          "description": "Security is an important part of the web for both developers and users. Moving forward, Transport Layer Security (TLS) support will be required for many APIs.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "is-on-https",
+              "category": "Security",
+              "description": "Site is on HTTPS"
+            },
+            {
+              "value": true,
+              "name": "redirects-http",
+              "category": "Security",
+              "description": "Site redirects HTTP traffic to HTTPS"
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "User can be prompted to Add to Homescreen",
+          "description": "While users can manually add your site to their homescreen in the browser menu, the <a href=\"https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android?hl=en\">prompt (aka app install banner)</a> will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
+          "subItems": [
+            {
+              "value": true,
+              "name": "service-worker",
+              "category": "Offline",
+              "description": "Has a registered Service Worker"
+            },
+            {
+              "value": true,
+              "name": "manifest-exists",
+              "category": "Manifest",
+              "description": "Manifest exists"
+            },
+            {
+              "value": true,
+              "name": "manifest-start-url",
+              "category": "Manifest",
+              "description": "Manifest contains start_url"
+            },
+            {
+              "value": true,
+              "debugString": "Found icons of sizes: 192x192,384x384",
+              "name": "manifest-icons-min-144",
+              "category": "Manifest",
+              "description": "Manifest contains icons at least 144px"
+            },
+            {
+              "value": true,
+              "name": "manifest-short-name",
+              "category": "Manifest",
+              "description": "Manifest contains short_name"
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "Installed web app will launch with custom splash screen",
+          "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable <a href=\"https://developers.google.com/web/updates/2015/10/splashscreen?hl=en\">splash screen</a> the user sees between tapping the home screen icon and your app’s first paint.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "manifest-exists",
+              "category": "Manifest",
+              "description": "Manifest exists"
+            },
+            {
+              "value": true,
+              "name": "manifest-name",
+              "category": "Manifest",
+              "description": "Manifest contains name"
+            },
+            {
+              "value": true,
+              "name": "manifest-background-color",
+              "category": "Manifest",
+              "description": "Manifest contains background_color"
+            },
+            {
+              "value": true,
+              "name": "manifest-theme-color",
+              "category": "Manifest",
+              "description": "Manifest contains theme_color"
+            },
+            {
+              "value": true,
+              "debugString": "Found icons of sizes: 192x192,384x384",
+              "name": "manifest-icons-min-192",
+              "category": "Manifest",
+              "description": "Manifest contains icons at least 192px"
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "Address bar matches brand colors",
+          "description": "The browser address bar can be themed to match your site. A theme-color <a href=\"https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android\">meta tag</a> will upgrade the address bar when a user browses the site, and the <a href=\"https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color\">manifest theme-color</a> will apply the same theme site-wide once it's been added to homescreen.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "manifest-exists",
+              "category": "Manifest",
+              "description": "Manifest exists"
+            },
+            {
+              "value": true,
+              "rawValue": "#4527A0",
+              "name": "theme-color-meta",
+              "category": "HTML",
+              "description": "HTML has a theme-color <meta>"
+            },
+            {
+              "value": true,
+              "name": "manifest-theme-color",
+              "category": "Manifest",
+              "description": "Manifest contains theme_color"
+            }
+          ]
+        },
+        {
+          "overall": 1,
+          "name": "Design is mobile-friendly",
+          "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
+          "subItems": [
+            {
+              "value": true,
+              "name": "viewport",
+              "category": "Mobile Friendly",
+              "description": "HTML has a viewport <meta>"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Best Practices",
+      "description": "These audits do not affect your score but are worth a look.",
+      "scored": false,
+      "categorizable": false,
+      "score": [
+        {
+          "overall": 0,
+          "subItems": [
+            {
+              "value": true,
+              "debugString": "",
+              "extendedInfo": {
+                "formatter": "accessibility"
+              },
+              "name": "aria-allowed-attr",
+              "category": "Accessibility",
+              "description": "Element aria-* roles are valid"
+            },
+            {
+              "value": false,
+              "debugString": "ARIA attributes must conform to valid names (Failed on 1 element)",
+              "extendedInfo": {
+                "formatter": "accessibility",
+                "value": {
+                  "id": "aria-valid-attr",
+                  "description": "Ensures attributes that begin with aria- are valid ARIA attributes",
+                  "help": "ARIA attributes must conform to valid names",
+                  "helpUrl": "https://dequeuniversity.com/rules/axe/1.1/aria-valid-attr",
+                  "impact": "critical",
+                  "tags": [
+                    "wcag2a",
+                    "wcag411"
+                  ],
+                  "nodes": [
+                    {
+                      "target": [
+                        "body > .main.js-main"
+                      ],
+                      "html": "<main class=\"main js-main\" aria-role=\"main\">\n      <div class=\"main__inner\">\n        <section class=\"list-view js-list-view\">\n\n\n        </section>\n      </div>\n\n    </main>",
+                      "impact": "critical",
+                      "any": [
+                        {
+                          "id": "aria-valid-attr",
+                          "impact": "critical",
+                          "message": "Invalid ARIA attribute name: aria-role",
+                          "data": [
+                            "aria-role"
+                          ],
+                          "relatedNodes": []
+                        }
+                      ],
+                      "all": [],
+                      "none": []
+                    }
+                  ]
+                }
+              },
+              "name": "aria-valid-attr",
+              "category": "Accessibility",
+              "description": "Element aria-* attributes are valid ARIA attributes"
+            },
+            {
+              "value": false,
+              "debugString": "Elements must have sufficient color contrast (Failed on 4 elements)",
+              "extendedInfo": {
+                "formatter": "accessibility",
+                "value": {
+                  "id": "color-contrast",
+                  "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
+                  "help": "Elements must have sufficient color contrast",
+                  "helpUrl": "https://dequeuniversity.com/rules/axe/1.1/color-contrast",
+                  "impact": "critical",
+                  "tags": [
+                    "wcag2aa",
+                    "wcag143"
+                  ],
+                  "nodes": [
+                    {
+                      "target": [
+                        "body > .details-view.js-details-view > .details-view__panel.js-details-panel > .details-view__content > .details-view__description-title"
+                      ],
+                      "html": "<h1 class=\"details-view__description-title\">Description</h1>",
+                      "impact": "critical",
+                      "any": [
+                        {
+                          "id": "color-contrast",
+                          "impact": "critical",
+                          "message": "Element has insufficient color contrast of 2.81 (foreground color: #9a9a9a, background color: #ffffff, font size: 10.5pt, font weight: bold)",
+                          "data": {
+                            "fgColor": "#9a9a9a",
+                            "bgColor": "#ffffff",
+                            "contrastRatio": "2.81",
+                            "fontSize": "10.5pt",
+                            "fontWeight": "bold"
+                          },
+                          "relatedNodes": [
+                            {
+                              "target": [
+                                "body > .details-view.js-details-view > .details-view__panel.js-details-panel > .details-view__content"
+                              ],
+                              "html": "<aside class=\"details-view__content\">\n          <h1 class=\"details-view__description-title\">Description</h1>\n          <div class=\"details-view__description js-description\"></div>\n        </aside>"
+                            }
+                          ]
+                        }
+                      ],
+                      "all": [],
+                      "none": []
+                    },
+                    {
+                      "target": [
+                        "body > .dialog-view.js-dialog > .dialog-view__panel > .dialog-view__panel-header > .dialog-view__panel-message.js-message"
+                      ],
+                      "html": "<p class=\"dialog-view__panel-message js-message\">A woodchuck chuck if a woodchuck could chuck wood?</p>",
+                      "impact": "critical",
+                      "any": [
+                        {
+                          "id": "color-contrast",
+                          "impact": "critical",
+                          "message": "Element has insufficient color contrast of 2.81 (foreground color: #9a9a9a, background color: #ffffff, font size: 12.0pt, font weight: normal)",
+                          "data": {
+                            "fgColor": "#9a9a9a",
+                            "bgColor": "#ffffff",
+                            "contrastRatio": "2.81",
+                            "fontSize": "12.0pt",
+                            "fontWeight": "normal"
+                          },
+                          "relatedNodes": [
+                            {
+                              "target": [
+                                "body > .dialog-view.js-dialog > .dialog-view__panel"
+                              ],
+                              "html": "<div class=\"dialog-view__panel\">"
+                            }
+                          ]
+                        }
+                      ],
+                      "all": [],
+                      "none": []
+                    },
+                    {
+                      "target": [
+                        "body > .dialog-view.js-dialog > .dialog-view__panel > .dialog-view__panel-footer > .dialog-view__panel-button.js-cancel"
+                      ],
+                      "html": "<button tabindex=\"-1\" class=\"dialog-view__panel-button js-cancel\">Cancel</button>",
+                      "impact": "critical",
+                      "any": [
+                        {
+                          "id": "color-contrast",
+                          "impact": "critical",
+                          "message": "Element has insufficient color contrast of 4.35 (foreground color: #e91e63, background color: #ffffff, font size: 11.3pt, font weight: normal)",
+                          "data": {
+                            "fgColor": "#e91e63",
+                            "bgColor": "#ffffff",
+                            "contrastRatio": "4.35",
+                            "fontSize": "11.3pt",
+                            "fontWeight": "normal"
+                          },
+                          "relatedNodes": [
+                            {
+                              "target": [
+                                "body > .dialog-view.js-dialog > .dialog-view__panel"
+                              ],
+                              "html": "<div class=\"dialog-view__panel\">"
+                            }
+                          ]
+                        }
+                      ],
+                      "all": [],
+                      "none": []
+                    },
+                    {
+                      "target": [
+                        "body > .dialog-view.js-dialog > .dialog-view__panel > .dialog-view__panel-footer > .dialog-view__panel-button.js-okay"
+                      ],
+                      "html": "<button tabindex=\"-1\" class=\"dialog-view__panel-button js-okay\">Okay</button>",
+                      "impact": "critical",
+                      "any": [
+                        {
+                          "id": "color-contrast",
+                          "impact": "critical",
+                          "message": "Element has insufficient color contrast of 4.35 (foreground color: #e91e63, background color: #ffffff, font size: 11.3pt, font weight: normal)",
+                          "data": {
+                            "fgColor": "#e91e63",
+                            "bgColor": "#ffffff",
+                            "contrastRatio": "4.35",
+                            "fontSize": "11.3pt",
+                            "fontWeight": "normal"
+                          },
+                          "relatedNodes": [
+                            {
+                              "target": [
+                                "body > .dialog-view.js-dialog > .dialog-view__panel"
+                              ],
+                              "html": "<div class=\"dialog-view__panel\">"
+                            }
+                          ]
+                        }
+                      ],
+                      "all": [],
+                      "none": []
+                    }
+                  ]
+                }
+              },
+              "name": "color-contrast",
+              "category": "Accessibility",
+              "description": "Background and foreground colors have a sufficient contrast ratio"
+            },
+            {
+              "value": true,
+              "debugString": "",
+              "extendedInfo": {
+                "formatter": "accessibility"
+              },
+              "name": "image-alt",
+              "category": "Accessibility",
+              "description": "Every image element has an alt attribute"
+            },
+            {
+              "value": true,
+              "debugString": "",
+              "extendedInfo": {
+                "formatter": "accessibility"
+              },
+              "name": "label",
+              "category": "Accessibility",
+              "description": "Every form element has a label"
+            },
+            {
+              "value": true,
+              "name": "manifest-short-name-length",
+              "category": "Manifest",
+              "description": "Manifest's short_name won't be truncated when displayed on homescreen"
+            },
+            {
+              "value": true,
+              "rawValue": "standalone",
+              "debugString": "Manifest display property should be standalone or fullscreen.",
+              "name": "manifest-display",
+              "category": "Manifest",
+              "description": "Manifest's display property set to standalone/fullscreen to allow launching without address bar"
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Service worker makes use of push notifications, if appropriate",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Tap targets are appropriately sized for touch",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Payment forms marked up with [autocomplete] attributes",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Login forms marked up with [autocomplete] attributes",
+              "comingSoon": true
+            },
+            {
+              "value": "¯\\_(ツ)_/¯",
+              "name": "coming-soon",
+              "category": "UX",
+              "description": "Input fields use appropriate [type] attributes for custom keyboards",
+              "comingSoon": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Performance Metrics",
+      "description": "These encapsulate your app's performance.",
+      "scored": false,
+      "categorizable": false,
+      "score": [
+        {
+          "overall": 0,
+          "subItems": [
+            {
+              "value": 2,
+              "optimalValue": 0,
+              "extendedInfo": {
+                "formatter": "criticalRequestChains",
+                "value": {
+                  "17740.1": {
+                    "request": {
+                      "url": "https://example.com/",
+                      "startTime": 16312.813276,
+                      "endTime": 16313.339138,
+                      "responseReceivedTime": 16313.338504
+                    },
+                    "children": {}
+                  },
+                  "17740.100": {
+                    "request": {
+                      "url": "https://example.com/images/chrome-touch-icon-384x384.png",
+                      "startTime": 16313.55491,
+                      "endTime": 16313.815876,
+                      "responseReceivedTime": 16313.707436
+                    },
+                    "children": {}
+                  }
+                }
+              },
+              "name": "critical-request-chains",
+              "category": "Performance",
+              "description": "Critical Request Chains"
+            },
+            {
+              "value": 0,
+              "extendedInfo": {
+                "formatter": "userTimings",
+                "value": [{
+                  "name": "one",
+                  "startTime": 100,
+                  "endTime": 1100,
+                  "duration": 1000
+                }, {
+                  "name": "two",
+                  "startTime": 100,
+                  "endTime": 2100,
+                  "duration": 2000
+                }]
+              },
+              "name": "user-timings",
+              "category": "Performance",
+              "description": "User Timing measures"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

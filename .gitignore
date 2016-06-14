@@ -3,10 +3,11 @@ node_modules
 .DS_Store
 dist
 third_party/src
-extension/pages/scripts/lighthouse-report.js
+**/pages/scripts/lighthouse-report.js
 npm-debug.log
 artifacts.log
 coverage
+lighthouse-cli/results
 
 results.html
 last-run-results.html
