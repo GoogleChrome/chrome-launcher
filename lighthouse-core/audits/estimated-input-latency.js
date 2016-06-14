@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Audit = require('../audit');
-const TracingProcessor = require('../../lib/traces/tracing-processor');
-const Formatter = require('../../../formatters/formatter');
+const Audit = require('./audit');
+const TracingProcessor = require('../lib/traces/tracing-processor');
+const Formatter = require('../formatters/formatter');
 
 class EstimatedInputLatency extends Audit {
   /**
@@ -30,7 +30,7 @@ class EstimatedInputLatency extends Audit {
       name: 'estimated-input-latency',
       description: 'Estimated Input Latency',
       optimalValue: '50ms',
-      requiredArtifacts: ['traceContents', 'speedline']
+      requiredArtifacts: ['traceContents', 'Speedline']
     };
   }
 
@@ -43,7 +43,7 @@ class EstimatedInputLatency extends Audit {
   static audit(artifacts) {
     try {
       // Use speedline's first paint as start of range for input readiness check.
-      const startTime = artifacts.speedline.first;
+      const startTime = artifacts.Speedline.first;
 
       const trace = artifacts.traceContents;
       const tracingProcessor = new TracingProcessor();
