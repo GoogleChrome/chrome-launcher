@@ -52,10 +52,13 @@ class Runner {
       // that have been listed in the config.
       const filteredPasses = config.passes.map(pass => {
         pass.gatherers = pass.gatherers.filter(gatherer => {
+          if (typeof gatherer !== 'string') {
+            return requiredGatherers.has(gatherer.name);
+          }
+
           try {
             const GathererClass = Driver.getGathererClass(gatherer);
-            const gathererNecessary = requiredGatherers.has(GathererClass.name);
-            return gathererNecessary;
+            return requiredGatherers.has(GathererClass.name);
           } catch (requireError) {
             throw new Error(`Unable to locate gatherer: ${gatherer}`);
           }

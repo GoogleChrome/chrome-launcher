@@ -149,13 +149,14 @@ gulp.task('watch', ['lint', 'browserify', 'html', 'copyReportScripts'], () => {
     'app/scripts/**/*.js',
     'app/images/**/*',
     'app/styles/**/*',
-    'app/_locales/**/*.json'
+    'app/_locales/**/*.json',
+    'node_modules/lighthouse-core/**/*.js'
   ]).on('change', livereload.reload);
 
   gulp.watch([
     '*.js',
     'app/src/**/*.js',
-    '../src/**/*.js'
+    'node_modules/lighthouse-core/**/*.js'
   ], ['browserify', 'lint']);
 });
 

@@ -199,7 +199,7 @@ class Driver {
           return gatherer;
         }
 
-        const GathererClass = require(`./gatherers/${gatherer}`);
+        const GathererClass = Driver.getGathererClass(gatherer);
         return new GathererClass();
       });
 
