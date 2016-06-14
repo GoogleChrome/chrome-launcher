@@ -45,8 +45,19 @@ lighthouse --help
 git clone https://github.com/GoogleChrome/lighthouse
 cd lighthouse
 
+# will be cleaner soon.
+cd lighthouse-core
 npm install
+cd ../lighthouse-cli/
+npm install
+# npm link # nah...
+# just use `node lighthouse-cli/index.js` for now
+
+# probably very temporary
+cd lighthouse-core
 npm link
+cd ../lighthouse-cli/
+npm link lighthouse-core
 ```
 
 ## Tests
