@@ -8,9 +8,6 @@
     "watch": "gulp watch",
     "build": "gulp build"
   },
-  "dependencies": {
-    "lighthouse-core": "file:../lighthouse-core"
-  },
   "devDependencies": {
     "brfs": "^1.4.3",
     "browserify": "^13.0.0",

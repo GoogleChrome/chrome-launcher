@@ -18,7 +18,6 @@
 'use strict';
 
 const through = require('through2');
-const path = require('path');
 
 /**
  * This is a browserify transform that looks for requires to _interopRequireDefault(_fs)

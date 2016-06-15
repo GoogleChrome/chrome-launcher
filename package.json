@@ -1,0 +1,56 @@
+{
+  "name": "lighthouse",
+  "version": "1.0.0",
+  "description": "Lighthouse",
+  "main": "./lighthouse-core/module/index.js",
+  "bin": "./lighthouse-cli/index.js",
+  "engines": {
+    "node": ">=5"
+  },
+  "scripts": {
+    "//":
+    "// dependency installation",
+    "postinstall": "npm run core-install && npm run extension-install",
+    "core-install": "npm --prefix ./lighthouse-core install ./lighthouse-core",
+    "extension-install": "npm --prefix ./lighthouse-extension install ./lighthouse-extension",
+    "//":
+    "// global tasks",
+    "lint": "eslint .",
+    "smoke": "lighthouse-cli/scripts/run-smoke-tests.sh",
+    "coverage": "istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*.js') --timeout 60000",
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "start": "node ./lighthouse-cli/index.js",
+    "//":
+    "// test",
+    "test": "npm run lint --silent && npm run unit && npm run closure",
+    "cli-unit": "mocha $(find lighthouse-cli/test -name '*.js') --timeout 60000",
+    "unit": "npm run cli-unit && npm --prefix ./lighthouse-core run unit",
+    "//":
+    "// passing through tasks to core",
+    "closure": "npm --prefix ./lighthouse-core run closure",
+    "watch": "npm --prefix ./lighthouse-core run watch",
+    "chrome": "npm --prefix ./lighthouse-core run chrome"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3",
+    "eslint": "^2.4.0",
+    "eslint-config-google": "^0.4.0",
+    "istanbul": "^0.4.3",
+    "coveralls": "^2.11.9"
+  },
+  "dependencies": {
+    "meow": "^3.7.0"
+  },
+  "repository": "googlechrome/lighthouse",
+  "keywords": [
+    "google",
+    "chrome",
+    "devtools"
+  ],
+  "author": "The Chromium Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/googlechrome/lighthouse/issues"
+  },
+  "homepage": "https://github.com/googlechrome/lighthouse#readme"
+}

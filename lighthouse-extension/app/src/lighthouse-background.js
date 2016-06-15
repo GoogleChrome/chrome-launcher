@@ -17,9 +17,9 @@
 
 'use strict';
 
-const ExtensionProtocol = require('lighthouse-core/driver/drivers/extension');
-const Runner = require('lighthouse-core/runner');
-const config = require('lighthouse-core/config/default.json');
+const ExtensionProtocol = require('../../../lighthouse-core/driver/drivers/extension');
+const Runner = require('../../../lighthouse-core/runner');
+const config = require('../../../lighthouse-core/config/default.json');
 
 window.createPageAndPopulate = function(results) {
   const tabURL = chrome.extension.getURL('/pages/report.html');

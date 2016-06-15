@@ -10,9 +10,6 @@ cache:
      - chrome-linux
      - extension/node_modules
 before_script:
-  - npm --prefix ./lighthouse-extension install ./lighthouse-extension
-  - npm --prefix ./lighthouse-core install ./lighthouse-core
-  - npm --prefix ./lighthouse-cli install ./lighthouse-cli
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
@@ -20,13 +17,12 @@ before_script:
   - start-stop-daemon --start --background --exec $(pwd)/lighthouse-core/scripts/launch-chrome.sh
   - sleep 5
 script:
-  - cd lighthouse-core
   - npm run lint
   - npm run unit
   - npm run closure
   - npm run coveralls
-  - cd ../lighthouse-extension
+  - npm run smoke
+  - cd lighthouse-extension
   - gulp build
   - cd ../lighthouse-cli
   - npm run unit
-  - npm run smoke
