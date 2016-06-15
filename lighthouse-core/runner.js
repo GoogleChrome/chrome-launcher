@@ -24,8 +24,13 @@ const fs = require('fs');
 const path = require('path');
 
 class Runner {
-
   static getGatherersNeededByAudits(audits) {
+    // It's possible we didn't get given any audits (but existing audit results), in which case
+    // there is no need to do any work here.
+    if (!audits) {
+      return new Set();
+    }
+
     audits = Core.expandAudits(audits);
 
     return audits.reduce((list, audit) => {
@@ -40,72 +45,78 @@ class Runner {
     // Filter out any audits by the whitelist.
     config.audits = Core.filterAudits(config.audits, opts.flags.auditWhitelist);
 
+    // Check that there are passes & audits...
+    const validPassesAndAudits = (
+        typeof config.passes !== 'undefined' &&
+        typeof config.audits !== 'undefined');
+
+    // ... or that there are artifacts & audits.
+    const validArtifactsAndAudits = (
+        typeof config.artifacts !== 'undefined' &&
+        typeof config.audits !== 'undefined');
+
     // Make a run, which can be .then()'d with whatever needs to run (based on the config).
     let run = Promise.resolve();
 
     // If there are passes run the Driver and gather the artifacts. If not, we will need
     // to check that there are artifacts specified in the config, and throw if not.
-    if (config.passes) {
-      const requiredGatherers = this.getGatherersNeededByAudits(config.audits);
+    if (validPassesAndAudits || validArtifactsAndAudits) {
+      if (validPassesAndAudits) {
+        const requiredGatherers = this.getGatherersNeededByAudits(config.audits);
 
-      // Make sure we only have the gatherers that are needed by the audits
-      // that have been listed in the config.
-      const filteredPasses = config.passes.map(pass => {
-        pass.gatherers = pass.gatherers.filter(gatherer => {
-          if (typeof gatherer !== 'string') {
-            return requiredGatherers.has(gatherer.name);
-          }
+        // Make sure we only have the gatherers that are needed by the audits
+        // that have been listed in the config.
+        const filteredPasses = config.passes.map(pass => {
+          pass.gatherers = pass.gatherers.filter(gatherer => {
+            if (typeof gatherer !== 'string') {
+              return requiredGatherers.has(gatherer.name);
+            }
 
-          try {
-            const GathererClass = Driver.getGathererClass(gatherer);
-            return requiredGatherers.has(GathererClass.name);
-          } catch (requireError) {
-            throw new Error(`Unable to locate gatherer: ${gatherer}`);
-          }
+            try {
+              const GathererClass = Driver.getGathererClass(gatherer);
+              return requiredGatherers.has(GathererClass.name);
+            } catch (requireError) {
+              throw new Error(`Unable to locate gatherer: ${gatherer}`);
+            }
+          });
+
+          return pass;
+        })
+
+        // Now remove any passes which no longer have gatherers.
+        .filter(p => p.gatherers.length > 0);
+
+        // Finally set up the driver to gather.
+        run = run.then(_ => Driver.run(filteredPasses, Object.assign({}, opts, {driver})));
+      } else if (validArtifactsAndAudits) {
+        run = run.then(_ => config.artifacts);
+      }
+
+      // Ignoring these two flags since this functionality is not exposed by the module.
+      /* istanbul ignore next */
+      if (opts.flags.saveArtifacts) {
+        run = run.then(artifacts => {
+          assetSaver.saveArtifacts(artifacts);
+          return artifacts;
         });
-
-        return pass;
-      })
-
-      // Now remove any passes which no longer have gatherers.
-      .filter(p => p.gatherers.length > 0);
-
-      // Finally set up the driver to gather.
-      run = run.then(_ => Driver.run(filteredPasses, Object.assign({}, opts, {driver})));
-    } else {
-      if (!config.artifacts) {
-        throw new Error('Neither passes nor artifacts has been included in the config.');
       }
 
-      run = run.then(_ => config.artifacts);
-    }
+      /* istanbul ignore next */
+      if (opts.flags.saveAssets) {
+        run = run.then(artifacts => {
+          assetSaver.saveAssets(opts, artifacts);
+          return artifacts;
+        });
+      }
 
-    // Ignoring these two flags since this functionality is not exposed by the module.
-    /* istanbul ignore next */
-    if (opts.flags.saveArtifacts) {
-      run = run.then(artifacts => {
-        assetSaver.saveArtifacts(artifacts);
-        return artifacts;
-      });
-    }
-
-    /* istanbul ignore next */
-    if (opts.flags.saveAssets) {
-      run = run.then(artifacts => {
-        assetSaver.saveAssets(opts, artifacts);
-        return artifacts;
-      });
-    }
-
-    // Now either run the audits, or use the supplied auditResults.
-    if (config.audits) {
+      // Now run the audits.
       run = run.then(artifacts => Core.audit(artifacts, config.audits));
-    } else {
-      if (!config.auditResults) {
-        throw new Error('Neither audits nor auditResults has been included in the config.');
-      }
-
+    } else if (config.auditResults) {
+      // If there are existing audit results, surface those here.
       run = run.then(_ => config.auditResults);
+    } else {
+      throw new Error(
+          'The config must provide passes and audits, artifacts and audits, or auditResults');
     }
 
     // Only run aggregations if needed.

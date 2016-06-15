@@ -28,6 +28,12 @@ describe('Formatter', () => {
     assert.notEqual(Formatter.SUPPORTED_FORMATS, undefined);
   });
 
+  it('returns supported formats when called by name', () => {
+    // Force the internal _formatters to not exist
+    Formatter._formatters = null;
+    assert.notEqual(Formatter.getByName('accessibility'), undefined);
+  });
+
   it('throws when invalid format is provided', () => {
     assert.throws(_ => Formatter.getByName('invalid-format'), Error);
   });

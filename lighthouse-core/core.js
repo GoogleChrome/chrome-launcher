@@ -26,6 +26,12 @@ class Core {
   }
 
   static expandAudits(audits) {
+    // It's possible we didn't get given any audits (but existing audit results), in which case
+    // there is no need to do any expansion work.
+    if (!audits) {
+      return;
+    }
+
     return audits.map(audit => {
       // If this is already instantiated, don't do anything else.
       if (typeof audit !== 'string') {
@@ -41,6 +47,12 @@ class Core {
   }
 
   static filterAudits(audits, whitelist) {
+    // It's possible we didn't get given any audits (but existing audit results), in which case
+    // there is no need to do any filter work.
+    if (!audits) {
+      return;
+    }
+
     const rejected = [];
     const filteredAudits = audits.filter(a => {
       // If there is no whitelist, assume all.

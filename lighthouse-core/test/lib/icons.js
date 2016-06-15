@@ -24,6 +24,10 @@ const manifestParser = require('../../lib/manifest-parser');
 /* global describe, it */
 describe('Icons helper', () => {
   describe('icons exist check', () => {
+    it('copes when no manifest is provided', () => {
+      return assert.equal(icons.doExist(), false);
+    });
+
     it('fails when a manifest contains no icons array', () => {
       const manifestSrc = JSON.stringify({
         name: 'NoIconsHere'

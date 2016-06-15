@@ -25,10 +25,17 @@ particular case, we need to test the functionality that would be branched for th
 extension, which is relatively minor stuff.
 */
 describe('Report', () => {
+  it('generates CLI HTML', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+
+    return assert(/<script>/gim.test(html));
+  });
+
   it('generates extension HTML', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults);
+    const html = reportGenerator.generateHTML(sampleResults, {inline: false});
 
-    return assert(/<!doctype/gim.test(html));
+    return assert(/<script src/gim.test(html));
   });
 });

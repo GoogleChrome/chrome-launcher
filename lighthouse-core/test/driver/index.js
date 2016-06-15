@@ -37,34 +37,7 @@ class TestGatherer extends Gather {
   }
 }
 
-const fakeDriver = {
-  connect() {
-    return Promise.resolve();
-  },
-  disconnect() {},
-  gotoURL() {
-    return Promise.resolve();
-  },
-
-  beginEmulation() {
-    return Promise.resolve();
-  },
-
-  cleanAndDisableBrowserCaches() {},
-  forceUpdateServiceWorkers() {},
-  beginTrace() {
-    return Promise.resolve();
-  },
-  endTrace() {
-    return Promise.resolve(
-      require('../fixtures/traces/progressive-app.json')
-    );
-  },
-  beginNetworkCollect() {},
-  endNetworkCollect() {
-    return Promise.resolve();
-  }
-};
+const fakeDriver = require('./fake-driver');
 
 describe('Driver', function() {
   it('loads a page', () => {
@@ -80,6 +53,16 @@ describe('Driver', function() {
       }
     }).then(res => {
       assert.equal(res, true);
+    });
+  });
+
+  it('creates flags if needed', () => {
+    const url = 'https://example.com';
+    const driver = fakeDriver;
+    const options = {url, driver};
+
+    return Driver.run([], options).then(_ => {
+      assert.equal(typeof options.flags, 'object');
     });
   });
 
