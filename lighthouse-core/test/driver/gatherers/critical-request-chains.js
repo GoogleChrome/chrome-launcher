@@ -30,6 +30,9 @@ const VERY_LOW = 'VeryLow';
 function mockTracingData(prioritiesList, edges) {
   const networkRecords = prioritiesList.map((priority, index) =>
       ({requestId: index.toString(),
+        _resourceType: {
+          _category: 'fake'
+        },
         initialPriority: () => priority,
         initiatorRequest: () => null,
         setInitialPriority: newPrio => {
