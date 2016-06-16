@@ -27,7 +27,8 @@ const extendedInfo = {
       endTime: 1,
       responseReceivedTime: 5,
       startTime: 0,
-      url: 'https://example.com/'
+      url: 'https://example.com/',
+      transferSize: 1
     },
     children: {
       1: {
@@ -35,7 +36,8 @@ const extendedInfo = {
           endTime: 16,
           responseReceivedTime: 14,
           startTime: 11,
-          url: 'https://example.com/b.js'
+          url: 'https://example.com/b.js',
+          transferSize: 1
         },
         children: {}
       },
@@ -44,7 +46,8 @@ const extendedInfo = {
           endTime: 17,
           responseReceivedTime: 15,
           startTime: 12,
-          url: superLongName
+          url: superLongName,
+          transferSize: 1
         },
         children: {}
       }
@@ -105,7 +108,7 @@ describe('CRC Formatter', () => {
       '<span class="cnc-node__tree-value">',
       '<span class="cnc-node__tree-file">/b.js</span>',
       '<span class="cnc-node__tree-hostname">\\(example.com\\)</span>',
-      '- <span class="cnc-node__chain-duration">5000.00ms</span>',
+      '- <span class="cnc-node__chain-duration">16000.00ms, 0.00KB</span>',
       '</span>'
     ].join('\\s*'), 'im');
 

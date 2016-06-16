@@ -38,11 +38,15 @@ class CriticalRequestChains extends Formatter {
           }
 
           const longestChain = CriticalRequestChains._getLongestChainLength(info);
-          const longestDuration = CriticalRequestChains._getLongestChainDuration(info);
+          const longestDuration =
+              CriticalRequestChains._getLongestChainDuration(info).toFixed(2);
+          const longestTransferSize = CriticalRequestChains.formatTransferSize(
+              CriticalRequestChains._getLongestChainTransferSize(info));
           const urlTree = CriticalRequestChains._createURLTreeOutput(info);
 
           const output = `    - Longest request chain (shorter is better): ${longestChain}\n` +
-          `    - Longest chain duration (shorter is better): ${longestDuration.toFixed(2)}ms\n` +
+          `    - Longest chain duration (shorter is better): ${longestDuration}ms\n` +
+          `    - Longest chain transfer size (smaller is better): ${longestTransferSize}KB\n` +
           '    - Initial navigation\n' +
               '      ' + urlTree.replace(/\n/g, '\n      ') + '\n';
           return output;
@@ -58,10 +62,14 @@ class CriticalRequestChains extends Formatter {
   }
 
   static _traverse(tree, cb) {
-    function walk(node, depth, startTime) {
+    function walk(node, depth, startTime, transferSize) {
       const children = Object.keys(node);
       if (children.length === 0) {
         return;
+      }
+
+      if (!transferSize) {
+        transferSize = 0;
       }
 
       children.forEach(id => {
@@ -75,7 +83,8 @@ class CriticalRequestChains extends Formatter {
           depth,
           id,
           node: child,
-          chainDuration: (child.request.endTime - startTime) * 1000
+          chainDuration: (child.request.endTime - startTime) * 1000,
+          chainTransferSize: (transferSize + child.request.transferSize)
         });
 
         // Carry on walking.
@@ -110,6 +119,17 @@ class CriticalRequestChains extends Formatter {
     return longestChainDuration;
   }
 
+  static _getLongestChainTransferSize(tree) {
+    let transferSize = 0;
+    this._traverse(tree, opts => {
+      const chainTransferSize = opts.chainTransferSize;
+      if (chainTransferSize > transferSize) {
+        transferSize = chainTransferSize;
+      }
+    });
+    return transferSize;
+  }
+
   /**
    * Converts the tree into an ASCII tree.
    */
@@ -119,6 +139,7 @@ class CriticalRequestChains extends Formatter {
       const depth = opts.depth;
       const treeMarkers = opts.treeMarkers;
       let startTime = opts.startTime;
+      let transferSize = opts.transferSize;
 
       return Object.keys(node).reduce((output, id, currentIndex, arr) => {
         // Test if this node has children, and if it's the last child.
@@ -149,16 +170,19 @@ class CriticalRequestChains extends Formatter {
         }
 
         const duration = ((node[id].request.endTime - startTime) * 1000).toFixed(2);
+        const chainTransferSize = transferSize + node[id].request.transferSize;
+        const formattedTransferSize = CriticalRequestChains.formatTransferSize(chainTransferSize);
 
         // Return the previous output plus this new node, and recursively write its children.
         return output + `${treeMarker} ${parsedURL.file} (${parsedURL.hostname})` +
             // If this node has children, write them out. Othewise write the chain time.
-            (hasChildren ? '' : ` - ${duration}ms`) + '\n' +
+            (hasChildren ? '' : ` - ${duration}ms, ${formattedTransferSize}KB`) + '\n' +
             write({
               node: node[id].children,
               depth: depth + 1,
               treeMarkers: newTreeMakers,
-              startTime
+              startTime,
+              transferSize: chainTransferSize
             });
       }, '');
     }
@@ -167,12 +191,17 @@ class CriticalRequestChains extends Formatter {
       node: tree,
       depth: 0,
       treeMarkers: [],
-      startTime: 0
+      startTime: 0,
+      transferSize: 0
     });
   }
 
   static formatTime(time) {
     return time.toFixed(2);
+  }
+
+  static formatTransferSize(size) {
+    return (size / 1024).toFixed(2);
   }
 
   static parseURL(resourceURL, opts) {
@@ -212,9 +241,15 @@ class CriticalRequestChains extends Formatter {
         return CriticalRequestChains._getLongestChainDuration(info);
       },
 
+      longestChainTransferSize(info) {
+        return CriticalRequestChains._getLongestChainTransferSize(info);
+      },
+
       chainDuration(startTime, endTime) {
         return ((endTime - startTime) * 1000).toFixed(2);
       },
+
+      formatTransferSize: CriticalRequestChains.formatTransferSize,
 
       parseURL: CriticalRequestChains.parseURL,
 
@@ -226,7 +261,7 @@ class CriticalRequestChains extends Formatter {
        * it has any children itself and what the tree looks like all the way back
        * up to the root, so the tree markers can be drawn correctly.
        */
-      createContextFor(parent, id, treeMarkers, parentIsLastChild, startTime, opts) {
+      createContextFor(parent, id, treeMarkers, parentIsLastChild, startTime, transferSize, opts) {
         const node = parent[id];
         const siblings = Object.keys(parent);
         const isLastChild = siblings.indexOf(id) === (siblings.length - 1);
@@ -240,16 +275,29 @@ class CriticalRequestChains extends Formatter {
           newTreeMarkers.push(!parentIsLastChild);
         }
 
-        if (!startTime) {
-          startTime = node.request.startTime;
-        }
-
         return opts.fn({
           node,
           isLastChild,
           hasChildren,
           startTime,
+          transferSize: (transferSize + node.request.transferSize),
           treeMarkers: newTreeMarkers
+        });
+      },
+
+      createTreeRenderContext(tree, opts) {
+        const transferSize = 0;
+        let startTime = 0;
+        const rootNodes = Object.keys(tree);
+
+        if (rootNodes.length > 0) {
+          startTime = tree[rootNodes[0]].request.startTime;
+        }
+
+        return opts.fn({
+          tree,
+          startTime,
+          transferSize
         });
       }
     };

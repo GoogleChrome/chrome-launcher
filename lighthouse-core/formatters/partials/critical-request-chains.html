@@ -90,13 +90,13 @@
         <span class="cnc-node__tree-hostname">({{ this.hostname }})</span>
       {{/parseURL}}
       {{#unless hasChildren}}
-        - <span class="cnc-node__chain-duration">{{chainDuration startTime this.node.request.endTime }}ms</span>
+        - <span class="cnc-node__chain-duration">{{chainDuration startTime this.node.request.endTime }}ms, {{formatTransferSize this.transferSize}}KB</span>
       {{/unless}}
     </span>
   </div>
 
   {{#each this.node.children as |child| }}
-    {{#createContextFor ../node.children @key ../treeMarkers ../isLastChild ../startTime }}
+    {{#createContextFor ../node.children @key ../treeMarkers ../isLastChild ../startTime ../transferSize }}
       {{> writeNode this }}
     {{/createContextFor }}
   {{/each}}
@@ -105,12 +105,15 @@
 <div class="cnc-tree">
   <div>Longest request chain (shorter is better): <strong>{{longestChain this}}</strong></div>
   <div>Longest chain duration (shorter is better): <strong>{{formatTime (longestDuration this)}}ms</strong></div>
+  <div>Longest chain transfer size (smaller is better): <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></div>
   <div>
     <div>Initial navigation</div>
-    {{#each this }}
-      {{#createContextFor .. @key undefined undefined undefined }}
-        {{> writeNode this }}
-      {{/createContextFor}}
-    {{/each}}
+    {{#createTreeRenderContext this}}
+      {{#each this.tree }}
+        {{#createContextFor ../tree @key undefined undefined ../startTime ../transferSize }}
+          {{> writeNode this }}
+        {{/createContextFor}}
+      {{/each}}
+    {{/createTreeRenderContext}}
   </div>
 </div>

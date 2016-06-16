@@ -74,7 +74,8 @@ class CriticalRequestChains extends Gather {
         url: request._url,
         startTime: request.startTime,
         endTime: request.endTime,
-        responseReceivedTime: request.responseReceivedTime
+        responseReceivedTime: request.responseReceivedTime,
+        transferSize: request.transferSize
       };
     };
 

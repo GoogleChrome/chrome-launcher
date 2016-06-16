@@ -58,7 +58,8 @@ function constructEmptyRequest() {
     endTime: undefined,
     responseReceivedTime: undefined,
     startTime: undefined,
-    url: undefined
+    url: undefined,
+    transferSize: undefined
   };
 }
 
