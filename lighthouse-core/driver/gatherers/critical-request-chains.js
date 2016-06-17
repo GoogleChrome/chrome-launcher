@@ -32,7 +32,8 @@ class CriticalRequestChains extends Gather {
    */
   isCritical(request) {
     // XHRs are fetched at High priority, but we exclude them, as they are unlikely to be critical
-    if (request._resourceType._category === WebInspector.resourceTypes.XHR._category) {
+    const resourceTypeCategory = request._resourceType && request._resourceType._category;
+    if (resourceTypeCategory === WebInspector.resourceTypes.XHR._category) {
       return false;
     }
     // TODO(deepanjanroy): When devtools-frontend module is updated,
