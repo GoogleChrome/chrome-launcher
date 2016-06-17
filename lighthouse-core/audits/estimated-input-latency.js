@@ -20,6 +20,11 @@ const Audit = require('./audit');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const Formatter = require('../formatters/formatter');
 
+// Parameters (in ms) for log-normal CDF scoring. To see the curve:
+// https://www.desmos.com/calculator/srv0hqhf7d
+const SCORING_POINT_OF_DIMINISHING_RETURNS = 50;
+const SCORING_MEDIAN = 100;
+
 class EstimatedInputLatency extends Audit {
   /**
    * @return {!AuditMeta}
@@ -29,7 +34,7 @@ class EstimatedInputLatency extends Audit {
       category: 'Performance',
       name: 'estimated-input-latency',
       description: 'Estimated Input Latency',
-      optimalValue: '50ms',
+      optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
       requiredArtifacts: ['traceContents', 'Speedline']
     };
   }
@@ -42,23 +47,33 @@ class EstimatedInputLatency extends Audit {
    */
   static audit(artifacts) {
     try {
-      // Use speedline's first paint as start of range for input readiness check.
+      // Use speedline's first paint as start of range for input latency check.
       const startTime = artifacts.Speedline.first;
 
       const trace = artifacts.traceContents;
       const tracingProcessor = new TracingProcessor();
       const model = tracingProcessor.init(artifacts.traceContents);
-      const readiness = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
+      const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
 
-      const median = readiness.find(result => result.percentile === 0.5);
-      const rawValue = median.time.toFixed(1) + 'ms';
+      const ninetieth = latencyPercentiles.find(result => result.percentile === 0.9);
+      const rawValue = ninetieth.time.toFixed(1) + 'ms';
+
+      // Use the CDF of a log-normal distribution for scoring.
+      //  10th Percentile ≈ 58ms
+      //  25th Percentile ≈ 75ms
+      //  Median = 100ms
+      //  75th Percentile ≈ 133ms
+      //  95th Percentile ≈ 199ms
+      const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
+          SCORING_POINT_OF_DIMINISHING_RETURNS);
+      let score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
 
       return EstimatedInputLatency.generateAuditResult({
-        value: 0,
+        value: Math.round(score),
         optimalValue: this.meta.optimalValue,
         rawValue,
         extendedInfo: {
-          value: readiness,
+          value: latencyPercentiles,
           formatter: Formatter.SUPPORTED_FORMATS.ESTIMATED_INPUT_LATENCY
         }
       });

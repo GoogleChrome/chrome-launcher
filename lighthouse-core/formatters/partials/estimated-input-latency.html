@@ -6,8 +6,9 @@
 
 <div>
   <div class="input-latency-measures">
-    {{#each this}}
-      <div>{{percentile this.percentile}}%: <strong>{{fixedTenths this.time}}ms</strong></div>
-    {{/each}}
+    <div>90% probability of input latency at <strong>{{ninetiethTime this}}ms</strong> or shorter.<div>
+    <div>
+      ({{#each this}}{{percentile this.percentile}}%: {{fixedTenths this.time}}ms{{#unless @last}}, {{/unless}}{{/each}})
+    </div>
   </div>
 </div>

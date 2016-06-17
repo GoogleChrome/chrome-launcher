@@ -30,11 +30,16 @@ class EstimatedInputLatencyFormatter extends Formatter {
             return '';
           }
 
-          const output = percentiles.reduce((output, result) => {
+          const ninetieth = percentiles.find(result => result.percentile === 0.9);
+          const time = ninetieth.time.toFixed(1);
+          const allResults = percentiles.map(result => {
             const percentile = Math.round(result.percentile * 100);
-            const value = result.time.toFixed(1);
-            return output + `    - ${percentile}%: ${value}ms\n`;
-          }, '');
+            const time = result.time.toFixed(1);
+            return `${percentile}%: ${time}ms`;
+          }).join(', ');
+
+          const output = `    - 90% probability of input latency at ${time}ms or shorter.\n` +
+              `      (${allResults})\n`;
 
           return output;
         };
@@ -50,6 +55,14 @@ class EstimatedInputLatencyFormatter extends Formatter {
 
   static getHelpers() {
     return {
+      ninetiethTime(percentiles) {
+        if (!Array.isArray(percentiles)) {
+          return;
+        }
+
+        const ninetieth = percentiles.find(result => result.percentile === 0.9);
+        return ninetieth.time.toFixed(1);
+      },
       percentile(value) {
         return Math.round(value * 100);
       },

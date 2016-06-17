@@ -193,18 +193,7 @@ class TraceProcessor {
         return;
       }
 
-      // Clip any at edges of range.
-      let duration = slice.duration;
-      let sliceStart = slice.start;
-      if (sliceStart < startTime) {
-        sliceStart = startTime;
-        duration = slice.end - sliceStart;
-      }
-      if (slice.end > endTime) {
-        duration = endTime - sliceStart;
-      }
-
-      durations.push(duration);
+      durations.push(slice.duration);
     });
     durations.sort((a, b) => a - b);
 
