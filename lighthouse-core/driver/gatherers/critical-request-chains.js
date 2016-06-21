@@ -41,20 +41,6 @@ class CriticalRequestChains extends Gather {
     return includes(['VeryHigh', 'High', 'Medium'], request.initialPriority());
   }
 
-  static _fixRedirectPriorities(requestIdToRequests) {
-    // This hack doesn't work if there is more than one consecutive redirect
-    for (let request of requestIdToRequests.values()) {
-      const requestId = request.requestId;
-      if (requestId.includes('redirected')) {
-        const originalRequestId = requestId.substring(0, requestId.indexOf(':'));
-        if (requestIdToRequests.has(originalRequestId)) {
-          const originalRequest = requestIdToRequests.get(originalRequestId);
-          originalRequest.setInitialPriority(request.initialPriority());
-        }
-      }
-    }
-  }
-
   afterPass(options, tracingData) {
     const networkRecords = tracingData.networkRecords;
 
@@ -63,10 +49,6 @@ class CriticalRequestChains extends Gather {
     for (let request of networkRecords) {
       requestIdToRequests.set(request.requestId, request);
     }
-
-    // This should go away once we fix
-    // https://github.com/GoogleChrome/lighthouse/issues/326
-    CriticalRequestChains._fixRedirectPriorities(requestIdToRequests);
 
     // Get all the critical requests.
     /** @type {!Array<NetworkRequest>} */

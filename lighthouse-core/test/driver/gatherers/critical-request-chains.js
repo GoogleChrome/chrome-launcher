@@ -264,26 +264,28 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     }));
 
   it('handles redirects', () => {
-    const networkRecords = mockTracingData([HIGH, LOW, HIGH], [[1, 2]]);
+    const networkRecords = mockTracingData([HIGH, HIGH, HIGH], [[0, 1], [1, 2]]);
 
     // Make a fake redirect
-    networkRecords[0].requestId = '1:redirected.1';
+    networkRecords[1].requestId = '1:redirected.0';
+    networkRecords[2].requestId = '1';
     Gatherer.afterPass(null, {networkRecords});
     const criticalChains = Gatherer.artifact;
 
     assert.deepEqual(criticalChains, {
-      '1': {
+      0: {
         request: constructEmptyRequest(),
         children: {
-          2: {
+          '1:redirected.0': {
             request: constructEmptyRequest(),
-            children: {}
+            children: {
+              1: {
+                request: constructEmptyRequest(),
+                children: {}
+              }
+            }
           }
         }
-      },
-      '1:redirected.1': {
-        request: constructEmptyRequest(),
-        children: {}
       }
     });
   });
