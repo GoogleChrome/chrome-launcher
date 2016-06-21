@@ -40,7 +40,7 @@ global.JSZip = require('jszip/dist/jszip.min.js');
 global.HTMLImportsLoader = {};
 global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
   if (path === '/gl-matrix-min.js') {
-    return 'empty-module';
+    return '../../../lib/empty-stub.js';
   }
   if (path === '/jszip.min.js') {
     return 'jszip/dist/jszip.min.js';

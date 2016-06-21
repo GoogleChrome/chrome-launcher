@@ -31,7 +31,6 @@
     "chrome-devtools-frontend": "1.0.381789",
     "chrome-remote-interface": "^0.11.0",
     "devtools-timeline-model": "1.1.4",
-    "empty-module": "0.0.2",
     "gl-matrix": "2.3.2",
     "handlebars": "^4.0.5",
     "json-stringify-safe": "^5.0.1",
