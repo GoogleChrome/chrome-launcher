@@ -1,0 +1,89 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+'use strict';
+
+const Audit = require('./audit');
+const TracingProcessor = require('../lib/traces/tracing-processor');
+const Formatter = require('../formatters/formatter');
+
+// Parameters (in ms) for log-normal CDF scoring. To see the curve:
+// https://www.desmos.com/calculator/srv0hqhf7d
+const SCORING_POINT_OF_DIMINISHING_RETURNS = 50;
+const SCORING_MEDIAN = 100;
+
+class EstimatedInputLatency extends Audit {
+  /**
+   * @return {!AuditMeta}
+   */
+  static get meta() {
+    return {
+      category: 'Performance',
+      name: 'estimated-input-latency',
+      description: 'Estimated Input Latency',
+      optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
+      requiredArtifacts: ['traceContents', 'Speedline']
+    };
+  }
+
+  /**
+   * Audits the page to estimate input latency.
+   * @see https://github.com/GoogleChrome/lighthouse/issues/28
+   * @param {!Artifacts} artifacts The artifacts from the gather phase.
+   * @return {!AuditResult} The score from the audit, ranging from 0-100.
+   */
+  static audit(artifacts) {
+    try {
+      // Use speedline's first paint as start of range for input latency check.
+      const startTime = artifacts.Speedline.first;
+
+      const trace = artifacts.traceContents;
+      const tracingProcessor = new TracingProcessor();
+      const model = tracingProcessor.init(artifacts.traceContents);
+      const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
+
+      const ninetieth = latencyPercentiles.find(result => result.percentile === 0.9);
+      const rawValue = ninetieth.time.toFixed(1) + 'ms';
+
+      // Use the CDF of a log-normal distribution for scoring.
+      //  10th Percentile ≈ 58ms
+      //  25th Percentile ≈ 75ms
+      //  Median = 100ms
+      //  75th Percentile ≈ 133ms
+      //  95th Percentile ≈ 199ms
+      const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
+          SCORING_POINT_OF_DIMINISHING_RETURNS);
+      let score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
+
+      return EstimatedInputLatency.generateAuditResult({
+        value: Math.round(score),
+        optimalValue: this.meta.optimalValue,
+        rawValue,
+        extendedInfo: {
+          value: latencyPercentiles,
+          formatter: Formatter.SUPPORTED_FORMATS.ESTIMATED_INPUT_LATENCY
+        }
+      });
+    } catch (err) {
+      return EstimatedInputLatency.generateAuditResult({
+        value: -1,
+        debugString: 'Unable to parse trace contents: ' + err.message
+      });
+    }
+  }
+}
+
+module.exports = EstimatedInputLatency;

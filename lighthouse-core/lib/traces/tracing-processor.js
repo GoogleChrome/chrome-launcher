@@ -21,6 +21,10 @@ if (typeof global.window === 'undefined') {
   global.window = global;
 }
 
+// The ideal input response latency, the time between the input task and the
+// first frame of the response.
+const BASE_RESPONSE_LATENCY = 16;
+
 // we need gl-matrix and jszip for traceviewer
 // since it has internal forks for isNode and they get mixed up during
 // browserify, we require them locally here and global-ize them.
@@ -97,21 +101,112 @@ class TraceProcessor {
     return model;
   }
 
-  getInputReadiness(model) {
-    // Now set up the user expectations model.
-    // this fake idle Interaction Record is used to grab the readiness out of
-    // TODO(paullewis) start the idle at firstPaint/fCP and end it at end of recording
-    const idle = new traceviewer.model.um.IdleExpectation(model, 'test', 0, 10000);
-    model.userModel.expectations.push(idle);
+  /**
+   * Find a main thread from supplied model with matching processId and
+   * threadId.
+   * @param {!Object} model TraceProcessor Model
+   * @param {number} processId
+   * @param {number} threadId
+   * @return {!Object}
+   * @private
+   */
+  static _findMainThreadFromIds(model, processId, threadId) {
+    const modelHelper = model.getOrCreateHelper(traceviewer.model.helpers.ChromeModelHelper);
+    const renderHelpers = traceviewer.b.dictionaryValues(modelHelper.rendererHelpers);
+    const mainThread = renderHelpers.find(helper => {
+      return helper.mainThread &&
+        helper.pid === processId &&
+        helper.mainThread.tid === threadId;
+    }).mainThread;
 
-    // Set up a value list for the hazard metric.
-    // TODO use new approach from ben
-    //   https://github.com/GoogleChrome/lighthouse/pull/284#issuecomment-217263964
-    const valueList = new traceviewer.metrics.ValueList();
-    traceviewer.metrics.sh.hazardMetric(valueList, model);
-    // grab last item, as it matches the fake idle we push()'d into the model'
-    const metricValue = valueList.valueDicts[valueList.valueDicts.length - 1];
-    return metricValue;
+    return mainThread;
+  }
+
+  /**
+   * Calculate duration at specified percentiles for given population of
+   * durations.
+   * @param {!Array<number>} durations Array of durations, sorted in ascending order.
+   * @param {number} totalTime Total time (in ms) of interval containing durations.
+   * @param {!Array<number>} percentiles Array of percentiles of interest, in ascending order.
+   * @return {!Array<{percentile: number, time: number}>}
+   * @private
+   */
+  static _riskPercentiles(durations, totalTime, percentiles) {
+    let busyTime = 0;
+    for (let i = 0; i < durations.length; i++) {
+      busyTime += durations[i];
+    }
+
+    // Start with idle time already complete.
+    let completedTime = totalTime - busyTime;
+    let duration = 0;
+    let cdfTime = completedTime;
+    let remainingCount = durations.length + 1;
+    const results = [];
+
+    // Find percentiles of interest, in order.
+    for (let percentile of percentiles) {
+      // Loop over durations, calculating a CDF value for each until it is above
+      // the target percentile.
+      const percentileTime = percentile * totalTime;
+      while (cdfTime < percentileTime && remainingCount > 1) {
+        completedTime += duration;
+        remainingCount--;
+        duration = durations[durations.length - remainingCount];
+
+        // Calculate value of CDF (multiplied by totalTime) for the end of this duration.
+        cdfTime = completedTime + duration * remainingCount;
+      }
+
+      // Negative results are within idle time (0ms wait by definition), so clamp at zero.
+      results.push({
+        percentile,
+        time: Math.max(0, (percentileTime - completedTime) / remainingCount) + BASE_RESPONSE_LATENCY
+      });
+    }
+
+    return results;
+  }
+
+  /**
+   * Calculates the maximum queueing time (in ms) of high priority tasks for
+   * selected percentiles within a window of the main thread.
+   * @param {!traceviewer.Model} model
+   * @param {!Array<!Object>} trace
+   * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
+   * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
+   * @param {!Array<number>=} percentiles Optional array of percentiles to compute. Defaults to [0.5, 0.75, 0.9, 0.99, 1].
+   * @return {!Array<{percentile: number, time: number}>}
+   */
+  static getRiskToResponsiveness(model, trace, startTime, endTime, percentiles) {
+    // Range of responsiveness we care about. Default to bounds of model.
+    startTime = startTime === undefined ? model.bounds.min : startTime;
+    endTime = endTime === undefined ? model.bounds.max : endTime;
+    const totalTime = endTime - startTime;
+
+    percentiles = percentiles || [0.5, 0.75, 0.9, 0.99, 1];
+
+    // Find the main thread.
+    const startEvent = trace.find(event => {
+      return event.name === 'TracingStartedInPage';
+    });
+    const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);
+
+    // Find durations of all slices in range of interest.
+    // TODO(bckenny): filter for top level slices ourselves?
+    const durations = [];
+    mainThread.sliceGroup.topLevelSlices.forEach(slice => {
+      // Discard slices outside range.
+      if (slice.end <= startTime || slice.start >= endTime) {
+        return;
+      }
+
+      durations.push(slice.duration);
+    });
+    durations.sort((a, b) => a - b);
+
+    // Actual calculation of percentiles done in _riskPercentiles.
+    return TraceProcessor._riskPercentiles(durations, totalTime, percentiles);
   }
 
   /**
