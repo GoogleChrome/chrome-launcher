@@ -39,7 +39,7 @@
     "coveralls": "^2.11.9"
   },
   "dependencies": {
-    "meow": "^3.7.0"
+    "yargs": "^3.3.0"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [

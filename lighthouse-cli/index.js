@@ -18,7 +18,7 @@
 
 'use strict';
 
-const meow = require('meow');
+const yargs = require('yargs');
 const log = require('../lighthouse-core/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
@@ -30,43 +30,74 @@ if (semver.lt(process.version, '5.0.0')) {
   process.exit(1);
 }
 
-const formatOptions = Object.values(Printer.OUTPUT_MODE).join(', ');
+const cli = yargs
+  .help('help')
+  .version()
 
-const cli = meow(`
-Usage:
-    lighthouse [url]
+  .usage('$0 url')
+  .demand(1, 'Please provide an url')
 
-Basic:
-    --help             Show this help
-    --version          Current version of package
+  // List of options
+  .group([
+    'verbose',
+    'quiet'
+  ], 'Logging:')
+  .describe({
+    verbose: 'Displays verbose logging',
+    quiet: 'Displays no progress or debug logs'
+  })
 
-Logging:
-    --verbose          Displays verbose logging
-    --quiet            Displays no progress or debug logs
+  .group([
+    'mobile',
+    'load-page',
+    'save-assets',
+    'save-artifacts',
+    'audit-whitelist',
+    'list-all-audits',
+    'config-path'
+  ], 'Configuration:')
+  .describe({
+    'mobile': 'Emulates a Nexus 5X',
+    'load-page': 'Loads the page',
+    'save-assets': 'Save the trace contents & screenshots to disk',
+    'save-artifacts': 'Save all gathered artifacts to disk',
+    'audit-whitelist': 'Comma separated list of audits to run',
+    'list-all-audits': 'Prints a list of all available audits and exits',
+    'config-path': 'The path to the config JSON.'
+  })
 
-Run Configuration:
-    --mobile           Emulates a Nexus 5X (default=true)
-    --load-page        Loads the page (default=true)
-    --save-assets      Save the trace contents & screenshots to disk
-    --save-artifacts   Save all gathered artifacts to disk
-    --audit-whitelist  Comma separated list of audits to run (default=all)
-    --list-all-audits  Prints a list of all available audits and exits
-    --config-path      The path to the config JSON.
+  .group([
+    'output',
+    'output-path'
+  ], 'Output:')
+  .describe({
+    'output': 'Reporter for the results',
+    'output-path': `The file path to output the results
+Example: --output-path=./lighthouse-results.html`
+  })
 
-Output:
-    --output           Reporter for the results
-                       Reporter options: ${formatOptions}  (default=pretty)
-    --output-path      The file path to output the results (default=stdout)
-                       Example: --output-path=./lighthouse-results.html
-`, {
-  // These options do not have a value
-  boolean: [
-    'save-assets', 'save-artifacts', 'list-all-audits',
-    'verbose', 'quiet', 'help', 'version'
-  ]
-});
+  // boolean values
+  .boolean([
+    'save-assets',
+    'save-artifacts',
+    'list-all-audits',
+    'verbose',
+    'quiet',
+    'help',
+    'version'
+  ])
 
-if (cli.flags.listAllAudits) {
+  .choices('output', Object.values(Printer.OUTPUT_MODE))
+
+  // default values
+  .default('mobile', true)
+  .default('load-page', true)
+  .default('audit-whitelist', 'all')
+  .default('output', Printer.OUTPUT_MODE.pretty)
+  .default('output-path', 'stdout')
+  .argv;
+
+if (cli.listAllAudits) {
   const audits = lighthouse
       .getAuditList()
       .map(i => {
@@ -77,11 +108,11 @@ if (cli.flags.listAllAudits) {
   process.exit(0);
 }
 
-const url = cli.input[0] || 'https://m.aliexpress.com/';
-const outputMode = cli.flags.output || Printer.OUTPUT_MODE.pretty;
-const outputPath = cli.flags.outputPath || 'stdout';
-const flags = cli.flags;
-const config = (cli.flags.configPath && require(cli.flags.configPath)) || null;
+const url = cli._[0];
+const outputMode = cli.output;
+const outputPath = cli.outputPath;
+const flags = cli;
+const config = (cli.configPath && require(cli.configPath)) || null;
 
 // If the URL isn't https or localhost complain to the user.
 if (url.indexOf('https') !== 0 && url.indexOf('http://localhost') !== 0) {
@@ -91,9 +122,9 @@ if (url.indexOf('https') !== 0 && url.indexOf('http://localhost') !== 0) {
 
 // set logging preferences
 flags.logLevel = 'info';
-if (cli.flags.verbose) {
+if (cli.verbose) {
   flags.logLevel = 'verbose';
-} else if (cli.flags.quiet) {
+} else if (cli.quiet) {
   flags.logLevel = 'error';
 }
 
