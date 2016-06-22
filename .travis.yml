@@ -24,5 +24,3 @@ script:
   - npm run smoke
   - cd lighthouse-extension
   - gulp build
-  - cd ../lighthouse-cli
-  - npm run unit
