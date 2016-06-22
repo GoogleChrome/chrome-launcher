@@ -79,7 +79,7 @@ npm run unit
 
 ## Chrome Extension
 
-The same audits are run against from a Chrome extension. See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/extension).
+The same audits are run against from a Chrome extension. See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-extension).
 
 
 ## Architecture
