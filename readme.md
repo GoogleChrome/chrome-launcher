@@ -95,6 +95,18 @@ _Some incomplete notes_
 * **Diagnoses** - The perf problems that affect those metrics
 * **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
 
+Moreover…
+
+* `/core.js` does the gathering, auditing and aggregation
+* `/runner.js` is the shared handler (for both module & extension) that needs to be given a driver, and sets up the core to do its job
+* `/module/index` is the require('lighthouse') file so you can use it in Node, and it uses the runner
+
+```
+module/index \
+              ----- Runner ----- Core [Gather / Audit / Aggregate] 
+extension    /
+```
+
 ### Protocol
 
 * _Interacting with Chrome:_ The Chrome protocol connection maintained via  [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface) for the CLI and [`chrome.debuggger` API](https://developer.chrome.com/extensions/debugger) when in the Chrome extension.
