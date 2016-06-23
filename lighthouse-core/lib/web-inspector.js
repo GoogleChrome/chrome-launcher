@@ -86,15 +86,6 @@ module.exports = (function() {
     return this._moduleSettings[settingName];
   };
 
-  global.insertionIndexForObjectInListSortedByFunction =
-      function(object, list, comparator, insertionIndexAfter) {
-        if (insertionIndexAfter) {
-          return list.upperBound(object, comparator);
-        }
-
-        return list.lowerBound(object, comparator);
-      };
-
   // Enum from chromium//src/third_party/WebKit/Source/core/loader/MixedContentChecker.h
   global.NetworkAgent = {
     RequestMixedContentType: {
@@ -200,16 +191,6 @@ module.exports = (function() {
   WebInspector.DeferredTempFile.prototype = {
     write: function() {},
     finishWriting: function() {}
-  };
-
-  // add support for groupBy('EventName')
-  WebInspector.TimelineAggregator.GroupBy.EventName = 'EventName';
-  const oldNodeToGroupIdFunction = WebInspector.TimelineAggregator.prototype._nodeToGroupIdFunction;
-  WebInspector.TimelineAggregator.prototype._nodeToGroupIdFunction = function(groupBy) {
-    if (groupBy === WebInspector.TimelineAggregator.GroupBy.EventName) {
-      return node => node.event.name;
-    }
-    return oldNodeToGroupIdFunction.call(this, groupBy);
   };
 
   // Mock for WebInspector code that writes to console.

@@ -43,11 +43,11 @@ class TimelineModel {
     this._tracingModel.tracingComplete();
     this._timelineModel.setEvents(this._tracingModel);
 
-    this._aggregator = new WebInspector.TimelineAggregator(event => {
-      return WebInspector.TimelineUIUtils.eventStyle(event).category.name;
-    });
-
     return this;
+  }
+
+  _createAggregator() {
+    return WebInspector.AggregatedTimelineTreeView.prototype._createAggregator();
   }
 
   timelineModel() {
@@ -69,15 +69,17 @@ class TimelineModel {
     ];
     filters.push(new WebInspector.ExclusiveNameFilter(nonessentialEvents));
 
-    return WebInspector.TimelineProfileTree.buildTopDown(this._timelineModel.mainThreadEvents(),
+    var topDown = WebInspector.TimelineProfileTree.buildTopDown(
+        this._timelineModel.mainThreadEvents(),
         filters, /* startTime */ 0, /* endTime */ Infinity,
         WebInspector.TimelineAggregator.eventId);
+    return topDown;
   }
 
   bottomUp() {
     var topDown = this.topDown();
     var noGrouping = WebInspector.TimelineAggregator.GroupBy.None;
-    var noGroupAggregator = this._aggregator.groupFunction(noGrouping);
+    var noGroupAggregator = this._createAggregator().groupFunction(noGrouping);
     return WebInspector.TimelineProfileTree.buildBottomUp(topDown, noGroupAggregator);
   }
 
@@ -89,7 +91,7 @@ class TimelineModel {
     var topDown = this.topDown();
 
     var groupSetting = WebInspector.TimelineAggregator.GroupBy[grouping];
-    var groupingAggregator = this._aggregator.groupFunction(groupSetting);
+    var groupingAggregator = this._createAggregator().groupFunction(groupSetting);
     var bottomUpGrouped =
         WebInspector.TimelineProfileTree.buildBottomUp(topDown, groupingAggregator);
 
@@ -99,7 +101,9 @@ class TimelineModel {
   }
 
   frameModel() {
-    var frameModel = new WebInspector.TracingTimelineFrameModel();
+    var frameModel = new WebInspector.TimelineFrameModel(event =>
+      WebInspector.TimelineUIUtils.eventStyle(event).category.name
+    );
     frameModel.addTraceEvents({ /* target */ },
       this._timelineModel.inspectedTargetEvents(), this._timelineModel.sessionId() || '');
     return frameModel;

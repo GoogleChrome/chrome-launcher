@@ -39,7 +39,7 @@ describe('DevTools Timeline Model', function() {
     const leavesCount = model.topDown().children.size;
     assert.equal(leavesCount, 27);
     const time = model.topDown().totalTime.toFixed(2);
-    assert.equal(time, '559.21');
+    assert.equal(time, '555.01');
   });
 
   it('bottom-up profile', () => {
@@ -48,14 +48,14 @@ describe('DevTools Timeline Model', function() {
     const topCosts = [...model.bottomUpGroupBy('URL').children.values()];
     const time = topCosts[1].totalTime.toFixed(2);
     const url = topCosts[1].id;
-    assert.equal(time, '80.77');
+    assert.equal(time, '76.26');
     assert.equal(url, 'https://s.ytimg.com/yts/jsbin/www-embed-lightweight-vflu_2b1k/www-embed-lightweight.js');
   });
 
   it('bottom-up profile - group by eventname', () => {
     const bottomUpByName = model.bottomUpGroupBy('EventName');
     const leavesCount = bottomUpByName.children.size;
-    assert.equal(leavesCount, 14);
+    assert.equal(leavesCount, 13);
     const topCosts = [...bottomUpByName.children.values()];
     const time = topCosts[0].selfTime.toFixed(2);
     const name = topCosts[0].id;
