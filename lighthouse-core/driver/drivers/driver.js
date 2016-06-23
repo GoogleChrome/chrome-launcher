@@ -27,7 +27,19 @@ class DriverBase {
     this.PAUSE_AFTER_LOAD = 500;
     this._chrome = null;
     this._traceEvents = [];
-    this._traceCategories = [
+    this._traceCategories = DriverBase.traceCategories;
+  }
+
+  get url() {
+    return this._url;
+  }
+
+  set url(_url) {
+    this._url = _url;
+  }
+
+  static get traceCategories() {
+    return [
       '-*', // exclude default
       'toplevel',
       'blink.console',
@@ -40,14 +52,6 @@ class DriverBase {
       'disabled-by-default-devtools.timeline.stack',
       'disabled-by-default-devtools.screenshot'
     ];
-  }
-
-  get url() {
-    return this._url;
-  }
-
-  set url(_url) {
-    this._url = _url;
   }
 
   enableRuntimeEvents() {
@@ -348,3 +352,4 @@ class DriverBase {
 }
 
 module.exports = DriverBase;
+
