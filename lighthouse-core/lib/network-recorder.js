@@ -81,8 +81,9 @@ class NetworkRecorder {
         data.blockedReason);
   }
 
-  onResourceChangedPriority() {
-    // TODO: Add call to dispatcher after devtools dependency is updated
+  onResourceChangedPriority(data) {
+    this.networkManager._dispatcher.resourceChangedPriority(data.requestId,
+      data.newPriority, data.timestamp);
   }
 }
 

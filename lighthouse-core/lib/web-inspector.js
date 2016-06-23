@@ -42,6 +42,16 @@ module.exports = (function() {
       }
     }
   };
+  global.Runtime.queryParam = function(arg) {
+    switch (arg) {
+      case 'remoteFrontend':
+        return false;
+      case 'ws':
+        return false;
+      default:
+        throw Error('Mock queryParam case not implemented.');
+    }
+  };
 
   global.TreeElement = {};
   global.WorkerRuntime = {};
@@ -151,7 +161,14 @@ module.exports = (function() {
     observeTargets() {}
   };
   WebInspector.settings = {
-    createSetting() {}
+    createSetting() {
+      return {
+        get() {
+          return false;
+        },
+        addChangeListener() {}
+      };
+    }
   };
   WebInspector.console = {
     error() {}
@@ -165,17 +182,18 @@ module.exports = (function() {
   require('chrome-devtools-frontend/front_end/common/SegmentedRange.js');
   require('chrome-devtools-frontend/front_end/bindings/TempFile.js');
   require('chrome-devtools-frontend/front_end/sdk/TracingModel.js');
-  require('chrome-devtools-frontend/front_end/timeline/TimelineJSProfile.js');
+  require('chrome-devtools-frontend/front_end/sdk/ProfileTreeModel.js');
   require('chrome-devtools-frontend/front_end/timeline/TimelineUIUtils.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/TimelineJSProfile.js');
   require('chrome-devtools-frontend/front_end/sdk/CPUProfileDataModel.js');
-  require('chrome-devtools-frontend/front_end/timeline/LayerTreeModel.js');
-  require('chrome-devtools-frontend/front_end/timeline/TimelineModel.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/LayerTreeModel.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/TimelineModel.js');
   require('chrome-devtools-frontend/front_end/ui_lazy/SortableDataGrid.js');
   require('chrome-devtools-frontend/front_end/timeline/TimelineTreeView.js');
-  require('chrome-devtools-frontend/front_end/timeline/TimelineProfileTree.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/TimelineProfileTree.js');
   require('chrome-devtools-frontend/front_end/components_lazy/FilmStripModel.js');
-  require('chrome-devtools-frontend/front_end/timeline/TimelineIRModel.js');
-  require('chrome-devtools-frontend/front_end/timeline/TimelineFrameModel.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/TimelineIRModel.js');
+  require('chrome-devtools-frontend/front_end/timeline_model/TimelineFrameModel.js');
 
   // DevTools makes a few assumptions about using backing storage to hold traces.
   WebInspector.DeferredTempFile = function() {};
