@@ -33,9 +33,10 @@ if (semver.lt(process.version, '5.0.0')) {
 const cli = yargs
   .help('help')
   .version()
+  .showHelpOnFail(false, 'Specify --help for available options')
 
   .usage('$0 url')
-  .demand(1, 'Please provide an url')
+  .demand(1, 'Please provide a url')
 
   // List of options
   .group([

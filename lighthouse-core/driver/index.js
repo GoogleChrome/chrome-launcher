@@ -26,7 +26,8 @@ class Driver {
       // Wait a bit for about:blank to "take hold" before switching back to the page.
       .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
       .then(_ => driver.gotoURL(options.url, {
-        waitForLoad: true, disableJavaScript: !!options.disableJavaScript
+        waitForLoad: true,
+        disableJavaScript: !!options.disableJavaScript
       }));
   }
 
