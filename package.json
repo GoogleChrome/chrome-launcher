@@ -39,7 +39,7 @@
     "coveralls": "^2.11.9"
   },
   "dependencies": {
-    "yargs": "^3.3.0"
+    "yargs": "3.30.0"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [
