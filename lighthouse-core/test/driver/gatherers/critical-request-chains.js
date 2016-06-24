@@ -287,6 +287,27 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     });
   });
 
+  it('discards favicons as non-critical', () => {
+    const networkRecords = mockTracingData([HIGH, HIGH, HIGH], [[0, 1], [0, 2]]);
+
+    // 2nd record is a favicon
+    networkRecords[1].url = 'https://example.com/favicon.ico';
+    networkRecords[1].parsedURL = {
+      lastPathComponent: 'favicon.ico'
+    };
+    // 3rd record is also a favicon
+    networkRecords[2].mimeType = 'image/x-icon';
+    Gatherer.afterPass(null, {networkRecords});
+    const criticalChains = Gatherer.artifact;
+
+    assert.deepEqual(criticalChains, {
+      0: {
+        request: constructEmptyRequest(),
+        children: {}
+      }
+    });
+  });
+
   it('handles non-existent nodes when building the tree', () => {
     const networkRecords = mockTracingData([HIGH, HIGH], [[0, 1]]);
 

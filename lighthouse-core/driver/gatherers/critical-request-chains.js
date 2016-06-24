@@ -36,6 +36,13 @@ class CriticalRequestChains extends Gather {
     if (resourceTypeCategory === WebInspector.resourceTypes.XHR._category) {
       return false;
     }
+
+    // Treat favicons as non-critical resources
+    if (request.mimeType === 'image/x-icon' ||
+        (request.parsedURL && request.parsedURL.lastPathComponent === 'favicon.ico')) {
+      return false;
+    }
+
     return includes(['VeryHigh', 'High', 'Medium'], request.priority());
   }
 
