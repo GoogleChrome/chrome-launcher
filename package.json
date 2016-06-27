@@ -39,6 +39,7 @@
     "coveralls": "^2.11.9"
   },
   "dependencies": {
+    "semver": ">=4.3.3",
     "yargs": "3.30.0"
   },
   "repository": "googlechrome/lighthouse",
