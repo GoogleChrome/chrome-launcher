@@ -30,7 +30,7 @@
     "axe-core": "^1.1.1",
     "chrome-devtools-frontend": "1.0.401423",
     "chrome-remote-interface": "^0.11.0",
-    "devtools-timeline-model": "1.1.4",
+    "devtools-timeline-model": "1.1.6",
     "gl-matrix": "2.3.2",
     "handlebars": "^4.0.5",
     "json-stringify-safe": "^5.0.1",
