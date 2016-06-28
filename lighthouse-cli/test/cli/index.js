@@ -21,16 +21,20 @@ const assert = require('assert');
 const childProcess = require('child_process');
 
 describe('CLI Tests', function() {
-  it('should list all audits and exit immediately after', () => {
+  it('fails if a url is not provided', () => {
+    assert.throws(() => childProcess.execSync('node lighthouse-cli/index.js'));
+  });
+
+  it('should list all audits without a url and exit immediately after', () => {
     const output = JSON.parse(childProcess.execSync(
-          'node lighthouse-cli/index.js https://example.com --list-all-audits').toString());
+          'node lighthouse-cli/index.js --list-all-audits').toString());
     assert(Array.isArray(output.audits));
     assert(output.audits.length > 0);
   });
 
-  it('should print trace categories list-trace-categories flag and exit immediately after', () => {
+  it('accepts just the list-trace-categories flag and exit immediately after', () => {
     const output = JSON.parse(childProcess.execSync(
-          'node lighthouse-cli/index.js https://example.com --list-trace-categories').toString());
+          'node lighthouse-cli/index.js --list-trace-categories').toString());
     assert(Array.isArray(output.traceCategories));
     assert(output.traceCategories.length > 0);
   });

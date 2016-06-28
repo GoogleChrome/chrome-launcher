@@ -36,7 +36,6 @@ const cli = yargs
   .showHelpOnFail(false, 'Specify --help for available options')
 
   .usage('$0 url')
-  .demand(1, 'Please provide a url')
 
   // List of options
   .group([
@@ -99,6 +98,15 @@ Example: --output-path=./lighthouse-results.html`
   .default('audit-whitelist', 'all')
   .default('output', Printer.OUTPUT_MODE.pretty)
   .default('output-path', 'stdout')
+  .check(argv => {
+    // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
+    // or --list-trace-categories. If not, stop the program and ask for a url
+    if (!argv.listAllAudits && !argv.listTraceCategories && argv._.length === 0) {
+      throw new Error('Please provide a url');
+    }
+
+    return true;
+  })
   .argv;
 
 if (cli.listAllAudits) {
@@ -113,9 +121,9 @@ if (cli.listAllAudits) {
 }
 
 if (cli.listTraceCategories) {
-  const categories = lighthouse.traceCategories;
+  const traceCategories = lighthouse.traceCategories;
 
-  process.stdout.write(JSON.stringify({traceCategories: categories}));
+  process.stdout.write(JSON.stringify({traceCategories}));
   process.exit(0);
 }
 
