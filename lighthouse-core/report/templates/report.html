@@ -111,10 +111,10 @@ limitations under the License.
                       (Coming soon)
                       {{/if}}
                     </span>
-                    {{#if subItem.rawValue }}
-                    <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
+                    {{#if subItem.displayValue }}
+                    <span class="report-section__item-raw-value">({{ subItem.displayValue }})&nbsp;</span>
                     {{/if }}
-                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
+                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.score }}">{{ getItemValue subItem.score }}</span>
                   </div>
                   {{#if subItem.extendedInfo.value}}
                     <div class="report-section__item-extended-info">

@@ -79,21 +79,21 @@ class Aggregate {
     }
 
     if (typeof result === 'undefined' ||
-        typeof result.value === 'undefined') {
+        typeof result.score === 'undefined') {
       return weight;
     }
 
-    if (typeof result.value !== typeof expected.value) {
+    if (typeof result.score !== typeof expected.value) {
       return weight;
     }
 
     switch (typeof expected.value) {
       case 'boolean':
-        weight = this._convertBooleanToWeight(result.value, expected.value, expected.weight);
+        weight = this._convertBooleanToWeight(result.score, expected.value, expected.weight);
         break;
 
       case 'number':
-        weight = this._convertNumberToWeight(result.value, expected.value, expected.weight);
+        weight = this._convertNumberToWeight(result.score, expected.value, expected.weight);
         break;
 
       default:
@@ -154,7 +154,7 @@ class Aggregate {
         // TODO(paullewis): Remove once coming soon audits have landed.
         if (item.criteria[e].comingSoon) {
           subItems.push({
-            value: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
+            score: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
             name: 'coming-soon',
             category: item.criteria[e].category,
             description: item.criteria[e].description,

@@ -33,17 +33,19 @@ class Audit {
       throw new Error('generateAuditResult requires a rawValue');
     }
 
+    let score = result.score ? result.score : result.rawValue;
     let displayValue = result.displayValue;
     if (!displayValue) {
       displayValue = result.rawValue ? result.rawValue : '';
     }
 
-    if (displayValue === true) {
+    // The same value or true should be '' it doesn't add value to the report
+    if (displayValue === score) {
       displayValue = '';
     }
 
     return {
-      score: result.score ? result.score : result.rawValue,
+      score,
       displayValue: `${displayValue}`,
       rawValue: result.rawValue,
       debugString: result.debugString,
