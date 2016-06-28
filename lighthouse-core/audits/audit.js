@@ -29,12 +29,22 @@ class Audit {
    * @return {!AuditResult}
    */
   static generateAuditResult(result) {
-    if (typeof result.value === 'undefined') {
-      throw new Error('generateAuditResult requires a value');
+    if (typeof result.rawValue === 'undefined') {
+      throw new Error('generateAuditResult requires a rawValue');
+    }
+
+    let displayValue = result.displayValue;
+    if (!displayValue) {
+      displayValue = result.rawValue ? result.rawValue : '';
+    }
+
+    if (displayValue === true) {
+      displayValue = '';
     }
 
     return {
-      value: result.value,
+      score: result.score ? result.score : result.rawValue,
+      displayValue: `${displayValue}`,
       rawValue: result.rawValue,
       debugString: result.debugString,
       optimalValue: result.optimalValue,

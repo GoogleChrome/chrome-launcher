@@ -29,7 +29,7 @@ describe('Performance: estimated-input-latency audit', () => {
         first: 500
       }
     });
-    assert.equal(output.value, -1);
+    assert.equal(output.score, -1);
     assert(output.debugString);
   });
 
@@ -41,7 +41,8 @@ describe('Performance: estimated-input-latency audit', () => {
       }
     });
 
-    assert.equal(output.rawValue, '17.4ms');
-    assert.equal(output.value, 100);
+    assert.equal(output.rawValue, 17.4);
+    assert.equal(output.displayValue, '17.4ms');
+    assert.equal(output.score, 100);
   });
 });

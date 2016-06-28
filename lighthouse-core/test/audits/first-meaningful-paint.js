@@ -22,13 +22,13 @@ const assert = require('assert');
 describe('Performance: first-meaningful-paint audit', () => {
   it('scores a -1 when no trace data is present', () => {
     return Audit.audit({}).then(response => {
-      return assert.equal(response.value, -1);
+      return assert.equal(response.score, -1);
     });
   });
 
   it('scores a -1 when faulty trace data is present', () => {
     return Audit.audit({boo: 'ya'}).then(response => {
-      return assert.equal(response.value, -1);
+      return assert.equal(response.score, -1);
     });
   });
 
@@ -43,7 +43,8 @@ describe('Performance: first-meaningful-paint audit', () => {
     });
 
     it('finds the expected fMP', () => {
-      assert.equal(fmpResult.rawValue, '1099.5ms');
+      assert.equal(fmpResult.displayValue, '1099.5ms');
+      assert.equal(fmpResult.rawValue, 1099.5);
     });
 
     it('finds the correct fCP + fMP timings', () => {
@@ -55,7 +56,7 @@ describe('Performance: first-meaningful-paint audit', () => {
     });
 
     it('scores the fMP correctly', () => {
-      assert.equal(fmpResult.value, 99);
+      assert.equal(fmpResult.score, 99);
     });
   });
 });

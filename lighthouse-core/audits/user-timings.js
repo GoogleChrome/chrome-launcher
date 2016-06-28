@@ -129,7 +129,7 @@ class UserTimings extends Audit {
   static audit(artifacts) {
     if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
       return UserTimings.generateAuditResult({
-        value: -1,
+        rawValue: -1,
         debugString: FAILURE_MESSAGE
       });
     }
@@ -137,7 +137,7 @@ class UserTimings extends Audit {
     const userTimings = filterTrace(artifacts.traceContents);
 
     return UserTimings.generateAuditResult({
-      value: userTimings.length,
+      rawValue: userTimings.length,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
         value: userTimings

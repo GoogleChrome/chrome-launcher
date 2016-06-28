@@ -23,7 +23,7 @@ describe('HTML: theme-color audit', () => {
   it('fails and warns when no window or html present', () => {
     const emptyAudit = Audit.audit({});
 
-    assert.equal(emptyAudit.value, false);
+    assert.equal(emptyAudit.rawValue, false);
     assert(emptyAudit.debugString);
   });
 
@@ -32,7 +32,7 @@ describe('HTML: theme-color audit', () => {
       ThemeColor: null
     });
 
-    assert.equal(nullColorAudit.value, false);
+    assert.equal(nullColorAudit.rawValue, false);
     assert(nullColorAudit.debugString);
   });
 
@@ -41,19 +41,19 @@ describe('HTML: theme-color audit', () => {
       ThemeColor: '#1234567'
     });
 
-    assert.equal(invalidColorAudit.value, false);
+    assert.equal(invalidColorAudit.rawValue, false);
     assert(invalidColorAudit.debugString);
   });
 
   it('succeeds when theme-color present in the html', () => {
     assert.equal(Audit.audit({
       ThemeColor: '#fafa33'
-    }).value, true);
+    }).rawValue, true);
   });
 
   it('succeeds when theme-color has a CSS nickname content value', () => {
     assert.equal(Audit.audit({
       ThemeColor: 'red'
-    }).value, true);
+    }).rawValue, true);
   });
 });

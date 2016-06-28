@@ -59,7 +59,7 @@ class CriticalRequestChains extends Audit {
     walk(artifacts.CriticalRequestChains, 0);
 
     return CriticalRequestChains.generateAuditResult({
-      value: chainCount,
+      rawValue: chainCount,
       optimalValue: this.meta.optimalValue,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,

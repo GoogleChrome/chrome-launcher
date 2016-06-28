@@ -20,18 +20,18 @@ const assert = require('assert');
 
 describe('Mobile-friendly: viewport audit', () => {
   it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+    return assert.equal(Audit.audit({}).rawValue, false);
   });
 
   it('fails when HTML does not contain a viewport meta tag', () => {
     return assert.equal(Audit.audit({
       Viewport: ''
-    }).value, false);
+    }).rawValue, false);
   });
 
   it('passes when a viewport is provided', () => {
     return assert.equal(Audit.audit({
       Viewport: 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
-    }).value, true);
+    }).rawValue, true);
   });
 });

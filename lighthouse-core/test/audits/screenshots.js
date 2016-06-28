@@ -22,11 +22,11 @@ const assert = require('assert');
 describe('Performance: screenshots audit', () => {
   it('fails gracefully', () => {
     const output = Audit.audit({});
-    assert.equal(output.value, -1);
+    assert.equal(output.score, -1);
   });
 
   it('processes an empty trace for screenshot data', () => {
     const output = Audit.audit({ScreenshotFilmstrip: []});
-    assert.equal(output.value, 0);
+    assert.equal(output.score, 0);
   });
 });

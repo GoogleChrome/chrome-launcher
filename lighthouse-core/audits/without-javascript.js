@@ -45,7 +45,7 @@ class WithoutJavaScript extends Audit {
     }
 
     return WithoutJavaScript.generateAuditResult({
-      value: bodyHasContent,
+      rawValue: bodyHasContent,
       debugString
     });
   }

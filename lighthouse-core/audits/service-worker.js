@@ -38,7 +38,7 @@ class ServiceWorker extends Audit {
    */
   static audit(artifacts) {
     return ServiceWorker.generateAuditResult({
-      value: !!artifacts.ServiceWorker.version,
+      rawValue: !!artifacts.ServiceWorker.version,
       debugString: artifacts.ServiceWorker.debugString
     });
   }

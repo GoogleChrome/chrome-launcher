@@ -45,7 +45,7 @@ class ManifestName extends Audit {
     }
 
     return ManifestName.generateAuditResult({
-      value: hasName
+      rawValue: hasName
     });
   }
 }

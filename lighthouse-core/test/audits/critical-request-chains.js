@@ -53,6 +53,6 @@ const CriticalRequestChains = {
 describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain length', () => {
     const output = Audit.audit({CriticalRequestChains});
-    assert.equal(output.value, 2);
+    assert.equal(output.score, 2);
   });
 });

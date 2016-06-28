@@ -51,7 +51,7 @@ class ManifestBackgroundColor extends Audit {
         .hasBackgroundColorValue(artifacts.Manifest.value);
 
     return ManifestBackgroundColor.generateAuditResult({
-      value: hasBackgroundColor
+      rawValue: hasBackgroundColor
     });
   }
 }

@@ -30,7 +30,7 @@ describe('Offline: Service Worker audit', () => {
       }
     });
 
-    assert.equal(output.value, false);
+    assert.equal(output.score, false);
     assert.equal(output.debugString, debugString);
   });
 
@@ -41,6 +41,6 @@ describe('Offline: Service Worker audit', () => {
       }
     });
 
-    return assert.equal(output.value, true);
+    return assert.equal(output.score, true);
   });
 });

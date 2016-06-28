@@ -57,7 +57,7 @@ class ManifestShortNameLength extends Audit {
     }
 
     return ManifestShortNameLength.generateAuditResult({
-      value: isShortNameShortEnough,
+      rawValue: isShortNameShortEnough,
       debugString
     });
   }

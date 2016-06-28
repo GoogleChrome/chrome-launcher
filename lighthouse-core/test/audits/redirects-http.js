@@ -20,7 +20,7 @@ const assert = require('assert');
 
 describe('Security: HTTP->HTTPS audit', () => {
   it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
+    return assert.equal(Audit.audit({}).rawValue, false);
   });
 
   it('fails when no redirect detected', () => {
@@ -28,7 +28,7 @@ describe('Security: HTTP->HTTPS audit', () => {
       HTTPRedirect: {
         value: false
       }
-    }).value, false);
+    }).rawValue, false);
   });
 
   it('passes when redirect detected', () => {
@@ -36,6 +36,6 @@ describe('Security: HTTP->HTTPS audit', () => {
       HTTPRedirect: {
         value: true
       }
-    }).value, true);
+    }).rawValue, true);
   });
 });

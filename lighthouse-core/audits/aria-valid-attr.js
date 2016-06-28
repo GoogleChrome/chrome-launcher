@@ -42,7 +42,7 @@ class ARIAValidAttr extends Audit {
         artifacts.Accessibility.violations.find(result => result.id === 'aria-valid-attr');
 
     return ARIAValidAttr.generateAuditResult({
-      value: typeof rule === 'undefined',
+      rawValue: typeof rule === 'undefined',
       debugString: this.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,

@@ -27,10 +27,13 @@
 function AuditResultInput() {}
 
 /** @type {(boolean|number|string)} */
-AuditResultInput.prototype.value;
+AuditResultInput.prototype.score;
 
-/** @type {(boolean|number|string|undefined|null)} */
+/** @type {(boolean|number|undefined|null)} */
 AuditResultInput.prototype.rawValue;
+
+/** @type {(string)} */
+AuditResultInput.prototype.displayValue;
 
 /** @type {(string|undefined)} */
 AuditResultInput.prototype.debugString;
