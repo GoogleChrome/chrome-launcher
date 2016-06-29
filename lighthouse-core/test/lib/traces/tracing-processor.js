@@ -26,7 +26,7 @@ const defaultPercentiles = [0, 0.25, 0.5, 0.75, 0.9, 0.99, 1];
  * Create a riskPercentiles result object by matching the values in percentiles
  * and times.
  * @param {!Array<number>} percentiles
- * @param {!array<number>} times
+ * @param {!Array<number>} times
  * @return {!Array<{percentile: number, time: number}>}
  */
 function createRiskPercentiles(percentiles, times) {
@@ -69,6 +69,75 @@ describe('TracingProcessor lib', () => {
       const results = TracingProcessor._riskPercentiles([0, 0, 0, 10, 20, 20, 30, 30, 120], 320,
           defaultPercentiles);
       const expected = createRiskPercentiles(defaultPercentiles, [16, 16, 28, 56, 104, 132.8, 136]);
+      assert.deepEqual(results, expected);
+    });
+
+    // Three tasks of one second each, all within a five-second window.
+    // Mean Queueing Time of 300ms.
+    it('correctly calculates percentiles of three one-second tasks in a five-second window', () => {
+      const results = TracingProcessor._riskPercentiles([1000, 1000, 1000], 5000,
+          defaultPercentiles, 0);
+      // Round to hundredths to simplify floating point comparison.
+      results.forEach(result => {
+        result.time = Number(result.time.toFixed(2));
+      });
+
+      const expected = createRiskPercentiles(defaultPercentiles,
+          [16, 16, 182.67, 599.33, 849.33, 999.33, 1016]);
+      assert.deepEqual(results, expected);
+    });
+
+    it('correctly calculates percentiles of tasks with a clipped task', () => {
+      const results = TracingProcessor._riskPercentiles([10, 20, 50, 60, 90, 100], 300,
+          defaultPercentiles, 30);
+      // Round to hundredths to simplify floating point comparison.
+      results.forEach(result => {
+        result.time = Number(result.time.toFixed(2));
+      });
+
+      const expected = createRiskPercentiles(defaultPercentiles,
+          [16, 32.25, 53.5, 74.33, 96, 113, 116]);
+      assert.deepEqual(results, expected);
+    });
+
+    // One 20 second long task over three five-second windows.
+    it('correctly calculates percentiles of single task over multiple windows', () => {
+      // Starts 3 seconds into the first window. Mean Queueing Time = 7600ms.
+      const TASK_LENGTH = 20000;
+      let results1 = TracingProcessor._riskPercentiles([TASK_LENGTH], 5000,
+          defaultPercentiles, TASK_LENGTH - 2000);
+      const expected1 = createRiskPercentiles(defaultPercentiles,
+          [16, 16, 16, 18766, 19516, 19966, 20016]);
+      assert.deepEqual(results1, expected1);
+
+      // Starts 2 seconds before and ends 13 seconds after. Mean Queueing Time = 15500ms.
+      const results2 = TracingProcessor._riskPercentiles([TASK_LENGTH - 2000], 5000,
+          defaultPercentiles, TASK_LENGTH - 7000);
+      const expected2 = createRiskPercentiles(defaultPercentiles,
+          [16, 14266, 15516, 16766, 17516, 17966, 18016]);
+      assert.deepEqual(results2, expected2);
+
+      // Starts 17 seconds before and ends 3 seconds into the window. Mean Queueing Time = 900ms.
+      const results3 = TracingProcessor._riskPercentiles([TASK_LENGTH - 17000], 5000,
+          defaultPercentiles, 0);
+      const expected3 = createRiskPercentiles(defaultPercentiles,
+          [16, 16, 516, 1766, 2516, 2966, 3016]);
+      assert.deepEqual(results3, expected3);
+    });
+
+    it('correctly calculates with a task shorter than the clipped length of another', () => {
+      const results = TracingProcessor._riskPercentiles([40, 100], 100,
+          defaultPercentiles, 50);
+      const expected = createRiskPercentiles(defaultPercentiles,
+          [16, 31, 56, 91, 106, 115, 116]);
+      assert.deepEqual(results, expected);
+    });
+
+    it('correctly calculates with a task clipped completely', () => {
+      const results = TracingProcessor._riskPercentiles([40, 100], 100,
+          defaultPercentiles, 100);
+      const expected = createRiskPercentiles(defaultPercentiles,
+          [16, 16, 16, 31, 46, 55, 56]);
       assert.deepEqual(results, expected);
     });
   });
