@@ -16,9 +16,39 @@
  */
 'use strict';
 
-const npmlog = require('npmlog');
+const debug = require('debug');
 
-// Use `npmlog` in node, `console` in browser and electron.
-const isNode = !!process && !process.browser && !process.versions.electron;
+function setLevel(level) {
+  if (level === 'verbose') {
+    debug.enable('*');
+  } else if (level === 'error') {
+    debug.enable('*:error');
+  } else {
+    debug.enable('*, -*:verbose');
+  }
+}
 
-module.exports = isNode ? npmlog : console;
+const loggers = {};
+function _log(title, logargs) {
+  const args = [...logargs].slice(1);
+  if (!loggers[title]) {
+    loggers[title] = debug(title);
+  }
+  return loggers[title](...args);
+}
+
+module.exports = {
+  setLevel,
+  log(title) {
+    return _log(title, arguments);
+  },
+  warn(title) {
+    return _log(`${title}:warn`, arguments);
+  },
+  error(title) {
+    return _log(`${title}:error`, arguments);
+  },
+  verbose(title) {
+    return _log(`${title}:verbose`, arguments);
+  }
+};

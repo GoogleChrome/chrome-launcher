@@ -19,7 +19,6 @@
 'use strict';
 
 const yargs = require('yargs');
-const log = require('../lighthouse-core/lib/log.js');
 const semver = require('semver');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
@@ -132,12 +131,6 @@ const outputMode = cli.output;
 const outputPath = cli.outputPath;
 const flags = cli;
 const config = (cli.configPath && require(cli.configPath)) || null;
-
-// If the URL isn't https or localhost complain to the user.
-if (url.indexOf('https') !== 0 && url.indexOf('http://localhost') !== 0) {
-  log.warn('Lighthouse', 'The URL provided should be on HTTPS');
-  log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
-}
 
 // set logging preferences
 flags.logLevel = 'info';

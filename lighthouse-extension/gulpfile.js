@@ -114,7 +114,6 @@ gulp.task('browserify', () => {
       .transform('./dtm-transform.js', {
         global: true
       })
-      .ignore('npmlog')
       .ignore('chrome-remote-interface');
 
       const corePath = /\.\.\/lighthouse-core\//;

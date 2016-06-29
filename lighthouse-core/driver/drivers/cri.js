@@ -84,7 +84,7 @@ class CriDriver extends Driver {
 
   beginLogging() {
     // log events received
-    this._chrome.on('event', req => _log('verbose', '<=', req));
+    this._chrome.on('event', req => _log('<=', req, 'verbose'));
   }
 
   /**
@@ -97,7 +97,7 @@ class CriDriver extends Driver {
       throw new Error('connect() must be called before attempting to listen to events.');
     }
     // log event listeners being bound
-    _log('info', 'listen for event =>', {method: eventName});
+    _log('listen for event =>', {method: eventName});
     this._chrome.on(eventName, cb);
   }
 
@@ -112,7 +112,7 @@ class CriDriver extends Driver {
       throw new Error('connect() must be called before attempting to listen to events.');
     }
     // log event listeners being bound
-    _log('info', 'listen once for event =>', {method: eventName});
+    _log('listen once for event =>', {method: eventName});
     this._chrome.once(eventName, cb);
   }
 
@@ -141,25 +141,25 @@ class CriDriver extends Driver {
     }
 
     return new Promise((resolve, reject) => {
-      _log('http', 'method => browser', {method: command, params: params});
+      _log('method => browser', {method: command, params: params});
 
       this._chrome.send(command, params, (err, result) => {
         if (err) {
-          _log('error', 'method <= browser', {method: command, params: result});
+          _log('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result);
         }
-        _log('http', 'method <= browser OK', {method: command, params: result});
+        _log('method <= browser OK', {method: command, params: result});
         resolve(result);
       });
     });
   }
 }
 
-function _log(level, prefix, data) {
+function _log(prefix, data, level) {
   const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
-  const maxLength = columns - data.method.length - prefix.length - 7;
+  const maxLength = columns - data.method.length - prefix.length - 18;
   const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
-  log.log(level, prefix, data.method, snippet);
+  log[level ? level : 'log'](prefix, data.method, snippet);
 }
 
 module.exports = CriDriver;

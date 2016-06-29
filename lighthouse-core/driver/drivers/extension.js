@@ -123,11 +123,11 @@ class ExtensionDriver extends Driver {
     return new Promise((resolve, reject) => {
       log.log('method => browser', command, params);
       if (!this._tabId) {
-        log.log('error', 'No tabId set for sendCommand');
+        log.error('No tabId set for sendCommand');
       }
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
-          log.log('error', 'method <= browser', command, result);
+          log.error('method <= browser', command, result);
           return reject(chrome.runtime.lastError);
         }
 

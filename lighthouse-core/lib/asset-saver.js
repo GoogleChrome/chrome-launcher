@@ -77,7 +77,7 @@ img {
 function saveArtifacts(artifacts, filename) {
   const artifactsFilename = filename || 'artifacts.log';
   fs.writeFileSync(artifactsFilename, stringify(artifacts));
-  log.log('info', 'artifacts file saved to disk', artifactsFilename);
+  log.log('artifacts file saved to disk', artifactsFilename);
 }
 
 function prepareAssets(options, artifacts) {
@@ -91,11 +91,11 @@ function saveAssets(options, artifacts) {
 
   const traceFilename = getFilenamePrefix(options);
   fs.writeFileSync(traceFilename + '.trace.json', stringify(assets.traceData, null, 2));
-  log.log('info', 'trace file saved to disk', traceFilename);
+  log.log('trace file saved to disk', traceFilename);
 
   const screenshotsFilename = getFilenamePrefix(options);
   fs.writeFileSync(screenshotsFilename + '.screenshots.html', assets.html);
-  log.log('info', 'screenshots saved to disk', screenshotsFilename);
+  log.log('screenshots saved to disk', screenshotsFilename);
 }
 
 module.exports = {

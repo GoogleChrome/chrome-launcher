@@ -20,6 +20,7 @@
 const ExtensionProtocol = require('../../../lighthouse-core/driver/drivers/extension');
 const Runner = require('../../../lighthouse-core/runner');
 const config = require('../../../lighthouse-core/config/default.json');
+const log = require('../../../lighthouse-core/lib/log');
 
 window.createPageAndPopulate = function(results) {
   const tabURL = chrome.extension.getURL('/pages/report.html');
@@ -36,6 +37,9 @@ window.createPageAndPopulate = function(results) {
 };
 
 window.runAudits = function(options) {
+  // Default to 'info' logging level.
+  log.setLevel('info');
+
   const driver = new ExtensionProtocol();
 
   return driver.getCurrentTabURL()
