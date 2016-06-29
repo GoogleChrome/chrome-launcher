@@ -29,7 +29,7 @@ describe('Aggregator', () => {
         description: 'item description',
         criteria: {
           'first-meaningful-paint': {
-            value: 100,
+            rawValue: 100,
             weight: 1
           }
         }
@@ -38,7 +38,9 @@ describe('Aggregator', () => {
     return Aggregator
       .aggregate(fakeAggregations, [{
         name: 'first-meaningful-paint',
-        value: 90
+        rawValue: 90,
+        score: 90,
+        displayValue: '90'
       }])
       .then(modifiedResults => {
         assert.equal(modifiedResults[0].name, fakeAggregations[0].name);

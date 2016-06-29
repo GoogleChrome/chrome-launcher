@@ -182,7 +182,9 @@ describe('Runner', () => {
     const config = {
       auditResults: [{
         name: 'is-on-https',
-        value: true
+        rawValue: true,
+        score: true,
+        displayValue: ''
       }],
 
       aggregations: [{
@@ -195,7 +197,7 @@ describe('Runner', () => {
           description: 'description',
           criteria: {
             'is-on-https': {
-              value: true,
+              rawValue: true,
               weight: 1
             }
           }

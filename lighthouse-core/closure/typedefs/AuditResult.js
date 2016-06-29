@@ -29,7 +29,7 @@ function AuditResultInput() {}
 /** @type {(boolean|number|string)} */
 AuditResultInput.prototype.score;
 
-/** @type {(boolean|number|undefined|null)} */
+/** @type {(boolean|number|undefined)} */
 AuditResultInput.prototype.rawValue;
 
 /** @type {(string)} */
@@ -89,7 +89,7 @@ UserTimingsExtendedInfo.prototype.duration;
 function AuditResult() {}
 
 /** @type {(boolean|number|string)} */
-AuditResult.prototype.value;
+AuditResult.prototype.score;
 
 /** @type {(boolean|number|string|undefined|null)} */
 AuditResult.prototype.rawValue;

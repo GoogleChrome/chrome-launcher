@@ -33,9 +33,9 @@ class Audit {
       throw new Error('generateAuditResult requires a rawValue');
     }
 
-    let score = result.score ? result.score : result.rawValue;
+    let score = typeof result.score === 'undefined' ? result.rawValue : result.score;
     let displayValue = result.displayValue;
-    if (!displayValue) {
+    if (typeof displayValue === 'undefined') {
       displayValue = result.rawValue ? result.rawValue : '';
     }
 

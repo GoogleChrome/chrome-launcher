@@ -74,15 +74,15 @@
       "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
       "criteria": {
         "service-worker": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "works-offline": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-start-url": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Manifest's start_url is in cache storage for offline use",
@@ -94,33 +94,33 @@
       "description": "Users notice if sites and apps don't perform well. These top-level metrics capture the most important perceived performance concerns.",
       "criteria": {
         "first-meaningful-paint": {
-          "value": 100,
+          "rawValue": 100,
           "weight": 1
         },
         "speed-index-metric": {
-          "value": 100,
+          "rawValue": 100,
           "weight": 1
         },
         "estimated-input-latency": {
-          "value": 100,
+          "rawValue": 100,
           "weight": 1
         },
         "scrolling-60fps": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Content scrolls at 60fps",
           "category": "UX"
         },
         "touch-150ms": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Touch input gets a response in < 150ms",
           "category": "UX"
         },
         "fmp-no-jank": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "App is interactive without jank after the first meaningful paint",
@@ -132,7 +132,7 @@
       "description": "Progressive enhancement means that everyone can access the basic content and functionality of a page in any browser, and those without certain browser features may receive a reduced but not unfunctioning experience.",
       "criteria": {
         "without-javascript": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -141,11 +141,11 @@
       "description": "Security is an important part of the web for both developers and users. Moving forward, Transport Layer Security (TLS) support will be required for many APIs.",
       "criteria": {
         "is-on-https": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "redirects-http": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -155,23 +155,23 @@
       "see": "https://github.com/GoogleChrome/lighthouse/issues/23",
       "criteria": {
         "service-worker": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-exists": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-start-url": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-icons-min-144": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-short-name": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -181,23 +181,23 @@
       "see": "https://github.com/GoogleChrome/lighthouse/issues/24",
       "criteria": {
         "manifest-exists": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-name": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-background-color": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-theme-color": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-icons-min-192": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -206,15 +206,15 @@
       "description": "The browser address bar can be themed to match your site. A theme-color <a href=\"https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android\">meta tag</a> will upgrade the address bar when a user browses the site, and the <a href=\"https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color\">manifest theme-color</a> will apply the same theme site-wide once it's been added to homescreen.",
       "criteria": {
         "manifest-exists": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "theme-color-meta": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-theme-color": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -223,7 +223,7 @@
       "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
       "criteria": {
         "viewport": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         }
       }
@@ -236,67 +236,67 @@
     "items": [{
       "criteria": {
         "aria-allowed-attr": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "aria-valid-attr": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "color-contrast": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "image-alt": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "label": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "tabindex": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-short-name-length": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "manifest-display": {
-          "value": true,
+          "rawValue": true,
           "weight": 1
         },
         "serviceworker-push": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Service worker makes use of push notifications, if appropriate",
           "category": "UX"
         },
         "tap-targets": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Tap targets are appropriately sized for touch",
           "category": "UX"
         },
         "payments-autocomplete": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Payment forms marked up with [autocomplete] attributes",
           "category": "UX"
         },
         "login-autocomplete": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Login forms marked up with [autocomplete] attributes",
           "category": "UX"
         },
         "input-type": {
-          "value": true,
+          "rawValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Input fields use appropriate [type] attributes for custom keyboards",
@@ -312,11 +312,11 @@
     "items": [{
       "criteria": {
         "critical-request-chains": {
-          "value": 0,
+          "rawValue": 0,
           "weight": 1
         },
         "user-timings": {
-          "value": 0,
+          "rawValue": 0,
           "weight": 1
         }
       }

@@ -27,7 +27,7 @@
 function AggregationCriterion() {}
 
 /** @type {(boolean|number|undefined)} */
-AggregationCriterion.prototype.value;
+AggregationCriterion.prototype.rawValue;
 
 /** @type {number} */
 AggregationCriterion.prototype.weight;
