@@ -208,11 +208,13 @@ class CriticalRequestChains extends Formatter {
     const MAX_FILENAME_LENGTH = 64;
     const parsedResourceURL = url.parse(resourceURL);
     const hostname = parsedResourceURL.hostname;
-    let file = parsedResourceURL.path
-        // Remove any query strings.
-        .replace(/\?.*/, '')
-        // Grab the last two parts of the path.
+    // Handle 'about:*' URLs specially since they have no path.
+    let file = parsedResourceURL.protocol === 'about:' ? parsedResourceURL.href :
+        // Otherwise, remove any query strings from the path.
+        parsedResourceURL.path.replace(/\?.*/, '')
+        // And grab the last two parts.
         .split('/').slice(-2).join('/');
+
     if (file.length > MAX_FILENAME_LENGTH) {
       file = file.slice(0, MAX_FILENAME_LENGTH) + '...';
     }
