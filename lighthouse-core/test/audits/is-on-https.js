@@ -13,25 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
 const Audit = require('../../audits/is-on-https.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Security: HTTPS audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).value, false);
-  });
-
   it('fails when not on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      HTTPS: false
-    }).value, false);
+    const debugString = 'Error string';
+    const result = Audit.audit({
+      HTTPS: {
+        value: false,
+        debugString
+      }
+    });
+    assert.strictEqual(result.value, false);
+    assert.strictEqual(result.debugString, debugString);
   });
 
   it('passes when on HTTPS', () => {
-    return assert.equal(Audit.audit({
-      HTTPS: true
-    }).value, true);
+    const result = Audit.audit({
+      HTTPS: {
+        value: true
+      }
+    });
+    assert.strictEqual(result.value, true);
   });
 });

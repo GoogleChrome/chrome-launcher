@@ -21,7 +21,11 @@ const assert = require('assert');
 describe('Core', () => {
   it('maps all audits to an array of Promises', () => {
     return Core
-      .audit([{}], ['is-on-https'])
+      .audit({
+        HTTPS: {
+          value: false
+        }
+      }, ['is-on-https'])
       .then(modifiedResults => {
         assert.ok(Array.isArray(modifiedResults));
         assert.equal(modifiedResults.length, 1);

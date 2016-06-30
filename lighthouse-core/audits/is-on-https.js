@@ -37,7 +37,8 @@ class HTTPS extends Audit {
    */
   static audit(artifacts) {
     return HTTPS.generateAuditResult({
-      value: !!artifacts.HTTPS
+      value: artifacts.HTTPS.value,
+      debugString: artifacts.HTTPS.debugString
     });
   }
 }
