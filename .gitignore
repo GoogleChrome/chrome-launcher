@@ -15,3 +15,5 @@ last-run-results.html
 
 *.trace.json
 *.screenshots.html
+
+closure-error.log
