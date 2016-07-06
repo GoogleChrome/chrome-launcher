@@ -19,10 +19,11 @@ const assert = require('assert');
 /* global describe, it*/
 
 describe('Mobile-friendly: display audit', () => {
-  it('only accepts fullscreen or standalone as recommended values', () => {
+  it('only accepts when a value is set for the display prop', () => {
     assert.equal(Audit.hasRecommendedValue('fullscreen'), true);
     assert.equal(Audit.hasRecommendedValue('standalone'), true);
-    assert.equal(Audit.hasRecommendedValue('browser'), false);
+    assert.equal(Audit.hasRecommendedValue('browser'), true);
+    assert.equal(Audit.hasRecommendedValue(undefined), false);
   });
 
   it('handles the case where there is no display property', () => {
