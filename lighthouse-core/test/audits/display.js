@@ -36,15 +36,15 @@ describe('Mobile-friendly: display audit', () => {
     }}).rawValue, false);
   });
 
-  it('handles the case where there is no manifest display property', () => {
+  it('falls back to the successful default when there is no manifest display property', () => {
     const artifacts = {
       Manifest: manifestParser('{}')
     };
     const output = Audit.audit(artifacts);
 
-    assert.equal(output.score, false);
-    assert.equal(output.displayValue, '');
-    assert.equal(output.rawValue, false);
+    assert.equal(output.score, true);
+    assert.equal(output.displayValue, 'browser');
+    assert.equal(output.rawValue, true);
   });
 
   it('succeeds when a manifest has a display property', () => {

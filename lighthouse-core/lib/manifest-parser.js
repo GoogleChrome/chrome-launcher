@@ -24,6 +24,11 @@ const ALLOWED_DISPLAY_VALUES = [
   'minimal-ui',
   'browser'
 ];
+/**
+ * All display-mode fallbacks, including when unset, lead to default display mode 'browser'.
+ * @see https://w3c.github.io/manifest/#dfn-default-display-mode
+ */
+const DEFAULT_DISPLAY_MODE = 'browser';
 
 const ALLOWED_ORIENTATION_VALUES = [
   'any',
@@ -98,9 +103,16 @@ function parseStartUrl(jsonInput) {
 function parseDisplay(jsonInput) {
   let display = parseString(jsonInput.display, true);
 
-  if (display.value && ALLOWED_DISPLAY_VALUES.indexOf(display.value.toLowerCase()) === -1) {
-    display.value = undefined;
-    display.debugString = 'ERROR: \'display\' has an invalid value, will be ignored.';
+  if (!display.value) {
+    display.value = DEFAULT_DISPLAY_MODE;
+    return display;
+  }
+
+  display.value = display.value.toLowerCase();
+  if (ALLOWED_DISPLAY_VALUES.indexOf(display.value) === -1) {
+    display.debugString = 'ERROR: \'display\' has invalid value ' + display.value +
+        ` will fall back to ${DEFAULT_DISPLAY_MODE}.`;
+    display.value = DEFAULT_DISPLAY_MODE;
   }
 
   return display;
