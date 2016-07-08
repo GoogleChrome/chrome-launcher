@@ -92,7 +92,7 @@ describe('Runner', () => {
     }, flags.auditWhitelist);
 
     return Runner.run({}, {url, config, flags}).then(results => {
-      assert.equal(results[0].value, 2);
+      assert.equal(results[0].rawValue, 2);
       assert.equal(results[0].name, 'user-timings');
     });
   });
@@ -113,7 +113,7 @@ describe('Runner', () => {
     }, flags.auditWhitelist);
 
     return Runner.run({}, {url, config, flags}).then(results => {
-      assert.equal(results[0].value, -1);
+      assert.equal(results[0].rawValue, -1);
       assert(results[0].debugString);
     });
   });
@@ -134,7 +134,7 @@ describe('Runner', () => {
     }, flags.auditWhitelist);
 
     return Runner.run({}, {url, config, flags}).then(results => {
-      assert.equal(results[0].value, 9);
+      assert.equal(results[0].rawValue, 9);
       assert.equal(results[0].name, 'critical-request-chains');
     });
   });

@@ -135,7 +135,7 @@ class UserTimings extends Audit {
       const userTimings = filterTrace(artifacts.traceContents);
 
       resolve(UserTimings.generateAuditResult({
-        value: userTimings.length,
+        rawValue: userTimings.length,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
           value: userTimings
