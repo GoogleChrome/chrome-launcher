@@ -21,14 +21,29 @@ const semver = require('semver');
 const Runner = require('./runner');
 const log = require('./lib/log.js');
 const ChromeProtocol = require('./driver/drivers/cri.js');
-const defaultConfig = require('./config/default.json');
+const Config = require('./config');
+
+/**
+ * The relationship between these root modules:
+ *
+ *   index.js  - the require('lighthouse') hook for Node modules (including the CLI)
+ *
+ *   runner.js - marshalls the actions that must be taken (Gather / Audit / Aggregate)
+ *               config file is used to determine which of these actions are needed
+ *
+ *   lighthouse-cli \
+ *                   -- index.js  \
+ *                                 ----- runner.js ----> [Gather / Audit / Aggregate]
+ *           lighthouse-extension /
+ *
+ */
 
 // node 5.x required due to use of ES2015 features, like spread operator
 if (semver.lt(process.version, '5.0.0')) {
   log.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
 }
 
-module.exports = function(url, flags, config) {
+module.exports = function(url, flags, configJSON) {
   return new Promise((resolve, reject) => {
     if (!url) {
       return reject(new Error('Lighthouse requires a URL'));
@@ -46,10 +61,8 @@ module.exports = function(url, flags, config) {
 
     flags = flags || {};
 
-    // Override the default config with any user config.
-    if (!config) {
-      config = defaultConfig;
-    }
+    // Use ConfigParser to generate a valid config file
+    const config = new Config(configJSON, flags.auditWhitelist);
 
     const driver = new ChromeProtocol();
 

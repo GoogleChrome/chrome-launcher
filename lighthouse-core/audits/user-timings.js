@@ -127,21 +127,25 @@ class UserTimings extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
+    return new Promise((resolve, reject) => {
+      if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
+        throw new Error(FAILURE_MESSAGE);
+      }
+
+      const userTimings = filterTrace(artifacts.traceContents);
+
+      resolve(UserTimings.generateAuditResult({
+        value: userTimings.length,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
+          value: userTimings
+        }
+      }));
+    }).catch(err => {
       return UserTimings.generateAuditResult({
         value: -1,
-        debugString: FAILURE_MESSAGE
+        debugString: err.message
       });
-    }
-
-    const userTimings = filterTrace(artifacts.traceContents);
-
-    return UserTimings.generateAuditResult({
-      value: userTimings.length,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
-        value: userTimings
-      }
     });
   }
 }

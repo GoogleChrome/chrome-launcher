@@ -85,6 +85,29 @@ class NetworkRecorder {
     this.networkManager._dispatcher.resourceChangedPriority(data.requestId,
       data.newPriority, data.timestamp);
   }
+
+  static recordsFromLogs(logs) {
+    const records = [];
+    const nr = new NetworkRecorder(records);
+    const dispatcher = method => {
+      switch (method) {
+        case 'Network.requestWillBeSent': return nr.onRequestWillBeSent;
+        case 'Network.requestServedFromCache': return nr.onRequestServedFromCache;
+        case 'Network.responseReceived': return nr.onResponseReceived;
+        case 'Network.dataReceived': return nr.onDataReceived;
+        case 'Network.loadingFinished': return nr.onLoadingFinished;
+        case 'Network.loadingFailed': return nr.onLoadingFailed;
+        case 'Network.resourceChangedPriority': return nr.onResourceChangedPriority;
+        default: return () => {};
+      }
+    };
+
+    logs.forEach(networkEvent => {
+      dispatcher(networkEvent.method)(networkEvent.params);
+    });
+
+    return records;
+  }
 }
 
 module.exports = NetworkRecorder;
