@@ -72,6 +72,10 @@ gulp.task('js-compile', function() {
       ],
       conformance_configs: 'closure/conformance_config.textproto'
     }))
+    .on('error', error => {
+      gutil.log('Closure compilation failed. Check `closure-error.log` for details.');
+      require('fs').writeFileSync('closure-error.log', error);
+    })
     .on('end', () => {
       gutil.log('Closure compilation successful.');
     });
