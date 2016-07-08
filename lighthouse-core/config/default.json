@@ -14,7 +14,8 @@
       "accessibility",
       "screenshots",
       "critical-request-chains",
-      "speedline"
+      "speedline",
+      "content-width"
     ]
   },
   {
@@ -61,7 +62,8 @@
     "color-contrast",
     "image-alt",
     "label",
-    "tabindex"
+    "tabindex",
+    "content-width"
   ],
 
   "aggregations": [{
@@ -224,6 +226,10 @@
       "criteria": {
         "viewport": {
           "rawValue": true,
+          "weight": 1
+        },
+        "content-width": {
+          "value": true,
           "weight": 1
         }
       }
