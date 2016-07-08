@@ -23,10 +23,9 @@ const semver = require('semver');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 
-// node 5.x required due to use of ES2015 features
+// node 5.x required due to use of ES2015 features, like spread operator
 if (semver.lt(process.version, '5.0.0')) {
-  console.error('Lighthouse requires node version 5.0 or newer');
-  process.exit(1);
+  console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
 }
 
 const cli = yargs
