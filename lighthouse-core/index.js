@@ -23,9 +23,9 @@ const log = require('./lib/log.js');
 const ChromeProtocol = require('./driver/drivers/cri.js');
 const defaultConfig = require('./config/default.json');
 
-// node 5.x required due to use of ES2015 features
+// node 5.x required due to use of ES2015 features, like spread operator
 if (semver.lt(process.version, '5.0.0')) {
-  throw new Error('Lighthouse requires node version 5.0 or newer');
+  log.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
 }
 
 module.exports = function(url, flags, config) {
