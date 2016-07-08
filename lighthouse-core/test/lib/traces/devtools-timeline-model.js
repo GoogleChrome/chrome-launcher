@@ -1,6 +1,6 @@
 'use strict';
 
-/* global describe, it */
+/* eslint-env mocha */
 const assert = require('assert');
 const TimelineModel = require('../../../lib/traces/devtools-timeline-model');
 

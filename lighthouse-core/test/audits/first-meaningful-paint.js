@@ -35,10 +35,13 @@ describe('Performance: first-meaningful-paint audit', () => {
   describe('measures the pwa.rocks example correctly', () => {
     let fmpResult;
 
-    it('processes a valid trace file', () => {
+    it('processes a valid trace file', done => {
       const traceData = require('../fixtures/traces/progressive-app.json');
-      return Audit.audit({traceContents: traceData}).then(response => {
-        fmpResult = response;
+      assert.doesNotThrow(_ => {
+        Audit.audit({traceContents: traceData}).then(response => {
+          fmpResult = response;
+          done();
+        });
       });
     });
 

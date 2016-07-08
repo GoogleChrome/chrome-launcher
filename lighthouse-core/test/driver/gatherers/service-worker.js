@@ -65,8 +65,8 @@ describe('Service Worker gatherer', () => {
       },
       url
     }).then(_ => {
-      assert(!serviceWorkerGatherer.artifact.version);
-      assert(serviceWorkerGatherer.artifact.debugString);
+      assert.ok(!serviceWorkerGatherer.artifact.version);
+      assert.ok(serviceWorkerGatherer.artifact.debugString);
     });
   });
 
@@ -78,8 +78,8 @@ describe('Service Worker gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(!serviceWorkerGatherer.artifact.version);
-      assert(serviceWorkerGatherer.artifact.debugString);
+      assert.ok(!serviceWorkerGatherer.artifact.version);
+      assert.ok(serviceWorkerGatherer.artifact.debugString);
     });
   });
 });

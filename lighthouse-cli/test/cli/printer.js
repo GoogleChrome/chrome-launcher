@@ -62,7 +62,7 @@ describe('Printer', () => {
   it('creates HTML for results', () => {
     const mode = 'html';
     const htmlOutput = Printer.createOutput(sampleResults, mode);
-    assert(/<!doctype/gim.test(htmlOutput));
+    assert.ok(/<!doctype/gim.test(htmlOutput));
   });
 
   it('writes file for results', () => {
@@ -81,7 +81,7 @@ describe('Printer', () => {
     const mode = 'html';
     const path = '!/#@.html';
     return Printer.write(sampleResults, mode, path).catch(err => {
-      assert(err.code === 'ENOENT');
+      assert.ok(err.code === 'ENOENT');
       done();
     });
   });
