@@ -9,9 +9,7 @@
   },
   "scripts": {
     "//": "// passing through tasks to core",
-    "postinstall": "npm run core-install && npm run extension-install",
-    "core-install": "npm --prefix ./lighthouse-core install ./lighthouse-core",
-    "extension-install": "npm --prefix ./lighthouse-extension install ./lighthouse-extension",
+    "postinstall": "node _install_deps.js",
     "lint": "eslint .",
     "smoke": "lighthouse-cli/scripts/run-smoke-tests.sh",
     "coverage": "istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*.js') --timeout 60000",
