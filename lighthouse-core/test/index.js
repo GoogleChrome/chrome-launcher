@@ -22,24 +22,6 @@ const pkg = require('../package.json');
 const assert = require('assert');
 
 describe('Module Tests', function() {
-  it('throws if node < 5 is used', () => {
-    const oldVersion = process.version;
-
-    // Override to an old version of Node.
-    Object.defineProperty(process, 'version', {
-      value: 'v0.1.0'
-    });
-
-    assert.throws(_ => {
-      require('../..');
-    });
-
-    // Reset to the current version.
-    Object.defineProperty(process, 'version', {
-      value: oldVersion
-    });
-  });
-
   it('should have a main attribute defined in the package.json', function() {
     assert.ok(pkg.main);
   });
