@@ -77,8 +77,8 @@ Lighthouse can be used to analyze trace and performance data collected from othe
  ],
 
  "artifacts": {
-   "traceContents": "~/code/lighthouse-core/test/fixtures/traces/trace-user-timings.json",
-   "performanceLog": "~/code/lighthouse-core/test/fixtures/traces/perflog.json"
+   "traceContents": "$HOME/code/lighthouse-core/test/fixtures/traces/trace-user-timings.json",
+   "performanceLog": "$HOME/code/lighthouse-core/test/fixtures/traces/perflog.json"
  },
 
  "aggregations": [{
@@ -89,7 +89,7 @@ Lighthouse can be used to analyze trace and performance data collected from othe
    "items": [{
      "criteria": {
        "user-timings": { "rawValue": 0, "weight": 1 },
-        "critical-request-chains": { "rawValue": 0, "weight": 1}
+       "critical-request-chains": { "rawValue": 0, "weight": 1}
      }
    }]
  }]
