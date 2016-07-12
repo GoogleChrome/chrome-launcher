@@ -66,13 +66,14 @@ You can supply your own run configuration to customize what audits you want deta
 
 ## Trace processing
 
-Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traceContents` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object) and reformatted slightly. As an example, here's a trace-only run that's also evaluating just user-timings:
+Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traceContents` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
 ##### `config.json`
 ```js
 {
  "audits": [
-  "user-timings"
+  "user-timings",
+  "critical-request-chains"
  ],
 
  "artifacts": {
@@ -87,7 +88,8 @@ Lighthouse can be used to analyze trace and performance data collected from othe
    "categorizable": false,
    "items": [{
      "criteria": {
-       "user-timings": { "rawValue": 0, "weight": 1 }
+       "user-timings": { "rawValue": 0, "weight": 1 },
+        "critical-request-chains": { "rawValue": 0, "weight": 1}
      }
    }]
  }]
