@@ -1,7 +1,15 @@
 language: node_js
-node_js:
-  - "5.0"
-  - "node"
+matrix:
+  include:
+    - node_js: "4.3.2"
+      env:
+        - UNIT=unit:harmony COVERALLS=coveralls:harmony
+    - node_js: "5.0"
+      env:
+        - UNIT=unit COVERALLS=coveralls
+    - node_js: "node"
+      env:
+        - UNIT=unit COVERALLS=coveralls
 sudo: required
 dist: trusty
 cache:
@@ -18,9 +26,9 @@ before_script:
   - sleep 5
 script:
   - npm run lint
-  - npm run unit
+  - npm run $UNIT
   - npm run closure
-  - npm run coveralls
+  - npm run $COVERALLS
   - npm run smoke
   - cd lighthouse-extension
   - gulp build
