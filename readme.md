@@ -14,13 +14,13 @@ _status: prototype extension and CLI available for testing_
 
 ## Install Chrome extension
 
-Requires Chrome version 52 or higher
+Requires Chrome version 52+
 
 [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
 ## Install CLI
 
-Requires Node version 5 or higher
+Requires Node v5+ or Node v4 w/ `--harmony`
 
 ```sh
 npm install -g GoogleChrome/lighthouse
