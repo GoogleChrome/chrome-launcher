@@ -99,6 +99,38 @@ Lighthouse can be used to analyze trace and performance data collected from othe
 Then, run with: `lighthouse --config-path=$PWD/config.json http://www.random.url`
 
 
+## Lighthouse CLI options
+
+```sh
+$ lighthouse --help
+
+lighthouse <url>
+
+Logging:
+  --verbose  Displays verbose logging                                                 [boolean]
+  --quiet    Displays no progress or debug logs                                       [boolean]
+
+Configuration:
+  --mobile                 Emulates a Nexus 5X                                  [default: true]
+  --load-page              Loads the page                                       [default: true]
+  --save-assets            Save the trace contents & screenshots to disk              [boolean]
+  --save-artifacts         Save all gathered artifacts to disk                        [boolean]
+  --audit-whitelist        Comma separated list of audits to run               [default: "all"]
+  --list-all-audits        Prints a list of all available audits and exits            [boolean]
+  --list-trace-categories  Prints a list of all required trace categories and exits   [boolean]
+  --config-path            The absolute path to the config JSON.
+
+Output:
+  --output       Reporter for the results
+                         [choices: "pretty", "json", "html"]                [default: "pretty"]
+  --output-path  The file path to output the results
+                 Example: --output-path=./lighthouse-results.html           [default: "stdout"]
+
+Options:
+  --help     Show help                                                                [boolean]
+  --version  Show version number                                                      [boolean]
+```
+
 ## Tests
 
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
