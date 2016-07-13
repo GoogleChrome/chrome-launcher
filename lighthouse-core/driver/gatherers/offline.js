@@ -38,23 +38,25 @@ const requestPage = function() {
 
 class Offline extends Gather {
 
-  static goOffline(driver) {
-    return driver.sendCommand('Network.emulateNetworkConditions', {
-      offline: true,
+  static config(opts) {
+    return {
+      offline: opts.offline,
       // values of 0 remove any active throttling. crbug.com/456324#c9
       latency: 0,
       downloadThroughput: 0,
       uploadThroughput: 0
+    };
+  }
+
+  static goOffline(driver) {
+    // Network.enable must be called for Network.emulateNetworkConditions to work
+    return driver.sendCommand('Network.enable').then(_ => {
+      driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: true}));
     });
   }
 
   static goOnline(driver) {
-    return driver.sendCommand('Network.emulateNetworkConditions', {
-      offline: false,
-      latency: 0,
-      downloadThroughput: 0,
-      uploadThroughput: 0
-    });
+    return driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: false}));
   }
 
   afterPass(options) {
