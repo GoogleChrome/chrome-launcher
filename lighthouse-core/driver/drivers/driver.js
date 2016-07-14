@@ -50,6 +50,8 @@ class DriverBase {
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',
       'disabled-by-default-devtools.timeline.stack',
+      // 'disabled-by-default-v8.cpu_profile',  // these would include JS stack samples, but
+      // 'disabled-by-default-v8.cpu_profile.hires', // will take the trace from 5MB -> 100MB
       'disabled-by-default-devtools.screenshot'
     ];
   }
