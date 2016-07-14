@@ -15,7 +15,8 @@
       "screenshots",
       "critical-request-chains",
       "speedline",
-      "content-width"
+      "content-width",
+      "cache-contents"
     ]
   },
   {
@@ -63,7 +64,8 @@
     "image-alt",
     "label",
     "tabindex",
-    "content-width"
+    "content-width",
+    "cache-start-url"
   ],
 
   "aggregations": [{
@@ -83,12 +85,9 @@
           "rawValue": true,
           "weight": 1
         },
-        "manifest-start-url": {
+        "cache-start-url": {
           "rawValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Manifest's start_url is in cache storage for offline use",
-          "category": "Offline"
+          "weight": 1
         }
       }
     },{
