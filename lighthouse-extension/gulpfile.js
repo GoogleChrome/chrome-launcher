@@ -97,37 +97,36 @@ gulp.task('browserify', () => {
     'app/src/report-loader.js'
   ], {read: false})
     .pipe(tap(file => {
-      let bundle = browserify(file.path)
-
+      let bundle = browserify(file.path, {debug: true})
       // Fix an issue with Babelified code that doesn't brfs well.
       .transform('./fs-transform', {
         global: true
       })
-
       // Transform the fs.readFile etc, but do so in all the modules.
       .transform('brfs', {
         global: true
-      })
-
-      // Do the additional transform to convert references to devtools-timeline-model
-      // to the modified version internal to Lighthouse.
-      .transform('./dtm-transform.js', {
-        global: true
-      })
-      .ignore('chrome-remote-interface');
-
-      const corePath = /\.\.\/lighthouse-core\//;
-      const driverPath = /\.\.\/lighthouse-core\/driver\//;
-
-      // Expose the audits and gatherers so they can be dynamically loaded.
-      audits.forEach(audit => {
-        bundle = bundle.require(audit, {expose: audit.replace(corePath, './')});
       });
 
-      gatherers.forEach(gatherer => {
-        bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
-      });
+      // In the case of our lighthouse-core script, we've got extra work to do
+      if (file.path.includes('app/src/lighthouse-background.js')){
+        // Do the additional transform to convert references to devtools-timeline-model
+        // to the modified version internal to Lighthouse.
+        bundle.transform('./dtm-transform.js', {
+          global: true
+        })
+        .ignore('chrome-remote-interface');
 
+        // Expose the audits and gatherers so they can be dynamically loaded.
+        const corePath = "../lighthouse-core/";
+        const driverPath = `${corePath}driver/`;
+        audits.forEach(audit => {
+          bundle = bundle.require(audit, {expose: audit.replace(corePath, '../')});
+        });
+        gatherers.forEach(gatherer => {
+          bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
+        });
+      }
+      // Inject the new browserified contents back into our gulp pipeline
       file.contents = bundle.bundle();
     }))
     .pipe(gulp.dest('app/scripts'))
