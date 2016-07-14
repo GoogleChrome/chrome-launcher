@@ -108,7 +108,7 @@ gulp.task('browserify', () => {
       });
 
       // In the case of our lighthouse-core script, we've got extra work to do
-      if (file.path.includes('app/src/lighthouse-background.js')){
+      if (file.path.includes('app/src/lighthouse-background.js')) {
         // Do the additional transform to convert references to devtools-timeline-model
         // to the modified version internal to Lighthouse.
         bundle.transform('./dtm-transform.js', {
@@ -117,7 +117,7 @@ gulp.task('browserify', () => {
         .ignore('chrome-remote-interface');
 
         // Expose the audits and gatherers so they can be dynamically loaded.
-        const corePath = "../lighthouse-core/";
+        const corePath = '../lighthouse-core/';
         const driverPath = `${corePath}driver/`;
         audits.forEach(audit => {
           bundle = bundle.require(audit, {expose: audit.replace(corePath, '../')});
