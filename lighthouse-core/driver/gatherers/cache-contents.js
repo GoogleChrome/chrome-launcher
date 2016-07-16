@@ -42,6 +42,8 @@ function getCacheContents() {
           // __returnResults is magically inserted by driver.evaluateAsync
           __returnResults(requests);
         });
+      }).catch(_ => {
+        __returnResults(undefined);
       });
 }
 
