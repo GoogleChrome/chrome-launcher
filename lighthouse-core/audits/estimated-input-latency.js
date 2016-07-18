@@ -56,7 +56,7 @@ class EstimatedInputLatency extends Audit {
       const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
 
       const ninetieth = latencyPercentiles.find(result => result.percentile === 0.9);
-      const rawValue = ninetieth.time.toFixed(1);
+      const rawValue = parseFloat(ninetieth.time.toFixed(1));
 
       // Use the CDF of a log-normal distribution for scoring.
       //  10th Percentile ≈ 58ms

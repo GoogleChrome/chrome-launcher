@@ -205,7 +205,7 @@ describe('Aggregate', () => {
     return assert.equal(Aggregate._convertToWeight(result, expected), 0);
   });
 
-  it('returns a weight of zero if types do not match', () => {
+  it('throws if types do not match', () => {
     const expected = {
       rawValue: true,
       weight: 10
@@ -217,7 +217,7 @@ describe('Aggregate', () => {
       displayValue: '20'
     };
 
-    return assert.equal(Aggregate._convertToWeight(result, expected), 0);
+    return assert.throws(_ => Aggregate._convertToWeight(result, expected));
   });
 
   it('scores a set correctly (contributesToScore: true)', () => {

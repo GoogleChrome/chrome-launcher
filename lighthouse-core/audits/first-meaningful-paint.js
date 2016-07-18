@@ -80,7 +80,7 @@ class FirstMeaningfulPaint extends Audit {
 
       resolve(FirstMeaningfulPaint.generateAuditResult({
         score: result.score,
-        rawValue: result.duration,
+        rawValue: parseFloat(result.duration),
         displayValue: `${result.duration}ms`,
         debugString: result.debugString,
         optimalValue: this.meta.optimalValue,

@@ -85,7 +85,9 @@ class Aggregate {
     }
 
     if (typeof result.rawValue !== typeof expected.rawValue) {
-      return weight;
+      const msg =
+          `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+      throw new Error(msg);
     }
 
     switch (typeof expected.rawValue) {
