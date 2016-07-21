@@ -17,6 +17,7 @@
 'use strict';
 
 const debug = require('debug');
+const EventEmitter = require('events').EventEmitter;
 
 function setLevel(level) {
   if (level === 'verbose') {
@@ -37,17 +38,31 @@ function _log(title, logargs) {
   return loggers[title](...args);
 }
 
+class Emitter extends EventEmitter { }
+const events = new Emitter();
+
 module.exports = {
   setLevel,
-  log(title) {
+  events,
+  log(title, msg) {
+    if (title === 'status') {
+      console.time(msg);
+      events.emit('status', arguments);
+    }
+    if (title === 'statusEnd') {
+      console.timeEnd(msg);
+    }
     return _log(title, arguments);
   },
+
   warn(title) {
     return _log(`${title}:warn`, arguments);
   },
+
   error(title) {
     return _log(`${title}:error`, arguments);
   },
+
   verbose(title) {
     return _log(`${title}:verbose`, arguments);
   }

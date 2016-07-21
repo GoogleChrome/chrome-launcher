@@ -53,6 +53,10 @@ window.runAudits = function(options) {
       });
 };
 
+window.listenForStatus = function(callback) {
+  log.events.addListener('status', callback);
+};
+
 chrome.runtime.onInstalled.addListener(details => {
   if (details.previousVersion) {
     console.log('previousVersion', details.previousVersion);

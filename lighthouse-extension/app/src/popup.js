@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', _ => {
   const generateReportEl = document.body.querySelector('.generate-report');
 
   const statusEl = document.body.querySelector('.status');
+  const statusMessageEl = document.body.querySelector('.status__msg');
+  const statusDetailsMessageEl = document.body.querySelector('.status__detailsmsg');
   const spinnerEl = document.body.querySelector('.status__spinner');
   const feedbackEl = document.body.querySelector('.feedback');
   let spinnerAnimation;
@@ -40,6 +42,13 @@ document.addEventListener('DOMContentLoaded', _ => {
     spinnerAnimation.cancel();
     statusEl.classList.remove('status--visible');
   };
+
+  const logstatus = ([, message, details]) => {
+    statusMessageEl.textContent = message;
+    statusDetailsMessageEl.textContent = details;
+  };
+
+  background.listenForStatus(logstatus);
 
   generateReportEl.addEventListener('click', () => {
     startSpinner();
@@ -61,6 +70,7 @@ document.addEventListener('DOMContentLoaded', _ => {
       }
       feedbackEl.textContent = message;
       stopSpinner();
+      background.console.error(err);
     });
   });
 

@@ -141,6 +141,7 @@ body {
   opacity: 0;
   will-change: opacity;
   transition: opacity 0.150s cubic-bezier(0,0,0.41,1);
+  text-align: center;
 }
 
 .status--visible {
