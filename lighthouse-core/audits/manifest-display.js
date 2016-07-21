@@ -27,8 +27,7 @@ class ManifestDisplay extends Audit {
     return {
       category: 'Manifest',
       name: 'manifest-display',
-      description: 'Manifest\'s display property set to standalone/fullscreen to ' +
-            'allow launching without address bar',
+      description: 'Manifest\'s display property is set',
       requiredArtifacts: ['Manifest']
     };
   }
@@ -38,7 +37,7 @@ class ManifestDisplay extends Audit {
    * @return {boolean}
    */
   static hasRecommendedValue(val) {
-    return (val === 'fullscreen' || val === 'standalone');
+    return val !== undefined;
   }
 
   /**
@@ -54,7 +53,7 @@ class ManifestDisplay extends Audit {
     return ManifestDisplay.generateAuditResult({
       rawValue: hasRecommendedValue,
       displayValue,
-      debugString: 'Manifest display property should be standalone or fullscreen.'
+      debugString: 'Manifest display property should be set.'
     });
   }
 }
