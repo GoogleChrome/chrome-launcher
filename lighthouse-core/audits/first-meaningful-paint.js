@@ -79,8 +79,9 @@ class FirstMeaningfulPaint extends Audit {
       const result = this.calculateScore(data);
 
       resolve(FirstMeaningfulPaint.generateAuditResult({
-        value: result.score,
-        rawValue: result.duration,
+        score: result.score,
+        rawValue: parseFloat(result.duration),
+        displayValue: `${result.duration}ms`,
         debugString: result.debugString,
         optimalValue: this.meta.optimalValue,
         extendedInfo: result.extendedInfo
@@ -88,7 +89,7 @@ class FirstMeaningfulPaint extends Audit {
     }).catch(err => {
       // Recover from trace parsing failures.
       return FirstMeaningfulPaint.generateAuditResult({
-        value: -1,
+        rawValue: -1,
         debugString: err.message
       });
     });
@@ -127,8 +128,9 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.max(0, score);
 
     return {
-      duration: `${firstMeaningfulPaint.toFixed(1)}ms`,
+      duration: `${firstMeaningfulPaint.toFixed(1)}`,
       score: Math.round(score),
+      rawValue: firstMeaningfulPaint.toFixed(1),
       extendedInfo: {timings}
     };
   }

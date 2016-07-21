@@ -22,13 +22,13 @@ describe('Manifest: exists audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('succeeds when a manifest is present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: {}
-    }}).value, true);
+    }}).rawValue, true);
   });
 
   it('correctly passes through debug strings', () => {

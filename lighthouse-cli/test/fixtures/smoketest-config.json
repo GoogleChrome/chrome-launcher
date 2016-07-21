@@ -1,0 +1,47 @@
+{
+  "passes": [{
+    "loadPage": true,
+    "gatherers": [
+      "service-worker",
+      "offline",
+      "viewport"
+    ]
+  }],
+
+  "audits": [
+    "service-worker",
+    "works-offline",
+    "viewport"
+  ],
+
+  "aggregations": [{
+    "name": "Progressive Web App",
+    "description": "These audits validate the aspects of a Progressive Web App.",
+    "scored": true,
+    "categorizable": true,
+    "items": [{
+      "name": "App can load on offline/flaky connections",
+      "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
+      "criteria": {
+        "service-worker": {
+          "rawValue": true,
+          "weight": 1
+        },
+        "works-offline": {
+          "rawValue": true,
+          "weight": 1
+        }
+      }
+    }, {
+      "name": "Design is mobile-friendly",
+      "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
+      "criteria": {
+        "viewport": {
+          "rawValue": true,
+          "weight": 1
+        }
+      }
+    }
+    ]
+  }]
+}

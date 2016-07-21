@@ -21,11 +21,13 @@ const SpeedlineGather = require('../../../driver/gatherers/speedline.js');
 const assert = require('assert');
 
 describe('Speedline gatherer', () => {
-  it('scores a -1 when faulty trace data is present', () => {
+  it('returns an error debugString on faulty trace data', done => {
     const speedlineGather = new SpeedlineGather();
 
-    return speedlineGather.afterPass({}, {traceContents: {boo: 'ya'}}).then(_ => {
-      return assert(speedlineGather.artifact.debugString);
+    speedlineGather.afterPass({}, {traceContents: {boo: 'ya'}}).then(_ => {
+      assert.ok(speedlineGather.artifact.debugString);
+      assert.ok(speedlineGather.artifact.debugString.length);
+      done();
     });
   });
 

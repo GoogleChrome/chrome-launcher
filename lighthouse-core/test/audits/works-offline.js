@@ -22,18 +22,18 @@ describe('Offline: works-offline audit', () => {
   it('fails gracefully', () => {
     const output = Audit.audit({});
 
-    return assert.equal(output.value, false);
+    return assert.equal(output.score, false);
   });
 
   it('correctly audits a 200 code', () => {
     const output = Audit.audit({Offline: 200});
 
-    return assert.equal(output.value, true);
+    return assert.equal(output.score, true);
   });
 
   it('correctly audits a non-200 code', () => {
     const output = Audit.audit({Offline: 203});
 
-    return assert.equal(output.value, false);
+    return assert.equal(output.score, false);
   });
 });

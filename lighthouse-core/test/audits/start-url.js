@@ -25,11 +25,11 @@ describe('Manifest: start_url audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).value, false);
+    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
   });
 
   // Need to disable camelcase check for dealing with short_name.
@@ -41,12 +41,12 @@ describe('Manifest: start_url audit', () => {
       }
     };
 
-    return assert.equal(Audit.audit(inputs).value, false);
+    return assert.equal(Audit.audit(inputs).rawValue, false);
   });
 
   /* eslint-enable camelcase */
 
   it('succeeds when a manifest contains a start_url', () => {
-    return assert.equal(Audit.audit({Manifest}).value, true);
+    return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
 });

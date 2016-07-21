@@ -25,11 +25,11 @@ describe('Manifest: short_name audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).value, false);
+    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
   });
 
   // Need to disable camelcase check for dealing with short_name.
@@ -41,7 +41,7 @@ describe('Manifest: short_name audit', () => {
     });
     const Manifest = manifestParser(inputs);
 
-    return assert.equal(Audit.audit({Manifest}).value, false);
+    return assert.equal(Audit.audit({Manifest}).rawValue, false);
   });
 
   it('succeeds when a manifest contains no short_name but a name', () => {
@@ -51,11 +51,11 @@ describe('Manifest: short_name audit', () => {
     });
     const Manifest = manifestParser(inputs);
 
-    return assert.equal(Audit.audit({Manifest}).value, true);
+    return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
   /* eslint-enable camelcase */
 
   it('succeeds when a manifest contains a short_name', () => {
-    return assert.equal(Audit.audit({Manifest}).value, true);
+    return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
 });

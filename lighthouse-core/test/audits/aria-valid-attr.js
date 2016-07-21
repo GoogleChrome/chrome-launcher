@@ -46,7 +46,7 @@ describe('Accessibility: aria-valid-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.value, false);
+    assert.equal(output.score, false);
     assert.equal(output.debugString, 'http://example.com/ (Failed on 0 elements)');
   });
 
@@ -62,7 +62,7 @@ describe('Accessibility: aria-valid-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.value, false);
+    assert.equal(output.score, false);
     assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
   });
 });

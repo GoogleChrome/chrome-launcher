@@ -38,7 +38,7 @@ class CriDriver extends Driver {
       /* eslint-disable new-cap */
       chromeRemoteInterface.New((err, tab) => {
         if (err) {
-          return reject(err);
+          log.warn('CRI driver', 'cannot create new tab, will reuse tab.', err);
         }
 
         chromeRemoteInterface({port: port, chooseTab: tab}, chrome => {
@@ -57,6 +57,7 @@ class CriDriver extends Driver {
   disconnect() {
     return new Promise((resolve, reject) => {
       if (!this._tab) {
+        this._chrome.close();
         return resolve();
       }
 

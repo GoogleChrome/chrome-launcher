@@ -70,9 +70,11 @@ const extendedInfo = {
 describe('CRC Formatter', () => {
   it('copes with invalid input', () => {
     const formatter = criticalRequestChainFormatter.getFormatter('pretty');
-    formatter();
-    formatter(null);
-    formatter({});
+    assert.doesNotThrow(_ => {
+      formatter();
+      formatter(null);
+      formatter({});
+    });
   });
 
   it('generates valid pretty output', () => {

@@ -51,8 +51,8 @@ class ManifestDisplay extends Audit {
     const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
 
     return ManifestDisplay.generateAuditResult({
-      value: hasRecommendedValue,
-      rawValue: displayValue,
+      rawValue: hasRecommendedValue,
+      displayValue,
       debugString: 'Manifest display property should be set.'
     });
   }

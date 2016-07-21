@@ -24,7 +24,7 @@ describe('Manifest: background color audit', () => {
   it('fails when no manifest present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('fails when no background color present', () => {
@@ -32,7 +32,7 @@ describe('Manifest: background color audit', () => {
       value: {
         foo: 1
       }
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('fails when no background color value present', () => {
@@ -40,7 +40,7 @@ describe('Manifest: background color audit', () => {
       value: {
         background_color: 'no'
       }
-    }}).value, false);
+    }}).rawValue, false);
   });
 
   it('passes when color is present', () => {
@@ -48,7 +48,7 @@ describe('Manifest: background color audit', () => {
       value: {
         background_color: {value: 'black'}
       }
-    }}).value, true);
+    }}).rawValue, true);
   });
 });
 /* eslint-enable */

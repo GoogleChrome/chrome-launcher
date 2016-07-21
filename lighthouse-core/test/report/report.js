@@ -29,13 +29,13 @@ describe('Report', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: true});
 
-    return assert(/<script>/gim.test(html));
+    return assert.ok(/<script>/gim.test(html));
   });
 
   it('generates extension HTML', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: false});
 
-    return assert(/<script src/gim.test(html));
+    return assert.ok(/<script src/gim.test(html));
   });
 });

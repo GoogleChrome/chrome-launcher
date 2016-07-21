@@ -73,27 +73,30 @@ class Aggregate {
     let weight = 0;
 
     if (typeof expected === 'undefined' ||
-        typeof expected.value === 'undefined' ||
+        typeof expected.rawValue === 'undefined' ||
         typeof expected.weight === 'undefined') {
       return weight;
     }
 
     if (typeof result === 'undefined' ||
-        typeof result.value === 'undefined') {
+        typeof result.rawValue === 'undefined' ||
+        typeof result.score === 'undefined') {
       return weight;
     }
 
-    if (typeof result.value !== typeof expected.value) {
-      return weight;
+    if (typeof result.rawValue !== typeof expected.rawValue) {
+      const msg =
+          `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+      throw new Error(msg);
     }
 
-    switch (typeof expected.value) {
+    switch (typeof expected.rawValue) {
       case 'boolean':
-        weight = this._convertBooleanToWeight(result.value, expected.value, expected.weight);
+        weight = this._convertBooleanToWeight(result.score, expected.rawValue, expected.weight);
         break;
 
       case 'number':
-        weight = this._convertNumberToWeight(result.value, expected.value, expected.weight);
+        weight = this._convertNumberToWeight(result.score, expected.rawValue, expected.weight);
         break;
 
       default:
@@ -154,7 +157,7 @@ class Aggregate {
         // TODO(paullewis): Remove once coming soon audits have landed.
         if (item.criteria[e].comingSoon) {
           subItems.push({
-            value: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
+            score: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
             name: 'coming-soon',
             category: item.criteria[e].category,
             description: item.criteria[e].description,

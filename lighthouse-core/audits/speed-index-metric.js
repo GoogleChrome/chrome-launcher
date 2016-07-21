@@ -53,28 +53,28 @@ class SpeedIndexMetric extends Audit {
       // Speedline gather failed; pass on error condition.
       if (speedline.debugString) {
         return resolve(SpeedIndexMetric.generateAuditResult({
-          value: -1,
+          rawValue: -1,
           debugString: speedline.debugString
         }));
       }
 
       if (speedline.frames.length === 0) {
         return resolve(SpeedIndexMetric.generateAuditResult({
-          value: -1,
+          rawValue: -1,
           debugString: 'Trace unable to find visual progress frames.'
         }));
       }
 
       if (speedline.frames.length < 3) {
         return resolve(SpeedIndexMetric.generateAuditResult({
-          value: -1,
+          rawValue: -1,
           debugString: 'Trace unable to find sufficient frames to evaluate Speed Index.'
         }));
       }
 
       if (speedline.speedIndex === 0) {
         return resolve(SpeedIndexMetric.generateAuditResult({
-          value: -1,
+          rawValue: -1,
           debugString: 'Error in Speedline calculating Speed Index (speedIndex of 0).'
         }));
       }
@@ -106,7 +106,7 @@ class SpeedIndexMetric extends Audit {
       };
 
       resolve(SpeedIndexMetric.generateAuditResult({
-        value: Math.round(score),
+        score: Math.round(score),
         rawValue: Math.round(speedline.speedIndex),
         optimalValue: this.meta.optimalValue,
         extendedInfo: {

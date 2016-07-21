@@ -34,7 +34,7 @@ describe('Performance: speed-index-metric audit', () => {
   it('passes on errors from gatherer', () => {
     const debugString = 'Real emergency here.';
     return Audit.audit({Speedline: {debugString}}).then(response => {
-      assert.equal(response.value, -1);
+      assert.equal(response.rawValue, -1);
       assert.equal(response.debugString, debugString);
     });
   });
@@ -42,7 +42,7 @@ describe('Performance: speed-index-metric audit', () => {
   it('gives error string if no frames', () => {
     const artifacts = {Speedline: {frames: []}};
     return Audit.audit(artifacts).then(response => {
-      assert.equal(response.value, -1);
+      assert.equal(response.rawValue, -1);
       assert(response.debugString);
     });
   });
@@ -50,7 +50,7 @@ describe('Performance: speed-index-metric audit', () => {
   it('gives error string if too few frames to determine speed index', () => {
     const artifacts = {Speedline: {frames: [frame()]}};
     return Audit.audit(artifacts).then(response => {
-      assert.equal(response.value, -1);
+      assert.equal(response.rawValue, -1);
       assert(response.debugString);
     });
   });
@@ -62,7 +62,7 @@ describe('Performance: speed-index-metric audit', () => {
     };
 
     return Audit.audit({Speedline}).then(response => {
-      assert.equal(response.value, -1);
+      assert.equal(response.rawValue, -1);
       assert(response.debugString);
     });
   });
@@ -74,8 +74,9 @@ describe('Performance: speed-index-metric audit', () => {
     };
 
     return Audit.audit({Speedline}).then(response => {
+      assert.equal(response.displayValue, '831');
       assert.equal(response.rawValue, 831);
-      assert.equal(response.value, 100);
+      assert.equal(response.score, 100);
     });
   });
 });

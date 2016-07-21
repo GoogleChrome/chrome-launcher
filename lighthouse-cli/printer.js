@@ -99,9 +99,9 @@ function createOutput(results, outputMode) {
       }
 
       item.subItems.forEach(subitem => {
-        let lineItem = ` -- ${subitem.description}: ${subitem.value}`;
-        if (typeof subitem.rawValue !== 'undefined') {
-          lineItem += ` (${subitem.rawValue})`;
+        let lineItem = ` -- ${subitem.description}: ${subitem.score}`;
+        if (subitem.displayValue) {
+          lineItem += ` (${subitem.displayValue})`;
         }
         output += `${lineItem}\n`;
         if (subitem.debugString) {

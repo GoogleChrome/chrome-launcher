@@ -42,13 +42,13 @@ class Screenshots extends Audit {
 
     if (typeof screenshots === 'undefined') {
       return Screenshots.generateAuditResult({
-        value: -1,
+        rawValue: -1,
         debugString: 'No screenshot artifact'
       });
     }
 
     return Screenshots.generateAuditResult({
-      value: screenshots.length || 0,
+      rawValue: screenshots.length || 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.NULL,
         value: screenshots

@@ -19,7 +19,8 @@
 
 const ExtensionProtocol = require('../../../lighthouse-core/driver/drivers/extension');
 const Runner = require('../../../lighthouse-core/runner');
-const config = require('../../../lighthouse-core/config/default.json');
+const Config = require('../../../lighthouse-core/config');
+const configJSON = require('../../../lighthouse-core/config/default.json');
 const log = require('../../../lighthouse-core/lib/log');
 
 window.createPageAndPopulate = function(results) {
@@ -44,6 +45,9 @@ window.runAudits = function(options) {
 
   return driver.getCurrentTabURL()
       .then(url => {
+        // Setup the run config, false == no whitelist, run all audits
+        const config = new Config(configJSON, false);
+
         // Add in the URL to the options.
         return Runner.run(driver, Object.assign({}, options, {url, config}));
       });

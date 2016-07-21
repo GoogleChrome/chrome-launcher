@@ -21,13 +21,13 @@ const assert = require('assert');
 /* eslint-disable no-script-url */
 describe('JavaScript: scripting audit', () => {
   it('fails when the js-less body is empty', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: ''}).value, false);
+    return assert.equal(Audit.audit({HTMLWithoutJavaScript: ''}).score, false);
   });
   it('fails when the js-less body is whitespace', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: '        '}).value, false);
+    return assert.equal(Audit.audit({HTMLWithoutJavaScript: '        '}).score, false);
   });
   it('succeeds when the js-less body contains some content', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: 'test'}).value, true);
+    return assert.equal(Audit.audit({HTMLWithoutJavaScript: 'test'}).score, true);
   });
 });
 /* eslint-enable */

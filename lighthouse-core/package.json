@@ -12,6 +12,7 @@
     "test": "npm run lint --silent && npm run unit && npm run closure",
     "watch": "find . -name '*.js' -not -path '*/node_modules/*' -not -path '*/extension/*' | entr npm run unit",
     "unit": "mocha $(find ./test -name '*.js') --timeout 60000",
+    "unit:harmony": "mocha --harmony $(find ./test -name '*.js') --timeout 60000",
     "chrome": "./scripts/launch-chrome.sh"
   },
   "repository": "googlechrome/lighthouse",

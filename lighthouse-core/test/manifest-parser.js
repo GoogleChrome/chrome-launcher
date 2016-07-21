@@ -24,7 +24,7 @@ const manifestStub = require('./fixtures/manifest.json');
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {
     let parsedManifest = manifestParser('');
-    assert(parsedManifest.debugString);
+    assert.ok(parsedManifest.debugString);
   });
 
   it('accepts empty dictionary', function() {

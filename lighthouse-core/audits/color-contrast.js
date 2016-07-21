@@ -42,7 +42,7 @@ class ColorContrast extends Audit {
         artifacts.Accessibility.violations.find(result => result.id === 'color-contrast');
 
     return ColorContrast.generateAuditResult({
-      value: typeof rule === 'undefined',
+      rawValue: typeof rule === 'undefined',
       debugString: this.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,

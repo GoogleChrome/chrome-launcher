@@ -39,7 +39,7 @@ class Viewport extends Audit {
     const hasMobileViewport = typeof artifacts.Viewport === 'string' &&
         artifacts.Viewport.includes('width=');
     return Viewport.generateAuditResult({
-      value: !!hasMobileViewport
+      rawValue: !!hasMobileViewport
     });
   }
 }

@@ -29,12 +29,24 @@ class Audit {
    * @return {!AuditResult}
    */
   static generateAuditResult(result) {
-    if (typeof result.value === 'undefined') {
-      throw new Error('generateAuditResult requires a value');
+    if (typeof result.rawValue === 'undefined') {
+      throw new Error('generateAuditResult requires a rawValue');
+    }
+
+    let score = typeof result.score === 'undefined' ? result.rawValue : result.score;
+    let displayValue = result.displayValue;
+    if (typeof displayValue === 'undefined') {
+      displayValue = result.rawValue ? result.rawValue : '';
+    }
+
+    // The same value or true should be '' it doesn't add value to the report
+    if (displayValue === score) {
+      displayValue = '';
     }
 
     return {
-      value: result.value,
+      score,
+      displayValue: `${displayValue}`,
       rawValue: result.rawValue,
       debugString: result.debugString,
       optimalValue: result.optimalValue,

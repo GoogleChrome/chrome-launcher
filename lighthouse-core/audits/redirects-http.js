@@ -39,12 +39,12 @@ class RedirectsHTTP extends Audit {
     if (!artifacts.HTTPRedirect ||
         !artifacts.HTTPRedirect.value) {
       return RedirectsHTTP.generateAuditResult({
-        value: false
+        rawValue: false
       });
     }
 
     return RedirectsHTTP.generateAuditResult({
-      value: artifacts.HTTPRedirect.value,
+      rawValue: artifacts.HTTPRedirect.value,
       debugString: artifacts.HTTPRedirect.debugString
     });
   }

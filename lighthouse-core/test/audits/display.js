@@ -29,8 +29,9 @@ describe('Mobile-friendly: display audit', () => {
   it('handles the case where there is no display property', () => {
     const output = Audit.audit({Manifest: {}});
 
-    assert.equal(output.value, false);
-    assert.equal(output.rawValue, undefined);
+    assert.equal(output.score, false);
+    assert.equal(output.displayValue, '');
+    assert.equal(output.rawValue, false);
   });
 
   it('audits a manifest\'s display property', () => {
@@ -45,7 +46,8 @@ describe('Mobile-friendly: display audit', () => {
       }
     });
 
-    assert.equal(output.value, true);
-    assert.equal(output.rawValue, expected);
+    assert.equal(output.score, true);
+    assert.equal(output.displayValue, expected);
+    assert.equal(output.rawValue, true);
   });
 });

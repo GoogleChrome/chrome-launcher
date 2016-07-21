@@ -73,6 +73,8 @@ function enableNexus5X(driver) {
 
   return Promise.all([
     driver.sendCommand('Emulation.setDeviceMetricsOverride', NEXUS5X_EMULATION_METRICS),
+    // Network.enable must be called for UA overriding to work
+    driver.sendCommand('Network.enable'),
     driver.sendCommand('Network.setUserAgentOverride', NEXUS5X_USERAGENT),
     driver.sendCommand('Emulation.setTouchEmulationEnabled', {
       enabled: true,

@@ -14,13 +14,13 @@ _status: prototype extension and CLI available for testing_
 
 ## Install Chrome extension
 
-Requires Chrome version 52 or higher
+Requires Chrome version 52+
 
 [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
 ## Install CLI
 
-Requires Node version 5 or higher
+Requires Node v5+ or Node v4 w/ `--harmony`
 
 ```sh
 npm install -g GoogleChrome/lighthouse
@@ -60,6 +60,77 @@ cd ../lighthouse-cli/
 npm link lighthouse-core
 ```
 
+## Custom run configuration
+
+You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=$PWD/myconfig.json <url>`
+
+## Trace processing
+
+Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traceContents` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
+
+##### `config.json`
+```js
+{
+ "audits": [
+  "user-timings",
+  "critical-request-chains"
+ ],
+
+ "artifacts": {
+   "traceContents": "$HOME/code/lighthouse-core/test/fixtures/traces/trace-user-timings.json",
+   "performanceLog": "$HOME/code/lighthouse-core/test/fixtures/traces/perflog.json"
+ },
+
+ "aggregations": [{
+   "name": "Performance Metrics",
+   "description": "These encapsulate your app's performance.",
+   "scored": false,
+   "categorizable": false,
+   "items": [{
+     "criteria": {
+       "user-timings": { "rawValue": 0, "weight": 1 },
+       "critical-request-chains": { "rawValue": 0, "weight": 1}
+     }
+   }]
+ }]
+}
+```
+
+Then, run with: `lighthouse --config-path=$PWD/config.json http://www.random.url`
+
+
+## Lighthouse CLI options
+
+```sh
+$ lighthouse --help
+
+lighthouse <url>
+
+Logging:
+  --verbose  Displays verbose logging                                                 [boolean]
+  --quiet    Displays no progress or debug logs                                       [boolean]
+
+Configuration:
+  --mobile                 Emulates a Nexus 5X                                  [default: true]
+  --load-page              Loads the page                                       [default: true]
+  --save-assets            Save the trace contents & screenshots to disk              [boolean]
+  --save-artifacts         Save all gathered artifacts to disk                        [boolean]
+  --audit-whitelist        Comma separated list of audits to run               [default: "all"]
+  --list-all-audits        Prints a list of all available audits and exits            [boolean]
+  --list-trace-categories  Prints a list of all required trace categories and exits   [boolean]
+  --config-path            The absolute path to the config JSON.
+
+Output:
+  --output       Reporter for the results
+                         [choices: "pretty", "json", "html"]                [default: "pretty"]
+  --output-path  The file path to output the results
+                 Example: --output-path=./lighthouse-results.html           [default: "stdout"]
+
+Options:
+  --help     Show help                                                                [boolean]
+  --version  Show version number                                                      [boolean]
+```
+
 ## Tests
 
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
@@ -96,7 +167,7 @@ _Some incomplete notes_
 * **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
 
 ##### Internal module graph
-![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/16317303/54a25e20-3982-11e6-9374-dd3c24b70468.png)
+![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/16702446/cd59989e-451a-11e6-97e9-6c72c301017d.png)
 <small><code>npm install -g js-vd; vd --exclude "node_modules|third_party" lighthouse-core/ > graph.html</code></small>
 
 

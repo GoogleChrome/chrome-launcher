@@ -86,28 +86,28 @@ describe('Aggregate', () => {
   it('remaps results to an object', () => {
     const a = [{
       name: 'test',
-      value: 1
+      rawValue: 1
     }, {
       name: 'test-2',
-      value: 2
+      rawValue: 2
     }, {
       name: 'test-3',
-      value: 3
+      rawValue: 3
     }];
 
     const remapped = Aggregate._remapResultsByName(a);
     return assert.deepEqual(remapped, {
       'test': {
         name: 'test',
-        value: 1
+        rawValue: 1
       },
       'test-2': {
         name: 'test-2',
-        value: 2
+        rawValue: 2
       },
       'test-3': {
         name: 'test-3',
-        value: 3
+        rawValue: 3
       }
     });
   });
@@ -115,10 +115,10 @@ describe('Aggregate', () => {
   it('throws if key already exists during remapping', () => {
     const a = [{
       name: 'test',
-      value: 1
+      rawValue: 1
     }, {
       name: 'test',
-      value: 2
+      rawValue: 2
     }];
 
     return assert.throws(_ => Aggregate._remapResultsByName(a),
@@ -131,7 +131,7 @@ describe('Aggregate', () => {
 
   it('returns a weight of zero for undefined results', () => {
     const expected = {
-      value: true,
+      rawValue: true,
       weight: 10
     };
     return assert.equal(Aggregate._convertToWeight(undefined, expected), 0);
@@ -139,19 +139,23 @@ describe('Aggregate', () => {
 
   it('returns a weight of zero for undefined expectations', () => {
     const result = {
-      value: true
+      rawValue: true,
+      score: true,
+      displayValue: ''
     };
     return assert.equal(Aggregate._convertToWeight(result, undefined), 0);
   });
 
   it('returns the correct weight for a boolean result', () => {
     const expected = {
-      value: true,
+      rawValue: true,
       weight: 10
     };
 
     const result = {
-      value: true
+      rawValue: true,
+      score: true,
+      displayValue: ''
     };
 
     return assert.equal(Aggregate._convertToWeight(result, expected), 10);
@@ -159,12 +163,14 @@ describe('Aggregate', () => {
 
   it('returns the correct weight for a numeric result', () => {
     const expected = {
-      value: 100,
+      rawValue: 100,
       weight: 10
     };
 
     const result = {
-      value: 50
+      rawValue: 50,
+      score: 50,
+      displayValue: '50'
     };
 
     return assert.equal(Aggregate._convertToWeight(result, expected), 5);
@@ -172,11 +178,13 @@ describe('Aggregate', () => {
 
   it('returns the a weight of zero if weight is missing from the expected', () => {
     const expected = {
-      value: 100
+      rawValue: 100
     };
 
     const result = {
-      value: 50
+      rawValue: 50,
+      score: 50,
+      displayValue: '50'
     };
 
     return assert.equal(Aggregate._convertToWeight(result, expected), 0);
@@ -184,39 +192,43 @@ describe('Aggregate', () => {
 
   it('returns a weight of zero for other inputs', () => {
     const expected = {
-      value: [],
+      rawValue: [],
       weight: 10
     };
 
     const result = {
-      value: []
+      rawValue: [],
+      score: [],
+      displayValue: ''
     };
 
     return assert.equal(Aggregate._convertToWeight(result, expected), 0);
   });
 
-  it('returns a weight of zero if types do not match', () => {
+  it('throws if types do not match', () => {
     const expected = {
-      value: true,
+      rawValue: true,
       weight: 10
     };
 
     const result = {
-      value: 20
+      rawValue: 20,
+      score: 20,
+      displayValue: '20'
     };
 
-    return assert.equal(Aggregate._convertToWeight(result, expected), 0);
+    return assert.throws(_ => Aggregate._convertToWeight(result, expected));
   });
 
   it('scores a set correctly (contributesToScore: true)', () => {
     const items = [{
       criteria: {
         'test': {
-          value: true,
+          rawValue: true,
           weight: 1
         },
         'alternate-test': {
-          value: 100,
+          rawValue: 100,
           weight: 3
         }
       }
@@ -224,10 +236,14 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'test',
-      value: false
+      rawValue: false,
+      score: false,
+      displayValue: ''
     }, {
       name: 'alternate-test',
-      value: 50
+      rawValue: 50,
+      score: 50,
+      displayValue: '50'
     }];
     const scored = true;
 
@@ -237,11 +253,15 @@ describe('Aggregate', () => {
       description: undefined,
       subItems: [{
         name: 'test',
-        value: false
+        rawValue: false,
+        score: false,
+        displayValue: ''
       },
       {
         name: 'alternate-test',
-        value: 50
+        rawValue: 50,
+        score: 50,
+        displayValue: '50'
       }]
     });
   });
@@ -250,11 +270,11 @@ describe('Aggregate', () => {
     const items = [{
       criteria: {
         'test': {
-          value: true,
+          rawValue: true,
           weight: 1
         },
         'alternate-test': {
-          value: 100,
+          rawValue: 100,
           weight: 3
         }
       }
@@ -262,10 +282,14 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'test',
-      value: false
+      rawValue: false,
+      score: false,
+      displayValue: ''
     }, {
       name: 'alternate-test',
-      value: 50
+      rawValue: 50,
+      score: 50,
+      displayValue: '50'
     }];
     const scored = false;
 
@@ -275,11 +299,15 @@ describe('Aggregate', () => {
       description: undefined,
       subItems: [{
         name: 'test',
-        value: false
+        rawValue: false,
+        score: false,
+        displayValue: ''
       },
       {
         name: 'alternate-test',
-        value: 50
+        rawValue: 50,
+        score: 50,
+        displayValue: '50'
       }]
     });
   });
@@ -288,7 +316,7 @@ describe('Aggregate', () => {
     const items = [{
       criteria: {
         test: {
-          value: true,
+          rawValue: true,
           weight: 1
         }
       }
@@ -296,7 +324,9 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'alternate-test',
-      value: 50,
+      rawValue: 50,
+      score: 50,
+      displayValue: '50',
       contributesToScore: true
     }];
 
@@ -314,7 +344,7 @@ describe('Aggregate', () => {
     const items = [{
       criteria: {
         test: {
-          value: true,
+          rawValue: true,
           weight: 1
         }
       }
@@ -322,7 +352,9 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'test',
-      value: true
+      rawValue: true,
+      score: true,
+      displayValue: ''
     }];
     const scored = true;
     return assert.equal(Aggregate.compare(results, items, scored)[0].overall, 1);
@@ -332,7 +364,7 @@ describe('Aggregate', () => {
     const items = [{
       criteria: {
         test: {
-          value: true,
+          rawValue: true,
           weight: 1
         }
       }
@@ -340,7 +372,9 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'test',
-      value: true
+      rawValue: true,
+      score: true,
+      displayValue: ''
     }];
 
     const scored = true;
@@ -359,7 +393,7 @@ describe('Aggregate', () => {
       items: [{
         criteria: {
           test: {
-            value: true,
+            rawValue: true,
             weight: 1
           }
         }
@@ -368,7 +402,9 @@ describe('Aggregate', () => {
 
     const results = [{
       name: 'test',
-      value: true
+      rawValue: true,
+      score: true,
+      displayValue: ''
     }];
 
     const output = Aggregate.aggregate(aggregation, results);

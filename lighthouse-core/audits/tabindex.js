@@ -42,7 +42,7 @@ class TabIndex extends Audit {
         artifacts.Accessibility.violations.find(result => result.id === 'tabindex');
 
     return TabIndex.generateAuditResult({
-      value: typeof rule === 'undefined',
+      rawValue: typeof rule === 'undefined',
       debugString: this.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,

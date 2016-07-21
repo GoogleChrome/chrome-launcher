@@ -22,7 +22,7 @@ const manifestParser = require('../../lib/manifest-parser');
 describe('Manifest: short_name_length audit', () => {
   it('fails when an empty manifest is present', () => {
     const Manifest = manifestParser('{}');
-    return assert.equal(Audit.audit({Manifest}).value, false);
+    return assert.equal(Audit.audit({Manifest}).rawValue, false);
   });
 
   it('fails when a manifest contains no short_name and too long name', () => {
@@ -31,7 +31,7 @@ describe('Manifest: short_name_length audit', () => {
     });
     const Manifest = manifestParser(manifestSrc);
     const out = Audit.audit({Manifest});
-    assert.equal(out.value, false);
+    assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
   });
 
@@ -43,7 +43,7 @@ describe('Manifest: short_name_length audit', () => {
     });
     const Manifest = manifestParser(manifestSrc);
     const out = Audit.audit({Manifest});
-    assert.equal(out.value, false);
+    assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
   });
 
@@ -52,7 +52,7 @@ describe('Manifest: short_name_length audit', () => {
       short_name: 'Lighthouse'
     });
     const Manifest = manifestParser(manifestSrc);
-    return assert.equal(Audit.audit({Manifest}).value, true);
+    return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
   /* eslint-enable camelcase */
 });

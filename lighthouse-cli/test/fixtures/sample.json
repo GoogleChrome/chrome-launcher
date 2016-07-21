@@ -39,8 +39,9 @@
           "description": "Users notice if sites and apps don't perform well. These top-level metrics capture the most important perceived performance concerns.",
           "subItems": [
             {
-              "value": 100,
-              "rawValue": "920.5ms",
+              "score": 100,
+              "displayValue": "920.5ms",
+              "rawValue": "920.5",
               "optimalValue": "1,600ms",
               "extendedInfo": {
                 "timings": {
@@ -57,6 +58,7 @@
             },
             {
               "value": 99,
+              "displayValue": "1068",
               "rawValue": 1068,
               "optimalValue": "1,250",
               "extendedInfo": {
@@ -301,6 +303,7 @@
             },
             {
               "value": true,
+              "displayValue": "#4527A0",
               "rawValue": "#4527A0",
               "name": "theme-color-meta",
               "category": "HTML",
