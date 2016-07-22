@@ -225,6 +225,7 @@ class TraceProcessor {
     let clippedLength = 0;
     mainThread.sliceGroup.topLevelSlices.forEach(slice => {
       // Discard slices outside range.
+
       if (slice.end <= startTime || slice.start >= endTime) {
         return;
       }

@@ -45,6 +45,7 @@
     "first-meaningful-paint",
     "speed-index-metric",
     "estimated-input-latency",
+    "time-to-interactive",
     "user-timings",
     "screenshots",
     "critical-request-chains",
@@ -104,6 +105,10 @@
         },
         "estimated-input-latency": {
           "rawValue": 100,
+          "weight": 1
+        },
+        "time-to-interactive": {
+          "value": 100,
           "weight": 1
         },
         "scrolling-60fps": {
