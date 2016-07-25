@@ -2,7 +2,6 @@
   "passes": [{
     "network": true,
     "trace": true,
-    "loadDataName": "first-pass",
     "loadPage": true,
     "gatherers": [
       "url",

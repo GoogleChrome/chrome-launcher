@@ -221,13 +221,14 @@ describe('Driver', function() {
     const passes = [{
       network: true,
       trace: true,
-      loadDataName: 'first-pass',
+      traceName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
       ]
     }, {
       loadPage: true,
+      traceName: 'secondPass',
       gatherers: [
         t2
       ]

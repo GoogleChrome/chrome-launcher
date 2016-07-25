@@ -53,11 +53,12 @@ class FirstMeaningfulPaint extends Audit {
    */
   static audit(artifacts) {
     return new Promise((resolve, reject) => {
-      if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
+      const traceContents = artifacts.traces[this.DEFAULT_TRACE].traceContents;
+      if (!traceContents || !Array.isArray(traceContents)) {
         throw new Error(FAILURE_MESSAGE);
       }
 
-      const evts = this.collectEvents(artifacts.traceContents);
+      const evts = this.collectEvents(traceContents);
 
       const navStart = evts.navigationStart;
       const fCP = evts.firstContentfulPaint;
