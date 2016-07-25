@@ -18,7 +18,7 @@
 
 /* eslint-env mocha */
 
-const pkg = require('../package.json');
+const pkg = require('../../package.json');
 const assert = require('assert');
 
 describe('Module Tests', function() {
