@@ -2,14 +2,8 @@ language: node_js
 matrix:
   include:
     - node_js: "4.3.2"
-      env:
-        - UNIT=unit:harmony COVERALLS=coveralls:harmony
     - node_js: "5.0"
-      env:
-        - UNIT=unit COVERALLS=coveralls
     - node_js: "node"
-      env:
-        - UNIT=unit COVERALLS=coveralls
 sudo: required
 dist: trusty
 cache:
@@ -25,10 +19,11 @@ before_script:
   - start-stop-daemon --start --background --exec $(pwd)/lighthouse-core/scripts/launch-chrome.sh
   - sleep 5
 script:
+  - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
   - npm run lint
-  - npm run $UNIT
+  - npm run unit
   - npm run closure
-  - npm run $COVERALLS
+  - npm run coveralls
   - npm run smoke
   - cd lighthouse-extension
   - gulp build
