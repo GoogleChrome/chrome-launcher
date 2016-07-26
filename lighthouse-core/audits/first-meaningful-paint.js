@@ -174,6 +174,7 @@ class FirstMeaningfulPaint extends Audit {
       }
       // firstContentfulPaint == the first time that text or image content was
       // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
+      // COMPAT: firstContentfulPaint trace event first introduced in Chrome 49 (r370921)
       if (event.name === 'firstContentfulPaint' && event.args.frame === mainFrameID) {
         firstContentfulPaint = event;
       }
