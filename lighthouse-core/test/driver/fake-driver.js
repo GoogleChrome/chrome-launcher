@@ -31,6 +31,9 @@ module.exports = {
 
   cleanAndDisableBrowserCaches() {},
   forceUpdateServiceWorkers() {},
+  reloadForCleanStateIfNeeded() {
+    return Promise.resolve();
+  },
   beginTrace() {
     return Promise.resolve();
   },

@@ -59,6 +59,15 @@ class ExtensionDriver extends Driver {
         });
   }
 
+  reloadForCleanStateIfNeeded(options) {
+    // Reload the page to remove any side-effects (like disabling JavaScript).
+    const status = 'Reloading page to reset state';
+    log.log('status', status);
+    return this.gotoURL(options.url).then(_ => {
+      log.log('statusEnd', status);
+    });
+  }
+
   beginLogging() {
     // log events received
     chrome.debugger.onEvent.addListener((source, method, params) =>

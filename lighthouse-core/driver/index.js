@@ -195,18 +195,15 @@ class Driver {
               .then(_ => this.tearDown(runOptions));
         }, Promise.resolve());
       })
-
-      // Reload the page to remove any side-effects of Lighthouse (like disabling JavaScript).
       .then(_ => {
-        const status = 'Reloading page to reset state';
-        log.log('status', status);
-        return this.loadPage(driver, options).then(_ => {
-          log.log('statusEnd', status);
+        // We dont need to hold up the reporting for the reload/disconnect,
+        // so we will not return a promise in here.
+        driver.reloadForCleanStateIfNeeded(options).then(_ => {
+          log.log('status', 'Disconnecting from browser...');
+          driver.disconnect();
         });
+        return undefined;
       })
-
-       // Finish and teardown.
-      .then(_ => driver.disconnect())
       .then(_ => {
         // Collate all the gatherer results.
         const artifacts = Object.assign({}, tracingData);

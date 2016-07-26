@@ -212,6 +212,10 @@ class DriverBase {
     });
   }
 
+  reloadForCleanStateIfNeeded() {
+    return Promise.resolve();
+  }
+
   /**
    * @param {string} selector Selector to find in the DOM
    * @return {!Promise<Element>} The found element, or null, resolved in a promise
