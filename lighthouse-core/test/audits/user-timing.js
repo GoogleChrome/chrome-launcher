@@ -29,15 +29,14 @@ describe('Performance: user-timings audit', () => {
   });
 
   it('evaluates valid input correctly', () => {
-    return Audit.audit({traces: {[Audit.DEFAULT_TRACE]: {traceContents}}})
-      .then(response => {
-        assert.equal(response.score, 2);
-        assert.ok(!Number.isNaN(response.extendedInfo.value[0].startTime));
-        assert.ok(typeof response.extendedInfo.value[0].endTime === 'undefined');
-        assert.ok(typeof response.extendedInfo.value[0].duration === 'undefined');
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].startTime));
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].endTime));
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].duration));
-      });
+    return Audit.audit({traceContents}).then(response => {
+      assert.equal(response.score, 2);
+      assert.ok(!Number.isNaN(response.extendedInfo.value[0].startTime));
+      assert.ok(typeof response.extendedInfo.value[0].endTime === 'undefined');
+      assert.ok(typeof response.extendedInfo.value[0].duration === 'undefined');
+      assert.ok(!Number.isNaN(response.extendedInfo.value[1].startTime));
+      assert.ok(!Number.isNaN(response.extendedInfo.value[1].endTime));
+      assert.ok(!Number.isNaN(response.extendedInfo.value[1].duration));
+    });
   });
 });

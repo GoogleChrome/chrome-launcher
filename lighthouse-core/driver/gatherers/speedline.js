@@ -16,21 +16,19 @@
  */
 'use strict';
 
-const Audit = require('../../audits/audit');
 const Gather = require('./gather');
 const speedline = require('speedline');
 
 class Speedline extends Gather {
 
   afterPass(options, tracingData) {
-    return speedline(tracingData.traces[Audit.DEFAULT_TRACE].traceContents)
-      .then(results => {
-        this.artifact = results;
-      }).catch(err => {
-        this.artifact = {
-          debugString: err.message
-        };
-      });
+    return speedline(tracingData.traceContents).then(results => {
+      this.artifact = results;
+    }).catch(err => {
+      this.artifact = {
+        debugString: err.message
+      };
+    });
   }
 }
 

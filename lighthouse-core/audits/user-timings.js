@@ -128,14 +128,12 @@ class UserTimings extends Audit {
    */
   static audit(artifacts) {
     return new Promise((resolve, reject) => {
-      const traceContents =
-        artifacts.traces[this.DEFAULT_TRACE] &&
-        artifacts.traces[this.DEFAULT_TRACE].traceContents;
-      if (!traceContents || !Array.isArray(traceContents)) {
+      if (!artifacts.traceContents || !Array.isArray(artifacts.traceContents)) {
         throw new Error(FAILURE_MESSAGE);
       }
 
-      const userTimings = filterTrace(traceContents);
+      const userTimings = filterTrace(artifacts.traceContents);
+
       resolve(UserTimings.generateAuditResult({
         rawValue: userTimings.length,
         extendedInfo: {

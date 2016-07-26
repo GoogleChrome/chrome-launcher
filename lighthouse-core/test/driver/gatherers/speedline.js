@@ -17,7 +17,6 @@
 
 /* eslint-env mocha */
 
-const Audit = require('../../../audits/audit.js');
 const SpeedlineGather = require('../../../driver/gatherers/speedline.js');
 const assert = require('assert');
 
@@ -25,13 +24,7 @@ describe('Speedline gatherer', () => {
   it('returns an error debugString on faulty trace data', done => {
     const speedlineGather = new SpeedlineGather();
 
-    speedlineGather.afterPass({}, {
-      traces: {
-        [Audit.DEFAULT_TRACE]: {
-          traceContents: {boo: 'ya'}
-        }
-      }
-    }).then(_ => {
+    speedlineGather.afterPass({}, {traceContents: {boo: 'ya'}}).then(_ => {
       assert.ok(speedlineGather.artifact.debugString);
       assert.ok(speedlineGather.artifact.debugString.length);
       done();
@@ -43,13 +36,7 @@ describe('Speedline gatherer', () => {
     const speedlineGather = new SpeedlineGather();
     const traceContents = require('../../fixtures/traces/progressive-app.json');
 
-    return speedlineGather.afterPass({}, {
-      traces: {
-        [Audit.DEFAULT_TRACE]: {
-          traceContents
-        }
-      }
-    }).then(_ => {
+    return speedlineGather.afterPass({}, {traceContents}).then(_ => {
       const speedline = speedlineGather.artifact;
       return assert.equal(Math.round(speedline.speedIndex), 831);
     });

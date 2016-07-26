@@ -46,10 +46,9 @@ class ScreenshotFilmstrip extends Gather {
   }
 
   afterPass(options, tracingData) {
-    return this.getScreenshots(tracingData.traceContents)
-      .then(screenshots => {
-        this.artifact = screenshots;
-      });
+    return this.getScreenshots(tracingData.traceContents).then(screenshots => {
+      this.artifact = screenshots;
+    });
   }
 }
 

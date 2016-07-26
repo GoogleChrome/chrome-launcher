@@ -16,7 +16,6 @@
 const Runner = require('../runner');
 const fakeDriver = require('./driver/fake-driver');
 const Config = require('../config');
-const Audit = require('../audits/audit');
 const assert = require('assert');
 const path = require('path');
 
@@ -87,12 +86,8 @@ describe('Runner', () => {
       ],
 
       artifacts: {
-        traces: {
-          [Audit.DEFAULT_TRACE]: {
-            traceContents: path.join(__dirname,
+        traceContents: path.join(__dirname,
                            '/fixtures/traces/trace-user-timings.json')
-          }
-        }
       }
     }, flags.auditWhitelist);
 

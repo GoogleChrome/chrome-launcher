@@ -130,16 +130,12 @@ describe('Config', () => {
   it('expands artifacts', () => {
     const config = new Config({
       artifacts: {
-        traces: {
-          firstPass: {
-            traceContents: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
-          }
-        },
+        traceContents: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json'),
         performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
       }
     });
     const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
-    assert.deepStrictEqual(config.artifacts.traces.firstPass.traceContents, traceUserTimings);
+    assert.deepStrictEqual(config.artifacts.traceContents, traceUserTimings);
     assert.ok(config.artifacts.CriticalRequestChains);
     assert.ok(config.artifacts.CriticalRequestChains['93149.1']);
     assert.ok(config.artifacts.CriticalRequestChains['93149.1'].request);

@@ -68,8 +68,7 @@ class TTIMetric extends Audit {
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
-      const traceContents = artifacts.traces[Audit.DEFAULT_TRACE].traceContents;
-      const model = tracingProcessor.init(traceContents);
+      const model = tracingProcessor.init(artifacts.traceContents);
       const endOfTraceTime = model.bounds.max;
 
       // TODO: Wait for DOMContentLoadedEndEvent
@@ -110,7 +109,7 @@ class TTIMetric extends Audit {
         }
         // Get our expected latency for the time window
         const latencies = TracingProcessor.getRiskToResponsiveness(
-          model, traceContents, startTime, endTime, percentiles);
+          model, artifacts.traceContents, startTime, endTime, percentiles);
         const estLatency = latencies[0].time.toFixed(2);
         foundLatencies.push({
           estLatency: estLatency,

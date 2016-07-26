@@ -24,7 +24,7 @@ const traceContents = require('../fixtures/traces/progressive-app.json');
 describe('Performance: estimated-input-latency audit', () => {
   it('scores a -1 with invalid trace data', () => {
     const output = Audit.audit({
-      traces: {[Audit.DEFAULT_TRACE]: {traceContents: '[{"pid": 15256,"tid": 1295,"t'}},
+      traceContents: '[{"pid": 15256,"tid": 1295,"t',
       Speedline: {
         first: 500
       }
@@ -35,7 +35,7 @@ describe('Performance: estimated-input-latency audit', () => {
 
   it('evaluates valid input correctly', () => {
     const output = Audit.audit({
-      traces: {[Audit.DEFAULT_TRACE]: {traceContents}},
+      traceContents,
       Speedline: {
         first: 500
       }

@@ -26,11 +26,7 @@ const speedlineGather = new SpeedlineGather();
 describe('Performance: time-to-interactive audit', () => {
   it('scores a -1 with invalid trace data', () => {
     return Audit.audit({
-      traces: {
-        [Audit.DEFAULT_TRACE]: {
-          traceContents: '[{"pid": 15256,"tid": 1295,"t'
-        }
-      },
+      traceContents: '[{"pid": 15256,"tid": 1295,"t',
       Speedline: {
         first: 500
       }
@@ -42,11 +38,7 @@ describe('Performance: time-to-interactive audit', () => {
 
   it('evaluates valid input correctly', () => {
     let artifacts = {
-      traces: {
-        [Audit.DEFAULT_TRACE]: {
-          traceContents: traceContents
-        }
-      }
+      traceContents: traceContents
     };
     return speedlineGather.afterPass({}, artifacts).then(_ => {
       artifacts.Speedline = speedlineGather.artifact;
