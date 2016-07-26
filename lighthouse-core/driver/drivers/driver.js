@@ -105,6 +105,12 @@ class DriverBase {
     return Promise.reject(new Error('Not implemented'));
   }
 
+  evaluateScriptOnLoad(scriptSource) {
+    return this.sendCommand('Page.addScriptToEvaluateOnLoad', {
+      scriptSource
+    });
+  }
+
   evaluateAsync(asyncExpression) {
     return new Promise((resolve, reject) => {
       let asyncTimeout;

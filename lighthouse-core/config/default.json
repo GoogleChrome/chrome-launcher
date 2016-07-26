@@ -16,7 +16,8 @@
       "critical-request-chains",
       "speedline",
       "content-width",
-      "cache-contents"
+      "cache-contents",
+      "geolocation-on-start"
     ]
   },
   {
@@ -66,7 +67,8 @@
     "label",
     "tabindex",
     "content-width",
-    "cache-start-url"
+    "cache-start-url",
+    "geolocation-on-start"
   ],
 
   "aggregations": [{
@@ -274,6 +276,10 @@
           "weight": 1
         },
         "manifest-display": {
+          "rawValue": true,
+          "weight": 1
+        },
+        "geolocation-on-start": {
           "rawValue": true,
           "weight": 1
         },
