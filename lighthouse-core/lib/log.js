@@ -44,13 +44,9 @@ const events = new Emitter();
 module.exports = {
   setLevel,
   events,
-  log(title, msg) {
-    if (title === 'status') {
-      console.time(msg);
-      events.emit('status', arguments);
-    }
-    if (title === 'statusEnd') {
-      console.timeEnd(msg);
+  log(title) {
+    if (title === 'status' || title === 'statusEnd') {
+      events.emit(title, arguments);
     }
     return _log(title, arguments);
   },

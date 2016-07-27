@@ -22,6 +22,7 @@ const yargs = require('yargs');
 const semver = require('semver');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
+const log = require('../lighthouse-core/lib/log');
 
 // node 5.x required due to use of ES2015 features, like spread operator
 if (semver.lt(process.version, '5.0.0')) {
@@ -145,6 +146,25 @@ if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
 } else {
   flags.auditWhitelist = new Set(flags.auditWhitelist.split(',').map(a => a.toLowerCase()));
 }
+
+// Listen on progress events, record their start timestamps
+// and print result using the logger.
+let timers = {};
+log.events.on('status', function(event) {
+  let msg = event[1];
+  if (!msg) {
+    return;
+  }
+  timers[msg] = Date.now();
+});
+log.events.on('statusEnd', function(event) {
+  let msg = event[1];
+  if (!msg) {
+    return;
+  }
+  let t = Date.now() - timers[msg];
+  log.log('Timer', `${msg} ${t}ms`);
+});
 
 // kick off a lighthouse run
 lighthouse(url, flags, config)
