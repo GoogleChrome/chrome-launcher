@@ -26,7 +26,8 @@ class ServiceWorker extends Gather {
    */
   static getOrigin(url) {
     const parsedURL = require('url').parse(url);
-    return `${parsedURL.protocol}//${parsedURL.hostname}`;
+    return `${parsedURL.protocol}//${parsedURL.hostname}` +
+        (parsedURL.port ? `:${parsedURL.port}` : '');
   }
 
   /**
