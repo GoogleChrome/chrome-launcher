@@ -19,7 +19,7 @@
 
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
 // *WARNING* do not use fetch.. due to it requiring window focus to fire.
 // Request the current page by issuing a XMLHttpRequest request to ''
@@ -36,7 +36,7 @@ const requestPage = function() {
   oReq.send();
 };
 
-class Offline extends Gather {
+class Offline extends Gatherer {
 
   static config(opts) {
     return {

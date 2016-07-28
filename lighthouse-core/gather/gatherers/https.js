@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class HTTPS extends Gather {
+class HTTPS extends Gatherer {
 
   constructor() {
     super();

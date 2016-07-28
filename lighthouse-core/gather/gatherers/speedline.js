@@ -16,10 +16,10 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 const speedline = require('speedline');
 
-class Speedline extends Gather {
+class Speedline extends Gatherer {
 
   afterPass(options, tracingData) {
     return speedline(tracingData.traceContents).then(results => {

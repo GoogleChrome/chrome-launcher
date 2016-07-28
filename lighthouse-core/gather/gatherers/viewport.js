@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class Viewport extends Gather {
+class Viewport extends Gatherer {
 
   /**
    * @param {!{driver: !Object}} options Run options

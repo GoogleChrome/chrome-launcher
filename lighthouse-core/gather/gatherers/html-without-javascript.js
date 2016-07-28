@@ -18,7 +18,7 @@
 
 /* Note that this returns the innerText of the <body> element, not the HTML. */
 
-const HTML = require('./html');
+const Gatherer = require('./gatherer');
 
 /* global document, __returnResults */
 
@@ -30,7 +30,7 @@ function getBodyText() {
   __returnResults(body ? body.innerText : '');
 }
 
-class HTMLWithoutJavaScript extends HTML {
+class HTMLWithoutJavaScript extends Gatherer {
 
   beforePass(options) {
     options.disableJavaScript = true;

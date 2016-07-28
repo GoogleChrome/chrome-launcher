@@ -1,5 +1,4 @@
 /**
- * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,33 +15,14 @@
  */
 'use strict';
 
-class Gather {
+/* eslint-env mocha */
 
-  constructor() {
-    this.artifact = {};
-  }
+const Gatherer = require('../../../gather/gatherers/gatherer');
+const assert = require('assert');
 
-  /**
-   * @return {string}
-   */
-  get name() {
-    return this.constructor.name;
-  }
-
-  /* eslint-disable no-unused-vars */
-
-  setup(options) { }
-
-  beforePass(options) { }
-
-  pass(options) { }
-
-  afterPass(options) { }
-
-  tearDown(options) { }
-
-  /* eslint-enable no-unused-vars */
-
-}
-
-module.exports = Gather;
+describe('Gatherer', () => {
+  it('returns its name', () => {
+    const g = new Gatherer();
+    return assert.equal(g.name, 'Gatherer');
+  });
+});

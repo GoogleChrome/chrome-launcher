@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class ThemeColor extends Gather {
+class ThemeColor extends Gatherer {
 
   afterPass(options) {
     const driver = options.driver;

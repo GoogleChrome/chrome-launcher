@@ -18,12 +18,12 @@
 
 /* eslint-env mocha */
 
-const Gather = require('../../gather/gatherers/gather');
+const Gatherer = require('../../gather/gatherers/gatherer');
 const GatherRunner = require('../../gather/gather-runner');
 const Audit = require('../../audits/audit');
 const assert = require('assert');
 
-class TestGatherer extends Gather {
+class TestGatherer extends Gatherer {
   constructor() {
     super();
     this.called = false;

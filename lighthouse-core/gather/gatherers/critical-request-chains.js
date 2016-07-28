@@ -17,12 +17,12 @@
 
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 const WebInspector = require('../../lib/web-inspector');
 
 const includes = (arr, elm) => arr.indexOf(elm) > -1;
 
-class CriticalRequestChains extends Gather {
+class CriticalRequestChains extends Gatherer {
 
   /**
    * For now, we use network priorities as a proxy for "render-blocking"/critical-ness.

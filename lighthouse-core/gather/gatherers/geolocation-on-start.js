@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
 /**
  * @fileoverview Tests whether the page attempts to request geolocation on page load. This often
@@ -42,7 +42,7 @@ function collectGeoState() {
   __returnResults(window.__didNotCallGeo);
 }
 
-class GeolocationOnStart extends Gather {
+class GeolocationOnStart extends Gatherer {
 
   beforePass(options) {
     return options.driver.evaluateScriptOnLoad(`(${overrideGeo.toString()}())`);

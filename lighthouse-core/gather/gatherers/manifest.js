@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 const manifestParser = require('../../lib/manifest-parser');
 
 /* global document, XMLHttpRequest, __returnResults */
@@ -53,7 +53,7 @@ function getManifestContent() {
   req.send();
 }
 
-class Manifest extends Gather {
+class Manifest extends Gatherer {
 
   static _errorManifest(errorString) {
     return {

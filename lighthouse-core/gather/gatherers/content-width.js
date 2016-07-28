@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
 /* global window, __returnResults */
 
@@ -30,7 +30,7 @@ function getContentWidth() {
   });
 }
 
-class ContentWidth extends Gather {
+class ContentWidth extends Gatherer {
 
   afterPass(options) {
     const driver = options.driver;

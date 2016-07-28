@@ -18,7 +18,7 @@
 
 /* global document, __returnResults */
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 const fs = require('fs');
 const axe = fs.readFileSync(
   require.resolve('axe-core/axe.min.js')
@@ -33,7 +33,7 @@ function runA11yChecks() {
   });
 }
 
-class Accessibility extends Gather {
+class Accessibility extends Gatherer {
   static _errorAccessibility(errorString) {
     return {
       raw: undefined,

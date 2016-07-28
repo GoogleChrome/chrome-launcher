@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class URL extends Gather {
+class URL extends Gatherer {
 
   beforePass(options) {
     this.artifact = options.url || options.driver.url;

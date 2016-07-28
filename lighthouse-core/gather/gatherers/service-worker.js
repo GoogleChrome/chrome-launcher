@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class ServiceWorker extends Gather {
+class ServiceWorker extends Gatherer {
 
   /**
    * @param {string} url

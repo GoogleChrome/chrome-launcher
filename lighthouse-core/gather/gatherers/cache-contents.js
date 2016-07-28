@@ -18,7 +18,7 @@
 
 /* global __returnResults, caches */
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
 // This is run in the page, not Lighthouse itself.
 /* istanbul ignore next */
@@ -47,7 +47,7 @@ function getCacheContents() {
       });
 }
 
-class CacheContents extends Gather {
+class CacheContents extends Gatherer {
   static _error(errorString) {
     return {
       raw: undefined,

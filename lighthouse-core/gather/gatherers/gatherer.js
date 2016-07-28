@@ -1,4 +1,5 @@
 /**
+ * @license
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +16,36 @@
  */
 'use strict';
 
-/* eslint-env mocha */
+/**
+ * Base class for all gatherers; defines pass lifecycle methods.
+ */
+class Gatherer {
 
-const Gather = require('../../../gather/gatherers/gather');
-const assert = require('assert');
+  constructor() {
+    this.artifact = {};
+  }
 
-describe('Gather', () => {
-  it('returns its name', () => {
-    const g = new Gather();
-    return assert.equal(g.name, 'Gather');
-  });
-});
+  /**
+   * @return {string}
+   */
+  get name() {
+    return this.constructor.name;
+  }
+
+  /* eslint-disable no-unused-vars */
+
+  setup(options) { }
+
+  beforePass(options) { }
+
+  pass(options) { }
+
+  afterPass(options) { }
+
+  tearDown(options) { }
+
+  /* eslint-enable no-unused-vars */
+
+}
+
+module.exports = Gatherer;

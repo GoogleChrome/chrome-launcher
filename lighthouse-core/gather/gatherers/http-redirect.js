@@ -16,9 +16,9 @@
  */
 'use strict';
 
-const Gather = require('./gather');
+const Gatherer = require('./gatherer');
 
-class HTTPRedirect extends Gather {
+class HTTPRedirect extends Gatherer {
 
   constructor() {
     super();
