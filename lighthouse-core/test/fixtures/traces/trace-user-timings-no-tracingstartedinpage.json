@@ -1,0 +1,4 @@
+[{"pid":41904,"tid":1295,"ts":506085991145,"ph":"R","cat":"blink.user_timing","name":"navigationStart","args":{"frame": "0xhad00p"},"tts":314882},
+{"pid":41904,"tid":1295,"ts":506086992099,"ph":"R","cat":"blink.user_timing","name":"mark_test","args":{},"tts":331149},
+{"pid":41904,"tid":1295,"ts":506085991147,"ph":"b","cat":"blink.user_timing","name":"measure_test","args":{},"tts":331184,"id":"0x73b016"},
+{"pid":41904,"tid":1295,"ts":506086992112,"ph":"e","cat":"blink.user_timing","name":"measure_test","args":{},"tts":331186,"id":"0x73b016"}]

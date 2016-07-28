@@ -131,7 +131,7 @@ describe('Config', () => {
     const config = new Config({
       artifacts: {
         traces: {
-          firstPass: {
+          defaultPass: {
             traceContents: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
           }
         },
@@ -139,11 +139,68 @@ describe('Config', () => {
       }
     });
     const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
-    assert.deepStrictEqual(config.artifacts.traces.firstPass.traceContents, traceUserTimings);
+    assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceContents, traceUserTimings);
     assert.ok(config.artifacts.CriticalRequestChains);
     assert.ok(config.artifacts.CriticalRequestChains['93149.1']);
     assert.ok(config.artifacts.CriticalRequestChains['93149.1'].request);
     assert.ok(config.artifacts.CriticalRequestChains['93149.1'].children);
+  });
+
+  it('handles traces with no TracingStartedInPage events', () => {
+    const config = new Config({
+      artifacts: {
+        traces: {
+          defaultPass: {
+            traceContents: path.resolve(__dirname,
+                               '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
+          }
+        },
+        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
+      }
+    });
+
+    assert.ok(config.artifacts.traces.defaultPass.traceContents.find(
+          e => e.name === 'TracingStartedInPage' && e.args.data.page === '0xhad00p'));
+  });
+
+  it('doesnt add speedline artifact to tests without tti audit', () => {
+    const config = new Config({
+      artifacts: {
+        traces: {
+          defaultPass: {
+            traceContents: path.resolve(__dirname,
+                               '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
+          }
+        },
+        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
+      },
+      audits: [
+        'first-meaningful-paint'
+
+      ]
+    });
+
+    assert.equal(config.artifacts.Speedline, undefined);
+  });
+
+  it('does add speedline artifact to tests without tti audit', () => {
+    const config = new Config({
+      artifacts: {
+        traces: {
+          defaultPass: {
+            traceContents: path.resolve(__dirname,
+                               '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
+          }
+        },
+        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
+      },
+      audits: [
+        'first-meaningful-paint',
+        'time-to-interactive'
+      ]
+    });
+
+    assert.notEqual(config.artifacts.Speedline, undefined);
   });
 });
 

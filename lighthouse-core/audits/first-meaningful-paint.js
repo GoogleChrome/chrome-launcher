@@ -132,7 +132,12 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.min(100, score);
     score = Math.max(0, score);
 
+    if (!data.navStart) {
+      throw new Error(FAILURE_MESSAGE);
+    }
+
     timings.navStart = data.navStart.ts / 1000;
+
     return {
       duration: `${firstMeaningfulPaint.toFixed(1)}`,
       score: Math.round(score),
@@ -243,7 +248,10 @@ class FirstMeaningfulPaint extends Audit {
       }
     });
 
-    const paintAfterMSLayout = evts.paints.find(e => e.ts > mostSignificantLayout.ts);
+    let paintAfterMSLayout;
+    if (mostSignificantLayout) {
+      paintAfterMSLayout = evts.paints.find(e => e.ts > mostSignificantLayout.ts);
+    }
     return paintAfterMSLayout;
   }
 }
