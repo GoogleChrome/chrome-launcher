@@ -20,9 +20,9 @@ const audits = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/audit
     .filter(f => /\.js$/.test(f))
     .map(f => `../lighthouse-core/audits/${f.replace(/\.js$/, '')}`);
 
-const gatherers = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/driver/gatherers/'))
+const gatherers = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/gather/gatherers/'))
     .filter(f => /\.js$/.test(f))
-    .map(f => `../lighthouse-core/driver/gatherers/${f.replace(/\.js$/, '')}`);
+    .map(f => `../lighthouse-core/gather/gatherers/${f.replace(/\.js$/, '')}`);
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -118,7 +118,7 @@ gulp.task('browserify', () => {
 
         // Expose the audits and gatherers so they can be dynamically loaded.
         const corePath = '../lighthouse-core/';
-        const driverPath = `${corePath}driver/`;
+        const driverPath = `${corePath}gather/`;
         audits.forEach(audit => {
           bundle = bundle.require(audit, {expose: audit.replace(corePath, '../')});
         });

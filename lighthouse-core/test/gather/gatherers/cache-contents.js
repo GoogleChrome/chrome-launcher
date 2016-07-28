@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const CacheContentGather = require('../../../driver/gatherers/cache-contents');
+const CacheContentGather = require('../../../gather/gatherers/cache-contents');
 const assert = require('assert');
 let cacheContentGather;
 

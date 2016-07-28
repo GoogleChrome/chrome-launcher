@@ -17,46 +17,43 @@
 
 /* eslint-env mocha */
 
-const URLGather = require('../../../driver/gatherers/url');
+const ThemeColorGather = require('../../../gather/gatherers/theme-color');
 const assert = require('assert');
-let urlGather;
+let themeColorGather;
 
-describe('URL gatherer', () => {
+describe('Theme Color gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    urlGather = new URLGather();
+    themeColorGather = new ThemeColorGather();
   });
 
   it('returns the correct URL from options', () => {
-    const url = 'https://example.com';
-    urlGather.beforePass({
-      url
+    return themeColorGather.afterPass({
+      driver: {
+        querySelector() {
+          return Promise.resolve({
+            getAttribute() {
+              return '#288A76';
+            }
+          });
+        }
+      }
+    }).then(_ => {
+      assert.equal(themeColorGather.artifact, '#288A76');
     });
-
-    return assert.equal(urlGather.artifact, url);
   });
 
-  it('returns the correct URL from options.driver', () => {
-    const url = 'https://example.com';
-    urlGather.beforePass({
+  it('handles driver failure', () => {
+    return themeColorGather.afterPass({
       driver: {
-        url
+        querySelector() {
+          return Promise.reject('such a fail');
+        }
       }
+    }).then(_ => {
+      assert(false);
+    }).catch(_ => {
+      assert.equal(themeColorGather.artifact, -1);
     });
-
-    return assert.equal(urlGather.artifact, url);
-  });
-
-  it('chooses the URL from options over options.driver', () => {
-    const url = 'https://example.com';
-    const driverUrl = 'https://example2.com';
-    urlGather.beforePass({
-      url,
-      driver: {
-        url: driverUrl
-      }
-    });
-
-    return assert.equal(urlGather.artifact, url);
   });
 });

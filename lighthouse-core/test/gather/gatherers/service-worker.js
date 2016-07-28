@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const ServiceWorkerGather = require('../../../driver/gatherers/service-worker');
+const ServiceWorkerGather = require('../../../gather/gatherers/service-worker');
 const assert = require('assert');
 let serviceWorkerGatherer;
 

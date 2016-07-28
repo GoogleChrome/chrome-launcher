@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const ScreenshotsGather = require('../../../driver/gatherers/screenshots');
+const ScreenshotsGather = require('../../../gather/gatherers/screenshots');
 const assert = require('assert');
 let screenshotsGather = new ScreenshotsGather();
 

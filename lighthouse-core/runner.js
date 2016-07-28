@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Driver = require('./driver');
+const GatherRunner = require('./gather/gather-runner');
 const Aggregator = require('./aggregator');
 const assetSaver = require('./lib/asset-saver');
 const log = require('./lib/log');
@@ -36,12 +36,12 @@ class Runner {
     // Make a run, which can be .then()'d with whatever needs to run (based on the config).
     let run = Promise.resolve();
 
-    // If there are passes run the Driver and gather the artifacts. If not, we will need
+    // If there are passes run the GatherRunner and gather the artifacts. If not, we will need
     // to check that there are artifacts specified in the config, and throw if not.
     if (validPassesAndAudits || validArtifactsAndAudits) {
       if (validPassesAndAudits) {
         // Finally set up the driver to gather.
-        run = run.then(_ => Driver.run(config.passes, Object.assign({}, opts, {driver})));
+        run = run.then(_ => GatherRunner.run(config.passes, Object.assign({}, opts, {driver})));
       } else if (validArtifactsAndAudits) {
         run = run.then(_ => config.artifacts);
       }

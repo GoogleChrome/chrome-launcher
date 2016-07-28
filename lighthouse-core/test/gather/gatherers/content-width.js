@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const ContentWidthGatherer = require('../../../driver/gatherers/content-width');
+const ContentWidthGatherer = require('../../../gather/gatherers/content-width');
 const assert = require('assert');
 let contentWidthGatherer;
 

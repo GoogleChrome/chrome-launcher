@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const HTMLGather = require('../../../driver/gatherers/html');
+const HTMLGather = require('../../../gather/gatherers/html');
 const assert = require('assert');
 let htmlGather;
 

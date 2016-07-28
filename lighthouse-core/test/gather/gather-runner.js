@@ -18,8 +18,8 @@
 
 /* eslint-env mocha */
 
-const Gather = require('../../driver/gatherers/gather');
-const Driver = require('../../driver');
+const Gather = require('../../gather/gatherers/gather');
+const GatherRunner = require('../../gather/gather-runner');
 const Audit = require('../../audits/audit');
 const assert = require('assert');
 
@@ -40,7 +40,7 @@ class TestGatherer extends Gather {
 
 const fakeDriver = require('./fake-driver');
 
-describe('Driver', function() {
+describe('GatherRunner', function() {
   it('loads a page', () => {
     const driver = {
       gotoURL() {
@@ -48,7 +48,7 @@ describe('Driver', function() {
       }
     };
 
-    return Driver.loadPage(driver, {}, {
+    return GatherRunner.loadPage(driver, {}, {
       flags: {
         loadPage: true
       }
@@ -62,7 +62,7 @@ describe('Driver', function() {
     const driver = fakeDriver;
     const options = {url, driver};
 
-    return Driver.run([], options).then(_ => {
+    return GatherRunner.run([], options).then(_ => {
       assert.equal(typeof options.flags, 'object');
     });
   });
@@ -79,7 +79,7 @@ describe('Driver', function() {
       }
     };
 
-    return Driver.loadPage(driver, {url: 'https://example.com'})
+    return GatherRunner.loadPage(driver, {url: 'https://example.com'})
         .then(res => {
           assert.equal(res, true);
         });
@@ -95,7 +95,7 @@ describe('Driver', function() {
       forceUpdateServiceWorkers() {}
     };
 
-    return Driver.setupDriver(driver, {}, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {
         mobile: true
       }
@@ -114,7 +114,7 @@ describe('Driver', function() {
       forceUpdateServiceWorkers() {}
     };
 
-    return Driver.setupDriver(driver, {}, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {}
     }).then(_ => {
       assert.equal(calledEmulation, false);
@@ -137,7 +137,7 @@ describe('Driver', function() {
       }]
     };
 
-    return Driver.setup({driver, config}).then(_ => {
+    return GatherRunner.setup({driver, config}).then(_ => {
       assert.equal(calledTrace, true);
     });
   });
@@ -158,7 +158,7 @@ describe('Driver', function() {
       }]
     };
 
-    return Driver.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}).then(vals => {
       assert.equal(calledTrace, true);
       assert.deepEqual(vals.traces[Audit.DEFAULT_TRACE].traceContents, {x: 1});
     });
@@ -179,7 +179,7 @@ describe('Driver', function() {
       }]
     };
 
-    return Driver.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}).then(vals => {
       assert.deepEqual(vals.traces.notTheDefaultPass.traceContents, {x: 1});
     });
   });
@@ -200,7 +200,7 @@ describe('Driver', function() {
       }]
     };
 
-    return Driver.setup({driver, config}).then(_ => {
+    return GatherRunner.setup({driver, config}).then(_ => {
       assert.equal(calledNetworkCollect, true);
     });
   });
@@ -221,18 +221,18 @@ describe('Driver', function() {
       }]
     };
 
-    return Driver.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}).then(vals => {
       assert.equal(calledNetworkCollect, true);
       assert.deepEqual(vals.networkRecords, {x: 1});
     });
   });
 
   it('rejects when not given a URL', () => {
-    return Driver.run({}, {}).then(_ => assert.ok(false), _ => assert.ok(true));
+    return GatherRunner.run({}, {}).then(_ => assert.ok(false), _ => assert.ok(true));
   });
 
   it('rejects when given a URL of zero length', () => {
-    return Driver.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
+    return GatherRunner.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
   });
 
   it('does as many passes as are required', () => {
@@ -255,7 +255,7 @@ describe('Driver', function() {
       ]
     }];
 
-    return Driver.run(passes, {driver: fakeDriver, url: 'https://example.com', flags: {}})
+    return GatherRunner.run(passes, {driver: fakeDriver, url: 'https://example.com', flags: {}})
         .then(_ => {
           assert.ok(t1.called);
           assert.ok(t2.called);

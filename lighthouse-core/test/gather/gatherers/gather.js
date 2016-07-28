@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const Gather = require('../../../driver/gatherers/gather');
+const Gather = require('../../../gather/gatherers/gather');
 const assert = require('assert');
 
 describe('Gather', () => {

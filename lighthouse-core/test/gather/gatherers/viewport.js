@@ -17,34 +17,33 @@
 
 /* eslint-env mocha */
 
-const ThemeColorGather = require('../../../driver/gatherers/theme-color');
+const ViewportGather = require('../../../gather/gatherers/viewport');
 const assert = require('assert');
-let themeColorGather;
+let viewportGather;
 
-describe('Theme Color gatherer', () => {
+describe('Viewport gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    themeColorGather = new ThemeColorGather();
+    viewportGather = new ViewportGather();
   });
 
-  it('returns the correct URL from options', () => {
-    return themeColorGather.afterPass({
+  it('returns an artifact', () => {
+    return viewportGather.afterPass({
       driver: {
         querySelector() {
           return Promise.resolve({
-            getAttribute() {
-              return '#288A76';
-            }
+            getAttribute: () => 'width=device-width'
           });
         }
       }
     }).then(_ => {
-      assert.equal(themeColorGather.artifact, '#288A76');
+      assert.ok(typeof viewportGather.artifact === 'string');
+      assert.ok(/width=/gim.test(viewportGather.artifact));
     });
   });
 
   it('handles driver failure', () => {
-    return themeColorGather.afterPass({
+    return viewportGather.afterPass({
       driver: {
         querySelector() {
           return Promise.reject('such a fail');
@@ -53,7 +52,7 @@ describe('Theme Color gatherer', () => {
     }).then(_ => {
       assert(false);
     }).catch(_ => {
-      assert.equal(themeColorGather.artifact, -1);
+      assert.equal(viewportGather.artifact, -1);
     });
   });
 });

@@ -20,7 +20,7 @@
 const semver = require('semver');
 const Runner = require('./runner');
 const log = require('./lib/log.js');
-const ChromeProtocol = require('./driver/drivers/cri.js');
+const ChromeProtocol = require('./gather/drivers/cri.js');
 const Config = require('./config');
 
 /**
@@ -72,4 +72,4 @@ module.exports = function(url, flags, configJSON) {
 };
 
 module.exports.getAuditList = Runner.getAuditList;
-module.exports.traceCategories = require('./driver/drivers/driver').traceCategories;
+module.exports.traceCategories = require('./gather/drivers/driver').traceCategories;

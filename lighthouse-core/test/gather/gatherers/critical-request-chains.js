@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const GathererClass = require('../../../driver/gatherers/critical-request-chains');
+const GathererClass = require('../../../gather/gatherers/critical-request-chains');
 const assert = require('assert');
 const Gatherer = new GathererClass();
 

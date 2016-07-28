@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const HTTPRedirectGather = require('../../../driver/gatherers/http-redirect');
+const HTTPRedirectGather = require('../../../gather/gatherers/http-redirect');
 const assert = require('assert');
 let httpRedirectGather;
 

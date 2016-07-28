@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const GeolocationGatherer = require('../../../driver/gatherers/geolocation-on-start');
+const GeolocationGatherer = require('../../../gather/gatherers/geolocation-on-start');
 const assert = require('assert');
 let geolocationGatherer;
 

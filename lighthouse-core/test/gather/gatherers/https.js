@@ -17,59 +17,61 @@
 
 /* eslint-env mocha */
 
-const OfflineGather = require('../../../driver/gatherers/offline');
+const HTTPSGather = require('../../../gather/gatherers/https');
 const assert = require('assert');
-let offlineGather;
+let httpsGather;
 
-describe('HTTP Redirect gatherer', () => {
+describe('HTTPS gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    offlineGather = new OfflineGather();
+    httpsGather = new HTTPSGather();
   });
 
   it('returns an artifact', () => {
-    return offlineGather.afterPass({
+    return httpsGather.afterPass({
       driver: {
-        sendCommand() {
-          return Promise.resolve();
-        },
-        evaluateAsync() {
-          return Promise.resolve({offlineResponseCode: 200});
+        getSecurityState() {
+          return Promise.resolve({
+            schemeIsCryptographic: true
+          });
         }
       }
     }).then(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: 200});
+      assert.deepEqual(httpsGather.artifact.value, true);
     });
   });
 
-  it('handles driver sendCommand() failure', () => {
-    return offlineGather.afterPass({
+  it('handles driver failure', () => {
+    return httpsGather.afterPass({
       driver: {
-        sendCommand() {
+        getSecurityState() {
           return Promise.reject('such a fail');
         }
       }
     }).then(_ => {
       assert(false);
     }).catch(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
+      assert.equal(httpsGather.artifact.value, false);
     });
   });
 
-  it('handles driver evaluateAsync() failure', () => {
-    return offlineGather.afterPass({
+  it('handles driver timeout', () => {
+    return httpsGather.afterPass({
       driver: {
-        sendCommand() {
-          return Promise.resolve();
-        },
-        evaluateAsync() {
-          return Promise.reject();
+        getSecurityState() {
+          return new Promise((resolve, reject) => {
+            // Resolve the Promise after the timeout should have fired.
+            setTimeout(resolve, 500);
+          });
         }
-      }
+      },
+
+      timeout: 250
     }).then(_ => {
       assert(false);
     }).catch(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
+      assert.equal(httpsGather.artifact.value, false);
+      assert.ok(typeof httpsGather.artifact.debugString === 'string');
     });
   });
 });

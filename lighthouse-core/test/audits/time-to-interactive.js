@@ -16,7 +16,7 @@
 'use strict';
 
 const Audit = require('../../audits/time-to-interactive.js');
-const SpeedlineGather = require('../../driver/gatherers/speedline');
+const SpeedlineGather = require('../../gather/gatherers/speedline');
 const assert = require('assert');
 
 const traceContents = require('../fixtures/traces/progressive-app.json');

@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const HTMLWithoutJavaScriptGather = require('../../../driver/gatherers/html-without-javascript');
+const HTMLWithoutJavaScriptGather = require('../../../gather/gatherers/html-without-javascript');
 const assert = require('assert');
 let htmlWithoutJavaScriptGather;
 

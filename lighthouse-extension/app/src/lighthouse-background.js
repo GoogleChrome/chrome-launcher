@@ -17,7 +17,7 @@
 
 'use strict';
 
-const ExtensionProtocol = require('../../../lighthouse-core/driver/drivers/extension');
+const ExtensionProtocol = require('../../../lighthouse-core/gather/drivers/extension');
 const Runner = require('../../../lighthouse-core/runner');
 const Config = require('../../../lighthouse-core/config');
 const configJSON = require('../../../lighthouse-core/config/default.json');

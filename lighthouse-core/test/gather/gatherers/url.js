@@ -17,42 +17,46 @@
 
 /* eslint-env mocha */
 
-const ViewportGather = require('../../../driver/gatherers/viewport');
+const URLGather = require('../../../gather/gatherers/url');
 const assert = require('assert');
-let viewportGather;
+let urlGather;
 
-describe('Viewport gatherer', () => {
+describe('URL gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    viewportGather = new ViewportGather();
+    urlGather = new URLGather();
   });
 
-  it('returns an artifact', () => {
-    return viewportGather.afterPass({
-      driver: {
-        querySelector() {
-          return Promise.resolve({
-            getAttribute: () => 'width=device-width'
-          });
-        }
-      }
-    }).then(_ => {
-      assert.ok(typeof viewportGather.artifact === 'string');
-      assert.ok(/width=/gim.test(viewportGather.artifact));
+  it('returns the correct URL from options', () => {
+    const url = 'https://example.com';
+    urlGather.beforePass({
+      url
     });
+
+    return assert.equal(urlGather.artifact, url);
   });
 
-  it('handles driver failure', () => {
-    return viewportGather.afterPass({
+  it('returns the correct URL from options.driver', () => {
+    const url = 'https://example.com';
+    urlGather.beforePass({
       driver: {
-        querySelector() {
-          return Promise.reject('such a fail');
-        }
+        url
       }
-    }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.equal(viewportGather.artifact, -1);
     });
+
+    return assert.equal(urlGather.artifact, url);
+  });
+
+  it('chooses the URL from options over options.driver', () => {
+    const url = 'https://example.com';
+    const driverUrl = 'https://example2.com';
+    urlGather.beforePass({
+      url,
+      driver: {
+        url: driverUrl
+      }
+    });
+
+    return assert.equal(urlGather.artifact, url);
   });
 });

@@ -20,14 +20,14 @@ const NetworkRecorder = require('../../lib/network-recorder');
 const emulation = require('../../lib/emulation');
 const Element = require('../../lib/element');
 
-class DriverBase {
+class Driver {
 
   constructor() {
     this._url = null;
     this.PAUSE_AFTER_LOAD = 500;
     this._chrome = null;
     this._traceEvents = [];
-    this._traceCategories = DriverBase.traceCategories;
+    this._traceCategories = Driver.traceCategories;
   }
 
   get url() {
@@ -363,5 +363,5 @@ class DriverBase {
   }
 }
 
-module.exports = DriverBase;
+module.exports = Driver;
 

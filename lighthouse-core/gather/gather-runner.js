@@ -19,7 +19,7 @@
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
 
-class Driver {
+class GatherRunner {
   static loadPage(driver, options) {
     // Since a Page.reload command does not let a service worker take over, we
     // navigate away and then come back to reload. We do not `waitForLoad` on
@@ -238,7 +238,7 @@ class Driver {
           return gatherer;
         }
 
-        const GathererClass = Driver.getGathererClass(gatherer);
+        const GathererClass = GatherRunner.getGathererClass(gatherer);
         return new GathererClass();
       });
 
@@ -247,4 +247,4 @@ class Driver {
   }
 }
 
-module.exports = Driver;
+module.exports = GatherRunner;

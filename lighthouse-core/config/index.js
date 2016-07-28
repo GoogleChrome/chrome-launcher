@@ -18,9 +18,10 @@
 
 const defaultConfig = require('./default.json');
 const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
-const CriticalRequestChainsGatherer = require('../driver/gatherers/critical-request-chains');
-const SpeedlineGatherer = require('../driver/gatherers/speedline');
-const Driver = require('../driver');
+const CriticalRequestChainsGatherer = require('../gather/gatherers/critical-request-chains');
+const SpeedlineGatherer = require('../gather/gatherers/speedline');
+
+const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
 
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
@@ -115,7 +116,7 @@ function filterPasses(passes, audits) {
 
     freshPass.gatherers = freshPass.gatherers.filter(gatherer => {
       try {
-        const GathererClass = Driver.getGathererClass(gatherer);
+        const GathererClass = GatherRunner.getGathererClass(gatherer);
         return requiredGatherers.has(GathererClass.name);
       } catch (requireError) {
         throw new Error(`Unable to locate gatherer: ${gatherer}`);

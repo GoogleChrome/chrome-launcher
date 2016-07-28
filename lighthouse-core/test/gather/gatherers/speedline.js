@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const SpeedlineGather = require('../../../driver/gatherers/speedline.js');
+const SpeedlineGather = require('../../../gather/gatherers/speedline.js');
 const assert = require('assert');
 
 describe('Speedline gatherer', () => {

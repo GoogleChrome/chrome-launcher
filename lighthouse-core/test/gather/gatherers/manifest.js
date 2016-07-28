@@ -17,34 +17,34 @@
 
 /* eslint-env mocha */
 
-const AccessibilityGather = require('../../../driver/gatherers/accessibility');
+const ManifestGather = require('../../../gather/gatherers/manifest');
 const assert = require('assert');
-let accessibilityGather;
+let manifestGather;
 
 const isExpectedOutput = artifact => {
   return 'raw' in artifact && 'value' in artifact;
 };
 
-describe('Accessibility gatherer', () => {
+describe('Manifest gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    accessibilityGather = new AccessibilityGather();
+    manifestGather = new ManifestGather();
   });
 
-  it('fails gracefully', () => {
-    return accessibilityGather.afterPass({
+  it('returns an artifact', () => {
+    return manifestGather.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.resolve();
+          return Promise.resolve('');
         }
       }
     }).then(_ => {
-      assert.ok(typeof accessibilityGather.artifact === 'object');
+      assert.ok(typeof manifestGather.artifact === 'object');
     });
   });
 
   it('handles driver failure', () => {
-    return accessibilityGather.afterPass({
+    return manifestGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.reject('such a fail');
@@ -53,13 +53,13 @@ describe('Accessibility gatherer', () => {
     }).then(_ => {
       assert(false);
     }).catch(_ => {
-      assert.ok(isExpectedOutput(accessibilityGather.artifact));
+      assert.ok(isExpectedOutput(manifestGather.artifact));
     });
   });
 
-  it('propagates error retrieving the results', () => {
+  it('propagates error retrieving the manifest', () => {
     const error = 'There was an error.';
-    return accessibilityGather.afterPass({
+    return manifestGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve({
@@ -68,22 +68,24 @@ describe('Accessibility gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(accessibilityGather.artifact.debugString === error);
+      assert.ok(manifestGather.artifact.debugString === error);
     });
   });
 
-  it('creates an object for valid results', () => {
-    return accessibilityGather.afterPass({
+  it('creates a manifest object for valid manifest content', () => {
+    const manifestContent = JSON.stringify({
+      name: 'App'
+    });
+    return manifestGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve({
-            name: 'a11y'
+            manifestContent
           });
         }
       }
     }).then(_ => {
-      assert.ok(typeof accessibilityGather.artifact === 'object');
-      assert.equal(accessibilityGather.artifact.name, 'a11y');
+      assert.ok(typeof manifestGather.artifact.value === 'object');
     });
   });
 });
