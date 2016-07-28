@@ -113,7 +113,7 @@ class Driver {
     if (config.trace) {
       pass = pass.then(_ => {
         log.log('status', 'Gathering: trace');
-        driver.endTrace().then(traceContents => {
+        return driver.endTrace().then(traceContents => {
           loadData.traceContents = traceContents;
           log.log('statusEnd', 'Gathering: trace');
         });
