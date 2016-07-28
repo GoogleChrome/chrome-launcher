@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 const Runner = require('../runner');
-const fakeDriver = require('./driver/fake-driver');
+const fakeDriver = require('./gather/fake-driver');
 const Config = require('../config');
 const Audit = require('../audits/audit');
 const assert = require('assert');
