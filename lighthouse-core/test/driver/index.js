@@ -20,6 +20,7 @@
 
 const Gather = require('../../driver/gatherers/gather');
 const Driver = require('../../driver');
+const Audit = require('../../audits/audit');
 const assert = require('assert');
 
 class TestGatherer extends Gather {
@@ -159,7 +160,27 @@ describe('Driver', function() {
 
     return Driver.afterPass({driver, config}).then(vals => {
       assert.equal(calledTrace, true);
-      assert.deepEqual(vals.traceContents, {x: 1});
+      assert.deepEqual(vals.traces[Audit.DEFAULT_TRACE].traceContents, {x: 1});
+    });
+  });
+
+  it('respects trace names', () => {
+    const driver = {
+      endTrace() {
+        return Promise.resolve({x: 1});
+      }
+    };
+
+    const config = {
+      trace: true,
+      traceName: 'notTheDefaultPass',
+      gatherers: [{
+        afterPass() {}
+      }]
+    };
+
+    return Driver.afterPass({driver, config}).then(vals => {
+      assert.deepEqual(vals.traces.notTheDefaultPass.traceContents, {x: 1});
     });
   });
 
@@ -221,13 +242,14 @@ describe('Driver', function() {
     const passes = [{
       network: true,
       trace: true,
-      loadDataName: 'first-pass',
+      traceName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
       ]
     }, {
       loadPage: true,
+      traceName: 'secondPass',
       gatherers: [
         t2
       ]

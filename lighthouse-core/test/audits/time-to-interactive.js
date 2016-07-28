@@ -26,7 +26,11 @@ const speedlineGather = new SpeedlineGather();
 describe('Performance: time-to-interactive audit', () => {
   it('scores a -1 with invalid trace data', () => {
     return Audit.audit({
-      traceContents: '[{"pid": 15256,"tid": 1295,"t',
+      traces: {
+        [Audit.DEFAULT_TRACE]: {
+          traceContents: '[{"pid": 15256,"tid": 1295,"t'
+        }
+      },
       Speedline: {
         first: 500
       }
@@ -37,11 +41,13 @@ describe('Performance: time-to-interactive audit', () => {
   });
 
   it('evaluates valid input correctly', () => {
-    let artifacts = {
-      traceContents: traceContents
-    };
+    let artifacts = {traceContents};
     return speedlineGather.afterPass({}, artifacts).then(_ => {
       artifacts.Speedline = speedlineGather.artifact;
+      // This is usually done by the driver
+      artifacts.traces = {
+        [Audit.DEFAULT_TRACE]: {traceContents}
+      };
       return Audit.audit(artifacts).then(output => {
         assert.equal(output.rawValue, '1105.8');
         assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, '20.72');

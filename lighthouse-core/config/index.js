@@ -100,8 +100,13 @@ function expandArtifacts(artifacts) {
   const expandedArtifacts = Object.assign({}, artifacts);
 
   // currently only trace logs and performance logs should be imported
-  if (artifacts.traceContents) {
-    expandedArtifacts.traceContents = require(artifacts.traceContents);
+  if (artifacts.traces) {
+    Object.keys(artifacts.traces).forEach(key => {
+      if (artifacts.traces[key].traceContents) {
+        expandedArtifacts.traces[key].traceContents =
+          require(artifacts.traces[key].traceContents);
+      }
+    });
   }
   if (artifacts.performanceLog) {
     expandedArtifacts.CriticalRequestChains =

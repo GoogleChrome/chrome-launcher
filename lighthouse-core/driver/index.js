@@ -17,9 +17,9 @@
 'use strict';
 
 const log = require('../lib/log.js');
+const Audit = require('../audits/audit');
 
 class Driver {
-
   static loadPage(driver, options) {
     // Since a Page.reload command does not let a service worker take over, we
     // navigate away and then come back to reload. We do not `waitForLoad` on
@@ -107,15 +107,19 @@ class Driver {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    const loadData = {};
+    const loadData = {traces: {}};
     let pass = Promise.resolve();
+    let traceName = Audit.DEFAULT_TRACE;
+    if (config.traceName) {
+      traceName = config.traceName;
+    }
 
     if (config.trace) {
       pass = pass.then(_ => {
-        log.log('status', 'Gathering: trace');
+        log.log('status', `Gathering: trace "${traceName}"`);
         return driver.endTrace().then(traceContents => {
-          loadData.traceContents = traceContents;
-          log.log('statusEnd', 'Gathering: trace');
+          loadData.traces[traceName] = {traceContents};
+          log.log('statusEnd', `Gathering: trace "${traceName}"`);
         });
       });
     }
@@ -136,6 +140,9 @@ class Driver {
           return chain.then(_ => {
             const status = `Gathering: ${gatherer.name}`;
             log.log('status', status);
+            if (config.trace) {
+              loadData.traceContents = loadData.traces[traceName].traceContents;
+            }
             return Promise.resolve(gatherer.afterPass(options, loadData)).then(ret => {
               log.log('statusEnd', status);
               return ret;
@@ -155,7 +162,7 @@ class Driver {
 
   static run(passes, options) {
     const driver = options.driver;
-    const tracingData = {};
+    const tracingData = {traces: {}};
 
     if (typeof options.url !== 'string' || options.url.length === 0) {
       return Promise.reject(new Error('You must provide a url to the driver'));
@@ -190,6 +197,9 @@ class Driver {
               .then(_ => this.pass(runOptions))
               .then(_ => this.afterPass(runOptions))
               .then(loadData => {
+                // Need to manually merge traces property before
+                // merging loadDat into tracingData to avoid data loss.
+                Object.assign(loadData.traces, tracingData.traces);
                 Object.assign(tracingData, loadData);
               })
               .then(_ => this.tearDown(runOptions));
@@ -212,7 +222,6 @@ class Driver {
             artifacts[gatherer.name] = gatherer.artifact;
           });
         });
-
         return artifacts;
       });
   }

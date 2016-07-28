@@ -36,10 +36,7 @@ Artifacts.prototype.HTMLWithoutJavaScript;
 Artifacts.prototype.HTTPS;
 
 /** @type {!Array<!Object>} */
-Artifacts.prototype.networkRecords;
-
-/** @type {?} */
-Artifacts.prototype.traceContents;
+Artifacts.prototype.traces;
 
 /** @type {!ManifestNode<(!Manifest|undefined)>} */
 Artifacts.prototype.Manifest;

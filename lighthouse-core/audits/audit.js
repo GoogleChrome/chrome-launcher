@@ -16,7 +16,16 @@
  */
 'use strict';
 
+const DEFAULT_TRACE = 'defaultPass';
+
 class Audit {
+  /**
+   * @return {!String}
+   */
+  static get DEFAULT_TRACE() {
+    return DEFAULT_TRACE;
+  }
+
   /**
    * @return {!AuditMeta}
    */
