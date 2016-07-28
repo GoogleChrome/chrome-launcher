@@ -1,6 +1,6 @@
 {
   "name": "lighthouse",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Lighthouse",
   "main": "./lighthouse-core/index.js",
   "bin": "./lighthouse-cli/index.js",
@@ -17,8 +17,6 @@
     "test": "npm run lint --silent && npm run unit && npm run closure",
     "cli-unit": "mocha $(echo $__node_harmony) $(find lighthouse-cli/test lighthouse-core/test -name '*.js') --timeout 60000",
     "unit": "npm run cli-unit",
-    "//":
-    "// passing through tasks to core",
     "closure": "cd lighthouse-core && closure/closure-type-checking.js",
     "watch": "find lighthouse-core lighthouse-cli -name '*.js' -not -path '*/node_modules/*' -not -path '*/extension/*' | entr npm run unit",
     "chrome": "lighthouse-core/scripts/launch-chrome.sh"
