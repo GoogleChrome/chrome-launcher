@@ -255,7 +255,7 @@ class Driver {
   endTrace() {
     return new Promise((resolve, reject) => {
       // When the tracing has ended this will fire with a stream handle.
-      this.on('Tracing.tracingComplete', streamHandle => {
+      this.once('Tracing.tracingComplete', streamHandle => {
         this._readTraceFromStream(streamHandle)
             .then(traceContents => resolve(traceContents));
       });
