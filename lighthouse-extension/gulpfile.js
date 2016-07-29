@@ -155,7 +155,7 @@ gulp.task('watch', ['lint', 'browserify', 'html', 'copyReportScripts'], () => {
     '*.js',
     'app/src/**/*.js',
     '../lighthouse-core/**/*.js'
-  ], ['browserify', 'lint']);
+  ], ['browserify']);
 });
 
 gulp.task('package', function() {
