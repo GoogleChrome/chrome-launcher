@@ -44,7 +44,7 @@ class CriDriver extends Driver {
         chromeRemoteInterface({port: port, chooseTab: tab}, chrome => {
           this._tab = tab;
           this._chrome = chrome;
-          this.beginLogging();
+          this._eventEmitter = chrome;
           this.enableRuntimeEvents().then(_ => {
             resolve();
           });
@@ -79,55 +79,9 @@ class CriDriver extends Driver {
       }
       this._tab = null;
       this._chrome = null;
+      this._eventEmitter = null;
       this.url = null;
     });
-  }
-
-  beginLogging() {
-    // log events received
-    this._chrome.on('event', req => _log('<=', req, 'verbose'));
-  }
-
-  /**
-   * Bind listeners for protocol events
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  on(eventName, cb) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to listen to events.');
-    }
-    // log event listeners being bound
-    _log('listen for event =>', {method: eventName});
-    this._chrome.on(eventName, cb);
-  }
-
-  /**
-   * Bind a one-time listener for protocol events. Listener is removed once it
-   * has been called.
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  once(eventName, cb) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to listen to events.');
-    }
-    // log event listeners being bound
-    _log('listen once for event =>', {method: eventName});
-    this._chrome.once(eventName, cb);
-  }
-
-  /**
-   * Unbind event listeners
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  off(eventName, cb) {
-    if (this._chrome === null) {
-      throw new Error('connect() must be called before attempting to remove an event listener.');
-    }
-
-    this._chrome.removeListener(eventName, cb);
   }
 
   /**
@@ -142,25 +96,18 @@ class CriDriver extends Driver {
     }
 
     return new Promise((resolve, reject) => {
-      _log('method => browser', {method: command, params: params});
+      this.formattedLog('method => browser', {method: command, params: params});
 
       this._chrome.send(command, params, (err, result) => {
         if (err) {
-          _log('method <= browser ERR', {method: command, params: result}, 'error');
+          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result);
         }
-        _log('method <= browser OK', {method: command, params: result});
+        this.formattedLog('method <= browser OK', {method: command, params: result});
         resolve(result);
       });
     });
   }
-}
-
-function _log(prefix, data, level) {
-  const columns = (typeof process === 'undefined') ? Infinity : process.stdout.columns;
-  const maxLength = columns - data.method.length - prefix.length - 18;
-  const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
-  log[level ? level : 'log'](prefix, data.method, snippet);
 }
 
 module.exports = CriDriver;

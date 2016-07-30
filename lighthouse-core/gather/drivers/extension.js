@@ -18,6 +18,7 @@
 
 const Driver = require('./driver.js');
 const log = require('../../lib/log.js');
+const EventEmitter = require('events').EventEmitter;
 
 /* globals chrome */
 
@@ -25,11 +26,13 @@ class ExtensionDriver extends Driver {
 
   constructor() {
     super();
-    this._listeners = {};
     this._tabId = null;
     this._debuggerConnected = false;
-    chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
     this.handleUnexpectedDetach();
+
+    this._eventEmitter = new EventEmitter();
+    chrome.debugger.onEvent.addListener((_, method, params) =>
+        this._eventEmitter.emit(method, params));
   }
 
   connect() {
@@ -76,53 +79,6 @@ class ExtensionDriver extends Driver {
   }
 
   /**
-   * Bind listeners for protocol events
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  on(eventName, cb) {
-    if (typeof this._listeners[eventName] === 'undefined') {
-      this._listeners[eventName] = [];
-    }
-    // log event listeners being bound
-    log.log('listen for event =>', eventName);
-    this._listeners[eventName].push(cb);
-  }
-
-  /**
-   * Bind a one-time listener for protocol events. Listener is removed once it
-   * has been called.
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  once(eventName, cb) {
-    // Create a replacement listener that will immediately remove itself after calling cb once.
-    const cbGuard = function() {
-      cb(...arguments);
-      this.off(eventName, cbGuard);
-    }.bind(this);
-
-    this.on(eventName, cbGuard);
-  }
-
-  _onEvent(source, method, params) {
-    if (this._listeners[method] === undefined) {
-      return;
-    }
-
-    // Copy array of listeners so all listeners are called, even if some removed
-    // during loop over listeners. Consistent with node's removeListener behavior:
-    // https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
-    const listenersCopy = Array.from(this._listeners[method]);
-    listenersCopy.forEach(cb => {
-      // despite best efforts, this still sometimes loses the context of the instance,
-      // which means sendCommand will not have this._tabId. Luckily, it doesn't need it
-      // for trace-based commands like IO.read.
-      cb.call(this, params);
-    });
-  }
-
-  /**
    * Call protocol methods
    * @param {!string} command
    * @param {!Object} params
@@ -130,22 +86,22 @@ class ExtensionDriver extends Driver {
    */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      log.log('method => browser', command, params);
+      this.formattedLog('method => browser', {method: command, params: params});
       if (!this._tabId) {
         log.error('No tabId set for sendCommand');
       }
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
-          log.error('method <= browser', command, result);
+          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(chrome.runtime.lastError);
         }
 
         if (result.wasThrown) {
-          log.log('error', 'method <= browser', command, result);
+          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result.exceptionDetails);
         }
 
-        log.log('method <= browser OK', command, result);
+        this.formattedLog('method <= browser OK', {method: command, params: result});
         resolve(result);
       });
     });
@@ -206,20 +162,6 @@ class ExtensionDriver extends Driver {
       this._debuggerConnected = false;
       throw new Error('Lighthouse detached from browser: ' + detachReason);
     });
-  }
-
-  off(eventName, cb) {
-    if (typeof this._listeners[eventName] === 'undefined') {
-      console.warn(`Unable to remove listener ${eventName}; no such listener found.`);
-      return;
-    }
-
-    const callbackIndex = this._listeners[eventName].indexOf(cb);
-    if (callbackIndex === -1) {
-      return;
-    }
-
-    this._listeners[eventName].splice(callbackIndex, 1);
   }
 }
 

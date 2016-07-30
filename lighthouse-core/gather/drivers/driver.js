@@ -20,6 +20,8 @@ const NetworkRecorder = require('../../lib/network-recorder');
 const emulation = require('../../lib/emulation');
 const Element = require('../../lib/element');
 
+const log = require('../../lib/log.js');
+
 class Driver {
 
   constructor() {
@@ -28,6 +30,7 @@ class Driver {
     this._chrome = null;
     this._traceEvents = [];
     this._traceCategories = Driver.traceCategories;
+    this._eventEmitter = null;
   }
 
   get url() {
@@ -65,6 +68,19 @@ class Driver {
   }
 
   /**
+   * A simple formatting utility for event logging.
+   * @param {string} prefix
+   * @param {!Object} data A JSON-serializable object of event data to log.
+   * @param {string=} level Optional logging level. Defaults to 'log'.
+   */
+  formattedLog(prefix, data, level) {
+    const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
+    const maxLength = columns - data.method.length - prefix.length - 18;
+    const snippet = data.params ? JSON.stringify(data.params).substr(0, maxLength) : '';
+    log[level ? level : 'log'](prefix, data.method, snippet);
+  }
+
+  /**
    * @return {!Promise<null>}
    */
   connect() {
@@ -77,24 +93,45 @@ class Driver {
 
   /**
    * Bind listeners for protocol events
+   * @param {!string} eventName
+   * @param {function(...)} cb
    */
-  on() {
-    return Promise.reject(new Error('Not implemented'));
+  on(eventName, cb) {
+    if (this._eventEmitter === null) {
+      throw new Error('connect() must be called before attempting to listen to events.');
+    }
+
+    // log event listeners being bound
+    this.formattedLog('listen for event =>', {method: eventName});
+    this._eventEmitter.on(eventName, cb);
   }
 
   /**
    * Bind a one-time listener for protocol events. Listener is removed once it
    * has been called.
+   * @param {!string} eventName
+   * @param {function(...)} cb
    */
-  once() {
-    return Promise.reject(new Error('Not implemented'));
+  once(eventName, cb) {
+    if (this._eventEmitter === null) {
+      throw new Error('connect() must be called before attempting to listen to events.');
+    }
+    // log event listeners being bound
+    this.formattedLog('listen once for event =>', {method: eventName});
+    this._eventEmitter.once(eventName, cb);
   }
 
   /**
    * Unbind event listeners
+   * @param {!string} eventName
+   * @param {function(...)} cb
    */
-  off() {
-    return Promise.reject(new Error('Not implemented'));
+  off(eventName, cb) {
+    if (this._eventEmitter === null) {
+      throw new Error('connect() must be called before attempting to remove an event listener.');
+    }
+
+    this._eventEmitter.removeListener(eventName, cb);
   }
 
   /**
