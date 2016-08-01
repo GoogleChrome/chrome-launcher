@@ -23,13 +23,21 @@ const port = process.env.PORT || 9222;
 const log = require('../../lib/log.js');
 
 class CriDriver extends Driver {
+  constructor() {
+    super();
+
+    /**
+     * Chrome remote interface instance.
+     */
+    this._cri = null;
+  }
 
   /**
-   * @return {!Promise<null>}
+   * @return {!Promise<undefined>}
    */
   connect() {
     return new Promise((resolve, reject) => {
-      if (this._chrome) {
+      if (this._cri) {
         return resolve();
       }
 
@@ -43,7 +51,8 @@ class CriDriver extends Driver {
 
         chromeRemoteInterface({port: port, chooseTab: tab}, chrome => {
           this._tab = tab;
-          this._chrome = chrome;
+          this._cri = chrome;
+          // The CRI instance is also an EventEmitter, so use directly for event dispatch.
           this._eventEmitter = chrome;
           this.enableRuntimeEvents().then(_ => {
             resolve();
@@ -57,7 +66,7 @@ class CriDriver extends Driver {
   disconnect() {
     return new Promise((resolve, reject) => {
       if (!this._tab) {
-        this._chrome.close();
+        this._cri.close();
         return resolve();
       }
 
@@ -74,11 +83,11 @@ class CriDriver extends Driver {
       /* eslint-enable new-cap */
     })
     .then(() => {
-      if (this._chrome) {
-        this._chrome.close();
+      if (this._cri) {
+        this._cri.close();
       }
       this._tab = null;
-      this._chrome = null;
+      this._cri = null;
       this._eventEmitter = null;
       this.url = null;
     });
@@ -91,14 +100,14 @@ class CriDriver extends Driver {
    * @return {!Promise}
    */
   sendCommand(command, params) {
-    if (this._chrome === null) {
+    if (this._cri === null) {
       throw new Error('connect() must be called before attempting to send a command.');
     }
 
     return new Promise((resolve, reject) => {
       this.formattedLog('method => browser', {method: command, params: params});
 
-      this._chrome.send(command, params, (err, result) => {
+      this._cri.send(command, params, (err, result) => {
         if (err) {
           this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result);
