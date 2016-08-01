@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const TracingProcessor = require('../../../lib/traces/tracing-processor');
+let TracingProcessor;
 const assert = require('assert');
 
 /* eslint-env mocha */
@@ -39,6 +39,12 @@ function createRiskPercentiles(percentiles, times) {
 }
 
 describe('TracingProcessor lib', () => {
+  it('doesn\'t throw when module is loaded', () => {
+    assert.doesNotThrow(_ => {
+      TracingProcessor = require('../../../lib/traces/tracing-processor');
+    });
+  });
+
   describe('riskPercentiles calculation', () => {
     it('correctly calculates percentiles of no tasks', () => {
       const results = TracingProcessor._riskPercentiles([], 100, defaultPercentiles);
