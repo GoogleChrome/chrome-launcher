@@ -231,6 +231,7 @@ The traceviewer-based trace processor from [node-big-rig](https://github.com/Goo
 **To update traceviewer source:**
 
 ```sh
+cd lighthouse-core
 # if not already there, clone catapult and copy license over
 git clone --depth=1 https://github.com/catapult-project/catapult.git third_party/src/catapult
 cp third_party/src/catapult/LICENSE third_party/traceviewer-js/
