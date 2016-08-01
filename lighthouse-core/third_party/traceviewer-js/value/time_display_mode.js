@@ -4,7 +4,7 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../base/base.js");
+require("./unit_scale.js");
 
 'use strict';
 
@@ -19,9 +19,10 @@ global.tr.exportTo('tr.v', function() {
     roundedLess: function(a, b) {
       return Math.round(a * 1000) < Math.round(b * 1000);
     },
-    format: function(ts) {
-      return new Number(ts)
-          .toLocaleString(undefined, { minimumFractionDigits: 3 }) + ' ms';
+    formatSpec: {
+      unit: 's',
+      unitPrefix: tr.v.UnitScale.MetricTime.MILLI,
+      minimumFractionDigits: 3,
     }
   };
 
@@ -32,9 +33,10 @@ global.tr.exportTo('tr.v', function() {
     roundedLess: function(a, b) {
       return Math.round(a * 1000000) < Math.round(b * 1000000);
     },
-    format: function(ts) {
-      return new Number(ts * 1000000)
-          .toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' ns';
+    formatSpec: {
+      unit: 's',
+      unitPrefix: tr.v.UnitScale.MetricTime.NANO,
+      maximumFractionDigits: 0
     }
   };
 

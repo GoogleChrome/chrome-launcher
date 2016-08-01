@@ -27,6 +27,13 @@ require("./base.js");
 'use strict';
 
 global.tr.exportTo('tr.b', function() {
+  /* Returns true when x and y are within delta of each other. */
+  function approximately(x, y, delta) {
+    if (delta === undefined)
+      delta = 1e-9;
+    return Math.abs(x - y) < delta;
+  }
+
   function clamp(x, lo, hi) {
     return Math.min(Math.max(x, lo), hi);
   }
@@ -152,6 +159,7 @@ global.tr.exportTo('tr.b', function() {
   };
 
   return {
+    approximately: approximately,
     clamp: clamp,
     lerp: lerp,
     normalize: normalize,

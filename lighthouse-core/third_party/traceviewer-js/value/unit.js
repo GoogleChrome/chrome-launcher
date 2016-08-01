@@ -6,14 +6,14 @@ found in the LICENSE file.
 
 require("../base/event.js");
 require("../base/event_target.js");
+require("../base/iteration_helpers.js");
 require("./time_display_mode.js");
+require("./unit_scale.js");
 
 'use strict';
 
 global.tr.exportTo('tr.v', function() {
   var TimeDisplayModes = tr.v.TimeDisplayModes;
-
-  var BINARY_PREFIXES = ['', 'Ki', 'Mi', 'Gi', 'Ti'];
 
   var PLUS_MINUS_SIGN = String.fromCharCode(177);
 
@@ -33,13 +33,18 @@ global.tr.exportTo('tr.v', function() {
   };
 
   /** @constructor */
-  function Unit(unitName, jsonName, isDelta, improvementDirection,
-      formatValue) {
+  function Unit(unitName, jsonName, isDelta, improvementDirection, formatSpec) {
     this.unitName = unitName;
     this.jsonName = jsonName;
     this.isDelta = isDelta;
     this.improvementDirection = improvementDirection;
-    this.formatValue_ = formatValue;
+    this.formatSpec_ = formatSpec;
+
+    // Example: powerInWattsDelta_biggerIsBetter -> powerInWatts.
+    this.baseUnit = undefined;
+
+    // Example: energyInJoules_smallerIsBetter ->
+    // energyInJoulesDelta_smallerIsBetter.
     this.correspondingDeltaUnit = undefined;
   }
 
@@ -48,14 +53,77 @@ global.tr.exportTo('tr.v', function() {
       return this.jsonName;
     },
 
-    format: function(value) {
-      var formattedValue = this.formatValue_(value);
-      if (!this.isDelta || value < 0 /* already contains negative sign */)
-        return formattedValue;
-      if (value === 0)
-        return PLUS_MINUS_SIGN + formattedValue;
-      else
-        return '+' + formattedValue;
+    format: function(value, opt_context) {
+      var context = opt_context || {};
+      var formatSpec = this.formatSpec_;
+      if (typeof formatSpec === 'function')
+        formatSpec = formatSpec();
+
+      function resolveProperty(propertyName) {
+        if (propertyName in context)
+          return context[propertyName];
+        else if (propertyName in formatSpec)
+          return formatSpec[propertyName];
+        else
+          return undefined;
+      }
+
+      var signString = '';
+      if (value < 0) {
+        signString = '-';
+        value = -value;  // Treat positive and negative values symmetrically.
+      } else if (this.isDelta) {
+        signString = value === 0 ? PLUS_MINUS_SIGN : '+';
+      }
+
+      var unitString = '';
+      if (formatSpec.unit) {
+        if (formatSpec.unitHasPrecedingSpace !== false)
+          unitString += ' ';
+        var unitPrefix = resolveProperty('unitPrefix');
+        if (unitPrefix !== undefined) {
+          var selectedPrefix;
+          if (unitPrefix instanceof Array) {
+            var i = 0;
+            while (i < unitPrefix.length - 1 &&
+                   value / unitPrefix[i + 1].value >= 1) {
+              i++;
+            }
+            selectedPrefix = unitPrefix[i];
+          } else {
+            selectedPrefix = unitPrefix;
+          }
+          unitString += selectedPrefix.symbol || '';
+          value /= selectedPrefix.value;
+        }
+        unitString += formatSpec.unit;
+      }
+
+      var minimumFractionDigits = resolveProperty('minimumFractionDigits');
+      var maximumFractionDigits = resolveProperty('maximumFractionDigits');
+
+      // If the context overrides only one of the two |*FractionDigits|
+      // properties and the other one is provided by the unit, we might need to
+      // shift the other property so that
+      // |minimumFractionDigits| <= |maximumFractionDigits|.
+      if (minimumFractionDigits > maximumFractionDigits) {
+        if ('minimumFractionDigits' in context &&
+            !('maximumFractionDigits' in context)) {
+          // Only minimumFractionDigits was overriden by context.
+          maximumFractionDigits = minimumFractionDigits;
+        } else if ('maximumFractionDigits' in context &&
+            !('minimumFractionDigits' in context)) {
+          // Only maximumFractionDigits was overriden by context.
+          minimumFractionDigits = maximumFractionDigits;
+        }
+      }
+
+      var numberString = value.toLocaleString(undefined, {
+        minimumFractionDigits: minimumFractionDigits,
+        maximumFractionDigits: maximumFractionDigits
+      });
+
+      return signString + numberString + unitString;
     }
   };
 
@@ -115,10 +183,11 @@ global.tr.exportTo('tr.v', function() {
    *   Unit.define({
    *     baseUnitName: 'powerInWatts'
    *     baseJsonName: 'W'
-   *     formatValue: function(value) {
-   *       // Code for formatting the unit (independent of isDelta and
-   *       // improvementDirection flags).
-   *      }
+   *     formatSpec: {
+   *       // Specification of how the unit should be formatted (unit symbol,
+   *       // unit prefix, fraction digits, etc), or a function returning such
+   *       // a specification.
+   *     }
    *   });
    *
    * generates the following six units (JSON names shown in parentheses):
@@ -134,6 +203,8 @@ global.tr.exportTo('tr.v', function() {
    * for deltas).
    */
   Unit.define = function(params) {
+    var definedUnits = [];
+
     tr.b.iterItems(ImprovementDirection, function(_, improvementDirection) {
       var regularUnit =
           Unit.defineUnitVariant_(params, false, improvementDirection);
@@ -142,7 +213,11 @@ global.tr.exportTo('tr.v', function() {
 
       regularUnit.correspondingDeltaUnit = deltaUnit;
       deltaUnit.correspondingDeltaUnit = deltaUnit;
+      definedUnits.push(regularUnit, deltaUnit);
     });
+
+    var baseUnit = Unit.byName[params.baseUnitName];
+    definedUnits.forEach(u => u.baseUnit = baseUnit);
   };
 
   Unit.defineUnitVariant_ = function(params, isDelta, improvementDirection) {
@@ -169,7 +244,7 @@ global.tr.exportTo('tr.v', function() {
       throw new Error('JSON unit \'' + jsonName + '\' alread exists');
 
     var unit = new Unit(
-        unitName, jsonName, isDelta, improvementDirection, params.formatValue);
+        unitName, jsonName, isDelta, improvementDirection, params.formatSpec);
     Unit.byName[unitName] = unit;
     Unit.byJSONName[jsonName] = unit;
 
@@ -185,72 +260,75 @@ global.tr.exportTo('tr.v', function() {
   Unit.define({
     baseUnitName: 'timeDurationInMs',
     baseJsonName: 'ms',
-    formatValue: function(value) {
-      return Unit.currentTimeDisplayMode_.format(value);
+    formatSpec: function() {
+      return Unit.currentTimeDisplayMode_.formatSpec;
     }
   });
 
   Unit.define({
     baseUnitName: 'timeStampInMs',
     baseJsonName: 'tsMs',
-    formatValue: function(value) {
-      return Unit.currentTimeDisplayMode_.format(value);
+    formatSpec: function() {
+      return Unit.currentTimeDisplayMode_.formatSpec;
     }
   });
 
   Unit.define({
     baseUnitName: 'normalizedPercentage',
     baseJsonName: 'n%',
-    formatValue: function(value) {
-      var tmp = new Number(Math.round(value * 100000) / 1000);
-      return tmp.toLocaleString(undefined, { minimumFractionDigits: 3 }) + '%';
+    formatSpec: {
+      unit: '%',
+      unitPrefix: { value: 0.01 },
+      unitHasPrecedingSpace: false,
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
     }
   });
 
   Unit.define({
     baseUnitName: 'sizeInBytes',
     baseJsonName: 'sizeInBytes',
-    formatValue: function(value) {
-      var signPrefix = '';
-      if (value < 0) {
-        signPrefix = '-';
-        value = -value;
-      }
-
-      var i = 0;
-      while (value >= 1024 && i < BINARY_PREFIXES.length - 1) {
-        value /= 1024;
-        i++;
-      }
-
-      return signPrefix + value.toFixed(1) + ' ' + BINARY_PREFIXES[i] + 'B';
+    formatSpec: {
+      unit: 'B',
+      unitPrefix: tr.v.UnitScale.Binary.AUTO,
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
     }
   });
 
   Unit.define({
     baseUnitName: 'energyInJoules',
     baseJsonName: 'J',
-    formatValue: function(value) {
-      return value.toLocaleString(
-          undefined, { minimumFractionDigits: 3 }) + ' J';
+    formatSpec: {
+      unit: 'J',
+      minimumFractionDigits: 3
     }
   });
 
   Unit.define({
     baseUnitName: 'powerInWatts',
     baseJsonName: 'W',
-    formatValue: function(value) {
-      return value.toLocaleString(
-          undefined, { minimumFractionDigits: 3 }) + ' W';
+    formatSpec: {
+      unit: 'W',
+      minimumFractionDigits: 3
     }
   });
 
   Unit.define({
     baseUnitName: 'unitlessNumber',
     baseJsonName: 'unitless',
-    formatValue: function(value) {
-      return value.toLocaleString(
-          undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+    formatSpec: {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
+    }
+  });
+
+  Unit.define({
+    baseUnitName: 'count',
+    baseJsonName: 'count',
+    formatSpec: {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }
   });
 

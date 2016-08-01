@@ -4,10 +4,10 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../../base/statistics.js");
-require("../../base/sorted_array_utils.js");
-require("../frame.js");
 require("../../base/range_utils.js");
+require("../../base/sorted_array_utils.js");
+require("../../base/statistics.js");
+require("../frame.js");
 
 'use strict';
 
@@ -229,10 +229,10 @@ global.tr.exportTo('tr.model.helpers', function() {
       return [];
 
     var slices = [];
-    uiThread.asyncSliceGroup.iterateAllEvents(function(slice) {
+    for (var slice of uiThread.asyncSliceGroup.getDescendantEvents()) {
       if (/^animator\:/.test(slice.title))
         slices.push(slice);
-    });
+    }
     return slices;
   }
 

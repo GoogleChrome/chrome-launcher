@@ -25,11 +25,17 @@ global.tr.exportTo('tr.e.importer.battor', function() {
   function BattorImporter(model, events) {
     this.importPriority = 3; // runs after the linux_perf importer
     this.model_ = model;
-    this.samples_ = this.linesToSamples_(events.split('\n'));
+
+    // The list of power samples contained within the trace.
+    this.samples_ = [];
+    // The clock sync markers contained within the trace.
+    this.syncTimestampsById_ = new Map();
+
+    this.parseTrace_(events);
   }
 
   var battorDataLineRE = new RegExp(
-      '^(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)' +
+      '^(-?\\d+\\.\\d+)\\s+(-?\\d+\\.\\d+)\\s+(-?\\d+\\.\\d+)' +
       '(?:\\s+<(\\S+)>)?$'
   );
   var battorHeaderLineRE = /^# BattOr/;
@@ -59,20 +65,17 @@ global.tr.exportTo('tr.e.importer.battor', function() {
     },
 
     /**
-     * Imports clock sync markers in this.events_ into model_.
+     * Imports clock sync markers from the trace into into this.model_.
      */
     importClockSyncMarkers: function() {
-      for (var i = 0; i < this.samples_.length; i++) {
-        var sample = this.samples_[i];
-        if (sample.syncId) {
-          this.model_.clockSyncManager.addClockSyncMarker(
-              tr.model.ClockDomainId.BATTOR, sample.syncId, sample.ts);
-        }
+      for (var [syncId, ts] of this.syncTimestampsById_) {
+        this.model_.clockSyncManager.addClockSyncMarker(
+            tr.model.ClockDomainId.BATTOR, syncId, ts);
       }
     },
 
     /**
-     * Imports the data in this.events_ into model_.
+     * Imports the events from the trace into this.model_.
      */
     importEvents: function() {
       if (this.model_.device.powerSeries) {
@@ -97,14 +100,13 @@ global.tr.exportTo('tr.e.importer.battor', function() {
     },
 
     /**
-     * Given an array of strings that make up the lines of a BattOr trace,
-     * returns an array of samples contained within those lines.
+     * Given the BattOr trace as a string, parse it and store the results in
+     * this.samples_ and this.syncTimestampsById_.
      */
-    linesToSamples_: function(lines) {
-      var samples = [];
+    parseTrace_: function(trace) {
+      var lines = trace.split('\n');
 
-      for (var i = 0; i < lines.length; i++) {
-        var line = lines[i];
+      for (var line of lines) {
         line = line.trim();
 
         if (line.length === 0)
@@ -118,7 +120,7 @@ global.tr.exportTo('tr.e.importer.battor', function() {
         if (!groups) {
           this.model_.importWarning({
             type: 'parse_error',
-            message: 'Unrecognized line: ' + line
+            message: 'Unrecognized line in BattOr trace: ' + line
           });
           continue;
         }
@@ -128,10 +130,22 @@ global.tr.exportTo('tr.e.importer.battor', function() {
         var current = parseFloat(groups[3]) / 1000;
         var syncId = groups[4];
 
-        samples.push(new Sample(ts, voltage, current, syncId));
-      }
+        if (syncId)
+          this.syncTimestampsById_.set(syncId, ts);
 
-      return samples;
+        if (voltage < 0 || current < 0) {
+          this.model_.importWarning({
+            type: 'parse_error',
+            message: 'The following line in the BattOr trace has a negative ' +
+                'voltage or current, neither of which are allowed: ' + line +
+                '. A common cause of this is that the device is charging ' +
+                'while the trace is being recorded.'
+          });
+          continue;
+        }
+
+        this.samples_.push(new Sample(ts, voltage, current));
+      }
     }
   };
 
@@ -141,16 +155,13 @@ global.tr.exportTo('tr.e.importer.battor', function() {
    * @param {number} ts The timestamp (in milliseconds) of the sample.
    * @param {number} voltage The voltage (in volts) at the specified time.
    * @param {number} current The current (in amps) at the specified time.
-   * @param {string=} opt_syncId The sync ID of the sync that happened at this
-   *     sample.
    *
    * @constructor
    */
-  function Sample(ts, voltage, current, opt_syncId) {
+  function Sample(ts, voltage, current) {
     this.ts = ts;
     this.voltage = voltage;
     this.current = current;
-    this.syncId = opt_syncId;
   }
 
   Sample.prototype = {
@@ -161,7 +172,7 @@ global.tr.exportTo('tr.e.importer.battor', function() {
   tr.importer.Importer.register(BattorImporter);
 
   return {
-    BattorImporter: BattorImporter,
+    BattorImporter: BattorImporter
   };
 });
 

@@ -21,7 +21,18 @@ global.tr.exportTo('tr.model', function() {
     MAC_MACH_ABSOLUTE_TIME: 'MAC_MACH_ABSOLUTE_TIME',
     WIN_ROLLOVER_PROTECTED_TIME_GET_TIME:
         'WIN_ROLLOVER_PROTECTED_TIME_GET_TIME',
-    WIN_QPC: 'WIN_QPC'
+    WIN_QPC: 'WIN_QPC',
+
+    // "Telemetry" isn't really a clock domain because Telemetry actually
+    // can use one of several clock domains, just like Chrome. However,
+    // because there's a chance that Telemetry is running off of the same
+    // clock as Chrome (e.g. LINUX_CLOCK_MONOTONIC) but on a separate device
+    // (i.e. on a host computer with Chrome running on an attached phone),
+    // there's a chance that Chrome and Telemetry will erroneously get put into
+    // the same clock domain. The solution for this is that clock domains should
+    // actually be some (unique_device_id, clock_id) tuple. For now, though,
+    // we'll hack around this by putting Telemetry into its own clock domain.
+    TELEMETRY: 'TELEMETRY'
   };
 
   var POSSIBLE_CHROME_CLOCK_DOMAINS = new Set([
@@ -170,6 +181,10 @@ global.tr.exportTo('tr.model', function() {
           createTransformer(marker, markers[0]);
     },
 
+    get markersBySyncId() {
+      return this.markersBySyncId_;
+    },
+
     /**
      * Returns a function that, given a timestamp in the domain with |domainId|,
      * returns a timestamp in the model's clock domain.
@@ -306,11 +321,12 @@ global.tr.exportTo('tr.model', function() {
         // This makes sure that we don't have two separate clock sync graphs:
         // one attached to UNKNOWN_CHROME_LEGACY and the other attached to the
         // real Chrome clock domain.
-        for (var domainId of POSSIBLE_CHROME_CLOCK_DOMAINS) {
-          if (domainId === ClockDomainId.UNKNOWN_CHROME_LEGACY)
+        for (var chromeDomainId of POSSIBLE_CHROME_CLOCK_DOMAINS) {
+          if (chromeDomainId === ClockDomainId.UNKNOWN_CHROME_LEGACY)
             continue;
 
-          this.collapseDomains_(ClockDomainId.UNKNOWN_CHROME_LEGACY, domainId);
+          this.collapseDomains_(
+              ClockDomainId.UNKNOWN_CHROME_LEGACY, chromeDomainId);
         }
       }
 

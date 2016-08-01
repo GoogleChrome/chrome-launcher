@@ -42,17 +42,11 @@ global.tr.exportTo('tr.model.um', function() {
     addCategoriesToDict: function(categoriesDict) {
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
+    childEvents: function*() {
+      yield * this.expectations;
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      if (eventTypePredicate.call(opt_this, tr.model.um.UserExpectation))
-        this.expectations.forEach(callback, opt_this);
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
+    childEventContainers: function*() {
     },
 
     updateBounds: function() {

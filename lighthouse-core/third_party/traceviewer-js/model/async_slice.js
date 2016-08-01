@@ -101,16 +101,13 @@ global.tr.exportTo('tr.model', function() {
           parentAsyncSliceGroup.slices.indexOf(this);
     },
 
-    findTopmostSlicesRelativeToThisSlice: function(eventPredicate, callback,
-                                                   opt_this) {
-      if (eventPredicate(this))
-        callback.call(opt_this, this);
-      else {
-        this.subSlices.forEach(function(s) {
-          s.findTopmostSlicesRelativeToThisSlice(eventPredicate, callback,
-                                                 opt_this);
-        });
+    findTopmostSlicesRelativeToThisSlice: function*(eventPredicate, opt_this) {
+      if (eventPredicate(this)) {
+        yield this;
+        return;
       }
+      for (var s of this.subSlices)
+        yield * s.findTopmostSlicesRelativeToThisSlice(eventPredicate);
     },
 
     findDescendentSlice: function(targetTitle) {
@@ -126,11 +123,11 @@ global.tr.exportTo('tr.model', function() {
       return undefined;
     },
 
-    iterateAllDescendents: function(callback, opt_this) {
-      this.subSlices.forEach(callback, opt_this);
-      this.subSlices.forEach(function(subSlice) {
-        subSlice.iterateAllDescendents(callback, opt_this);
-      }, opt_this);
+    enumerateAllDescendents: function*() {
+      for (var slice of this.subSlices)
+        yield slice;
+      for (var slice of this.subSlices)
+        yield * slice.enumerateAllDescendents();
     },
 
     compareTo: function(that) {

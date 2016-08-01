@@ -76,17 +76,16 @@ global.tr.exportTo('tr.model', function() {
 
     updateBounds: function() {
       this.bounds.reset();
-
-      this.iterateAllChildEventContainers(function(child) {
+      for (var child of this.childEventContainers()) {
         child.updateBounds();
         this.bounds.addRange(child.bounds);
-      }, this);
+      }
     },
 
     shiftTimestampsForward: function(amount) {
-      this.iterateAllChildEventContainers(function(child) {
+      for (var child of this.childEventContainers()) {
         child.shiftTimestampsForward(amount);
-      });
+      }
 
       for (var i = 0; i < this.vSyncTimestamps_.length; i++)
         this.vSyncTimestamps_[i] += amount;
@@ -95,17 +94,9 @@ global.tr.exportTo('tr.model', function() {
     addCategoriesToDict: function(categoriesDict) {
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
-    },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
+    childEventContainers: function*() {
       if (this.powerSeries_)
-        callback.call(opt_this, this.powerSeries_);
+        yield this.powerSeries_;
     }
   };
 

@@ -29,6 +29,9 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
 
   var LOW_MEMORY_EVENT = 'V8.GCLowMemoryNotification';
 
+  var MAJOR_GC_EVENT = 'MajorGC';
+  var MINOR_GC_EVENT = 'MinorGC';
+
   // Maps the top-level GC events in timeline to telemetry friendly names.
   var TOP_GC_EVENTS = {
       'V8.GCCompactor': 'v8-gc-full-mark-compactor',
@@ -37,10 +40,11 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
       'V8.GCIncrementalMarking': 'v8-gc-incremental-step',
       'V8.GCIncrementalMarkingFinalize': 'v8-gc-incremental-finalize',
       'V8.GCIncrementalMarkingStart': 'v8-gc-incremental-start',
-      'V8.GCLowMemoryNotification': 'v8-gc-low-memory-mark-compactor',
       'V8.GCPhantomHandleProcessingCallback' : 'v8-gc-phantom-handle-callback',
       'V8.GCScavenger': 'v8-gc-scavenger'
   };
+
+  var LOW_MEMORY_MARK_COMPACTOR = 'v8-gc-low-memory-mark-compactor';
 
   /**
    * Finds the first parent of the |event| for which the |predicate| holds.
@@ -83,9 +87,19 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     return event.title in TOP_GC_EVENTS;
   }
 
+  function isForcedGarbageCollectionEvent(event) {
+    return findParent(event, isLowMemoryEvent) !== null;
+  }
+
   function isSubGarbageCollectionEvent(event) {
+    // To reduce number of results, we return only the first level of GC
+    // subevents. Some subevents are nested in MajorGC or MinorGC events, so
+    // we have to check for it explicitly.
     return isGarbageCollectionEvent(event) &&
-           !isTopGarbageCollectionEvent(event);
+           event.parentSlice &&
+           (isTopGarbageCollectionEvent(event.parentSlice) ||
+            event.parentSlice.title === MAJOR_GC_EVENT ||
+            event.parentSlice.title === MINOR_GC_EVENT);
   }
 
   function topGarbageCollectionEventName(event) {
@@ -93,7 +107,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
       // Full mark compact events inside a low memory notification
       // are counted as low memory mark compacts.
       if (findParent(event, isLowMemoryEvent)) {
-        return TOP_GC_EVENTS[LOW_MEMORY_EVENT];
+        return LOW_MEMORY_MARK_COMPACTOR;
       }
     }
     return TOP_GC_EVENTS[event.title];
@@ -108,6 +122,29 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
                           .replace('V8.GC_', '')
                           .replace(/_/g, '-').toLowerCase();
     return prefix + '-' + name;
+  }
+
+  /**
+   * Filters events using the |filterCallback|, then groups events by the user
+   * the name computed using the |nameCallback|, and then invokes
+   * the |processCallback| with the grouped events.
+   * @param {Function} filterCallback Takes an event and returns a boolean.
+   * @param {Function} nameCallback Takes event and returns a string.
+   * @param {Function} processCallback Takes a name, and an array of events.
+   */
+  function groupAndProcessEvents(model, filterCallback,
+                                 nameCallback, processCallback) {
+    // Map: name -> [events].
+    var nameToEvents = {};
+    for (var event of model.getDescendantEvents()) {
+      if (!filterCallback(event)) continue;
+      var name = nameCallback(event);
+      nameToEvents[name] = nameToEvents[name] || [];
+      nameToEvents[name].push(event);
+    }
+    tr.b.iterItems(nameToEvents, function(name, events) {
+      processCallback(name, events);
+    });
   }
 
   /**
@@ -237,18 +274,38 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     return mu;
   }
 
+  function hasV8Stats(globalMemoryDump) {
+    var v8stats = undefined;
+    globalMemoryDump.iterateContainerDumps(function(dump) {
+      v8stats = v8stats || dump.getMemoryAllocatorDumpByFullName('v8');
+    });
+    return !!v8stats;
+  }
+
+  function rangeForMemoryDumps(model) {
+    var startOfFirstDumpWithV8 =
+        model.globalMemoryDumps.filter(hasV8Stats).reduce(
+            (start, dump) => Math.min(start, dump.start), Infinity);
+    if (startOfFirstDumpWithV8 === Infinity)
+      return new tr.b.Range(); // Empty range.
+    return tr.b.Range.fromExplicitRange(startOfFirstDumpWithV8, Infinity);
+  }
+
   return {
     findParent: findParent,
+    groupAndProcessEvents: groupAndProcessEvents,
+    isForcedGarbageCollectionEvent: isForcedGarbageCollectionEvent,
+    isGarbageCollectionEvent: isGarbageCollectionEvent,
     isIdleTask: isIdleTask,
     isLowMemoryEvent: isLowMemoryEvent,
-    isV8ExecuteEvent: isV8ExecuteEvent,
-    isTopV8ExecuteEvent: isTopV8ExecuteEvent,
-    isGarbageCollectionEvent: isGarbageCollectionEvent,
-    isTopGarbageCollectionEvent: isTopGarbageCollectionEvent,
     isSubGarbageCollectionEvent: isSubGarbageCollectionEvent,
-    topGarbageCollectionEventName: topGarbageCollectionEventName,
+    isTopGarbageCollectionEvent: isTopGarbageCollectionEvent,
+    isTopV8ExecuteEvent: isTopV8ExecuteEvent,
+    isV8ExecuteEvent: isV8ExecuteEvent,
+    mutatorUtilization: mutatorUtilization,
     subGarbageCollectionEventName: subGarbageCollectionEventName,
-    unionOfIntervals: unionOfIntervals,
-    mutatorUtilization: mutatorUtilization
+    topGarbageCollectionEventName: topGarbageCollectionEventName,
+    rangeForMemoryDumps: rangeForMemoryDumps,
+    unionOfIntervals: unionOfIntervals
   };
 });

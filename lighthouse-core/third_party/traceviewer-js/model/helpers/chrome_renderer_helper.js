@@ -4,6 +4,8 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../../base/range.js");
+require("../../extras/chrome/chrome_user_friendly_category_driver.js");
 require("./chrome_process_helper.js");
 
 'use strict';
@@ -58,7 +60,106 @@ global.tr.exportTo('tr.model.helpers', function() {
 
     get isChromeTracingUI() {
       return this.isChromeTracingUI_;
+    },
+
+    /**
+    * Generate a breakdown that attributes where time goes between |start| &
+    * |end| on renderer thread.
+    *
+    * @param {number} start
+    * @param {number} end
+    * @return {Object} A time breakdown object whose every key is a chrome
+    * userfriendly title & values are an object that show the total spent
+    * between |start| & |end|, and the list of event labels of the group and
+    * their total time between |start| & |end|.
+    *
+    * Example:
+    *   {layout: {
+    *        total: 100,
+    *        events: {'FrameView::performPreLayoutTasks': 20,..}},
+    *    v8_runtime: {
+    *        total: 500,
+    *        events: {'String::NewExternalTwoByte': 0.5,..}},
+    *    ...
+    *    }
+    *
+    *
+    */
+    generateTimeBreakdownTree: function(start, end) {
+      if (this.mainThread === null)
+        return;
+      var breakdownMap = {};
+      var range = tr.b.Range.fromExplicitRange(start, end);
+      for (var title of
+           tr.e.chrome.ChromeUserFriendlyCategoryDriver.ALL_TITLES) {
+        breakdownMap[title] = {total: 0, events: {}};
+      }
+      breakdownMap['idle'] = {total: 0, events: {}};
+      var totalIdleTime = end - start;
+      for (var event of this.mainThread.getDescendantEvents()) {
+        if (!range.intersectsExplicitRangeExclusive(event.start, event.end))
+          continue;
+        if (event.selfTime === undefined)
+          continue;
+        var title =
+          tr.e.chrome.ChromeUserFriendlyCategoryDriver.fromEvent(event);
+        var wallTimeIntersectionRatio = 0;
+        if (event.duration > 0) {
+          wallTimeIntersectionRatio =
+            range.findExplicitIntersectionDuration(event.start, event.end) /
+            event.duration;
+        }
+        var v8_runtime = event.args['runtime-call-stat'];
+        if (v8_runtime !== undefined) {
+          try {
+            var v8_runtime_object = JSON.parse(v8_runtime);
+            for (var runtime_call in v8_runtime_object) {
+              if (v8_runtime_object[runtime_call].length == 2) {
+                if (breakdownMap['v8_runtime'].events[runtime_call] ===
+                    undefined) {
+                  breakdownMap['v8_runtime'].events[runtime_call] = 0;
+                }
+                // V8 Runtime Call Stats data is in us, while the
+                // breakdown tree timing is in ms.
+                var runtime_time = v8_runtime_object[runtime_call][1] *
+                                   wallTimeIntersectionRatio / 1000;
+                breakdownMap['v8_runtime'].total += runtime_time;
+                breakdownMap['v8_runtime'].events[runtime_call] +=
+                     runtime_time;
+              }
+            }
+          } catch (e) {
+             console.warn(e);
+          }
+        }
+        //        [     Slice 1       ]   [      Slice  2   ]   [    Slice 3   ]
+        //            [  Slice 4    ]                             [ Slice 5 ]
+        //              [ Slice 6 ]                                  |
+        //                 |                                         |
+        //                 |                                         |
+        //                 v                                         v
+        //                start                                     end
+        //
+        // For the case where the |start| or |end| overlapped with some existing
+        // slice (see above diagram), we approximate the overlapped self-time
+        // by multiplying the ratio of overlapped wall time to the self-time.
+        // There should be way to compute the exact number, but in practice,
+        // this should rarely happen, and when it does, the overlapped range
+        // is relative small so that using approximation here should be good
+        // enough.
+        var approximatedSelfTimeContribution =
+          event.selfTime * wallTimeIntersectionRatio;
+        breakdownMap[title].total += approximatedSelfTimeContribution;
+        if (breakdownMap[title].events[event.title] === undefined)
+          breakdownMap[title].events[event.title] = 0;
+        breakdownMap[title].events[event.title] +=
+          approximatedSelfTimeContribution;
+        totalIdleTime -= approximatedSelfTimeContribution;
+      }
+      breakdownMap['idle'].total = totalIdleTime;
+      return breakdownMap;
     }
+
   };
 
   return {

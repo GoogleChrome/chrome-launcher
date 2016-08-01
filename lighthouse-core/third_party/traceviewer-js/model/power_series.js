@@ -62,13 +62,21 @@ global.tr.exportTo('tr.model', function() {
       var measurementRange = tr.b.Range.fromExplicitRange(start, end);
 
       var energyConsumed = 0;
-      for (var i = 0; i < this.samples.length; i++) {
+      var startIndex = tr.b.findLowIndexInSortedArray(
+          this.samples, x => x.start, start) - 1;
+      var endIndex = tr.b.findLowIndexInSortedArray(
+          this.samples, x => x.start, end);
+
+      if (startIndex < 0)
+        startIndex = 0;
+
+      for (var i = startIndex; i < endIndex; i++) {
         var sample = this.samples[i];
         var nextSample = this.samples[i + 1];
 
         var sampleRange = new tr.b.Range();
         sampleRange.addValue(sample.start);
-        sampleRange.addValue(nextSample ? nextSample.start : Infinity);
+        sampleRange.addValue(nextSample ? nextSample.start : sample.start);
 
         var timeIntersection = measurementRange.findIntersection(sampleRange);
 
@@ -104,18 +112,9 @@ global.tr.exportTo('tr.model', function() {
       this.bounds.addValue(this.samples_[this.samples_.length - 1].start);
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
+    childEvents: function*() {
+      yield * this.samples_;
     },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate, callback,
-                                              opt_this) {
-      if (eventTypePredicate.call(opt_this, PowerSample))
-        this.samples_.forEach(callback, opt_this);
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
-    }
   };
 
   return {

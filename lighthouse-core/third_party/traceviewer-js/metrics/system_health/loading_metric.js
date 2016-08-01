@@ -1,0 +1,480 @@
+/**
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../base/statistics.js");
+require("../metric_registry.js");
+require("./utils.js");
+require("../../model/helpers/chrome_model_helper.js");
+require("../../model/timed_event.js");
+require("../../value/numeric.js");
+require("../../value/value.js");
+
+'use strict';
+
+global.tr.exportTo('tr.metrics.sh', function() {
+  var RESPONSIVENESS_THRESHOLD = 50;
+  var INTERACTIVE_WINDOW_SIZE = 5 * 1000;
+  var timeDurationInMs_smallerIsBetter =
+      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter;
+
+  function findTargetRendererHelper(chromeHelper) {
+    var largestPid = -1;
+    for (var pid in chromeHelper.rendererHelpers) {
+      var rendererHelper = chromeHelper.rendererHelpers[pid];
+      if (rendererHelper.isChromeTracingUI)
+        continue;
+      if (pid > largestPid)
+        largestPid = pid;
+    }
+
+    if (largestPid === -1)
+      return undefined;
+
+    return chromeHelper.rendererHelpers[largestPid];
+  }
+
+  /**
+   * A utility class for finding navigationStart event for given frame and
+   * timestamp.
+   * @constructor
+   */
+  function NavigationStartFinder(rendererHelper) {
+    this.navigationStartsForFrameId_ = {};
+    for (var ev of rendererHelper.mainThread.sliceGroup.childEvents()) {
+      if (ev.category !== 'blink.user_timing' ||
+          ev.title !== 'navigationStart')
+        continue;
+      var frameIdRef = ev.args['frame'];
+      var list = this.navigationStartsForFrameId_[frameIdRef];
+      if (list === undefined)
+        this.navigationStartsForFrameId_[frameIdRef] = list = [];
+      list.unshift(ev);
+    }
+  }
+
+  NavigationStartFinder.prototype = {
+    findNavigationStartEventForFrameBeforeTimestamp: function(frameIdRef, ts) {
+      var list = this.navigationStartsForFrameId_[frameIdRef];
+      if (list === undefined) {
+        console.warn('No navigationStartEvent found for frame id "' +
+            frameIdRef + '"');
+        return undefined;
+      }
+      var eventBeforeTimestamp;
+      for (var ev of list) {
+        if (ev.start > ts)
+          continue;
+        if (eventBeforeTimestamp === undefined)
+          eventBeforeTimestamp = ev;
+      }
+      if (eventBeforeTimestamp === undefined) {
+        console.warn('Failed to find navigationStartEvent.');
+        return undefined;
+      }
+      return eventBeforeTimestamp;
+    }
+  };
+
+  /**
+   * A utility class for finding Paint event for given frame and timestamp.
+   * @constructor
+   */
+  function PaintFinder(rendererHelper) {
+    this.paintsForFrameId_ = {};
+    for (var ev of rendererHelper.mainThread.sliceGroup.childEvents()) {
+      if (ev.category !== 'devtools.timeline' || ev.title !== 'Paint')
+        continue;
+      var frameIdRef = ev.args['data']['frame'];
+      var list = this.paintsForFrameId_[frameIdRef];
+      if (list === undefined)
+          this.paintsForFrameId_[frameIdRef] = list = [];
+      list.push(ev);
+    }
+  }
+
+  PaintFinder.prototype = {
+    findPaintEventForFrameAfterTimestamp: function(frameIdRef, ts) {
+      var list = this.paintsForFrameId_[frameIdRef];
+      if (list === undefined)
+        return undefined;
+
+      var eventAfterTimestamp;
+      for (var ev of list) {
+        if (ev.start < ts)
+          continue;
+        if (eventAfterTimestamp === undefined)
+          eventAfterTimestamp = ev;
+      }
+      return eventAfterTimestamp;
+    }
+  };
+
+  var FIRST_PAINT_NUMERIC_BUILDER =
+      new tr.v.NumericBuilder(timeDurationInMs_smallerIsBetter, 0)
+      .addLinearBins(1000, 20) // 50ms step to 1s
+      .addLinearBins(3000, 20) // 100ms step to 3s
+      .addExponentialBins(20000, 20);
+  function createHistogram() {
+    var histogram = FIRST_PAINT_NUMERIC_BUILDER.build();
+    histogram.customizeSummaryOptions({
+      avg: true,
+      count: false,
+      max: true,
+      min: true,
+      std: true,
+      sum: false,
+      percentile: [0.90, 0.95, 0.99],
+    });
+    return histogram;
+  }
+
+  function findFrameLoaderSnapshotAt(rendererHelper, frameIdRef, ts) {
+    var snapshot;
+
+    var objects = rendererHelper.process.objects;
+    var frameLoaderInstances = objects.instancesByTypeName_['FrameLoader'];
+    if (frameLoaderInstances === undefined) {
+      console.warn('Failed to find FrameLoader for frameId "' + frameIdRef +
+          '" at ts ' + ts + ', the trace maybe incomplete or from an old' +
+          'Chrome.');
+      return undefined;
+    }
+
+    var snapshot;
+    for (var instance of frameLoaderInstances) {
+      if (!instance.isAliveAt(ts))
+        continue;
+      var maybeSnapshot = instance.getSnapshotAt(ts);
+      if (frameIdRef !== maybeSnapshot.args['frame']['id_ref'])
+        continue;
+      snapshot = maybeSnapshot;
+    }
+
+    return snapshot;
+  }
+
+  function findAllUserTimingEvents(rendererHelper, title) {
+    var targetEvents = [];
+
+    for (var ev of rendererHelper.process.getDescendantEvents()) {
+      if (ev.category !== 'blink.user_timing' || ev.title !== title)
+        continue;
+      targetEvents.push(ev);
+    }
+
+    return targetEvents;
+  }
+
+  function findAllLayoutEvents(rendererHelper) {
+    var isTelemetryInternalEvent =
+        prepareTelemetryInternalEventPredicate(rendererHelper);
+    var layoutsForFrameId = {};
+    for (var ev of rendererHelper.process.getDescendantEvents()) {
+      if (ev.category !==
+          'blink,benchmark,disabled-by-default-blink.debug.layout' ||
+          ev.title !== 'FrameView::performLayout')
+        continue;
+      if (isTelemetryInternalEvent(ev))
+        continue;
+      if (ev.args.counters === undefined) {
+        console.warn('Ignoring FrameView::performLayout event with no ' +
+            'counters arg (END event is missing).');
+        continue;
+      }
+      var frameIdRef = ev.args.counters['frame'];
+      if (frameIdRef === undefined)
+        continue;
+      var list = layoutsForFrameId[frameIdRef];
+      if (list === undefined)
+        layoutsForFrameId[frameIdRef] = list = [];
+      list.push(ev);
+    }
+    return layoutsForFrameId;
+  }
+
+  function prepareTelemetryInternalEventPredicate(rendererHelper) {
+    var ignoreRegions = [];
+
+    var internalRegionStart;
+    for (var slice of
+        rendererHelper.mainThread.asyncSliceGroup.getDescendantEvents()) {
+          if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.start$/))
+            internalRegionStart = slice.start;
+          if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.end$/)) {
+            var timedEvent = new tr.model.TimedEvent(internalRegionStart);
+            timedEvent.duration = slice.end - internalRegionStart;
+            ignoreRegions.push(timedEvent);
+          }
+        }
+
+    return function isTelemetryInternalEvent(slice) {
+      for (var region of ignoreRegions)
+        if (region.bounds(slice))
+          return true;
+      return false;
+    }
+  }
+
+  var URL_BLACKLIST = [
+    'about:blank',
+    // Chrome on Android creates main frames with the below URL for plugins.
+    'data:text/html,pluginplaceholderdata'
+  ];
+  function shouldIgnoreURL(url) {
+    return URL_BLACKLIST.indexOf(url) >= 0;
+  }
+
+  var METRICS = [
+    {
+      valueName: 'firstContentfulPaint',
+      title: 'firstContentfulPaint',
+      description: 'time to first contentful paint'
+    },
+    {
+      valueName: 'timeToOnload',
+      title: 'loadEventStart',
+      description: 'time to onload. ' +
+        'This is temporary metric used for PCv1/v2 sanity checking'
+    }];
+
+  function firstContentfulPaintMetric(values, model) {
+    var chromeHelper = model.getOrCreateHelper(
+        tr.model.helpers.ChromeModelHelper);
+    var rendererHelper = findTargetRendererHelper(chromeHelper);
+    var isTelemetryInternalEvent =
+        prepareTelemetryInternalEventPredicate(rendererHelper);
+    var navigationStartFinder = new NavigationStartFinder(rendererHelper);
+
+    for (var metric of METRICS) {
+      var histogram = createHistogram();
+      var targetEvents = findAllUserTimingEvents(rendererHelper, metric.title);
+     for (var ev of targetEvents) {
+        if (isTelemetryInternalEvent(ev))
+          continue;
+        var frameIdRef = ev.args['frame'];
+        var snapshot =
+          findFrameLoaderSnapshotAt(rendererHelper, frameIdRef, ev.start);
+        if (snapshot === undefined || !snapshot.args.isLoadingMainFrame)
+          continue;
+        var url = snapshot.args.documentLoaderURL;
+        if (shouldIgnoreURL(url))
+          continue;
+        var navigationStartEvent = navigationStartFinder.
+          findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
+        // Ignore layout w/o preceding navigationStart, as they are not
+        // attributed to any time-to-X metric.
+        if (navigationStartEvent === undefined)
+          continue;
+
+        var timeToEvent = ev.start - navigationStartEvent.start;
+        histogram.add(timeToEvent, new tr.v.d.Generic({url: url}));
+      }
+      values.addValue(new tr.v.NumericValue(
+          metric.valueName, histogram,
+          { description: metric.description }));
+    }
+  }
+
+  /**
+   * Compute significance of given layout event.
+   *
+   * Significance of a layout is the number of layout objects newly added to the
+   * layout tree, weighted by page height (before and after the layout).
+   */
+  function layoutSignificance(event) {
+    var newObjects = event.args.counters['LayoutObjectsThatHadNeverHadLayout'];
+    var visibleHeight = event.args['counters']['visibleHeight'];
+    if (!newObjects || !visibleHeight)
+      return 0;
+
+    var heightBefore = event.args['contentsHeightBeforeLayout'];
+    var heightAfter = event.args['counters']['contentsHeightAfterLayout'];
+    var ratioBefore = Math.max(1, heightBefore / visibleHeight);
+    var ratioAfter = Math.max(1, heightAfter / visibleHeight);
+    return newObjects / ((ratioBefore + ratioAfter) / 2);
+  }
+
+  /**
+   * If there are loading fonts when layout happened, the layout change
+   * accounting is postponed until the font is displayed. However, icon fonts
+   * shouldn't block first meaningful paint. We use a threshold that only web
+   * fonts that laid out more than 200 characters should block first meaningful
+   * paint.
+   */
+  function hasTooManyBlankCharactersToBeMeaningful(event) {
+    var BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN = 200;
+    return event.args['counters']['approximateBlankCharacterCount'] >
+        BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN;
+  }
+
+  function addTimeToInteractiveSampleToHistogram(histogram, rendererHelper,
+    navigationStartTime, firstMeaningfulPaint, url) {
+    if (shouldIgnoreURL(url))
+      return;
+    var firstInteractive = Infinity;
+    var firstInteractiveCandidate = firstMeaningfulPaint;
+    // Find the first interactive point X after firstMeaningfulPaint so that
+    // range [X, X + INTERACTIVE_WINDOW_SIZE] contains no
+    // 'TaskQueueManager::ProcessTaskFromWorkQueues' slice which takes more than
+    // RESPONSIVENESS_THRESHOLD.
+    // For more details on why TaskQueueManager::ProcessTaskFromWorkQueue is
+    // chosen as a proxy for all un-interruptable task on renderer thread, see
+    // https://github.com/GoogleChrome/lighthouse/issues/489
+    // TODO(nedn): replace this with just "var ev of rendererHelper..." once
+    // canary binary is updated.
+    // (https://github.com/catapult-project/catapult/issues/2586)
+    for (var ev of[...rendererHelper.mainThread.sliceGroup.childEvents()]) {
+      if (ev.start < firstInteractiveCandidate)
+        continue;
+      var interactiveDurationSoFar = ev.start - firstInteractiveCandidate;
+      if (interactiveDurationSoFar >= INTERACTIVE_WINDOW_SIZE) {
+        firstInteractive = firstInteractiveCandidate;
+        break;
+      }
+      if (ev.title === 'TaskQueueManager::ProcessTaskFromWorkQueue' &&
+          ev.duration > RESPONSIVENESS_THRESHOLD) {
+        firstInteractiveCandidate = ev.end - 50;
+      }
+    }
+    var diagnosticDict = rendererHelper.generateTimeBreakdownTree(
+        navigationStartTime, firstInteractive);
+    diagnosticDict.url = url;
+    var timeToFirstInteractive = firstInteractive - navigationStartTime;
+    histogram.add(timeToFirstInteractive, new tr.v.d.Generic(diagnosticDict));
+  }
+
+  /**
+   * Computes Time to first meaningful paint (TTFMP) & time to interactive (TTI)
+   * from |model| and add it to |value|.
+   *
+   * TTFMP is computed from three types of events: NavigationStart, Layout, and
+   * Paint. Each Layout event has associated "significance" value, indicating
+   * how the layout was visually significant.
+   *
+   * TTFMP is the time between NavigationStart and Paint that follows the Layout
+   * with biggest significance value.
+   *
+   * Design doc: https://goo.gl/vpaxv6
+   *
+   * TTI is computed as the starting time of the timed window with size
+   * INTERACTIVE_WINDOW_SIZE that happens after FMP in which there is no
+   * uninterruptable task on the main thread with size more than
+   * RESPONSIVENESS_THRESHOLD.
+   *
+   * Design doc: https://goo.gl/ISWndc
+   */
+  function firstMeaningfulPaintAndTimeToInteractiveMetrics(values, model) {
+    var chromeHelper = model.getOrCreateHelper(
+        tr.model.helpers.ChromeModelHelper);
+    var rendererHelper = findTargetRendererHelper(chromeHelper);
+    var navigationStartFinder = new NavigationStartFinder(rendererHelper);
+    var paintFinder = new PaintFinder(rendererHelper);
+    var firstMeaningfulPaintHistogram = createHistogram();
+    var firstInteractiveHistogram = createHistogram();
+
+    function addFirstMeaningfulPaintSampleToHistogram(
+        frameIdRef, navigationStart, mostSignificantLayout) {
+      var snapshot = findFrameLoaderSnapshotAt(
+          rendererHelper, frameIdRef, mostSignificantLayout.start);
+      if (snapshot === undefined || !snapshot.args.isLoadingMainFrame)
+        return;
+      var url = snapshot.args.documentLoaderURL;
+      if (shouldIgnoreURL(url))
+        return;
+      var paintEvent = paintFinder.findPaintEventForFrameAfterTimestamp(
+          frameIdRef, mostSignificantLayout.start);
+      if (paintEvent === undefined) {
+        console.warn('Failed to find paint event after the most significant ' +
+            'layout for frameId "' + frameIdRef + '".');
+        return;
+      }
+      var timeToFirstMeaningfulPaint = paintEvent.start - navigationStart.start;
+      var diagnosticDict = rendererHelper.generateTimeBreakdownTree(
+          navigationStart.start, paintEvent.start);
+      diagnosticDict.url = url;
+      firstMeaningfulPaintHistogram.add(timeToFirstMeaningfulPaint,
+          new tr.v.d.Generic(diagnosticDict));
+      return {firstMeaningfulPaint: paintEvent.start, url: url};
+    }
+
+    var layoutsForFrameId = findAllLayoutEvents(rendererHelper);
+
+    for (var frameIdRef in layoutsForFrameId) {
+      var navigationStart;
+      var mostSignificantLayout;
+      var maxSignificanceSoFar = 0;
+      var accumulatedSignificanceWhileHavingBlankText = 0;
+
+      // Iterate over the layout events, remembering one with largest
+      // significance.
+      for (var ev of layoutsForFrameId[frameIdRef]) {
+        var navigationStartForThisLayout = navigationStartFinder.
+          findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
+        // Ignore layout w/o preceding navigationStart, as they are not
+        // attributed to any TTFMP.
+        if (navigationStartForThisLayout === undefined)
+          continue;
+
+        if (navigationStart !== navigationStartForThisLayout) {
+          // New navigation is found. Compute TTFMP for current navigation, and
+          // reset the state variables.
+          if (navigationStart !== undefined &&
+              mostSignificantLayout !== undefined)
+            addFirstMeaningfulPaintSampleToHistogram(
+                frameIdRef, navigationStart, mostSignificantLayout);
+          navigationStart = navigationStartForThisLayout;
+          mostSignificantLayout = undefined;
+          maxSignificanceSoFar = 0;
+          accumulatedSignificanceWhileHavingBlankText = 0;
+        }
+
+        // Check if |ev| has the largest significance. If the page has many
+        // blank characters, the significance value is accumulated until
+        // the text become visible.
+        var significance = layoutSignificance(ev);
+        if (hasTooManyBlankCharactersToBeMeaningful(ev)) {
+          accumulatedSignificanceWhileHavingBlankText += significance;
+        } else {
+          significance += accumulatedSignificanceWhileHavingBlankText;
+          accumulatedSignificanceWhileHavingBlankText = 0;
+          if (significance > maxSignificanceSoFar) {
+            maxSignificanceSoFar = significance;
+            mostSignificantLayout = ev;
+          }
+        }
+      }
+
+      // Emit TTFMP for the last navigation.
+      if (mostSignificantLayout !== undefined) {
+        var data = addFirstMeaningfulPaintSampleToHistogram(
+          frameIdRef, navigationStart, mostSignificantLayout);
+
+        if (data !== undefined)
+          addTimeToInteractiveSampleToHistogram(
+              firstInteractiveHistogram, rendererHelper, navigationStart.start,
+              data.firstMeaningfulPaint, data.url);
+      }
+    }
+
+    values.addValue(new tr.v.NumericValue(
+        'firstMeaningfulPaint', firstMeaningfulPaintHistogram,
+        { description: 'time to first meaningful paint' }));
+    values.addValue(new tr.v.NumericValue(
+        'timeToFirstInteractive', firstInteractiveHistogram,
+        { description: 'time to first interactive' }));
+  }
+
+  function loadingMetric(values, model) {
+    firstContentfulPaintMetric(values, model);
+    firstMeaningfulPaintAndTimeToInteractiveMetrics(values, model);
+  }
+
+  tr.metrics.MetricRegistry.register(loadingMetric);
+
+  return {
+    loadingMetric: loadingMetric
+  };
+});

@@ -8,6 +8,23 @@ require("./math.js");
 require("./range.js");
 
 'use strict';
+// In node, the script-src for mannwhitneyu above brings in mannwhitneyui
+// into a module, instead of into the global scope. Whereas this file
+// assumes that mannwhitneyu is in the global scope. So, in Node only, we
+// require() it in, and then take all its exports and shove them into the
+// global scope by hand.
+(function() {
+  if (tr.isNode) {
+    var mwuAbsPath = HTMLImportsLoader.hrefToAbsolutePath(
+        '/mannwhitneyu.js');
+    var mwuModule = require(mwuAbsPath);
+    for (var exportName in mwuModule) {
+      global[exportName] = mwuModule[exportName];
+    }
+  }
+})(this);
+
+'use strict';
 
 global.tr.exportTo('tr.b', function() {
 
@@ -28,8 +45,9 @@ global.tr.exportTo('tr.b', function() {
   Statistics.sum = function(ary, opt_func, opt_this) {
     var func = opt_func || identity;
     var ret = 0;
-    for (var i = 0; i < ary.length; i++)
-      ret += func.call(opt_this, ary[i], i);
+    var i = 0;
+    for (var elt of ary)
+      ret += func.call(opt_this, elt, i++);
     return ret;
   };
 
@@ -45,12 +63,14 @@ global.tr.exportTo('tr.b', function() {
     var valueCallback = opt_valueCallback || identity;
     var numerator = 0;
     var denominator = 0;
+    var i = -1;
 
-    for (var i = 0; i < ary.length; i++) {
-      var value = valueCallback.call(opt_this, ary[i], i);
+    for (var elt of ary) {
+      i++;
+      var value = valueCallback.call(opt_this, elt, i);
       if (value === undefined)
         continue;
-      var weight = weightCallback.call(opt_this, ary[i], i, value);
+      var weight = weightCallback.call(opt_this, elt, i, value);
       numerator += weight * value;
       denominator += weight;
     }
@@ -88,24 +108,27 @@ global.tr.exportTo('tr.b', function() {
   Statistics.max = function(ary, opt_func, opt_this) {
     var func = opt_func || identity;
     var ret = -Infinity;
-    for (var i = 0; i < ary.length; i++)
-      ret = Math.max(ret, func.call(opt_this, ary[i], i));
+    var i = 0;
+    for (var elt of ary)
+      ret = Math.max(ret, func.call(opt_this, elt, i++));
     return ret;
   };
 
   Statistics.min = function(ary, opt_func, opt_this) {
     var func = opt_func || identity;
     var ret = Infinity;
-    for (var i = 0; i < ary.length; i++)
-      ret = Math.min(ret, func.call(opt_this, ary[i], i));
+    var i = 0;
+    for (var elt of ary)
+      ret = Math.min(ret, func.call(opt_this, elt, i++));
     return ret;
   };
 
   Statistics.range = function(ary, opt_func, opt_this) {
     var func = opt_func || identity;
     var ret = new tr.b.Range();
-    for (var i = 0; i < ary.length; i++)
-      ret.addValue(func.call(opt_this, ary[i], i));
+    var i = 0;
+    for (var elt of ary)
+      ret.addValue(func.call(opt_this, elt, i++));
     return ret;
   };
 
@@ -115,18 +138,12 @@ global.tr.exportTo('tr.b', function() {
 
     var func = opt_func || identity;
     var tmp = new Array(ary.length);
-    for (var i = 0; i < ary.length; i++)
-      tmp[i] = func.call(opt_this, ary[i], i);
+    var i = 0;
+    for (var elt of ary)
+      tmp[i] = func.call(opt_this, elt, i++);
     tmp.sort((a, b) => a - b);
     var idx = Math.floor((ary.length - 1) * percent);
     return tmp[idx];
-  };
-
-  /* Clamp a value between some low and high value. */
-  Statistics.clamp = function(value, opt_low, opt_high) {
-    opt_low = opt_low || 0.0;
-    opt_high = opt_high || 1.0;
-    return Math.min(Math.max(value, opt_low), opt_high);
   };
 
   /**
@@ -333,8 +350,8 @@ global.tr.exportTo('tr.b', function() {
       discrepancy /= sample_scale;
     } else {
       // Compute relative discrepancy
-      discrepancy = Statistics.clamp(
-        (discrepancy - inv_sample_count) / (1.0 - inv_sample_count));
+      discrepancy = tr.b.clamp(
+        (discrepancy - inv_sample_count) / (1.0 - inv_sample_count), 0.0, 1.0);
     }
     return discrepancy;
   };
@@ -702,6 +719,35 @@ global.tr.exportTo('tr.b', function() {
                       this.normalDistribution_.variance);
     }
   };
+
+  /**
+   * Instead of describing a LogNormalDistribution in terms of its "location"
+   * and "shape", it can also be described in terms of its median
+   * and the point at which its complementary cumulative distribution
+   * function bends between the linear-ish region in the middle and the
+   * exponential-ish region. When the distribution is used to compute
+   * percentiles for log-normal random processes such as latency, as the latency
+   * improves, it hits a point of diminishing returns, when it becomes
+   * relatively difficult to improve the score further. This point of
+   * diminishing returns is the first x-intercept of the third derivative of the
+   * CDF, which is the second derivative of the PDF.
+   *
+   * https://www.desmos.com/calculator/cg5rnftabn
+   *
+   * @param {number} median The median of the distribution.
+   * @param {number} diminishingReturns The point of diminishing returns.
+   * @return {LogNormalDistribution}
+   */
+  Statistics.LogNormalDistribution.fromMedianAndDiminishingReturns =
+    function(median, diminishingReturns) {
+      diminishingReturns = Math.log(diminishingReturns / median);
+      var shape = Math.sqrt(1 - 3 * diminishingReturns -
+          Math.sqrt(Math.pow(diminishingReturns - 3, 2) - 8)) / 2;
+      var location = Math.log(median);
+      return new Statistics.LogNormalDistribution(location, shape);
+  };
+
+  Statistics.mwu = mannwhitneyu;
 
   return {
     Statistics: Statistics

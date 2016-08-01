@@ -4,10 +4,11 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("./iteration_helpers.js");
 require("./event_target.js");
+require("./extension_registry_base.js");
 require("./extension_registry_basic.js");
 require("./extension_registry_type_based.js");
+require("./iteration_helpers.js");
 
 'use strict';
 
@@ -22,9 +23,6 @@ require("./extension_registry_type_based.js");
  * - TypeName-based: register a type that handles some combination
  *                   of tracing categories or typeNames, then query
  *                   for it based on a category, typeName or both.
- *
- * Use these for pure-JS classes or ui.define'd classes. For polymer element
- * related registries, consult base/polymer_utils.html.
  *
  * When you register subtypes, you pass the constructor for the
  * subtype, and any metadata you want associated with the subtype. Use metadata

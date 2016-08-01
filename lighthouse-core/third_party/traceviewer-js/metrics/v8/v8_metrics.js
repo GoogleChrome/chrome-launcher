@@ -12,15 +12,12 @@ require("./gc_metric.js");
 'use strict';
 
 global.tr.exportTo('tr.metrics.v8', function() {
-  function v8AndMemoryMetrics(valueList, model) {
-    tr.metrics.v8.executionMetric(valueList, model);
-    tr.metrics.v8.gcMetric(valueList, model);
-    tr.metrics.sh.memoryMetric(valueList, model);
+  function v8AndMemoryMetrics(values, model) {
+    tr.metrics.v8.executionMetric(values, model);
+    tr.metrics.v8.gcMetric(values, model);
+    tr.metrics.sh.memoryMetric(values, model,
+        {rangeOfInterest: tr.metrics.v8.utils.rangeForMemoryDumps(model)});
   }
-
-  v8AndMemoryMetrics.prototype = {
-    __proto__: Function.prototype
-  };
 
   tr.metrics.MetricRegistry.register(v8AndMemoryMetrics);
 

@@ -71,25 +71,18 @@ global.tr.exportTo('tr.model', function() {
       return Thread.compare(this, that);
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                              opt_this) {
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
+    childEventContainers: function*() {
       if (this.sliceGroup.length)
-        callback.call(opt_this, this.sliceGroup);
+        yield this.sliceGroup;
       if (this.kernelSliceGroup.length)
-        callback.call(opt_this, this.kernelSliceGroup);
+        yield this.kernelSliceGroup;
       if (this.asyncSliceGroup.length)
-        callback.call(opt_this, this.asyncSliceGroup);
+        yield this.asyncSliceGroup;
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      if (this.timeSlices && this.timeSlices.length) {
-        if (eventTypePredicate.call(opt_this, ThreadTimeSlice))
-          this.timeSlices.forEach(callback, opt_this);
-      }
+    childEvents: function*() {
+      if (this.timeSlices)
+        yield * this.timeSlices;
     },
 
     iterateAllPersistableObjects: function(cb) {

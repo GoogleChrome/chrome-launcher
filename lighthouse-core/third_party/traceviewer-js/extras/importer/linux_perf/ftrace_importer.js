@@ -65,6 +65,7 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
     this.pseudoThreadCounter = 1;
     this.parsers_ = [];
     this.eventHandlers_ = {};
+    this.haveClockSyncedMonotonicToGlobal_ = false;
   }
 
   var TestExports = {};
@@ -149,7 +150,7 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
   TestExports.traceEventClockSyncRE = traceEventClockSyncRE;
 
   var realTimeClockSyncRE = /trace_event_clock_sync: realtime_ts=(\d+)/;
-  var genericClockSyncRE = /trace_event_clock_sync: name=(\w+)/;
+  var genericClockSyncRE = /trace_event_clock_sync: name=([\w\-]+)/;
 
   // Some kernel trace events are manually classified in slices and
   // hand-assigned a pseudo PID.
@@ -644,7 +645,7 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
                 prevSlice.end, {}, midDuration));
           } else if (prevSlice.args.stateWhenDescheduled == 'Z') {
             slices.push(new tr.model.ThreadTimeSlice(
-                thread, SCHEDULING_STATE.ZOMBIE, '', ioWaitId,
+                thread, SCHEDULING_STATE.ZOMBIE, '',
                 prevSlice.end, {}, midDuration));
           } else if (prevSlice.args.stateWhenDescheduled == 'X') {
             slices.push(new tr.model.ThreadTimeSlice(
@@ -726,6 +727,8 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
       // sync ID and the current time according to the "ftrace global" clock.
       var event = /name=(\w+?)\s(.+)/.exec(eventBase.details);
       if (event) {
+        // TODO(alexandermont): This section of code seems to be broken. It
+        // creates an "args" variable, but doesn't seem to do anything with it.
         var name = event[1];
         var pieces = event[2].split(' ');
         var args = {
@@ -743,6 +746,15 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
         return true;
       }
 
+      // Check to see if we have a "new style" clock sync marker that contains
+      // only a sync ID.
+      var event = /name=([\w\-]+)/.exec(eventBase.details);
+      if (event) {
+        this.model_.clockSyncManager.addClockSyncMarker(
+            tr.model.ClockDomainId.LINUX_FTRACE_GLOBAL, event[1], ts);
+        return true;
+      }
+
       // Check to see if we have a special clock sync marker that contains both
       // the current "ftrace global" time and the current CLOCK_MONOTONIC time.
       event = /parent_ts=(\d+\.?\d*)/.exec(eventBase.details);
@@ -755,6 +767,12 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
       if (monotonicTs === 0)
         monotonicTs = ts;
 
+      if (this.haveClockSyncedMonotonicToGlobal_)
+        // ftrace sometimes includes multiple clock syncs between the monotonic
+        // and global clocks within a single trace. We protect against this by
+        // only taking the first one into account.
+        return true;
+
       // We have a clock sync event that contains two timestamps: a timestamp
       // according to the ftrace 'global' clock, and that same timestamp
       // according to clock_gettime(CLOCK_MONOTONIC).
@@ -765,6 +783,7 @@ global.tr.exportTo('tr.e.importer.linux_perf', function() {
           tr.model.ClockDomainId.LINUX_CLOCK_MONOTONIC,
           MONOTONIC_TO_FTRACE_GLOBAL_SYNC_ID, monotonicTs);
 
+      this.haveClockSyncedMonotonicToGlobal_ = true;
       return true;
     },
 

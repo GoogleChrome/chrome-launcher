@@ -64,6 +64,11 @@ global.tr.exportTo('tr.model', function() {
       return this.guid_;
     },
 
+    *[Symbol.iterator]() {
+      for (var i = 0; i < this.length_; ++i)
+        yield this[i];
+    },
+
     clear: function() {
       for (var i = 0; i < this.length_; ++i)
         delete this[i];
@@ -183,21 +188,14 @@ global.tr.exportTo('tr.model', function() {
       });
     },
 
-    getEventsOrganizedByCallback: function(cb) {
-      var eventsByCallback = {};
-      for (var i = 0; i < this.length; i++) {
-        var event = this[i];
-        var key = cb(event);
-
-        if (key === undefined)
-          throw new Error('An event could not be organized');
-
-        if (eventsByCallback[key] === undefined)
-          eventsByCallback[key] = new EventSet();
-
-        eventsByCallback[key].push(event);
-      }
-      return eventsByCallback;
+    /**
+     * @param {!function(!tr.model.Event):string} cb
+     * @param {*=} opt_this
+     * @return {!Object}
+     */
+    getEventsOrganizedByCallback: function(cb, opt_this) {
+      var groupedEvents = tr.b.group(this, cb, opt_this || this);
+      return tr.b.mapItems(groupedEvents, (_, events) => new EventSet(events));
     },
 
     enumEventsOfType: function(type, func) {

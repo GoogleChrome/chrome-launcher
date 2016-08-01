@@ -8,6 +8,18 @@ require("../../core/auditor.js");
 
 'use strict';
 
+function filterDuplicateTimestamps(timestamps) {
+  var dedupedTimestamps = [];
+  var lastTs = 0;
+  for (var ts of timestamps) {
+    if (ts - lastTs >= 1) {
+      dedupedTimestamps.push(ts);
+      lastTs = ts;
+    }
+  }
+  return dedupedTimestamps;
+}
+
 global.tr.exportTo('tr.e.audits', function() {
 
   var VSYNC_COUNTER_PRECISIONS = {
@@ -29,7 +41,7 @@ global.tr.exportTo('tr.e.audits', function() {
   };
 
   var BEGIN_FRAME_SLICE_PRECISION = {
-    'Scheduler::BeginFrame': 10
+    'DisplayScheduler::BeginFrame': 10
   };
 
   /**
@@ -113,7 +125,7 @@ global.tr.exportTo('tr.e.audits', function() {
         }
       }
       times.sort(function(x, y) { return x - y; });
-      return times;
+      return filterDuplicateTimestamps(times);
     }
   };
 

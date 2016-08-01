@@ -7,6 +7,7 @@ found in the LICENSE file.
 require("../base/range.js");
 require("./counter.js");
 require("./cpu_slice.js");
+require("./process_base.js");
 require("./thread_time_slice.js");
 
 'use strict';
@@ -32,7 +33,7 @@ global.tr.exportTo('tr.model', function() {
     this.cpuNumber = number;
     this.slices = [];
     this.counters = {};
-    this.bounds = new tr.b.Range();
+    this.bounds_ = new tr.b.Range();
     this.samples_ = undefined; // Set during createSubSlices
 
     // Start timestamp of the last active thread.
@@ -48,6 +49,8 @@ global.tr.exportTo('tr.model', function() {
   };
 
   Cpu.prototype = {
+    __proto__: tr.model.EventContainer.prototype,
+
     get samples() {
       return this.samples_;
     },
@@ -56,29 +59,23 @@ global.tr.exportTo('tr.model', function() {
       return 'CPU ' + this.cpuNumber;
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
+    findTopmostSlicesInThisContainer: function*(eventPredicate, opt_this) {
       // All CpuSlices are toplevel since CpuSlices do not nest.
-      this.slices.forEach(function(s) {
-        s.findTopmostSlicesRelativeToThisSlice(eventPredicate, callback,
-                                               opt_this);
-      });
-    },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      if (eventTypePredicate.call(opt_this, tr.model.CpuSlice))
-        this.slices.forEach(callback, opt_this);
-
-      if (this.samples_) {
-        if (eventTypePredicate.call(opt_this, tr.model.Sample))
-          this.samples_.forEach(callback, opt_this);
+      for (var s of slices) {
+        yield * s.findTopmostSlicesRelativeToThisSlice(
+            eventPredicate, opt_this);
       }
     },
 
-    iterateAllChildEventContainers: function(callback, opt_this) {
-      for (var id in this.counters)
-        callback.call(opt_this, this.counters[id]);
+    childEvents: function*() {
+      yield * this.slices;
+
+      if (this.samples_)
+        yield * this.samples_;
+    },
+
+    childEventContainers: function*() {
+      yield * tr.b.dictionaryValues(this.counters);
     },
 
     /**
@@ -118,18 +115,18 @@ global.tr.exportTo('tr.model', function() {
      * Updates the range based on the current slices attached to the cpu.
      */
     updateBounds: function() {
-      this.bounds.reset();
+      this.bounds_.reset();
       if (this.slices.length) {
-        this.bounds.addValue(this.slices[0].start);
-        this.bounds.addValue(this.slices[this.slices.length - 1].end);
+        this.bounds_.addValue(this.slices[0].start);
+        this.bounds_.addValue(this.slices[this.slices.length - 1].end);
       }
       for (var id in this.counters) {
         this.counters[id].updateBounds();
-        this.bounds.addRange(this.counters[id].bounds);
+        this.bounds_.addRange(this.counters[id].bounds);
       }
       if (this.samples_ && this.samples_.length) {
-        this.bounds.addValue(this.samples_[0].start);
-        this.bounds.addValue(
+        this.bounds_.addValue(this.samples_[0].start);
+        this.bounds_.addValue(
             this.samples_[this.samples_.length - 1].end);
       }
     },

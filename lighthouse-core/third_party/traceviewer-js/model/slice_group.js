@@ -273,24 +273,19 @@ global.tr.exportTo('tr.model', function() {
       return newSlice;
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                              opt_this) {
+    findTopmostSlicesInThisContainer: function*(eventPredicate, opt_this) {
       if (!this.haveTopLevelSlicesBeenBuilt)
         throw new Error('Nope');
 
-      this.topLevelSlices.forEach(function(s) {
-        s.findTopmostSlicesRelativeToThisSlice(eventPredicate, callback,
-                                               opt_this);
-      });
+      for (var s of this.topLevelSlices)
+        yield * s.findTopmostSlicesRelativeToThisSlice(eventPredicate);
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      if (eventTypePredicate.call(opt_this, this.sliceConstructor))
-        this.slices.forEach(callback, opt_this);
+    childEvents: function*() {
+      yield * this.slices;
     },
 
-    iterateAllChildEventContainers: function(callback, opt_this) {
+    childEventContainers: function*() {
     },
 
     getSlicesOfName: function(title) {
@@ -313,7 +308,8 @@ global.tr.exportTo('tr.model', function() {
         end,
         function(topLevelSlice) {
           callback(topLevelSlice);
-          topLevelSlice.iterateAllDescendents(callback);
+          for (var slice of topLevelSlice.enumerateAllDescendents())
+            callback(slice);
         });
       return ret;
     },

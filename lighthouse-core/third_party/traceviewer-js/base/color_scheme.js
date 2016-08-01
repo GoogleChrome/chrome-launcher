@@ -70,6 +70,7 @@ global.tr.exportTo('tr.b', function() {
     rail_animation: new tr.b.Color(244, 74, 63),
     rail_idle: new tr.b.Color(238, 142, 0),
     rail_load: new tr.b.Color(13, 168, 97),
+    startup: new tr.b.Color(230, 230, 0),
 
     used_memory_column: new tr.b.Color(0, 0, 255),
     older_used_memory_column: new tr.b.Color(153, 204, 255),
@@ -179,10 +180,10 @@ global.tr.exportTo('tr.b', function() {
 
   // Build reservedColorNameToIdMap.
   var reservedColorNameToIdMap = (function() {
-    var m = {};
+    var m = new Map();
     var i = generalPurposeColors.length;
     tr.b.iterItems(reservedColorsByName, function(key, value) {
-      m[key] = i++;
+      m.set(key, i++);
     });
     return m;
   })();
@@ -192,7 +193,7 @@ global.tr.exportTo('tr.b', function() {
    * @return {Number} The color ID for the given color name.
    */
   ColorScheme.getColorIdForReservedName = function(name) {
-    var id = reservedColorNameToIdMap[name];
+    var id = reservedColorNameToIdMap.get(name);
     if (id === undefined)
       throw new Error('Unrecognized color ') + name;
     return id;
@@ -217,7 +218,7 @@ global.tr.exportTo('tr.b', function() {
 
   // Previously computed string color IDs. They are based on a stable hash, so
   // it is safe to save them throughout the program time.
-  var stringColorIdCache = {};
+  var stringColorIdCache = new Map();
 
   /**
    * @return {Number} A color ID that is stably associated to the provided via
@@ -225,11 +226,11 @@ global.tr.exportTo('tr.b', function() {
    * purpose ID space only, e.g. no reserved ID will be used.
    */
   ColorScheme.getColorIdForGeneralPurposeString = function(string) {
-    if (stringColorIdCache[string] === undefined) {
+    if (stringColorIdCache.get(string) === undefined) {
       var hash = ColorScheme.getStringHash(string);
-      stringColorIdCache[string] = hash % numGeneralPurposeColorIds;
+      stringColorIdCache.set(string, hash % numGeneralPurposeColorIds);
     }
-    return stringColorIdCache[string];
+    return stringColorIdCache.get(string);
   };
 
   return {

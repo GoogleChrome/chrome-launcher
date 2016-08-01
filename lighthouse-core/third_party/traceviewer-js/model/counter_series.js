@@ -107,18 +107,11 @@ global.tr.exportTo('tr.model', function() {
       }
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
+    childEvents: function*() {
+      yield * this.samples_;
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      if (eventTypePredicate.call(opt_this, tr.model.CounterSample)) {
-        this.samples_.forEach(callback, opt_this);
-      }
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
+    childEventContainers: function*() {
     }
   };
 
