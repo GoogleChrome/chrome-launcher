@@ -50,6 +50,9 @@ window.runAudits = function(options) {
 
         // Add in the URL to the options.
         return Runner.run(driver, Object.assign({}, options, {url, config}));
+      }).catch(e => {
+        console.error(e);
+        throw e;
       });
 };
 
