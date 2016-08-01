@@ -18,6 +18,7 @@
 
 const Driver = require('./driver.js');
 const log = require('../../lib/log.js');
+const EventEmitter = require('events').EventEmitter;
 
 /* globals chrome */
 
@@ -25,25 +26,54 @@ class ExtensionDriver extends Driver {
 
   constructor() {
     super();
-    this._listeners = {};
     this._tabId = null;
-    this._debuggerConnected = false;
-    chrome.debugger.onEvent.addListener(this._onEvent.bind(this));
-    this.handleUnexpectedDetach();
+
+    this._eventEmitter = new EventEmitter();
+    this._onEvent = this._onEvent.bind(this);
+    this._onUnexpectedDetach = this._onUnexpectedDetach.bind(this);
+  }
+
+  _onEvent(source, method, params) {
+    // log events received
+    log.log('<=', method, params);
+
+    this._eventEmitter.emit(method, params);
+  }
+
+  _onUnexpectedDetach(debuggee, detachReason) {
+    this._detachCleanup();
+    throw new Error('Lighthouse detached from browser: ' + detachReason);
+  }
+
+  _detachCleanup() {
+    this._tabId = null;
+    this.url = null;
+    chrome.debugger.onEvent.removeListener(this._onEvent);
+    chrome.debugger.onDetach.removeListener(this._onUnexpectedDetach);
+    this._eventEmitter.removeAllListeners();
+    this._eventEmitter = null;
   }
 
   connect() {
-    if (this._debuggerConnected) {
+    if (this._tabId !== null) {
       return Promise.resolve();
     }
 
     return this.queryCurrentTab_()
       .then(tabId => {
         this._tabId = tabId;
-        this.beginLogging();
-        return this.attachDebugger_(tabId)
-            .then(_ => this.enableRuntimeEvents());
-      });
+        chrome.debugger.onEvent.addListener(this._onEvent);
+        chrome.debugger.onDetach.addListener(this._onUnexpectedDetach);
+
+        return new Promise((resolve, reject) => {
+          chrome.debugger.attach({tabId}, '1.1', _ => {
+            if (chrome.runtime.lastError) {
+              return reject(chrome.runtime.lastError);
+            }
+            resolve(tabId);
+          });
+        });
+      }).then(_ => this.enableRuntimeEvents());
   }
 
   disconnect() {
@@ -51,12 +81,15 @@ class ExtensionDriver extends Driver {
       return Promise.resolve();
     }
 
-    return this.detachDebugger_(this._tabId)
-        .then(_ => {
-          this._tabId = null;
-          this.url = null;
-          this._debuggerConnected = false;
-        });
+    const tabId = this._tabId;
+    return new Promise((resolve, reject) => {
+      chrome.debugger.detach({tabId}, _ => {
+        if (chrome.runtime.lastError) {
+          return reject(chrome.runtime.lastError);
+        }
+        resolve();
+      });
+    }).then(_ => this._detachCleanup());
   }
 
   reloadForCleanStateIfNeeded(options) {
@@ -68,60 +101,6 @@ class ExtensionDriver extends Driver {
     });
   }
 
-  beginLogging() {
-    // log events received
-    chrome.debugger.onEvent.addListener((source, method, params) =>
-     log.log('<=', method, params)
-    );
-  }
-
-  /**
-   * Bind listeners for protocol events
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  on(eventName, cb) {
-    if (typeof this._listeners[eventName] === 'undefined') {
-      this._listeners[eventName] = [];
-    }
-    // log event listeners being bound
-    log.log('listen for event =>', eventName);
-    this._listeners[eventName].push(cb);
-  }
-
-  /**
-   * Bind a one-time listener for protocol events. Listener is removed once it
-   * has been called.
-   * @param {!string} eventName
-   * @param {function(...)} cb
-   */
-  once(eventName, cb) {
-    // Create a replacement listener that will immediately remove itself after calling cb once.
-    const cbGuard = function() {
-      cb(...arguments);
-      this.off(eventName, cbGuard);
-    }.bind(this);
-
-    this.on(eventName, cbGuard);
-  }
-
-  _onEvent(source, method, params) {
-    if (this._listeners[method] === undefined) {
-      return;
-    }
-
-    // Copy array of listeners so all listeners are called, even if some removed
-    // during loop over listeners. Consistent with node's removeListener behavior:
-    // https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
-    const listenersCopy = Array.from(this._listeners[method]);
-    listenersCopy.forEach(cb => {
-      // despite best efforts, this still sometimes loses the context of the instance,
-      // which means sendCommand will not have this._tabId. Luckily, it doesn't need it
-      // for trace-based commands like IO.read.
-      cb.call(this, params);
-    });
-  }
-
   /**
    * Call protocol methods
    * @param {!string} command
@@ -130,22 +109,22 @@ class ExtensionDriver extends Driver {
    */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      log.log('method => browser', command, params);
+      this.formattedLog('method => browser', {method: command, params: params});
       if (!this._tabId) {
         log.error('No tabId set for sendCommand');
       }
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
-          log.error('method <= browser', command, result);
+          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(chrome.runtime.lastError);
         }
 
         if (result.wasThrown) {
-          log.log('error', 'method <= browser', command, result);
+          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result.exceptionDetails);
         }
 
-        log.log('method <= browser OK', command, result);
+        this.formattedLog('method <= browser OK', {method: command, params: result});
         resolve(result);
       });
     });
@@ -175,51 +154,6 @@ class ExtensionDriver extends Driver {
     }
 
     return Promise.resolve(this.url);
-  }
-
-  attachDebugger_(tabId) {
-    return new Promise((resolve, reject) => {
-      chrome.debugger.attach({tabId}, '1.1', _ => {
-        if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError);
-        }
-        this._debuggerConnected = true;
-        resolve(tabId);
-      });
-    });
-  }
-
-  detachDebugger_(tabId) {
-    return new Promise((resolve, reject) => {
-      chrome.debugger.detach({tabId}, _ => {
-        if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError);
-        }
-
-        resolve(tabId);
-      });
-    });
-  }
-
-  handleUnexpectedDetach() {
-    chrome.debugger.onDetach.addListener((debuggee, detachReason) => {
-      this._debuggerConnected = false;
-      throw new Error('Lighthouse detached from browser: ' + detachReason);
-    });
-  }
-
-  off(eventName, cb) {
-    if (typeof this._listeners[eventName] === 'undefined') {
-      console.warn(`Unable to remove listener ${eventName}; no such listener found.`);
-      return;
-    }
-
-    const callbackIndex = this._listeners[eventName].indexOf(cb);
-    if (callbackIndex === -1) {
-      return;
-    }
-
-    this._listeners[eventName].splice(callbackIndex, 1);
   }
 }
 
