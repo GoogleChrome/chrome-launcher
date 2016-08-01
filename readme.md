@@ -71,28 +71,32 @@ Lighthouse can be used to analyze trace and performance data collected from othe
 ##### `config.json`
 ```js
 {
- "audits": [
-  "user-timings",
-  "critical-request-chains"
- ],
+  "audits": [
+    "user-timings",
+    "critical-request-chains"
+  ],
 
- "artifacts": {
-   "traceContents": "$HOME/code/lighthouse-core/test/fixtures/traces/trace-user-timings.json",
-   "performanceLog": "$HOME/code/lighthouse-core/test/fixtures/traces/perflog.json"
- },
+  "artifacts": {
+    "traces": {
+      "defaultPass": {
+        "traceContents": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/trace-user-timings.json"
+      }
+    },
+    "performanceLog": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/perflog.json"
+  },
 
- "aggregations": [{
-   "name": "Performance Metrics",
-   "description": "These encapsulate your app's performance.",
-   "scored": false,
-   "categorizable": false,
-   "items": [{
-     "criteria": {
-       "user-timings": { "rawValue": 0, "weight": 1 },
-       "critical-request-chains": { "rawValue": 0, "weight": 1}
-     }
-   }]
- }]
+  "aggregations": [{
+    "name": "Performance Metrics",
+    "description": "These encapsulate your app's performance.",
+    "scored": false,
+    "categorizable": false,
+    "items": [{
+      "criteria": {
+        "user-timings": { "rawValue": 0, "weight": 1 },
+        "critical-request-chains": { "rawValue": 0, "weight": 1}
+      }
+    }]
+  }]
 }
 ```
 
