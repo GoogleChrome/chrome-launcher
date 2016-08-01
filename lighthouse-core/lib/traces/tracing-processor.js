@@ -36,6 +36,7 @@ Object.keys(glMatrixModule).forEach(exportName => {
 });
 // from catapult/tracing/tracing/extras/importer/jszip.html
 global.JSZip = require('jszip/dist/jszip.min.js');
+global.mannwhitneyu = {};
 
 global.HTMLImportsLoader = {};
 global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
@@ -44,6 +45,9 @@ global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
   }
   if (path === '/jszip.min.js') {
     return 'jszip/dist/jszip.min.js';
+  }
+  if (path === '/mannwhitneyu.js') {
+    return '../../../lib/empty-stub.js';
   }
 };
 
