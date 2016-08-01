@@ -6,5 +6,5 @@ found in the LICENSE file.
 
 require("./importer/import.js");
 require("./model/model.js");
-require("./extras/full_config.js");
+require("./extras/lean_config.js");
 require("./metrics/all_metrics.js");
