@@ -114,7 +114,8 @@ gulp.task('browserify', () => {
         bundle.transform('./dtm-transform.js', {
           global: true
         })
-        .ignore('chrome-remote-interface');
+        .ignore('chrome-remote-interface')
+        .ignore('source-map');
 
         // Expose the audits and gatherers so they can be dynamically loaded.
         const corePath = '../lighthouse-core/';
