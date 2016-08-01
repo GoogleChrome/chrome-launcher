@@ -17,7 +17,12 @@
 
 'use strict';
 
-const semver = require('semver');
+const environment = require('../lighthouse-core/lib/environment');
+if (!environment.checkNodeCompatibility()) {
+  console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
+  process.exit(1);
+}
+
 const Runner = require('./runner');
 const log = require('./lib/log.js');
 const ChromeProtocol = require('./gather/drivers/cri.js');
@@ -38,16 +43,13 @@ const Config = require('./config');
  *
  */
 
-// node 5.x required due to use of ES2015 features, like spread operator
-if (semver.lt(process.version, '5.0.0')) {
-  log.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
-}
-
 module.exports = function(url, flags, configJSON) {
   return new Promise((resolve, reject) => {
     if (!url) {
       return reject(new Error('Lighthouse requires a URL'));
     }
+
+    flags = flags || {};
 
     // set logging preferences, assume quiet
     flags.logLevel = flags.logLevel || 'error';
@@ -58,8 +60,6 @@ module.exports = function(url, flags, configJSON) {
       log.warn('Lighthouse', 'The URL provided should be on HTTPS');
       log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
     }
-
-    flags = flags || {};
 
     // Use ConfigParser to generate a valid config file
     const config = new Config(configJSON, flags.auditWhitelist);

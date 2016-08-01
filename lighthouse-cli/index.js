@@ -18,16 +18,16 @@
 
 'use strict';
 
+const environment = require('../lighthouse-core/lib/environment.js');
+if (!environment.checkNodeCompatibility()) {
+  console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
+  process.exit(1);
+}
+
 const yargs = require('yargs');
-const semver = require('semver');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 const log = require('../lighthouse-core/lib/log');
-
-// node 5.x required due to use of ES2015 features, like spread operator
-if (semver.lt(process.version, '5.0.0')) {
-  console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
-}
 
 const cli = yargs
   .help('help')
