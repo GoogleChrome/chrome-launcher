@@ -31,7 +31,7 @@ const log = require('../lighthouse-core/lib/log');
 
 const cli = yargs
   .help('help')
-  .version()
+  .version(() => require('../package').version)
   .showHelpOnFail(false, 'Specify --help for available options')
 
   .usage('$0 url')
@@ -85,8 +85,7 @@ Example: --output-path=./lighthouse-results.html`
     'list-trace-categories',
     'verbose',
     'quiet',
-    'help',
-    'version'
+    'help'
   ])
 
   .choices('output', Object.values(Printer.OUTPUT_MODE))
