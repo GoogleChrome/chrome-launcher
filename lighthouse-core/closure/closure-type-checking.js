@@ -51,7 +51,7 @@ gulp.task('js-compile', function() {
       checks_only: true,
       language_in: 'ECMASCRIPT6_STRICT',
       language_out: 'ECMASCRIPT5_STRICT',
-      warning_level: 'VERBOSE',
+      warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
       jscomp_error: [
         'checkTypes',
         'conformanceViolations'
