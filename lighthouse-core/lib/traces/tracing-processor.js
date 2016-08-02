@@ -169,7 +169,7 @@ class TraceProcessor {
       // Loop over durations, calculating a CDF value for each until it is above
       // the target percentile.
       const percentileTime = percentile * totalTime;
-      while (cdfTime < percentileTime && durationIndex < durations.length) {
+      while (cdfTime < percentileTime && durationIndex < durations.length - 1) {
         completedTime += duration;
         remainingCount -= (duration < 0 ? -1 : 1);
 
