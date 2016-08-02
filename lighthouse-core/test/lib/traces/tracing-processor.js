@@ -140,5 +140,17 @@ describe('TracingProcessor lib', () => {
           [16, 16, 16, 31, 46, 55, 56]);
       assert.deepEqual(results, expected);
     });
+
+    it('does not divide by zero when duration sum is less than whole', () => {
+      // Durations chosen such that, due to floating point error:
+      //   const idleTime = totalTime - (duration1 + duration2);
+      //   (idleTime + duration1 + duration2) < totalTime
+      const duration1 = 67 / 107;
+      const duration2 = 67 / 53;
+      const totalTime = 10;
+      const results = TracingProcessor._riskPercentiles([duration1, duration2], totalTime, [1], 0);
+      const expected = createRiskPercentiles([1], [16 + duration2]);
+      assert.deepEqual(results, expected);
+    });
   });
 });
