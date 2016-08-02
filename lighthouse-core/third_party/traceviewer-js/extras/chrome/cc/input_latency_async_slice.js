@@ -4,9 +4,9 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../../../model/helpers/chrome_model_helper.js");
 require("../../../model/async_slice.js");
 require("../../../model/event_set.js");
+require("../../../model/helpers/chrome_model_helper.js");
 
 'use strict';
 
@@ -121,17 +121,17 @@ global.tr.exportTo('tr.e.cc', function() {
 
     determineLegacyTypeName_: function() {
       // Iterate over all descendent subSlices.
-      this.iterateAllDescendents(function(subSlice) {
+      for (var subSlice of this.enumerateAllDescendents()) {
 
         // If |subSlice| is not an InputLatencyAsyncSlice, then ignore it.
         var subSliceIsAInputLatencyAsyncSlice = (
             subSlice instanceof InputLatencyAsyncSlice);
         if (!subSliceIsAInputLatencyAsyncSlice)
-          return;
+          continue;
 
         // If |subSlice| does not have a typeName, then ignore it.
         if (!subSlice.typeName)
-          return;
+          continue;
 
         // If |this| already has a typeName and |subSlice| has a different
         // typeName, then explode!
@@ -147,7 +147,7 @@ global.tr.exportTo('tr.e.cc', function() {
         // The typeName of |this| top-level event is whatever the typeName of
         // |subSlice| is. Set |this.typeName_| to the subSlice's typeName.
         this.typeName_ = subSlice.typeName_;
-      }, this);
+      }
 
       // If typeName could not be determined, then explode!
       if (!this.typeName_)

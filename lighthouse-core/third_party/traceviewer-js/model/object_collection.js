@@ -38,25 +38,11 @@ global.tr.exportTo('tr.model', function() {
   ObjectCollection.prototype = {
     __proto__: tr.model.EventContainer.prototype,
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
-    },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      var bI = !!eventTypePredicate.call(opt_this, ObjectInstance);
-      var bS = !!eventTypePredicate.call(opt_this, ObjectSnapshot);
-      if (bI === false && bS === false)
-        return;
-      this.iterObjectInstances(function(instance) {
-        if (bI)
-          callback.call(opt_this, instance);
-        if (bS)
-          instance.snapshots.forEach(callback, opt_this);
-      }, opt_this);
+    childEvents: function*() {
+      for (var instance of this.getAllObjectInstances()) {
+        yield instance;
+        yield * instance.snapshots;
+      }
     },
 
     createObjectInstance_: function(

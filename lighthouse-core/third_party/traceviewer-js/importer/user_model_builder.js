@@ -10,6 +10,7 @@ require("../core/auditor.js");
 require("../extras/chrome/cc/input_latency_async_slice.js");
 require("./find_input_expectations.js");
 require("./find_load_expectations.js");
+require("./find_startup_expectations.js");
 require("../model/event_info.js");
 require("../model/ir_coverage.js");
 require("../model/user_model/idle_expectation.js");
@@ -55,6 +56,8 @@ global.tr.exportTo('tr.importer', function() {
 
     findUserExpectations: function() {
       var expectations = [];
+      expectations.push.apply(expectations, tr.importer.findStartupExpectations(
+          this.modelHelper));
       expectations.push.apply(expectations, tr.importer.findLoadExpectations(
           this.modelHelper));
       expectations.push.apply(expectations, tr.importer.findInputExpectations(
@@ -71,8 +74,9 @@ global.tr.exportTo('tr.importer', function() {
     collectUnassociatedEvents_: function(rirs) {
       var vacuumIRs = [];
       rirs.forEach(function(ir) {
-        if (ir instanceof tr.model.um.LoadExpectation ||
-            ir instanceof tr.model.um.IdleExpectation)
+        if (ir instanceof tr.model.um.IdleExpectation ||
+            ir instanceof tr.model.um.LoadExpectation ||
+            ir instanceof tr.model.um.StartupExpectation)
           vacuumIRs.push(ir);
       });
       if (vacuumIRs.length === 0)

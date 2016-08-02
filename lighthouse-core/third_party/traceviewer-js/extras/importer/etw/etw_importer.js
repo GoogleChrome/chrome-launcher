@@ -437,7 +437,7 @@ global.tr.exportTo('tr.e.importer.etw', function() {
       if (!handler(header, decoder)) {
         this.model_.importWarning({
           type: 'parse_error',
-          message: 'Malformed ' + header.guid + ' event (' + text + ')'
+          message: 'Malformed ' + header.guid + ' event (' + event.payload + ')'
         });
         return false;
       }

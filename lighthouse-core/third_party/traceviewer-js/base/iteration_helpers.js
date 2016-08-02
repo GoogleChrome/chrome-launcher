@@ -9,11 +9,53 @@ require("./base.js");
 'use strict';
 
 global.tr.exportTo('tr.b', function() {
-  function asArray(arrayish) {
+
+  /**
+   * Converts any object which is either (a) an iterable, or (b) an
+   * "array-ish" object (has length property and can be indexed into)
+   * into an array.
+   */
+  function asArray(x) {
     var values = [];
-    for (var i = 0; i < arrayish.length; i++)
-      values.push(arrayish[i]);
+    if (x[Symbol.iterator])
+      for (var value of x)
+        values.push(value);
+    else
+      for (var i = 0; i < x.length; i++)
+        values.push(x[i]);
     return values;
+  }
+
+  /**
+   * Returns the only element in the iterable. If the iterable is empty or has
+   * more than one element, an error is thrown.
+   */
+  function getOnlyElement(iterable) {
+    var iterator = iterable[Symbol.iterator]();
+
+    var firstIteration = iterator.next();
+    if (firstIteration.done)
+      throw new Error('getOnlyElement was passed an empty iterable.');
+
+    var secondIteration = iterator.next();
+    if (!secondIteration.done)
+      throw new Error(
+          'getOnlyElement was passed an iterable with multiple elements.');
+
+    return firstIteration.value;
+  }
+
+  /**
+   * Returns the first element in the iterable. If the iterable is empty, an
+   * error is thrown.
+   */
+  function getFirstElement(iterable) {
+    var iterator = iterable[Symbol.iterator]();
+    var result = iterator.next();
+    if (result.done)
+      throw new Error('getFirstElement was passed an empty iterable.');
+
+    return result.value;
   }
 
   function compareArrays(x, y, elementCmp) {
@@ -118,23 +160,33 @@ global.tr.exportTo('tr.b', function() {
   }
 
   /**
+   * Returns true if all the elements of the iterable pass the predicate.
+   */
+  function every(iterable, predicate) {
+    for (var x of iterable)
+      if (!predicate(x))
+        return false;
+    return true;
+  }
+
+  /**
    * Returns a new dictionary with items grouped by the return value of the
    * specified function being called on each item.
-   * @param {!Array.<Object>} ary The array being iterated through
-   * @param {!Function} fn The mapping function between the array value and the
-   * map key.
+   * @param {!Array.<!*>} ary The array being iterated through
+   * @param {!function(!*):!*} callback The mapping function between the array
+   * value and the map key.
+   * @param {*=} opt_this
    */
-  function group(ary, fn) {
-    return ary.reduce(function(accumulator, curr) {
-      var key = fn(curr);
-
-      if (key in accumulator)
-        accumulator[key].push(curr);
+  function group(ary, callback, opt_this) {
+    var results = {};
+    for (var element of ary) {
+      var key = callback.call(opt_this, element);
+      if (key in results)
+        results[key].push(element);
       else
-        accumulator[key] = [curr];
-
-      return accumulator;
-    }, {});
+        results[key] = [element];
+    }
+    return results;
   }
 
   function iterItems(dict, fn, opt_this) {
@@ -373,6 +425,9 @@ global.tr.exportTo('tr.b', function() {
     dictionaryKeys: dictionaryKeys,
     dictionaryValues: dictionaryValues,
     dictionaryContainsValue: dictionaryContainsValue,
+    every: every,
+    getOnlyElement: getOnlyElement,
+    getFirstElement: getFirstElement,
     group: group,
     iterItems: iterItems,
     mapItems: mapItems,

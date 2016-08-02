@@ -28,7 +28,7 @@ global.tr.exportTo('tr.metrics.sh', function() {
         return;
 
       if (!opt_range ||
-          opt_range.intersectsExplicitRangeExclusive(ir.start, ir.end))
+          opt_range.intersectsExplicitRangeInclusive(ir.start, ir.end))
         filteredExpectations.push(ir);
     });
     return filteredExpectations;

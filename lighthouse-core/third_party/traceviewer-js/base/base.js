@@ -95,14 +95,14 @@ global.tr = (function() {
     panicElement = document.createElement('div');
     panicElement.style.webkitFlex = '1 1 auto';
     panicElement.style.overflow = 'auto';
-    panicOverlay.appendChild(panicElement);
+    Polymer.dom(panicOverlay).appendChild(panicElement);
 
     if (!document.body) {
       setTimeout(function() {
-        document.body.appendChild(panicOverlay);
+        Polymer.dom(document.body).appendChild(panicOverlay);
       }, 150);
     } else {
-      document.body.appendChild(panicOverlay);
+      Polymer.dom(document.body).appendChild(panicOverlay);
     }
   }
 
@@ -118,12 +118,14 @@ global.tr = (function() {
 
     showPanicElementIfNeeded();
     var panicMessageEl = document.createElement('div');
-    panicMessageEl.innerHTML =
+    Polymer.dom(panicMessageEl).innerHTML =
         '<h2 id="message"></h2>' +
         '<pre id="details"></pre>';
-    panicMessageEl.querySelector('#message').textContent = panicTitle;
-    panicMessageEl.querySelector('#details').textContent = panicDetails;
-    panicElement.appendChild(panicMessageEl);
+    Polymer.dom(Polymer.dom(panicMessageEl).querySelector('#message')).
+        textContent = panicTitle;
+    Polymer.dom(Polymer.dom(panicMessageEl).querySelector('#details')).
+        textContent = panicDetails;
+    Polymer.dom(panicElement).appendChild(panicMessageEl);
 
     rawPanicMessages.push({
       title: panicTitle,

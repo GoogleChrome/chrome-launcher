@@ -90,18 +90,6 @@ global.tr.exportTo('tr.e.chrome', function() {
       'RenderLayer::updateLayerPositionsAfterLayout'
     ],
 
-    script: [
-      'EvaluateScript',
-      'FunctionCall',
-      'ScheduledAction::execute',
-      'Script',
-      'V8.Execute',
-      'v8.run',
-      'v8.callModuleMethod',
-      'v8.callFunction',
-      'WindowProxy::initialize'
-    ],
-
     style: [
       'CSSParserImpl::parseStyleSheet.parse',
       'CSSParserImpl::parseStyleSheet.tokenize',
@@ -116,27 +104,13 @@ global.tr.exportTo('tr.e.chrome', function() {
     ],
 
     script_parse_and_compile: [
-      'V8.RecompileSynchronous',
-      'V8.RecompileConcurrent',
-      'V8.PreParseMicroSeconds',
       'v8.parseOnBackground',
-      'V8.ParseMicroSeconds',
-      'V8.ParseLazyMicroSeconds',
-      'V8.CompileScriptMicroSeconds',
-      'V8.CompileMicroSeconds',
-      'V8.CompileFullCode',
-      'V8.CompileEvalMicroSeconds',
-      'v8.compile'
+      'V8.ScriptCompiler'
     ],
 
-    script_parse: [
-      'V8Test.ParseScript',
-      'V8Test.ParseFunction',
-    ],
-
-    script_compile: [
-      'V8Test.Compile',
-      'V8Test.CompileFullCode',
+    script_execute: [
+      'V8.Execute',
+      'WindowProxy::initialize'
     ],
 
     resource_loading: [
@@ -153,16 +127,21 @@ global.tr.exportTo('tr.e.chrome', function() {
       'ThreadState::completeSweep' // blink_gc
     ],
 
+    // TODO(fmeawad): https://github.com/catapult-project/catapult/issues/2572
+    v8_runtime: [
+      // Dynamically populated.
+    ],
+
     [SAME_AS_PARENT]: [
       'SyncChannel::Send'
     ]
   };
 
-  var USER_FRIENDLY_CATEGORY_FOR_TITLE = {};
+  var USER_FRIENDLY_CATEGORY_FOR_TITLE = new Map();
 
   for (var category in TITLES_FOR_USER_FRIENDLY_CATEGORY) {
     TITLES_FOR_USER_FRIENDLY_CATEGORY[category].forEach(function(title) {
-      USER_FRIENDLY_CATEGORY_FOR_TITLE[title] = category;
+      USER_FRIENDLY_CATEGORY_FOR_TITLE.set(title, category);
     });
   }
 
@@ -177,7 +156,8 @@ global.tr.exportTo('tr.e.chrome', function() {
   }
 
   ChromeUserFriendlyCategoryDriver.fromEvent = function(event) {
-    var userFriendlyCategory = USER_FRIENDLY_CATEGORY_FOR_TITLE[event.title];
+    var userFriendlyCategory =
+        USER_FRIENDLY_CATEGORY_FOR_TITLE.get(event.title);
     if (userFriendlyCategory) {
       if (userFriendlyCategory == SAME_AS_PARENT) {
         if (event.parentSlice)
@@ -196,8 +176,19 @@ global.tr.exportTo('tr.e.chrome', function() {
         return userFriendlyCategory;
     }
 
-    return undefined;
+    return 'other';
   };
+
+  ChromeUserFriendlyCategoryDriver.ALL_TITLES = ['other'];
+  for (var category in TITLES_FOR_USER_FRIENDLY_CATEGORY) {
+    if (category === SAME_AS_PARENT)
+      continue;
+    ChromeUserFriendlyCategoryDriver.ALL_TITLES.push(category);
+  }
+  for (var category in USER_FRIENDLY_CATEGORY_FOR_EVENT_CATEGORY) {
+    ChromeUserFriendlyCategoryDriver.ALL_TITLES.push(category);
+  }
+
 
   return {
     ChromeUserFriendlyCategoryDriver: ChromeUserFriendlyCategoryDriver

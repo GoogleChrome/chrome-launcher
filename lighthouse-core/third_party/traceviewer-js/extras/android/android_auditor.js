@@ -44,11 +44,7 @@ global.tr.exportTo('tr.e.audits', function() {
   }
 
   function frameIsActivityStart(frame) {
-    for (var i = 0; i < frame.associatedEvents.length; i++) {
-      if (frame.associatedEvents[i].title == 'activityStart')
-        return true;
-    }
-    return false;
+    return frame.associatedEvents.any(x => x.title === 'activityStart');
   }
 
   function frameMissedDeadline(frame) {
@@ -220,7 +216,7 @@ global.tr.exportTo('tr.e.audits', function() {
       'ListView recycling taking too much time per frame. Ensure your Adapter#getView() binds data efficiently.'); // @suppress longLineCheck
   AndroidAuditor.getListViewAlert_ = function(frame) {
     var events = frame.associatedEvents.filter(function(event) {
-      return event.title == 'obtainView' || event.title == 'setupListItem';
+      return event.title === 'obtainView' || event.title === 'setupListItem';
     });
     var duration = Statistics.sum(events, getCpuDuration);
 
@@ -257,7 +253,7 @@ global.tr.exportTo('tr.e.audits', function() {
           .build());
   AndroidAuditor.getMeasureLayoutAlert_ = function(frame) {
     var events = frame.associatedEvents.filter(function(event) {
-      return event.title == 'measure' || event.title == 'layout';
+      return event.title === 'measure' || event.title === 'layout';
     });
     var duration = Statistics.sum(events, getCpuDuration);
 
@@ -280,10 +276,10 @@ global.tr.exportTo('tr.e.audits', function() {
           .build());
   AndroidAuditor.getViewDrawAlert_ = function(frame) {
     var slice = undefined;
-    for (var i = 0; i < frame.associatedEvents.length; i++) {
-      if (frame.associatedEvents[i].title == 'getDisplayList' ||
-          frame.associatedEvents[i].title == 'Record View#draw()') {
-        slice = frame.associatedEvents[i];
+    for (var event of frame.associatedEvents) {
+      if (event.title === 'getDisplayList' ||
+          event.title === 'Record View#draw()') {
+        slice = event;
         break;
       }
     }
@@ -565,18 +561,18 @@ global.tr.exportTo('tr.e.audits', function() {
   Auditor.register(AndroidAuditor);
 
   function AppAnnotator() {
-    this.titleInfoLookup = {};
-    this.titleParentLookup = {};
+    this.titleInfoLookup = new Map();
+    this.titleParentLookup = new Map();
     this.build_();
   }
 
   AppAnnotator.prototype = {
     build_: function() {
       var registerEventInfo = function(dict) {
-        this.titleInfoLookup[dict.title] = new EventInfo(
-            dict.title, dict.description, dict.docLinks);
+        this.titleInfoLookup.set(dict.title, new EventInfo(
+            dict.title, dict.description, dict.docLinks));
         if (dict.parents)
-          this.titleParentLookup[dict.title] = dict.parents;
+          this.titleParentLookup.set(dict.title, dict.parents);
       }.bind(this);
 
       registerEventInfo({
@@ -718,23 +714,22 @@ global.tr.exportTo('tr.e.audits', function() {
         if (!expectedParentNames)
           return true;
         return expectedParentNames.some(function(name) {
-          return name in parentNames;
+          return parentNames.has(name);
         });
       };
 
-
       // Set EventInfo on the slice if it matches title, and parent.
-      if (slice.title in this.titleInfoLookup) {
-        if (checkExpectedParentNames(this.titleParentLookup[slice.title]))
-          slice.info = this.titleInfoLookup[slice.title];
+      if (this.titleInfoLookup.has(slice.title)) {
+        if (checkExpectedParentNames(this.titleParentLookup.get(slice.title)))
+          slice.info = this.titleInfoLookup.get(slice.title);
       }
 
       // Push slice into parentNames, and recurse over subSlices.
       if (slice.subSlices.length > 0) {
         // Increment title in parentName dict.
-        if (!(slice.title in parentNames))
-          parentNames[slice.title] = 0;
-        parentNames[slice.title]++;
+        if (!parentNames.has(slice.title))
+          parentNames.set(slice.title, 0);
+        parentNames.set(slice.title, parentNames.get(slice.title) + 1);
 
         // Recurse over subSlices.
         slice.subSlices.forEach(function(subSlice) {
@@ -742,15 +737,15 @@ global.tr.exportTo('tr.e.audits', function() {
         }, this);
 
         // Decrement title in parentName dict.
-        parentNames[slice.title]--;
-        if (parentNames[slice.title] == 0)
+        parentNames.set(slice.title, parentNames.get(slice.title) - 1);
+        if (parentNames.get(slice.title) == 0)
           delete parentNames[slice.title];
       }
     },
 
     applyEventInfos: function(sliceGroup) {
       sliceGroup.topLevelSlices.forEach(function(slice) {
-        this.applyEventInfosRecursive_({}, slice);
+        this.applyEventInfosRecursive_(new Map(), slice);
       }, this);
     }
   };

@@ -50,20 +50,10 @@ global.tr.exportTo('tr.model', function() {
       throw new Error('Not implemented');
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
-      for (var tid in this.threads)
-        callback.call(opt_this, this.threads[tid]);
-      for (var id in this.counters)
-        callback.call(opt_this, this.counters[id]);
-      callback.call(opt_this, this.objects);
-    },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
+    childEventContainers: function*() {
+      yield * tr.b.dictionaryValues(this.threads);
+      yield * tr.b.dictionaryValues(this.counters);
+      yield this.objects;
     },
 
     iterateAllPersistableObjects: function(cb) {
@@ -88,9 +78,8 @@ global.tr.exportTo('tr.model', function() {
      * specified.
      */
     shiftTimestampsForward: function(amount) {
-      this.iterateAllChildEventContainers(function(child) {
+      for (var child of this.childEventContainers())
         child.shiftTimestampsForward(amount);
-      });
     },
 
     /**

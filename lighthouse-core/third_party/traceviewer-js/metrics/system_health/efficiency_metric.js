@@ -19,17 +19,12 @@ global.tr.exportTo('tr.metrics.sh', function() {
 
   var DESCRIPTION = 'Normalized CPU budget consumption';
 
-  function EfficiencyMetric(valueList, model) {
+  function efficiencyMetric(values, model) {
     var scores = [];
 
     model.userModel.expectations.forEach(function(ue) {
       var options = {};
       options.description = DESCRIPTION;
-
-      var groupingKeys = {};
-      groupingKeys.userExpectationStableId = ue.stableId;
-      groupingKeys.userExpectationStageTitle = ue.stageTitle;
-      groupingKeys.userExpectationInitiatorTitle = ue.initiatorTitle;
 
       var score = undefined;
 
@@ -54,10 +49,8 @@ global.tr.exportTo('tr.metrics.sh', function() {
 
       scores.push(score);
 
-      valueList.addValue(new tr.v.NumericValue(
-          model.canonicalUrl, 'efficiency',
-          new tr.v.ScalarNumeric(UNIT, score),
-          options, groupingKeys));
+      values.addValue(new tr.v.NumericValue(
+          'efficiency', new tr.v.ScalarNumeric(UNIT, score), options));
     });
 
     // Manually reduce scores.
@@ -65,25 +58,18 @@ global.tr.exportTo('tr.metrics.sh', function() {
 
     var options = {};
     options.description = DESCRIPTION;
-    var groupingKeys = {};
     var overallScore = tr.b.Statistics.weightedMean(
         scores, tr.metrics.sh.perceptualBlend);
     if (overallScore === undefined)
       return;
 
-    valueList.addValue(new tr.v.NumericValue(
-        model.canonicalUrl, 'efficiency',
-        new tr.v.ScalarNumeric(UNIT, overallScore),
-        options, groupingKeys));
+    values.addValue(new tr.v.NumericValue(
+        'efficiency', new tr.v.ScalarNumeric(UNIT, overallScore), options));
   }
 
-  EfficiencyMetric.prototype = {
-    __proto__: Function.prototype
-  };
-
-  tr.metrics.MetricRegistry.register(EfficiencyMetric);
+  tr.metrics.MetricRegistry.register(efficiencyMetric);
 
   return {
-    EfficiencyMetric: EfficiencyMetric
+    efficiencyMetric: efficiencyMetric
   };
 });

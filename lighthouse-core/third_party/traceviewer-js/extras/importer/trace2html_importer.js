@@ -4,9 +4,9 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../../base/base64.js");
 require("../../importer/importer.js");
 require("../../importer/simple_line_reader.js");
-require("../../base/base64.js");
 require("../../model/model.js");
 
 'use strict';
@@ -34,7 +34,7 @@ global.tr.exportTo('tr.e.importer', function() {
 
       r.beginSavingLines();
       if (!r.advanceToLineMatching(/^<\/\s*script>$/))
-        return failure;
+        return;
 
       var raw_events = r.endSavingLinesAndGetResult();
 

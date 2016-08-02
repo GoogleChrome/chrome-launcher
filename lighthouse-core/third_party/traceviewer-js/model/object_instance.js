@@ -5,10 +5,10 @@ found in the LICENSE file.
 **/
 
 require("../base/extension_registry.js");
-require("./event.js");
-require("./object_snapshot.js");
 require("../base/range.js");
 require("../base/sorted_array_utils.js");
+require("./event.js");
+require("./object_snapshot.js");
 
 'use strict';
 
@@ -116,6 +116,15 @@ global.tr.exportTo('tr.model', function() {
     initialize: function() {
       for (var i = 0; i < this.snapshots.length; i++)
         this.snapshots[i].initialize();
+    },
+
+    isAliveAt: function(ts) {
+      if (ts < this.creationTs && this.creationTsWasExplicit)
+        return false;
+      if (ts > this.deletionTs)
+        return false;
+
+      return true;
     },
 
     getSnapshotAt: function(ts) {

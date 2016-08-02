@@ -7,27 +7,25 @@ found in the LICENSE file.
 require("../base/guid.js");
 require("../base/iteration_helpers.js");
 require("../base/utils.js");
+require("./diagnostics/diagnostic_map.js");
 
 'use strict';
 
 global.tr.exportTo('tr.v', function() {
-  function Value(canonicalUrl, name, opt_options, opt_groupingKeys,
-                 opt_diagnostics) {
+  /** @constructor */
+  function Value(name, opt_options) {
     if (typeof(name) !== 'string')
-      throw new Error('Expected value_name grouping key to be provided');
+      throw new Error('name must be a string');
 
-    // Allow callers to re-use groupingKeys dictionaries.
-    this.groupingKeys = {name: name};
-    if (opt_groupingKeys) {
-      for (var keyName in opt_groupingKeys) {
-        this.addGroupingKey(keyName, opt_groupingKeys[keyName]);
-      }
-    }
+    this.name_ = name;
 
-    this.diagnostics = opt_diagnostics || {};
+    // If this Value is being deserialized, then its guid will be set by
+    // fromDict().
+    // If this Value is being computed by a metric, then its guid will be
+    // allocated the first time the guid is gotten by asDict().
+    this.guid_ = undefined;
 
-    // May be undefined
-    this.diagnostics.canonical_url = canonicalUrl;
+    this.diagnostics = new tr.v.d.DiagnosticMap();
 
     var options = opt_options || {};
     this.description = options.description;
@@ -36,38 +34,50 @@ global.tr.exportTo('tr.v', function() {
   }
 
   Value.fromDict = function(d) {
-    if (d.type === 'numeric')
-      return NumericValue.fromDict(d);
+    var value = undefined;
+    switch (d.type) {
+      case 'numeric':
+        value = NumericValue.fromDict(d);
+        break;
 
-    if (d.type === 'dict')
-      return DictValue.fromDict(d);
+      case 'dict':
+        value = DictValue.fromDict(d);
+        break;
 
-    if (d.type == 'failure')
-      return FailureValue.fromDict(d);
+      case 'failure':
+        value = FailureValue.fromDict(d);
+        break;
 
-    if (d.type === 'skip')
-      return SkipValue.fromDict(d);
+      case 'skip':
+        value = SkipValue.fromDict(d);
+        break;
 
-    throw new Error('Not implemented');
+      default:
+        throw new Error('Not implemented');
+    }
+
+    value.guid = d.guid;
+    value.diagnostics.addDicts(d.diagnostics);
+    return value;
   };
 
   Value.prototype = {
+    get guid() {
+      if (this.guid_ === undefined)
+        this.guid_ = tr.b.GUID.allocateUUID4();
+
+      return this.guid_;
+    },
+
+    set guid(guid) {
+      if (this.guid_ !== undefined)
+        throw new Error('Cannot reset guid');
+
+      this.guid_ = guid;
+    },
+
     get name() {
-      return this.groupingKeys.name;
-    },
-
-    get canonicalUrl() {
-      return this.diagnostics.canonical_url;
-    },
-
-    addGroupingKey: function(keyName, key) {
-      if (keyName === 'name')
-        throw new Error('Invalid groupingKey name "name"');
-
-      if (this.groupingKeys.hasOwnProperty(keyName))
-        throw new Error('Tried to redefine grouping key ' + keyName);
-
-      this.groupingKeys[keyName] = key;
+      return this.name_;
     },
 
     asDict: function() {
@@ -76,30 +86,30 @@ global.tr.exportTo('tr.v', function() {
 
     asJSON: function() {
       var d = {
-        grouping_keys: tr.b.cloneDictionary(this.groupingKeys),
+        guid: this.guid,
+        name: this.name_,
         description: this.description,
         important: this.important,
-        diagnostics: this.diagnostics
+        diagnostics: this.diagnostics.asDict()
       };
 
-      this._asDictInto(d);
+      this.asDictInto_(d);
       if (d.type === undefined)
-        throw new Error('_asDictInto must set type field');
+        throw new Error('asDictInto_ must set type field');
       return d;
     },
 
-    _asDictInto: function(d) {
+    asDictInto_: function(d) {
       throw new Error('Not implemented');
     }
   };
 
-  function NumericValue(canonicalUrl, name, numeric, opt_options,
-                        opt_groupingKeys, opt_diagnostics) {
+  /** @constructor */
+  function NumericValue(name, numeric, opt_options) {
     if (!(numeric instanceof tr.v.NumericBase))
       throw new Error('Expected numeric to be instance of tr.v.NumericBase');
 
-    Value.call(this, canonicalUrl, name, opt_options, opt_groupingKeys,
-               opt_diagnostics);
+    Value.call(this, name, opt_options);
     this.numeric = numeric;
   }
 
@@ -107,26 +117,32 @@ global.tr.exportTo('tr.v', function() {
     if (d.numeric === undefined)
       throw new Error('Expected numeric to be provided');
     var numeric = tr.v.NumericBase.fromDict(d.numeric);
-    var name = d.grouping_keys.name;
-    d.grouping_keys = tr.b.cloneDictionary(d.groupingKeys);
-    delete d.grouping_keys.name;
-    return new NumericValue(d.diagnostics.canonical_url, name,
-                            numeric, d, d.grouping_keys, d.diagnostics);
+    var value = new NumericValue(d.name, numeric, d);
+    return value;
   };
 
   NumericValue.prototype = {
     __proto__: Value.prototype,
 
-    _asDictInto: function(d) {
+    merge: function(other) {
+      if (!(other instanceof NumericValue))
+        throw new Error('Merging non-NumericValues is not supported');
+
+      var numeric = this.numeric.merge(other.numeric);
+      var result = new NumericValue(this.name, numeric);
+      // TODO(eakuefner): merge diagnostics?
+      return result;
+    },
+
+    asDictInto_: function(d) {
       d.type = 'numeric';
       d.numeric = this.numeric.asDict();
     }
   };
 
-  function DictValue(canonicalUrl, name, value, opt_options, opt_groupingKeys,
-                     opt_diagnostics) {
-    Value.call(this, canonicalUrl, name, opt_options, opt_groupingKeys,
-               opt_diagnostics);
+  /** @constructor */
+  function DictValue(name, value, opt_options) {
+    Value.call(this, name, opt_options);
     this.value = value;
   }
 
@@ -135,25 +151,21 @@ global.tr.exportTo('tr.v', function() {
       throw new Error('Expected units to be undefined');
     if (d.value === undefined)
       throw new Error('Expected value to be provided');
-    var name = d.grouping_keys.name;
-    d.grouping_keys = tr.b.cloneDictionary(d.groupingKeys);
-    delete d.grouping_keys.name;
-    return new DictValue(d.diagnostics.canonical_url, name,
-                         d.value, d, d.groupingKeys, d.diagnostics);
+    var value = new DictValue(d.name, d.value, d);
+    return value;
   };
 
   DictValue.prototype = {
     __proto__: Value.prototype,
 
-    _asDictInto: function(d) {
+    asDictInto_: function(d) {
       d.type = 'dict';
       d.value = this.value;
     }
   };
 
-
-  function FailureValue(canonicalUrl, name, opt_options, opt_groupingKeys,
-                        opt_diagnostics) {
+  /** @constructor */
+  function FailureValue(name, opt_options) {
     var options = opt_options || {};
 
     var stack;
@@ -170,21 +182,14 @@ global.tr.exportTo('tr.v', function() {
     if (typeof stack !== 'string')
       throw new Error('stack must be provided as a string');
 
-    if (canonicalUrl === undefined) {
-      throw new Error('FailureValue must provide canonicalUrl');
-    }
-
-    Value.call(this, canonicalUrl, name, options, opt_groupingKeys,
-               opt_diagnostics);
+    Value.call(this, name, options);
     this.stack = stack;
   }
 
-  FailureValue.fromError = function(canonicalUrl, e) {
+  FailureValue.fromError = function(e) {
     var ex = tr.b.normalizeException(e);
-    return new FailureValue(canonicalUrl, ex.typeName,
-                            {description: ex.message,
-                             stack: ex.stack});
-
+    return new FailureValue(ex.typeName, {
+      description: ex.message, stack: ex.stack});
   };
 
   FailureValue.fromDict = function(d) {
@@ -192,43 +197,33 @@ global.tr.exportTo('tr.v', function() {
       throw new Error('Expected units to be undefined');
     if (d.stack_str === undefined)
       throw new Error('Expected stack_str to be provided');
-    var name = d.grouping_keys.name;
-    d.grouping_keys = tr.b.cloneDictionary(d.groupingKeys);
-    delete d.grouping_keys.name;
-    return new FailureValue(d.diagnostics.canonical_url, name,
-                            d, d.grouping_keys, d.diagnostics);
+    return new FailureValue(d.name, d);
   };
 
   FailureValue.prototype = {
     __proto__: Value.prototype,
 
-    _asDictInto: function(d) {
+    asDictInto_: function(d) {
       d.type = 'failure';
       d.stack_str = this.stack;
     }
   };
 
-
-  function SkipValue(canonicalUrl, name, opt_options, opt_groupingKeys,
-                     opt_diagnostics) {
-    Value.call(this, canonicalUrl, name, opt_options, opt_groupingKeys,
-               opt_diagnostics);
+  /** @constructor */
+  function SkipValue(name, opt_options) {
+    Value.call(this, name, opt_options);
   }
 
   SkipValue.fromDict = function(d) {
     if (d.units !== undefined)
       throw new Error('Expected units to be undefined');
-    var name = d.grouping_keys.name;
-    d.grouping_keys = tr.b.cloneDictionary(d.groupingKeys);
-    delete d.grouping_keys.name;
-    return new SkipValue(d.diagnostics.canonical_url, name,
-                         d, d.grouping_keys, d.diagnostics);
+    return new SkipValue(d.name, d);
   };
 
   SkipValue.prototype = {
     __proto__: Value.prototype,
 
-    _asDictInto: function(d) {
+    asDictInto_: function(d) {
       d.type = 'skip';
     }
   };

@@ -46,6 +46,11 @@ global.tr.exportTo('tr.model.helpers', function() {
 
     this.appVsyncTimestamps_ = getVsyncTimestamps(process, VSYNC_APP_NAME);
     this.sfVsyncTimestamps_ = getVsyncTimestamps(process, VSYNC_SF_NAME);
+
+    // separation of vsync of app vs sf - assume app has at least window of 5ms
+    this.deadlineDelayMs_ =
+        this.appVsyncTimestamps_ !== this.sfVsyncTimestamps_ ?
+        5 : TIMESTAMP_FUDGE_MS;
   };
 
   AndroidSurfaceFlinger.createForProcessIfPossible = function(process) {
@@ -89,7 +94,7 @@ global.tr.exportTo('tr.model.helpers', function() {
       var firstGreaterIndex =
           findLowIndexInSortedArray(this.sfVsyncTimestamps_,
                                     function(x) { return x; },
-                                    timestamp + TIMESTAMP_FUDGE_MS);
+                                    timestamp + this.deadlineDelayMs_);
       if (firstGreaterIndex >= this.sfVsyncTimestamps_.length)
         return undefined;
       return this.sfVsyncTimestamps_[firstGreaterIndex];

@@ -6,6 +6,7 @@ found in the LICENSE file.
 
 require("./base.js");
 require("./iteration_helpers.js");
+require("./math.js");
 
 'use strict';
 
@@ -102,8 +103,8 @@ global.tr.exportTo('tr.b', function() {
         return true;
       if (this.isEmpty != that.isEmpty)
         return false;
-      return this.min === that.min &&
-          this.max === that.max;
+      return (tr.b.approximately(this.min, that.min) &&
+          tr.b.approximately(this.max, that.max));
     },
 
     containsExplicitRangeInclusive: function(min, max) {
@@ -152,6 +153,14 @@ global.tr.exportTo('tr.b', function() {
       if (range.isEmpty)
         return false;
       return this.intersectsExplicitRangeExclusive(range.min_, range.max_);
+    },
+
+    findExplicitIntersectionDuration: function(min, max) {
+      var min = Math.max(this.min, min);
+      var max = Math.min(this.max, max);
+      if (max < min)
+        return 0;
+      return max - min;
     },
 
     findIntersection: function(range) {

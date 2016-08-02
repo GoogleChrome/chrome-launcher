@@ -67,8 +67,7 @@ global.tr.exportTo('tr.model.um', function() {
     },
 
     get stableId() {
-      return ('UserExpectation.' +
-          this.parentModel.userModel.expectations.indexOf(this));
+      return ('UserExpectation.' + this.guid);
     },
 
     get typeInfo() {
@@ -137,8 +136,8 @@ global.tr.exportTo('tr.model.um', function() {
   tr.model.EventRegistry.register(
       UserExpectation,
       {
-        name: 'user-expectation',
-        pluralName: 'user-expectations',
+        name: 'userExpectation',
+        pluralName: 'userExpectations',
         singleViewElementName: 'tr-ui-a-single-user-expectation-sub-view',
         multiViewElementName: 'tr-ui-a-multi-user-expectation-sub-view'
       });

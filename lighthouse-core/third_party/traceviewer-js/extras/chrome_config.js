@@ -15,11 +15,13 @@ The chrome config is heavily used:
 **/
 
 require("./android/android_auditor.js");
+require("./chrome/blame_context/blame_context.js");
+require("./chrome/blame_context/frame_tree_node.js");
+require("./chrome/blame_context/render_frame.js");
+require("./chrome/blame_context/top_level.js");
 require("./chrome/chrome_auditor.js");
-require("./chrome/frame_tree_node.js");
 require("./chrome/layout_object.js");
 require("./chrome/layout_tree.js");
-require("./chrome/render_frame.js");
 require("./importer/etw/etw_importer.js");
 require("./importer/gzip_importer.js");
 require("./importer/trace2html_importer.js");

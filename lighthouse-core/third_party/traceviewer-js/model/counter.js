@@ -54,17 +54,11 @@ global.tr.exportTo('tr.model', function() {
       return this.name_;
     },
 
-    findTopmostSlicesInThisContainer: function(eventPredicate, callback,
-                                               opt_this) {
+    childEvents: function*() {
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-    },
-
-    iterateAllChildEventContainers: function(callback, opt_this) {
-      for (var i = 0; i < this.series_.length; i++)
-        callback.call(opt_this, this.series_[i]);
+    childEventContainers: function*() {
+      yield * this.series;
     },
 
     set timestamps(arg) {

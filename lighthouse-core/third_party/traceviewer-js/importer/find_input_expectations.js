@@ -71,7 +71,6 @@ global.tr.exportTo('tr.importer', function() {
 
   var RENDERER_FLING_TITLE = 'InputHandlerProxy::HandleGestureFling::started';
 
-  // TODO(benjhayden) share with rail_ir_finder
   var CSS_ANIMATION_TITLE = 'Animation';
 
   // If there's less than this much time between the end of one event and the
@@ -100,6 +99,7 @@ global.tr.exportTo('tr.importer', function() {
   var TOUCH_IR_NAME = 'Touch';
   var SCROLL_IR_NAME = 'Scroll';
   var CSS_IR_NAME = 'CSS';
+  var WEBGL_IR_NAME = 'WebGL';
 
   // TODO(benjhayden) Find a better home for this.
   function compareEvents(x, y) {
@@ -125,28 +125,37 @@ global.tr.exportTo('tr.importer', function() {
         x => x.title === tr.model.helpers.IMPL_RENDERING_STATS);
   }
 
+  function getSortedFrameEventsByProcess(modelHelper) {
+    var frameEventsByPid = {};
+    tr.b.iterItems(modelHelper.rendererHelpers, function(pid, rendererHelper) {
+      frameEventsByPid[pid] = rendererHelper.getFrameEventsInRange(
+          tr.model.helpers.IMPL_FRAMETIME_TYPE, modelHelper.model.bounds);
+    });
+    return frameEventsByPid;
+  }
+
   function getSortedInputEvents(modelHelper) {
     var inputEvents = [];
 
     var browserProcess = modelHelper.browserHelper.process;
     var mainThread = browserProcess.findAtMostOneThreadNamed(
         'CrBrowserMain');
-    mainThread.asyncSliceGroup.iterateAllEvents(function(slice) {
+    for (var slice of mainThread.asyncSliceGroup.getDescendantEvents()) {
       if (!slice.isTopLevel)
-        return;
+        continue;
 
       if (!(slice instanceof tr.e.cc.InputLatencyAsyncSlice))
-        return;
+        continue;
 
       // TODO(beaudoin): This should never happen but it does. Investigate
       // the trace linked at in #1567 and remove that when it's fixed.
       if (isNaN(slice.start) ||
           isNaN(slice.duration) ||
           isNaN(slice.end))
-        return;
+        continue;
 
       inputEvents.push(slice);
-    });
+    }
 
     return inputEvents.sort(compareEvents);
   }
@@ -164,7 +173,8 @@ global.tr.exportTo('tr.importer', function() {
       handleFlingEvents,
       handleTouchEvents,
       handleScrollEvents,
-      handleCSSAnimations
+      handleCSSAnimations,
+      handleWebGLAnimations,
     ];
     handlers.forEach(function(handler) {
       protoExpectations.push.apply(protoExpectations, handler(
@@ -722,55 +732,16 @@ global.tr.exportTo('tr.importer', function() {
                   (event.duration > 0));
     });
 
-    // Memoize the frame events per process.
-    // There may be many Animation events for each process. We can save a
-    // significant amount of processing time by avoiding re-computing them for
-    // each animation.
-    var framesForProcess = {};
-
-    function getFramesForAnimationProcess(animation) {
-      var frames = framesForProcess[animation.parentContainer.parent.guid];
-      if (frames === undefined) {
-        var rendererHelper = new tr.model.helpers.ChromeRendererHelper(
-            modelHelper, animation.parentContainer.parent);
-        // Collect all the frame events in the same renderer process as the css
-        // animation, and memoize them.
-        frames = rendererHelper.getFrameEventsInRange(
-            tr.model.helpers.IMPL_FRAMETIME_TYPE, modelHelper.model.bounds);
-        framesForProcess[animation.parentContainer.parent.guid] = frames;
-      }
-      return frames;
-    }
 
     // Time ranges where animations are actually running will be collected here.
-    // Each element will contain {min, max, animation, frames}.
+    // Each element will contain {min, max, animation}.
     var animationRanges = [];
 
     // This helper function will be called when a time range is found
     // during which the animation is actually running.
-    // This helper function collects the frames that happened during the time
-    // range, and pushes it all to |animationRanges|.
     function pushAnimationRange(start, end, animation) {
       var range = tr.b.Range.fromExplicitRange(start, end);
       range.animation = animation;
-
-      // Collect the frames that happened while the animation was running.
-      // A more general way to find these frames would be to collect all of
-      // the trace events caused by this animation, but that will require
-      // adding flow events to chrome:
-      // https://github.com/catapult-project/catapult/issues/1433
-      range.frames = range.filterArray(
-          getFramesForAnimationProcess(animation),
-          function(frameEvent) { return frameEvent.start; });
-
-      // If a tree falls in a forest...
-      // If there were not actually any frames while the animation was
-      // running, then it wasn't really an animation, now, was it?
-      // Philosophy aside, the system_health Animation metrics fail hard if
-      // there are no frames in an AnimationExpectation.
-      if (range.frames.length === 0)
-        return;
-
       animationRanges.push(range);
     }
 
@@ -814,30 +785,124 @@ global.tr.exportTo('tr.importer', function() {
     });
 
     // Now we have a set of time ranges when css animations were actually
-    // running, along with their frames.
-    // Now all that's left for this function is to merge over-lapping ranges
-    // into ProtoExpectations.
+    // running.
+    // Leave merging intersecting animations to mergeIntersectingAnimations(),
+    // after findFrameEventsForAnimations removes frame-less animations.
 
-    function merge(ranges) {
+    return animationRanges.map(function(range) {
       var protoExpectation = new ProtoExpectation(
           ProtoExpectation.ANIMATION_TYPE, CSS_IR_NAME);
-      ranges.forEach(function(range) {
-        protoExpectation.start = Math.min(protoExpectation.start, range.min);
-        protoExpectation.end = Math.max(protoExpectation.end, range.max);
-        protoExpectation.associatedEvents.push(range.animation);
-        protoExpectation.associatedEvents.addEventSet(range.frames);
-      });
+      protoExpectation.start = range.min;
+      protoExpectation.end = range.max;
+      protoExpectation.associatedEvents.push(range.animation);
       return protoExpectation;
-    }
-
-    return tr.b.mergeRanges(animationRanges,
-                            ANIMATION_MERGE_THRESHOLD_MS,
-                            merge);
+    });
   }
 
-  function postProcessProtoExpectations(protoExpectations) {
+  /**
+   * Get all the events (prepareMailbox and serviceScriptedAnimations)
+   * relevant to WebGL. Note that modelHelper is the helper object containing
+   * the model, and mailboxEvents and animationEvents are arrays where the
+   * events are being pushed into (DrawingBuffer::prepareMailbox events go
+   * into mailboxEvents; PageAnimator::serviceScriptedAnimations events go
+   * into animationEvents). The function does not return anything but
+   * modifies mailboxEvents and animationEvents.
+   */
+  function findWebGLEvents(modelHelper, mailboxEvents, animationEvents) {
+    for (var event of modelHelper.model.getDescendantEvents()) {
+      if (event.title === 'DrawingBuffer::prepareMailbox')
+        mailboxEvents.push(event);
+      else if (event.title === 'PageAnimator::serviceScriptedAnimations')
+        animationEvents.push(event);
+    }
+  }
+
+  /**
+   * Returns a list of events in mailboxEvents that have an event in
+   * animationEvents close by (within ANIMATION_MERGE_THRESHOLD_MS).
+   */
+  function findMailboxEventsNearAnimationEvents(
+      mailboxEvents, animationEvents) {
+    if (animationEvents.length === 0)
+      return [];
+
+    mailboxEvents.sort(compareEvents);
+    animationEvents.sort(compareEvents);
+    var animationIterator = animationEvents[Symbol.iterator]();
+    var animationEvent = animationIterator.next().value;
+
+    var filteredEvents = [];
+
+    // We iterate through the mailboxEvents. With each event, we check if
+    // there is a animationEvent near it, and if so, add it to the result.
+    for (var event of mailboxEvents) {
+      // If the current animationEvent is too far before the mailboxEvent,
+      // we advance until we get to the next animationEvent that is not too
+      // far before the animationEvent.
+      while (animationEvent &&
+          (animationEvent.start < (
+           event.start - ANIMATION_MERGE_THRESHOLD_MS)))
+        animationEvent = animationIterator.next().value;
+
+      // If there aren't any more animationEvents, then that means all the
+      // remaining mailboxEvents are too far after the animationEvents, so
+      // we can quit now.
+      if (!animationEvent)
+        break;
+
+      // If there's a animationEvent close to the mailboxEvent, then we push
+      // the current mailboxEvent onto the stack.
+      if (animationEvent.start < (event.start + ANIMATION_MERGE_THRESHOLD_MS))
+        filteredEvents.push(event);
+    }
+    return filteredEvents;
+  }
+
+  /**
+   * Merge consecutive mailbox events into a ProtoExpectation. Note: Only
+   * the drawingBuffer::prepareMailbox events will end up in the
+   * associatedEvents. The PageAnimator::serviceScriptedAnimations events
+   * will not end up in the associatedEvents.
+   */
+  function createProtoExpectationsFromMailboxEvents(mailboxEvents) {
+    var protoExpectations = [];
+    var currentPE = undefined;
+    for (var event of mailboxEvents) {
+      if (currentPE === undefined || !currentPE.isNear(
+          event, ANIMATION_MERGE_THRESHOLD_MS)) {
+        currentPE = new ProtoExpectation(
+            ProtoExpectation.ANIMATION_TYPE, WEBGL_IR_NAME);
+        currentPE.pushEvent(event);
+        protoExpectations.push(currentPE);
+      }
+      else {
+        currentPE.pushEvent(event);
+      }
+    }
+    return protoExpectations;
+  }
+
+  // WebGL animations are identified by the DrawingBuffer::prepareMailbox
+  // and PageAnimator::serviceScriptedAnimations events (one of each per frame)
+  // and consecutive frames are merged into the same animation.
+  function handleWebGLAnimations(modelHelper, sortedInputEvents) {
+    // Get the prepareMailbox and scriptedAnimation events.
+    var prepareMailboxEvents = [];
+    var scriptedAnimationEvents = [];
+
+    findWebGLEvents(modelHelper, prepareMailboxEvents, scriptedAnimationEvents);
+    var webGLMailboxEvents = findMailboxEventsNearAnimationEvents(
+        prepareMailboxEvents, scriptedAnimationEvents);
+
+    return createProtoExpectationsFromMailboxEvents(webGLMailboxEvents);
+  }
+
+
+  function postProcessProtoExpectations(modelHelper, protoExpectations) {
     // protoExpectations is input only. Returns a modified set of
     // ProtoExpectations.  The order is important.
+    protoExpectations = findFrameEventsForAnimations(
+        modelHelper, protoExpectations);
     protoExpectations = mergeIntersectingResponses(protoExpectations);
     protoExpectations = mergeIntersectingAnimations(protoExpectations);
     protoExpectations = fixResponseAnimationStarts(protoExpectations);
@@ -927,8 +992,12 @@ global.tr.exportTo('tr.importer', function() {
         if (isCSS != otherPE.containsSliceTitle(CSS_ANIMATION_TITLE))
           continue;
 
-        if (!otherPE.intersects(pe))
+        if (isCSS) {
+          if (!pe.isNear(otherPE, ANIMATION_MERGE_THRESHOLD_MS))
+            continue;
+        } else if (!otherPE.intersects(pe)) {
           continue;
+        }
 
         // Don't merge Fling Animations with any other types.
         if (isFling != otherPE.containsTypeNames([INPUT_TYPE.FLING_START]))
@@ -1029,6 +1098,46 @@ global.tr.exportTo('tr.importer', function() {
     return newPEs;
   }
 
+  function findFrameEventsForAnimations(modelHelper, protoExpectations) {
+    var newPEs = [];
+    var frameEventsByPid = getSortedFrameEventsByProcess(modelHelper);
+
+    for (var pe of protoExpectations) {
+      if (pe.irType !== ProtoExpectation.ANIMATION_TYPE) {
+        newPEs.push(pe);
+        continue;
+      }
+
+      var frameEvents = [];
+      // TODO(benjhayden): Use frame blame contexts here.
+      for (var pid of Object.keys(modelHelper.rendererHelpers)) {
+        var range = tr.b.Range.fromExplicitRange(pe.start, pe.end);
+        frameEvents.push.apply(frameEvents,
+            range.filterArray(frameEventsByPid[pid], e => e.start));
+      }
+
+      // If a tree falls in a forest...
+      // If there were not actually any frames while the animation was
+      // running, then it wasn't really an animation, now, was it?
+      // Philosophy aside, the system_health Animation metrics fail hard if
+      // there are no frames in an AnimationExpectation.
+      // Since WebGL animations don't generate this type of frame event,
+      // don't remove them if it's a WebGL animation.
+      // TODO(alexandermont): Identify what the correct frame event to
+      // use here is.
+      if (frameEvents.length === 0 && !pe.names.has(WEBGL_IR_NAME)) {
+        pe.irType = ProtoExpectation.IGNORED_TYPE;
+        newPEs.push(pe);
+        continue;
+      }
+
+      pe.associatedEvents.addEventSet(frameEvents);
+      newPEs.push(pe);
+    }
+
+    return newPEs;
+  }
+
   // Check that none of the handlers accidentally ignored an input event.
   function checkAllInputEventsHandled(sortedInputEvents, protoExpectations) {
     var handledEvents = [];
@@ -1061,7 +1170,8 @@ global.tr.exportTo('tr.importer', function() {
     var sortedInputEvents = getSortedInputEvents(modelHelper);
     var protoExpectations = findProtoExpectations(
         modelHelper, sortedInputEvents);
-    protoExpectations = postProcessProtoExpectations(protoExpectations);
+    protoExpectations = postProcessProtoExpectations(
+        modelHelper, protoExpectations);
     checkAllInputEventsHandled(sortedInputEvents, protoExpectations);
 
     var irs = [];

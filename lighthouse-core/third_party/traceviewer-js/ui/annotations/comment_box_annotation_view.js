@@ -31,7 +31,8 @@ global.tr.exportTo('tr.ui.annotations', function() {
     __proto__: tr.ui.annotations.AnnotationView.prototype,
 
     removeTextArea: function() {
-      this.textArea_.parentNode.removeChild(this.textArea_);
+      Polymer.dom(Polymer.dom(this.textArea_).parentNode).removeChild(
+          this.textArea_);
     },
 
     draw: function(ctx) {
@@ -50,7 +51,8 @@ global.tr.exportTo('tr.ui.annotations', function() {
         this.textArea_.value = this.annotation_.text;
         // Set the z-index so that this is shown on top of canvas.
         this.textArea_.style.zIndex = 1;
-        ctx.canvas.parentNode.appendChild(this.textArea_);
+        Polymer.dom(Polymer.dom(ctx.canvas).parentNode)
+            .appendChild(this.textArea_);
       }
 
       this.textArea_.style.width = this.styleWidth + 'px';

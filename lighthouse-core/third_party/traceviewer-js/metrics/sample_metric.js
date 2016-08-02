@@ -18,23 +18,31 @@ global.tr.exportTo('tr.metrics', function() {
   var SIZE_NUMERIC_BUILDER = tr.v.NumericBuilder.createLinear(
       sizeInBytes_smallerIsBetter, tr.b.Range.fromExplicitRange(1, 100), 100);
 
-  function sampleMetric(valueList, model) {
+  function sampleMetric(values, model) {
     var n1 = new tr.v.ScalarNumeric(sizeInBytes_smallerIsBetter, 1);
     var n2 = new tr.v.ScalarNumeric(sizeInBytes_smallerIsBetter, 2);
     var n3 = SIZE_NUMERIC_BUILDER.build();
     n3.add(1);
-    valueList.addValue(new tr.v.NumericValue(model.canonicalUrl, 'foo', n1));
-    valueList.addValue(new tr.v.NumericValue(model.canonicalUrl, 'bar', n2));
-    valueList.addValue(new tr.v.NumericValue(model.canonicalUrl, 'baz', n3));
+    values.addValue(new tr.v.NumericValue('foo', n1));
+    values.addValue(new tr.v.NumericValue('bar', n2));
+    values.addValue(new tr.v.NumericValue('baz', n3));
   }
 
-  sampleMetric.prototype = {
-    __proto__: Function.prototype
-  };
+  function sampleMetric2(values, model) {
+    var n1 = new tr.v.ScalarNumeric(sizeInBytes_smallerIsBetter, 1);
+    var n2 = new tr.v.ScalarNumeric(sizeInBytes_smallerIsBetter, 2);
+    var n3 = SIZE_NUMERIC_BUILDER.build();
+    n3.add(1);
+    values.addValue(new tr.v.NumericValue('one', n1));
+    values.addValue(new tr.v.NumericValue('two', n2));
+    values.addValue(new tr.v.NumericValue('three', n3));
+  }
 
   tr.metrics.MetricRegistry.register(sampleMetric);
+  tr.metrics.MetricRegistry.register(sampleMetric2);
 
   return {
-    sampleMetric: sampleMetric
+    sampleMetric: sampleMetric,
+    sampleMetric2: sampleMetric2
   };
 });

@@ -71,19 +71,11 @@ global.tr.exportTo('tr.model', function() {
       return Process.compare(this, that);
     },
 
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      ProcessBase.prototype.iterateAllEventsInThisContainer.call(
-          this, eventTypePredicate, callback, opt_this);
-
-      if (eventTypePredicate.call(opt_this, ProcessInstantEvent))
-        this.instantEvents.forEach(callback, opt_this);
-
-      if (eventTypePredicate.call(opt_this, Frame))
-        this.frames.forEach(callback, opt_this);
-
-      if (eventTypePredicate.call(opt_this, ProcessMemoryDump))
-        this.memoryDumps.forEach(callback, opt_this);
+    childEvents: function*() {
+      yield * ProcessBase.prototype.childEvents.call(this);
+      yield * this.instantEvents;
+      yield * this.frames;
+      yield * this.memoryDumps;
     },
 
     addLabelIfNeeded: function(labelName) {

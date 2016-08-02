@@ -6,24 +6,23 @@ found in the LICENSE file.
 
 require("./efficiency_metric.js");
 require("./hazard_metric.js");
-require("./responsiveness_metric.js");
+require("./long_tasks_metric.js");
+require("./power_metric.js");
 
 'use strict';
 
 global.tr.exportTo('tr.metrics.sh', function() {
-  function SystemHealthMetrics(valueList, model) {
-    tr.metrics.sh.responsivenessMetric(valueList, model);
-    tr.metrics.sh.EfficiencyMetric(valueList, model);
-    tr.metrics.sh.hazardMetric(valueList, model);
+  function systemHealthMetrics(values, model) {
+    tr.metrics.sh.responsivenessMetric(values, model);
+    tr.metrics.sh.efficiencyMetric(values, model);
+    tr.metrics.sh.longTasksMetric(values, model);
+    tr.metrics.sh.hazardMetric(values, model);
+    tr.metrics.sh.powerMetric(values, model);
   }
 
-  SystemHealthMetrics.prototype = {
-    __proto__: Function.prototype
-  };
-
-  tr.metrics.MetricRegistry.register(SystemHealthMetrics);
+  tr.metrics.MetricRegistry.register(systemHealthMetrics);
 
   return {
-    SystemHealthMetrics: SystemHealthMetrics
+    systemHealthMetrics: systemHealthMetrics
   };
 });

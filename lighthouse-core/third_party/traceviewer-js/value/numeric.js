@@ -16,7 +16,17 @@ require("./unit.js");
 global.tr.exportTo('tr.v', function() {
   var Range = tr.b.Range;
 
-  var MAX_SOURCE_INFOS = 16;
+  var MAX_DIAGNOSTICS = 16;
+
+  // p-values less than this indicate statistical significance.
+  var DEFAULT_ALPHA = 0.05;
+
+  /** @enum */
+  var Significance = {
+    DONT_CARE: -1,
+    INSIGNIFICANT: 0,
+    SIGNIFICANT: 1
+  };
 
   function NumericBase(unit) {
     if (!(unit instanceof tr.v.Unit))
@@ -26,6 +36,32 @@ global.tr.exportTo('tr.v', function() {
   }
 
   NumericBase.prototype = {
+    merge: function(other) {
+      if (this.unit !== other.unit)
+        throw new Error('Merging Numerics with different units');
+
+      // Two Numerics that were built using the same NumericBuilder
+      // can be merged using addNumeric().
+      if (this instanceof Numeric && other instanceof Numeric &&
+          this.canAddNumeric(other)) {
+        var result = this.clone();
+        result.addNumeric(other.clone());
+        return result;
+      }
+
+      // Either a Scalar and a Numeric, or two Scalars...
+      // or two Numerics that were not built using the same NumericBuilder,
+      // should be built from their raw samples.
+      var samples = [];
+      this.sampleValuesInto(samples);
+      other.sampleValuesInto(samples);
+      return Numeric.buildFromSamples(this.unit, samples);
+    },
+
+    sampleValuesInto: function(samples) {
+      throw new Error('Not implemented');
+    },
+
     asDict: function() {
       var d = {
         unit: this.unit.asJSON()
@@ -40,6 +76,9 @@ global.tr.exportTo('tr.v', function() {
     if (d.type === 'scalar')
       return ScalarNumeric.fromDict(d);
 
+    if (d.type === 'numeric')
+      return Numeric.fromDict(d);
+
     throw new Error('Not implemented');
   };
 
@@ -47,7 +86,7 @@ global.tr.exportTo('tr.v', function() {
     this.parentNumeric = parentNumeric;
     this.range = opt_range || (new tr.b.Range());
     this.count = 0;
-    this.sourceInfos = [];
+    this.diagnostics = [];
   }
 
   NumericBin.fromDict = function(parentNumeric, d) {
@@ -55,22 +94,29 @@ global.tr.exportTo('tr.v', function() {
     n.range.min = d.min;
     n.range.max = d.max;
     n.count = d.count;
-    n.sourceInfos = d.sourceInfos;
+    if (d.diagnostics)
+      n.diagnostics = d.diagnostics.map(dd => tr.v.d.Diagnostic.fromDict(dd));
     return n;
   };
 
   NumericBin.prototype = {
-    add: function(value, sourceInfo) {
+    /**
+     * @param {*} value
+     * @param {!tr.v.d.Diagnostic=} opt_diagnostic
+     */
+    add: function(value, opt_diagnostic) {
       this.count += 1;
-      tr.b.Statistics.uniformlySampleStream(this.sourceInfos, this.count,
-          sourceInfo, MAX_SOURCE_INFOS);
+      if (opt_diagnostic) {
+        tr.b.Statistics.uniformlySampleStream(
+            this.diagnostics, this.count, opt_diagnostic, MAX_DIAGNOSTICS);
+      }
     },
 
     addBin: function(other) {
       if (!this.range.equals(other.range))
         throw new Error('Merging incompatible Numeric bins.');
-      tr.b.Statistics.mergeSampledStreams(this.sourceInfos, this.count,
-          other.sourceInfos, other.count, MAX_SOURCE_INFOS);
+      tr.b.Statistics.mergeSampledStreams(this.diagnostics, this.count,
+          other.diagnostics, other.count, MAX_DIAGNOSTICS);
       this.count += other.count;
     },
 
@@ -79,7 +125,7 @@ global.tr.exportTo('tr.v', function() {
         min: this.range.min,
         max: this.range.max,
         count: this.count,
-        sourceInfos: this.sourceInfos.slice(0)
+        diagnostics: this.diagnostics.map(d => d.asDict())
       };
     },
 
@@ -94,7 +140,7 @@ global.tr.exportTo('tr.v', function() {
     this.range = range;
 
     this.numNans = 0;
-    this.nanSourceInfos = [];
+    this.nanDiagnostics = [];
 
     this.running = new tr.b.RunningStatistics();
     this.maxCount_ = 0;
@@ -112,6 +158,9 @@ global.tr.exportTo('tr.v', function() {
       if (bin.count > this.maxCount_)
         this.maxCount_ = bin.count;
     }, this);
+
+    this.sampleValues_ = [];
+    this.maxNumSampleValues = this.allBins.length * 10;
 
     this.summaryOptions = this.defaultSummaryOptions();
   }
@@ -133,8 +182,47 @@ global.tr.exportTo('tr.v', function() {
     if (d.summaryOptions)
       n.customizeSummaryOptions(d.summaryOptions);
     n.numNans = d.numNans;
-    n.nanSourceInfos = d.nanSourceInfos;
+    if (d.nanDiagnostics) {
+      n.nanDiagnostics = d.nanDiagnostics.map(
+          dd => tr.v.d.Diagnostic.fromDict(dd));
+    }
+    n.maxNumSampleValues = d.maxNumSampleValues;
+    n.sampleValues_ = d.sampleValues;
     return n;
+  };
+
+  /**
+   * @param {!tr.v.Unit} unit
+   * @param {!Array.<number>} samples
+   * @return {!Numeric}
+   */
+  Numeric.buildFromSamples = function(unit, samples) {
+    var range = new tr.b.Range();
+    // Prevent non-numeric samples from introducing NaNs into the range.
+    for (var sample of samples)
+      if (!isNaN(Math.max(sample)))
+        range.addValue(sample);
+
+    // NumericBuilder.addLinearBins() requires this.
+    if (range.isEmpty)
+      range.addValue(1);
+    if (range.min === range.max)
+      range.addValue(range.min - 1);
+
+    // This optimizes the resolution when samples are uniformly distributed
+    // (which is almost never the case).
+    var numBins = Math.ceil(Math.sqrt(samples.length));
+    var builder = new NumericBuilder(unit, range.min);
+    builder.addLinearBins(range.max, numBins);
+
+    var result = builder.build();
+    result.maxNumSampleValues = 1000;
+
+    // TODO(eakuefner): Propagate diagnostics?
+    for (var sample of samples)
+      result.add(sample);
+
+    return result;
   };
 
   Numeric.prototype = {
@@ -156,6 +244,35 @@ global.tr.exportTo('tr.v', function() {
 
     get maxCount() {
       return this.maxCount_;
+    },
+
+    /**
+     * Requires that units agree.
+     * Returns DONT_CARE if that is the units' improvementDirection.
+     * Returns SIGNIFICANT if the Mann-Whitney U test returns a
+     * p-value less than opt_alpha or DEFAULT_ALPHA. Returns INSIGNIFICANT if
+     * the p-value is greater than alpha.
+     *
+     * @param {!tr.v.Numeric} other
+     * @param {number=} opt_alpha
+     * @return {!tr.v.Significance}
+     */
+    getDifferenceSignificance: function(other, opt_alpha) {
+      if (this.unit !== other.unit)
+        throw new Error('Cannot compare Numerics with different units');
+
+      if (this.unit.improvementDirection ===
+          tr.v.ImprovementDirection.DONT_CARE) {
+        return tr.v.Significance.DONT_CARE;
+      }
+
+      if (!(other instanceof Numeric))
+        throw new Error('Unable to compute a p-value');
+
+      var mwu = tr.b.Statistics.mwu.test(this.sampleValues, other.sampleValues);
+      if (mwu.p < (opt_alpha || DEFAULT_ALPHA))
+        return tr.v.Significance.SIGNIFICANT;
+      return tr.v.Significance.INSIGNIFICANT;
     },
 
     /*
@@ -250,29 +367,70 @@ global.tr.exportTo('tr.v', function() {
       return this.allBins[binIndex] || this.overflowBin;
     },
 
-    add: function(value, sourceInfo) {
+    /**
+     * @param {*} value
+     * @param {!tr.v.d.Diagnostic=} opt_diagnostic
+     */
+    add: function(value, opt_diagnostic) {
       if (typeof(value) !== 'number' || isNaN(value)) {
         this.numNans++;
-        tr.b.Statistics.uniformlySampleStream(this.nanSourceInfos, this.numNans,
-            sourceInfo, MAX_SOURCE_INFOS);
-        return;
+        if (opt_diagnostic) {
+          tr.b.Statistics.uniformlySampleStream(this.nanDiagnostics,
+              this.numNans, opt_diagnostic, MAX_DIAGNOSTICS);
+        }
+      } else {
+        var bin = this.getBinForValue(value);
+        bin.add(value, opt_diagnostic);
+        this.running.add(value);
+        if (bin.count > this.maxCount_)
+          this.maxCount_ = bin.count;
       }
 
-      var bin = this.getBinForValue(value);
-      bin.add(value, sourceInfo);
-      this.running.add(value);
-      if (bin.count > this.maxCount_)
-        this.maxCount_ = bin.count;
+      tr.b.Statistics.uniformlySampleStream(this.sampleValues_,
+          this.numValues + this.numNans, value, this.maxNumSampleValues);
     },
 
+    sampleValuesInto: function(samples) {
+      for (var sampleValue of this.sampleValues)
+        samples.push(sampleValue);
+    },
+
+    /**
+     * Return true if this Numeric can be added to |other|.
+     *
+     * @param {!tr.v.Numeric} other
+     * @return {boolean}
+     */
+    canAddNumeric: function(other) {
+      if (!this.range.equals(other.range))
+        return false;
+      if (this.unit !== other.unit)
+        return false;
+      if (this.allBins.length !== other.allBins.length)
+        return false;
+
+      for (var i = 0; i < this.allBins.length; ++i)
+        if (!this.allBins[i].range.equals(other.allBins[i].range))
+          return false;
+
+      return true;
+    },
+
+    /**
+     * Add |other| to this Numeric in-place if they can be added.
+     *
+     * @param {!tr.v.Numeric} other
+     */
     addNumeric: function(other) {
-      if (!this.range.equals(other.range) ||
-          !this.unit === other.unit ||
-          this.allBins.length !== other.allBins.length) {
+      if (!this.canAddNumeric(other))
         throw new Error('Merging incompatible Numerics.');
-      }
-      tr.b.Statistics.mergeSampledStreams(this.nanSourceInfos, this.numNans,
-          other.nanSourceInfos, other.numNans, MAX_SOURCE_INFOS);
+
+      tr.b.Statistics.mergeSampledStreams(this.nanDiagnostics, this.numNans,
+          other.nanDiagnostics, other.numNans, MAX_DIAGNOSTICS);
+      tr.b.Statistics.mergeSampledStreams(
+          this.sampleValues, this.numValues,
+          other.sampleValues, other.numValues, tr.b.Statistics.mean(
+              [this.maxNumSampleValues, other.maxNumSampleValues]));
       this.numNans += other.numNans;
       this.running = this.running.merge(other.running);
       for (var i = 0; i < this.allBins.length; ++i) {
@@ -302,6 +460,7 @@ global.tr.exportTo('tr.v', function() {
         std: true,
         min: true,
         max: true,
+        nans: false,
         percentile: []
       };
     },
@@ -360,12 +519,18 @@ global.tr.exportTo('tr.v', function() {
                 scalar: new tr.v.ScalarNumeric(this.unit, percentile)
             });
           }, this);
+        } else if (stat === 'nans') {
+          results.push({
+            name: 'nans',
+            scalar: new tr.v.ScalarNumeric(
+                tr.v.Unit.byName.count_smallerIsBetter, this.numNans)
+          });
         } else {
           var statUnit = stat === 'count' ?
-              tr.v.Unit.byName.unitlessNumber_smallerIsBetter : this.unit;
+              tr.v.Unit.byName.count_smallerIsBetter : this.unit;
           var key = statNameToKey(stat);
           var statValue = this.running[key];
-          if (statValue !== undefined) {
+          if (typeof(statValue) === 'number') {
             results.push({
                 name: stat,
                 scalar: new tr.v.ScalarNumeric(statUnit, statValue)
@@ -374,6 +539,10 @@ global.tr.exportTo('tr.v', function() {
         }
       }, this);
       return results;
+    },
+
+    get sampleValues() {
+      return this.sampleValues_;
     },
 
     clone: function() {
@@ -389,11 +558,13 @@ global.tr.exportTo('tr.v', function() {
         max: this.range.max,
 
         numNans: this.numNans,
-        nanSourceInfos: this.nanSourceInfos,
+        nanDiagnostics: this.nanDiagnostics.map(d => d.asDict()),
 
         running: this.running.asDict(),
         summaryOptions: this.summaryOptions,
 
+        sampleValues: this.sampleValues,
+        maxNumSampleValues: this.maxNumSampleValues,
         underflowBin: this.underflowBin.asDict(),
         centralBins: this.centralBins.map(function(bin) {
           return bin.asDict();
@@ -503,8 +674,8 @@ global.tr.exportTo('tr.v', function() {
 
       var curMaxBinBoundary = this.maxBinBoundary;
       if (curMaxBinBoundary >= nextMaxBinBoundary) {
-        throw new Error('The last added max boundary must be greater than ' +
-            'the current max boundary boundary');
+        throw new Error('The new max bin boundary must be greater than ' +
+            'the previous max bin boundary');
       }
 
       var binWidth = (nextMaxBinBoundary - curMaxBinBoundary) / binCount;
@@ -596,6 +767,11 @@ global.tr.exportTo('tr.v', function() {
   /**
    * Create a linearly scaled tr.v.NumericBuilder with |numBins| bins ranging
    * from |range.min| to |range.max|.
+   *
+   * @param {!tr.v.Unit} unit
+   * @param {!tr.b.Range} range
+   * @param {number} numBins
+   * @return {tr.v.NumericBuilder}
    */
   NumericBuilder.createLinear = function(unit, range, numBins) {
     if (range.isEmpty)
@@ -604,7 +780,26 @@ global.tr.exportTo('tr.v', function() {
         range.max, numBins);
   };
 
+  /**
+   * Create an exponentially scaled tr.v.NumericBuilder with |numBins| bins
+   * ranging from |range.min| to |range.max|.
+   *
+   * @param {!tr.v.Unit} unit
+   * @param {!tr.b.Range} range
+   * @param {number} numBins
+   * @return {tr.v.NumericBuilder}
+   */
+  NumericBuilder.createExponential = function(unit, range, numBins) {
+    if (range.isEmpty)
+      throw new Error('Range must be non-empty');
+    return new NumericBuilder(unit, range.min).addExponentialBins(
+        range.max, numBins);
+  };
+
   function ScalarNumeric(unit, value) {
+    if (!(unit instanceof tr.v.Unit))
+      throw new Error('Expected Unit');
+
     if (!(typeof(value) == 'number'))
       throw new Error('Expected value to be number');
 
@@ -617,7 +812,21 @@ global.tr.exportTo('tr.v', function() {
 
     asDictInto_: function(d) {
       d.type = 'scalar';
-      d.value = this.value;
+
+      // Infinity and NaN are left out of JSON for security reasons that do not
+      // apply to our use cases.
+      if (this.value === Infinity)
+        d.value = 'Infinity';
+      else if (this.value === -Infinity)
+        d.value = '-Infinity';
+      else if (isNaN(this.value))
+        d.value = 'NaN';
+      else
+        d.value = this.value;
+    },
+
+    sampleValuesInto: function(samples) {
+      samples.push(this.value);
     },
 
     toString: function() {
@@ -626,10 +835,23 @@ global.tr.exportTo('tr.v', function() {
   };
 
   ScalarNumeric.fromDict = function(d) {
+    // Infinity and NaN are left out of JSON for security reasons that do not
+    // apply to our use cases.
+    if (typeof(d.value) === 'string') {
+      if (d.value === '-Infinity') {
+        d.value = -Infinity;
+      } else if (d.value === 'Infinity') {
+        d.value = Infinity;
+      } else if (d.value === 'NaN') {
+        d.value = NaN;
+      }
+    }
+
     return new ScalarNumeric(tr.v.Unit.fromJSON(d.unit), d.value);
   };
 
   return {
+    Significance: Significance,
     NumericBase: NumericBase,
     NumericBin: NumericBin,
     Numeric: Numeric,

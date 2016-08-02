@@ -12,7 +12,6 @@ global.tr.exportTo('tr.model.um', function() {
   var LOAD_SUBTYPE_NAMES = {
     SUCCESSFUL: 'Successful',
     FAILED: 'Failed',
-    STARTUP: 'Startup'
   };
 
   var DOES_LOAD_SUBTYPE_NAME_EXIST = {};

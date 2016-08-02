@@ -4,9 +4,9 @@ Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../base/iteration_helpers.js");
 require("./cpu.js");
 require("./process_base.js");
-require("../base/iteration_helpers.js");
 
 'use strict';
 
@@ -119,18 +119,10 @@ global.tr.exportTo('tr.model', function() {
       return 'kernel';
     },
 
-    iterateAllChildEventContainers: function(callback, opt_this) {
-      ProcessBase.prototype.iterateAllChildEventContainers.call(
-          this, callback, opt_this);
-      for (var cpuId in this.cpus)
-        callback.call(opt_this, this.cpus[cpuId]);
+    childEventContainers: function*() {
+      yield * ProcessBase.prototype.childEventContainers.call(this);
+      yield * tr.b.dictionaryValues(this.cpus);
     },
-
-    iterateAllEventsInThisContainer: function(eventTypePredicate,
-                                              callback, opt_this) {
-      ProcessBase.prototype.iterateAllEventsInThisContainer.call(
-          this, eventTypePredicate, callback, opt_this);
-    }
   };
 
   return {

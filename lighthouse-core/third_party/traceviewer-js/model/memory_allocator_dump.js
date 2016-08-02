@@ -79,6 +79,11 @@ global.tr.exportTo('tr.model', function() {
           this.containerMemoryDump.containerName;
     },
 
+    getDescendantDumpByFullName: function(fullName) {
+      return this.containerMemoryDump.getMemoryAllocatorDumpByFullName(
+          this.fullName + '/' + fullName);
+    },
+
     isDescendantOf: function(otherDump) {
       var dump = this;
       while (dump !== undefined) {

@@ -20,18 +20,14 @@ global.tr.exportTo('tr.metrics.v8', function() {
   var MS_PER_SECOND = 1000;
   var WINDOW_SIZE_MS = MS_PER_SECOND / TARGET_FPS;
 
-  function gcMetric(valueList, model) {
-    addDurationOfTopEvents(valueList, model);
-    addTotalDurationOfTopEvents(valueList, model);
-    addDurationOfSubEvents(valueList, model);
-    addIdleTimesOfTopEvents(valueList, model);
-    addTotalIdleTimesOfTopEvents(valueList, model);
-    addV8ExecuteMutatorUtilization(valueList, model);
+  function gcMetric(values, model) {
+    addDurationOfTopEvents(values, model);
+    addTotalDurationOfTopEvents(values, model);
+    addDurationOfSubEvents(values, model);
+    addIdleTimesOfTopEvents(values, model);
+    addTotalIdleTimesOfTopEvents(values, model);
+    addV8ExecuteMutatorUtilization(values, model);
   }
-
-  gcMetric.prototype = {
-    __proto__: Function.prototype
-  };
 
   tr.metrics.MetricRegistry.register(gcMetric);
 
@@ -93,99 +89,107 @@ global.tr.exportTo('tr.metrics.v8', function() {
     return new tr.v.ScalarNumeric(percentage_biggerIsBetter, percentage);
   }
 
+  function isNotForcedTopGarbageCollectionEvent(event) {
+    // We exclude garbage collection events forced by benchmark runner,
+    // because they cannot happen in real world.
+    return tr.metrics.v8.utils.isTopGarbageCollectionEvent(event) &&
+           !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
+  }
+
+  function isNotForcedSubGarbageCollectionEvent(event) {
+    // We exclude garbage collection events forced by benchmark runner,
+    // because they cannot happen in real world.
+    return tr.metrics.v8.utils.isSubGarbageCollectionEvent(event) &&
+           !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
+  }
+
   /**
    * Example output:
-   * - Animation-v8_gc_full_mark_compactor.
+   * - v8-gc-full-mark-compactor.
    */
-  function addDurationOfTopEvents(valueList, model) {
-    groupAndProcessEvents(model,
-      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+  function addDurationOfTopEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
+      isNotForcedTopGarbageCollectionEvent,
       tr.metrics.v8.utils.topGarbageCollectionEventName,
-      function(stageTitle, name, events) {
+      function(name, events) {
         var cpuDuration = createNumericForTopEventTime();
         events.forEach(function(event) {
           cpuDuration.add(event.cpuDuration);
         });
-        valueList.addValue(
-          new tr.v.NumericValue(model.canonicalUrl,
-            stageTitle + '-' + name, cpuDuration));
+        values.addValue(new tr.v.NumericValue(name, cpuDuration));
       }
     );
   }
 
   /**
    * Example output:
-   * - Animation:v8_gc_total
+   * - v8-gc-total
    */
-  function addTotalDurationOfTopEvents(valueList, model) {
-    groupAndProcessEvents(model,
-      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+  function addTotalDurationOfTopEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
+      isNotForcedTopGarbageCollectionEvent,
       event => 'v8-gc-total',
-      function(stageTitle, name, events) {
+      function(name, events) {
         var cpuDuration = createNumericForTopEventTime();
         events.forEach(function(event) {
           cpuDuration.add(event.cpuDuration);
         });
-        valueList.addValue(
-          new tr.v.NumericValue(model.canonicalUrl,
-            stageTitle + '-' + name, cpuDuration));
+        values.addValue(new tr.v.NumericValue(name, cpuDuration));
       }
     );
   }
 
   /**
    * Example output:
-   * - Animation-v8-gc-full-mark-compactor-evacuate.
+   * - v8-gc-full-mark-compactor-evacuate.
    */
-  function addDurationOfSubEvents(valueList, model) {
-    groupAndProcessEvents(model,
-      tr.metrics.v8.utils.isSubGarbageCollectionEvent,
+  function addDurationOfSubEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
+      isNotForcedSubGarbageCollectionEvent,
       tr.metrics.v8.utils.subGarbageCollectionEventName,
-      function(stageTitle, name, events) {
+      function(name, events) {
         var cpuDuration = createNumericForSubEventTime();
         events.forEach(function(event) {
           cpuDuration.add(event.cpuDuration);
         });
-        valueList.addValue(
-          new tr.v.NumericValue(model.canonicalUrl,
-            stageTitle + '-' + name, cpuDuration));
+        values.addValue(new tr.v.NumericValue(name, cpuDuration));
       }
     );
   }
 
   /**
    * Example output:
-   * - Animation-v8-gc-full-mark-compactor_idle_deadline_overrun,
-   * - Animation-v8-gc-full-mark-compactor_outside_idle,
-   * - Animation-v8-gc-full-mark-compactor_percentage_idle.
+   * - v8-gc-full-mark-compactor_idle_deadline_overrun,
+   * - v8-gc-full-mark-compactor_outside_idle,
+   * - v8-gc-full-mark-compactor_percentage_idle.
    */
-  function addIdleTimesOfTopEvents(valueList, model) {
-    groupAndProcessEvents(model,
-      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+  function addIdleTimesOfTopEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
+      isNotForcedTopGarbageCollectionEvent,
       tr.metrics.v8.utils.topGarbageCollectionEventName,
-      function(stageTitle, name, events) {
-        addIdleTimes(valueList, model, stageTitle, name, events);
+      function(name, events) {
+        addIdleTimes(values, model, name, events);
       }
     );
   }
 
   /**
    * Example output:
-   * - Animation-v8-gc-total_idle_deadline_overrun,
-   * - Animation-v8-gc-total_outside_idle,
-   * - Animation-v8-gc-total_percentage_idle.
+   * - v8-gc-total_idle_deadline_overrun,
+   * - v8-gc-total_outside_idle,
+   * - v8-gc-total_percentage_idle.
    */
-  function addTotalIdleTimesOfTopEvents(valueList, model) {
-    groupAndProcessEvents(model,
-      tr.metrics.v8.utils.isTopGarbageCollectionEvent,
+  function addTotalIdleTimesOfTopEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
+      isNotForcedTopGarbageCollectionEvent,
       event => 'v8-gc-total',
-      function(stageTitle, name, events) {
-        addIdleTimes(valueList, model, stageTitle, name, events);
+      function(name, events) {
+        addIdleTimes(values, model, name, events);
       }
     );
   }
 
-  function addIdleTimes(valueList, model, stageTitle, name, events) {
+  function addIdleTimes(values, model, name, events) {
     var cpuDuration = createNumericForIdleTime();
     var insideIdle = createNumericForIdleTime();
     var outsideIdle = createNumericForIdleTime();
@@ -214,39 +218,36 @@ global.tr.exportTo('tr.metrics.v8', function() {
       outsideIdle.add(event.cpuDuration - inside);
       idleDeadlineOverrun.add(overrun);
     });
-    valueList.addValue(
-      new tr.v.NumericValue(model.canonicalUrl,
-        stageTitle + '-' + name + '_idle_deadline_overrun',
+    values.addValue(new tr.v.NumericValue(
+        name + '_idle_deadline_overrun',
         idleDeadlineOverrun));
-    valueList.addValue(
-      new tr.v.NumericValue(model.canonicalUrl,
-        stageTitle + '-' + name + '_outside_idle', outsideIdle));
+    values.addValue(new tr.v.NumericValue(
+        name + '_outside_idle', outsideIdle));
     var percentage = createPercentage(insideIdle.sum,
                                       cpuDuration.sum);
-    valueList.addValue(
-      new tr.v.NumericValue(model.canonicalUrl,
-        stageTitle + '-' + name + '_percentage_idle', percentage));
+    values.addValue(new tr.v.NumericValue(
+        name + '_percentage_idle', percentage));
   }
 
-  function addV8ExecuteMutatorUtilization(valueList, model) {
-    groupAndProcessEvents(model,
+  function addV8ExecuteMutatorUtilization(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model,
         tr.metrics.v8.utils.isTopV8ExecuteEvent,
         event => 'v8-execute',
-        function(stageTitle, name, events) {
+        function(name, events) {
           events.sort((a, b) => a.start - b.start);
           var time = 0;
           var pauses = [];
           // Glue together the v8.execute events and adjust the GC pause
           // times accordingly.
-          events.forEach(function(topEvent) {
-            topEvent.findTopmostSlicesRelativeToThisSlice(function(e) {
-              if (tr.metrics.v8.utils.isTopGarbageCollectionEvent(e)) {
+          for (var topEvent of events) {
+            for (var e of topEvent.enumerateAllDescendents()) {
+              if (isNotForcedTopGarbageCollectionEvent(e)) {
                 pauses.push({ start: e.start - topEvent.start + time,
                               end: e.end - topEvent.start + time });
               }
-            });
+            }
             time += topEvent.duration;
-          });
+          }
           // Now we have one big v8.execute interval from 0 to |time| and
           // a list of GC pauses.
           var mutatorUtilization = tr.metrics.v8.utils.mutatorUtilization(
@@ -254,49 +255,16 @@ global.tr.exportTo('tr.metrics.v8', function() {
           [0.90, 0.95, 0.99].forEach(function(percent) {
             var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
                 mutatorUtilization.percentile(1.0 - percent) * 100);
-            valueList.addValue(new tr.v.NumericValue(model.canonicalUrl,
-                stageTitle + '-v8-execute-mutator-utilization_pct_0' +
+            values.addValue(new tr.v.NumericValue(
+                'v8-execute-mutator-utilization_pct_0' +
                 percent * 100,
                 value));
           });
           var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
               mutatorUtilization.min);
-          valueList.addValue(new tr.v.NumericValue(model.canonicalUrl,
-              stageTitle + '-v8-execute-mutator-utilization_min', value));
+          values.addValue(new tr.v.NumericValue(
+              'v8-execute-mutator-utilization_min', value));
         }
-    );
-  }
-
-  /**
-   * Filters events using the |filterCallback|, then groups events by the user
-   * expectation stage title and the name computed using the |nameCallback|,
-   * and then invokes the |processCallback| with the grouped events.
-   * @param {Function} filterCallback Takes an event and returns a boolean.
-   * @param {Function} nameCallback Takes event and returns a string.
-   * @param {Function} processCallback Takes a stage title, a name, and
-   *                   an array of events.
-   */
-  function groupAndProcessEvents(model, filterCallback,
-                                 nameCallback, processCallback) {
-    // Two level map: stageTitle -> name -> [events].
-    var stageTitleToNameToEvents = {};
-    model.userModel.expectations.forEach(function(ue) {
-      stageTitleToNameToEvents[ue.stageTitle] =
-        stageTitleToNameToEvents[ue.stageTitle] || {};
-      var nameToEvents = stageTitleToNameToEvents[ue.stageTitle];
-      ue.associatedEvents.forEach(function(event) {
-        if (!filterCallback(event)) return;
-        var name = nameCallback(event);
-        nameToEvents[name] = nameToEvents[name] || [];
-        nameToEvents[name].push(event);
-      });
-    });
-    tr.b.iterItems(stageTitleToNameToEvents,
-      function(stageTitle, nameToEvents) {
-        tr.b.iterItems(nameToEvents, function(name, events) {
-          processCallback(stageTitle, name, events);
-        });
-      }
     );
   }
 

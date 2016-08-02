@@ -1,0 +1,133 @@
+/**
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+**/
+
+require("../../base/utils.js");
+require("./diagnostic.js");
+
+'use strict';
+
+global.tr.exportTo('tr.v.d', function() {
+  /**
+   * @constructor
+   * @param {!Object} info
+   * @param {string} info.benchmarkName
+   * @param {undefined|string} info.label
+   * @param {undefined|!Object} info.storyGroupingKeys
+   * @param {undefined|string} info.storyDisplayName
+   * @param {string} info.storyUrl
+   * @param {number} info.storyRepeatCounter
+   * @param {number} info.storysetRepeatCounter
+   * @param {number} info.benchmarkStartMs Milliseconds since Unix epoch.
+   */
+  function IterationInfo(info) {
+    this.benchmarkName_ = info.benchmarkName;
+    this.benchmarkStart_ = new Date(info.benchmarkStartMs);
+    this.label_ = info.label;
+    this.storyDisplayName_ = info.storyDisplayName;
+    this.storyGroupingKeys_ = info.storyGroupingKeys;
+    this.storyRepeatCounter_ = info.storyRepeatCounter;
+    this.storyUrl_ = info.storyUrl;
+    this.storysetRepeatCounter_ = info.storysetRepeatCounter;
+  }
+
+  // Diagnostics generally do not need a constant name or getFromValue().
+  // IterationInfo is a special kind of Diagnostic that is produced by
+  // telemetry, which shepherds whole flocks of traces at once, and needs a
+  // system to identify and find traces by these attributes.
+
+  // Values produced by telemetry all have a single IterationInfo at this key in
+  // their DiagnosticMap.
+  IterationInfo.NAME = 'iteration';
+
+  /**
+   * @param {!tr.v.Value} value
+   * @return {(undefined|!IterationInfo)}
+   */
+  IterationInfo.getFromValue = function(value) {
+    return value.diagnostics.get(IterationInfo.NAME);
+  };
+
+  IterationInfo.prototype = {
+    __proto__: tr.v.d.Diagnostic.prototype,
+
+    addToValue: function(value) {
+      value.diagnostics.add(IterationInfo.NAME, this);
+    },
+
+    asDictInto_: function(d) {
+      d.benchmarkName = this.benchmarkName;
+      d.benchmarkStartMs = this.benchmarkStart.getTime();
+      d.label = this.label;
+      d.storyDisplayName = this.storyDisplayName;
+      d.storyGroupingKeys = this.storyGroupingKeys;
+      d.storyRepeatCounter = this.storyRepeatCounter;
+      d.storyUrl = this.storyUrl;
+      d.storysetRepeatCounter = this.storysetRepeatCounter;
+    },
+
+    get displayLabel() {
+      if (this.label)
+        return this.label;
+      return this.benchmarkName + ' ' + this.benchmarkStartString;
+    },
+
+    get benchmarkName() {
+      return this.benchmarkName_;
+    },
+
+    get label() {
+      return this.label_;
+    },
+
+    get storyGroupingKeys() {
+      return this.storyGroupingKeys_;
+    },
+
+    get storyDisplayName() {
+      return this.storyDisplayName_;
+    },
+
+    get storyUrl() {
+      return this.storyUrl_;
+    },
+
+    get storyRepeatCounter() {
+      return this.storyRepeatCounter_;
+    },
+
+    get storyRepeatCounterLabel() {
+      return 'story repeat ' + this.storyRepeatCounter;
+    },
+
+    get storysetRepeatCounter() {
+      return this.storysetRepeatCounter_;
+    },
+
+    get storysetRepeatCounterLabel() {
+      return 'storyset repeat ' + this.storysetRepeatCounter;
+    },
+
+    get benchmarkStart() {
+      return this.benchmarkStart_;
+    },
+
+    get benchmarkStartString() {
+      return tr.b.formatDate(this.benchmarkStart);
+    }
+  };
+
+  IterationInfo.fromDict = function(d) {
+    return new IterationInfo(d);
+  };
+
+  tr.v.d.Diagnostic.register(IterationInfo, {
+    elementName: 'tr-v-ui-iteration-info-span'
+  });
+
+  return {
+    IterationInfo: IterationInfo
+  };
+});
