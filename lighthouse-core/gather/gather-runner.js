@@ -119,7 +119,7 @@ class GatherRunner {
         log.log('status', `Gathering: trace "${traceName}"`);
         return driver.endTrace().then(traceContents => {
           loadData.traces[traceName] = {traceContents};
-          log.log('statusEnd', `Gathering: trace "${traceName}"`);
+          log.verbose('statusEnd', `Gathering: trace "${traceName}"`);
         });
       });
     }
@@ -130,7 +130,7 @@ class GatherRunner {
         log.log('status', status);
         return driver.endNetworkCollect().then(networkRecords => {
           loadData.networkRecords = networkRecords;
-          log.log('statusEnd', status);
+          log.verbose('statusEnd', status);
         });
       });
     }
@@ -144,7 +144,7 @@ class GatherRunner {
               loadData.traceContents = loadData.traces[traceName].traceContents;
             }
             return Promise.resolve(gatherer.afterPass(options, loadData)).then(ret => {
-              log.log('statusEnd', status);
+              log.verbose('statusEnd', status);
               return ret;
             });
           });

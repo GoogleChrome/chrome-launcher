@@ -105,14 +105,14 @@ class CriDriver extends Driver {
     }
 
     return new Promise((resolve, reject) => {
-      this.formattedLog('method => browser', {method: command, params: params});
+      this.formattedLog('method => browser', {method: command, params: params}, 'verbose');
 
       this._cri.send(command, params, (err, result) => {
         if (err) {
           this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result);
         }
-        this.formattedLog('method <= browser OK', {method: command, params: result});
+        this.formattedLog('method <= browser OK', {method: command, params: result}, 'verbose');
         resolve(result);
       });
     });

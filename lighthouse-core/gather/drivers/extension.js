@@ -109,7 +109,7 @@ class ExtensionDriver extends Driver {
    */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      this.formattedLog('method => browser', {method: command, params: params});
+      this.formattedLog('method => browser', {method: command, params: params}, 'verbose');
       if (!this._tabId) {
         log.error('No tabId set for sendCommand');
       }
@@ -124,7 +124,7 @@ class ExtensionDriver extends Driver {
           return reject(result.exceptionDetails);
         }
 
-        this.formattedLog('method <= browser OK', {method: command, params: result});
+        this.formattedLog('method <= browser OK', {method: command, params: result}, 'verbose');
         resolve(result);
       });
     });

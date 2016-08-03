@@ -68,7 +68,7 @@ class Runner {
         const status = `Evaluating: ${audit.meta.description}`;
         log.log('status', status);
         return Promise.resolve(audit.audit(artifacts)).then(ret => {
-          log.log('statusEnd', status);
+          log.verbose('statusEnd', status);
           return ret;
         });
       })));

@@ -130,7 +130,13 @@ function createOutput(results, outputMode) {
  * @return {!Promise}
  */
 function writeToStdout(output) {
-  return Promise.resolve(process.stdout.write(`${output}\n`));
+  return new Promise((resolve, reject) => {
+    // small delay to avoid race with debug() logs
+    setTimeout(_ => {
+      process.stdout.write(`${output}\n`);
+      resolve();
+    }, 50);
+  });
 }
 
 /**
