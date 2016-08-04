@@ -48,6 +48,18 @@ describe('Cache: start_url audit', () => {
   it('fails when a manifest contains no start_url', () => {
     const inputs = {
       Manifest: {
+
+      }
+    };
+
+    return assert.equal(Audit.audit(inputs).rawValue, false);
+  });
+
+  // Need to disable camelcase check for dealing with short_name.
+  /* eslint-disable camelcase */
+  it('fails when a manifest contains no start_url', () => {
+    const inputs = {
+      Manifest: {
         start_url: null
       }
     };

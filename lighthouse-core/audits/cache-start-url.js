@@ -39,20 +39,23 @@ class CacheStartUrl extends Audit {
    */
   static audit(artifacts) {
     let cacheHasStartUrl = false;
+    const manifest = artifacts.Manifest && artifacts.Manifest.value;
+    const cacheContents = artifacts.CacheContents;
+    const baseURL = artifacts.URL;
 
-    if (!(artifacts.Manifest &&
-          artifacts.Manifest.value &&
-          artifacts.Manifest.value.start_url &&
-          Array.isArray(artifacts.CacheContents) &&
-          artifacts.URL)) {
+    if (!(manifest && manifest.start_url && manifest.start_url.raw)) {
       return CacheStartUrl.generateAuditResult({
-        rawValue: false
+        rawValue: false,
+        debugString: 'start_url not present in Manifest'
       });
     }
 
-    const manifest = artifacts.Manifest.value;
-    const cacheContents = artifacts.CacheContents;
-    const baseURL = artifacts.URL;
+    if (!(Array.isArray(cacheContents) && artifacts.URL)) {
+      return CacheStartUrl.generateAuditResult({
+        rawValue: false,
+        debugString: 'No cache or URL detected'
+      });
+    }
 
     // Remove any UTM strings.
     const startURL = url.resolve(baseURL, manifest.start_url.raw).toString();
