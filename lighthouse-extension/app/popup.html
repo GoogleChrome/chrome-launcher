@@ -38,13 +38,34 @@ limitations under the License.
 
   <main class="main" role="main">
     <div class="feedback"></div>
-    <button class="generate-report">Generate report</button>
+
+    <button class="button button--link button--configure" id="configure-options">Options</button>
+    <button class="button button--generate" id="generate-report">Generate report</button>
   </main>
 
-  <aside class="status">
+  <aside class="status subpage">
     <div class="status__spinner"></div>
     <div class="status__msg">Starting...</div>
     <div><small class="status__detailsmsg"></small></div>
+  </aside>
+
+  <aside class="options subpage">
+    <h2 class="options__title">Options</h2>
+    <ul class="options__list">
+        <li><input type="checkbox" id="offline" checked="checked" value="App can load on offline/flaky connections" /><label for="offline">App can load on offline/flaky connections</label></li>
+        <li><input type="checkbox" id="pageload" checked="checked" value="Page load performance is fast" /><label for="pageload">Page load performance</label></li>
+        <li><input type="checkbox" id="progressive" checked="checked"  value="Site is progressively enhanced" /><label for="progressive">Site is progressively enhanced</label></li>
+        <li><input type="checkbox" id="secure" checked="checked"  value="Network connection is secure" /><label for="secure">Network connection is secure</label></li>
+        <li><input type="checkbox" id="homescreen" checked="checked" value="User can be prompted to Add to Homescreen" /><label for="homescreen">User can be prompted to Add to Homescreen</label></li>
+        <li><input type="checkbox" id="splashscreen" checked="checked" value="Installed web app will launch with custom splash screen" /><label for="splashscreen">Installed web app will launch with custom splash screen</label></li>
+        <li><input type="checkbox" id="brandcolor" checked="checked" value="Address bar matches brand colors" /><label for="brandcolor">Address bar matches brand colors</label></li>
+        <li><input type="checkbox" id="mobile-friendly" checked="checked" value="Design is mobile-friendly" /><label for="mobile-friendly">Design is mobile-friendly</label></li>
+        <li>&nbsp;</li>
+        <li><input type="checkbox" id="bestpractices" checked="checked" value="Best Practices" /><label for="bestpractices">Best Practices</label></li>
+        <li><input type="checkbox" id="performance" checked="checked" value="Performance Metrics" /><label for="performance">Performance Metrics</label></li>
+    </ul>
+
+    <button class="button button--link button--go-back" id="go-back">Back</button>
   </aside>
 
   <script src="scripts/popup.js"></script>
