@@ -51,7 +51,7 @@ class EstimatedInputLatency extends Audit {
       const startTime = artifacts.Speedline.first;
 
       const trace = artifacts.traces[this.DEFAULT_TRACE] &&
-        artifacts.traces[this.DEFAULT_TRACE].traceContents;
+        artifacts.traces[this.DEFAULT_TRACE].traceEvents;
       const tracingProcessor = new TracingProcessor();
       const model = tracingProcessor.init(trace);
       const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);

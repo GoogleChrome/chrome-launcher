@@ -19,7 +19,7 @@ const Audit = require('../../audits/time-to-interactive.js');
 const SpeedlineGather = require('../../gather/gatherers/speedline');
 const assert = require('assert');
 
-const traceContents = require('../fixtures/traces/progressive-app.json');
+const traceEvents = require('../fixtures/traces/progressive-app.json');
 const speedlineGather = new SpeedlineGather();
 
 /* eslint-env mocha */
@@ -28,7 +28,7 @@ describe('Performance: time-to-interactive audit', () => {
     return Audit.audit({
       traces: {
         [Audit.DEFAULT_TRACE]: {
-          traceContents: '[{"pid": 15256,"tid": 1295,"t'
+          traceEvents: '[{"pid": 15256,"tid": 1295,"t'
         }
       },
       Speedline: {
@@ -41,12 +41,12 @@ describe('Performance: time-to-interactive audit', () => {
   });
 
   it('evaluates valid input correctly', () => {
-    let artifacts = {traceContents};
+    let artifacts = {traceEvents};
     return speedlineGather.afterPass({}, artifacts).then(_ => {
       artifacts.Speedline = speedlineGather.artifact;
       // This is usually done by the driver
       artifacts.traces = {
-        [Audit.DEFAULT_TRACE]: {traceContents}
+        [Audit.DEFAULT_TRACE]: {traceEvents}
       };
       return Audit.audit(artifacts).then(output => {
         assert.equal(output.rawValue, '1105.8');

@@ -66,7 +66,7 @@ You can supply your own run configuration to customize what audits you want deta
 
 ## Trace processing
 
-Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traceContents` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
+Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
 ##### `config.json`
 ```js
@@ -78,9 +78,7 @@ Lighthouse can be used to analyze trace and performance data collected from othe
 
   "artifacts": {
     "traces": {
-      "defaultPass": {
-        "traceContents": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/trace-user-timings.json"
-      }
+      "defaultPass": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/trace-user-timings.json"
     },
     "performanceLog": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/perflog.json"
   },
