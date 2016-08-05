@@ -97,7 +97,7 @@ gulp.task('browserify', () => {
     'app/src/report-loader.js'
   ], {read: false})
     .pipe(tap(file => {
-      let bundle = browserify(file.path, {debug: true})
+      let bundle = browserify(file.path) // , {debug: true})
       // Fix an issue with Babelified code that doesn't brfs well.
       .transform('./fs-transform', {
         global: true
