@@ -35,13 +35,24 @@ describe('Manifest: exists audit', () => {
     }}).rawValue, true);
   });
 
-  it('succeeds when a minimal manifest contains a valid background_color', () => {
+  it('succeeds with a valid minimal manifest', () => {
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
+  });
+
+  it('succeeds with a valid minimal manifest', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         name: 'Lighthouse PWA'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, true);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
   it('correctly passes through debug strings', () => {
@@ -53,6 +64,15 @@ describe('Manifest: exists audit', () => {
         debugString
       }
     }).debugString, debugString);
+  });
+
+  it('correctly passes through a JSON parsing failure', () => {
+    const artifacts = {
+      Manifest: manifestParser('{ \name: Definitely not valid JSON }')
+    };
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.ok(output.debugString.includes('Unexpected token'), 'No JSON error message');
   });
 
   it('succeeds with a complete manifest', () => {

@@ -19,7 +19,6 @@ const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
 const exampleManifest = manifestParser(manifestSrc);
 
-
 /* global describe, it*/
 
 // Need to disable camelcase check for dealing with background_color.
@@ -44,7 +43,9 @@ describe('Manifest: background color audit', () => {
         start_url: '/'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   it('fails when a minimal manifest contains an invalid background_color', () => {
@@ -53,7 +54,9 @@ describe('Manifest: background color audit', () => {
         background_color: 'no'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   it('succeeds when a minimal manifest contains a valid background_color', () => {

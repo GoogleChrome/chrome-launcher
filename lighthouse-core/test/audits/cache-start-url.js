@@ -30,11 +30,17 @@ describe('Cache: start_url audit', () => {
   });
 
   it('fails when no cache contents given', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest, URL}).rawValue, false);
+    const artifacts = {Manifest: exampleManifest, URL};
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, 'No cache or URL detected');
   });
 
   it('fails when no URL given', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest, CacheContents}).rawValue, false);
+    const artifacts = {Manifest: exampleManifest, CacheContents};
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, 'No cache or URL detected');
   });
 
   // Need to disable camelcase check for dealing with start_url.
@@ -43,23 +49,18 @@ describe('Cache: start_url audit', () => {
     const artifacts = {
       Manifest: { }
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
-  });
-
-  it('fails when a manifest artifact contains a null start_url', () => {
-    const artifacts = {
-      Manifest: {
-        start_url: null
-      }
-    };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, 'start_url not present in Manifest');
   });
 
   it('fails when a manifest contains no start_url', () => {
     const artifacts = {
       Manifest: manifestParser('{}')
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, 'start_url not present in Manifest');
   });
   /* eslint-enable camelcase */
 

@@ -32,7 +32,9 @@ describe('Manifest: start_url audit', () => {
     const artifacts = {
       Manifest: manifestParser('{}')
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   // Need to disable camelcase check for dealing with short_name.
@@ -43,7 +45,9 @@ describe('Manifest: start_url audit', () => {
         start_url: undefined
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   it('succeeds when a minimal manifest contains a start_url', () => {
@@ -52,7 +56,9 @@ describe('Manifest: start_url audit', () => {
         start_url: '/'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, true);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
   /* eslint-enable camelcase */
 

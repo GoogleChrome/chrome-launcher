@@ -32,7 +32,9 @@ describe('Manifest: theme_color audit', () => {
     const artifacts = {
       Manifest: manifestParser('{}')
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   // Need to disable camelcase check for dealing with theme_color.
@@ -43,7 +45,9 @@ describe('Manifest: theme_color audit', () => {
         start_url: '/'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
   });
 
   it('succeeds when a minimal manifest contains a theme_color', () => {
@@ -52,7 +56,9 @@ describe('Manifest: theme_color audit', () => {
         theme_color: '#bada55'
       }))
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, true);
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
   /* eslint-enable camelcase */

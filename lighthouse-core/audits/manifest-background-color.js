@@ -20,7 +20,6 @@
 const Audit = require('./audit');
 const Formatter = require('../formatters/formatter');
 
-
 class ManifestBackgroundColor extends Audit {
   /**
    * @return {!AuditMeta}
