@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', _ => {
   const generateOptionsEl = document.getElementById('configure-options');
   const optionsEl = document.body.querySelector('.options');
   const optionsList = document.body.querySelector('.options__list');
-  const goBack = document.getElementById('go-back');
+  const okButton = document.getElementById('ok');
 
   let spinnerAnimation;
 
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', _ => {
     optionsEl.classList.add(subpageVisibleClass);
   });
 
-  goBack.addEventListener('click', () => {
+  okButton.addEventListener('click', () => {
     optionsEl.classList.remove(subpageVisibleClass);
   });
 
