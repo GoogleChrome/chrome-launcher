@@ -17,11 +17,19 @@
 
 const configJSON = require('../../../lighthouse-core/config/default.json');
 const _flatten = arr => [].concat.apply([], arr);
-const aggregations = _flatten([
-  configJSON.aggregations[0].items,
-  configJSON.aggregations[1],
-  configJSON.aggregations[2]
-]);
+
+const aggregations = _flatten(
+  configJSON.aggregations.map(aggregation => {
+    if (aggregation.items.length > 1) {
+      return aggregation.items;
+    }
+
+    return {
+      name: aggregation.name,
+      criteria: aggregation.items[0].criteria,
+    };
+  })
+);
 
 document.addEventListener('DOMContentLoaded', _ => {
   const background = chrome.extension.getBackgroundPage();
@@ -37,6 +45,7 @@ document.addEventListener('DOMContentLoaded', _ => {
 
   const generateOptionsEl = document.getElementById('configure-options');
   const optionsEl = document.body.querySelector('.options');
+  const optionsList = document.body.querySelector('.options__list');
   const goBack = document.getElementById('go-back');
 
   let spinnerAnimation;
@@ -65,19 +74,35 @@ document.addEventListener('DOMContentLoaded', _ => {
   const getAuditsOfName = name => {
     let aggregation = aggregations.filter(aggregation => aggregation.name === name);
 
-    if (!aggregation.length) {
-      return [];
-    }
-
-    // This checks if we have a a criteria property, it's necessary to check categories like Best Practices
-    if (!aggregation[0].hasOwnProperty('criteria')) {
-      aggregation = aggregation[0].items;
-    }
-
     return Object.keys(aggregation[0].criteria);
   };
 
+  const createOptionItem = text => {
+    const input = document.createElement('input');
+    const attributes = [['type', 'checkbox'], ['checked', 'checked'], ['value', text]];
+    attributes.forEach(attr => input.setAttribute.apply(input, attr));
+
+    const label = document.createElement('label');
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(text));
+    const listItem = document.createElement('li');
+    listItem.appendChild(label);
+
+    return listItem;
+  };
+
+  const generateOptionsList = list => {
+    const frag = document.createDocumentFragment();
+
+    aggregations.forEach(aggregation => {
+      frag.appendChild(createOptionItem(aggregation.name));
+    });
+
+    list.appendChild(frag);
+  };
+
   background.listenForStatus(logstatus);
+  generateOptionsList(optionsList);
 
   generateReportEl.addEventListener('click', () => {
     startSpinner();
