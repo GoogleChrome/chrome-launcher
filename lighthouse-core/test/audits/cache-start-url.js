@@ -25,13 +25,7 @@ const AltURL = 'https://example.com/?utm_source=http203';
 /* global describe, it*/
 
 describe('Cache: start_url audit', () => {
-  it('fails when no manifest present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
-  });
-
-  it('fails when an empty manifest is present', () => {
+  it('fails when an empty manifest artifact is present', () => {
     return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
   });
 
@@ -43,30 +37,30 @@ describe('Cache: start_url audit', () => {
     return assert.equal(Audit.audit({Manifest, CacheContents}).rawValue, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
+  // Need to disable camelcase check for dealing with start_url.
   /* eslint-disable camelcase */
-  it('fails when a manifest contains no start_url', () => {
+  it('fails when a manifest artifact contains no start_url', () => {
     const inputs = {
-      Manifest: {
-
-      }
+      Manifest: { }
     };
-
     return assert.equal(Audit.audit(inputs).rawValue, false);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
-  /* eslint-disable camelcase */
-  it('fails when a manifest contains no start_url', () => {
+  it('fails when a manifest artifact contains a null start_url', () => {
     const inputs = {
       Manifest: {
         start_url: null
       }
     };
-
     return assert.equal(Audit.audit(inputs).rawValue, false);
   });
 
+  it('fails when a manifest contains no start_url', () => {
+    const inputs = {
+      Manifest: manifestParser({})
+    };
+    return assert.equal(Audit.audit(inputs).rawValue, false);
+  });
   /* eslint-enable camelcase */
 
   it('succeeds when given a manifest with a start_url, cache contents, and a URL', () => {

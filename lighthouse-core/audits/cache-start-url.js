@@ -43,7 +43,7 @@ class CacheStartUrl extends Audit {
     const cacheContents = artifacts.CacheContents;
     const baseURL = artifacts.URL;
 
-    if (!(manifest && manifest.start_url && manifest.start_url.raw)) {
+    if (!(manifest && manifest.start_url && manifest.start_url.value)) {
       return CacheStartUrl.generateAuditResult({
         rawValue: false,
         debugString: 'start_url not present in Manifest'
@@ -58,7 +58,7 @@ class CacheStartUrl extends Audit {
     }
 
     // Remove any UTM strings.
-    const startURL = url.resolve(baseURL, manifest.start_url.raw).toString();
+    const startURL = url.resolve(baseURL, manifest.start_url.value).toString();
     const altStartURL = startURL
         .replace(/\?utm_([^=]*)=([^&]|$)*/, '')
         .replace(/\?$/, '');
