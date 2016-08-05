@@ -116,7 +116,7 @@ class GatherRunner {
 
     if (config.trace) {
       pass = pass.then(_ => {
-        log.log('status', `Gathering: trace "${traceName}"`);
+        log.log('status', 'Retrieving trace');
         return driver.endTrace().then(traceContents => {
           // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
           // traceContents was an array of trace events. After this point,
@@ -130,14 +130,14 @@ class GatherRunner {
 
           loadData.traces[traceName] = traceContents;
           loadData.traceEvents = traceContents.traceEvents;
-          log.verbose('statusEnd', `Gathering: trace "${traceName}"`);
+          log.verbose('statusEnd', 'Retrieving trace');
         });
       });
     }
 
     if (config.network) {
       pass = pass.then(_ => {
-        const status = 'Gathering: network records';
+        const status = 'Retrieving network records';
         log.log('status', status);
         return driver.endNetworkCollect().then(networkRecords => {
           loadData.networkRecords = networkRecords;
@@ -149,7 +149,7 @@ class GatherRunner {
     return gatherers
         .reduce((chain, gatherer) => {
           return chain.then(_ => {
-            const status = `Gathering: ${gatherer.name}`;
+            const status = `Retrieving: ${gatherer.name}`;
             log.log('status', status);
             return Promise.resolve(gatherer.afterPass(options, loadData)).then(ret => {
               log.verbose('statusEnd', status);
