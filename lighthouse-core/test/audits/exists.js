@@ -16,19 +16,32 @@
 const Audit = require('../../audits/manifest-exists.js');
 const assert = require('assert');
 
+const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
+const manifestParser = require('../../lib/manifest-parser');
+const exampleManifest = manifestParser(manifestSrc);
+
 /* global describe, it*/
 
 describe('Manifest: exists audit', () => {
-  it('fails when no manifest present', () => {
+  it('fails when no manifest artifact present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
     }}).rawValue, false);
   });
 
-  it('succeeds when a manifest is present', () => {
+  it('succeeds when a manifest artifact is present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: {}
     }}).rawValue, true);
+  });
+
+  it('succeeds when a minimal manifest contains a valid background_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        name: 'Lighthouse PWA'
+      }))
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, true);
   });
 
   it('correctly passes through debug strings', () => {
@@ -40,5 +53,9 @@ describe('Manifest: exists audit', () => {
         debugString
       }
     }).debugString, debugString);
+  });
+
+  it('succeeds with a complete manifest', () => {
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

@@ -18,6 +18,8 @@
 'use strict';
 
 const Audit = require('./audit');
+const Formatter = require('../formatters/formatter');
+
 
 class ManifestBackgroundColor extends Audit {
   /**
@@ -39,7 +41,7 @@ class ManifestBackgroundColor extends Audit {
   static hasBackgroundColorValue(manifest) {
     return manifest !== undefined &&
       manifest.background_color !== undefined &&
-      manifest.background_color.value !== undefined;
+      manifest.background_color.value;
   }
 
   /**
@@ -47,11 +49,16 @@ class ManifestBackgroundColor extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const hasBackgroundColor = ManifestBackgroundColor
-        .hasBackgroundColorValue(artifacts.Manifest.value);
+    const bgColor = ManifestBackgroundColor.hasBackgroundColorValue(artifacts.Manifest.value);
 
     return ManifestBackgroundColor.generateAuditResult({
-      rawValue: hasBackgroundColor
+      rawValue: !!bgColor,
+      extendedInfo: {
+        value: {
+          color: bgColor
+        },
+        formatter: Formatter.SUPPORTED_FORMATS.NULL
+      }
     });
   }
 }

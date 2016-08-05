@@ -17,45 +17,48 @@ const Audit = require('../../audits/manifest-short-name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const Manifest = manifestParser(manifestSrc);
+const exampleManifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
 describe('Manifest: short_name audit', () => {
-  it('fails when no manifest present', () => {
+  it('fails when no manifest artfifact present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
     }}).rawValue, false);
   });
 
   it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
   // Need to disable camelcase check for dealing with short_name.
   /* eslint-disable camelcase */
   it('fails when a manifest contains no short_name and no name', () => {
-    const inputs = JSON.stringify({
+    const artifacts = {
       name: null,
       short_name: null
-    });
-    const Manifest = manifestParser(inputs);
+    };
+    const Manifest = manifestParser(JSON.stringify(artifacts));
 
     return assert.equal(Audit.audit({Manifest}).rawValue, false);
   });
 
   it('succeeds when a manifest contains no short_name but a name', () => {
-    const inputs = JSON.stringify({
+    const artifacts = {
       short_name: undefined,
       name: 'Example App'
-    });
-    const Manifest = manifestParser(inputs);
+    };
+    const Manifest = manifestParser(JSON.stringify(artifacts));
 
     return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
   /* eslint-enable camelcase */
 
   it('succeeds when a manifest contains a short_name', () => {
-    return assert.equal(Audit.audit({Manifest}).rawValue, true);
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

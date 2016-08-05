@@ -15,40 +15,60 @@
  */
 const Audit = require('../../audits/manifest-background-color.js');
 const assert = require('assert');
+const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
+const manifestParser = require('../../lib/manifest-parser');
+const exampleManifest = manifestParser(manifestSrc);
+
 
 /* global describe, it*/
 
 // Need to disable camelcase check for dealing with background_color.
 /* eslint-disable camelcase */
 describe('Manifest: background color audit', () => {
-  it('fails when no manifest present', () => {
+  it('fails when no manifest artifact present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
     }}).rawValue, false);
   });
 
-  it('fails when no background color present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: {
-        foo: 1
-      }
-    }}).rawValue, false);
+  it('fails when an empty manifest is present', () => {
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
-  it('fails when no background color value present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: {
+  it('fails when a minimal manifest contains no background_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        start_url: '/'
+      }))
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
+  });
+
+  it('fails when a minimal manifest contains an invalid background_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
         background_color: 'no'
-      }
-    }}).rawValue, false);
+      }))
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
-  it('passes when color is present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: {
-        background_color: {value: 'black'}
-      }
-    }}).rawValue, true);
+  it('succeeds when a minimal manifest contains a valid background_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        background_color: '#FAFAFA'
+      }))
+    };
+    const output = Audit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.extendedInfo.value.color, '#FAFAFA');
+  });
+
+  it('succeeds when a complete manifest contains a background_color', () => {
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });
 /* eslint-enable */

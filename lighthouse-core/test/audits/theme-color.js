@@ -17,36 +17,47 @@ const Audit = require('../../audits/manifest-theme-color.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const Manifest = manifestParser(manifestSrc);
+const exampleManifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
 describe('Manifest: theme_color audit', () => {
-  it('fails when no manifest present', () => {
+  it('fails when no manifest artifact present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
     }}).rawValue, false);
   });
 
   it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
   // Need to disable camelcase check for dealing with theme_color.
   /* eslint-disable camelcase */
-  it('fails when a manifest contains no theme_color', () => {
-    const inputs = {
-      Manifest: {
-        theme_color: null
-      }
+  it('fails when a minimal manifest contains no theme_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        start_url: '/'
+      }))
     };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
+  });
 
-    return assert.equal(Audit.audit(inputs).rawValue, false);
+  it('succeeds when a minimal manifest contains a theme_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        theme_color: '#bada55'
+      }))
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, true);
   });
 
   /* eslint-enable camelcase */
 
-  it('succeeds when a manifest contains a theme_color', () => {
-    return assert.equal(Audit.audit({Manifest}).rawValue, true);
+  it('succeeds when a complete manifest contains a theme_color', () => {
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

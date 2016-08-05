@@ -17,32 +17,43 @@ const Audit = require('../../audits/manifest-name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const manifest = manifestParser(manifestSrc);
+const exampleManifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
 describe('Manifest: name audit', () => {
-  it('fails when no manifest present', () => {
+  it('fails when no manifest artifact present', () => {
     return assert.equal(Audit.audit({Manifest: {
       value: undefined
     }}).rawValue, false);
   });
 
   it('fails when an empty manifest is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
   it('fails when a manifest contains no name', () => {
-    const inputs = {
-      Manifest: {
-        name: null
-      }
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        display: '/'
+      }))
     };
-
-    return assert.equal(Audit.audit(inputs).rawValue, false);
+    return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
-  it('succeeds when a manifest contains a name', () => {
-    return assert.equal(Audit.audit({Manifest: manifest}).rawValue, true);
+  it('succeeds when a minimal manifest contains a name', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        name: 'Lighthouse PWA'
+      }))
+    };
+    return assert.equal(Audit.audit(artifacts).rawValue, true);
+  });
+
+  it('succeeds when a complete manifest contains a name', () => {
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });
