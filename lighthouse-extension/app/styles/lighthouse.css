@@ -114,43 +114,33 @@ body {
 
 .button {
   cursor: pointer;
-}
-
-.button--link {
-  background: none;
-  border: none;
-  box-shadow: none;
-  color: #FFF;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.button--generate {
   font-family: 'Roboto', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 12px;
   color: #FFFFFF;
   border: none;
   color: #FFF;
   background: #719EA8;
   box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.50);
   border-radius: 2px;
+  padding: 7px 12px 5px 12px
+}
+
+.button--generate {
+  font-weight: 500;
+  font-size: 16px;
   padding: 8px 16px 10px 16px;
-  margin-left: auto;
   align-self: stretched;
+  margin-left: auto;
 }
 
 .button--configure {
-  background: none;
-  border: none;
-  box-shadow: none;
-  color: #FFF;
-  text-decoration: underline;
+  margin-right: auto;
 }
 
 .button--ok {
-  align-self: center;
+  margin: 0 auto;
 }
 
 .subpage {
@@ -205,6 +195,7 @@ body {
 /* 1. scrollbar when extension is too small */
 .options {
   overflow: auto; /* [1] */
+  display: block;
 }
 
 .options__title {
