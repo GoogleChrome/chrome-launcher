@@ -17,14 +17,14 @@
 
 const Audit = require('../../audits/estimated-input-latency.js');
 const assert = require('assert');
-const traceContents = require('../fixtures/traces/progressive-app.json');
+const traceEvents = require('../fixtures/traces/progressive-app.json');
 
 /* eslint-env mocha */
 
 describe('Performance: estimated-input-latency audit', () => {
   it('scores a -1 with invalid trace data', () => {
     const output = Audit.audit({
-      traces: {[Audit.DEFAULT_TRACE]: {traceContents: '[{"pid": 15256,"tid": 1295,"t'}},
+      traces: {[Audit.DEFAULT_TRACE]: {traceEvents: '[{"pid": 15256,"tid": 1295,"t'}},
       Speedline: {
         first: 500
       }
@@ -35,7 +35,7 @@ describe('Performance: estimated-input-latency audit', () => {
 
   it('evaluates valid input correctly', () => {
     const output = Audit.audit({
-      traces: {[Audit.DEFAULT_TRACE]: {traceContents}},
+      traces: {[Audit.DEFAULT_TRACE]: {traceEvents}},
       Speedline: {
         first: 500
       }

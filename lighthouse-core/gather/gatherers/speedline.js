@@ -22,7 +22,7 @@ const speedline = require('speedline');
 class Speedline extends Gatherer {
 
   afterPass(options, tracingData) {
-    return speedline(tracingData.traceContents).then(results => {
+    return speedline(tracingData.traceEvents).then(results => {
       this.artifact = results;
     }).catch(err => {
       this.artifact = {

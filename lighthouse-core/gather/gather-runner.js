@@ -118,7 +118,18 @@ class GatherRunner {
       pass = pass.then(_ => {
         log.log('status', `Gathering: trace "${traceName}"`);
         return driver.endTrace().then(traceContents => {
-          loadData.traces[traceName] = {traceContents};
+          // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
+          // traceContents was an array of trace events. After this point,
+          // traceContents is an object with a traceEvents property. Normalize
+          // to new format.
+          if (Array.isArray(traceContents)) {
+            traceContents = {
+              traceEvents: traceContents
+            };
+          }
+
+          loadData.traces[traceName] = traceContents;
+          loadData.traceEvents = traceContents.traceEvents;
           log.verbose('statusEnd', `Gathering: trace "${traceName}"`);
         });
       });
@@ -140,9 +151,6 @@ class GatherRunner {
           return chain.then(_ => {
             const status = `Gathering: ${gatherer.name}`;
             log.log('status', status);
-            if (config.trace) {
-              loadData.traceContents = loadData.traces[traceName].traceContents;
-            }
             return Promise.resolve(gatherer.afterPass(options, loadData)).then(ret => {
               log.verbose('statusEnd', status);
               return ret;
@@ -197,10 +205,9 @@ class GatherRunner {
               .then(_ => this.pass(runOptions))
               .then(_ => this.afterPass(runOptions))
               .then(loadData => {
-                // Need to manually merge traces property before
-                // merging loadDat into tracingData to avoid data loss.
-                Object.assign(loadData.traces, tracingData.traces);
-                Object.assign(tracingData, loadData);
+                // Merge pass trace and network data into tracingData.
+                Object.assign(tracingData.traces, loadData.traces);
+                tracingData.networkRecords = loadData.networkRecords;
               })
               .then(_ => this.tearDown(runOptions));
         }, Promise.resolve());

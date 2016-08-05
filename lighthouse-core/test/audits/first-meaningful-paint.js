@@ -17,6 +17,7 @@
 
 const Audit = require('../../audits/first-meaningful-paint.js');
 const assert = require('assert');
+const traceEvents = require('../fixtures/traces/progressive-app.json');
 
 /* eslint-env mocha */
 describe('Performance: first-meaningful-paint audit', () => {
@@ -36,9 +37,8 @@ describe('Performance: first-meaningful-paint audit', () => {
     let fmpResult;
 
     it('processes a valid trace file', done => {
-      const traceData = require('../fixtures/traces/progressive-app.json');
       assert.doesNotThrow(_ => {
-        Audit.audit({traces: {[Audit.DEFAULT_TRACE]: {traceContents: traceData}}})
+        Audit.audit({traces: {[Audit.DEFAULT_TRACE]: {traceEvents}}})
           .then(response => {
             fmpResult = response;
             done();

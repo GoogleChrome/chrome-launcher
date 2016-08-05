@@ -88,10 +88,7 @@ describe('Runner', () => {
 
       artifacts: {
         traces: {
-          [Audit.DEFAULT_TRACE]: {
-            traceContents: path.join(__dirname,
-                           '/fixtures/traces/trace-user-timings.json')
-          }
+          [Audit.DEFAULT_TRACE]: path.join(__dirname, '/fixtures/traces/trace-user-timings.json')
         }
       }
     }, flags.auditWhitelist);

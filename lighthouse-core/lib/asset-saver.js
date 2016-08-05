@@ -81,7 +81,11 @@ function saveArtifacts(artifacts, filename) {
 }
 
 function prepareAssets(options, artifacts) {
-  const traceData = filterForSize(artifacts.traceContents);
+  const traceData = Object.keys(artifacts.traces).map(traceName => {
+    const filteredTrace = Object.assign({}, artifacts.traces[traceName]);
+    filteredTrace.traceEvents = filterForSize(filteredTrace.traceEvents);
+    return filteredTrace;
+  });
   const html = screenshotDump(options, artifacts.ScreenshotFilmstrip);
   return {traceData, html};
 }

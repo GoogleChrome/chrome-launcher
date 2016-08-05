@@ -160,7 +160,7 @@ describe('GatherRunner', function() {
 
     return GatherRunner.afterPass({driver, config}).then(vals => {
       assert.equal(calledTrace, true);
-      assert.deepEqual(vals.traces[Audit.DEFAULT_TRACE].traceContents, {x: 1});
+      assert.deepEqual(vals.traces[Audit.DEFAULT_TRACE], {x: 1});
     });
   });
 
@@ -180,7 +180,7 @@ describe('GatherRunner', function() {
     };
 
     return GatherRunner.afterPass({driver, config}).then(vals => {
-      assert.deepEqual(vals.traces.notTheDefaultPass.traceContents, {x: 1});
+      assert.deepEqual(vals.traces.notTheDefaultPass, {x: 1});
     });
   });
 

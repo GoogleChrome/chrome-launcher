@@ -68,7 +68,7 @@ class TTIMetric extends Audit {
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
-      const traceContents = artifacts.traces[Audit.DEFAULT_TRACE].traceContents;
+      const traceContents = artifacts.traces[Audit.DEFAULT_TRACE].traceEvents;
       const model = tracingProcessor.init(traceContents);
       const endOfTraceTime = model.bounds.max;
 

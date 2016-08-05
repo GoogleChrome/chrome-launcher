@@ -130,7 +130,7 @@ class UserTimings extends Audit {
     return new Promise((resolve, reject) => {
       const traceContents =
         artifacts.traces[this.DEFAULT_TRACE] &&
-        artifacts.traces[this.DEFAULT_TRACE].traceContents;
+        artifacts.traces[this.DEFAULT_TRACE].traceEvents;
       if (!traceContents || !Array.isArray(traceContents)) {
         throw new Error(FAILURE_MESSAGE);
       }

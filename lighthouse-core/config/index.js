@@ -28,7 +28,7 @@ const log = require('../lib/log');
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
 // This is done by searching for most occuring threads and basing new events
 // off of those.
-function cleanTrace(traceContents) {
+function cleanTrace(traceEvents) {
   // Keep track of most occuring threads
   const threads = [];
   const countsByThread = {};
@@ -55,7 +55,7 @@ function cleanTrace(traceContents) {
   let name;
   let counter;
 
-  traceContents.forEach((evt, idx) => {
+  traceEvents.forEach((evt, idx) => {
     if (evt.name.startsWith('TracingStartedIn')) {
       traceStartEvents.push(idx);
     }
@@ -90,20 +90,20 @@ function cleanTrace(traceContents) {
 
   // Remove all current TracingStartedIn* events, storing
   // the first events ts.
-  const ts = traceContents[traceStartEvents[0]] && traceContents[traceStartEvents[0]].ts;
+  const ts = traceEvents[traceStartEvents[0]] && traceEvents[traceStartEvents[0]].ts;
 
   // account for offset after removing items
   let i = 0;
   for (let dup of traceStartEvents) {
-    traceContents.splice(dup - i, 1);
+    traceEvents.splice(dup - i, 1);
     i++;
   }
 
   // Add a new TracingStartedInPage event based on most active thread
   // and using TS of first found TracingStartedIn* event
-  traceContents.unshift(makeMockEvent(mostActiveFrame, ts));
+  traceEvents.unshift(makeMockEvent(mostActiveFrame, ts));
 
-  return traceContents;
+  return traceEvents;
 }
 
 function filterPasses(passes, audits) {
@@ -185,20 +185,26 @@ function expandArtifacts(artifacts, includeSpeedline) {
 
   // currently only trace logs and performance logs should be imported
   if (artifacts.traces) {
-    let trace;
     Object.keys(artifacts.traces).forEach(key => {
-      if (artifacts.traces[key].traceContents) {
-        log.log('info', 'Normalizng trace contents into expected state...');
-        trace = require(artifacts.traces[key].traceContents);
-
-        expandedArtifacts.traces[key].traceContents = cleanTrace(trace.traceEvents || trace);
+      log.log('info', 'Normalizng trace contents into expected state...');
+      let trace = require(artifacts.traces[key]);
+      // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004), trace was
+      // an array of trace events. After this point, trace is an object with a
+      // traceEvents property. Normalize to new format.
+      if (Array.isArray(trace)) {
+        trace = {
+          traceEvents: trace
+        };
       }
+      cleanTrace(trace.traceEvents);
+
+      expandedArtifacts.traces[key] = trace;
     });
   }
 
   if (includeSpeedline) {
     const speedline = new SpeedlineGatherer();
-    speedline.afterPass({}, {traceContents: expandedArtifacts.traces.defaultPass.traceContents});
+    speedline.afterPass({}, {traceEvents: expandedArtifacts.traces.defaultPass.traceEvents});
     expandedArtifacts.Speedline = speedline.artifact;
   }
 

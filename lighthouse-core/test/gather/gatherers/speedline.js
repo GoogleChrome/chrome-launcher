@@ -19,12 +19,13 @@
 
 const SpeedlineGather = require('../../../gather/gatherers/speedline.js');
 const assert = require('assert');
+const traceEvents = require('../../fixtures/traces/progressive-app.json');
 
 describe('Speedline gatherer', () => {
   it('returns an error debugString on faulty trace data', done => {
     const speedlineGather = new SpeedlineGather();
 
-    speedlineGather.afterPass({}, {traceContents: {boo: 'ya'}}).then(_ => {
+    speedlineGather.afterPass({}, {traceEvents: {boo: 'ya'}}).then(_ => {
       assert.ok(speedlineGather.artifact.debugString);
       assert.ok(speedlineGather.artifact.debugString.length);
       done();
@@ -34,9 +35,8 @@ describe('Speedline gatherer', () => {
   // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
   it('measures the pwa.rocks example with speed index of 831', () => {
     const speedlineGather = new SpeedlineGather();
-    const traceContents = require('../../fixtures/traces/progressive-app.json');
 
-    return speedlineGather.afterPass({}, {traceContents}).then(_ => {
+    return speedlineGather.afterPass({}, {traceEvents}).then(_ => {
       const speedline = speedlineGather.artifact;
       return assert.equal(Math.round(speedline.speedIndex), 831);
     });

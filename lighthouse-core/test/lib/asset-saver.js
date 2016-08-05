@@ -22,13 +22,14 @@ const assert = require('assert');
 const fs = require('fs');
 
 const ScreenshotFilmstrip = require('../fixtures/traces/screenshots.json');
-const traceContents = require('../fixtures/traces/progressive-app.json');
+const traceEvents = require('../fixtures/traces/progressive-app.json');
+const Audit = require('../../audits/audit.js');
 
 /* eslint-env mocha */
 describe('asset-saver helper', () => {
   it('generates HTML', () => {
     const options = {url: 'https://testexample.com'};
-    const artifacts = {screenshots: [], traceContents: []};
+    const artifacts = {screenshots: [], traces: []};
     const output = assetSaver.prepareAssets(options, artifacts);
     assert.ok(/<!doctype/gim.test(output.html));
   });
@@ -42,7 +43,11 @@ describe('asset-saver helper', () => {
       }
     };
     const artifacts = {
-      traceContents,
+      traces: {
+        [Audit.DEFAULT_TRACE]: {
+          traceEvents
+        }
+      },
       ScreenshotFilmstrip
     };
 
