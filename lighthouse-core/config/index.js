@@ -28,7 +28,8 @@ const log = require('../lib/log');
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
 // This is done by searching for most occuring threads and basing new events
 // off of those.
-function cleanTrace(traceEvents) {
+function cleanTrace(trace) {
+  const traceEvents = trace.traceEvents;
   // Keep track of most occuring threads
   const threads = [];
   const countsByThread = {};
@@ -103,7 +104,7 @@ function cleanTrace(traceEvents) {
   // and using TS of first found TracingStartedIn* event
   traceEvents.unshift(makeMockEvent(mostActiveFrame, ts));
 
-  return traceEvents;
+  return trace;
 }
 
 function filterPasses(passes, audits) {
@@ -196,7 +197,7 @@ function expandArtifacts(artifacts, includeSpeedline) {
           traceEvents: trace
         };
       }
-      cleanTrace(trace.traceEvents);
+      trace = cleanTrace(trace);
 
       expandedArtifacts.traces[key] = trace;
     });
