@@ -38,13 +38,23 @@ limitations under the License.
 
   <main class="main" role="main">
     <div class="feedback"></div>
-    <button class="generate-report">Generate report</button>
+
+    <button class="button button--configure" id="configure-options">Options</button>
+    <button class="button button--generate" id="generate-report">Generate report</button>
   </main>
 
-  <aside class="status">
+  <aside class="status subpage">
     <div class="status__spinner"></div>
     <div class="status__msg">Starting...</div>
     <div><small class="status__detailsmsg"></small></div>
+  </aside>
+
+  <aside class="options subpage">
+    <h2 class="options__title">Options</h2>
+    <ul class="options__list">
+    </ul>
+
+    <button class="button button--ok" id="ok">OK</button>
   </aside>
 
   <script src="scripts/popup.js"></script>
