@@ -29,12 +29,6 @@ describe('Manifest: exists audit', () => {
     }}).rawValue, false);
   });
 
-  it('succeeds when a manifest artifact is present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: {}
-    }}).rawValue, true);
-  });
-
   it('succeeds with a valid minimal manifest', () => {
     const artifacts = {
       Manifest: manifestParser('{}')

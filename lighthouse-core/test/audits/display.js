@@ -38,7 +38,7 @@ describe('Mobile-friendly: display audit', () => {
 
   it('handles the case where there is no manifest display property', () => {
     const artifacts = {
-      Manifest: manifestParser({})
+      Manifest: manifestParser('{}')
     };
     const output = Audit.audit(artifacts);
 

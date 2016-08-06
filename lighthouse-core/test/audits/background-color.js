@@ -67,7 +67,7 @@ describe('Manifest: background color audit', () => {
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, true);
-    assert.equal(output.extendedInfo.value.color, '#FAFAFA');
+    assert.equal(output.extendedInfo.value, '#FAFAFA');
   });
 
   it('succeeds when a complete manifest contains a background_color', () => {

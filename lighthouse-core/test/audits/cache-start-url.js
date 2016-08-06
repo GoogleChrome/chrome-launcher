@@ -45,15 +45,6 @@ describe('Cache: start_url audit', () => {
 
   // Need to disable camelcase check for dealing with start_url.
   /* eslint-disable camelcase */
-  it('fails when a manifest artifact contains no start_url', () => {
-    const artifacts = {
-      Manifest: { }
-    };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
-    assert.equal(output.debugString, 'start_url not present in Manifest');
-  });
-
   it('fails when a manifest contains no start_url', () => {
     const artifacts = {
       Manifest: manifestParser('{}')

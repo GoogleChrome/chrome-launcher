@@ -39,7 +39,6 @@ class ManifestBackgroundColor extends Audit {
    */
   static getBackgroundColorValue(manifest) {
     return manifest !== undefined &&
-      manifest.background_color !== undefined &&
       manifest.background_color.value;
   }
 
@@ -53,9 +52,7 @@ class ManifestBackgroundColor extends Audit {
     return ManifestBackgroundColor.generateAuditResult({
       rawValue: !!bgColor,
       extendedInfo: {
-        value: {
-          color: bgColor
-        },
+        value: bgColor,
         formatter: Formatter.SUPPORTED_FORMATS.NULL
       }
     });

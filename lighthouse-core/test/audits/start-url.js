@@ -37,7 +37,7 @@ describe('Manifest: start_url audit', () => {
     assert.equal(output.debugString, undefined);
   });
 
-  // Need to disable camelcase check for dealing with short_name.
+  // Need to disable camelcase check for dealing with start_url.
   /* eslint-disable camelcase */
   it('fails when a manifest contains no start_url', () => {
     const artifacts = {
