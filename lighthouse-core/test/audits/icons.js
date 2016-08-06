@@ -19,6 +19,7 @@ const Audit144 = require('../../audits/manifest-icons-min-144.js');
 const Audit192 = require('../../audits/manifest-icons-min-192.js');
 const assert = require('assert');
 const manifestParser = require('../../lib/manifest-parser');
+const exampleManifest = JSON.stringify(require('../fixtures/manifest.json'));
 
 /* global describe, it*/
 
@@ -58,8 +59,7 @@ describe('Manifest: icons audits', () => {
 
     it('succeeds when a manifest contains icons that are large enough', () => {
       // stub manifest contains a 192 icon
-      const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(exampleManifest);
       assert.equal(Audit144.audit({Manifest}).rawValue, true);
       assert.equal(Audit192.audit({Manifest}).rawValue, true);
     });

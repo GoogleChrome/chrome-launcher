@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 const Audit = require('../../audits/manifest-display.js');
+const manifestParser = require('../../lib/manifest-parser');
 const assert = require('assert');
+
+const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
+const exampleManifest = manifestParser(manifestSrc);
 
 /* global describe, it*/
 
@@ -26,28 +30,36 @@ describe('Mobile-friendly: display audit', () => {
     assert.equal(Audit.hasRecommendedValue(undefined), false);
   });
 
-  it('handles the case where there is no display property', () => {
-    const output = Audit.audit({Manifest: {}});
+  it('fails when no manifest artifact present', () => {
+    return assert.equal(Audit.audit({Manifest: {
+      value: undefined
+    }}).rawValue, false);
+  });
+
+  it('handles the case where there is no manifest display property', () => {
+    const artifacts = {
+      Manifest: manifestParser('{}')
+    };
+    const output = Audit.audit(artifacts);
 
     assert.equal(output.score, false);
     assert.equal(output.displayValue, '');
     assert.equal(output.rawValue, false);
   });
 
-  it('audits a manifest\'s display property', () => {
-    const expected = 'standalone';
-    const output = Audit.audit({
-      Manifest: {
-        value: {
-          display: {
-            value: expected
-          }
-        }
-      }
-    });
-
+  it('succeeds when a manifest has a display property', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        display: 'standalone'
+      }))
+    };
+    const output = Audit.audit(artifacts);
     assert.equal(output.score, true);
-    assert.equal(output.displayValue, expected);
+    assert.equal(output.displayValue, 'standalone');
     assert.equal(output.rawValue, true);
+  });
+
+  it('succeeds when a complete manifest contains a display property', () => {
+    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });
