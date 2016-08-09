@@ -171,24 +171,31 @@ class ReportGenerator {
     const inline = (options && options.inline) || false;
 
     // Ensure the formatter for each extendedInfo is registered.
+    Object.keys(results.audits).forEach(audit => {
+      // Use value rather than key for audit.
+      audit = results.audits[audit];
+
+      if (!audit.extendedInfo) {
+        return;
+      }
+      if (!audit.extendedInfo.formatter) {
+        // HTML formatter not provided for this subItem
+        return;
+      }
+      const formatter = Formatter.getByName(audit.extendedInfo.formatter);
+      const helpers = formatter.getHelpers();
+      if (helpers) {
+        Handlebars.registerHelper(helpers);
+      }
+
+      Handlebars.registerPartial(audit.name, formatter.getFormatter('html'));
+    });
+
     results.aggregations.forEach(aggregation => {
       aggregation.score.forEach(score => {
-        score.subItems.forEach(subItem => {
-          if (!subItem.extendedInfo) {
-            return;
-          }
-          if (!subItem.extendedInfo.formatter) {
-            // HTML formatter not provided for this subItem
-            return;
-          }
-          const formatter = Formatter.getByName(subItem.extendedInfo.formatter);
-          const helpers = formatter.getHelpers();
-          if (helpers) {
-            Handlebars.registerHelper(helpers);
-          }
-
-          Handlebars.registerPartial(subItem.name, formatter.getFormatter('html'));
-        });
+        // Map subItem strings to auditResults from results.audits.
+        // Coming soon events are not in auditResults, but rather still in subItems.
+        score.subItems = score.subItems.map(subItem => results.audits[subItem] || subItem);
       });
     });
 

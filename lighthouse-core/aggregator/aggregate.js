@@ -171,7 +171,7 @@ class Aggregate {
           return;
         }
 
-        subItems.push(filteredAndRemappedResults[e]);
+        subItems.push(filteredAndRemappedResults[e].name);
 
         // Only add to the score if this aggregation contributes to the
         // overall score.
@@ -199,13 +199,13 @@ class Aggregate {
    * @param {!Array<!AuditResult>} results
    * @return {!AggregationResult}
    */
-  static aggregate(aggregation, results) {
+  static aggregate(aggregation, auditResults) {
     return {
       name: aggregation.name,
       description: aggregation.description,
       scored: aggregation.scored,
       categorizable: aggregation.categorizable,
-      score: Aggregate.compare(results, aggregation.items, aggregation.scored)
+      score: Aggregate.compare(auditResults, aggregation.items, aggregation.scored)
     };
   }
 }

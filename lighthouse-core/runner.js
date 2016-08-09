@@ -83,10 +83,20 @@ class Runner {
     // Only run aggregations if needed.
     if (config.aggregations) {
       run = run
-          .then(results => Aggregator.aggregate(config.aggregations, results))
-          .then(aggregations => {
+          .then(auditResults => Promise.all([
+            auditResults,
+            Aggregator.aggregate(config.aggregations, auditResults)
+          ]))
+          .then(results => {
+            const audits = results[0];
+            const aggregations = results[1];
+            const formattedAudits = audits.reduce((formatted, audit) => {
+              formatted[audit.name] = audit;
+              return formatted;
+            }, {});
             return {
               url: opts.url,
+              audits: formattedAudits,
               aggregations
             };
           });

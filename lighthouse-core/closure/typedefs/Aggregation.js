@@ -97,7 +97,7 @@ AggregationResultItem.prototype.name;
 /** @type {string} */
 AggregationResultItem.prototype.description;
 
-/** @type {!Array<!AuditResult>} */
+/** @type {!Array<!string>} */
 AggregationResultItem.prototype.subItems;
 
 /**

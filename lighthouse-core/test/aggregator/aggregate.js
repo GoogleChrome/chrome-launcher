@@ -251,18 +251,10 @@ describe('Aggregate', () => {
       overall: 0.375,
       name: undefined,
       description: undefined,
-      subItems: [{
-        name: 'test',
-        rawValue: false,
-        score: false,
-        displayValue: ''
-      },
-      {
-        name: 'alternate-test',
-        rawValue: 50,
-        score: 50,
-        displayValue: '50'
-      }]
+      subItems: [
+        'test',
+        'alternate-test'
+      ]
     });
   });
 
@@ -297,18 +289,10 @@ describe('Aggregate', () => {
       overall: 0,
       name: undefined,
       description: undefined,
-      subItems: [{
-        name: 'test',
-        rawValue: false,
-        score: false,
-        displayValue: ''
-      },
-      {
-        name: 'alternate-test',
-        rawValue: 50,
-        score: 50,
-        displayValue: '50'
-      }]
+      subItems: [
+        'test',
+        'alternate-test'
+      ]
     });
   });
 

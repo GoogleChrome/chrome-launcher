@@ -81,7 +81,7 @@ function createOutput(results, outputMode) {
 
   // JSON report.
   if (outputMode === 'json') {
-    return JSON.stringify(results.aggregations, null, 2);
+    return JSON.stringify({audits: results.audits, aggregations: results.aggregations}, null, 2);
   }
 
   // Pretty printed.
@@ -99,6 +99,9 @@ function createOutput(results, outputMode) {
       }
 
       item.subItems.forEach(subitem => {
+        // Get audit object from inside of results.audits under name subitem.
+        // Coming soon events are not located inside of results.audits.
+        subitem = results.audits[subitem] || subitem;
         let lineItem = ` -- ${subitem.description}: ${subitem.score}`;
         if (subitem.displayValue) {
           lineItem += ` (${subitem.displayValue})`;
