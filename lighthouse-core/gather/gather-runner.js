@@ -51,10 +51,9 @@ class GatherRunner {
     });
   }
 
-  static setup(options) {
+  static setupPass(options) {
     const driver = options.driver;
     const config = options.config;
-    const gatherers = config.gatherers;
     let pass = Promise.resolve();
 
     if (config.trace) {
@@ -65,9 +64,7 @@ class GatherRunner {
       pass = pass.then(_ => driver.beginNetworkCollect());
     }
 
-    return gatherers.reduce((chain, gatherer) => {
-      return chain.then(_ => gatherer.setup(options));
-    }, pass);
+    return pass;
   }
 
   static beforePass(options) {
@@ -160,14 +157,6 @@ class GatherRunner {
         .then(_ => loadData);
   }
 
-  static tearDown(options) {
-    const config = options.config;
-    const gatherers = config.gatherers;
-    return gatherers.reduce((chain, gatherer) => {
-      return chain.then(_ => gatherer.tearDown(options));
-    }, Promise.resolve());
-  }
-
   static run(passes, options) {
     const driver = options.driver;
     const tracingData = {traces: {}};
@@ -200,7 +189,7 @@ class GatherRunner {
         return passes.reduce((chain, config) => {
           const runOptions = Object.assign({}, options, {config});
           return chain
-              .then(_ => this.setup(runOptions))
+              .then(_ => this.setupPass(runOptions))
               .then(_ => this.beforePass(runOptions))
               .then(_ => this.pass(runOptions))
               .then(_ => this.afterPass(runOptions))
@@ -208,8 +197,7 @@ class GatherRunner {
                 // Merge pass trace and network data into tracingData.
                 config.trace && Object.assign(tracingData.traces, loadData.traces);
                 config.network && (tracingData.networkRecords = loadData.networkRecords);
-              })
-              .then(_ => this.tearDown(runOptions));
+              });
         }, Promise.resolve());
       })
       .then(_ => {
