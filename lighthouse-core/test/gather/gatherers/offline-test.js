@@ -55,21 +55,4 @@ describe('HTTP Redirect gatherer', () => {
       assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
     });
   });
-
-  it('handles driver evaluateAsync() failure', () => {
-    return offlineGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.resolve();
-        },
-        evaluateAsync() {
-          return Promise.reject();
-        }
-      }
-    }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
-    });
-  });
 });

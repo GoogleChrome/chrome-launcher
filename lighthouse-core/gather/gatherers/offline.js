@@ -15,26 +15,9 @@
  * limitations under the License.
  */
 
-/* global XMLHttpRequest, __returnResults */
-
 'use strict';
 
 const Gatherer = require('./gatherer');
-
-// *WARNING* do not use fetch.. due to it requiring window focus to fire.
-// Request the current page by issuing a XMLHttpRequest request to ''
-// and storing the status code on the window.
-// This runs in the context of the page, so we don't cover it with unit tests.
-/* istanbul ignore next */
-const requestPage = function() {
-  const oReq = new XMLHttpRequest();
-  oReq.onload = oReq.onerror = e => {
-    // __returnResults is injected by driver.evaluateAsync
-    __returnResults(e.currentTarget.status);
-  };
-  oReq.open('GET', '');
-  oReq.send();
-};
 
 class Offline extends Gatherer {
 
@@ -59,23 +42,28 @@ class Offline extends Gatherer {
     return driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: false}));
   }
 
-  afterPass(options) {
+  beforePass(options) {
     const driver = options.driver;
 
-    // TODO eventually we will want to walk all network
-    // requests that the page initially made and retry them.
-    return Offline
-        .goOffline(driver)
-        .then(_ => driver.evaluateAsync(`(${requestPage.toString()}())`))
-        .then(offlineResponseCode => {
-          this.artifact = offlineResponseCode;
-        })
-        .then(_ => Offline.goOnline(driver))
-        .catch(_ => {
-          this.artifact = {
-            offlineResponseCode: -1
-          };
-        });
+    return driver.gotoURL(options.url, {waitForLoad: true})
+      .then(_ => Offline.goOffline(driver))
+      // Navigate away, then back, to allow a service worker that doesn't call
+      // clients.claim() to take control of the page load.
+      .then(_ => driver.gotoURL('about:blank'))
+      .then(_ => driver.gotoURL(options.url, {waitForLoad: true}))
+      .then(_ => Offline.goOnline(driver));
+  }
+
+  afterPass(options, tracingData) {
+    const navigationRecord = tracingData.networkRecords.filter(record => {
+      // If options.url is just an origin without a path, the Chrome will
+      // implicitly add in a path of '/'.
+      return (record._url === options.url || record._url === options.url + '/') &&
+        record._initiator.type === 'other' &&
+        record._fetchedViaServiceWorker;
+    })[0];
+
+    this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
   }
 }
 
