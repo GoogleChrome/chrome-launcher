@@ -59,9 +59,8 @@ class Offline extends Gatherer {
       // If options.url is just an origin without a path, the Chrome will
       // implicitly add in a path of '/'.
       return (record._url === options.url || record._url === options.url + '/') &&
-        record._initiator.type === 'other' &&
         record._fetchedViaServiceWorker;
-    })[0];
+    }).pop(); // Take the last record that matches.
 
     this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
   }
