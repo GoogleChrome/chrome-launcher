@@ -206,8 +206,8 @@ class GatherRunner {
               .then(_ => this.afterPass(runOptions))
               .then(loadData => {
                 // Merge pass trace and network data into tracingData.
-                Object.assign(tracingData.traces, loadData.traces);
-                tracingData.networkRecords = loadData.networkRecords;
+                config.trace && Object.assign(tracingData.traces, loadData.traces);
+                config.network && (tracingData.networkRecords = loadData.networkRecords);
               })
               .then(_ => this.tearDown(runOptions));
         }, Promise.resolve());
