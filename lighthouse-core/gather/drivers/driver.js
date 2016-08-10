@@ -247,7 +247,7 @@ class Driver {
           return resolve();
         }
 
-        this.on('Page.loadEventFired', response => {
+        this.once('Page.loadEventFired', response => {
           setTimeout(_ => {
             resolve(response);
           }, this.PAUSE_AFTER_LOAD);

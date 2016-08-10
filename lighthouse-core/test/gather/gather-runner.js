@@ -33,7 +33,7 @@ class TestGatherer extends Gatherer {
     return 'test';
   }
 
-  setup() {
+  pass() {
     this.called = true;
   }
 }
@@ -132,12 +132,10 @@ describe('GatherRunner', function() {
 
     const config = {
       trace: true,
-      gatherers: [{
-        setup() {}
-      }]
+      gatherers: [{}]
     };
 
-    return GatherRunner.setup({driver, config}).then(_ => {
+    return GatherRunner.setupPass({driver, config}).then(_ => {
       assert.equal(calledTrace, true);
     });
   });
@@ -195,12 +193,10 @@ describe('GatherRunner', function() {
 
     const config = {
       network: true,
-      gatherers: [{
-        setup() {}
-      }]
+      gatherers: [{}]
     };
 
-    return GatherRunner.setup({driver, config}).then(_ => {
+    return GatherRunner.setupPass({driver, config}).then(_ => {
       assert.equal(calledNetworkCollect, true);
     });
   });
