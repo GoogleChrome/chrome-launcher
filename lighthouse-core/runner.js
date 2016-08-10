@@ -64,14 +64,18 @@ class Runner {
       }
 
       // Now run the audits.
-      run = run.then(artifacts => Promise.all(config.audits.map(audit => {
+      let auditResults = [];
+      run = run.then(artifacts => config.audits.reduce((chain, audit) => {
         const status = `Evaluating: ${audit.meta.description}`;
-        log.log('status', status);
-        return Promise.resolve(audit.audit(artifacts)).then(ret => {
+        // Run each audit sequentially, the auditResults array has all our fine work
+        return chain.then(_ => {
+          log.log('status', status);
+          return audit.audit(artifacts);
+        }).then(ret => {
           log.verbose('statusEnd', status);
-          return ret;
+          auditResults.push(ret);
         });
-      })));
+      }, Promise.resolve()).then(_ => auditResults));
     } else if (config.auditResults) {
       // If there are existing audit results, surface those here.
       run = run.then(_ => config.auditResults);
