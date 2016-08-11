@@ -218,28 +218,22 @@ class Driver {
     });
   }
 
+  /**
+   * Navigate to the given URL. Use of this method directly isn't advised: if
+   * the current page is already at the given URL, navigation will not occur and
+   * so the returned promise will never resolve. See https://github.com/GoogleChrome/lighthouse/pull/185
+   * for one possible workaround.
+   * @param {string} url
+   * @param {!Object} options
+   * @return {!Promise}
+   */
   gotoURL(url, options) {
     const waitForLoad = (options && options.waitForLoad) || false;
     const disableJavaScript = (options && options.disableJavaScript) || false;
     return this.sendCommand('Page.enable')
     .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJavaScript}))
-    .then(_ => this.sendCommand('Page.getNavigationHistory'))
-    .then(navHistory => {
-      const currentURL = navHistory.entries[navHistory.currentIndex].url;
-
-      // Because you can give https://example.com and the browser will
-      // silently redirect to https://example.com/ we need to check the match
-      // with a trailing slash on it.
-      //
-      // If the URL matches then we need to issue a reload not navigate
-      // @see https://github.com/GoogleChrome/lighthouse/issues/183
-      const shouldReload = (currentURL === url || currentURL === url + '/');
-      if (shouldReload) {
-        return this.sendCommand('Page.reload', {ignoreCache: true});
-      }
-
-      return this.sendCommand('Page.navigate', {url});
-    }).then(_ => {
+    .then(_ => this.sendCommand('Page.navigate', {url}))
+    .then(_ => {
       return new Promise((resolve, reject) => {
         this.url = url;
 
