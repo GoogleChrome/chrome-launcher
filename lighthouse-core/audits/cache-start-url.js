@@ -28,7 +28,7 @@ class CacheStartUrl extends Audit {
     return {
       category: 'Manifest',
       name: 'cache-start-url',
-      description: 'Cache contains start_url from manifest',
+      description: 'Cache contains start_url from manifest (alpha)',
       requiredArtifacts: ['CacheContents', 'Manifest', 'URL']
     };
   }
