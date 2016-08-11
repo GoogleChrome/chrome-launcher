@@ -160,7 +160,7 @@ The same audits are run against from a Chrome extension. See [./extension](https
 _Some incomplete notes_
 
 #### Components
-* **Driver** - Interfaces with Chrome Debugging Protocol
+* **Driver** - Interfaces with [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)  ([API viewer](https://chromedevtools.github.io/debugger-protocol-viewer/))
 * **Gathers** - Requesting data from the browser (and maybe post-processing)
 * **Artifacts** - The output of gatherers
 * **Audits** - Non-performance evaluations of capabilities and issues. Includes a raw value and score of that value.
