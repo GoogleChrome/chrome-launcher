@@ -19,6 +19,35 @@
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
 
+/**
+ * Class that drives browser to load the page and runs gatherer lifecycle hooks.
+ * Execution sequence when GatherRunner.run() is called:
+ *
+ * 1. Setup
+ *   A. driver.connect()
+ *   B. GatherRunner.setupDriver()
+ *     i. beginEmulation
+ *     ii. cleanAndDisableBrowserCaches
+ *     iii. forceUpdateServiceWorkers
+ *
+ * 2. For each pass in the config:
+ *   A. GatherRunner.beforePass()
+ *     i. all gatherer's beforePass()
+ *   B. GatherRunner.pass()
+ *     i. GatherRunner.loadPage()
+ *       a. navigate to about:blank
+ *       b. beginTrace & beginNetworkCollect (if requested)
+ *       c. navigate to options.url (and wait for onload)
+ *     ii. all gatherer's pass()
+ *   C. GatherRunner.afterPass()
+ *     i. endTrace & endNetworkCollect (if requested)
+ *     ii. all gatherer's afterPass()
+ *
+ * 3. Teardown
+ *   A. reloadForCleanStateIfNeeded
+ *   B. driver.disconnect()
+ *   C. collect all artifacts and return them
+ */
 class GatherRunner {
   static loadPage(driver, options) {
     // Since a Page.reload command does not let a service worker take over, we
@@ -27,46 +56,34 @@ class GatherRunner {
     return driver.gotoURL('about:blank')
       // Wait a bit for about:blank to "take hold" before switching back to the page.
       .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
+      // Begin tracing and network recording if required.
+      .then(_ => options.config.trace && driver.beginTrace())
+      .then(_ => options.config.network && driver.beginNetworkCollect())
+      // Navigate.
       .then(_ => driver.gotoURL(options.url, {
         waitForLoad: true,
         disableJavaScript: !!options.disableJavaScript
       }));
   }
 
-  static setupDriver(driver, gatherers, options) {
+  static setupDriver(driver, options) {
     log.log('status', 'Initializing…');
-    return new Promise((resolve, reject) => {
-      // Enable emulation.
-      if (options.flags.mobile) {
-        return resolve(driver.beginEmulation());
-      }
-
-      // noop if no mobile emulation
-      resolve();
-    }).then(_ => {
-      return driver.cleanAndDisableBrowserCaches();
-    }).then(_ => {
-      // Force SWs to update on load.
-      return driver.forceUpdateServiceWorkers();
-    });
+    // Enable emulation if required.
+    return Promise.resolve(options.flags.mobile && driver.beginEmulation())
+      .then(_ => {
+        return driver.cleanAndDisableBrowserCaches();
+      }).then(_ => {
+        // Force SWs to update on load.
+        return driver.forceUpdateServiceWorkers();
+      });
   }
 
-  static setupPass(options) {
-    const driver = options.driver;
-    const config = options.config;
-    let pass = Promise.resolve();
-
-    if (config.trace) {
-      pass = pass.then(_ => driver.beginTrace());
-    }
-
-    if (config.network) {
-      pass = pass.then(_ => driver.beginNetworkCollect());
-    }
-
-    return pass;
-  }
-
+  /**
+   * Calls beforePass() on gatherers before navigation and before tracing has
+   * started (if requested).
+   * @param {!Object} options
+   * @return {!Promise}
+   */
   static beforePass(options) {
     const config = options.config;
     const gatherers = config.gatherers;
@@ -78,18 +95,24 @@ class GatherRunner {
     }, Promise.resolve());
   }
 
+  /**
+   * Navigates to requested URL and then runs pass() on gatherers while trace
+   * (if requested) is still being recorded.
+   * @param {!Object} options
+   * @return {!Promise}
+   */
   static pass(options) {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    const gatherernames = gatherers.map(g => g.name).join(', ');
     let pass = Promise.resolve();
 
     if (config.loadPage) {
       pass = pass.then(_ => {
         const status = 'Loading page & waiting for onload';
+        const gatherernames = gatherers.map(g => g.name).join(', ');
         log.log('status', status, gatherernames);
-        return this.loadPage(driver, options).then(_ => {
+        return GatherRunner.loadPage(driver, options).then(_ => {
           log.log('statusEnd', status);
         });
       });
@@ -100,99 +123,85 @@ class GatherRunner {
     }, pass);
   }
 
+  /**
+   * Ends tracing and collects trace data (if requested for this pass), and runs
+   * afterPass() on gatherers with trace data passed in. Promise resolves with
+   * object containing trace and network data.
+   * @param {!Object} options
+   * @return {!Promise}
+   */
   static afterPass(options) {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
     const loadData = {traces: {}};
     let pass = Promise.resolve();
-    let traceName = Audit.DEFAULT_TRACE;
-    if (config.traceName) {
-      traceName = config.traceName;
-    }
 
     if (config.trace) {
       pass = pass.then(_ => {
         log.log('status', 'Retrieving trace');
-        return driver.endTrace().then(traceContents => {
-          // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
-          // traceContents was an array of trace events. After this point,
-          // traceContents is an object with a traceEvents property. Normalize
-          // to new format.
-          if (Array.isArray(traceContents)) {
-            traceContents = {
-              traceEvents: traceContents
-            };
-          }
+        return driver.endTrace();
+      }).then(traceContents => {
+        // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
+        // traceContents was an array of trace events. After this point,
+        // traceContents is an object with a traceEvents property. Normalize
+        // to new format.
+        if (Array.isArray(traceContents)) {
+          traceContents = {
+            traceEvents: traceContents
+          };
+        }
 
-          loadData.traces[traceName] = traceContents;
-          loadData.traceEvents = traceContents.traceEvents;
-          log.verbose('statusEnd', 'Retrieving trace');
-        });
+        const traceName = config.traceName || Audit.DEFAULT_TRACE;
+        loadData.traces[traceName] = traceContents;
+        loadData.traceEvents = traceContents.traceEvents;
+        log.verbose('statusEnd', 'Retrieving trace');
       });
     }
 
     if (config.network) {
+      const status = 'Retrieving network records';
       pass = pass.then(_ => {
-        const status = 'Retrieving network records';
         log.log('status', status);
-        return driver.endNetworkCollect().then(networkRecords => {
-          loadData.networkRecords = networkRecords;
-          log.verbose('statusEnd', status);
-        });
+        return driver.endNetworkCollect();
+      }).then(networkRecords => {
+        loadData.networkRecords = networkRecords;
+        log.verbose('statusEnd', status);
       });
     }
 
-    return gatherers
-        .reduce((chain, gatherer) => {
-          return chain.then(_ => {
-            const status = `Retrieving: ${gatherer.name}`;
-            log.log('status', status);
-            return Promise.resolve(gatherer.afterPass(options, loadData)).then(ret => {
-              log.verbose('statusEnd', status);
-              return ret;
-            });
-          });
-        }, pass)
-        .then(_ => loadData);
+    pass = gatherers.reduce((chain, gatherer) => {
+      const status = `Retrieving: ${gatherer.name}`;
+      return chain.then(_ => {
+        log.log('status', status);
+        return gatherer.afterPass(options, loadData);
+      }).then(ret => {
+        log.verbose('statusEnd', status);
+        return ret;
+      });
+    }, pass);
+
+    // Resolve on loadData.
+    return pass.then(_ => loadData);
   }
 
   static run(passes, options) {
     const driver = options.driver;
     const tracingData = {traces: {}};
 
-    if (typeof options.url !== 'string' || options.url.length === 0) {
-      return Promise.reject(new Error('You must provide a url to the driver'));
-    }
-
-    if (typeof options.flags === 'undefined') {
-      options.flags = {};
-    }
-
-    // Default mobile emulation and page loading to true.
-    // The extension will switch these off initially.
-    if (typeof options.flags.mobile === 'undefined') {
-      options.flags.mobile = true;
-    }
-
-    if (typeof options.flags.loadPage === 'undefined') {
-      options.flags.loadPage = true;
-    }
-
-    passes = this.instantiateGatherers(passes);
+    passes = GatherRunner.instantiateGatherers(passes);
 
     return driver.connect()
-      .then(_ => this.setupDriver(driver, 1, options))
+      .then(_ => GatherRunner.setupDriver(driver, options))
 
       // Run each pass
       .then(_ => {
         return passes.reduce((chain, config) => {
           const runOptions = Object.assign({}, options, {config});
           return chain
-              .then(_ => this.setupPass(runOptions))
-              .then(_ => this.beforePass(runOptions))
-              .then(_ => this.pass(runOptions))
-              .then(_ => this.afterPass(runOptions))
+              .then(_ => GatherRunner.beforePass(runOptions))
+              .then(_ => GatherRunner.pass(runOptions))
+              .then(_ => GatherRunner.afterPass(runOptions))
               .then(loadData => {
                 // Merge pass trace and network data into tracingData.
                 config.trace && Object.assign(tracingData.traces, loadData.traces);
@@ -207,7 +216,6 @@ class GatherRunner {
           log.log('status', 'Disconnecting from browser...');
           driver.disconnect();
         });
-        return undefined;
       })
       .then(_ => {
         // Collate all the gatherer results.
