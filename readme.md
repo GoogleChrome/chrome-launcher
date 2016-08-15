@@ -28,7 +28,8 @@ npm install -g GoogleChrome/lighthouse
 
 ## Run
 ```sh
-# Start Chrome with a few flags
+# Launch Chrome by reaching into the Lighthouse module
+# and using one of its scripts.
 npm explore -g lighthouse -- npm run chrome
 
 # Kick off a lighthouse run
