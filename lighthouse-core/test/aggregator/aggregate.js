@@ -125,16 +125,16 @@ describe('Aggregate', () => {
       'Cannot remap: test already exists');
   });
 
-  it('returns a weight of zero for undefined inputs', () => {
-    return assert.equal(Aggregate._convertToWeight(), 0);
+  it('throws for undefined inputs', () => {
+    return assert.throws(_ => Aggregate._convertToWeight(), 0);
   });
 
-  it('returns a weight of zero for undefined results', () => {
+  it('throws for undefined results', () => {
     const expected = {
       rawValue: true,
       weight: 10
     };
-    return assert.equal(Aggregate._convertToWeight(undefined, expected), 0);
+    return assert.throws(_ => Aggregate._convertToWeight(undefined, expected));
   });
 
   it('returns a weight of zero for undefined expectations', () => {
@@ -143,7 +143,7 @@ describe('Aggregate', () => {
       score: true,
       displayValue: ''
     };
-    return assert.equal(Aggregate._convertToWeight(result, undefined), 0);
+    return assert.throws(_ => Aggregate._convertToWeight(result, undefined));
   });
 
   it('returns the correct weight for a boolean result', () => {
@@ -176,7 +176,7 @@ describe('Aggregate', () => {
     return assert.equal(Aggregate._convertToWeight(result, expected), 5);
   });
 
-  it('returns the a weight of zero if weight is missing from the expected', () => {
+  it('throws if weight is missing from the expected', () => {
     const expected = {
       rawValue: 100
     };
@@ -187,7 +187,7 @@ describe('Aggregate', () => {
       displayValue: '50'
     };
 
-    return assert.equal(Aggregate._convertToWeight(result, expected), 0);
+    return assert.throws(_ => Aggregate._convertToWeight(result, expected), 0);
   });
 
   it('returns a weight of zero for other inputs', () => {
@@ -294,6 +294,45 @@ describe('Aggregate', () => {
         'alternate-test'
       ]
     });
+  });
+
+  it('throws when given a result containing no score property', () => {
+    const items = [{
+      criteria: {
+        test: {
+          rawValue: true,
+          weight: 1
+        }
+      }
+    }];
+
+    const results = [{
+      name: 'test',
+      value: 'should be rawValue',
+      displayValue: ''
+    }];
+    const scored = true;
+
+    return assert.throws(_ => Aggregate.compare(results, items, scored));
+  });
+
+  it('throws when given a criterion containing no rawValue property', () => {
+    const items = [{
+      criteria: {
+        test: {
+          weight: 1
+        }
+      }
+    }];
+
+    const results = [{
+      name: 'test',
+      score: false,
+      displayValue: ''
+    }];
+    const scored = true;
+
+    return assert.throws(_ => Aggregate.compare(results, items, scored));
   });
 
   it('filters a set correctly', () => {

@@ -121,7 +121,7 @@ class TTIMetric extends Audit {
         // Grab this latency and try the threshold again
         currentLatency = estLatency;
       }
-      const timeToInteractive = startTime.toFixed(1);
+      const timeToInteractive = parseFloat(startTime.toFixed(1));
 
       // Use the CDF of a log-normal distribution for scoring.
       //   < 1200ms: score≈100
@@ -129,7 +129,7 @@ class TTIMetric extends Audit {
       //   >= 15000ms: score≈0
       const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
           SCORING_POINT_OF_DIMINISHING_RETURNS);
-      let score = 100 * distribution.computeComplementaryPercentile(timeToInteractive);
+      let score = 100 * distribution.computeComplementaryPercentile(startTime);
 
       // Clamp the score to 0 <= x <= 100.
       score = Math.min(100, score);
