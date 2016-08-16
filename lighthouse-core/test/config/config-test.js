@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Config = require('../../config');
+const Config = require('../../config/config');
 const assert = require('assert');
 const path = require('path');
 const defaultConfig = require('../../config/default.json');

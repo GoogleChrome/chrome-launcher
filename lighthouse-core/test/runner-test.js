@@ -15,7 +15,7 @@
  */
 const Runner = require('../runner');
 const fakeDriver = require('./gather/fake-driver');
-const Config = require('../config');
+const Config = require('../config/config');
 const Audit = require('../audits/audit');
 const assert = require('assert');
 const path = require('path');

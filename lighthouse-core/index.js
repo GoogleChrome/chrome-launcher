@@ -26,7 +26,7 @@ if (!environment.checkNodeCompatibility()) {
 const Runner = require('./runner');
 const log = require('./lib/log.js');
 const ChromeProtocol = require('./gather/drivers/cri.js');
-const Config = require('./config');
+const Config = require('./config/config');
 
 /**
  * The relationship between these root modules:

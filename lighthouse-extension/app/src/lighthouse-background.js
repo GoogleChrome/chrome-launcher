@@ -19,7 +19,7 @@
 
 const ExtensionProtocol = require('../../../lighthouse-core/gather/drivers/extension');
 const Runner = require('../../../lighthouse-core/runner');
-const Config = require('../../../lighthouse-core/config');
+const Config = require('../../../lighthouse-core/config/config');
 const configJSON = require('../../../lighthouse-core/config/default.json');
 const log = require('../../../lighthouse-core/lib/log');
 
