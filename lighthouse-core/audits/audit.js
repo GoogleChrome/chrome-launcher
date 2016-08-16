@@ -34,6 +34,13 @@ class Audit {
   }
 
   /**
+   * @throws
+   */
+  static audit() {
+    throw new Error('Audit audit() function must be overridden.');
+  }
+
+  /**
    * @param {!AuditResultInput} result
    * @return {!AuditResult}
    */

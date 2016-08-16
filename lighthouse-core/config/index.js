@@ -23,6 +23,7 @@ const SpeedlineGatherer = require('../gather/gatherers/speedline');
 
 const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
+const path = require('path');
 
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
@@ -107,7 +108,7 @@ function cleanTrace(trace) {
   return trace;
 }
 
-function filterPasses(passes, audits) {
+function filterPasses(passes, audits, paths) {
   const requiredGatherers = getGatherersNeededByAudits(audits);
 
   // Make sure we only have the gatherers that are needed by the audits
@@ -117,7 +118,7 @@ function filterPasses(passes, audits) {
 
     freshPass.gatherers = freshPass.gatherers.filter(gatherer => {
       try {
-        const GathererClass = GatherRunner.getGathererClass(gatherer);
+        const GathererClass = GatherRunner.getGathererClass(gatherer, paths);
         return requiredGatherers.has(GathererClass.name);
       } catch (requireError) {
         throw new Error(`Unable to locate gatherer: ${gatherer}`);
@@ -171,14 +172,77 @@ function filterAudits(audits, auditWhitelist) {
   return filteredAudits;
 }
 
-function expandAudits(audits) {
+function expandAudits(audits, paths) {
+  const rootPath = path.join(__dirname, '../../');
+
   return audits.map(audit => {
-    try {
-      return require(`../audits/${audit}`);
-    } catch (requireError) {
+    // Check each path to see if the audit can be located. First match wins.
+    const AuditClass = paths.reduce((definition, auditPath) => {
+      // If the definition has already been found, just propagate it. Otherwise try a search
+      // on the path in this iteration of the loop.
+      if (definition !== null) {
+        return definition;
+      }
+
+      const requirePath = auditPath.startsWith('/') ? auditPath : path.join(rootPath, auditPath);
+      try {
+        return require(`${requirePath}/${audit}`);
+      } catch (requireError) {
+        return null;
+      }
+    }, null);
+
+    if (!AuditClass) {
       throw new Error(`Unable to locate audit: ${audit}`);
     }
+
+    // Confirm that the audit appears valid.
+    const auditValidation = validateAudit(AuditClass);
+    if (!auditValidation.valid) {
+      const errors = Object.keys(auditValidation)
+          .reduce((errorList, item) => {
+            // Ignore the valid property as it's generated from the other items in the object.
+            if (item === 'valid') {
+              return errorList;
+            }
+
+            return errorList + (auditValidation[item] ? '' : `\n - ${item} is missing`);
+          }, '');
+
+      throw new Error(`Invalid audit class: ${errors}`);
+    }
+
+    return AuditClass;
   });
+}
+
+function validateAudit(auditDefinition) {
+  const hasAuditMethod = typeof auditDefinition.audit === 'function';
+  const hasMeta = typeof auditDefinition.meta === 'object';
+  const hasMetaName = hasMeta && typeof auditDefinition.meta.name !== 'undefined';
+  const hasMetaCategory = hasMeta && typeof auditDefinition.meta.category !== 'undefined';
+  const hasMetaDescription = hasMeta && typeof auditDefinition.meta.description !== 'undefined';
+  const hasMetaRequiredArtifacts = hasMeta && Array.isArray(auditDefinition.meta.requiredArtifacts);
+  const hasGenerateAuditResult = typeof auditDefinition.generateAuditResult === 'function';
+
+  return {
+    'valid': (
+      hasAuditMethod &&
+      hasMeta &&
+      hasMetaName &&
+      hasMetaCategory &&
+      hasMetaDescription &&
+      hasMetaRequiredArtifacts &&
+      hasGenerateAuditResult
+    ),
+    'audit()': hasAuditMethod,
+    'meta property': hasMeta,
+    'meta.name property': hasMetaName,
+    'meta.category property': hasMetaCategory,
+    'meta.description property': hasMetaDescription,
+    'meta.requiredArtifacts array': hasMetaRequiredArtifacts,
+    'generateAuditResult()': hasGenerateAuditResult
+  };
 }
 
 function expandArtifacts(artifacts, includeSpeedline) {
@@ -241,19 +305,53 @@ class Config {
       configJSON = defaultConfig;
     }
 
-    this._audits = configJSON.audits ? expandAudits(
-        filterAudits(configJSON.audits, auditWhitelist)
+    this._configJSON = this._initRequirePaths(configJSON);
+
+    this._audits = this.json.audits ? expandAudits(
+        filterAudits(this.json.audits, auditWhitelist), this.json.paths.audits
         ) : null;
     // filterPasses expects audits to have been expanded
-    this._passes = configJSON.passes ? filterPasses(configJSON.passes, this._audits) : null;
-    this._auditResults = configJSON.auditResults ? Array.from(configJSON.auditResults) : null;
+    this._passes = this.json.passes ?
+        filterPasses(this.json.passes, this._audits, this.json.paths.gatherers) :
+        null;
+    this._auditResults = this.json.auditResults ? Array.from(this.json.auditResults) : null;
     this._artifacts = null;
-    if (configJSON.artifacts) {
-      this._artifacts = expandArtifacts(configJSON.artifacts,
+    if (this.json.artifacts) {
+      this._artifacts = expandArtifacts(this.json.artifacts,
           // If time-to-interactive is present, add the speedline artifact
-          configJSON.audits && configJSON.audits.find(a => a === 'time-to-interactive'));
+          this.json.audits && this.json.audits.find(a => a === 'time-to-interactive'));
     }
-    this._aggregations = configJSON.aggregations ? Array.from(configJSON.aggregations) : null;
+    this._aggregations = this.json.aggregations ? Array.from(this.json.aggregations) : null;
+  }
+
+  _initRequirePaths(configJSON) {
+    if (typeof configJSON.paths !== 'object') {
+      configJSON.paths = {};
+    }
+
+    if (!Array.isArray(configJSON.paths.audits)) {
+      configJSON.paths.audits = [];
+    }
+
+    if (!Array.isArray(configJSON.paths.gatherers)) {
+      configJSON.paths.gatherers = [];
+    }
+
+    // Make sure the default paths are prepended to the list
+    if (configJSON.paths.audits.indexOf('lighthouse-core/audits') === -1) {
+      configJSON.paths.audits.unshift('lighthouse-core/audits');
+    }
+
+    if (configJSON.paths.gatherers.indexOf('lighthouse-core/gather/gatherers') === -1) {
+      configJSON.paths.gatherers.unshift('lighthouse-core/gather/gatherers');
+    }
+
+    return configJSON;
+  }
+
+  /** @type {!Object} */
+  get json() {
+    return this._configJSON;
   }
 
   /** @type {Array<!Pass>} */

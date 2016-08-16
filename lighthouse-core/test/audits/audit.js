@@ -26,6 +26,8 @@ class B extends Audit {
   static get meta() {
     return {};
   }
+
+  static audit() {}
 }
 
 describe('Audit', () => {
@@ -35,6 +37,14 @@ describe('Audit', () => {
 
   it('does not throw if an audit overrides the meta', () => {
     assert.doesNotThrow(_ => B.meta);
+  });
+
+  it('throws if an audit does not override audit()', () => {
+    assert.throws(_ => A.audit());
+  });
+
+  it('does not throw if an audit overrides audit()', () => {
+    assert.doesNotThrow(_ => B.audit());
   });
 
   it('throws if an audit does generate a result with a value', () => {

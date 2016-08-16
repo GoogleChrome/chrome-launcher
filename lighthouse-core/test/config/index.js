@@ -127,6 +127,39 @@ describe('Config', () => {
     return assert.equal(typeof config.audits[0], 'function');
   });
 
+  it('tests multiple paths for expanding audits', () => {
+    const config = new Config({
+      paths: {
+        audits: ['/fake-path/']
+      },
+      audits: ['user-timings']
+    });
+
+    assert.ok(Array.isArray(config.audits));
+    assert.equal(config.audits.length, 1);
+
+    return assert.throws(_ => new Config({
+      paths: {
+        audits: ['/fake-path/']
+      },
+      audits: ['non-existent-audit']
+    }));
+  });
+
+  it('throws when it finds invalid audits', () => {
+    const paths = {
+      audits: ['lighthouse-core/test/fixtures/invalid-audits']
+    };
+
+    assert.throws(_ => new Config({paths, audits: ['missing-meta']}));
+    assert.throws(_ => new Config({paths, audits: ['missing-audit']}));
+    assert.throws(_ => new Config({paths, audits: ['missing-category']}));
+    assert.throws(_ => new Config({paths, audits: ['missing-name']}));
+    assert.throws(_ => new Config({paths, audits: ['missing-description']}));
+    assert.throws(_ => new Config({paths, audits: ['missing-required-artifact']}));
+    return assert.throws(_ => new Config({paths, audits: ['missing-generate-audit-result']}));
+  });
+
   it('expands artifacts', () => {
     const config = new Config({
       artifacts: {
