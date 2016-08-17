@@ -19,40 +19,6 @@
 const Gatherer = require('./gatherer');
 const manifestParser = require('../../lib/manifest-parser');
 
-/* global document, XMLHttpRequest, __returnResults */
-
-/* istanbul ignore next */
-function getManifestContent() {
-  function post(response) {
-    // __returnResults is magically inserted by driver.evaluateAsync
-    __returnResults(response);
-  }
-
-  const manifestNode = document.querySelector('link[rel=manifest]');
-  if (!manifestNode) {
-    return post({error: 'No <link rel="manifest"> found in DOM.'});
-  }
-
-  const manifestURL = manifestNode.href;
-  if (!manifestURL) {
-    return post({error: 'No href found on <link rel="manifest">.'});
-  }
-
-  const req = new XMLHttpRequest();
-  req.open('GET', manifestURL);
-  req.onload = function() {
-    if (req.status !== 200) {
-      return post({
-        error: `Unable to fetch manifest at \
-          ${manifestURL}: ${req.status} - ${req.statusText}`
-      });
-    }
-
-    post({manifestContent: req.response});
-  };
-  req.send();
-}
-
 class Manifest extends Gatherer {
 
   static _errorManifest(errorString) {
@@ -70,23 +36,18 @@ class Manifest extends Gatherer {
      * potentially lead to a different asset. Using the original manifest
      * resource is tracked in issue #83
      */
-    return driver.evaluateAsync(`(${getManifestContent.toString()}())`)
+    return driver.sendCommand('Page.getAppManifest')
+      .then(response => {
+        if (response.errors.length) {
+          this.artifact = Manifest._errorManifest(response.errors.join(', '));
+          return;
+        }
 
-    .then(returnedValue => {
-      if (!returnedValue) {
+        this.artifact = manifestParser(response.data);
+      }, _ => {
         this.artifact = Manifest._errorManifest('Unable to retrieve manifest');
         return;
-      }
-
-      if (returnedValue.error) {
-        this.artifact = Manifest._errorManifest(returnedValue.error);
-      } else {
-        this.artifact = manifestParser(returnedValue.manifestContent);
-      }
-    }, _ => {
-      this.artifact = Manifest._errorManifest('Unable to retrieve manifest');
-      return;
-    });
+      });
   }
 }
 

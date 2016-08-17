@@ -34,8 +34,8 @@ describe('Manifest gatherer', () => {
   it('returns an artifact', () => {
     return manifestGather.afterPass({
       driver: {
-        evaluateAsync() {
-          return Promise.resolve('');
+        sendCommand() {
+          return Promise.resolve({data: '', errors: [], url: 'https://example.com/manifest.json'});
         }
       }
     }).then(_ => {
@@ -46,7 +46,7 @@ describe('Manifest gatherer', () => {
   it('handles driver failure', () => {
     return manifestGather.afterPass({
       driver: {
-        evaluateAsync() {
+        sendCommand() {
           return Promise.reject('such a fail');
         }
       }
@@ -61,9 +61,9 @@ describe('Manifest gatherer', () => {
     const error = 'There was an error.';
     return manifestGather.afterPass({
       driver: {
-        evaluateAsync() {
+        sendCommand() {
           return Promise.resolve({
-            error
+            errors: [error]
           });
         }
       }
@@ -73,14 +73,15 @@ describe('Manifest gatherer', () => {
   });
 
   it('creates a manifest object for valid manifest content', () => {
-    const manifestContent = JSON.stringify({
+    const data = JSON.stringify({
       name: 'App'
     });
     return manifestGather.afterPass({
       driver: {
-        evaluateAsync() {
+        sendCommand() {
           return Promise.resolve({
-            manifestContent
+            errors: [],
+            data
           });
         }
       }
