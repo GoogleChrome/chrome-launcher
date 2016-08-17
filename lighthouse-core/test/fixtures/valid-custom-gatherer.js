@@ -17,17 +17,8 @@
 
 'use strict';
 
-const LighthouseAudit = require('../../../audits/audit');
+const LighthouseGatherer = require('../../gather/gatherers/gatherer');
 
-class MissingRequiredArtifacts extends LighthouseAudit {
-  static get meta() {
-    return {
-      name: 'missing-category',
-      category: 'Custom',
-      description: 'Missing required artifacts',
-      requiredArtifacts: ['HTML']
-    };
-  }
-}
+class CustomGatherer extends LighthouseGatherer {}
 
-module.exports = MissingRequiredArtifacts;
+module.exports = CustomGatherer;

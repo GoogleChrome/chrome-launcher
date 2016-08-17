@@ -17,8 +17,10 @@
 
 'use strict';
 
-const LighthouseGatherer = require('../../../gather/gatherers/gatherer');
+class MissingArtifact {
+  beforePass() {}
+  pass() {}
+  afterPass() {}
+}
 
-class CustomGatherer extends LighthouseGatherer {}
-
-module.exports = CustomGatherer;
+module.exports = MissingArtifact;

@@ -202,8 +202,6 @@ class GatherRunner {
       return Promise.reject(new Error('You must provide a config'));
     }
 
-    const configJSON = options.config.json;
-
     // Default mobile emulation and page loading to true.
     // The extension will switch these off initially.
     if (typeof options.flags.mobile === 'undefined') {
@@ -214,7 +212,7 @@ class GatherRunner {
       options.flags.loadPage = true;
     }
 
-    passes = this.instantiateGatherers(passes, configJSON.paths.gatherers);
+    passes = this.instantiateGatherers(passes, options.config.configDir);
 
     return driver.connect()
       .then(_ => GatherRunner.setupDriver(driver, options))
@@ -258,36 +256,69 @@ class GatherRunner {
       });
   }
 
-  static getGathererClass(gatherer, paths) {
-    const rootPath = path.join(__dirname, '../../');
+  static getGathererClass(gatherer, rootPath) {
+    const Runner = require('../runner');
+    const list = Runner.getGathererList();
+    const coreGatherer = list.find(a => a === `${gatherer}.js`);
 
-    // Check each path to see if the gatherer can be located. First match wins.
-    const gathererDefinition = paths.reduce((definition, gathererPath) => {
-      // If the definition has already been found, just propagate it. Otherwise try a search
-      // on the path in this iteration of the loop.
-      if (definition !== null) {
-        return definition;
-      }
+    // Assume it's a core gatherer first.
+    let requirePath = path.resolve(__dirname, `./gatherers/${gatherer}`);
+    let GathererClass;
 
-      const requirePath = gathererPath.startsWith('/') ?
-          gathererPath :
-          path.join(rootPath, gathererPath);
-
+    // If not, see if it can be found another way.
+    if (!coreGatherer) {
+      // Firstly try and see if the gatherer resolves naturally through the usual means.
       try {
-        return require(`${requirePath}/${gatherer}`);
-      } catch (requireError) {
-        return null;
-      }
-    }, null);
+        require.resolve(gatherer);
 
-    if (!gathererDefinition) {
-      throw new Error(`Unable to locate gatherer: ${gatherer}`);
+        // If the above works, update the path to the absolute value provided.
+        requirePath = gatherer;
+      } catch (requireError) {
+        // If that fails, try and find it relative to any config path provided.
+        if (rootPath) {
+          requirePath = path.resolve(rootPath, gatherer);
+        }
+      }
     }
 
-    return gathererDefinition;
+    // Now try and require it in. If this fails then the audit file isn't where we expected it.
+    try {
+      GathererClass = require(requirePath);
+    } catch (requireError) {
+      GathererClass = null;
+    }
+
+    if (!GathererClass) {
+      throw new Error(`Unable to locate gatherer: ${gatherer} (tried at: ${requirePath})`);
+    }
+
+    // Confirm that the gatherer appears valid.
+    this.assertValidGatherer(gatherer, GathererClass);
+
+    return GathererClass;
   }
 
-  static instantiateGatherers(passes, paths) {
+  static assertValidGatherer(gatherer, GathererDefinition) {
+    const gathererInstance = new GathererDefinition();
+
+    if (typeof gathererInstance.beforePass !== 'function') {
+      throw new Error(`${gatherer} has no beforePass() method.`);
+    }
+
+    if (typeof gathererInstance.pass !== 'function') {
+      throw new Error(`${gatherer} has no pass() method.`);
+    }
+
+    if (typeof gathererInstance.afterPass !== 'function') {
+      throw new Error(`${gatherer} has no afterPass() method.`);
+    }
+
+    if (typeof gathererInstance.artifact !== 'object') {
+      throw new Error(`${gatherer} has no artifact property.`);
+    }
+  }
+
+  static instantiateGatherers(passes, rootPath) {
     return passes.map(pass => {
       pass.gatherers = pass.gatherers.map(gatherer => {
         // If this is already instantiated, don't do anything else.
@@ -295,7 +326,7 @@ class GatherRunner {
           return gatherer;
         }
 
-        const GathererClass = GatherRunner.getGathererClass(gatherer, paths);
+        const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
         return new GathererClass();
       });
 

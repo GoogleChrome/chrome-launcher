@@ -62,7 +62,7 @@ module.exports = function(url, flags, configJSON) {
     }
 
     // Use ConfigParser to generate a valid config file
-    const config = new Config(configJSON, flags.auditWhitelist);
+    const config = new Config(configJSON, flags.auditWhitelist, flags.configPath);
 
     const driver = new ChromeProtocol();
 
@@ -73,3 +73,5 @@ module.exports = function(url, flags, configJSON) {
 
 module.exports.getAuditList = Runner.getAuditList;
 module.exports.traceCategories = require('./gather/drivers/driver').traceCategories;
+module.exports.Audit = require('./audits/audit');
+module.exports.Gatherer = require('./gather/gatherers/gatherer');

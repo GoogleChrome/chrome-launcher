@@ -17,17 +17,13 @@
 
 'use strict';
 
-const LighthouseAudit = require('../../../audits/audit');
-
-class MissingRequiredArtifacts extends LighthouseAudit {
-  static get meta() {
-    return {
-      name: 'missing-category',
-      category: 'Custom',
-      description: 'Missing required artifacts',
-      requiredArtifacts: ['HTML']
-    };
+class MissingPass {
+  constructor() {
+    this.artifact = {};
   }
+
+  beforePass() {}
+  afterPass() {}
 }
 
-module.exports = MissingRequiredArtifacts;
+module.exports = MissingPass;

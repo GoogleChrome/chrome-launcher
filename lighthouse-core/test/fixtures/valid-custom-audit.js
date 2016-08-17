@@ -15,5 +15,21 @@
  * limitations under the License.
  */
 
-// Pass-through file for developer convenience.
-module.exports = require('../lighthouse-core/gather/gatherers/gatherer');
+'use strict';
+
+const LighthouseAudit = require('../../audits/audit');
+
+class ValidCustomAudit extends LighthouseAudit {
+  static get meta() {
+    return {
+      name: 'valid-audit',
+      category: 'Custom',
+      description: 'Valid Audit',
+      requiredArtifacts: ['HTML']
+    };
+  }
+
+  static audit() {}
+}
+
+module.exports = ValidCustomAudit;

@@ -108,7 +108,7 @@ function cleanTrace(trace) {
   return trace;
 }
 
-function filterPasses(passes, audits, paths) {
+function filterPasses(passes, audits, rootPath) {
   const requiredGatherers = getGatherersNeededByAudits(audits);
 
   // Make sure we only have the gatherers that are needed by the audits
@@ -117,12 +117,8 @@ function filterPasses(passes, audits, paths) {
     const freshPass = Object.assign({}, pass);
 
     freshPass.gatherers = freshPass.gatherers.filter(gatherer => {
-      try {
-        const GathererClass = GatherRunner.getGathererClass(gatherer, paths);
-        return requiredGatherers.has(GathererClass.name);
-      } catch (requireError) {
-        throw new Error(`Unable to locate gatherer: ${gatherer}`);
-      }
+      const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
+      return requiredGatherers.has(GathererClass.name);
     });
 
     return freshPass;
@@ -172,77 +168,80 @@ function filterAudits(audits, auditWhitelist) {
   return filteredAudits;
 }
 
-function expandAudits(audits, paths) {
-  const rootPath = path.join(__dirname, '../../');
+function expandAudits(audits, rootPath) {
+  const Runner = require('../runner');
 
   return audits.map(audit => {
-    // Check each path to see if the audit can be located. First match wins.
-    const AuditClass = paths.reduce((definition, auditPath) => {
-      // If the definition has already been found, just propagate it. Otherwise try a search
-      // on the path in this iteration of the loop.
-      if (definition !== null) {
-        return definition;
-      }
+    // Firstly see if the audit is in Lighthouse itself.
+    const list = Runner.getAuditList();
+    const coreAudit = list.find(a => a === `${audit}.js`);
 
-      const requirePath = auditPath.startsWith('/') ? auditPath : path.join(rootPath, auditPath);
+    // Assume it's a core audit first.
+    let requirePath = path.resolve(__dirname, `../audits/${audit}`);
+    let AuditClass;
+
+    // If not, see if it can be found another way.
+    if (!coreAudit) {
+      // Firstly try and see if the audit resolves naturally through the usual means.
       try {
-        return require(`${requirePath}/${audit}`);
+        require.resolve(audit);
+
+        // If the above works, update the path to the absolute value provided.
+        requirePath = audit;
       } catch (requireError) {
-        return null;
+        // If that fails, try and find it relative to any config path provided.
+        if (rootPath) {
+          requirePath = path.resolve(rootPath, audit);
+        }
       }
-    }, null);
+    }
+
+    // Now try and require it in. If this fails then the audit file isn't where we expected it.
+    try {
+      AuditClass = require(requirePath);
+    } catch (requireError) {
+      AuditClass = null;
+    }
 
     if (!AuditClass) {
-      throw new Error(`Unable to locate audit: ${audit}`);
+      throw new Error(`Unable to locate audit: ${audit} (tried at ${requirePath})`);
     }
 
     // Confirm that the audit appears valid.
-    const auditValidation = validateAudit(AuditClass);
-    if (!auditValidation.valid) {
-      const errors = Object.keys(auditValidation)
-          .reduce((errorList, item) => {
-            // Ignore the valid property as it's generated from the other items in the object.
-            if (item === 'valid') {
-              return errorList;
-            }
-
-            return errorList + (auditValidation[item] ? '' : `\n - ${item} is missing`);
-          }, '');
-
-      throw new Error(`Invalid audit class: ${errors}`);
-    }
+    assertValidAudit(audit, AuditClass);
 
     return AuditClass;
   });
 }
 
-function validateAudit(auditDefinition) {
-  const hasAuditMethod = typeof auditDefinition.audit === 'function';
-  const hasMeta = typeof auditDefinition.meta === 'object';
-  const hasMetaName = hasMeta && typeof auditDefinition.meta.name !== 'undefined';
-  const hasMetaCategory = hasMeta && typeof auditDefinition.meta.category !== 'undefined';
-  const hasMetaDescription = hasMeta && typeof auditDefinition.meta.description !== 'undefined';
-  const hasMetaRequiredArtifacts = hasMeta && Array.isArray(auditDefinition.meta.requiredArtifacts);
-  const hasGenerateAuditResult = typeof auditDefinition.generateAuditResult === 'function';
+function assertValidAudit(audit, auditDefinition) {
+  if (typeof auditDefinition.audit !== 'function') {
+    throw new Error(`${audit} has no audit() method.`);
+  }
 
-  return {
-    'valid': (
-      hasAuditMethod &&
-      hasMeta &&
-      hasMetaName &&
-      hasMetaCategory &&
-      hasMetaDescription &&
-      hasMetaRequiredArtifacts &&
-      hasGenerateAuditResult
-    ),
-    'audit()': hasAuditMethod,
-    'meta property': hasMeta,
-    'meta.name property': hasMetaName,
-    'meta.category property': hasMetaCategory,
-    'meta.description property': hasMetaDescription,
-    'meta.requiredArtifacts array': hasMetaRequiredArtifacts,
-    'generateAuditResult()': hasGenerateAuditResult
-  };
+  if (typeof auditDefinition.meta.name !== 'string') {
+    throw new Error(`${audit} has no meta.name property, or the property is not a string.`);
+  }
+
+  if (typeof auditDefinition.meta.category !== 'string') {
+    throw new Error(`${audit} has no meta.category property, or the property is not a string.`);
+  }
+
+  if (typeof auditDefinition.meta.description !== 'string') {
+    throw new Error(`${audit} has no meta.description property, or the property is not a string.`);
+  }
+
+  if (!Array.isArray(auditDefinition.meta.requiredArtifacts)) {
+    throw new Error(
+      `${audit} has no meta.requiredArtifacts property, or the property is not an array.`
+    );
+  }
+
+  if (typeof auditDefinition.generateAuditResult !== 'function') {
+    throw new Error(
+      `${audit} has no generateAuditResult() method. Did you inherit from the proper base class?`
+    );
+  }
 }
 
 function expandArtifacts(artifacts, includeSpeedline) {
@@ -300,58 +299,34 @@ class Config {
    * @constructor
    * @param{Object} config
    */
-  constructor(configJSON, auditWhitelist) {
+  constructor(configJSON, auditWhitelist, configPath) {
     if (!configJSON) {
       configJSON = defaultConfig;
     }
 
-    this._configJSON = this._initRequirePaths(configJSON);
+    // Store the directory of the config path, if one was provided.
+    this._configDir = configPath ? path.dirname(configPath) : undefined;
 
-    this._audits = this.json.audits ? expandAudits(
-        filterAudits(this.json.audits, auditWhitelist), this.json.paths.audits
+    this._audits = configJSON.audits ? expandAudits(
+        filterAudits(configJSON.audits, auditWhitelist), this._configDir
         ) : null;
     // filterPasses expects audits to have been expanded
-    this._passes = this.json.passes ?
-        filterPasses(this.json.passes, this._audits, this.json.paths.gatherers) :
+    this._passes = configJSON.passes ?
+        filterPasses(configJSON.passes, this._audits, this._configDir) :
         null;
-    this._auditResults = this.json.auditResults ? Array.from(this.json.auditResults) : null;
+    this._auditResults = configJSON.auditResults ? Array.from(configJSON.auditResults) : null;
     this._artifacts = null;
-    if (this.json.artifacts) {
-      this._artifacts = expandArtifacts(this.json.artifacts,
+    if (configJSON.artifacts) {
+      this._artifacts = expandArtifacts(configJSON.artifacts,
           // If time-to-interactive is present, add the speedline artifact
-          this.json.audits && this.json.audits.find(a => a === 'time-to-interactive'));
+          configJSON.audits && configJSON.audits.find(a => a === 'time-to-interactive'));
     }
-    this._aggregations = this.json.aggregations ? Array.from(this.json.aggregations) : null;
+    this._aggregations = configJSON.aggregations ? Array.from(configJSON.aggregations) : null;
   }
 
-  _initRequirePaths(configJSON) {
-    if (typeof configJSON.paths !== 'object') {
-      configJSON.paths = {};
-    }
-
-    if (!Array.isArray(configJSON.paths.audits)) {
-      configJSON.paths.audits = [];
-    }
-
-    if (!Array.isArray(configJSON.paths.gatherers)) {
-      configJSON.paths.gatherers = [];
-    }
-
-    // Make sure the default paths are prepended to the list
-    if (configJSON.paths.audits.indexOf('lighthouse-core/audits') === -1) {
-      configJSON.paths.audits.unshift('lighthouse-core/audits');
-    }
-
-    if (configJSON.paths.gatherers.indexOf('lighthouse-core/gather/gatherers') === -1) {
-      configJSON.paths.gatherers.unshift('lighthouse-core/gather/gatherers');
-    }
-
-    return configJSON;
-  }
-
-  /** @type {!Object} */
-  get json() {
-    return this._configJSON;
+  /** @type {string} */
+  get configDir() {
+    return this._configDir;
   }
 
   /** @type {Array<!Pass>} */

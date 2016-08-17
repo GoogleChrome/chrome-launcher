@@ -15,5 +15,15 @@
  * limitations under the License.
  */
 
-// Pass-through file for developer convenience.
-module.exports = require('../lighthouse-core/audits/audit');
+'use strict';
+
+class MissingAfterPass {
+  constructor() {
+    this.artifact = {};
+  }
+
+  beforePass() {}
+  pass() {}
+}
+
+module.exports = MissingAfterPass;

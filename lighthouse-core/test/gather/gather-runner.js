@@ -23,6 +23,7 @@ const GatherRunner = require('../../gather/gather-runner');
 const Audit = require('../../audits/audit');
 const assert = require('assert');
 const Config = require('../../config');
+const path = require('path');
 
 class TestGatherer extends Gatherer {
   constructor() {
@@ -314,14 +315,25 @@ describe('GatherRunner', function() {
   });
 
   it('loads gatherers from custom paths', () => {
-    return assert.doesNotThrow(_ => GatherRunner.getGathererClass('custom-gatherer',
-        ['lighthouse-core/test/fixtures/custom-gatherers']));
+    const root = path.resolve(__dirname, '../fixtures');
+
+    assert.doesNotThrow(_ => GatherRunner.getGathererClass(`${root}/valid-custom-gatherer`));
+    return assert.doesNotThrow(_ => GatherRunner.getGathererClass('valid-custom-gatherer', root));
   });
 
-  it('checks multiple paths for gatherers', () => {
-    return assert.doesNotThrow(_ => GatherRunner.getGathererClass('custom-gatherer',
-        ['/fake-path/',
-         'lighthouse-core/test/fixtures/custom-gatherers',
-         'alt-path']));
+  it('throws for invalid gatherers', () => {
+    const root = path.resolve(__dirname, '../fixtures/invalid-gatherers');
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-before-pass', root),
+      /beforePass\(\) method/);
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-pass', root),
+      /pass\(\) method/);
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-after-pass', root),
+      /afterPass\(\) method/);
+
+    return assert.throws(_ => GatherRunner.getGathererClass('missing-artifact', root),
+      /artifact property/);
   });
 });
