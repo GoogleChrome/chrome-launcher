@@ -67,26 +67,36 @@ class Aggregate {
    * @private
    * @param {!AuditResult} result The audit's output value.
    * @param {!AggregationCriterion} expected The aggregation's expected value and weighting for this result.
+   * @param {!string} name The name of the audit.
    * @return {number} The weighted result.
    */
-  static _convertToWeight(result, expected) {
+  static _convertToWeight(result, expected, name) {
     let weight = 0;
 
     if (typeof expected === 'undefined' ||
         typeof expected.rawValue === 'undefined' ||
         typeof expected.weight === 'undefined') {
-      return weight;
+      const msg =
+          `aggregations: ${name} criteria does not contain expected rawValue or weight properties`;
+      throw new Error(msg);
     }
 
     if (typeof result === 'undefined' ||
-        typeof result.rawValue === 'undefined' ||
         typeof result.score === 'undefined') {
-      return weight;
+      let msg =
+          `${name} audit result is undefined or does not contain score property`;
+      if (result && result.debugString) {
+        msg += ': ' + result.debugString;
+      }
+      throw new Error(msg);
     }
 
-    if (typeof result.rawValue !== typeof expected.rawValue) {
-      const msg =
+    if (typeof result.score !== typeof expected.rawValue) {
+      let msg =
           `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+      if (result.debugString) {
+        msg += ': ' + result.debugString;
+      }
       throw new Error(msg);
     }
 
@@ -181,7 +191,8 @@ class Aggregate {
 
         overallScore += Aggregate._convertToWeight(
             filteredAndRemappedResults[e],
-            item.criteria[e]);
+            item.criteria[e],
+            e);
       });
 
       return {
