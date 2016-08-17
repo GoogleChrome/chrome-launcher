@@ -77,20 +77,26 @@ class Aggregate {
         typeof expected.rawValue === 'undefined' ||
         typeof expected.weight === 'undefined') {
       const msg =
-          `Config for ${name} is undefined or does not contain rawValue and weight properties`;
+          `aggregations: ${name} criteria does not contain expected rawValue or weight properties`;
       throw new Error(msg);
     }
 
     if (typeof result === 'undefined' ||
         typeof result.score === 'undefined') {
-      const msg =
-          `Audit result for ${name} is undefined or does not contain score property`;
+      let msg =
+          `${name} audit result is undefined or does not contain score property`;
+      if (result && result.debugString) {
+        msg += ': ' + result.debugString;
+      }
       throw new Error(msg);
     }
 
     if (typeof result.score !== typeof expected.rawValue) {
-      const msg =
+      let msg =
           `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+      if (result.debugString) {
+        msg += ': ' + result.debugString;
+      }
       throw new Error(msg);
     }
 
