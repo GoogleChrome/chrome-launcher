@@ -25,6 +25,23 @@ const path = require('path');
 
 class Runner {
   static run(driver, opts) {
+    // Clean opts input.
+    if (typeof opts.url !== 'string' || opts.url.length === 0) {
+      return Promise.reject(new Error('You must provide a url to the driver'));
+    }
+
+    opts.flags = opts.flags || {};
+
+    // Default mobile emulation and page loading to true.
+    // The extension will switch these off initially.
+    if (typeof opts.flags.mobile === 'undefined') {
+      opts.flags.mobile = true;
+    }
+
+    if (typeof opts.flags.loadPage === 'undefined') {
+      opts.flags.loadPage = true;
+    }
+
     const config = opts.config;
 
     // Check that there are passes & audits...

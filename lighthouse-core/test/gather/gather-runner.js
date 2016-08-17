@@ -48,22 +48,13 @@ describe('GatherRunner', function() {
       }
     };
 
-    return GatherRunner.loadPage(driver, {}, {
+    return GatherRunner.loadPage(driver, {
       flags: {
         loadPage: true
-      }
+      },
+      config: {}
     }).then(res => {
       assert.equal(res, true);
-    });
-  });
-
-  it('creates flags if needed', () => {
-    const url = 'https://example.com';
-    const driver = fakeDriver;
-    const options = {url, driver};
-
-    return GatherRunner.run([], options).then(_ => {
-      assert.equal(typeof options.flags, 'object');
     });
   });
 
@@ -79,10 +70,12 @@ describe('GatherRunner', function() {
       }
     };
 
-    return GatherRunner.loadPage(driver, {url: 'https://example.com'})
-        .then(res => {
-          assert.equal(res, true);
-        });
+    return GatherRunner.loadPage(driver, {
+      url: 'https://example.com',
+      config: {}
+    }).then(res => {
+      assert.equal(res, true);
+    });
   });
 
   it('sets up the driver to begin emulation when mobile == true', () => {
@@ -95,7 +88,7 @@ describe('GatherRunner', function() {
       forceUpdateServiceWorkers() {}
     };
 
-    return GatherRunner.setupDriver(driver, {}, {
+    return GatherRunner.setupDriver(driver, {
       flags: {
         mobile: true
       }
@@ -114,7 +107,7 @@ describe('GatherRunner', function() {
       forceUpdateServiceWorkers() {}
     };
 
-    return GatherRunner.setupDriver(driver, {}, {
+    return GatherRunner.setupDriver(driver, {
       flags: {}
     }).then(_ => {
       assert.equal(calledEmulation, false);
@@ -127,6 +120,9 @@ describe('GatherRunner', function() {
       beginTrace() {
         calledTrace = true;
         return Promise.resolve();
+      },
+      gotoURL() {
+        return Promise.resolve();
       }
     };
 
@@ -135,7 +131,7 @@ describe('GatherRunner', function() {
       gatherers: [{}]
     };
 
-    return GatherRunner.setupPass({driver, config}).then(_ => {
+    return GatherRunner.loadPage(driver, {config}).then(_ => {
       assert.equal(calledTrace, true);
     });
   });
@@ -188,6 +184,9 @@ describe('GatherRunner', function() {
       beginNetworkCollect() {
         calledNetworkCollect = true;
         return Promise.resolve();
+      },
+      gotoURL() {
+        return Promise.resolve();
       }
     };
 
@@ -196,7 +195,7 @@ describe('GatherRunner', function() {
       gatherers: [{}]
     };
 
-    return GatherRunner.setupPass({driver, config}).then(_ => {
+    return GatherRunner.loadPage(driver, {config}).then(_ => {
       assert.equal(calledNetworkCollect, true);
     });
   });
@@ -221,14 +220,6 @@ describe('GatherRunner', function() {
       assert.equal(calledNetworkCollect, true);
       assert.deepEqual(vals.networkRecords, {x: 1});
     });
-  });
-
-  it('rejects when not given a URL', () => {
-    return GatherRunner.run({}, {}).then(_ => assert.ok(false), _ => assert.ok(true));
-  });
-
-  it('rejects when given a URL of zero length', () => {
-    return GatherRunner.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
   });
 
   it('does as many passes as are required', () => {
