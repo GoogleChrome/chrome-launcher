@@ -3,7 +3,7 @@
 flag=$1
 
 function _runmocha() {
-  mocha $2 $__node_harmony $(find $1/test -name '*.js') --timeout 60000;
+  mocha $2 $__node_harmony $1/**/*-test.js --timeout 60000;
 }
 
 if [ "$flag" == '--watch' ]; then
