@@ -1,0 +1,2 @@
+# Lighthouse objects & options
+
