@@ -15,11 +15,11 @@
  */
 'use strict';
 
-/* global describe, it */
+/* eslint-env mocha */
 
-var manifestParser = require('../lib/manifest-parser');
+var manifestParser = require('../../lib/manifest-parser');
 var assert = require('assert');
-const manifestStub = require('./fixtures/manifest.json');
+const manifestStub = require('../fixtures/manifest.json');
 
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {
@@ -33,7 +33,7 @@ describe('Manifest Parser', function() {
     assert.equal(parsedManifest.value.name.value, undefined);
     assert.equal(parsedManifest.value.short_name.value, undefined);
     assert.equal(parsedManifest.value.start_url.value, undefined);
-    assert.equal(parsedManifest.value.display.value, undefined);
+    assert.equal(parsedManifest.value.display.value, 'browser');
     assert.equal(parsedManifest.value.orientation.value, undefined);
     assert.equal(parsedManifest.value.theme_color.value, undefined);
     assert.equal(parsedManifest.value.background_color.value, undefined);
@@ -41,19 +41,6 @@ describe('Manifest Parser', function() {
     // icons
     // related_applications
     // prefer_related_applications
-  });
-
-  it('accepts unknown values', function() {
-    // TODO(bckenny): this is the same exact test as above
-    let parsedManifest = manifestParser('{}');
-    assert(!parsedManifest.debugString);
-    assert.equal(parsedManifest.value.name.value, undefined);
-    assert.equal(parsedManifest.value.short_name.value, undefined);
-    assert.equal(parsedManifest.value.start_url.value, undefined);
-    assert.equal(parsedManifest.value.display.value, undefined);
-    assert.equal(parsedManifest.value.orientation.value, undefined);
-    assert.equal(parsedManifest.value.theme_color.value, undefined);
-    assert.equal(parsedManifest.value.background_color.value, undefined);
   });
 
   describe('icon parsing', function() {
@@ -129,6 +116,84 @@ describe('Manifest Parser', function() {
       parsedManifest = manifestParser('{"short_name": 42 }');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, undefined);
+    });
+  });
+
+  /**
+   * @see https://w3c.github.io/manifest/#display-member
+   */
+  describe('display parsing', () => {
+    it('falls back to \'browser\' and issues a warning for an invalid value', () => {
+      const parsedManifest = manifestParser('{"display": {} }');
+      const display = parsedManifest.value.display;
+      assert.ok(display.debugString);
+      assert.equal(display.value, 'browser');
+    });
+
+    it('falls back to \'browser\' and issues a warning for an invalid value', () => {
+      const parsedManifest = manifestParser('{"display": 5 }');
+      const display = parsedManifest.value.display;
+      assert.ok(display.debugString);
+      assert.equal(display.value, 'browser');
+    });
+
+    it('falls back to \'browser\' and issues no warning when undefined', () => {
+      const parsedManifest = manifestParser('{}');
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'browser');
+      assert.equal(display.rawValue, undefined);
+    });
+
+    it('trims whitespace', () => {
+      const displayValue = ' fullscreen     ';
+      const parsedManifest = manifestParser(`{"display": "${displayValue}" }`);
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'fullscreen');
+    });
+
+    it('converts to lowercase', () => {
+      const displayValue = 'fUlLScrEEn';
+      const parsedManifest = manifestParser(`{"display": "${displayValue}" }`);
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'fullscreen');
+    });
+
+    it('falls back to \'browser\' and issues a warning when a non-existent mode', () => {
+      const parsedManifest = manifestParser('{"display": "fullestscreen" }');
+      const display = parsedManifest.value.display;
+      assert.ok(display.debugString);
+      assert.equal(display.value, 'browser');
+    });
+
+    it('correctly parses `fullscreen` display mode', () => {
+      const parsedManifest = manifestParser('{"display": "fullscreen" }');
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'fullscreen');
+    });
+
+    it('correctly parses `standalone` display mode', () => {
+      const parsedManifest = manifestParser('{"display": "standalone" }');
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'standalone');
+    });
+
+    it('correctly parses `minimal-ui` display mode', () => {
+      const parsedManifest = manifestParser('{"display": "minimal-ui" }');
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'minimal-ui');
+    });
+
+    it('correctly parses `browser` display mode', () => {
+      const parsedManifest = manifestParser('{"display": "browser" }');
+      const display = parsedManifest.value.display;
+      assert.ok(!display.debugString);
+      assert.equal(display.value, 'browser');
     });
   });
 });

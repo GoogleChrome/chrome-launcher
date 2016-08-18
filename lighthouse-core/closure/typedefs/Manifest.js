@@ -94,7 +94,7 @@ Manifest.prototype.short_name;
 /** @type {!ManifestNode<(string|undefined)>} */
 Manifest.prototype.start_url;
 
-/** @type {!ManifestNode<(string|undefined)>} */
+/** @type {!ManifestNode<string>} */
 Manifest.prototype.display;
 
 /** @type {!ManifestNode<(string|undefined)>} */
