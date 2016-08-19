@@ -93,9 +93,11 @@ function prepareAssets(options, artifacts) {
 function saveAssets(options, artifacts) {
   const assets = prepareAssets(options, artifacts);
 
-  const traceFilename = getFilenamePrefix(options);
-  fs.writeFileSync(traceFilename + '.trace.json', stringify(assets.traceData, null, 2));
-  log.log('trace file saved to disk', traceFilename);
+  assets.traceData.forEach((data, index) => {
+    const traceFilename = getFilenamePrefix(options);
+    fs.writeFileSync(`${traceFilename}${index}.trace.json`, stringify(data, null, 2));
+    log.log('trace file saved to disk', traceFilename);
+  });
 
   const screenshotsFilename = getFilenamePrefix(options);
   fs.writeFileSync(screenshotsFilename + '.screenshots.html', assets.html);
