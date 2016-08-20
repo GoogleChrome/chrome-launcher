@@ -17,12 +17,16 @@
 
 'use strict';
 
-const Gatherer = require('./gatherer');
+const ComputedArtifact = require('./computed-artifact');
 const WebInspector = require('../../lib/web-inspector');
 
 const includes = (arr, elm) => arr.indexOf(elm) > -1;
 
-class CriticalRequestChains extends Gatherer {
+class CriticalRequestChains extends ComputedArtifact {
+
+  get name() {
+    return 'CriticalRequestChains';
+  }
 
   /**
    * For now, we use network priorities as a proxy for "render-blocking"/critical-ness.
@@ -46,9 +50,7 @@ class CriticalRequestChains extends Gatherer {
     return includes(['VeryHigh', 'High', 'Medium'], request.priority());
   }
 
-  afterPass(options, tracingData) {
-    const networkRecords = tracingData.networkRecords;
-
+  getChains(networkRecords) {
     // Build a map of requestID -> Node.
     const requestIdToRequests = new Map();
     for (let request of networkRecords) {
@@ -130,7 +132,18 @@ class CriticalRequestChains extends Gatherer {
       };
     }
 
-    this.artifact = criticalRequestChains;
+    return Promise.resolve(criticalRequestChains);
+  }
+
+  request(networkRecords) {
+    if (this.cache.has(networkRecords)) {
+      return this.cache.get(networkRecords);
+    }
+
+    return this.getChains(networkRecords).then(chains => {
+      this.cache.set(chains, networkRecords);
+      return chains;
+    });
   }
 
 }

@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "[ \"$CI\" = true ] && eslint --quiet . || eslint .",
     "smoke": "lighthouse-cli/scripts/run-smoke-tests.sh",
-    "coverage": "node $__node_harmony $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*.js' -not -path '*/fixtures/*') --timeout 60000 --reporter progress",
+    "coverage": "node $__node_harmony $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*.js' -not -path '*/fixtures/*') --timeout 10000 --reporter progress",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
     "start": "node ./lighthouse-cli/index.js",
     "test": "npm run lint --silent && npm run unit && npm run closure",

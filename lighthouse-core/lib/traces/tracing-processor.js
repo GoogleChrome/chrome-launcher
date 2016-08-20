@@ -67,32 +67,8 @@ class TraceProcessor {
     return 'Load';
   }
 
-  init(contents) {
-    let contentsJSON = null;
-
-    try {
-      contentsJSON = typeof contents === 'string' ? JSON.parse(contents) :
-          contents;
-
-      // If the file already wrapped the trace events in a
-      // traceEvents object, grab the contents of the object.
-      if (contentsJSON !== null &&
-        typeof contentsJSON.traceEvents !== 'undefined') {
-        contentsJSON = contentsJSON.traceEvents;
-      }
-    } catch (e) {
-      throw new Error('Invalid trace contents: ' + e.message);
-    }
-
-    const events = [JSON.stringify({
-      traceEvents: contentsJSON
-    })];
-
-    return this.convertEventsToModel(events);
-  }
-
   // Create the importer and import the trace contents to a model.
-  convertEventsToModel(events) {
+  init(trace) {
     const io = new traceviewer.importer.ImportOptions();
     io.showImportWarnings = false;
     io.pruneEmptyContainers = false;
@@ -100,7 +76,7 @@ class TraceProcessor {
 
     const model = new traceviewer.Model();
     const importer = new traceviewer.importer.Import(model, io);
-    importer.importTraces(events);
+    importer.importTraces([trace]);
 
     return model;
   }
@@ -200,7 +176,7 @@ class TraceProcessor {
    * selected percentiles within a window of the main thread.
    * @see https://docs.google.com/document/d/18gvP-CBA2BiBpi3Rz1I1ISciKGhniTSZ9TY0XCnXS7E/preview
    * @param {!traceviewer.Model} model
-   * @param {!Array<!Object>} trace
+   * @param {{traceEvents: !Array<!Object>}} trace
    * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
    * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
    * @param {!Array<number>=} percentiles Optional array of percentiles to compute. Defaults to [0.5, 0.75, 0.9, 0.99, 1].
@@ -218,7 +194,7 @@ class TraceProcessor {
     }
 
     // Find the main thread.
-    const startEvent = trace.find(event => {
+    const startEvent = trace.traceEvents.find(event => {
       return event.name === 'TracingStartedInPage';
     });
     const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);

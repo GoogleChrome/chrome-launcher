@@ -17,10 +17,14 @@
 
 'use strict';
 
-const Gatherer = require('./gatherer');
+const ComputedArtifact = require('./computed-artifact');
 const DevtoolsTimelineModel = require('../../lib/traces/devtools-timeline-model');
 
-class ScreenshotFilmstrip extends Gatherer {
+class ScreenshotFilmstrip extends ComputedArtifact {
+
+  get name() {
+    return 'Screenshots';
+  }
 
   fetchScreenshot(frame) {
     return frame
@@ -38,16 +42,22 @@ class ScreenshotFilmstrip extends Gatherer {
 
     const frameFetches = filmStripFrames.map(frame => this.fetchScreenshot(frame));
     return Promise.all(frameFetches).then(images => {
-      return filmStripFrames.map((frame, i) => ({
+      const result = filmStripFrames.map((frame, i) => ({
         timestamp: frame.timestamp,
         datauri: images[i]
       }));
+      return result;
     });
   }
 
-  afterPass(options, tracingData) {
-    return this.getScreenshots(tracingData.traceEvents).then(screenshots => {
-      this.artifact = screenshots;
+  request(trace) {
+    if (this.cache.has(trace)) {
+      return this.cache.get(trace);
+    }
+
+    return this.getScreenshots(trace).then(screenshots => {
+      this.cache.set(trace, screenshots);
+      return screenshots;
     });
   }
 }

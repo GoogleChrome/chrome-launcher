@@ -16,11 +16,12 @@
 'use strict';
 
 const Audit = require('../../audits/time-to-interactive.js');
-const SpeedlineGather = require('../../gather/gatherers/speedline');
+const GatherRunner = require('../../gather/gather-runner.js');
 const assert = require('assert');
 
-const traceEvents = require('../fixtures/traces/progressive-app.json');
-const speedlineGather = new SpeedlineGather();
+const pwaTrace = require('../fixtures/traces/progressive-app.json');
+
+let mockArtifacts = GatherRunner.instantiateComputedArtifacts();
 
 /* eslint-env mocha */
 describe('Performance: time-to-interactive audit', () => {
@@ -31,8 +32,8 @@ describe('Performance: time-to-interactive audit', () => {
           traceEvents: '[{"pid": 15256,"tid": 1295,"t'
         }
       },
-      Speedline: {
-        first: 500
+      requestSpeedline() {
+        return Promise.resolve({first: 500});
       }
     }).then(output => {
       assert.equal(output.rawValue, -1);
@@ -41,20 +42,19 @@ describe('Performance: time-to-interactive audit', () => {
   });
 
   it('evaluates valid input correctly', () => {
-    let artifacts = {traceEvents};
-    return speedlineGather.afterPass({}, artifacts).then(_ => {
-      artifacts.Speedline = speedlineGather.artifact;
-      // This is usually done by the driver
-      artifacts.traces = {
-        [Audit.DEFAULT_TRACE]: {traceEvents}
-      };
-      return Audit.audit(artifacts).then(output => {
-        assert.equal(output.rawValue, '1105.8');
-        assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, '20.72');
-        assert.equal(output.extendedInfo.value.timings.fMP, '1099.5');
-        assert.equal(output.extendedInfo.value.timings.mainThreadAvail, '1105.8');
-        assert.equal(output.extendedInfo.value.timings.visuallyReady, '1105.8');
-      });
+    let artifacts = mockArtifacts;
+    artifacts.traces = {
+      [Audit.DEFAULT_TRACE]: {
+        traceEvents: pwaTrace
+      }
+    };
+
+    return Audit.audit(artifacts).then(output => {
+      assert.equal(output.rawValue, '1105.8', output.debugString);
+      assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, '20.72');
+      assert.equal(output.extendedInfo.value.timings.fMP, '1099.5');
+      assert.equal(output.extendedInfo.value.timings.mainThreadAvail, '1105.8');
+      assert.equal(output.extendedInfo.value.timings.visuallyReady, '1105.8');
     });
   });
 });

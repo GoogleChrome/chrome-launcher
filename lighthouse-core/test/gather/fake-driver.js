@@ -16,6 +16,8 @@
 
 'use strict';
 
+const recordsFromLogs = require('../../lib/network-recorder').recordsFromLogs;
+
 module.exports = {
   connect() {
     return Promise.resolve();
@@ -44,7 +46,9 @@ module.exports = {
   },
   beginNetworkCollect() {},
   endNetworkCollect() {
-    return Promise.resolve();
+    return Promise.resolve(
+      recordsFromLogs(require('../fixtures/perflog.json'))
+    );
   },
   getSecurityState() {
     return Promise.resolve({

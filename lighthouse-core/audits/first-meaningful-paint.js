@@ -57,7 +57,6 @@ class FirstMeaningfulPaint extends Audit {
       if (!traceContents || !Array.isArray(traceContents)) {
         throw new Error(FAILURE_MESSAGE);
       }
-
       const evts = this.collectEvents(traceContents);
 
       const navStart = evts.navigationStart;

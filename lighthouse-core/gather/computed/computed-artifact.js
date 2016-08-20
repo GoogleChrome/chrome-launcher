@@ -14,22 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-const Gatherer = require('./gatherer');
-const speedline = require('speedline');
+class ComputedArtifact {
+  constructor() {
+    this.cache = new Map();
+  }
 
-class Speedline extends Gatherer {
-
-  afterPass(options, tracingData) {
-    return speedline(tracingData.traceEvents).then(results => {
-      this.artifact = results;
-    }).catch(err => {
-      this.artifact = {
-        debugString: err.message
-      };
-    });
+  request() {
+    throw new Error('request() not implemented for computed Artifact' + this.name);
   }
 }
 
-module.exports = Speedline;
+module.exports = ComputedArtifact;

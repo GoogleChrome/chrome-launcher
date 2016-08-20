@@ -36,7 +36,7 @@ class SpeedIndexMetric extends Audit {
       name: 'speed-index-metric',
       description: 'Speed Index',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
-      requiredArtifacts: ['Speedline']
+      requiredArtifacts: ['traceContents']
     };
   }
 
@@ -47,36 +47,35 @@ class SpeedIndexMetric extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    return new Promise((resolve, reject) => {
-      const speedline = artifacts.Speedline;
+    const trace = artifacts.traces[this.DEFAULT_TRACE];
+    if (typeof trace === 'undefined') {
+      return SpeedIndexMetric.generateAuditResult({
+        rawValue: -1,
+        debugString: 'No trace found to generate screenshots'
+      });
+    }
 
-      // Speedline gather failed; pass on error condition.
-      if (speedline.debugString) {
-        return resolve(SpeedIndexMetric.generateAuditResult({
-          rawValue: -1,
-          debugString: speedline.debugString
-        }));
-      }
-
+    // run speedline
+    return artifacts.requestSpeedline(trace).then(speedline => {
       if (speedline.frames.length === 0) {
-        return resolve(SpeedIndexMetric.generateAuditResult({
+        return SpeedIndexMetric.generateAuditResult({
           rawValue: -1,
           debugString: 'Trace unable to find visual progress frames.'
-        }));
+        });
       }
 
       if (speedline.frames.length < 3) {
-        return resolve(SpeedIndexMetric.generateAuditResult({
+        return SpeedIndexMetric.generateAuditResult({
           rawValue: -1,
           debugString: 'Trace unable to find sufficient frames to evaluate Speed Index.'
-        }));
+        });
       }
 
       if (speedline.speedIndex === 0) {
-        return resolve(SpeedIndexMetric.generateAuditResult({
+        return SpeedIndexMetric.generateAuditResult({
           rawValue: -1,
           debugString: 'Error in Speedline calculating Speed Index (speedIndex of 0).'
-        }));
+        });
       }
 
       // Use the CDF of a log-normal distribution for scoring.
@@ -86,7 +85,7 @@ class SpeedIndexMetric extends Audit {
       //  75th Percentile = 8,820
       //  95th Percentile = 17,400
       const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
-          SCORING_POINT_OF_DIMINISHING_RETURNS);
+        SCORING_POINT_OF_DIMINISHING_RETURNS);
       let score = 100 * distribution.computeComplementaryPercentile(speedline.speedIndex);
 
       // Clamp the score to 0 <= x <= 100.
@@ -105,7 +104,7 @@ class SpeedIndexMetric extends Audit {
         })
       };
 
-      resolve(SpeedIndexMetric.generateAuditResult({
+      return SpeedIndexMetric.generateAuditResult({
         score: Math.round(score),
         rawValue: Math.round(speedline.speedIndex),
         optimalValue: this.meta.optimalValue,
@@ -113,7 +112,12 @@ class SpeedIndexMetric extends Audit {
           formatter: Formatter.SUPPORTED_FORMATS.SPEEDLINE,
           value: extendedInfo
         }
-      }));
+      });
+    }).catch(err => {
+      return SpeedIndexMetric.generateAuditResult({
+        rawValue: -1,
+        debugString: err.message
+      });
     });
   }
 }

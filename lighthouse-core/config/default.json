@@ -11,9 +11,6 @@
       "html",
       "manifest",
       "accessibility",
-      "screenshots",
-      "critical-request-chains",
-      "speedline",
       "content-width",
       "cache-contents",
       "geolocation-on-start"

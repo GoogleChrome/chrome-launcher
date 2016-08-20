@@ -17,7 +17,7 @@
 
 /* eslint-env mocha */
 
-const GathererClass = require('../../../gather/gatherers/critical-request-chains');
+const GathererClass = require('../../../gather/computed/critical-request-chains');
 const assert = require('assert');
 const Gatherer = new GathererClass();
 
@@ -48,9 +48,9 @@ function mockTracingData(prioritiesList, edges) {
 
 function testGetCriticalChain(data) {
   const networkRecords = mockTracingData(data.priorityList, data.edges);
-  Gatherer.afterPass(null, {networkRecords});
-  const criticalChains = Gatherer.artifact;
-  assert.deepEqual(criticalChains, data.expected);
+  return Gatherer.request(networkRecords).then(criticalChains => {
+    assert.deepEqual(criticalChains, data.expected);
+  });
 }
 
 function constructEmptyRequest() {
@@ -266,24 +266,23 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     // Make a fake redirect
     networkRecords[1].requestId = '1:redirected.0';
     networkRecords[2].requestId = '1';
-    Gatherer.afterPass(null, {networkRecords});
-    const criticalChains = Gatherer.artifact;
-
-    assert.deepEqual(criticalChains, {
-      0: {
-        request: constructEmptyRequest(),
-        children: {
-          '1:redirected.0': {
-            request: constructEmptyRequest(),
-            children: {
-              1: {
-                request: constructEmptyRequest(),
-                children: {}
+    return Gatherer.request(networkRecords).then(criticalChains => {
+      assert.deepEqual(criticalChains, {
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            '1:redirected.0': {
+              request: constructEmptyRequest(),
+              children: {
+                1: {
+                  request: constructEmptyRequest(),
+                  children: {}
+                }
               }
             }
           }
         }
-      }
+      });
     });
   });
 
@@ -297,14 +296,13 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     };
     // 3rd record is also a favicon
     networkRecords[2].mimeType = 'image/x-icon';
-    Gatherer.afterPass(null, {networkRecords});
-    const criticalChains = Gatherer.artifact;
-
-    assert.deepEqual(criticalChains, {
-      0: {
-        request: constructEmptyRequest(),
-        children: {}
-      }
+    return Gatherer.request(networkRecords).then(criticalChains => {
+      assert.deepEqual(criticalChains, {
+        0: {
+          request: constructEmptyRequest(),
+          children: {}
+        }
+      });
     });
   });
 
@@ -313,19 +311,18 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
 
     // Reverse the records so we force nodes to be made early.
     networkRecords.reverse();
-    Gatherer.afterPass(null, {networkRecords});
-    const criticalChains = Gatherer.artifact;
-
-    assert.deepEqual(criticalChains, {
-      0: {
-        request: constructEmptyRequest(),
-        children: {
-          1: {
-            request: constructEmptyRequest(),
-            children: {}
+    return Gatherer.request(networkRecords).then(criticalChains => {
+      assert.deepEqual(criticalChains, {
+        0: {
+          request: constructEmptyRequest(),
+          children: {
+            1: {
+              request: constructEmptyRequest(),
+              children: {}
+            }
           }
         }
-      }
+      });
     });
   });
 });
