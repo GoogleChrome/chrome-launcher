@@ -22,6 +22,8 @@ const Gatherer = require('../../gather/gatherers/gatherer');
 const GatherRunner = require('../../gather/gather-runner');
 const Audit = require('../../audits/audit');
 const assert = require('assert');
+const Config = require('../../config');
+const path = require('path');
 
 class TestGatherer extends Gatherer {
   constructor() {
@@ -36,6 +38,12 @@ class TestGatherer extends Gatherer {
   pass() {
     this.called = true;
   }
+}
+
+class TestGathererNoArtifact {
+  beforePass() {}
+  pass() {}
+  afterPass() {}
 }
 
 const fakeDriver = require('./fake-driver');
@@ -55,6 +63,17 @@ describe('GatherRunner', function() {
       config: {}
     }).then(res => {
       assert.equal(res, true);
+    });
+  });
+
+  it('creates flags if needed', () => {
+    const url = 'https://example.com';
+    const driver = fakeDriver;
+    const config = new Config({});
+    const options = {url, driver, config};
+
+    return GatherRunner.run([], options).then(_ => {
+      assert.equal(typeof options.flags, 'object');
     });
   });
 
@@ -222,9 +241,26 @@ describe('GatherRunner', function() {
     });
   });
 
+  it('rejects when not given a URL', () => {
+    return GatherRunner.run({}, {}).then(_ => assert.ok(false), _ => assert.ok(true));
+  });
+
+  it('rejects when given a URL of zero length', () => {
+    return GatherRunner.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
+  });
+
+  it('rejects when not given a config', () => {
+    return GatherRunner.run({}, {url: 'http://example.com'})
+        .then(_ => assert.ok(false), err => {
+          assert.ok(/config/i.test(err));
+        });
+  });
+
   it('does as many passes as are required', () => {
     const t1 = new TestGatherer();
     const t2 = new TestGatherer();
+    const config = new Config({});
+    const flags = {};
 
     const passes = [{
       network: true,
@@ -242,10 +278,62 @@ describe('GatherRunner', function() {
       ]
     }];
 
-    return GatherRunner.run(passes, {driver: fakeDriver, url: 'https://example.com', flags: {}})
-        .then(_ => {
-          assert.ok(t1.called);
-          assert.ok(t2.called);
-        });
+    return GatherRunner.run(passes, {
+      driver: fakeDriver,
+      url: 'https://example.com',
+      flags,
+      config
+    }).then(_ => {
+      assert.ok(t1.called);
+      assert.ok(t2.called);
+    }, _ => {
+      assert.ok(false);
+    });
+  });
+
+  it('rejects if an audit does not provide an artifact', () => {
+    const t1 = new TestGathererNoArtifact();
+    const config = new Config({});
+    const flags = {};
+
+    const passes = [{
+      network: true,
+      trace: true,
+      traceName: 'firstPass',
+      loadPage: true,
+      gatherers: [
+        t1
+      ]
+    }];
+
+    return GatherRunner.run(passes, {
+      driver: fakeDriver,
+      url: 'https://example.com',
+      flags,
+      config
+    }).then(_ => assert.ok(false), _ => assert.ok(true));
+  });
+
+  it('loads gatherers from custom paths', () => {
+    const root = path.resolve(__dirname, '../fixtures');
+
+    assert.doesNotThrow(_ => GatherRunner.getGathererClass(`${root}/valid-custom-gatherer`));
+    return assert.doesNotThrow(_ => GatherRunner.getGathererClass('valid-custom-gatherer', root));
+  });
+
+  it('throws for invalid gatherers', () => {
+    const root = path.resolve(__dirname, '../fixtures/invalid-gatherers');
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-before-pass', root),
+      /beforePass\(\) method/);
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-pass', root),
+      /pass\(\) method/);
+
+    assert.throws(_ => GatherRunner.getGathererClass('missing-after-pass', root),
+      /afterPass\(\) method/);
+
+    return assert.throws(_ => GatherRunner.getGathererClass('missing-artifact', root),
+      /artifact property/);
   });
 });

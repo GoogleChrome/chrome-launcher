@@ -1,5 +1,5 @@
 /**
- * @license
+ *
  * Copyright 2016 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 'use strict';
 
-const Gatherer = require('./gatherer');
+const LighthouseAudit = require('../../../audits/audit');
 
-class URL extends Gatherer {
-
-  afterPass(options) {
-    // Used currently by cache-start-url audit, which wants to know if the start_url
-    // in the manifest is stored in the cache.
-    // Instead of the originally inputted URL (options.initialUrl), we want the resolved
-    // post-redirect URL (which is here at options.url)
-    this.artifact = options.url;
+class MissingRequiredArtifacts extends LighthouseAudit {
+  static audit(_) {
+    return MissingRequiredArtifacts.generateAuditResult({
+      rawValue: true
+    });
   }
 }
 
-module.exports = URL;
+module.exports = MissingRequiredArtifacts;

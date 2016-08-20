@@ -18,6 +18,11 @@
 
 const Gatherer = require('./gatherer');
 
+/**
+ * This gatherer changes the options.url so that its pass loads the http page.
+ * After load it detects if its on a crypographic scheme.
+ * TODO: Instead of abusing a loadPage pass for this test, it could likely just do an XHR instead
+ */
 class HTTPRedirect extends Gatherer {
 
   constructor() {

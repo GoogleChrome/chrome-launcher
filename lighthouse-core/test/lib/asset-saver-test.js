@@ -54,7 +54,7 @@ describe('asset-saver helper', () => {
     assetSaver.saveAssets(options, artifacts);
 
     it('trace file saved to disk with data', () => {
-      const traceFilename = assetSaver.getFilenamePrefix(options) + '.trace.json';
+      const traceFilename = assetSaver.getFilenamePrefix(options) + '0.trace.json';
       const traceFileContents = fs.readFileSync(traceFilename, 'utf8');
       assert.ok(traceFileContents.length > 3000000);
       fs.unlinkSync(traceFilename);

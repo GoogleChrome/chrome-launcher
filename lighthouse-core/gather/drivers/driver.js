@@ -25,19 +25,10 @@ const log = require('../../lib/log.js');
 class Driver {
 
   constructor() {
-    this._url = null;
     this.PAUSE_AFTER_LOAD = 500;
     this._traceEvents = [];
     this._traceCategories = Driver.traceCategories;
     this._eventEmitter = null;
-  }
-
-  get url() {
-    return this._url;
-  }
-
-  set url(_url) {
-    this._url = _url;
   }
 
   static get traceCategories() {
@@ -219,6 +210,26 @@ class Driver {
   }
 
   /**
+   * If our main document URL redirects, we will update options.url accordingly
+   * As such, options.url will always represent the post-redirected URL.
+   * options.initialUrl is the pre-redirect URL that things started with
+   *
+   * Caveat: only works when network recording enabled for a pass
+   */
+  enableUrlUpdateIfRedirected(opts) {
+    this._networkRecorder.on('requestloaded', redirectRequest => {
+      // Quit if this is not a redirected request
+      if (!redirectRequest.redirectSource) {
+        return;
+      }
+      const earlierRequest = redirectRequest.redirectSource;
+      if (earlierRequest.url === opts.url) {
+        opts.url = redirectRequest.url;
+      }
+    });
+  }
+
+  /**
    * Navigate to the given URL. Use of this method directly isn't advised: if
    * the current page is already at the given URL, navigation will not occur and
    * so the returned promise will never resolve. See https://github.com/GoogleChrome/lighthouse/pull/185
@@ -328,10 +339,11 @@ class Driver {
     });
   }
 
-  beginNetworkCollect() {
+  beginNetworkCollect(opts) {
     return new Promise((resolve, reject) => {
       this._networkRecords = [];
       this._networkRecorder = new NetworkRecorder(this._networkRecords);
+      this.enableUrlUpdateIfRedirected(opts);
 
       this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
       this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);

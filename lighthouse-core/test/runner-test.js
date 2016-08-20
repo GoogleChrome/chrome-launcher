@@ -219,7 +219,7 @@ describe('Runner', () => {
     }, flags.auditWhitelist);
 
     return Runner.run(fakeDriver, {url, config, flags}).then(results => {
-      assert.equal(results.url, url);
+      assert.equal(results.initialUrl, url);
       assert.equal(results.audits['is-on-https'].name, 'is-on-https');
       assert.equal(results.aggregations[0].score[0].overall, 1);
       assert.equal(results.aggregations[0].score[0].subItems[0], 'is-on-https');

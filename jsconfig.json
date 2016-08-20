@@ -10,7 +10,11 @@
     },
     "exclude": [
         "node_modules",
-        "extension",
-        "third_party"
+        "lighthouse-extension",
+        "lighthouse-core/closure",
+
+        "third_party",
+        "lighthouse-core/third_party",
+        "dist"
     ]
 }

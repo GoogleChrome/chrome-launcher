@@ -19,42 +19,13 @@
 
 const URLGather = require('../../../gather/gatherers/url');
 const assert = require('assert');
-let urlGather;
 
 describe('URL gatherer', () => {
-  // Reset the Gatherer before each test.
-  beforeEach(() => {
-    urlGather = new URLGather();
-  });
-
   it('returns the correct URL from options', () => {
+    const urlGather = new URLGather();
     const url = 'https://example.com';
-    urlGather.beforePass({
-      url
-    });
-
-    return assert.equal(urlGather.artifact, url);
-  });
-
-  it('returns the correct URL from options.driver', () => {
-    const url = 'https://example.com';
-    urlGather.beforePass({
-      driver: {
-        url
-      }
-    });
-
-    return assert.equal(urlGather.artifact, url);
-  });
-
-  it('chooses the URL from options over options.driver', () => {
-    const url = 'https://example.com';
-    const driverUrl = 'https://example2.com';
-    urlGather.beforePass({
-      url,
-      driver: {
-        url: driverUrl
-      }
+    urlGather.afterPass({
+      url: url
     });
 
     return assert.equal(urlGather.artifact, url);
