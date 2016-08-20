@@ -57,11 +57,11 @@ describe('Config', () => {
         gatherers: [
           'url',
           'html',
-          'critical-request-chains'
+          'viewport'
         ]
       }],
 
-      audits: ['critical-request-chains']
+      audits: ['viewport']
     });
 
     assert.equal(config.passes[0].gatherers.length, 1);
@@ -176,10 +176,7 @@ describe('Config', () => {
     });
     const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
     assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
-    assert.ok(config.artifacts.CriticalRequestChains);
-    assert.ok(config.artifacts.CriticalRequestChains['93149.1']);
-    assert.ok(config.artifacts.CriticalRequestChains['93149.1'].request);
-    assert.ok(config.artifacts.CriticalRequestChains['93149.1'].children);
+    assert.equal(config.artifacts.networkRecords.length, 76);
   });
 
   it('handles traces with no TracingStartedInPage events', () => {
@@ -196,41 +193,4 @@ describe('Config', () => {
     assert.ok(config.artifacts.traces.defaultPass.traceEvents.find(
           e => e.name === 'TracingStartedInPage' && e.args.data.page === '0xhad00p'));
   });
-
-  it('doesnt add speedline artifact to tests without tti audit', () => {
-    const config = new Config({
-      artifacts: {
-        traces: {
-          defaultPass: path.resolve(__dirname,
-                           '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
-        },
-        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
-      },
-      audits: [
-        'first-meaningful-paint'
-
-      ]
-    });
-
-    assert.equal(config.artifacts.Speedline, undefined);
-  });
-
-  it('does add speedline artifact to tests without tti audit', () => {
-    const config = new Config({
-      artifacts: {
-        traces: {
-          defaultPass: path.resolve(__dirname,
-                           '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
-        },
-        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
-      },
-      audits: [
-        'first-meaningful-paint',
-        'time-to-interactive'
-      ]
-    });
-
-    assert.notEqual(config.artifacts.Speedline, undefined);
-  });
 });
-

@@ -30,7 +30,7 @@ class CriticalRequestChains extends Audit {
       name: 'critical-request-chains',
       description: 'Critical Request Chains',
       optimalValue: 0,
-      requiredArtifacts: ['CriticalRequestChains']
+      requiredArtifacts: ['networkRecords']
     };
   }
 
@@ -40,31 +40,33 @@ class CriticalRequestChains extends Audit {
    * @return {!AuditResult} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    let chainCount = 0;
-    function walk(node, depth) {
-      const children = Object.keys(node);
+    return artifacts.requestCriticalRequestChains(artifacts.networkRecords).then(chains => {
+      let chainCount = 0;
+      function walk(node, depth) {
+        const children = Object.keys(node);
 
-      // Since a leaf node indicates the end of a chain, we can inspect the number
-      // of child nodes, and, if the count is zero, increment the count.
-      if (children.length === 0) {
-        chainCount++;
+        // Since a leaf node indicates the end of a chain, we can inspect the number
+        // of child nodes, and, if the count is zero, increment the count.
+        if (children.length === 0) {
+          chainCount++;
+        }
+
+        children.forEach(id => {
+          const child = node[id];
+          walk(child.children, depth + 1);
+        }, '');
       }
 
-      children.forEach(id => {
-        const child = node[id];
-        walk(child.children, depth + 1);
-      }, '');
-    }
+      walk(chains, 0);
 
-    walk(artifacts.CriticalRequestChains, 0);
-
-    return CriticalRequestChains.generateAuditResult({
-      rawValue: chainCount,
-      optimalValue: this.meta.optimalValue,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
-        value: artifacts.CriticalRequestChains
-      }
+      return CriticalRequestChains.generateAuditResult({
+        rawValue: chainCount,
+        optimalValue: this.meta.optimalValue,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
+          value: chains
+        }
+      });
     });
   }
 }

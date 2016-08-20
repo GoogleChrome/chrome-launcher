@@ -29,30 +29,38 @@ class Screenshots extends Audit {
       category: 'Performance',
       name: 'screenshots',
       description: 'Screenshots of all captured frames',
-      requiredArtifacts: ['ScreenshotFilmstrip']
+      requiredArtifacts: ['traceContents']
     };
   }
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {!AuditResultInput}
+   * @return {!Promise<!AuditResult>}
    */
   static audit(artifacts) {
-    const screenshots = artifacts.ScreenshotFilmstrip;
-
-    if (typeof screenshots === 'undefined') {
-      return Screenshots.generateAuditResult({
+    const trace = artifacts.traces[this.DEFAULT_TRACE];
+    if (typeof trace === 'undefined') {
+      return Promise.resolve(Screenshots.generateAuditResult({
         rawValue: -1,
-        debugString: 'No screenshot artifact'
-      });
+        debugString: 'No trace found to generate screenshots'
+      }));
     }
 
-    return Screenshots.generateAuditResult({
-      rawValue: screenshots.length || 0,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.NULL,
-        value: screenshots
+    return artifacts.requestScreenshots(trace).then(screenshots => {
+      if (typeof screenshots === 'undefined') {
+        return Screenshots.generateAuditResult({
+          rawValue: -1,
+          debugString: 'No screenshot artifact'
+        });
       }
+
+      return Screenshots.generateAuditResult({
+        rawValue: screenshots.length || 0,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.NULL,
+          value: screenshots
+        }
+      });
     });
   }
 }

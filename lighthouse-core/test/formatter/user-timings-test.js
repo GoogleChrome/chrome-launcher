@@ -43,7 +43,6 @@ describe('Formatter', () => {
       endTime: 2500,
       duration: 1500
     }]);
-    console.log(output);
     assert.ok(/Mark/.test(output));
     assert.ok(/Start Time: 10/.test(output));
     assert.ok(/Measure/.test(output));

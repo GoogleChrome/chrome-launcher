@@ -249,7 +249,9 @@ class GatherRunner {
       })
       .then(_ => {
         // Collate all the gatherer results.
-        const artifacts = Object.assign({}, tracingData);
+        const computedArtifacts = this.instantiateComputedArtifacts();
+        const artifacts = Object.assign({}, computedArtifacts, tracingData);
+
         passes.forEach(pass => {
           pass.gatherers.forEach(gatherer => {
             if (typeof gatherer.artifact === 'undefined') {
@@ -323,6 +325,20 @@ class GatherRunner {
     if (typeof gathererInstance.artifact !== 'object') {
       throw new Error(`${gatherer} has no artifact property.`);
     }
+  }
+
+  static instantiateComputedArtifacts() {
+    let computedArtifacts = {};
+    var normalizedPath = require('path').join(__dirname, 'computed');
+    require('fs').readdirSync(normalizedPath).forEach(function(file) {
+      const ArtifactClass = require('./computed/' + file);
+      const artifact = new ArtifactClass();
+      // define the request* function that will be exposed on `artifacts`
+      computedArtifacts['request' + artifact.name] = function(artifacts) {
+        return Promise.resolve(artifact.request(artifacts));
+      };
+    });
+    return computedArtifacts;
   }
 
   static instantiateGatherers(passes, rootPath) {

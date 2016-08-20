@@ -28,7 +28,7 @@ class TTIMetric extends Audit {
       name: 'time-to-interactive',
       description: 'Time To Interactive (alpha)',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
-      requiredArtifacts: ['traceContents', 'speedline']
+      requiredArtifacts: ['traceContents']
     };
   }
 
@@ -54,11 +54,17 @@ class TTIMetric extends Audit {
    * will be changing in the future to a more accurate number.
    *
    * @param {!Artifacts} artifacts The artifacts from the gather phase.
-   * @return {!AuditResult} The score from the audit, ranging from 0-100.
+   * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
+    const trace = artifacts.traces[Audit.DEFAULT_TRACE];
+    const pendingSpeedline = artifacts.requestSpeedline(trace);
+    const pendingFMP = FMPMetric.audit(artifacts);
+
     // We start looking at Math.Max(FMPMetric, visProgress[0.85])
-    return FMPMetric.audit(artifacts).then(fmpResult => {
+    return Promise.all([pendingSpeedline, pendingFMP]).then(results => {
+      const speedline = results[0];
+      const fmpResult = results[1];
       if (fmpResult.rawValue === -1) {
         return generateError(fmpResult.debugString);
       }
@@ -68,8 +74,8 @@ class TTIMetric extends Audit {
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
-      const traceContents = artifacts.traces[Audit.DEFAULT_TRACE].traceEvents;
-      const model = tracingProcessor.init(traceContents);
+      const trace = artifacts.traces[Audit.DEFAULT_TRACE];
+      const model = tracingProcessor.init(trace);
       const endOfTraceTime = model.bounds.max;
 
       // TODO: Wait for DOMContentLoadedEndEvent
@@ -81,8 +87,8 @@ class TTIMetric extends Audit {
       // look at speedline results for 85% starting at FMP
       let visuallyReadyTiming = 0;
 
-      if (artifacts.Speedline.frames) {
-        const eightyFivePctVC = artifacts.Speedline.frames.find(frame => {
+      if (speedline.frames) {
+        const eightyFivePctVC = speedline.frames.find(frame => {
           return frame.getTimeStamp() >= fMPts && frame.getProgress() >= 85;
         });
 
@@ -111,7 +117,7 @@ class TTIMetric extends Audit {
         }
         // Get our expected latency for the time window
         const latencies = TracingProcessor.getRiskToResponsiveness(
-          model, traceContents, startTime, endTime, percentiles);
+          model, trace, startTime, endTime, percentiles);
         const estLatency = latencies[0].time.toFixed(2);
         foundLatencies.push({
           estLatency: estLatency,
@@ -151,7 +157,7 @@ class TTIMetric extends Audit {
         rawValue: timeToInteractive,
         displayValue: `${timeToInteractive}ms`,
         optimalValue: this.meta.optimalValue,
-        debugString: artifacts.Speedline.debugString,
+        debugString: speedline.debugString,
         extendedInfo: {
           value: extendedInfo,
           formatter: Formatter.SUPPORTED_FORMATS.NULL
@@ -170,6 +176,6 @@ function generateError(err) {
     value: -1,
     rawValue: -1,
     optimalValue: TTIMetric.meta.optimalValue,
-    debugString: err
+    debugString: err.message || err
   });
 }

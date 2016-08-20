@@ -49,10 +49,17 @@ const CriticalRequestChains = {
   }
 };
 
+const mockArtifacts = {
+  requestCriticalRequestChains: function() {
+    return Promise.resolve(CriticalRequestChains);
+  }
+};
+
 /* eslint-env mocha */
 describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain length', () => {
-    const output = Audit.audit({CriticalRequestChains});
-    assert.equal(output.score, 2);
+    Audit.audit(mockArtifacts).then(output => {
+      assert.equal(output.score, 2);
+    });
   });
 });

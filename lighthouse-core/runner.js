@@ -72,7 +72,9 @@ class Runner {
         // Finally set up the driver to gather.
         run = run.then(_ => GatherRunner.run(config.passes, opts));
       } else if (validArtifactsAndAudits) {
-        run = run.then(_ => config.artifacts);
+        run = run.then(_ => {
+          return Object.assign(GatherRunner.instantiateComputedArtifacts(), config.artifacts);
+        });
       }
 
       // Ignoring these two flags for coverage as this functionality is not exposed by the module.
