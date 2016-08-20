@@ -114,6 +114,7 @@ gulp.task('browserify', () => {
         bundle.transform('./dtm-transform.js', {
           global: true
         })
+        .ignore('../lighthouse-core/lib/asset-saver.js') // relative from gulpfile location
         .ignore('chrome-remote-interface')
         .ignore('source-map');
 

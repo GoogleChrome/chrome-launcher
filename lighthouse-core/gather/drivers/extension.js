@@ -47,7 +47,6 @@ class ExtensionDriver extends Driver {
 
   _detachCleanup() {
     this._tabId = null;
-    this.url = null;
     chrome.debugger.onEvent.removeListener(this._onEvent);
     chrome.debugger.onDetach.removeListener(this._onUnexpectedDetach);
     this._eventEmitter.removeAllListeners();
@@ -60,8 +59,8 @@ class ExtensionDriver extends Driver {
     }
 
     return this.queryCurrentTab_()
-      .then(tabId => {
-        this._tabId = tabId;
+      .then(tab => {
+        const tabId = this._tabId = tab.id;
         chrome.debugger.onEvent.addListener(this._onEvent);
         chrome.debugger.onDetach.addListener(this._onUnexpectedDetach);
 
@@ -142,18 +141,16 @@ class ExtensionDriver extends Driver {
           return reject(chrome.runtime.lastError);
         }
 
-        this.url = tabs[0].url;
-        resolve(tabs[0].id);
+        resolve(tabs[0]);
       });
     });
   }
 
+  /**
+   * Used by lighthouse-background to kick off the run on the current page
+   */
   getCurrentTabURL() {
-    if (this.url === undefined || this.url === null) {
-      return this.queryCurrentTab_().then(_ => this.url);
-    }
-
-    return Promise.resolve(this.url);
+    return this.queryCurrentTab_().then(tab => tab.url);
   }
 }
 

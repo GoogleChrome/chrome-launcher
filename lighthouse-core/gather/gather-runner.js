@@ -59,7 +59,7 @@ class GatherRunner {
       .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
       // Begin tracing and network recording if required.
       .then(_ => options.config.trace && driver.beginTrace())
-      .then(_ => options.config.network && driver.beginNetworkCollect())
+      .then(_ => options.config.network && driver.beginNetworkCollect(options))
       // Navigate.
       .then(_ => driver.gotoURL(options.url, {
         waitForLoad: true,
@@ -219,18 +219,25 @@ class GatherRunner {
 
       // Run each pass
       .then(_ => {
-        return passes.reduce((chain, config) => {
+        // If the main document redirects, we'll update this to keep track
+        let urlAfterRedirects;
+        return passes.reduce((chain, config, passIndex) => {
           const runOptions = Object.assign({}, options, {config});
           return chain
-              .then(_ => GatherRunner.beforePass(runOptions))
-              .then(_ => GatherRunner.pass(runOptions))
-              .then(_ => GatherRunner.afterPass(runOptions))
-              .then(loadData => {
-                // Merge pass trace and network data into tracingData.
-                config.trace && Object.assign(tracingData.traces, loadData.traces);
-                config.network && (tracingData.networkRecords = loadData.networkRecords);
-              });
-        }, Promise.resolve());
+            .then(_ => GatherRunner.beforePass(runOptions))
+            .then(_ => GatherRunner.pass(runOptions))
+            .then(_ => GatherRunner.afterPass(runOptions))
+            .then(loadData => {
+              // Merge pass trace and network data into tracingData.
+              config.trace && Object.assign(tracingData.traces, loadData.traces);
+              config.network && (tracingData.networkRecords = loadData.networkRecords);
+              if (passIndex === 0) {
+                urlAfterRedirects = runOptions.url;
+              }
+            });
+        }, Promise.resolve()).then(_ => {
+          options.url = urlAfterRedirects;
+        });
       })
       .then(_ => {
         // We dont need to hold up the reporting for the reload/disconnect,

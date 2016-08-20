@@ -55,12 +55,6 @@ module.exports = function(url, flags, configJSON) {
     flags.logLevel = flags.logLevel || 'error';
     log.setLevel(flags.logLevel);
 
-    // If the URL isn't https or localhost complain to the user.
-    if (url.indexOf('https') !== 0 && url.indexOf('http://localhost') !== 0) {
-      log.warn('Lighthouse', 'The URL provided should be on HTTPS');
-      log.warn('Lighthouse', 'Performance stats will be skewed redirecting from HTTP to HTTPS.');
-    }
-
     // Use ConfigParser to generate a valid config file
     const config = new Config(configJSON, flags.auditWhitelist, flags.configPath);
 

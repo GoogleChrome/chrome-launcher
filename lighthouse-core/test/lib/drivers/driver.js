@@ -19,11 +19,12 @@
 
 const Driver = require('../../../gather/drivers/cri.js');
 const Element = require('../../../lib/element.js');
+const NetworkRecorder = require('../../../lib/network-recorder');
 const assert = require('assert');
 
-let DriverStub = new Driver();
+let driverStub = new Driver();
 
-DriverStub.sendCommand = function(command, params) {
+driverStub.sendCommand = function(command, params) {
   switch (command) {
     case 'DOM.getDocument':
       return Promise.resolve({root: {nodeId: 249}});
@@ -36,17 +37,47 @@ DriverStub.sendCommand = function(command, params) {
   }
 };
 
+// mock redirects to test out enableUrlUpdateIfRedirected
+const req1 = {
+  url: 'http://aliexpress.com/'
+};
+const req2 = {
+  redirectSource: req1,
+  url: 'http://www.aliexpress.com/'
+};
+const req3 = {
+  redirectSource: req2,
+  url: 'http://m.aliexpress.com/?tracelog=wwwhome2mobilesitehome'
+};
+const mockRedirects = [req1, req2, req3];
+
 /* global describe, it */
 describe('Browser Driver', () => {
   it('returns null when DOM.querySelector finds no node', () => {
-    return DriverStub.querySelector('invalid').then(value => {
+    return driverStub.querySelector('invalid').then(value => {
       assert.equal(value, null);
     });
   });
 
   it('returns element when DOM.querySelector finds node', () => {
-    return DriverStub.querySelector('meta head').then(value => {
+    return driverStub.querySelector('meta head').then(value => {
       assert.equal(value instanceof Element, true);
     });
+  });
+
+  it('will update the options.url through redirects', () => {
+    const networkRecorder = driverStub._networkRecorder = new NetworkRecorder([]);
+    let opts = {url: req1.url};
+    driverStub.enableUrlUpdateIfRedirected(opts);
+
+    // Fake some reqFinished events
+    const networkManager = networkRecorder.networkManager;
+    mockRedirects.forEach(request => {
+      networkManager.dispatchEventToListeners(networkRecorder.EventTypes.RequestFinished, request);
+    });
+
+    // The above event is handled synchronously by enableUrlUpdateIfRedirected and will be all set
+    assert.notEqual(opts.url, req1.url, 'opts.url changed after the redirects');
+    assert.equal(opts.url, req3.url, 'opts.url matches the last redirect');
   });
 });
