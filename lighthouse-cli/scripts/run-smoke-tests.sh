@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-cd lighthouse-cli/test/fixtures && python -m SimpleHTTPServer 10200 &
+node lighthouse-cli/test/fixtures/static-server.js &
+
+sleep 0.5s
 
 NODE=$([ $(node -v | grep -E "v4") ] && echo "node --harmony" || echo "node")
-#config="$PWD/lighthouse-cli/test/fixtures/smoketest-config.json"
-#flags="--config-path=$config"
+config="$PWD/lighthouse-cli/test/fixtures/smoketest-offline-config.json"
 
 offline200result="URL responds with a 200 when offline"
 
@@ -30,15 +31,13 @@ if ! grep -q "$offline200result: false" results; then
   exit 1
 fi
 
-# SKIP this test for now until the flakiness is addressed.
-# sleep 1s
-#
-# # test mojibrush which should pass the offline test
-# $NODE lighthouse-cli $flags https://www.moji-brush.com > results
-#
-# if ! grep -q "$offline200result: true" results; then
-#   echo "Fail! offline ready site did not work while offline"
-#   cat results
-#   exit 1
-# fi
-#
+sleep 0.5s
+
+# run minimal lighthouse run against a basic offline-sw page
+$NODE lighthouse-cli --config-path=$config --quiet http://localhost:10503/offline-ready.html > results
+
+if ! grep -q "$offline200result: true" results; then
+  echo "Fail! offline ready site did not work while offline"
+  cat results
+  exit 1
+fi
