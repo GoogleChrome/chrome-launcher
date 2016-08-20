@@ -22,7 +22,7 @@ const Gatherer = require('../../gather/gatherers/gatherer');
 const GatherRunner = require('../../gather/gather-runner');
 const Audit = require('../../audits/audit');
 const assert = require('assert');
-const Config = require('../../config');
+const Config = require('../../config/config');
 const path = require('path');
 
 class TestGatherer extends Gatherer {
