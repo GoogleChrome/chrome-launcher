@@ -128,6 +128,16 @@ class Runner {
         .readdirSync(path.join(__dirname, './audits'))
         .filter(f => /\.js$/.test(f));
   }
+
+  /**
+   * Returns list of gatherer names for external querying.
+   * @return {!Array<string>}
+   */
+  static getGathererList() {
+    return fs
+        .readdirSync(path.join(__dirname, './gather/gatherers'))
+        .filter(f => /\.js$/.test(f));
+  }
 }
 
 module.exports = Runner;

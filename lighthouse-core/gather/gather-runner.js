@@ -18,6 +18,7 @@
 
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
+const path = require('path');
 
 /**
  * Class that drives browser to load the page and runs gatherer lifecycle hooks.
@@ -189,7 +190,29 @@ class GatherRunner {
     const driver = options.driver;
     const tracingData = {traces: {}};
 
-    passes = GatherRunner.instantiateGatherers(passes);
+    if (typeof options.url !== 'string' || options.url.length === 0) {
+      return Promise.reject(new Error('You must provide a url to the driver'));
+    }
+
+    if (typeof options.flags === 'undefined') {
+      options.flags = {};
+    }
+
+    if (typeof options.config === 'undefined') {
+      return Promise.reject(new Error('You must provide a config'));
+    }
+
+    // Default mobile emulation and page loading to true.
+    // The extension will switch these off initially.
+    if (typeof options.flags.mobile === 'undefined') {
+      options.flags.mobile = true;
+    }
+
+    if (typeof options.flags.loadPage === 'undefined') {
+      options.flags.loadPage = true;
+    }
+
+    passes = this.instantiateGatherers(passes, options.config.configDir);
 
     return driver.connect()
       .then(_ => GatherRunner.setupDriver(driver, options))
@@ -222,6 +245,10 @@ class GatherRunner {
         const artifacts = Object.assign({}, tracingData);
         passes.forEach(pass => {
           pass.gatherers.forEach(gatherer => {
+            if (typeof gatherer.artifact === 'undefined') {
+              throw new Error(`${gatherer.constructor.name} failed to provide an artifact.`);
+            }
+
             artifacts[gatherer.name] = gatherer.artifact;
           });
         });
@@ -229,11 +256,69 @@ class GatherRunner {
       });
   }
 
-  static getGathererClass(gatherer) {
-    return require(`./gatherers/${gatherer}`);
+  static getGathererClass(gatherer, rootPath) {
+    const Runner = require('../runner');
+    const list = Runner.getGathererList();
+    const coreGatherer = list.find(a => a === `${gatherer}.js`);
+
+    // Assume it's a core gatherer first.
+    let requirePath = path.resolve(__dirname, `./gatherers/${gatherer}`);
+    let GathererClass;
+
+    // If not, see if it can be found another way.
+    if (!coreGatherer) {
+      // Firstly try and see if the gatherer resolves naturally through the usual means.
+      try {
+        require.resolve(gatherer);
+
+        // If the above works, update the path to the absolute value provided.
+        requirePath = gatherer;
+      } catch (requireError) {
+        // If that fails, try and find it relative to any config path provided.
+        if (rootPath) {
+          requirePath = path.resolve(rootPath, gatherer);
+        }
+      }
+    }
+
+    // Now try and require it in. If this fails then the audit file isn't where we expected it.
+    try {
+      GathererClass = require(requirePath);
+    } catch (requireError) {
+      GathererClass = null;
+    }
+
+    if (!GathererClass) {
+      throw new Error(`Unable to locate gatherer: ${gatherer} (tried at: ${requirePath})`);
+    }
+
+    // Confirm that the gatherer appears valid.
+    this.assertValidGatherer(gatherer, GathererClass);
+
+    return GathererClass;
   }
 
-  static instantiateGatherers(passes) {
+  static assertValidGatherer(gatherer, GathererDefinition) {
+    const gathererInstance = new GathererDefinition();
+
+    if (typeof gathererInstance.beforePass !== 'function') {
+      throw new Error(`${gatherer} has no beforePass() method.`);
+    }
+
+    if (typeof gathererInstance.pass !== 'function') {
+      throw new Error(`${gatherer} has no pass() method.`);
+    }
+
+    if (typeof gathererInstance.afterPass !== 'function') {
+      throw new Error(`${gatherer} has no afterPass() method.`);
+    }
+
+    if (typeof gathererInstance.artifact !== 'object') {
+      throw new Error(`${gatherer} has no artifact property.`);
+    }
+  }
+
+  static instantiateGatherers(passes, rootPath) {
     return passes.map(pass => {
       pass.gatherers = pass.gatherers.map(gatherer => {
         // If this is already instantiated, don't do anything else.
@@ -241,7 +326,7 @@ class GatherRunner {
           return gatherer;
         }
 
-        const GathererClass = GatherRunner.getGathererClass(gatherer);
+        const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
         return new GathererClass();
       });
 

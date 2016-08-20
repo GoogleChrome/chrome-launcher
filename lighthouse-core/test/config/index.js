@@ -127,6 +127,44 @@ describe('Config', () => {
     return assert.equal(typeof config.audits[0], 'function');
   });
 
+  it('throws when it audit is not found', () => {
+    return assert.throws(_ => new Config({
+      audits: ['/fake-path/non-existent-audit']
+    }));
+  });
+
+  it('loads an audit relative to a config', () => {
+    return assert.doesNotThrow(_ => new Config({
+      audits: ['../fixtures/valid-custom-audit']
+    }, null, __filename));
+  });
+
+  it('throws when it finds invalid audits', () => {
+    assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-audit']
+    }), /audit\(\) method/);
+
+    assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-category']
+    }), /meta.category property/);
+
+    assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-name']
+    }), /meta.name property/);
+
+    assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-description']
+    }), /meta.description property/);
+
+    assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-required-artifacts']
+    }), /meta.requiredArtifacts property/);
+
+    return assert.throws(_ => new Config({
+      audits: ['../test/fixtures/invalid-audits/missing-generate-audit-result']
+    }), /generateAuditResult\(\) method/);
+  });
+
   it('expands artifacts', () => {
     const config = new Config({
       artifacts: {

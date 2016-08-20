@@ -23,6 +23,7 @@ const SpeedlineGatherer = require('../gather/gatherers/speedline');
 
 const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
+const path = require('path');
 
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
@@ -107,7 +108,7 @@ function cleanTrace(trace) {
   return trace;
 }
 
-function filterPasses(passes, audits) {
+function filterPasses(passes, audits, rootPath) {
   const requiredGatherers = getGatherersNeededByAudits(audits);
 
   // Make sure we only have the gatherers that are needed by the audits
@@ -116,12 +117,8 @@ function filterPasses(passes, audits) {
     const freshPass = Object.assign({}, pass);
 
     freshPass.gatherers = freshPass.gatherers.filter(gatherer => {
-      try {
-        const GathererClass = GatherRunner.getGathererClass(gatherer);
-        return requiredGatherers.has(GathererClass.name);
-      } catch (requireError) {
-        throw new Error(`Unable to locate gatherer: ${gatherer}`);
-      }
+      const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
+      return requiredGatherers.has(GathererClass.name);
     });
 
     return freshPass;
@@ -171,14 +168,80 @@ function filterAudits(audits, auditWhitelist) {
   return filteredAudits;
 }
 
-function expandAudits(audits) {
+function expandAudits(audits, rootPath) {
+  const Runner = require('../runner');
+
   return audits.map(audit => {
-    try {
-      return require(`../audits/${audit}`);
-    } catch (requireError) {
-      throw new Error(`Unable to locate audit: ${audit}`);
+    // Firstly see if the audit is in Lighthouse itself.
+    const list = Runner.getAuditList();
+    const coreAudit = list.find(a => a === `${audit}.js`);
+
+    // Assume it's a core audit first.
+    let requirePath = path.resolve(__dirname, `../audits/${audit}`);
+    let AuditClass;
+
+    // If not, see if it can be found another way.
+    if (!coreAudit) {
+      // Firstly try and see if the audit resolves naturally through the usual means.
+      try {
+        require.resolve(audit);
+
+        // If the above works, update the path to the absolute value provided.
+        requirePath = audit;
+      } catch (requireError) {
+        // If that fails, try and find it relative to any config path provided.
+        if (rootPath) {
+          requirePath = path.resolve(rootPath, audit);
+        }
+      }
     }
+
+    // Now try and require it in. If this fails then the audit file isn't where we expected it.
+    try {
+      AuditClass = require(requirePath);
+    } catch (requireError) {
+      AuditClass = null;
+    }
+
+    if (!AuditClass) {
+      throw new Error(`Unable to locate audit: ${audit} (tried at ${requirePath})`);
+    }
+
+    // Confirm that the audit appears valid.
+    assertValidAudit(audit, AuditClass);
+
+    return AuditClass;
   });
+}
+
+function assertValidAudit(audit, auditDefinition) {
+  if (typeof auditDefinition.audit !== 'function') {
+    throw new Error(`${audit} has no audit() method.`);
+  }
+
+  if (typeof auditDefinition.meta.name !== 'string') {
+    throw new Error(`${audit} has no meta.name property, or the property is not a string.`);
+  }
+
+  if (typeof auditDefinition.meta.category !== 'string') {
+    throw new Error(`${audit} has no meta.category property, or the property is not a string.`);
+  }
+
+  if (typeof auditDefinition.meta.description !== 'string') {
+    throw new Error(`${audit} has no meta.description property, or the property is not a string.`);
+  }
+
+  if (!Array.isArray(auditDefinition.meta.requiredArtifacts)) {
+    throw new Error(
+      `${audit} has no meta.requiredArtifacts property, or the property is not an array.`
+    );
+  }
+
+  if (typeof auditDefinition.generateAuditResult !== 'function') {
+    throw new Error(
+      `${audit} has no generateAuditResult() method. Did you inherit from the proper base class?`
+    );
+  }
 }
 
 function expandArtifacts(artifacts, includeSpeedline) {
@@ -236,16 +299,21 @@ class Config {
    * @constructor
    * @param{Object} config
    */
-  constructor(configJSON, auditWhitelist) {
+  constructor(configJSON, auditWhitelist, configPath) {
     if (!configJSON) {
       configJSON = defaultConfig;
     }
 
+    // Store the directory of the config path, if one was provided.
+    this._configDir = configPath ? path.dirname(configPath) : undefined;
+
     this._audits = configJSON.audits ? expandAudits(
-        filterAudits(configJSON.audits, auditWhitelist)
+        filterAudits(configJSON.audits, auditWhitelist), this._configDir
         ) : null;
     // filterPasses expects audits to have been expanded
-    this._passes = configJSON.passes ? filterPasses(configJSON.passes, this._audits) : null;
+    this._passes = configJSON.passes ?
+        filterPasses(configJSON.passes, this._audits, this._configDir) :
+        null;
     this._auditResults = configJSON.auditResults ? Array.from(configJSON.auditResults) : null;
     this._artifacts = null;
     if (configJSON.artifacts) {
@@ -254,6 +322,11 @@ class Config {
           configJSON.audits && configJSON.audits.find(a => a === 'time-to-interactive'));
     }
     this._aggregations = configJSON.aggregations ? Array.from(configJSON.aggregations) : null;
+  }
+
+  /** @type {string} */
+  get configDir() {
+    return this._configDir;
   }
 
   /** @type {Array<!Pass>} */
