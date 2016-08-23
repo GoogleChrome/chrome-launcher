@@ -18,6 +18,7 @@
   "permissions": [
     "activeTab",
     "debugger",
+    "storage",
     "tabs"
   ],
   "browser_action": {
