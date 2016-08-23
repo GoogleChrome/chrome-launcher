@@ -35,7 +35,11 @@ describe('Manifest gatherer', () => {
     return manifestGather.afterPass({
       driver: {
         sendCommand() {
-          return Promise.resolve({data: '', errors: [], url: 'https://example.com/manifest.json'});
+          return Promise.resolve({
+            data: '{}',
+            errors: [],
+            url: 'https://example.com/manifest.json'
+          });
         }
       }
     }).then(_ => {
@@ -68,7 +72,23 @@ describe('Manifest gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(manifestGather.artifact.debugString === error);
+      assert.notStrictEqual(manifestGather.artifact.debugString.indexOf(error), -1);
+    });
+  });
+
+  it('emits an error when there was no manifest', () => {
+    return manifestGather.afterPass({
+      driver: {
+        sendCommand() {
+          return Promise.resolve({
+            data: '',
+            errors: [],
+            url: ''
+          });
+        }
+      }
+    }).then(_ => {
+      assert.ok(manifestGather.artifact.debugString);
     });
   });
 
