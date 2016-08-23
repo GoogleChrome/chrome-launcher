@@ -17,10 +17,10 @@ const Audit = require('../../audits/cache-start-url.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
 const CacheContents = ['https://another.example.com/', 'https://example.com/'];
 const URL = 'https://example.com';
 const AltURL = 'https://example.com/?utm_source=http203';
+const exampleManifest = manifestParser(manifestSrc, URL, URL);
 
 /* global describe, it*/
 
@@ -42,18 +42,6 @@ describe('Cache: start_url audit', () => {
     assert.equal(output.rawValue, false);
     assert.equal(output.debugString, 'No cache or URL detected');
   });
-
-  // Need to disable camelcase check for dealing with start_url.
-  /* eslint-disable camelcase */
-  it('fails when a manifest contains no start_url', () => {
-    const artifacts = {
-      Manifest: manifestParser('{}')
-    };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
-    assert.equal(output.debugString, 'start_url not present in Manifest');
-  });
-  /* eslint-enable camelcase */
 
   it('succeeds when given a manifest with a start_url, cache contents, and a URL', () => {
     return assert.equal(Audit.audit({

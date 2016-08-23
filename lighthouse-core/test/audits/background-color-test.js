@@ -17,7 +17,20 @@ const Audit = require('../../audits/manifest-background-color.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
+const exampleManifest = manifestParser(manifestSrc, 'https://example.com/', 'https://example.com/');
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+
+/**
+ * Simple manifest parsing helper when the manifest URLs aren't material to the
+ * test. Uses example.com URLs for testing.
+ * @param {string} manifestSrc
+ * @return {!ManifestNode<(!Manifest|undefined)>}
+ */
+function noUrlManifestParser(manifestSrc) {
+  return manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+}
 
 /* global describe, it*/
 
@@ -32,14 +45,14 @@ describe('Manifest: background color audit', () => {
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: noUrlManifestParser('{}')
     };
     return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
 
   it('fails when a minimal manifest contains no background_color', () => {
     const artifacts = {
-      Manifest: manifestParser(JSON.stringify({
+      Manifest: noUrlManifestParser(JSON.stringify({
         start_url: '/'
       }))
     };
@@ -50,7 +63,7 @@ describe('Manifest: background color audit', () => {
 
   it('fails when a minimal manifest contains an invalid background_color', () => {
     const artifacts = {
-      Manifest: manifestParser(JSON.stringify({
+      Manifest: noUrlManifestParser(JSON.stringify({
         background_color: 'no'
       }))
     };
@@ -61,7 +74,7 @@ describe('Manifest: background color audit', () => {
 
   it('succeeds when a minimal manifest contains a valid background_color', () => {
     const artifacts = {
-      Manifest: manifestParser(JSON.stringify({
+      Manifest: noUrlManifestParser(JSON.stringify({
         background_color: '#FAFAFA'
       }))
     };

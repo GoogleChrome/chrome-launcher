@@ -17,7 +17,10 @@ const Audit = require('../../audits/manifest-start-url.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
 /* global describe, it*/
 
@@ -30,10 +33,10 @@ describe('Manifest: start_url audit', () => {
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
+    assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
 
@@ -43,10 +46,10 @@ describe('Manifest: start_url audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         start_url: undefined
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
+    assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
 
@@ -54,7 +57,7 @@ describe('Manifest: start_url audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         start_url: '/'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, true);

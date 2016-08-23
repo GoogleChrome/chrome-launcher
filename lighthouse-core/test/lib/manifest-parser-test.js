@@ -15,24 +15,37 @@
  */
 'use strict';
 
-/* global describe, it */
+/* eslint-env mocha */
 
-var manifestParser = require('../lib/manifest-parser');
-var assert = require('assert');
-const manifestStub = require('./fixtures/manifest.json');
+const manifestParser = require('../../lib/manifest-parser');
+const assert = require('assert');
+const manifestStub = require('../fixtures/manifest.json');
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+
+/**
+ * Simple manifest parsing helper when the manifest URLs aren't material to the
+ * test. Uses example.com URLs for testing.
+ * @param {string} manifestSrc
+ * @return {!ManifestNode<(!Manifest|undefined)>}
+ */
+function noUrlManifestParser(manifestSrc) {
+  return manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+}
 
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {
-    let parsedManifest = manifestParser('');
+    let parsedManifest = noUrlManifestParser('');
     assert.ok(parsedManifest.debugString);
   });
 
   it('accepts empty dictionary', function() {
-    let parsedManifest = manifestParser('{}');
+    let parsedManifest = noUrlManifestParser('{}');
     assert(!parsedManifest.debugString);
     assert.equal(parsedManifest.value.name.value, undefined);
     assert.equal(parsedManifest.value.short_name.value, undefined);
-    assert.equal(parsedManifest.value.start_url.value, undefined);
+    assert.equal(parsedManifest.value.start_url.value, EXAMPLE_DOC_URL);
     assert.equal(parsedManifest.value.display.value, 'browser');
     assert.equal(parsedManifest.value.orientation.value, undefined);
     assert.equal(parsedManifest.value.theme_color.value, undefined);
@@ -45,7 +58,8 @@ describe('Manifest Parser', function() {
 
   describe('icon parsing', function() {
     it('parses basic string', function() {
-      let parsedManifest = manifestParser('{"icons": [{"src": "192.png", "sizes": "192x192"}]}');
+      let parsedManifest = manifestParser('{"icons": [{"src": "192.png", "sizes": "192x192"}]}',
+          EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert(!parsedManifest.debugString);
       let icons = parsedManifest.value.icons;
       assert(!icons.debugString);
@@ -55,41 +69,80 @@ describe('Manifest Parser', function() {
     });
 
     it('finds three icons in the stub manifest', function() {
-      let parsedManifest = manifestParser(JSON.stringify(manifestStub));
+      let parsedManifest = manifestParser(JSON.stringify(manifestStub), EXAMPLE_MANIFEST_URL,
+          EXAMPLE_DOC_URL);
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.icons.value.length, 3);
     });
 
     it('parses icons with extra whitespace', function() {
       let manifest = '{"icons": [{"src": "192.png", "sizes": " 192x192   256x256"}]}';
-      let parsedManifest = manifestParser(manifest);
+      let parsedManifest = manifestParser(manifest, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       let icons = parsedManifest.value.icons;
       let icon192 = icons.value[0];
       let icon192Sizes = icon192.value.sizes.value;
       assert.equal(icon192Sizes[0], '192x192');
       assert.equal(icon192Sizes[1], '256x256');
     });
+
+    it('parses icons and discards any with invalid src values', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: {}
+        }, {
+          src: 17
+        }]
+      });
+      const parsedManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+      const icons = parsedManifest.value.icons;
+      assert.equal(icons.value.length, 0);
+    });
+
+    it('parses icons and discards any with undefined or empty string src values', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: ''
+        }, {}]
+      });
+      const parsedManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+      const icons = parsedManifest.value.icons;
+      assert.equal(icons.value.length, 0);
+    });
+
+    it('constructs icon URLs relative to manifest URL ', () => {
+      const manifestSrc = JSON.stringify({
+        icons: [{
+          src: '../cool.gif'
+        }]
+      });
+      const manifestUrl = 'https://example.com/resources/manifest.webmanifest';
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, EXAMPLE_DOC_URL);
+      const icons = parsedManifest.value.icons;
+      assert.equal(icons.value.length, 1);
+      const icon = icons.value[0].value;
+      assert.equal(icon.src.value, 'https://example.com/cool.gif');
+    });
   });
 
   describe('name parsing', function() {
     it('parses basic string', function() {
-      let parsedManifest = manifestParser('{"name":"foo"}');
+      let parsedManifest = noUrlManifestParser('{"name":"foo"}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, 'foo');
     });
 
     it('trims whitespaces', function() {
-      let parsedManifest = manifestParser('{"name":" foo "}');
+      let parsedManifest = noUrlManifestParser('{"name":" foo "}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, 'foo');
     });
 
     it('doesn\'t parse non-string', function() {
-      let parsedManifest = manifestParser('{"name": {} }');
+      let parsedManifest = noUrlManifestParser('{"name": {} }');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, undefined);
 
-      parsedManifest = manifestParser('{"name": 42 }');
+      parsedManifest = noUrlManifestParser('{"name": 42 }');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, undefined);
     });
@@ -97,26 +150,168 @@ describe('Manifest Parser', function() {
 
   describe('short_name parsing', function() {
     it('parses basic string', function() {
-      let parsedManifest = manifestParser('{"short_name":"foo"}');
+      let parsedManifest = noUrlManifestParser('{"short_name":"foo"}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, 'foo');
     });
 
     it('trims whitespaces', function() {
-      let parsedManifest = manifestParser('{"short_name":" foo "}');
+      let parsedManifest = noUrlManifestParser('{"short_name":" foo "}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, 'foo');
     });
 
     it('doesn\'t parse non-string', function() {
-      let parsedManifest = manifestParser('{"short_name": {} }');
+      let parsedManifest = noUrlManifestParser('{"short_name": {} }');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, undefined);
 
-      parsedManifest = manifestParser('{"short_name": 42 }');
+      parsedManifest = noUrlManifestParser('{"short_name": 42 }');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, undefined);
     });
+  });
+
+  /**
+   * @see https://w3c.github.io/manifest/#start_url-member
+   */
+  describe('start_url parsing', () => {
+    /* eslint-disable camelcase */
+    // 8.10(3)
+    it('falls back to document URL and issues a warning for an invalid value', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: {}
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('falls back to document URL and issues a warning for an invalid value', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: 6
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('falls back to document URL and issues a warning for an empty string', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: ''
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('falls back to document URL and issues no warning when undefined', () => {
+      const manifestSrc = JSON.stringify({});
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(!parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    // TODO(bckenny): run these tests when we have a proper URL parser:
+    // https://github.com/GoogleChrome/lighthouse/issues/602
+    // 8.10(5)
+    it.skip('falls back to document URL and issues a warning for an invalid URL', () => {
+      // `new URL('/manifest.json', '')` is invalid and will throw.
+      const manifestSrc = JSON.stringify({
+        start_url: '/manifest.json'
+      });
+      const manifestUrl = '';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    // 8.10(6)
+    it('falls back to document URL with warning when on different domain from document URL', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: 'https://evil.com/index.html'
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('falls back to document URL with warning when on different port from document URL', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: 'https://example.com:314/index.html'
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com:8080/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('falls back to document URL with warning when on different scheme from document URL', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: 'http://example.com/index.html'
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(parsedUrl.debugString);
+      assert.equal(parsedUrl.value, docUrl);
+    });
+
+    it('correctly parses a start_url of "/" relative to the manifest\'s url', () => {
+      const manifestSrc = JSON.stringify({
+        start_url: '/'
+      });
+      const manifestUrl = 'https://example.com/manifest.json';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(!parsedUrl.debugString);
+      assert.equal(parsedUrl.value, 'https://example.com/');
+    });
+
+    it('correctly parses a start_url relative to the manifest\'s url', () => {
+      // from non-normative example in spec
+      const manifestSrc = JSON.stringify({
+        start_url: '../start_point.html'
+      });
+      const manifestUrl = 'https://example.com/resources/manifest.webmanifest';
+      const docUrl = 'https://example.com/index.html';
+
+      const parsedManifest = manifestParser(manifestSrc, manifestUrl, docUrl);
+      const parsedUrl = parsedManifest.value.start_url;
+      assert.ok(!parsedUrl.debugString);
+      assert.equal(parsedUrl.value, 'https://example.com/start_point.html');
+    });
+    /* eslint-enable camelcase */
   });
 
   /**
@@ -124,21 +319,21 @@ describe('Manifest Parser', function() {
    */
   describe('display parsing', () => {
     it('falls back to \'browser\' and issues a warning for an invalid value', () => {
-      const parsedManifest = manifestParser('{"display": {} }');
+      const parsedManifest = noUrlManifestParser('{"display": {} }');
       const display = parsedManifest.value.display;
       assert.ok(display.debugString);
       assert.equal(display.value, 'browser');
     });
 
     it('falls back to \'browser\' and issues a warning for an invalid value', () => {
-      const parsedManifest = manifestParser('{"display": 5 }');
+      const parsedManifest = noUrlManifestParser('{"display": 5 }');
       const display = parsedManifest.value.display;
       assert.ok(display.debugString);
       assert.equal(display.value, 'browser');
     });
 
     it('falls back to \'browser\' and issues no warning when undefined', () => {
-      const parsedManifest = manifestParser('{}');
+      const parsedManifest = noUrlManifestParser('{}');
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'browser');
@@ -147,7 +342,7 @@ describe('Manifest Parser', function() {
 
     it('trims whitespace', () => {
       const displayValue = ' fullscreen     ';
-      const parsedManifest = manifestParser(`{"display": "${displayValue}" }`);
+      const parsedManifest = noUrlManifestParser(`{"display": "${displayValue}" }`);
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'fullscreen');
@@ -155,45 +350,99 @@ describe('Manifest Parser', function() {
 
     it('converts to lowercase', () => {
       const displayValue = 'fUlLScrEEn';
-      const parsedManifest = manifestParser(`{"display": "${displayValue}" }`);
+      const parsedManifest = noUrlManifestParser(`{"display": "${displayValue}" }`);
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'fullscreen');
     });
 
     it('falls back to \'browser\' and issues a warning when a non-existent mode', () => {
-      const parsedManifest = manifestParser('{"display": "fullestscreen" }');
+      const parsedManifest = noUrlManifestParser('{"display": "fullestscreen" }');
       const display = parsedManifest.value.display;
       assert.ok(display.debugString);
       assert.equal(display.value, 'browser');
     });
 
     it('correctly parses `fullscreen` display mode', () => {
-      const parsedManifest = manifestParser('{"display": "fullscreen" }');
+      const parsedManifest = noUrlManifestParser('{"display": "fullscreen" }');
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'fullscreen');
     });
 
     it('correctly parses `standalone` display mode', () => {
-      const parsedManifest = manifestParser('{"display": "standalone" }');
+      const parsedManifest = noUrlManifestParser('{"display": "standalone" }');
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'standalone');
     });
 
     it('correctly parses `minimal-ui` display mode', () => {
-      const parsedManifest = manifestParser('{"display": "minimal-ui" }');
+      const parsedManifest = noUrlManifestParser('{"display": "minimal-ui" }');
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'minimal-ui');
     });
 
     it('correctly parses `browser` display mode', () => {
-      const parsedManifest = manifestParser('{"display": "browser" }');
+      const parsedManifest = noUrlManifestParser('{"display": "browser" }');
       const display = parsedManifest.value.display;
       assert.ok(!display.debugString);
       assert.equal(display.value, 'browser');
+    });
+  });
+
+  /**
+   * @see https://w3c.github.io/manifest/#related_applications-member
+   */
+  describe('related_applications parsing', () => {
+    it('correctly parses the urls from an example manifest', () => {
+      /* eslint-disable camelcase */
+      // non normative-example from section 10
+      const exampleManifest = {
+        related_applications: [{
+          platform: 'play',
+          url: 'https://play.google.com/store/apps/details?id=com.example.app1',
+          id: 'com.example.app1'
+        }, {
+          platform: 'itunes',
+          url: 'https://itunes.apple.com/app/example-app1/id123456789'
+        }]
+      };
+      /* eslint-enable camelcase */
+
+      const parsedManifest = manifestParser(JSON.stringify(exampleManifest), EXAMPLE_MANIFEST_URL,
+          EXAMPLE_DOC_URL);
+      const applications = parsedManifest.value.related_applications.value;
+      assert.equal(applications.length, 2);
+      const url0 = applications[0].value.url.value;
+      assert.equal(url0, exampleManifest.related_applications[0].url);
+      const url1 = applications[1].value.url.value;
+      assert.equal(url1, exampleManifest.related_applications[1].url);
+    });
+
+    it('handles applications with invalid urls', () => {
+      /* eslint-disable camelcase */
+      const exampleManifest = {
+        related_applications: [{
+          platform: 'play',
+          url: 6,
+          id: 'com.example.app1'
+        }, {
+          platform: 'itunes',
+          url: {}
+        }]
+      };
+      /* eslint-enable camelcase */
+
+      const parsedManifest = manifestParser(JSON.stringify(exampleManifest), EXAMPLE_MANIFEST_URL,
+          EXAMPLE_DOC_URL);
+      const applications = parsedManifest.value.related_applications.value;
+      // First entry's url should be discarded but entry preserved due to valid id.
+      // Second entry should be discarded since discarded url and no id.
+      assert.equal(applications.length, 1);
+      const url0 = applications[0].value.url.value;
+      assert.equal(url0, undefined);
     });
   });
 });

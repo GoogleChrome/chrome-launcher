@@ -16,6 +16,7 @@
  */
 'use strict';
 
+const url = require('url');
 const validateColor = require('./web-inspector').Color.parse;
 
 const ALLOWED_DISPLAY_VALUES = [
@@ -61,13 +62,6 @@ function parseString(raw, trim) {
   };
 }
 
-function parseURL(raw) {
-  // TODO: resolve url using baseURL
-  // var baseURL = args.baseURL;
-  // new URL(parseString(raw).value, baseURL);
-  return parseString(raw, true);
-}
-
 function parseColor(raw) {
   const color = parseString(raw);
 
@@ -94,10 +88,69 @@ function parseShortName(jsonInput) {
   return parseString(jsonInput.short_name, true);
 }
 
-function parseStartUrl(jsonInput) {
-  // TODO: parse url using manifest_url as a base (missing).
-  // start_url must be same-origin as Document of the top-level browsing context.
-  return parseURL(jsonInput.start_url);
+/**
+ * Returns whether the urls are of the same origin. See https://html.spec.whatwg.org/#same-origin
+ * @param {string} url1
+ * @param {string} url2
+ * @return {boolean}
+ */
+function checkSameOrigin(url1, url2) {
+  const parsed1 = url.parse(url1);
+  const parsed2 = url.parse(url2);
+
+  return parsed1.protocol === parsed2.protocol &&
+      parsed1.hostname === parsed2.hostname &&
+      parsed1.port === parsed2.port;
+}
+
+/**
+ * https://w3c.github.io/manifest/#start_url-member
+ */
+function parseStartUrl(jsonInput, manifestUrl, documentUrl) {
+  const raw = jsonInput.start_url;
+
+  // 8.10(3) - discard the empty string and non-strings.
+  if (raw === '') {
+    return {
+      raw,
+      value: documentUrl,
+      debugString: 'ERROR: start_url string empty'
+    };
+  }
+  const parsedAsString = parseString(raw);
+  if (!parsedAsString.value) {
+    parsedAsString.value = documentUrl;
+    return parsedAsString;
+  }
+
+  // 8.10(4) - construct URL with raw as input and manifestUrl as the base.
+  let startUrl;
+  try {
+    // TODO(bckenny): need better URL constructor to do this properly. See
+    // https://github.com/GoogleChrome/lighthouse/issues/602
+    startUrl = url.resolve(manifestUrl, raw);
+  } catch (e) {
+    // 8.10(5) - discard invalid URLs.
+    return {
+      raw,
+      value: documentUrl,
+      debugString: 'ERROR: invalid start_url relative to ${manifestUrl}'
+    };
+  }
+
+  // 8.10(6) - discard start_urls that are not same origin as documentUrl.
+  if (!checkSameOrigin(startUrl, documentUrl)) {
+    return {
+      raw,
+      value: documentUrl,
+      debugString: 'ERROR: start_url must be same-origin as document'
+    };
+  }
+
+  return {
+    raw,
+    value: startUrl
+  };
 }
 
 function parseDisplay(jsonInput) {
@@ -130,9 +183,20 @@ function parseOrientation(jsonInput) {
   return orientation;
 }
 
-function parseIcon(raw) {
-  // TODO: pass manifest url as base.
-  let src = parseURL(raw.src);
+function parseIcon(raw, manifestUrl) {
+  // 9.4(3)
+  const src = parseString(raw.src, true);
+  // 9.4(4) - discard if trimmed value is the empty string.
+  if (src.value === '') {
+    src.value = undefined;
+  }
+  if (src.value) {
+    // TODO(bckenny): need better URL constructor to do this properly. See
+    // https://github.com/GoogleChrome/lighthouse/issues/602
+    // 9.4(4) - construct URL with manifest URL as the base
+    src.value = url.resolve(manifestUrl, src.value);
+  }
+
   let type = parseString(raw.type, true);
 
   let density = {
@@ -167,7 +231,7 @@ function parseIcon(raw) {
   };
 }
 
-function parseIcons(jsonInput) {
+function parseIcons(jsonInput, manifestUrl) {
   const raw = jsonInput.icons;
   let value;
 
@@ -187,8 +251,15 @@ function parseIcons(jsonInput) {
     };
   }
 
-  // TODO(bckenny): spec says to skip icons missing `src`. Warn instead?
-  value = raw.filter(icon => !!icon.src).map(parseIcon);
+  // TODO(bckenny): spec says to skip icons missing `src`, so debug messages on
+  // individual icons are lost. Warn instead?
+  value = raw
+    // 9.6(3)(1)
+    .filter(icon => icon.src !== undefined)
+    // 9.6(3)(2)(1)
+    .map(icon => parseIcon(icon, manifestUrl))
+    // 9.6(3)(2)(2)
+    .filter(parsedIcon => parsedIcon.value.src.value !== undefined);
 
   return {
     raw,
@@ -200,15 +271,27 @@ function parseIcons(jsonInput) {
 function parseApplication(raw) {
   let platform = parseString(raw.platform, true);
   let id = parseString(raw.id, true);
-  // TODO: pass manfiest url as base.
-  let url = parseURL(raw.url);
+
+  // 10.2.(2) and 10.2.(3)
+  const appUrl = parseString(raw.url, true);
+  if (appUrl.value) {
+    try {
+      // TODO(bckenny): need better URL constructor to do this properly. See
+      // https://github.com/GoogleChrome/lighthouse/issues/602
+      // 10.2.(4) - attempt to construct URL.
+      appUrl.value = url.parse(appUrl.value).href;
+    } catch (e) {
+      appUrl.value = undefined;
+      appUrl.debugString = 'ERROR: invalid application URL ${raw.url}';
+    }
+  }
 
   return {
     raw,
     value: {
       platform,
       id,
-      url
+      url: appUrl
     },
     debugString: undefined
   };
@@ -234,8 +317,12 @@ function parseRelatedApplications(jsonInput) {
     };
   }
 
-  // TODO(bckenny): spec says to skip apps missing `platform`. Warn instead?
-  value = raw.filter(application => !!application.platform).map(parseApplication);
+  // TODO(bckenny): spec says to skip apps missing `platform`, so debug messages
+  // on individual apps are lost. Warn instead?
+  value = raw
+    .filter(application => !!application.platform)
+    .map(parseApplication)
+    .filter(parsedApp => !!parsedApp.value.id.value || !!parsedApp.value.url.value);
 
   return {
     raw,
@@ -273,7 +360,18 @@ function parseBackgroundColor(jsonInput) {
   return parseColor(jsonInput.background_color);
 }
 
-function parse(string) {
+/**
+ * Parse a manifest from the given inputs.
+ * @param {string} string Manifest JSON string.
+ * @param {string} manifestUrl URL of manifest file.
+ * @param {string} documentUrl URL of document containing manifest link element.
+ * @return {!ManifestNode<(!Manifest|undefined)>}
+ */
+function parse(string, manifestUrl, documentUrl) {
+  if (manifestUrl === undefined || documentUrl === undefined) {
+    throw new Error('Manifest and document URLs required for manifest parsing.');
+  }
+
   let jsonInput;
 
   try {
@@ -290,10 +388,10 @@ function parse(string) {
   let manifest = {
     name: parseName(jsonInput),
     short_name: parseShortName(jsonInput),
-    start_url: parseStartUrl(jsonInput),
+    start_url: parseStartUrl(jsonInput, manifestUrl, documentUrl),
     display: parseDisplay(jsonInput),
     orientation: parseOrientation(jsonInput),
-    icons: parseIcons(jsonInput),
+    icons: parseIcons(jsonInput, manifestUrl),
     related_applications: parseRelatedApplications(jsonInput),
     prefer_related_applications: parsePreferRelatedApplications(jsonInput),
     theme_color: parseThemeColor(jsonInput),

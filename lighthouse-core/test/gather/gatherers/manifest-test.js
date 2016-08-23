@@ -21,6 +21,9 @@ const ManifestGather = require('../../../gather/gatherers/manifest');
 const assert = require('assert');
 let manifestGather;
 
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+
 const isExpectedOutput = artifact => {
   return 'raw' in artifact && 'value' in artifact;
 };
@@ -38,10 +41,11 @@ describe('Manifest gatherer', () => {
           return Promise.resolve({
             data: '{}',
             errors: [],
-            url: 'https://example.com/manifest.json'
+            url: EXAMPLE_MANIFEST_URL
           });
         }
-      }
+      },
+      url: EXAMPLE_DOC_URL
     }).then(_ => {
       assert.ok(typeof manifestGather.artifact === 'object');
     });
@@ -101,10 +105,12 @@ describe('Manifest gatherer', () => {
         sendCommand() {
           return Promise.resolve({
             errors: [],
-            data
+            data,
+            url: EXAMPLE_MANIFEST_URL
           });
         }
-      }
+      },
+      url: EXAMPLE_DOC_URL
     }).then(_ => {
       assert.ok(typeof manifestGather.artifact.value === 'object');
     });

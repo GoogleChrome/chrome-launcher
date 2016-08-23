@@ -21,6 +21,9 @@ const assert = require('assert');
 const manifestParser = require('../../lib/manifest-parser');
 const exampleManifest = JSON.stringify(require('../fixtures/manifest.json'));
 
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+
 /* global describe, it*/
 
 describe('Manifest: icons audits', () => {
@@ -29,7 +32,7 @@ describe('Manifest: icons audits', () => {
       const manifestSrc = JSON.stringify({
         name: 'NoIconsHere'
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.equal(Audit144.audit({Manifest}).rawValue, false);
       assert.equal(Audit192.audit({Manifest}).rawValue, false);
     });
@@ -38,7 +41,7 @@ describe('Manifest: icons audits', () => {
       const manifestSrc = JSON.stringify({
         icons: []
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.equal(Audit144.audit({Manifest}).rawValue, false);
       assert.equal(Audit192.audit({Manifest}).rawValue, false);
     });
@@ -51,7 +54,7 @@ describe('Manifest: icons audits', () => {
           src: 'icon.png'
         }]
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
       assert.equal(Audit144.audit({Manifest}).rawValue, false);
       assert.equal(Audit192.audit({Manifest}).rawValue, false);
@@ -59,7 +62,7 @@ describe('Manifest: icons audits', () => {
 
     it('succeeds when a manifest contains icons that are large enough', () => {
       // stub manifest contains a 192 icon
-      const Manifest = manifestParser(exampleManifest);
+      const Manifest = manifestParser(exampleManifest, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.equal(Audit144.audit({Manifest}).rawValue, true);
       assert.equal(Audit192.audit({Manifest}).rawValue, true);
     });
@@ -71,7 +74,7 @@ describe('Manifest: icons audits', () => {
           sizes: '72x72 96x96 128x128 256x256'
         }]
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
       assert.equal(Audit144.audit({Manifest}).rawValue, true);
       assert.equal(Audit192.audit({Manifest}).rawValue, true);
@@ -86,7 +89,7 @@ describe('Manifest: icons audits', () => {
           sizes: '256x256'
         }]
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.equal(Audit144.audit({Manifest}).rawValue, true);
       assert.equal(Audit192.audit({Manifest}).rawValue, true);
     });
@@ -99,7 +102,7 @@ describe('Manifest: icons audits', () => {
           sizes: '200x220'
         }]
       });
-      const Manifest = manifestParser(manifestSrc);
+      const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.equal(Audit144.audit({Manifest}).rawValue, false);
       assert.equal(Audit192.audit({Manifest}).rawValue, false);
     });

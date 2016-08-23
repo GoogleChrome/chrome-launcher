@@ -18,7 +18,10 @@ const assert = require('assert');
 
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
 /* global describe, it*/
 
@@ -31,7 +34,7 @@ describe('Manifest: exists audit', () => {
 
   it('succeeds with a valid minimal manifest', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, true);
@@ -42,7 +45,7 @@ describe('Manifest: exists audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         name: 'Lighthouse PWA'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, true);
@@ -62,7 +65,8 @@ describe('Manifest: exists audit', () => {
 
   it('correctly passes through a JSON parsing failure', () => {
     const artifacts = {
-      Manifest: manifestParser('{ \name: Definitely not valid JSON }')
+      Manifest: manifestParser('{ \name: Definitely not valid JSON }', EXAMPLE_MANIFEST_URL,
+          EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
