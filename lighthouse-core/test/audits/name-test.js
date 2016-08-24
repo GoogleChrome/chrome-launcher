@@ -17,7 +17,10 @@ const Audit = require('../../audits/manifest-name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
 /* global describe, it*/
 
@@ -30,7 +33,7 @@ describe('Manifest: name audit', () => {
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
@@ -39,7 +42,7 @@ describe('Manifest: name audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         display: '/'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
@@ -48,7 +51,7 @@ describe('Manifest: name audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         name: 'Lighthouse PWA'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     return assert.equal(Audit.audit(artifacts).rawValue, true);
   });

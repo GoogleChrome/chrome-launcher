@@ -54,7 +54,7 @@ class Manifest extends Gatherer {
           return;
         }
 
-        this.artifact = manifestParser(response.data);
+        this.artifact = manifestParser(response.data, response.url, options.url);
       }, _ => {
         this.artifact = Manifest._errorManifest('Unable to retrieve manifest');
         return;

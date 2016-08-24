@@ -18,7 +18,9 @@ const manifestParser = require('../../lib/manifest-parser');
 const assert = require('assert');
 
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
-const exampleManifest = manifestParser(manifestSrc);
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
 /* global describe, it*/
 
@@ -38,7 +40,7 @@ describe('Mobile-friendly: display audit', () => {
 
   it('falls back to the successful default when there is no manifest display property', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
 
@@ -51,7 +53,7 @@ describe('Mobile-friendly: display audit', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
         display: 'standalone'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = Audit.audit(artifacts);
     assert.equal(output.score, true);

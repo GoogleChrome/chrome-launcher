@@ -17,7 +17,10 @@ const Audit = require('../../audits/manifest-short-name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
-const exampleManifest = manifestParser(manifestSrc);
+
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
 /* global describe, it*/
 
@@ -30,7 +33,7 @@ describe('Manifest: short_name audit', () => {
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
-      Manifest: manifestParser('{}')
+      Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     return assert.equal(Audit.audit(artifacts).rawValue, false);
   });
@@ -42,7 +45,7 @@ describe('Manifest: short_name audit', () => {
       Manifest: manifestParser(JSON.stringify({
         name: undefined,
         short_name: undefined
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
 
     const output = Audit.audit(artifacts);
@@ -55,7 +58,7 @@ describe('Manifest: short_name audit', () => {
       Manifest: manifestParser(JSON.stringify({
         short_name: undefined,
         name: 'Example App'
-      }))
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
 
     const output = Audit.audit(artifacts);

@@ -17,11 +17,14 @@ const Audit = require('../../audits/manifest-short-name-length.js');
 const assert = require('assert');
 const manifestParser = require('../../lib/manifest-parser');
 
+const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
+const EXAMPLE_DOC_URL = 'https://example.com/index.html';
+
 /* global describe, it*/
 
 describe('Manifest: short_name_length audit', () => {
   it('fails when an empty manifest is present', () => {
-    const Manifest = manifestParser('{}');
+    const Manifest = manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
     return assert.equal(Audit.audit({Manifest}).rawValue, false);
   });
 
@@ -29,7 +32,7 @@ describe('Manifest: short_name_length audit', () => {
     const manifestSrc = JSON.stringify({
       name: 'i\'m much longer than the recommended size'
     });
-    const Manifest = manifestParser(manifestSrc);
+    const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
     const out = Audit.audit({Manifest});
     assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
@@ -41,7 +44,7 @@ describe('Manifest: short_name_length audit', () => {
     const manifestSrc = JSON.stringify({
       short_name: 'i\'m much longer than the recommended size'
     });
-    const Manifest = manifestParser(manifestSrc);
+    const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
     const out = Audit.audit({Manifest});
     assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
@@ -51,7 +54,7 @@ describe('Manifest: short_name_length audit', () => {
     const manifestSrc = JSON.stringify({
       short_name: 'Lighthouse'
     });
-    const Manifest = manifestParser(manifestSrc);
+    const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
     return assert.equal(Audit.audit({Manifest}).rawValue, true);
   });
   /* eslint-enable camelcase */

@@ -17,7 +17,6 @@
 
 'use strict';
 
-const url = require('url');
 const Audit = require('./audit');
 
 class CacheStartUrl extends Audit {
@@ -41,7 +40,6 @@ class CacheStartUrl extends Audit {
     let cacheHasStartUrl = false;
     const manifest = artifacts.Manifest && artifacts.Manifest.value;
     const cacheContents = artifacts.CacheContents;
-    const baseURL = artifacts.URL;
 
     if (!(manifest && manifest.start_url && manifest.start_url.value)) {
       return CacheStartUrl.generateAuditResult({
@@ -58,7 +56,7 @@ class CacheStartUrl extends Audit {
     }
 
     // Remove any UTM strings.
-    const startURL = url.resolve(baseURL, manifest.start_url.value).toString();
+    const startURL = manifest.start_url.value;
     const altStartURL = startURL
         .replace(/\?utm_([^=]*)=([^&]|$)*/, '')
         .replace(/\?$/, '');
