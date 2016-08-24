@@ -73,7 +73,6 @@ window.getListOfAudits = function() {
 };
 
 window.saveAudits = function(audits) {
-  const listOfAudits = window.getListOfAudits().map(aggregation => aggregation.name);
   let storage = {};
   storage[STORAGE_KEY] = {};
 
@@ -91,7 +90,7 @@ window.fetchAudits = function() {
 
       // create list of default audits
       let defaultAudits = {};
-      window.getListOfAudits().forEach((audit) => {
+      window.getListOfAudits().forEach(audit => {
         defaultAudits[audit.name] = true;
       });
 
