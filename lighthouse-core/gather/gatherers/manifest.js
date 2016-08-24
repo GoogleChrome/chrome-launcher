@@ -39,7 +39,18 @@ class Manifest extends Gatherer {
     return driver.sendCommand('Page.getAppManifest')
       .then(response => {
         if (response.errors.length) {
-          this.artifact = Manifest._errorManifest(response.errors.join(', '));
+          let errorString;
+          if (response.url) {
+            errorString = `Unable to retrieve manifest at ${response.url}: `;
+          }
+          this.artifact = Manifest._errorManifest(errorString + response.errors.join(', '));
+          return;
+        }
+
+        // The driver will return an empty string for url and the data if the
+        // page has no manifest.
+        if (!response.data.length && !response.data.url) {
+          this.artifact = Manifest._errorManifest('No manifest found.');
           return;
         }
 
