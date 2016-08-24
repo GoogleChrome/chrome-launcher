@@ -3,12 +3,7 @@
     "network": true,
     "trace": true,
     "loadPage": true,
-    "gatherers": [
-      "url",
-      "critical-request-chains",
-      "screenshots",
-      "speedline"
-    ]
+    "gatherers": []
   }],
 
   "audits": [

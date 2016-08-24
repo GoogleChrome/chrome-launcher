@@ -50,7 +50,6 @@ const cli = yargs
     'load-page',
     'save-assets',
     'save-artifacts',
-    'audit-whitelist',
     'list-all-audits',
     'list-trace-categories',
     'config-path'
@@ -60,7 +59,6 @@ const cli = yargs
     'load-page': 'Loads the page',
     'save-assets': 'Save the trace contents & screenshots to disk',
     'save-artifacts': 'Save all gathered artifacts to disk',
-    'audit-whitelist': 'Comma separated list of audits to run',
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
     'config-path': 'The absolute path to the config JSON.'
@@ -92,7 +90,6 @@ Example: --output-path=./lighthouse-results.html`
   // default values
   .default('mobile', true)
   .default('load-page', true)
-  .default('audit-whitelist', 'all')
   .default('output', Printer.OUTPUT_MODE.pretty)
   .default('output-path', 'stdout')
   .check(argv => {
@@ -136,13 +133,6 @@ if (cli.verbose) {
   flags.logLevel = 'verbose';
 } else if (cli.quiet) {
   flags.logLevel = 'error';
-}
-
-// Normalize audit whitelist.
-if (!flags.auditWhitelist || flags.auditWhitelist === 'all') {
-  flags.auditWhitelist = null;
-} else {
-  flags.auditWhitelist = new Set(flags.auditWhitelist.split(',').map(a => a.toLowerCase()));
 }
 
 // kick off a lighthouse run

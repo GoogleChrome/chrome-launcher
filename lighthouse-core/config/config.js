@@ -106,29 +106,22 @@ function cleanTrace(trace) {
   return trace;
 }
 
-function filterPasses(passes, audits, rootPath) {
+function validatePasses(passes, audits, rootPath) {
+  if (!Array.isArray(passes)) {
+    return;
+  }
   const requiredGatherers = getGatherersNeededByAudits(audits);
 
-  // Make sure we only have the gatherers that are needed by the audits
-  // that have been listed in the config.
-  const filteredPasses = passes.map(pass => {
-    const freshPass = Object.assign({}, pass);
-
-    freshPass.gatherers = freshPass.gatherers.filter(gatherer => {
+  // Log if we are running gathers that are not needed by the audits listed in the config
+  passes.forEach(pass => {
+    pass.gatherers.forEach(gatherer => {
       const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
       const isGatherRequiredByAudits = requiredGatherers.has(GathererClass.name);
       if (isGatherRequiredByAudits === false) {
-        log.warn('config', `Skipping ${GathererClass.name} gatherer as no audit requires it.`);
+        log.warn('config', `${GathererClass.name} is included, however no audit requires it.`);
       }
-      return isGatherRequiredByAudits;
     });
-
-    return freshPass;
-  })
-
-  // Now remove any passes which no longer have gatherers.
-  .filter(p => p.gatherers.length > 0);
-  return filteredPasses;
+  });
 }
 
 function getGatherersNeededByAudits(audits) {
@@ -144,33 +137,10 @@ function getGatherersNeededByAudits(audits) {
   }, new Set());
 }
 
-function filterAudits(audits, auditWhitelist) {
-  // If there is no whitelist, assume all.
-  if (!auditWhitelist) {
-    return Array.from(audits);
+function requireAudits(audits, rootPath) {
+  if (!audits) {
+    return null;
   }
-
-  const rejected = [];
-  const filteredAudits = audits.filter(a => {
-    const auditName = a.toLowerCase();
-    const inWhitelist = auditWhitelist.has(auditName);
-
-    if (!inWhitelist) {
-      rejected.push(auditName);
-    }
-
-    return inWhitelist;
-  });
-
-  if (rejected.length) {
-    log.log('info', 'Running these audits:', `${filteredAudits.join(', ')}`);
-    log.log('info', 'Skipping these audits:', `${rejected.join(', ')}`);
-  }
-
-  return filteredAudits;
-}
-
-function expandAudits(audits, rootPath) {
   const Runner = require('../runner');
 
   return audits.map(audit => {
@@ -247,8 +217,9 @@ function assertValidAudit(audit, auditDefinition) {
 }
 
 function expandArtifacts(artifacts) {
-  const expandedArtifacts = Object.assign({}, artifacts);
-
+  if (!artifacts) {
+    return null;
+  }
   // currently only trace logs and performance logs should be imported
   if (artifacts.traces) {
     Object.keys(artifacts.traces).forEach(key => {
@@ -264,15 +235,14 @@ function expandArtifacts(artifacts) {
       }
       trace = cleanTrace(trace);
 
-      expandedArtifacts.traces[key] = trace;
+      artifacts.traces[key] = trace;
     });
   }
-
   if (artifacts.performanceLog) {
-    expandedArtifacts.networkRecords = recordsFromLogs(require(artifacts.performanceLog));
+    artifacts.networkRecords = recordsFromLogs(require(artifacts.performanceLog));
   }
 
-  return expandedArtifacts;
+  return artifacts;
 }
 
 /**
@@ -283,27 +253,24 @@ class Config {
    * @constructor
    * @param{Object} config
    */
-  constructor(configJSON, auditWhitelist, configPath) {
+  constructor(configJSON, configPath) {
     if (!configJSON) {
       configJSON = defaultConfig;
     }
-
+    // We don't want to mutate the original config object
+    configJSON = JSON.parse(JSON.stringify(configJSON));
     // Store the directory of the config path, if one was provided.
     this._configDir = configPath ? path.dirname(configPath) : undefined;
 
-    this._audits = configJSON.audits ? expandAudits(
-        filterAudits(configJSON.audits, auditWhitelist), this._configDir
-        ) : null;
-    // filterPasses expects audits to have been expanded
-    this._passes = configJSON.passes ?
-        filterPasses(configJSON.passes, this._audits, this._configDir) :
-        null;
-    this._auditResults = configJSON.auditResults ? Array.from(configJSON.auditResults) : null;
-    this._artifacts = null;
-    if (configJSON.artifacts) {
-      this._artifacts = expandArtifacts(configJSON.artifacts);
-    }
-    this._aggregations = configJSON.aggregations ? Array.from(configJSON.aggregations) : null;
+    this._passes = configJSON.passes || null;
+    this._auditResults = configJSON.auditResults || null;
+    this._aggregations = configJSON.aggregations || null;
+
+    this._audits = requireAudits(configJSON.audits, this._configDir);
+    this._artifacts = expandArtifacts(configJSON.artifacts);
+
+    // validatePasses must follow after audits are required
+    validatePasses(configJSON.passes, this._audits, this._configDir);
   }
 
   /** @type {string} */

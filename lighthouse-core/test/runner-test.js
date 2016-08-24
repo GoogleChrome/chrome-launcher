@@ -25,9 +25,6 @@ const path = require('path');
 describe('Runner', () => {
   it('expands gatherers', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       passes: [{
         gatherers: ['https']
@@ -37,31 +34,25 @@ describe('Runner', () => {
       ]
     });
 
-    return Runner.run(fakeDriver, {url, config, flags}).then(_ => {
+    return Runner.run(fakeDriver, {url, config}).then(_ => {
       assert.ok(typeof config.passes[0].gatherers[0] === 'object');
     });
   });
 
   it('throws when given neither passes nor artifacts', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       audits: [
         'is-on-https'
       ]
-    }, flags.auditWhitelist);
+    });
 
-    return assert.throws(_ => Runner.run(fakeDriver, {url, config, flags}),
+    return assert.throws(_ => Runner.run(fakeDriver, {url, config}),
         /The config must provide passes/);
   });
 
   it('accepts existing artifacts', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       audits: [
         'is-on-https'
@@ -70,16 +61,13 @@ describe('Runner', () => {
       artifacts: {
         HTTPS: true
       }
-    }, flags.auditWhitelist);
+    });
 
-    return assert.doesNotThrow(_ => Runner.run({}, {url, config, flags}));
+    return assert.doesNotThrow(_ => Runner.run({}, {url, config}));
   });
 
   it('accepts trace artifacts as paths and outputs appropriate data', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
 
     const config = new Config({
       audits: [
@@ -91,9 +79,9 @@ describe('Runner', () => {
           [Audit.DEFAULT_TRACE]: path.join(__dirname, '/fixtures/traces/trace-user-timings.json')
         }
       }
-    }, flags.auditWhitelist);
+    });
 
-    return Runner.run({}, {url, config, flags}).then(results => {
+    return Runner.run({}, {url, config}).then(results => {
       assert.equal(results[0].rawValue, 2);
       assert.equal(results[0].name, 'user-timings');
     });
@@ -101,9 +89,6 @@ describe('Runner', () => {
 
   it('fails gracefully with empty artifacts object', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
 
     const config = new Config({
       audits: [
@@ -112,9 +97,9 @@ describe('Runner', () => {
 
       artifacts: {
       }
-    }, flags.auditWhitelist);
+    });
 
-    return Runner.run({}, {url, config, flags}).then(results => {
+    return Runner.run({}, {url, config}).then(results => {
       assert.equal(results[0].rawValue, -1);
       assert(results[0].debugString);
     });
@@ -122,9 +107,6 @@ describe('Runner', () => {
 
   it('accepts performance logs as an artifact', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       audits: [
         'critical-request-chains'
@@ -133,9 +115,9 @@ describe('Runner', () => {
       artifacts: {
         performanceLog: path.join(__dirname, '/fixtures/perflog.json')
       }
-    }, flags.auditWhitelist);
+    });
 
-    return Runner.run({}, {url, config, flags}).then(results => {
+    return Runner.run({}, {url, config}).then(results => {
       assert.equal(results[0].rawValue, 9);
       assert.equal(results[0].name, 'critical-request-chains');
     });
@@ -143,24 +125,18 @@ describe('Runner', () => {
 
   it('throws when given neither audits nor auditResults', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       passes: [{
         gatherers: ['https']
       }]
-    }, flags.auditWhitelist);
+    });
 
-    return assert.throws(_ => Runner.run(fakeDriver, {url, config, flags}),
+    return assert.throws(_ => Runner.run(fakeDriver, {url, config}),
         /The config must provide passes/);
   });
 
   it('accepts existing auditResults', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       auditResults: {
         HTTPS: true
@@ -182,16 +158,13 @@ describe('Runner', () => {
           }
         }]
       }]
-    }, flags.auditWhitelist);
+    });
 
-    return assert.doesNotThrow(_ => Runner.run(fakeDriver, {url, config, flags}));
+    return assert.doesNotThrow(_ => Runner.run(fakeDriver, {url, config}));
   });
 
   it('returns an aggregation', () => {
     const url = 'https://example.com';
-    const flags = {
-      auditWhitelist: null
-    };
     const config = new Config({
       auditResults: [{
         name: 'is-on-https',
@@ -216,9 +189,9 @@ describe('Runner', () => {
           }
         }]
       }]
-    }, flags.auditWhitelist);
+    });
 
-    return Runner.run(fakeDriver, {url, config, flags}).then(results => {
+    return Runner.run(fakeDriver, {url, config}).then(results => {
       assert.equal(results.initialUrl, url);
       assert.equal(results.audits['is-on-https'].name, 'is-on-https');
       assert.equal(results.aggregations[0].score[0].overall, 1);

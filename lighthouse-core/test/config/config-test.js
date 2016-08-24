@@ -51,22 +51,6 @@ describe('Config', () => {
         /Unable to locate/);
   });
 
-  it('filters gatherers from passes when no audits require them', () => {
-    const config = new Config({
-      passes: [{
-        gatherers: [
-          'url',
-          'html',
-          'viewport'
-        ]
-      }],
-
-      audits: ['viewport']
-    });
-
-    assert.equal(config.passes[0].gatherers.length, 1);
-  });
-
   it('doesn\'t mutate old gatherers when filtering passes', () => {
     const configJSON = {
       passes: [{
@@ -99,22 +83,13 @@ describe('Config', () => {
     }];
 
     const config = new Config(configJSON);
-    assert.notEqual(config, configJSON);
-    assert.ok(config.aggregations);
-    assert.ok(config.auditResults);
-    assert.deepStrictEqual(config.aggregations, configJSON.aggregations);
-    assert.notEqual(config.aggregations, configJSON.aggregations);
-    assert.notEqual(config.auditResults, configJSON.auditResults);
-    assert.deepStrictEqual(config.auditResults, configJSON.auditResults);
-  });
-
-  it('returns filtered audits when a whitelist is given', () => {
-    const config = new Config({
-      audits: ['is-on-https']
-    }, new Set(['b']));
-
-    assert.ok(Array.isArray(config.audits));
-    return assert.equal(config.audits.length, 0);
+    assert.notEqual(config, configJSON, 'Objects are strictly different');
+    assert.ok(config.aggregations, 'Aggregations array exists');
+    assert.ok(config.auditResults, 'Audits array exists');
+    assert.deepStrictEqual(config.aggregations, configJSON.aggregations, 'Aggregations match');
+    assert.notEqual(config.aggregations, configJSON.aggregations, 'Aggregations not same object');
+    assert.notEqual(config.auditResults, configJSON.auditResults, 'Audits not same object');
+    assert.deepStrictEqual(config.auditResults, configJSON.auditResults, 'Audits match');
   });
 
   it('expands audits', () => {
@@ -136,7 +111,7 @@ describe('Config', () => {
   it('loads an audit relative to a config', () => {
     return assert.doesNotThrow(_ => new Config({
       audits: ['../fixtures/valid-custom-audit']
-    }, null, __filename));
+    }, __filename));
   });
 
   it('throws when it finds invalid audits', () => {

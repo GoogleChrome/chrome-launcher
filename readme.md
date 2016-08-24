@@ -108,7 +108,6 @@ Configuration:
   --load-page              Loads the page                                       [default: true]
   --save-assets            Save the trace contents & screenshots to disk              [boolean]
   --save-artifacts         Save all gathered artifacts to disk                        [boolean]
-  --audit-whitelist        Comma separated list of audits to run               [default: "all"]
   --list-all-audits        Prints a list of all available audits and exits            [boolean]
   --list-trace-categories  Prints a list of all required trace categories and exits   [boolean]
   --config-path            The absolute path to the config JSON.
