@@ -79,7 +79,7 @@ class EstimatedInputLatency extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    const trace = artifacts.traces[this.DEFAULT_TRACE];
+    const trace = artifacts.traces[this.DEFAULT_PASS];
 
     return artifacts.requestSpeedline(trace)
       .then(speedline => EstimatedInputLatency.calculate(speedline, trace))

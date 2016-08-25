@@ -44,7 +44,7 @@ describe('asset-saver helper', () => {
     };
     const artifacts = {
       traces: {
-        [Audit.DEFAULT_TRACE]: {
+        [Audit.DEFAULT_PASS]: {
           traceEvents
         }
       },

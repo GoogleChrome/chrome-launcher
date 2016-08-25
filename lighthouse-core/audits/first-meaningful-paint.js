@@ -53,7 +53,7 @@ class FirstMeaningfulPaint extends Audit {
    */
   static audit(artifacts) {
     return new Promise((resolve, reject) => {
-      const traceContents = artifacts.traces[this.DEFAULT_TRACE].traceEvents;
+      const traceContents = artifacts.traces[this.DEFAULT_PASS].traceEvents;
       if (!traceContents || !Array.isArray(traceContents)) {
         throw new Error(FAILURE_MESSAGE);
       }

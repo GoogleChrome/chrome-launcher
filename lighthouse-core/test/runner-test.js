@@ -76,7 +76,7 @@ describe('Runner', () => {
 
       artifacts: {
         traces: {
-          [Audit.DEFAULT_TRACE]: path.join(__dirname, '/fixtures/traces/trace-user-timings.json')
+          [Audit.DEFAULT_PASS]: path.join(__dirname, '/fixtures/traces/trace-user-timings.json')
         }
       }
     });

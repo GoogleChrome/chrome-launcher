@@ -16,14 +16,14 @@
  */
 'use strict';
 
-const DEFAULT_TRACE = 'defaultPass';
+const DEFAULT_PASS = 'defaultPass';
 
 class Audit {
   /**
    * @return {!String}
    */
-  static get DEFAULT_TRACE() {
-    return DEFAULT_TRACE;
+  static get DEFAULT_PASS() {
+    return DEFAULT_PASS;
   }
 
   /**

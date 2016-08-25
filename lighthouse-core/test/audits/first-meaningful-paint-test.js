@@ -38,7 +38,7 @@ describe('Performance: first-meaningful-paint audit', () => {
 
     it('processes a valid trace file', done => {
       assert.doesNotThrow(_ => {
-        Audit.audit({traces: {[Audit.DEFAULT_TRACE]: {traceEvents}}})
+        Audit.audit({traces: {[Audit.DEFAULT_PASS]: {traceEvents}}})
           .then(response => {
             fmpResult = response;
             done();

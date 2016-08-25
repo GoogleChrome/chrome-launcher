@@ -213,8 +213,6 @@ class Driver {
    * If our main document URL redirects, we will update options.url accordingly
    * As such, options.url will always represent the post-redirected URL.
    * options.initialUrl is the pre-redirect URL that things started with
-   *
-   * Caveat: only works when network recording enabled for a pass
    */
   enableUrlUpdateIfRedirected(opts) {
     this._networkRecorder.on('requestloaded', redirectRequest => {
