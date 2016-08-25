@@ -131,10 +131,10 @@ function validatePasses(passes, audits, rootPath) {
       return;
     }
 
-    const passName = pass.traceName || Audit.DEFAULT_PASS;
+    const passName = pass.passName || Audit.DEFAULT_PASS;
     if (usedNames.has(passName)) {
       log.warn('config', `passes[${index}] may overwrite trace or network ` +
-          `data of earlier pass without a unique traceName (repeated name: ${passName}.`);
+          `data of earlier pass without a unique passName (repeated name: ${passName}.`);
     }
     usedNames.add(passName);
   });

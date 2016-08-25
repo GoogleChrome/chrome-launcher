@@ -39,16 +39,16 @@ describe('Config', () => {
     assert.equal(defaultConfig.audits.length, config.audits.length);
   });
 
-  it('warns when a traceName is used twice', () => {
+  it('warns when a passName is used twice', () => {
     const unlikelyPassName = 'unlikelyPassName';
     const configJson = {
       passes: [{
         network: true,
-        traceName: unlikelyPassName,
+        passName: unlikelyPassName,
         gatherers: []
       }, {
         network: true,
-        traceName: unlikelyPassName,
+        passName: unlikelyPassName,
         gatherers: []
       }],
       audits: []
@@ -68,7 +68,7 @@ describe('Config', () => {
     });
   });
 
-  it('warns when traced twice with no traceNames', () => {
+  it('warns when traced twice with no passNames specified', () => {
     const configJson = {
       passes: [{
         network: true,

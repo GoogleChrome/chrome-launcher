@@ -81,8 +81,8 @@ function saveArtifacts(artifacts, filename) {
 }
 
 function prepareAssets(options, artifacts) {
-  const traceData = Object.keys(artifacts.traces).map(traceName => {
-    const filteredTrace = Object.assign({}, artifacts.traces[traceName]);
+  const traceData = Object.keys(artifacts.traces).map(passName => {
+    const filteredTrace = Object.assign({}, artifacts.traces[passName]);
     filteredTrace.traceEvents = filterForSize(filteredTrace.traceEvents);
     return filteredTrace;
   });

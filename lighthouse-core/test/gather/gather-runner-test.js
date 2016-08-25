@@ -256,14 +256,14 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
       ]
     }, {
       loadPage: true,
-      traceName: 'secondPass',
+      passName: 'secondPass',
       gatherers: [
         t2
       ]
@@ -286,13 +286,13 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [new TestGatherer()]
     }, {
       network: true,
       trace: true,
-      traceName: 'secondPass',
+      passName: 'secondPass',
       loadPage: true,
       gatherers: [new TestGatherer()]
     }];
@@ -315,7 +315,7 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
@@ -365,7 +365,7 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [new TestGatherer()]
     }];

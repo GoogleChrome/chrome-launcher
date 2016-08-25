@@ -176,7 +176,7 @@ class GatherRunner {
       });
     }, pass);
 
-    // Resolve on tracing data using traceName from config.
+    // Resolve on tracing data using passName from config.
     return pass.then(_ => loadData);
   }
 
@@ -227,7 +227,7 @@ class GatherRunner {
             .then(passData => {
               // If requested by config, merge trace and network data for this
               // pass into tracingData.
-              const passName = config.traceName || Audit.DEFAULT_PASS;
+              const passName = config.passName || Audit.DEFAULT_PASS;
               config.trace && (tracingData.traces[passName] = passData.trace);
               config.network && (tracingData.networkRecords[passName] = passData.networkRecords);
 
