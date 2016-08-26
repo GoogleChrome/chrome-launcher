@@ -142,15 +142,14 @@ function requireAudits(audits, rootPath) {
     return null;
   }
   const Runner = require('../runner');
+  const coreList = Runner.getAuditList();
 
   return audits.map(audit => {
-    // Firstly see if the audit is in Lighthouse itself.
-    const list = Runner.getAuditList();
-    const coreAudit = list.find(a => a === `${audit}.js`);
-
-    // Assume it's a core audit first.
-    let requirePath = path.resolve(__dirname, `../audits/${audit}`);
     let AuditClass;
+
+    // Firstly see if the audit is in Lighthouse itself.
+    const coreAudit = coreList.find(a => a === `${audit}.js`);
+    let requirePath = `../audits/${audit}`;
 
     // If not, see if it can be found another way.
     if (!coreAudit) {

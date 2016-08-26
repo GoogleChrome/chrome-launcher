@@ -24,6 +24,11 @@ const gatherers = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/ga
     .filter(f => /\.js$/.test(f))
     .map(f => `../lighthouse-core/gather/gatherers/${f.replace(/\.js$/, '')}`);
 
+const computedArtifacts = fs.readdirSync(
+    path.join(__dirname, '../lighthouse-core/gather/computed/'))
+    .filter(f => /\.js$/.test(f))
+    .map(f => `../lighthouse-core/gather/computed/${f.replace(/\.js$/, '')}`);
+
 gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
@@ -118,7 +123,7 @@ gulp.task('browserify', () => {
         .ignore('chrome-remote-interface')
         .ignore('source-map');
 
-        // Expose the audits and gatherers so they can be dynamically loaded.
+        // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.
         const corePath = '../lighthouse-core/';
         const driverPath = `${corePath}gather/`;
         audits.forEach(audit => {
@@ -126,6 +131,9 @@ gulp.task('browserify', () => {
         });
         gatherers.forEach(gatherer => {
           bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
+        });
+        computedArtifacts.forEach(artifact => {
+          bundle = bundle.require(artifact, {expose: artifact.replace(driverPath, './')});
         });
       }
       // Inject the new browserified contents back into our gulp pipeline
