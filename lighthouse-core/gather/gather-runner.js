@@ -267,12 +267,13 @@ class GatherRunner {
 
   static getGathererClass(gatherer, rootPath) {
     const Runner = require('../runner');
-    const list = Runner.getGathererList();
-    const coreGatherer = list.find(a => a === `${gatherer}.js`);
+    const coreList = Runner.getGathererList();
 
-    // Assume it's a core gatherer first.
-    let requirePath = path.resolve(__dirname, `./gatherers/${gatherer}`);
     let GathererClass;
+
+    // First see if it is a core gatherer in Lighthouse itself.
+    const coreGatherer = coreList.find(a => a === `${gatherer}.js`);
+    let requirePath = `./gatherers/${gatherer}`;
 
     // If not, see if it can be found another way.
     if (!coreGatherer) {
@@ -329,8 +330,9 @@ class GatherRunner {
 
   static instantiateComputedArtifacts() {
     let computedArtifacts = {};
-    var normalizedPath = require('path').join(__dirname, 'computed');
-    require('fs').readdirSync(normalizedPath).forEach(function(file) {
+    require('fs').readdirSync(path.join(__dirname, 'computed')).forEach(function(file) {
+      // Drop `.js` suffix to keep browserify import happy.
+      file = file.replace(/\.js$/, '');
       const ArtifactClass = require('./computed/' + file);
       const artifact = new ArtifactClass();
       // define the request* function that will be exposed on `artifacts`
