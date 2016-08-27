@@ -12,8 +12,6 @@
     "brfs": "^1.4.3",
     "browserify": "^13.0.0",
     "del": "^2.2.0",
-    "eslint": "^2.4.0",
-    "eslint-config-google": "^0.4.0",
     "gulp": "^3.9.1",
     "gulp-chrome-manifest": "0.0.13",
     "gulp-debug": "^2.1.2",

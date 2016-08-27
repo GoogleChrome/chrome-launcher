@@ -4,7 +4,9 @@
 **/node_modules/**
 **/third_party/**
 
-lighthouse-extension/
+lighthouse-extension/dist
+lighthouse-extension/app/scripts
+
 
 **/closure/*/*
 coverage/**

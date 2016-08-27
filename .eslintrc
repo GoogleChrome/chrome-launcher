@@ -26,6 +26,7 @@
     }],
     "quotes": [2, "single"],
     "require-jsdoc": 0,
-    "valid-jsdoc": 0
+    "valid-jsdoc": 0,
+    "comma-dangle": 0
   }
 }
