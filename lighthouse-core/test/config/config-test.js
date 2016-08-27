@@ -19,6 +19,8 @@ const Config = require('../../config/config');
 const assert = require('assert');
 const path = require('path');
 const defaultConfig = require('../../config/default.json');
+const log = require('../../lib/log');
+const Audit = require('../../audits/audit');
 
 /* eslint-env mocha */
 
@@ -35,6 +37,61 @@ describe('Config', () => {
     const config = new Config();
     assert.deepStrictEqual(defaultConfig.aggregations, config.aggregations);
     assert.equal(defaultConfig.audits.length, config.audits.length);
+  });
+
+  it('warns when a passName is used twice', () => {
+    const unlikelyPassName = 'unlikelyPassName';
+    const configJson = {
+      passes: [{
+        network: true,
+        passName: unlikelyPassName,
+        gatherers: []
+      }, {
+        network: true,
+        passName: unlikelyPassName,
+        gatherers: []
+      }],
+      audits: []
+    };
+
+    return new Promise((resolve, reject) => {
+      const warningListener = function(args) {
+        const warningMsg = args[1];
+        if (new RegExp(`overwrite.+${unlikelyPassName}`).test(warningMsg)) {
+          log.events.removeListener('warning', warningListener);
+          resolve();
+        }
+      };
+      log.events.addListener('warning', warningListener);
+
+      const _ = new Config(configJson);
+    });
+  });
+
+  it('warns when traced twice with no passNames specified', () => {
+    const configJson = {
+      passes: [{
+        network: true,
+        gatherers: []
+      }, {
+        network: true,
+        gatherers: []
+      }],
+      audits: []
+    };
+
+    return new Promise((resolve, reject) => {
+      const warningListener = function(args) {
+        const warningMsg = args[1];
+        if (new RegExp(`overwrite.+${Audit.DEFAULT_PASS}`).test(warningMsg)) {
+          log.events.removeListener('warning', warningListener);
+          resolve();
+        }
+      };
+      log.events.addListener('warning', warningListener);
+
+      const _ = new Config(configJson);
+    });
   });
 
   it('throws for unknown gatherers', () => {
@@ -151,7 +208,27 @@ describe('Config', () => {
     });
     const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
     assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
-    assert.equal(config.artifacts.networkRecords.length, 76);
+    assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
+  });
+
+  it('expands artifacts with multiple named passes', () => {
+    const config = new Config({
+      artifacts: {
+        traces: {
+          defaultPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json'),
+          otherPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
+        },
+        performanceLog: {
+          defaultPass: path.resolve(__dirname, '../fixtures/perflog.json'),
+          otherPass: path.resolve(__dirname, '../fixtures/perflog.json')
+        }
+      }
+    });
+    const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
+    assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
+    assert.deepStrictEqual(config.artifacts.traces.otherPass.traceEvents, traceUserTimings);
+    assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
+    assert.equal(config.artifacts.networkRecords.otherPass.length, 76);
   });
 
   it('handles traces with no TracingStartedInPage events', () => {

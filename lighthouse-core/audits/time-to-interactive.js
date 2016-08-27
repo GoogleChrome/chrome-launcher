@@ -57,7 +57,7 @@ class TTIMetric extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    const trace = artifacts.traces[Audit.DEFAULT_TRACE];
+    const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const pendingSpeedline = artifacts.requestSpeedline(trace);
     const pendingFMP = FMPMetric.audit(artifacts);
 
@@ -74,7 +74,7 @@ class TTIMetric extends Audit {
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
-      const trace = artifacts.traces[Audit.DEFAULT_TRACE];
+      const trace = artifacts.traces[Audit.DEFAULT_PASS];
       const model = tracingProcessor.init(trace);
       const endOfTraceTime = model.bounds.max;
 

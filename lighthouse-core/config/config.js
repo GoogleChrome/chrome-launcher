@@ -22,6 +22,7 @@ const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
 const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
 const path = require('path');
+const Audit = require('../audits/audit');
 
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
@@ -121,6 +122,21 @@ function validatePasses(passes, audits, rootPath) {
         log.warn('config', `${GathererClass.name} is included, however no audit requires it.`);
       }
     });
+  });
+
+  // Log if multiple passes require trace or network data and could overwrite one another.
+  const usedNames = new Set();
+  passes.forEach((pass, index) => {
+    if (!pass.network && !pass.trace) {
+      return;
+    }
+
+    const passName = pass.passName || Audit.DEFAULT_PASS;
+    if (usedNames.has(passName)) {
+      log.warn('config', `passes[${index}] may overwrite trace or network ` +
+          `data of earlier pass without a unique passName (repeated name: ${passName}.`);
+    }
+    usedNames.add(passName);
   });
 }
 
@@ -237,8 +253,21 @@ function expandArtifacts(artifacts) {
       artifacts.traces[key] = trace;
     });
   }
+
   if (artifacts.performanceLog) {
-    artifacts.networkRecords = recordsFromLogs(require(artifacts.performanceLog));
+    if (typeof artifacts.performanceLog === 'string') {
+      // Support older format of a single performance log.
+      const log = require(artifacts.performanceLog);
+      artifacts.networkRecords = {
+        [Audit.DEFAULT_PASS]: recordsFromLogs(log)
+      };
+    } else {
+      artifacts.networkRecords = {};
+      Object.keys(artifacts.performanceLog).forEach(key => {
+        const log = require(artifacts.performanceLog[key]);
+        artifacts.networkRecords[key] = recordsFromLogs(log);
+      });
+    }
   }
 
   return artifacts;

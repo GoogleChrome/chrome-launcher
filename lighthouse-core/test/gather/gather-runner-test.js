@@ -20,7 +20,6 @@
 
 const Gatherer = require('../../gather/gatherers/gatherer');
 const GatherRunner = require('../../gather/gather-runner');
-const Audit = require('../../audits/audit');
 const assert = require('assert');
 const Config = require('../../config/config');
 const path = require('path');
@@ -53,6 +52,9 @@ describe('GatherRunner', function() {
     const driver = {
       gotoURL() {
         return Promise.resolve(true);
+      },
+      beginNetworkCollect() {
+        return Promise.resolve();
       }
     };
 
@@ -86,6 +88,9 @@ describe('GatherRunner', function() {
       gotoURL(url) {
         assert(url, expected.pop());
         return Promise.resolve(true);
+      },
+      beginNetworkCollect() {
+        return Promise.resolve();
       }
     };
 
@@ -142,6 +147,9 @@ describe('GatherRunner', function() {
       },
       gotoURL() {
         return Promise.resolve();
+      },
+      beginNetworkCollect() {
+        return Promise.resolve();
       }
     };
 
@@ -157,10 +165,14 @@ describe('GatherRunner', function() {
 
   it('tells the driver to end tracing', () => {
     let calledTrace = false;
+    const fakeTraceData = {traceEvents: ['reallyBelievableTraceEvents']};
     const driver = {
       endTrace() {
         calledTrace = true;
-        return Promise.resolve({x: 1});
+        return Promise.resolve(fakeTraceData);
+      },
+      endNetworkCollect() {
+        return Promise.resolve();
       }
     };
 
@@ -171,29 +183,9 @@ describe('GatherRunner', function() {
       }]
     };
 
-    return GatherRunner.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}).then(passData => {
       assert.equal(calledTrace, true);
-      assert.deepEqual(vals.traces[Audit.DEFAULT_TRACE], {x: 1});
-    });
-  });
-
-  it('respects trace names', () => {
-    const driver = {
-      endTrace() {
-        return Promise.resolve({x: 1});
-      }
-    };
-
-    const config = {
-      trace: true,
-      traceName: 'notTheDefaultPass',
-      gatherers: [{
-        afterPass() {}
-      }]
-    };
-
-    return GatherRunner.afterPass({driver, config}).then(vals => {
-      assert.deepEqual(vals.traces.notTheDefaultPass, {x: 1});
+      assert.equal(passData.trace, fakeTraceData);
     });
   });
 
@@ -265,14 +257,14 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
       ]
     }, {
       loadPage: true,
-      traceName: 'secondPass',
+      passName: 'secondPass',
       gatherers: [
         t2
       ]
@@ -291,6 +283,31 @@ describe('GatherRunner', function() {
     });
   });
 
+  it('respects trace names', () => {
+    const passes = [{
+      network: true,
+      trace: true,
+      passName: 'firstPass',
+      loadPage: true,
+      gatherers: [new TestGatherer()]
+    }, {
+      network: true,
+      trace: true,
+      passName: 'secondPass',
+      loadPage: true,
+      gatherers: [new TestGatherer()]
+    }];
+    const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};
+
+    return GatherRunner.run(passes, options)
+      .then(artifacts => {
+        assert.ok(artifacts.traces.firstPass);
+        assert.ok(artifacts.networkRecords.firstPass);
+        assert.ok(artifacts.traces.secondPass);
+        assert.ok(artifacts.networkRecords.secondPass);
+      });
+  });
+
   it('rejects if an audit does not provide an artifact', () => {
     const t1 = new TestGathererNoArtifact();
     const config = new Config({});
@@ -299,7 +316,7 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [
         t1
@@ -349,7 +366,7 @@ describe('GatherRunner', function() {
     const passes = [{
       network: true,
       trace: true,
-      traceName: 'firstPass',
+      passName: 'firstPass',
       loadPage: true,
       gatherers: [new TestGatherer()]
     }];
@@ -357,7 +374,8 @@ describe('GatherRunner', function() {
 
     return GatherRunner.run(passes, options)
         .then(artifacts => {
-          const p = artifacts.requestCriticalRequestChains(artifacts.networkRecords);
+          const networkRecords = artifacts.networkRecords.firstPass;
+          const p = artifacts.requestCriticalRequestChains(networkRecords);
           return p.then(chains => {
             // fakeDriver will include networkRecords built from fixtures/perflog.json
             assert.ok(chains['93149.1']);

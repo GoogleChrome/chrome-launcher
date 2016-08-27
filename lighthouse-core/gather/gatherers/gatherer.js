@@ -52,7 +52,7 @@ class Gatherer {
    * executed, and — if generated in this pass — the trace is ended. The trace
    * and record of network activity are provided in `loadData`.
    * @param {!Object} options
-   * @param {{networkRecords: !Array, traceEvents: !Array} loadData
+   * @param {{networkRecords: !Array, trace: {traceEvents: !Array}} loadData
    */
   afterPass(options, loadData) { }
 

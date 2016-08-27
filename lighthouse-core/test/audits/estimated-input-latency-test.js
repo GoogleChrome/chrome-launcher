@@ -26,7 +26,7 @@ let computedArtifacts = GatherRunner.instantiateComputedArtifacts();
 function generateArtifactsWithTrace(trace) {
   return Object.assign(computedArtifacts, {
     traces: {
-      [Audit.DEFAULT_TRACE]: trace
+      [Audit.DEFAULT_PASS]: trace
     }
   });
 }

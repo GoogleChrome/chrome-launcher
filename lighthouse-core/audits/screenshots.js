@@ -38,7 +38,7 @@ class Screenshots extends Audit {
    * @return {!Promise<!AuditResult>}
    */
   static audit(artifacts) {
-    const trace = artifacts.traces[this.DEFAULT_TRACE];
+    const trace = artifacts.traces[this.DEFAULT_PASS];
     if (typeof trace === 'undefined') {
       return Promise.resolve(Screenshots.generateAuditResult({
         rawValue: -1,

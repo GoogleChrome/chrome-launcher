@@ -37,11 +37,11 @@ const path = require('path');
  *   B. GatherRunner.pass()
  *     i. GatherRunner.loadPage()
  *       a. navigate to about:blank
- *       b. beginTrace & beginNetworkCollect (if requested)
+ *       b. beginTrace (if requested) & beginNetworkCollect
  *       c. navigate to options.url (and wait for onload)
  *     ii. all gatherer's pass()
  *   C. GatherRunner.afterPass()
- *     i. endTrace & endNetworkCollect (if requested)
+ *     i. endTrace (if requested) & endNetworkCollect
  *     ii. all gatherer's afterPass()
  *
  * 3. Teardown
@@ -57,9 +57,10 @@ class GatherRunner {
     return driver.gotoURL('about:blank')
       // Wait a bit for about:blank to "take hold" before switching back to the page.
       .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
-      // Begin tracing and network recording if required.
+      // Begin tracing only if requested by config.
       .then(_ => options.config.trace && driver.beginTrace())
-      .then(_ => options.config.network && driver.beginNetworkCollect(options))
+      // Network is always recorded for internal use, even if not saved as artifact.
+      .then(_ => driver.beginNetworkCollect(options))
       // Navigate.
       .then(_ => driver.gotoURL(options.url, {
         waitForLoad: true,
@@ -135,7 +136,8 @@ class GatherRunner {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    const loadData = {traces: {}};
+    const passData = {};
+
     let pass = Promise.resolve();
 
     if (config.trace) {
@@ -144,51 +146,45 @@ class GatherRunner {
         return driver.endTrace();
       }).then(traceContents => {
         // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
-        // traceContents was an array of trace events. After this point,
-        // traceContents is an object with a traceEvents property. Normalize
-        // to new format.
-        if (Array.isArray(traceContents)) {
-          traceContents = {
-            traceEvents: traceContents
-          };
-        }
-
-        const traceName = config.traceName || Audit.DEFAULT_TRACE;
-        loadData.traces[traceName] = traceContents;
-        loadData.traceEvents = traceContents.traceEvents;
+        // traceContents was an array of trace events; after, traceContents is
+        // an object with a traceEvents property. Normalize to object form.
+        passData.trace = Array.isArray(traceContents) ?
+            {traceEvents: traceContents} : traceContents;
         log.verbose('statusEnd', 'Retrieving trace');
       });
     }
 
-    if (config.network) {
-      const status = 'Retrieving network records';
-      pass = pass.then(_ => {
-        log.log('status', status);
-        return driver.endNetworkCollect();
-      }).then(networkRecords => {
-        loadData.networkRecords = networkRecords;
-        log.verbose('statusEnd', status);
-      });
-    }
+    const status = 'Retrieving network records';
+    pass = pass.then(_ => {
+      log.log('status', status);
+      return driver.endNetworkCollect();
+    }).then(networkRecords => {
+      // Network records only given to gatherers if requested by config.
+      config.network && (passData.networkRecords = networkRecords);
+      log.verbose('statusEnd', status);
+    });
 
     pass = gatherers.reduce((chain, gatherer) => {
       const status = `Retrieving: ${gatherer.name}`;
       return chain.then(_ => {
         log.log('status', status);
-        return gatherer.afterPass(options, loadData);
+        return gatherer.afterPass(options, passData);
       }).then(ret => {
         log.verbose('statusEnd', status);
         return ret;
       });
     }, pass);
 
-    // Resolve on loadData.
-    return pass.then(_ => loadData);
+    // Resolve on tracing data using passName from config.
+    return pass.then(_ => passData);
   }
 
   static run(passes, options) {
     const driver = options.driver;
-    const tracingData = {traces: {}};
+    const tracingData = {
+      traces: {},
+      networkRecords: {}
+    };
 
     if (typeof options.url !== 'string' || options.url.length === 0) {
       return Promise.reject(new Error('You must provide a url to the driver'));
@@ -227,10 +223,13 @@ class GatherRunner {
             .then(_ => GatherRunner.beforePass(runOptions))
             .then(_ => GatherRunner.pass(runOptions))
             .then(_ => GatherRunner.afterPass(runOptions))
-            .then(loadData => {
-              // Merge pass trace and network data into tracingData.
-              config.trace && Object.assign(tracingData.traces, loadData.traces);
-              config.network && (tracingData.networkRecords = loadData.networkRecords);
+            .then(passData => {
+              // If requested by config, merge trace and network data for this
+              // pass into tracingData.
+              const passName = config.passName || Audit.DEFAULT_PASS;
+              config.trace && (tracingData.traces[passName] = passData.trace);
+              config.network && (tracingData.networkRecords[passName] = passData.networkRecords);
+
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;
               }

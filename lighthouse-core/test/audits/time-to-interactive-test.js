@@ -28,7 +28,7 @@ describe('Performance: time-to-interactive audit', () => {
   it('scores a -1 with invalid trace data', () => {
     return Audit.audit({
       traces: {
-        [Audit.DEFAULT_TRACE]: {
+        [Audit.DEFAULT_PASS]: {
           traceEvents: '[{"pid": 15256,"tid": 1295,"t'
         }
       },
@@ -44,7 +44,7 @@ describe('Performance: time-to-interactive audit', () => {
   it('evaluates valid input correctly', () => {
     let artifacts = mockArtifacts;
     artifacts.traces = {
-      [Audit.DEFAULT_TRACE]: {
+      [Audit.DEFAULT_PASS]: {
         traceEvents: pwaTrace
       }
     };

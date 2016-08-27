@@ -39,12 +39,22 @@ function _log(title, logargs) {
 }
 
 class Emitter extends EventEmitter {
-  // issueStatus fires off all status updates
-  // listen with `require('lib/log').events.addListener('status', callback)`
+  /**
+   * Fires off all status updates. Listen with
+   * `require('lib/log').events.addListener('status', callback)`
+   */
   issueStatus(title, args) {
     if (title === 'status' || title === 'statusEnd') {
       this.emit(title, args);
     }
+  }
+
+  /**
+   * Fires off all warnings. Listen with
+   * `require('lib/log').events.addListener('warning', callback)`
+   */
+  issueWarning(args) {
+    this.emit('warning', args);
   }
 }
 
@@ -57,6 +67,7 @@ module.exports = {
   },
 
   warn(title) {
+    this.events.issueWarning(arguments);
     return _log(`${title}:warn`, arguments);
   },
 

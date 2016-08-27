@@ -47,7 +47,7 @@ class SpeedIndexMetric extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    const trace = artifacts.traces[this.DEFAULT_TRACE];
+    const trace = artifacts.traces[this.DEFAULT_PASS];
     if (typeof trace === 'undefined') {
       return SpeedIndexMetric.generateAuditResult({
         rawValue: -1,

@@ -50,6 +50,9 @@ const CriticalRequestChains = {
 };
 
 const mockArtifacts = {
+  networkRecords: {
+    [Audit.DEFAULT_PASS]: []
+  },
   requestCriticalRequestChains: function() {
     return Promise.resolve(CriticalRequestChains);
   }
