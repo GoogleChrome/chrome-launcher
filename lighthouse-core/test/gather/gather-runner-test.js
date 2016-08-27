@@ -165,10 +165,11 @@ describe('GatherRunner', function() {
 
   it('tells the driver to end tracing', () => {
     let calledTrace = false;
+    const fakeTraceData = {traceEvents: ['reallyBelievableTraceEvents']};
     const driver = {
       endTrace() {
         calledTrace = true;
-        return Promise.resolve({x: 1});
+        return Promise.resolve(fakeTraceData);
       },
       endNetworkCollect() {
         return Promise.resolve();
@@ -182,9 +183,9 @@ describe('GatherRunner', function() {
       }]
     };
 
-    return GatherRunner.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}).then(passData => {
       assert.equal(calledTrace, true);
-      assert.deepEqual(vals.trace, {x: 1});
+      assert.equal(passData.trace, fakeTraceData);
     });
   });
 

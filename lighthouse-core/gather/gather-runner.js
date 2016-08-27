@@ -57,9 +57,9 @@ class GatherRunner {
     return driver.gotoURL('about:blank')
       // Wait a bit for about:blank to "take hold" before switching back to the page.
       .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
-      // Begin tracing if required.
+      // Begin tracing only if requested by config.
       .then(_ => options.config.trace && driver.beginTrace())
-      // Begin network recording.
+      // Network is always recorded for internal use, even if not saved as artifact.
       .then(_ => driver.beginNetworkCollect(options))
       // Navigate.
       .then(_ => driver.gotoURL(options.url, {
@@ -136,7 +136,7 @@ class GatherRunner {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    const loadData = {};
+    const passData = {};
 
     let pass = Promise.resolve();
 
@@ -148,9 +148,8 @@ class GatherRunner {
         // Before Chrome 54.0.2816 (codereview.chromium.org/2161583004),
         // traceContents was an array of trace events; after, traceContents is
         // an object with a traceEvents property. Normalize to object form.
-        loadData.trace = Array.isArray(traceContents) ? {
-          traceEvents: traceContents
-        } : traceContents;
+        passData.trace = Array.isArray(traceContents) ?
+            {traceEvents: traceContents} : traceContents;
         log.verbose('statusEnd', 'Retrieving trace');
       });
     }
@@ -161,7 +160,7 @@ class GatherRunner {
       return driver.endNetworkCollect();
     }).then(networkRecords => {
       // Network records only given to gatherers if requested by config.
-      config.network && (loadData.networkRecords = networkRecords);
+      config.network && (passData.networkRecords = networkRecords);
       log.verbose('statusEnd', status);
     });
 
@@ -169,7 +168,7 @@ class GatherRunner {
       const status = `Retrieving: ${gatherer.name}`;
       return chain.then(_ => {
         log.log('status', status);
-        return gatherer.afterPass(options, loadData);
+        return gatherer.afterPass(options, passData);
       }).then(ret => {
         log.verbose('statusEnd', status);
         return ret;
@@ -177,7 +176,7 @@ class GatherRunner {
     }, pass);
 
     // Resolve on tracing data using passName from config.
-    return pass.then(_ => loadData);
+    return pass.then(_ => passData);
   }
 
   static run(passes, options) {

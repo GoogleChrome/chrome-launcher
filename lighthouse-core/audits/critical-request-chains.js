@@ -40,8 +40,8 @@ class CriticalRequestChains extends Audit {
    * @return {!AuditResult} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    const networkRecord = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    return artifacts.requestCriticalRequestChains(networkRecord).then(chains => {
+    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
+    return artifacts.requestCriticalRequestChains(networkRecords).then(chains => {
       let chainCount = 0;
       function walk(node, depth) {
         const children = Object.keys(node);
