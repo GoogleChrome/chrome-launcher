@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 const _flatten = arr => [].concat.apply([], arr);
 
 document.addEventListener('DOMContentLoaded', _ => {
   const background = chrome.extension.getBackgroundPage();
-  const aggregations = background.getListOfAudits();
+  const defaultAggregations = background.getDefaultAggregations();
 
   const siteNameEl = window.document.querySelector('header h2');
   const generateReportEl = document.getElementById('generate-report');
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', _ => {
 
   let spinnerAnimation;
 
-  const startSpinner = _ => {
+  function startSpinner() {
     statusEl.classList.add(subpageVisibleClass);
     spinnerAnimation = spinnerEl.animate([
       {transform: 'rotate(0deg)'},
@@ -47,26 +48,25 @@ document.addEventListener('DOMContentLoaded', _ => {
       duration: 1000,
       iterations: Infinity
     });
-  };
+  }
 
-  const stopSpinner = _ => {
+  function stopSpinner() {
     spinnerAnimation.cancel();
     statusEl.classList.remove(subpageVisibleClass);
-  };
+  }
 
-  const logstatus = ([, message, details]) => {
+  function logstatus([, message, details]) {
     statusMessageEl.textContent = message;
     statusDetailsMessageEl.textContent = details;
-  };
+  }
 
-  const createOptionItem = (text, isChecked) => {
+  function createOptionItem(text, isChecked) {
     const input = document.createElement('input');
-    const attributes = [['type', 'checkbox'], ['value', text]];
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('value', text);
     if (isChecked) {
-      attributes.push(['checked', 'checked']);
+      input.setAttribute('checked', 'checked');
     }
-
-    attributes.forEach(attr => input.setAttribute.apply(input, attr));
 
     const label = document.createElement('label');
     label.appendChild(input);
@@ -75,44 +75,61 @@ document.addEventListener('DOMContentLoaded', _ => {
     listItem.appendChild(label);
 
     return listItem;
-  };
+  }
 
-  const generateOptionsList = (list, selectedAudits) => {
+  /**
+   * Generates a document fragment containing a list of checkboxes and labels
+   * for the aggregation categories.
+   * @param {!Object<boolean>} selectedAggregations
+   * @return {!DocumentFragment}
+   */
+  function generateOptionsList(list, selectedAggregations) {
     const frag = document.createDocumentFragment();
 
-    aggregations.forEach(aggregation => {
-      frag.appendChild(createOptionItem(aggregation.name, selectedAudits[aggregation.name]));
+    defaultAggregations.forEach(aggregation => {
+      const isChecked = selectedAggregations[aggregation.name];
+      frag.appendChild(createOptionItem(aggregation.name, isChecked));
     });
 
-    list.appendChild(frag);
-  };
+    return frag;
+  }
 
-  const getAuditsFromCategory = audits => _flatten(
-    Object.keys(audits).filter(audit => audits[audit]).map(audit => {
-      const auditsInCategory = aggregations
-        .find(aggregation => aggregation.name === audit).criteria;
+  /**
+   * Returns an array of names of audits from the selected aggregation
+   * categories.
+   * @param {!Object<boolean>} selectedAggregations
+   * @return {!Array<string>}
+   */
+  function getAuditsFromSelected(selectedAggregations) {
+    const auditLists = defaultAggregations.filter(aggregation => {
+      return selectedAggregations[aggregation.name];
+    }).map(selectedAggregation => {
+      return selectedAggregation.audits;
+    });
 
-      return Object.keys(auditsInCategory);
-    })
-  );
+    return _flatten(auditLists);
+  }
 
   background.listenForStatus(logstatus);
-  background.fetchAudits().then(audits => {
-    generateOptionsList(optionsList, audits);
+  background.loadSelectedAggregations().then(aggregations => {
+    const frag = generateOptionsList(optionsList, aggregations);
+    optionsList.appendChild(frag);
   });
 
   generateReportEl.addEventListener('click', () => {
     startSpinner();
     feedbackEl.textContent = '';
 
-    background.fetchAudits()
-    .then(getAuditsFromCategory)
-    .then(audits => background.runAudits({
-      flags: {
-        mobile: true,
-        loadPage: true
-      }
-    }, audits))
+    background.loadSelectedAggregations()
+    .then(getAuditsFromSelected)
+    .then(selectedAudits => {
+      return background.runLighthouse({
+        flags: {
+          mobile: true,
+          loadPage: true
+        }
+      }, selectedAudits);
+    })
     .then(results => {
       background.createPageAndPopulate(results);
     })
@@ -133,9 +150,10 @@ document.addEventListener('DOMContentLoaded', _ => {
   });
 
   okButton.addEventListener('click', () => {
-    const checkedAudits = Array.from(optionsEl.querySelectorAll(':checked'))
+    // Save selected aggregation categories on options page close.
+    const checkedAggregations = Array.from(optionsEl.querySelectorAll(':checked'))
         .map(input => input.value);
-    background.saveAudits(checkedAudits);
+    background.saveSelectedAggregations(checkedAggregations);
 
     optionsEl.classList.remove(subpageVisibleClass);
   });

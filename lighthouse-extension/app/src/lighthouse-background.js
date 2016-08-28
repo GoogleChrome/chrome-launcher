@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
 const ExtensionProtocol = require('../../../lighthouse-core/gather/drivers/extension');
 const Runner = require('../../../lighthouse-core/runner');
 const Config = require('../../../lighthouse-core/config/config');
-const configJSON = require('../../../lighthouse-core/config/default.json');
+const defaultConfig = require('../../../lighthouse-core/config/default.json');
 const log = require('../../../lighthouse-core/lib/log');
+
 const STORAGE_KEY = 'lighthouse_audits';
 const _flatten = arr => [].concat.apply([], arr);
 
@@ -39,27 +39,45 @@ window.createPageAndPopulate = function(results) {
   });
 };
 
-window.runAudits = function(options, audits) {
+/**
+ * @param {!Object} options Lighthouse options.
+ * @param {!Array<string>} requestedAudits Names of audits to run.
+ * @return {!Promise}
+ */
+window.runLighthouse = function(options, requestedAudits) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const driver = new ExtensionProtocol();
 
   return driver.getCurrentTabURL()
-      .then(url => {
-        // Setup the run config, audits are calculated by selected options
-        const config = new Config(configJSON, new Set(audits));
+    .then(url => {
+      // Always start with a freshly parsed default config.
+      const runConfig = JSON.parse(JSON.stringify(defaultConfig));
 
-        // Add in the URL to the options.
-        return Runner.run(driver, Object.assign({}, options, {url, config}));
-      }).catch(e => {
-        console.error(e);
-        throw e;
-      });
+      // Filter out audits not requested.
+      requestedAudits = new Set(requestedAudits);
+      runConfig.audits = runConfig.audits.filter(audit => requestedAudits.has(audit));
+      const config = new Config(runConfig);
+
+      // Add url and config to fresh options object.
+      const runOptions = Object.assign({}, options, {url, config});
+
+      // Run Lighthouse.
+      return Runner.run(driver, runOptions);
+    }).catch(e => {
+      console.error(e);
+      throw e;
+    });
 };
 
-window.getListOfAudits = function() {
+/**
+ * Returns list of aggregation categories (each with a list of its constituent
+ * audits) from the default config.
+ * @return {!Array<{name: string, audits: !Array<string>}>}
+ */
+window.getDefaultAggregations = function() {
   return _flatten(
-    configJSON.aggregations.map(aggregation => {
+    defaultConfig.aggregations.map(aggregation => {
       if (aggregation.items.length === 1) {
         return {
           name: aggregation.name,
@@ -69,34 +87,51 @@ window.getListOfAudits = function() {
 
       return aggregation.items;
     })
-  );
+  ).map(aggregation => {
+    return {
+      name: aggregation.name,
+      audits: Object.keys(aggregation.criteria)
+    };
+  });
 };
 
-window.saveAudits = function(audits) {
-  let storage = {};
-  storage[STORAGE_KEY] = {};
+/**
+ * Save currently selected set of aggregation categories to local storage.
+ * @param {!Array<{name: string, audits: !Array<string>}>} selectedAggregations
+ */
+window.saveSelectedAggregations = function(selectedAggregations) {
+  const storage = {
+    [STORAGE_KEY]: {}
+  };
 
-  window.getListOfAudits().forEach(audit => {
-    storage[STORAGE_KEY][audit.name] = audits.indexOf(audit.name) > -1;
+  window.getDefaultAggregations().forEach(audit => {
+    const selected = selectedAggregations.indexOf(audit.name) > -1;
+    storage[STORAGE_KEY][audit.name] = selected;
   });
 
   chrome.storage.local.set(storage);
 };
 
-window.fetchAudits = function() {
+/**
+ * Load selected aggregation categories from local storage.
+ * @return {!Promise<!Object<boolean>>}
+ */
+window.loadSelectedAggregations = function() {
   return new Promise(resolve => {
     chrome.storage.local.get(STORAGE_KEY, result => {
-      const audits = result[STORAGE_KEY];
-
-      // create list of default audits
-      let defaultAudits = {};
-      window.getListOfAudits().forEach(audit => {
-        defaultAudits[audit.name] = true;
+      // Start with list of all default aggregations set to true so list is
+      // always up to date.
+      const defaultAggregations = {};
+      window.getDefaultAggregations().forEach(aggregation => {
+        defaultAggregations[aggregation.name] = true;
       });
 
-      // merge default and saved audits together so we always have the latest list of audits
+      // Load saved aggregation selections.
+      const savedSelections = result[STORAGE_KEY];
+
+      // Overwrite defaults with any saved aggregation selections.
       resolve(
-        Object.assign({}, defaultAudits, audits)
+        Object.assign(defaultAggregations, savedSelections)
       );
     });
   });
