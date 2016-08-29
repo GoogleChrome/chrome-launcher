@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
 const Gatherer = require('./gatherer');
@@ -43,26 +42,17 @@ class Offline extends Gatherer {
   }
 
   beforePass(options) {
-    const driver = options.driver;
-
-    return driver.gotoURL(options.url, {waitForLoad: true})
-      .then(_ => Offline.goOffline(driver))
-      // Navigate away, then back, to allow a service worker that doesn't call
-      // clients.claim() to take control of the page load.
-      .then(_ => driver.gotoURL('about:blank'))
-      .then(_ => driver.gotoURL(options.url, {waitForLoad: true}))
-      .then(_ => Offline.goOnline(driver));
+    return Offline.goOffline(options.driver);
   }
 
   afterPass(options, tracingData) {
     const navigationRecord = tracingData.networkRecords.filter(record => {
-      // If options.url is just an origin without a path, the Chrome will
-      // implicitly add in a path of '/'.
-      return (record._url === options.url || record._url === options.url + '/') &&
-        record._fetchedViaServiceWorker;
+      return record._url === options.url && record._fetchedViaServiceWorker;
     }).pop(); // Take the last record that matches.
 
     this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
+
+    return Offline.goOnline(options.driver);
   }
 }
 

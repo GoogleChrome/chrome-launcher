@@ -20,21 +20,33 @@
 const OfflineGather = require('../../../gather/gatherers/offline');
 const assert = require('assert');
 const tracingData = require('../../fixtures/traces/network-records.json');
-let offlineGather;
+
+const mockDriver = {
+  sendCommand() {
+    return Promise.resolve();
+  }
+};
 
 describe('Offline gatherer', () => {
-  // Reset the Gatherer before each test.
-  beforeEach(() => {
-    offlineGather = new OfflineGather();
-  });
-
   it('returns an artifact set to -1 when offline loading fails', () => {
-    offlineGather.afterPass({url: 'https://do-not-match.com'}, tracingData);
-    assert.deepEqual(offlineGather.artifact, -1);
+    const offlineGather = new OfflineGather();
+    const options = {
+      url: 'https://do-not-match.com/',
+      driver: mockDriver
+    };
+    return offlineGather.afterPass(options, tracingData).then(_ => {
+      assert.strictEqual(offlineGather.artifact, -1);
+    });
   });
 
   it('returns an artifact set to 200 when offline loading succeeds', () => {
-    offlineGather.afterPass({url: 'https://ifixit-pwa.appspot.com'}, tracingData);
-    assert.deepEqual(offlineGather.artifact, 200);
+    const offlineGather = new OfflineGather();
+    const options = {
+      url: 'https://ifixit-pwa.appspot.com/',
+      driver: mockDriver
+    };
+    return offlineGather.afterPass(options, tracingData).then(_ => {
+      assert.strictEqual(offlineGather.artifact, 200);
+    });
   });
 });

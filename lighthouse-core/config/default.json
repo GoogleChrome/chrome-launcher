@@ -17,6 +17,7 @@
     ]
   },
   {
+    "passName": "offlinePass",
     "loadPage": true,
     "network": true,
     "gatherers": [
