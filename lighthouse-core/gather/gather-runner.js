@@ -217,10 +217,6 @@ class GatherRunner {
       options.flags.mobile = true;
     }
 
-    if (typeof options.flags.loadPage === 'undefined') {
-      options.flags.loadPage = true;
-    }
-
     passes = this.instantiateGatherers(passes, options.config.configDir);
 
     return driver.connect()

@@ -47,7 +47,6 @@ const cli = yargs
 
   .group([
     'mobile',
-    'load-page',
     'save-assets',
     'save-artifacts',
     'list-all-audits',
@@ -56,7 +55,6 @@ const cli = yargs
   ], 'Configuration:')
   .describe({
     'mobile': 'Emulates a Nexus 5X',
-    'load-page': 'Loads the page',
     'save-assets': 'Save the trace contents & screenshots to disk',
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
@@ -89,7 +87,6 @@ Example: --output-path=./lighthouse-results.html`
 
   // default values
   .default('mobile', true)
-  .default('load-page', true)
   .default('output', Printer.OUTPUT_MODE.pretty)
   .default('output-path', 'stdout')
   .check(argv => {

@@ -105,7 +105,6 @@ Logging:
 
 Configuration:
   --mobile                 Emulates a Nexus 5X                                  [default: true]
-  --load-page              Loads the page                                       [default: true]
   --save-assets            Save the trace contents & screenshots to disk              [boolean]
   --save-artifacts         Save all gathered artifacts to disk                        [boolean]
   --list-all-audits        Prints a list of all available audits and exits            [boolean]
