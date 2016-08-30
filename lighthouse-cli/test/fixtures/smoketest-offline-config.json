@@ -2,7 +2,8 @@
   "passes": [{
     "loadPage": true,
     "gatherers": [
-      "viewport"
+      "viewport",
+      "url"
     ]
   },{
     "loadPage": true,
