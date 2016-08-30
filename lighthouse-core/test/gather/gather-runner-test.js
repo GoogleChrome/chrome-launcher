@@ -79,29 +79,6 @@ describe('GatherRunner', function() {
     });
   });
 
-  it('reloads a page via about:blank', () => {
-    const expected = [
-      'https://example.com',
-      'about:blank'
-    ];
-    const driver = {
-      gotoURL(url) {
-        assert(url, expected.pop());
-        return Promise.resolve(true);
-      },
-      beginNetworkCollect() {
-        return Promise.resolve();
-      }
-    };
-
-    return GatherRunner.loadPage(driver, {
-      url: 'https://example.com',
-      config: {}
-    }).then(res => {
-      assert.equal(res, true);
-    });
-  });
-
   it('sets up the driver to begin emulation when mobile == true', () => {
     let calledEmulation = false;
     const driver = {

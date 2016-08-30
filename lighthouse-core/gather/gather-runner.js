@@ -33,10 +33,10 @@ const path = require('path');
  *
  * 2. For each pass in the config:
  *   A. GatherRunner.beforePass()
- *     i. all gatherer's beforePass()
+ *     i. navigate to about:blank
+ *     ii. all gatherer's beforePass()
  *   B. GatherRunner.pass()
  *     i. GatherRunner.loadPage()
- *       a. navigate to about:blank
  *       b. beginTrace (if requested) & beginNetworkCollect
  *       c. navigate to options.url (and wait for onload)
  *     ii. all gatherer's pass()
@@ -50,13 +50,27 @@ const path = require('path');
  *   C. collect all artifacts and return them
  */
 class GatherRunner {
-  static loadPage(driver, options) {
-    // Since a Page.reload command does not let a service worker take over, we
-    // navigate away and then come back to reload. We do not `waitForLoad` on
-    // about:blank since a page load event is never fired on it.
+  /**
+   * Loads about:blank and waits there briefly. Since a Page.reload command does
+   * not let a service worker take over, we navigate away and then come back to
+   * reload. We do not `waitForLoad` on about:blank since a page load event is
+   * never fired on it.
+   * @param {!Driver} driver
+   * @return {!Promise}
+   */
+  static loadBlank(driver) {
     return driver.gotoURL('about:blank')
-      // Wait a bit for about:blank to "take hold" before switching back to the page.
-      .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)))
+      .then(_ => new Promise((resolve, reject) => setTimeout(resolve, 300)));
+  }
+
+  /**
+   * Loads options.url with specified options.
+   * @param {!Driver} driver
+   * @param {!Object} options
+   * @return {!Promise}
+   */
+  static loadPage(driver, options) {
+    return Promise.resolve()
       // Begin tracing only if requested by config.
       .then(_ => options.config.trace && driver.beginTrace())
       // Network is always recorded for internal use, even if not saved as artifact.
@@ -81,20 +95,19 @@ class GatherRunner {
   }
 
   /**
-   * Calls beforePass() on gatherers before navigation and before tracing has
-   * started (if requested).
+   * Navigates to about:blank and calls beforePass() on gatherers before tracing
+   * has started and before navigation to the target page.
    * @param {!Object} options
    * @return {!Promise}
    */
   static beforePass(options) {
-    const config = options.config;
-    const gatherers = config.gatherers;
+    const pass = GatherRunner.loadBlank(options.driver);
 
-    return gatherers.reduce((chain, gatherer) => {
+    return options.config.gatherers.reduce((chain, gatherer) => {
       return chain.then(_ => {
         return gatherer.beforePass(options);
       });
-    }, Promise.resolve());
+    }, pass);
   }
 
   /**
