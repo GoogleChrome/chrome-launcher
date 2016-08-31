@@ -88,7 +88,7 @@ class NetworkRecorder extends EventEmitter {
 
   onResourceChangedPriority(data) {
     this.networkManager._dispatcher.resourceChangedPriority(data.requestId,
-      data.newPriority, data.timestamp);
+        data.newPriority, data.timestamp);
   }
 
   static recordsFromLogs(logs) {

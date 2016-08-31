@@ -14,68 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* global XMLHttpRequest, __returnResults */
-
 'use strict';
 
 const Gatherer = require('./gatherer');
 
-// *WARNING* do not use fetch.. due to it requiring window focus to fire.
-// Request the current page by issuing a XMLHttpRequest request to ''
-// and storing the status code on the window.
-// This runs in the context of the page, so we don't cover it with unit tests.
-/* istanbul ignore next */
-const requestPage = function() {
-  const oReq = new XMLHttpRequest();
-  oReq.onload = oReq.onerror = e => {
-    // __returnResults is injected by driver.evaluateAsync
-    __returnResults(e.currentTarget.status);
-  };
-  oReq.open('GET', '');
-  oReq.send();
-};
-
 class Offline extends Gatherer {
-
-  static config(opts) {
-    return {
-      offline: opts.offline,
-      // values of 0 remove any active throttling. crbug.com/456324#c9
-      latency: 0,
-      downloadThroughput: 0,
-      uploadThroughput: 0
-    };
+  beforePass(options) {
+    return options.driver.goOffline();
   }
 
-  static goOffline(driver) {
-    // Network.enable must be called for Network.emulateNetworkConditions to work
-    return driver.sendCommand('Network.enable').then(_ => {
-      driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: true}));
-    });
-  }
+  afterPass(options, tracingData) {
+    const navigationRecord = tracingData.networkRecords.filter(record => {
+      return record._url === options.url && record._fetchedViaServiceWorker;
+    }).pop(); // Take the last record that matches.
 
-  static goOnline(driver) {
-    return driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: false}));
-  }
+    this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
 
-  afterPass(options) {
-    const driver = options.driver;
-
-    // TODO eventually we will want to walk all network
-    // requests that the page initially made and retry them.
-    return Offline
-        .goOffline(driver)
-        .then(_ => driver.evaluateAsync(`(${requestPage.toString()}())`))
-        .then(offlineResponseCode => {
-          this.artifact = offlineResponseCode;
-        })
-        .then(_ => Offline.goOnline(driver))
-        .catch(_ => {
-          this.artifact = {
-            offlineResponseCode: -1
-          };
-        });
+    return options.driver.goOnline(options);
   }
 }
 
