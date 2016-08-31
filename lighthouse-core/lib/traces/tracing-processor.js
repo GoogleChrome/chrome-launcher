@@ -193,7 +193,7 @@ class TraceProcessor {
       percentiles = [0.5, 0.75, 0.9, 0.99, 1];
     }
 
-    // Find the main thread.
+    // Find the main thread via the first TracingStartedInPage event in the trace
     const startEvent = trace.traceEvents.find(event => {
       return event.name === 'TracingStartedInPage';
     });
