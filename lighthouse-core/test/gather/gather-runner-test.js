@@ -59,9 +59,7 @@ describe('GatherRunner', function() {
     };
 
     return GatherRunner.loadPage(driver, {
-      flags: {
-        loadPage: true
-      },
+      flags: {},
       config: {}
     }).then(res => {
       assert.equal(res, true);
