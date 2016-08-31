@@ -19,30 +19,8 @@
 const Gatherer = require('./gatherer');
 
 class Offline extends Gatherer {
-
-  static config(opts) {
-    return {
-      offline: opts.offline,
-      // values of 0 remove any active throttling. crbug.com/456324#c9
-      latency: 0,
-      downloadThroughput: 0,
-      uploadThroughput: 0
-    };
-  }
-
-  static goOffline(driver) {
-    // Network.enable must be called for Network.emulateNetworkConditions to work
-    return driver.sendCommand('Network.enable').then(_ => {
-      driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: true}));
-    });
-  }
-
-  static goOnline(driver) {
-    return driver.sendCommand('Network.emulateNetworkConditions', Offline.config({offline: false}));
-  }
-
   beforePass(options) {
-    return Offline.goOffline(options.driver);
+    return options.driver.goOffline();
   }
 
   afterPass(options, tracingData) {
@@ -52,7 +30,7 @@ class Offline extends Gatherer {
 
     this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
 
-    return Offline.goOnline(options.driver);
+    return options.driver.goOnline(options);
   }
 }
 

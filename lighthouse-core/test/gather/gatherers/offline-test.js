@@ -22,7 +22,10 @@ const assert = require('assert');
 const tracingData = require('../../fixtures/traces/network-records.json');
 
 const mockDriver = {
-  sendCommand() {
+  goOffline() {
+    return Promise.resolve();
+  },
+  goOnline() {
     return Promise.resolve();
   }
 };
