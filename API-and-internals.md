@@ -21,6 +21,7 @@ cd lighthouse && npm i && npm link
 ```
 
 ```sh
+export DISPLAY=:1.5
 
 # start up chromium inside xvfb
 xvfb-run --server-args='-screen 0, 1024x768x16' chromium-browser  --temp-profile --start-maximized --no-first-run  --remote-debugging-port=9222 "about:blank"
