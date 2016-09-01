@@ -39,4 +39,4 @@ AuditMeta.prototype.description;
 AuditMeta.prototype.optimalValue;
 
 /** @type {!Array<string>} */
-AuditMeta.prototype.requiredArtifacts
+AuditMeta.prototype.requiredArtifacts;
