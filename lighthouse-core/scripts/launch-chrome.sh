@@ -1,25 +1,44 @@
 #!/usr/bin/env bash
 
+# Running:
+#     npm run chrome
+# or
+#     npm explore -g lighthouse -- npm run chrome
+
+# You can also add custom cmd line flags for Chrome:
+#     npm run chrome -- --show-paint-rects
+
 CHROME_ARGS=$@
+
+INITIAL_URL="about:blank"
+TMP_PROFILE_DIR=$(mktemp -d -t lighthouse.XXXXXXXXXX)
+CHROME_FLAGS="--remote-debugging-port=9222 --user-data-dir=$TMP_PROFILE_DIR --no-first-run $CHROME_ARGS"
+CHROME_PATH=""
+
+log_warning() {
+  green="\e[38;5;121m"
+  reset="\e[0m"
+  read -d '' warning << EOF
+; Launching Chrome w/ flags from path: $CHROME_PATH
+;
+; Run Lighthouse from another Terminal tab or window. Ctrl-C here will terminate Chrome
+EOF
+  printf "%b$warning%b\n\n" "$green" "$reset"
+}
 
 launch_osx() {
   LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister
   CHROME_CANARY_PATH=${CHROME_CANARY_PATH:-$($LSREGISTER -dump | grep -i "google chrome canary.app$" | awk '{$1=""; print $0}' | head -n1 | xargs)}
   CHROME_CANARY_EXEC_PATH="${CHROME_CANARY_PATH}/Contents/MacOS/Google Chrome Canary"
-  echo "Using Chrome Canary from path ${CHROME_CANARY_PATH}"
+  CHROME_PATH="$CHROME_CANARY_PATH"
+  log_warning
   if [ ! -f "$CHROME_CANARY_EXEC_PATH" ]; then
     echo "You must install Google Chrome Canary to use lighthouse"
     echo "You can download it from https://www.google.com/chrome/browser/canary.html"
     exit 1
   fi
-  TMP_PROFILE_DIR=$(mktemp -d -t lighthouse)
-  "$CHROME_CANARY_EXEC_PATH" \
-    --remote-debugging-port=9222 \
-    --no-first-run \
-    --user-data-dir=$TMP_PROFILE_DIR \
-    $CHROME_ARGS \
-    "about:blank"
-  rm -r $TMP_PROFILE_DIR
+  "$CHROME_CANARY_EXEC_PATH" $CHROME_FLAGS "$INITIAL_URL"
+  rm -r "$TMP_PROFILE_DIR"
 }
 
 launch_linux() {
@@ -29,18 +48,11 @@ launch_linux() {
     exit 1
   fi
 
-  TMP_PROFILE_DIR=$(mktemp -d -t lighthouse.XXXXXXXXXX)
-  echo "Launching Google Chrome from $LIGHTHOUSE_CHROMIUM_PATH"
-  "$LIGHTHOUSE_CHROMIUM_PATH" \
-    --disable-setuid-sandbox \
-    --remote-debugging-port=9222 \
-    --no-first-run \
-    --user-data-dir=$TMP_PROFILE_DIR \
-    $CHROME_ARGS \
-    "about:blank"
-  rm -r $TMP_PROFILE_DIR
+  CHROME_PATH="$LIGHTHOUSE_CHROMIUM_PATH"
+  log_warning
+  "$LIGHTHOUSE_CHROMIUM_PATH" --disable-setuid-sandbox $CHROME_FLAGS "$INITIAL_URL"
+  rm -r "$TMP_PROFILE_DIR"
 }
-
 
 if [[ $(uname) == "Darwin" ]]; then
   launch_osx
