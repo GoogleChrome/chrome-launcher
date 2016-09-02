@@ -48,6 +48,21 @@ const TYPICAL_MOBILE_THROTTLING_METRICS = {
   offline: false
 };
 
+const OFFLINE_METRICS = {
+  offline: true,
+  // values of 0 remove any active throttling. crbug.com/456324#c9
+  latency: 0,
+  downloadThroughput: 0,
+  uploadThroughput: 0
+};
+
+const NO_THROTTLING_METRICS = {
+  latency: 0,
+  downloadThroughput: 0,
+  uploadThroughput: 0,
+  offline: false
+};
+
 function enableNexus5X(driver) {
   /**
    * Finalizes touch emulation by enabling `"ontouchstart" in window` feature detect
@@ -90,7 +105,17 @@ function enableNetworkThrottling(driver) {
   return driver.sendCommand('Network.emulateNetworkConditions', TYPICAL_MOBILE_THROTTLING_METRICS);
 }
 
+function disableNetworkThrottling(driver) {
+  return driver.sendCommand('Network.emulateNetworkConditions', NO_THROTTLING_METRICS);
+}
+
+function goOffline(driver) {
+  return driver.sendCommand('Network.emulateNetworkConditions', OFFLINE_METRICS);
+}
+
 module.exports = {
   enableNexus5X,
-  enableNetworkThrottling
+  enableNetworkThrottling,
+  disableNetworkThrottling,
+  goOffline
 };

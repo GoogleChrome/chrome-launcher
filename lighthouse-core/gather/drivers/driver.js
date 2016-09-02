@@ -381,6 +381,30 @@ class Driver {
     ]);
   }
 
+  /**
+   * Emulate internet disconnection.
+   * @return {!Promise}
+   */
+  goOffline() {
+    return this.sendCommand('Network.enable').then(_ => emulation.goOffline(this));
+  }
+
+  /**
+   * Enable internet connection, using emulated mobile settings if
+   * `options.flags.mobile` is true.
+   * @param {!Object} options
+   * @return {!Promise}
+   */
+  goOnline(options) {
+    return this.sendCommand('Network.enable').then(_ => {
+      if (options.flags.mobile) {
+        return emulation.enableNetworkThrottling(this);
+      }
+
+      return emulation.disableNetworkThrottling(this);
+    });
+  }
+
   cleanAndDisableBrowserCaches() {
     return Promise.all([
       this.clearBrowserCache(),

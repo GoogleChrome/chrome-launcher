@@ -35,10 +35,6 @@ class Runner {
       opts.flags.mobile = true;
     }
 
-    if (typeof opts.flags.loadPage === 'undefined') {
-      opts.flags.loadPage = true;
-    }
-
     const config = opts.config;
 
     // save the initialUrl provided by the user

@@ -125,8 +125,7 @@ document.addEventListener('DOMContentLoaded', _ => {
     .then(selectedAudits => {
       return background.runLighthouse({
         flags: {
-          mobile: true,
-          loadPage: true
+          mobile: true
         }
       }, selectedAudits);
     })

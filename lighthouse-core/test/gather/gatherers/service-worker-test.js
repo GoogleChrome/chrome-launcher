@@ -42,31 +42,7 @@ describe('Service Worker gatherer', () => {
       },
       url
     }).then(_ => {
-      assert(serviceWorkerGatherer.artifact.version);
-      assert.deepEqual(serviceWorkerGatherer.artifact.version, {
-        status: 'activated',
-        scriptURL: url
-      });
-    });
-  });
-
-  it('discards service worker registrations for other origins', () => {
-    const url = 'https://example.com/';
-    const versions = [{
-      status: 'activated',
-      scriptURL: 'https://other-example.com'
-    }];
-
-    return serviceWorkerGatherer.beforePass({
-      driver: {
-        getServiceWorkerVersions() {
-          return Promise.resolve({versions});
-        }
-      },
-      url
-    }).then(_ => {
-      assert.ok(!serviceWorkerGatherer.artifact.version);
-      assert.ok(serviceWorkerGatherer.artifact.debugString);
+      assert.deepEqual(serviceWorkerGatherer.artifact.versions, versions);
     });
   });
 
@@ -78,7 +54,7 @@ describe('Service Worker gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(!serviceWorkerGatherer.artifact.version);
+      assert.ok(!serviceWorkerGatherer.artifact.versions);
       assert.ok(serviceWorkerGatherer.artifact.debugString);
     });
   });

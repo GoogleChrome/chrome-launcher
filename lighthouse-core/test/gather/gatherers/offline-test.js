@@ -19,57 +19,37 @@
 
 const OfflineGather = require('../../../gather/gatherers/offline');
 const assert = require('assert');
-let offlineGather;
+const tracingData = require('../../fixtures/traces/network-records.json');
 
-describe('HTTP Redirect gatherer', () => {
-  // Reset the Gatherer before each test.
-  beforeEach(() => {
-    offlineGather = new OfflineGather();
-  });
+const mockDriver = {
+  goOffline() {
+    return Promise.resolve();
+  },
+  goOnline() {
+    return Promise.resolve();
+  }
+};
 
-  it('returns an artifact', () => {
-    return offlineGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.resolve();
-        },
-        evaluateAsync() {
-          return Promise.resolve({offlineResponseCode: 200});
-        }
-      }
-    }).then(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: 200});
+describe('Offline gatherer', () => {
+  it('returns an artifact set to -1 when offline loading fails', () => {
+    const offlineGather = new OfflineGather();
+    const options = {
+      url: 'https://do-not-match.com/',
+      driver: mockDriver
+    };
+    return offlineGather.afterPass(options, tracingData).then(_ => {
+      assert.strictEqual(offlineGather.artifact, -1);
     });
   });
 
-  it('handles driver sendCommand() failure', () => {
-    return offlineGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
-    });
-  });
-
-  it('handles driver evaluateAsync() failure', () => {
-    return offlineGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.resolve();
-        },
-        evaluateAsync() {
-          return Promise.reject();
-        }
-      }
-    }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.deepEqual(offlineGather.artifact, {offlineResponseCode: -1});
+  it('returns an artifact set to 200 when offline loading succeeds', () => {
+    const offlineGather = new OfflineGather();
+    const options = {
+      url: 'https://ifixit-pwa.appspot.com/',
+      driver: mockDriver
+    };
+    return offlineGather.afterPass(options, tracingData).then(_ => {
+      assert.strictEqual(offlineGather.artifact, 200);
     });
   });
 });

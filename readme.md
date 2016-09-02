@@ -10,11 +10,9 @@
 [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
 [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
 
-_status: prototype extension and CLI available for testing_
+_status: ready for use! please report any issues or questions you have_
 
 ## Install Chrome extension
-
-Requires Chrome version 52+
 
 [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
@@ -45,10 +43,12 @@ lighthouse --help
 ```sh
 git clone https://github.com/GoogleChrome/lighthouse
 cd lighthouse
-
-# will be cleaner soon.
-cd lighthouse-core
 npm install
+```
+
+#### Run
+```sh
+node lighthouse-cli http://example.com
 ```
 
 ## Custom run configuration
@@ -105,7 +105,6 @@ Logging:
 
 Configuration:
   --mobile                 Emulates a Nexus 5X                                  [default: true]
-  --load-page              Loads the page                                       [default: true]
   --save-assets            Save the trace contents & screenshots to disk              [boolean]
   --save-artifacts         Save all gathered artifacts to disk                        [boolean]
   --list-all-audits        Prints a list of all available audits and exits            [boolean]

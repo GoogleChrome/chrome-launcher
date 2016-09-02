@@ -2,10 +2,12 @@
   "passes": [{
     "loadPage": true,
     "gatherers": [
-      "viewport"
+      "viewport",
+      "url"
     ]
   },{
     "loadPage": true,
+    "network": true,
     "gatherers": [
       "service-worker",
       "offline"
