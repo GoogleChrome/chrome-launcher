@@ -84,7 +84,7 @@ describe('GatherRunner', function() {
         calledEmulation = true;
       },
       cleanAndDisableBrowserCaches() {},
-      forceUpdateServiceWorkers() {}
+      clearDataForOrigin() {}
     };
 
     return GatherRunner.setupDriver(driver, {
@@ -103,7 +103,7 @@ describe('GatherRunner', function() {
         calledEmulation = true;
       },
       cleanAndDisableBrowserCaches() {},
-      forceUpdateServiceWorkers() {}
+      clearDataForOrigin() {}
     };
 
     return GatherRunner.setupDriver(driver, {

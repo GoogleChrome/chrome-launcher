@@ -32,7 +32,7 @@ module.exports = {
   },
 
   cleanAndDisableBrowserCaches() {},
-  forceUpdateServiceWorkers() {},
+  clearDataForOrigin() {},
   reloadForCleanStateIfNeeded() {
     return Promise.resolve();
   },
