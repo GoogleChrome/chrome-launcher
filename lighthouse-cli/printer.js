@@ -81,7 +81,7 @@ function createOutput(results, outputMode) {
 
   // JSON report.
   if (outputMode === 'json') {
-    return JSON.stringify({audits: results.audits, aggregations: results.aggregations}, null, 2);
+    return JSON.stringify(results, null, 2);
   }
 
   // Pretty printed.
