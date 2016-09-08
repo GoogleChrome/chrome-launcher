@@ -16,6 +16,8 @@ _status: ready for use! please report any issues or questions you have_
 
 [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
+Quick-start guide on using the Lighthouse extension: http://bit.ly/using-lighthouse
+
 ## Install CLI
 
 Requires Node v5+ or Node v4 w/ `--harmony`
