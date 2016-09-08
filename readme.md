@@ -12,6 +12,8 @@
 
 _status: ready for use! please report any issues or questions you have_
 
+**Lighthouse requires Chrome 52 or later**
+
 ## Install Chrome extension
 
 [chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
