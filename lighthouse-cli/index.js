@@ -60,7 +60,7 @@ const cli = yargs
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
-    'config-path': 'The absolute path to the config JSON.'
+    'config-path': 'The path to the config JSON.'
   })
 
   .group([

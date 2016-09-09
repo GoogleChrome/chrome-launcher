@@ -53,7 +53,7 @@ node lighthouse-cli http://example.com
 
 ## Custom run configuration
 
-You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=$PWD/myconfig.json <url>`
+You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.json <url>`
 
 ## Trace processing
 
@@ -89,7 +89,7 @@ Lighthouse can be used to analyze trace and performance data collected from othe
 }
 ```
 
-Then, run with: `lighthouse --config-path=$PWD/config.json http://www.random.url`
+Then, run with: `lighthouse --config-path=config.json http://www.random.url`
 
 
 ## Lighthouse CLI options
@@ -109,7 +109,7 @@ Configuration:
   --save-artifacts         Save all gathered artifacts to disk                        [boolean]
   --list-all-audits        Prints a list of all available audits and exits            [boolean]
   --list-trace-categories  Prints a list of all required trace categories and exits   [boolean]
-  --config-path            The absolute path to the config JSON.
+  --config-path            The path to the config JSON.
 
 Output:
   --output       Reporter for the results
