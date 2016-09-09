@@ -24,6 +24,7 @@ if (!environment.checkNodeCompatibility()) {
   process.exit(1);
 }
 
+const path = require('path');
 const yargs = require('yargs');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
@@ -59,7 +60,7 @@ const cli = yargs
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
-    'config-path': 'The absolute path to the config JSON.'
+    'config-path': 'The path to the config JSON.'
   })
 
   .group([
@@ -122,7 +123,13 @@ const url = cli._[0];
 const outputMode = cli.output;
 const outputPath = cli['output-path'];
 const flags = cli;
-const config = (cli.configPath && require(cli.configPath)) || null;
+
+let config = null;
+if (cli.configPath) {
+  // Resolve the config file path relative to where cli was called.
+  const configPath = path.resolve(process.cwd(), cli.configPath);
+  config = require(configPath);
+}
 
 // set logging preferences
 flags.logLevel = 'info';
