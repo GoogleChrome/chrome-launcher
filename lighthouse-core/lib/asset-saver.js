@@ -26,6 +26,7 @@ function getFilenamePrefix(options) {
 
   const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
   const filenamePrefix = hostname + '_' + date.toISOString();
+  // replace characters that are unfriendly to filenames
   return (filenamePrefix).replace(/[\/\?<>\\:\*\|":]/g, '-');
 }
 
