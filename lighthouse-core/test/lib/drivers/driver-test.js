@@ -33,7 +33,7 @@ driverStub.sendCommand = function(command, params) {
         nodeId: params.selector === 'invalid' ? 0 : 231
       });
     case 'Storage.clearDataForOrigin':
-      return Promise.resolve({origin: 'http://aliexpress.com', storageTypes: 'all'});
+      return Promise.resolve({origin: 'http://aliexpress.com:80', storageTypes: 'all'});
     default:
       throw Error(`Stub not implemented: ${command}`);
   }
@@ -92,13 +92,5 @@ describe('Browser Driver', () => {
         assert.equal(data.origin, origin);
         assert.equal(data.storageTypes, 'all');
       });
-  });
-
-  it('will throw an error when invalid url is given', () => {
-    const pageUrl = 'aliexpress.com/';
-    const pageUrl2 = 'http://';
-
-    assert.throws(() => driverStub.clearDataForOrigin(pageUrl), /protocol/);
-    assert.throws(() => driverStub.clearDataForOrigin(pageUrl2), /hostname/);
   });
 });

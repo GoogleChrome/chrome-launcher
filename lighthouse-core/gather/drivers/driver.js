@@ -422,8 +422,9 @@ class Driver {
   }
 
   clearDataForOrigin(url) {
-    const parsedUrl = parseURL(url);
-    const origin = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
+    const parsedURL = parseURL(url);
+    const origin = `${parsedURL.protocol}//${parsedURL.hostname}` +
+      (parsedURL.port ? `:${parsedURL.port}` : '');
 
     return this.sendCommand('Storage.clearDataForOrigin', {
       origin,
