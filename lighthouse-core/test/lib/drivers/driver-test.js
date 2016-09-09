@@ -84,8 +84,8 @@ describe('Browser Driver', () => {
   });
 
   it('will clear origin of a page', () => {
-    const pageUrl = 'http://aliexpress.com/';
-    const origin = 'http://aliexpress.com';
+    const pageUrl = 'http://aliexpress.com:80/';
+    const origin = 'http://aliexpress.com:80';
 
     return driverStub.clearDataForOrigin(pageUrl)
       .then(data => {

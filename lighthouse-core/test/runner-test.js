@@ -206,4 +206,12 @@ describe('Runner', () => {
   it('rejects when given a URL of zero length', () => {
     return Runner.run({}, {url: ''}).then(_ => assert.ok(false), _ => assert.ok(true));
   });
+
+  it('rejects when given a URL without protocol', () => {
+    return Runner.run({}, {url: 'localhost'}).then(_ => assert.ok(false), _ => assert.ok(true));
+  });
+
+  it('rejects when given a URL without hostname', () => {
+    return Runner.run({}, {url: 'https://'}).then(_ => assert.ok(false), _ => assert.ok(true));
+  });
 });

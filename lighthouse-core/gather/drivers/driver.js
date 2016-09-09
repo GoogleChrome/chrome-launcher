@@ -425,14 +425,6 @@ class Driver {
     const parsedUrl = parseURL(url);
     const origin = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
 
-    if (!parsedUrl.protocol) {
-      throw new Error(`Couldn't find protocol of ${url}`);
-    }
-
-    if (!parsedUrl.hostname) {
-      throw new Error(`Couldn't find hostname of ${url}`);
-    }
-
     return this.sendCommand('Storage.clearDataForOrigin', {
       origin,
       storageTypes: 'all',
