@@ -20,7 +20,7 @@ const Audit = require('../audits/audit');
 const assert = require('assert');
 const path = require('path');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Runner', () => {
   it('expands gatherers', () => {
@@ -82,8 +82,8 @@ describe('Runner', () => {
     });
 
     return Runner.run({}, {url, config}).then(results => {
-      assert.equal(results[0].rawValue, 2);
-      assert.equal(results[0].name, 'user-timings');
+      const audits = results.audits;
+      assert.equal(audits['user-timings'].rawValue, 2);
     });
   });
 
@@ -100,8 +100,9 @@ describe('Runner', () => {
     });
 
     return Runner.run({}, {url, config}).then(results => {
-      assert.equal(results[0].rawValue, -1);
-      assert(results[0].debugString);
+      const audits = results.audits;
+      assert.equal(audits['user-timings'].rawValue, -1);
+      assert(audits['user-timings'].debugString);
     });
   });
 
@@ -118,8 +119,8 @@ describe('Runner', () => {
     });
 
     return Runner.run({}, {url, config}).then(results => {
-      assert.equal(results[0].rawValue, 9);
-      assert.equal(results[0].name, 'critical-request-chains');
+      const audits = results.audits;
+      assert.equal(audits['critical-request-chains'].rawValue, 9);
     });
   });
 

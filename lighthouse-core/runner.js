@@ -17,7 +17,7 @@
 'use strict';
 
 const GatherRunner = require('./gather/gather-runner');
-const Aggregator = require('./aggregator');
+const Aggregate = require('./aggregator/aggregate');
 const assetSaver = require('./lib/asset-saver');
 const log = require('./lib/log');
 const fs = require('fs');
@@ -104,29 +104,27 @@ class Runner {
           'The config must provide passes and audits, artifacts and audits, or auditResults');
     }
 
-    // Only run aggregations if needed.
-    if (config.aggregations) {
-      run = run
-          .then(auditResults => Promise.all([
-            auditResults,
-            Aggregator.aggregate(config.aggregations, auditResults)
-          ]))
-          .then(results => {
-            const audits = results[0];
-            const aggregations = results[1];
-            const formattedAudits = audits.reduce((formatted, audit) => {
-              formatted[audit.name] = audit;
-              return formatted;
-            }, {});
+    // Format and aggregate results before returning.
+    run = run
+      .then(auditResults => {
+        const formattedAudits = auditResults.reduce((formatted, audit) => {
+          formatted[audit.name] = audit;
+          return formatted;
+        }, {});
 
-            return {
-              initialUrl: opts.initialUrl,
-              url: opts.url,
-              audits: formattedAudits,
-              aggregations
-            };
-          });
-    }
+        // Only run aggregations if needed.
+        let aggregations = [];
+        if (config.aggregations) {
+          aggregations = config.aggregations.map(a => Aggregate.aggregate(a, auditResults));
+        }
+
+        return {
+          initialUrl: opts.initialUrl,
+          url: opts.url,
+          audits: formattedAudits,
+          aggregations
+        };
+      });
 
     return run;
   }

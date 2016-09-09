@@ -20,6 +20,7 @@
 
 const pkg = require('../../package.json');
 const assert = require('assert');
+const lighthouse = require('..');
 
 describe('Module Tests', function() {
   it('should have a main attribute defined in the package.json', function() {
@@ -27,17 +28,14 @@ describe('Module Tests', function() {
   });
 
   it('should be able to require in the package.json\'s main file', function() {
-    const lighthouse = require('..');
     assert.ok(lighthouse);
   });
 
   it('should require lighthouse as a function', function() {
-    const lighthouse = require('..');
     assert.ok(typeof lighthouse === 'function');
   });
 
   it('should throw an error when the first parameter is not defined', function() {
-    const lighthouse = require('..');
     return lighthouse()
       .then(() => {
         throw new Error('Should not have resolved when first arg is not a string');
@@ -47,7 +45,6 @@ describe('Module Tests', function() {
   });
 
   it('should throw an error when the first parameter is an empty string', function() {
-    const lighthouse = require('..');
     return lighthouse('')
       .then(() => {
         throw new Error('Should not have resolved when first arg is an empty string');
@@ -57,7 +54,6 @@ describe('Module Tests', function() {
   });
 
   it('should throw an error when the first parameter is not a string', function() {
-    const lighthouse = require('..');
     return lighthouse({})
       .then(() => {
         throw new Error('Should not have resolved when first arg is not a string');
@@ -67,7 +63,6 @@ describe('Module Tests', function() {
   });
 
   it('should throw an error when the second parameter is not an object', function() {
-    const lighthouse = require('..');
     return lighthouse('SOME_URL', 'flags')
       .then(() => {
         throw new Error('Should not have resolved when second arg is not an object');
@@ -77,7 +72,6 @@ describe('Module Tests', function() {
   });
 
   it('should throw an error when the config is invalid', function() {
-    const lighthouse = require('..');
     return lighthouse('SOME_URL', {}, {})
       .then(() => {
         throw new Error('Should not have resolved when second arg is not an object');
@@ -87,7 +81,6 @@ describe('Module Tests', function() {
   });
 
   it('should throw an error when the config contains incorrect audits', function() {
-    const lighthouse = require('..');
     return lighthouse('SOME_URL', {}, {
       passes: [{
         gatherers: [
@@ -106,14 +99,34 @@ describe('Module Tests', function() {
       });
   });
 
+  it('should return formatted audit results when given no aggregations', function() {
+    const exampleUrl = 'https://example.com/';
+    return lighthouse(exampleUrl, {
+      output: 'json'
+    }, {
+      auditResults: [{
+        score: true,
+        displayValue: '',
+        rawValue: true,
+        name: 'viewport',
+        category: 'Mobile Friendly',
+        description: 'HTML has a viewport <meta>'
+      }]
+    }).then(results => {
+      assert.equal(results.url, exampleUrl);
+      assert.equal(results.initialUrl, exampleUrl);
+      assert.ok(Array.isArray(results.aggregations));
+      assert.equal(results.aggregations.length, 0);
+      assert.ok(results.audits.viewport);
+    });
+  });
+
   it('should return a list of audits', function() {
-    const lighthouseModule = require('..');
-    assert.ok(Array.isArray(lighthouseModule.getAuditList()));
+    assert.ok(Array.isArray(lighthouse.getAuditList()));
   });
 
   it('should return a list of trace categories required by the driver', function() {
-    const lighthouseModule = require('..');
-    const lighthouseTraceCategories = lighthouseModule.traceCategories;
+    const lighthouseTraceCategories = lighthouse.traceCategories;
     assert.ok(Array.isArray(lighthouseTraceCategories));
     assert.notEqual(lighthouseTraceCategories.length, 0);
   });
