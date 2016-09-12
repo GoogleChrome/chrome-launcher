@@ -29,6 +29,7 @@ const yargs = require('yargs');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
+const Launcher = require('./chrome-launcher');
 
 const cli = yargs
   .help('help')
@@ -61,7 +62,9 @@ const cli = yargs
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
-    'config-path': 'The path to the config JSON.'
+    'config-path': 'The path to the config JSON.',
+    'skip-autolaunch': 'Skip autolaunch of chrome when accessing port 9222 fails',
+    'select-chrome': 'Choose chrome location to use when multiple installations are found',
   })
 
   .group([
@@ -80,6 +83,8 @@ Example: --output-path=./lighthouse-results.html`
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
+    'skip-autolaunch',
+    'select-chrome',
     'verbose',
     'quiet',
     'help'
@@ -91,6 +96,7 @@ Example: --output-path=./lighthouse-results.html`
   .default('mobile', true)
   .default('output', Printer.OUTPUT_MODE.pretty)
   .default('output-path', 'stdout')
+  .default('launch-chrome', true)
   .check(argv => {
     // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
     // or --list-trace-categories. If not, stop the program and ask for a url
@@ -140,35 +146,62 @@ if (cli.verbose) {
   flags.logLevel = 'error';
 }
 
-function runLighthouse(addresses) {
+function launchChromeAndRun() {
+  const launcher = new Launcher({
+    head: !cli.selectChrome,
+  });
+
+  return launcher
+    .connect()
+    .catch(() => {
+      if (cli.skipAutolaunch) {
+        showConnectionError();
+      }
+      console.log('Launching Chrome...');
+      return launcher.run();
+    })
+    .then(() => lighthouseRun(urls))
+    .then(() => launcher.kill());
+}
+
+function lighthouseRun(addresses) {
   // Process URLs once at a time
   const address = addresses.shift();
   if (!address) {
     return;
   }
 
-  lighthouse(address, flags, config)
+  return lighthouse(address, flags, config)
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
       if (outputMode !== 'html') {
-        const filename = './' + assetSaver.getFilenamePrefix({url: address}) + '.html';
-        Printer.write(results, 'html', filename);
+        Printer.write(results, 'html', './last-run-results.html');
       }
-      runLighthouse(addresses);
-      return;
+
+      return lighthouseRun(addresses);
     })
     .catch(err => {
       if (err.code === 'ECONNREFUSED') {
-        console.error('Unable to connect to Chrome.');
-        console.error('Please run Chrome w/ debugging port 9222 open:');
-        console.error('    npm explore -g lighthouse -- npm run chrome');
+        showConnectionError();
       } else {
-        console.error('Runtime error encountered:', err);
-        console.error(err.stack);
+        showRuntimeError(err);
       }
-      process.exit(1);
     });
 }
 
+function showConnectionError() {
+  console.error(
+    'Unable to connect to Chrome. Please run Chrome w/ debugging port 9222 open:'
+  );
+  console.error('    npm explore -g lighthouse -- npm run chrome');
+  process.exit(1);
+}
+
+function showRuntimeError(err) {
+  console.error('Runtime error encountered:', err);
+  console.error(err.stack);
+  process.exit(1);
+}
+
 // kick off a lighthouse run
-runLighthouse(urls);
+launchChromeAndRun(urls);
