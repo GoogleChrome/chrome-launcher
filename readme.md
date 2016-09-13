@@ -126,6 +126,23 @@ Options:
   --version  Show version number                                                      [boolean]
 ```
 
+## Lighthouse w/ mobile devices
+
+Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse. 
+
+```sh
+$ adb kill-server
+
+$ adb devices -l
+* daemon not running. starting it now on port 5037 *
+* daemon started successfully *
+00a2fd8b1e631fcb       device usb:335682009X product:bullhead model:Nexus_5X device:bullhead
+
+$ adb forward tcp:9222 localabstract:chrome_devtools_remote
+
+$ lighthouse  https://mysite.com
+```
+
 ## Tests
 
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
