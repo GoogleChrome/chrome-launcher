@@ -140,7 +140,7 @@ $ adb devices -l
 
 $ adb forward tcp:9222 localabstract:chrome_devtools_remote
 
-$ lighthouse  https://mysite.com
+$ lighthouse --mobile false https://mysite.com
 ```
 
 ## Tests
