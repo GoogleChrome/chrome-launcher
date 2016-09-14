@@ -42,9 +42,6 @@ function ask(question, options) {
 }
 
 function toInt(n) {
-  try {
-    return parseInt(n, 10);
-  } catch (e) {
-    return 0;
-  }
+  const result = parseInt(n, 10);
+  return isNaN(result) ? 0 : result;
 }

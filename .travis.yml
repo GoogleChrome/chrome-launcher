@@ -17,7 +17,6 @@ before_script:
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./lighthouse-core/scripts/download-chrome.sh
-  - start-stop-daemon --start --background --exec $(pwd)/lighthouse-core/scripts/launch-chrome.sh
 script:
   - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
   - npm run lint

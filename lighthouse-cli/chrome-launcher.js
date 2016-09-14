@@ -34,7 +34,7 @@ module.exports = class Launcher {
   constructor(opts) {
     opts = opts || {};
     // choose the first one (default)
-    this.head = defaults(opts.head, true);
+    this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
     this.pollInterval = 500;
     this.chrome = null;
     this.prepared = false;
@@ -87,19 +87,13 @@ module.exports = class Launcher {
       .then(() => {
         const installations = chromeFinder[process.platform]();
 
-        switch (true) {
-          case installations.length < 1:
-            return Promise.reject(new Error('No Chrome Installations Found'));
-
-          case installations.length === 1:
-            return installations[0];
-
-          case this.head:
-            return installations[0];
-
-          default:
-            return ask('Choose a Chrome installation to use with Lighthouse', installations);
+        if (installations.length < 1) {
+          return Promise.reject(new Error('No Chrome Installations Found'));
+        } else if (installations.length === 1 || this.autoSelectChrome) {
+          return installations[0];
         }
+
+        return ask('Choose a Chrome installation to use with Lighthouse', installations);
       })
       .then(execPath => this.spawn(execPath));
   }
@@ -121,7 +115,7 @@ module.exports = class Launcher {
       console.log('Chrome running with pid =', chrome.pid);
       resolve(chrome.pid);
     })
-    .then(pid => Promise.all([pid, this.poll(0)]));
+    .then(pid => Promise.all([pid, this.waitUntilReady()]));
   }
 
   cleanup(client) {
@@ -133,7 +127,8 @@ module.exports = class Launcher {
     }
   }
 
-  connect() {
+  // resolves if ready, rejects otherwise
+  isDebuggerReady() {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(9222);
       client.once('error', err => {
@@ -147,7 +142,8 @@ module.exports = class Launcher {
     });
   }
 
-  poll() {
+  // resolves when debugger is ready, rejects after 10 polls
+  waitUntilReady() {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
@@ -160,7 +156,7 @@ module.exports = class Launcher {
         process.stdout.write('.');
 
         launcher
-          .connect()
+          .isDebuggerReady()
           .then(() => {
             process.stdout.write('✓\n');
             resolve();

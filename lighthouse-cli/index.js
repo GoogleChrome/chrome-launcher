@@ -29,7 +29,7 @@ const yargs = require('yargs');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
-const Launcher = require('./chrome-launcher');
+const ChromeLauncher = require('./chrome-launcher');
 
 const cli = yargs
   .help('help')
@@ -96,7 +96,6 @@ Example: --output-path=./lighthouse-results.html`
   .default('mobile', true)
   .default('output', Printer.OUTPUT_MODE.pretty)
   .default('output-path', 'stdout')
-  .default('launch-chrome', true)
   .check(argv => {
     // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
     // or --list-trace-categories. If not, stop the program and ask for a url
@@ -152,23 +151,20 @@ process.on('SIGINT', () => {
   process.exit(130);
 });
 
-function launchChromeAndRun() {
-  const launcher = new Launcher({
-    head: !cli.selectChrome,
+function launchChromeAndRun(addresses) {
+  const launcher = new ChromeLauncher({
+    autoSelectChrome: !cli.selectChrome,
   });
 
   cleanups.push(() => launcher.kill());
 
   return launcher
-    .connect()
+    .isDebuggerReady()
     .catch(() => {
-      if (cli.skipAutolaunch) {
-        showConnectionError();
-      }
       console.log('Launching Chrome...');
       return launcher.run();
     })
-    .then(() => lighthouseRun(urls))
+    .then(() => lighthouseRun(addresses))
     .then(() => launcher.kill());
 }
 
@@ -199,10 +195,11 @@ function lighthouseRun(addresses) {
 }
 
 function showConnectionError() {
+  console.error('Unable to connect to Chrome');
   console.error(
-    'Unable to connect to Chrome. Please run Chrome w/ debugging port 9222 open:'
+    'If you\'re using lighthouse with --skip-autolaunch, ' +
+    'make sure you\'re running some other Chrome with a debugger.'
   );
-  console.error('    npm explore -g lighthouse -- npm run chrome');
   process.exit(1);
 }
 
@@ -212,5 +209,13 @@ function showRuntimeError(err) {
   process.exit(1);
 }
 
+function run() {
+  if (cli.skipAutolaunch) {
+    lighthouseRun(urls);
+  } else {
+    launchChromeAndRun(urls);
+  }
+}
+
 // kick off a lighthouse run
-launchChromeAndRun(urls);
+run();
