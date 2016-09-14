@@ -175,7 +175,8 @@ function lighthouseRun(addresses) {
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
       if (outputMode !== 'html') {
-        Printer.write(results, 'html', './last-run-results.html');
+        const filename = './' + assetSaver.getFilenamePrefix({url: address}) + '.html';
+        Printer.write(results, 'html', filename);
       }
 
       return lighthouseRun(addresses);
