@@ -28,6 +28,7 @@ const path = require('path');
 const yargs = require('yargs');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
+const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 
 const cli = yargs
   .help('help')
@@ -119,7 +120,7 @@ if (cli.listTraceCategories) {
   process.exit(0);
 }
 
-const url = cli._[0];
+const urls = cli._;
 const outputMode = cli.output;
 const outputPath = cli['output-path'];
 const flags = cli;
@@ -139,22 +140,35 @@ if (cli.verbose) {
   flags.logLevel = 'error';
 }
 
-// kick off a lighthouse run
-lighthouse(url, flags, config)
-  .then(results => Printer.write(results, outputMode, outputPath))
-  .then(results => {
-    if (outputMode !== 'html') {
-      Printer.write(results, 'html', './last-run-results.html');
-    }
+function runLighthouse(addresses) {
+  // Process URLs once at a time
+  const address = addresses.shift();
+  if (!address) {
     return;
-  })
-  .catch(err => {
-    if (err.code === 'ECONNREFUSED') {
-      console.error('Unable to connect to Chrome. Please run Chrome w/ debugging port 9222 open:');
-      console.error('    npm explore -g lighthouse -- npm run chrome');
-    } else {
-      console.error('Runtime error encountered:', err);
-      console.error(err.stack);
-    }
-    process.exit(1);
-  });
+  }
+
+  lighthouse(address, flags, config)
+    .then(results => Printer.write(results, outputMode, outputPath))
+    .then(results => {
+      if (outputMode !== 'html') {
+        const filename = './' + assetSaver.getFilenamePrefix({url: address}) + '.html';
+        Printer.write(results, 'html', filename);
+      }
+      runLighthouse(addresses);
+      return;
+    })
+    .catch(err => {
+      if (err.code === 'ECONNREFUSED') {
+        console.error('Unable to connect to Chrome.');
+        console.error('Please run Chrome w/ debugging port 9222 open:');
+        console.error('    npm explore -g lighthouse -- npm run chrome');
+      } else {
+        console.error('Runtime error encountered:', err);
+        console.error(err.stack);
+      }
+      process.exit(1);
+    });
+}
+
+// kick off a lighthouse run
+runLighthouse(urls);
