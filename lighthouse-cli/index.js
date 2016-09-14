@@ -146,10 +146,18 @@ if (cli.verbose) {
   flags.logLevel = 'error';
 }
 
+const cleanups = [];
+process.on('SIGINT', () => {
+  cleanups.forEach(c => c());
+  process.exit(130);
+});
+
 function launchChromeAndRun() {
   const launcher = new Launcher({
     head: !cli.selectChrome,
   });
+
+  cleanups.push(() => launcher.kill());
 
   return launcher
     .connect()

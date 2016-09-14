@@ -28,6 +28,7 @@ const chromeFinder = require('./chrome-finder');
 
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
+const spawnSync = childProcess.spawnSync;
 
 module.exports = class Launcher {
   constructor(opts) {
@@ -35,7 +36,7 @@ module.exports = class Launcher {
     // choose the first one (default)
     this.head = defaults(opts.head, true);
     this.pollInterval = 500;
-    this.chromeInstances = [];
+    this.chrome = null;
     this.prepared = false;
   }
 
@@ -56,9 +57,6 @@ module.exports = class Launcher {
   prepare() {
     switch (process.platform) {
       case 'darwin':
-        this.TMP_PROFILE_DIR = unixTmpDir();
-        break;
-
       case 'linux':
         this.TMP_PROFILE_DIR = unixTmpDir();
         break;
@@ -116,7 +114,7 @@ module.exports = class Launcher {
           stdio: ['ignore', this.outFile, this.errFile]
         }
       );
-      this.chromeInstances.push(chrome);
+      this.chrome = chrome;
 
       fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
@@ -149,37 +147,61 @@ module.exports = class Launcher {
     });
   }
 
-  poll(retries, lastError) {
-    console.log('polling ', retries);
-    if (retries > 10) {
-      return Promise.reject(lastError);
-    }
+  poll() {
+    const launcher = this;
 
-    return this
-      .connect()
-      .catch(err => {
-        return new Promise(resolve => setTimeout(resolve, this.pollInterval))
-          .then(_ => this.poll(retries + 1, err));
-      });
-  }
+    return new Promise((resolve, reject) => {
+      let retries = 0;
+      (function poll() {
+        if (retries === 0) {
+          process.stdout.write('Waiting for debugger to start.');
+        }
+        retries++;
+        process.stdout.write('.');
 
-  kill() {
-    console.log('Killing all Chrome Instances');
-    this.chromeInstances.forEach(chrome => {
-      // chrome.unref();
-      chrome.kill();
-      chrome.on('exit', () => this.destroyTmp());
+        launcher
+          .connect()
+          .then(() => {
+            process.stdout.write('✓\n');
+            resolve();
+          })
+          .catch(err => {
+            if (retries > 10) {
+              process.stdout.write('\n');
+              return reject(err);
+            }
+            delay(launcher.pollInterval).then(poll);
+          });
+      })();
     });
   }
 
+  kill() {
+    if (this.chrome) {
+      console.log('Killing all Chrome Instances');
+      this.chrome.kill();
+      if (process.platform === 'win32') {
+        spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+      }
+    }
+
+    this.destroyTmp();
+  }
+
   destroyTmp() {
-    console.log(`Removing TMPDIR: ${this.TMP_PROFILE_DIR}`);
-    rimraf.sync(this.TMP_PROFILE_DIR);
+    if (this.TMP_PROFILE_DIR) {
+      console.log(`Removing ${this.TMP_PROFILE_DIR}`);
+      rimraf.sync(this.TMP_PROFILE_DIR);
+    }
   }
 };
 
 function defaults(val, def) {
   return typeof val === 'undefined' ? def : val;
+}
+
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function unixTmpDir() {
