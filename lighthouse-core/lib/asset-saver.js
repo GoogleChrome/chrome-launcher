@@ -21,11 +21,15 @@ const log = require('../../lighthouse-core/lib/log.js');
 const stringify = require('json-stringify-safe');
 
 function getFilenamePrefix(options) {
-  const date = options.date || new Date();
   const url = options.url;
-
   const hostname = url.match(/^.*?\/\/(.*?)(:?\/|$)/)[1];
-  const filenamePrefix = hostname + '_' + date.toISOString();
+
+  const date = options.date || new Date();
+  const resolvedLocale = new Intl.DateTimeFormat().resolvedOptions().locale;
+  const time = date.toLocaleTimeString(resolvedLocale, {hour12: false});
+  const timeStampStr = date.toISOString().replace(/T.*/, '_' + time);
+
+  const filenamePrefix = hostname + '_' + timeStampStr;
   // replace characters that are unfriendly to filenames
   return (filenamePrefix).replace(/[\/\?<>\\:\*\|":]/g, '-');
 }
