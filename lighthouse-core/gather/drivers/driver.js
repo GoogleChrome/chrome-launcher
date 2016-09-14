@@ -38,6 +38,7 @@ class Driver {
       'blink.console',
       'blink.user_timing',
       'benchmark',
+      'netlog',
       'devtools.timeline',
       'disabled-by-default-blink.debug.layout',
       'disabled-by-default-devtools.timeline',
