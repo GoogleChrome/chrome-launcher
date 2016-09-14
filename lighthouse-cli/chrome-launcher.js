@@ -71,7 +71,10 @@ module.exports = class Launcher {
 
     this.outFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-out.log`, 'a');
     this.errFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-err.log`, 'a');
-    this.pidFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome.pid`, 'w');
+
+    // fix for Node4
+    // you can't pass a fd to fs.writeFileSync
+    this.pidFile = `${this.TMP_PROFILE_DIR}/chrome.pid`;
 
     console.log(`created ${this.TMP_PROFILE_DIR}`);
 
