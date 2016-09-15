@@ -29,7 +29,7 @@ const path = require('path');
  *   B. GatherRunner.setupDriver()
  *     i. beginEmulation
  *     ii. cleanAndDisableBrowserCaches
- *     iii. forceUpdateServiceWorkers
+ *     iii. clearDataForOrigin
  *
  * 2. For each pass in the config:
  *   A. GatherRunner.beforePass()
@@ -89,8 +89,8 @@ class GatherRunner {
       .then(_ => {
         return driver.cleanAndDisableBrowserCaches();
       }).then(_ => {
-        // Force SWs to update on load.
-        return driver.forceUpdateServiceWorkers();
+        // Clears storage for origin.
+        return driver.clearDataForOrigin(options.url);
       });
   }
 

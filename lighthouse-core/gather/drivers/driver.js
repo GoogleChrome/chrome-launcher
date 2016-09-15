@@ -19,6 +19,7 @@
 const NetworkRecorder = require('../../lib/network-recorder');
 const emulation = require('../../lib/emulation');
 const Element = require('../../lib/element');
+const parseURL = require('url').parse;
 
 const log = require('../../lib/log.js');
 
@@ -421,11 +422,14 @@ class Driver {
     return this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
   }
 
-  forceUpdateServiceWorkers() {
-    // COMPAT: This command will trigger this registrationId error in Chrome 50 (51 undetermined):
-    //   "{"code":-32602,"message":"Missing or invalid 'registrationId' parameter"}"
-    return this.sendCommand('ServiceWorker.setForceUpdateOnPageLoad', {
-      forceUpdateOnPageLoad: true
+  clearDataForOrigin(url) {
+    const parsedURL = parseURL(url);
+    const origin = `${parsedURL.protocol}//${parsedURL.hostname}` +
+      (parsedURL.port ? `:${parsedURL.port}` : '');
+
+    return this.sendCommand('Storage.clearDataForOrigin', {
+      origin,
+      storageTypes: 'all',
     });
   }
 }
