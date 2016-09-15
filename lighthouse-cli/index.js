@@ -29,6 +29,7 @@ const yargs = require('yargs');
 const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
+const ChromeLauncher = require('./chrome-launcher');
 
 const cli = yargs
   .help('help')
@@ -61,7 +62,9 @@ const cli = yargs
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
-    'config-path': 'The path to the config JSON.'
+    'config-path': 'The path to the config JSON.',
+    'skip-autolaunch': 'Skip autolaunch of chrome when accessing port 9222 fails',
+    'select-chrome': 'Choose chrome location to use when multiple installations are found',
   })
 
   .group([
@@ -80,6 +83,8 @@ Example: --output-path=./lighthouse-results.html`
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
+    'skip-autolaunch',
+    'select-chrome',
     'verbose',
     'quiet',
     'help'
@@ -140,35 +145,77 @@ if (cli.verbose) {
   flags.logLevel = 'error';
 }
 
-function runLighthouse(addresses) {
+const cleanups = [];
+process.on('SIGINT', () => {
+  cleanups.forEach(c => c());
+  process.exit(130);
+});
+
+function launchChromeAndRun(addresses) {
+  const launcher = new ChromeLauncher({
+    autoSelectChrome: !cli.selectChrome,
+  });
+
+  cleanups.push(() => launcher.kill());
+
+  return launcher
+    .isDebuggerReady()
+    .catch(() => {
+      console.log('Launching Chrome...');
+      return launcher.run();
+    })
+    .then(() => lighthouseRun(addresses))
+    .then(() => launcher.kill());
+}
+
+function lighthouseRun(addresses) {
   // Process URLs once at a time
   const address = addresses.shift();
   if (!address) {
     return;
   }
 
-  lighthouse(address, flags, config)
+  return lighthouse(address, flags, config)
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
       if (outputMode !== 'html') {
         const filename = './' + assetSaver.getFilenamePrefix({url: address}) + '.html';
         Printer.write(results, 'html', filename);
       }
-      runLighthouse(addresses);
-      return;
+
+      return lighthouseRun(addresses);
     })
     .catch(err => {
       if (err.code === 'ECONNREFUSED') {
-        console.error('Unable to connect to Chrome.');
-        console.error('Please run Chrome w/ debugging port 9222 open:');
-        console.error('    npm explore -g lighthouse -- npm run chrome');
+        showConnectionError();
       } else {
-        console.error('Runtime error encountered:', err);
-        console.error(err.stack);
+        showRuntimeError(err);
       }
-      process.exit(1);
     });
 }
 
+function showConnectionError() {
+  console.error('Unable to connect to Chrome');
+  console.error(
+    'If you\'re using lighthouse with --skip-autolaunch, ' +
+    'make sure you\'re running some other Chrome with a debugger.'
+  );
+  process.exit(1);
+}
+
+function showRuntimeError(err) {
+  console.error('Runtime error encountered:', err);
+  console.error(err.stack);
+  process.exit(1);
+}
+
+function run() {
+  if (cli.skipAutolaunch) {
+    lighthouseRun(urls);
+  } else {
+    launchChromeAndRun(urls);
+  }
+}
+
 // kick off a lighthouse run
-runLighthouse(urls);
+run();
