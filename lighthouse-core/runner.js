@@ -46,6 +46,10 @@ class Runner {
     // canonicalize URL with any trailing slashes neccessary
     opts.url = url.format(parsedURL);
 
+    if (!parsedURL.protocol || !parsedURL.hostname) {
+      const err = new Error('The url provided should have a proper protocol and hostname.');
+      return Promise.reject(err);
+    }
     // If the URL isn't https and is also not localhost complain to the user.
     if (!parsedURL.protocol.includes('https') && parsedURL.hostname !== 'localhost') {
       log.warn('Lighthouse', 'The URL provided should be on HTTPS');

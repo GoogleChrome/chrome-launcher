@@ -82,15 +82,4 @@ describe('Browser Driver', () => {
     assert.notEqual(opts.url, req1.url, 'opts.url changed after the redirects');
     assert.equal(opts.url, req3.url, 'opts.url matches the last redirect');
   });
-
-  it('will clear origin of a page', () => {
-    const pageUrl = 'http://aliexpress.com:80/';
-    const origin = 'http://aliexpress.com:80';
-
-    return driverStub.clearDataForOrigin(pageUrl)
-      .then(data => {
-        assert.equal(data.origin, origin);
-        assert.equal(data.storageTypes, 'all');
-      });
-  });
 });
