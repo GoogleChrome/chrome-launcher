@@ -152,16 +152,19 @@ module.exports = class Launcher {
     return new Promise((resolve, reject) => {
       let retries = 0;
       (function poll() {
+        const green = '\x1B[32m';
+        const reset = '\x1B[0m';
+
         if (retries === 0) {
-          process.stdout.write('Waiting for debugger to start.');
+          process.stdout.write('Waiting for browser.');
         }
         retries++;
-        process.stdout.write('.');
+        process.stdout.write('..');
 
         launcher
           .isDebuggerReady()
           .then(() => {
-            process.stdout.write('✓\n');
+            process.stdout.write(`${green}✓${reset}\n`);
             resolve();
           })
           .catch(err => {
