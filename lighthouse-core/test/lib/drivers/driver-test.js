@@ -32,8 +32,6 @@ driverStub.sendCommand = function(command, params) {
       return Promise.resolve({
         nodeId: params.selector === 'invalid' ? 0 : 231
       });
-    case 'Storage.clearDataForOrigin':
-      return Promise.resolve({origin: 'http://aliexpress.com:80', storageTypes: 'all'});
     default:
       throw Error(`Stub not implemented: ${command}`);
   }
