@@ -31,6 +31,8 @@ const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const ChromeLauncher = require('./chrome-launcher');
 
+const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
+
 const cli = yargs
   .help('help')
   .version(() => require('../package').version)
@@ -54,7 +56,8 @@ const cli = yargs
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
-    'config-path'
+    'config-path',
+    'perf'
   ], 'Configuration:')
   .describe({
     'mobile': 'Emulates a Nexus 5X',
@@ -63,6 +66,7 @@ const cli = yargs
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
     'config-path': 'The path to the config JSON.',
+    'perf': 'Use a performance-test-only configuration',
     'skip-autolaunch': 'Skip autolaunch of chrome when accessing port 9222 fails',
     'select-chrome': 'Choose chrome location to use when multiple installations are found',
   })
@@ -83,6 +87,7 @@ Example: --output-path=./lighthouse-results.html`
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
+    'perf',
     'skip-autolaunch',
     'select-chrome',
     'verbose',
@@ -135,6 +140,8 @@ if (cli.configPath) {
   // Resolve the config file path relative to where cli was called.
   const configPath = path.resolve(process.cwd(), cli.configPath);
   config = require(configPath);
+} else if (cli.perf) {
+  config = perfOnlyConfig;
 }
 
 // set logging preferences
