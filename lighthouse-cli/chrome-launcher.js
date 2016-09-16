@@ -179,15 +179,24 @@ module.exports = class Launcher {
   }
 
   kill() {
-    if (this.chrome) {
-      console.log('Killing all Chrome Instances');
-      this.chrome.kill();
-      if (process.platform === 'win32') {
-        spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
-      }
-    }
+    return new Promise(resolve => {
+      if (this.chrome) {
+        this.chrome.on('close', () => {
+          this.destroyTmp();
+          resolve();
+        });
 
-    this.destroyTmp();
+        console.log('Killing all Chrome Instances');
+        this.chrome.kill();
+
+        if (process.platform === 'win32') {
+          spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+        }
+      } else {
+        // fail silently as we did not start chrome
+        resolve();
+      }
+    });
   }
 
   destroyTmp() {
