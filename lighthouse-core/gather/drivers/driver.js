@@ -23,7 +23,7 @@ const parseURL = require('url').parse;
 
 const log = require('../../lib/log.js');
 
-const LOAD_TIMEOUT = 25000;
+const MAX_WAIT_FOR_LOAD_EVENT = 25 * 1000;
 const PAUSE_AFTER_LOAD = 500;
 
 class Driver {
@@ -266,12 +266,12 @@ class Driver {
         };
         this.once('Page.loadEventFired', loadListener);
 
-        // ...or LOAD_TIMEOUT ms from now in case the page load times out.
+        // ...or MAX_WAIT_FOR_LOAD_EVENT ms from now in case the page load times out.
         loadTimeout = setTimeout(_ => {
-          console.warn('Driver', 'Timed out waiting for page load. Moving on...');
+          log.warn('Driver', 'Timed out waiting for page load. Moving on...');
           this.off('Page.loadEventFired', loadListener);
           resolve();
-        }, LOAD_TIMEOUT);
+        }, MAX_WAIT_FOR_LOAD_EVENT);
       });
     });
   }
