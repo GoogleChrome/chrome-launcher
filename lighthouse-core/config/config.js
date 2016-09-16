@@ -119,7 +119,8 @@ function validatePasses(passes, audits, rootPath) {
       const GathererClass = GatherRunner.getGathererClass(gatherer, rootPath);
       const isGatherRequiredByAudits = requiredGatherers.has(GathererClass.name);
       if (isGatherRequiredByAudits === false) {
-        log.warn('config', `${GathererClass.name} is included, however no audit requires it.`);
+        const msg = `${GathererClass.name} gatherer requested, however no audit requires it.`;
+        log.warn('config', msg);
       }
     });
   });
