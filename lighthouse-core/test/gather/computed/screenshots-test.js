@@ -25,7 +25,7 @@ let screenshotsGather = new ScreenshotsGather();
 
 describe('Screenshot gatherer', () => {
   it('returns an artifact for a real trace', () => {
-    return screenshotsGather.request(pwaTrace).then(screenshots => {
+    return screenshotsGather.request({traceEvents: pwaTrace}).then(screenshots => {
       assert.ok(Array.isArray(screenshots));
       assert.equal(screenshots.length, 7);
 

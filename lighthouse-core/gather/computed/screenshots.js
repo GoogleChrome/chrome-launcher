@@ -33,11 +33,11 @@ class ScreenshotFilmstrip extends ComputedArtifact {
   }
 
   /**
-   * @param {!Array<!Object>} traceData
+   * @param {{traceEvents: !Array}} trace
    * @return {!Promise}
   */
-  getScreenshots(traceData) {
-    const model = new DevtoolsTimelineModel(traceData);
+  getScreenshots(trace) {
+    const model = new DevtoolsTimelineModel(trace.traceEvents);
     const filmStripFrames = model.filmStripModel().frames();
 
     const frameFetches = filmStripFrames.map(frame => this.fetchScreenshot(frame));

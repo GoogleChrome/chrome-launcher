@@ -18,6 +18,7 @@
 'use strict';
 
 const WebInspector = require('../web-inspector');
+const ConsoleQuieter = require('../console-quieter');
 
 // Polyfill the bottom-up and topdown tree sorting.
 const TimelineModelTreeView =
@@ -37,11 +38,21 @@ class TimelineModel {
     this._timelineModel =
         new WebInspector.TimelineModel(WebInspector.TimelineUIUtils.visibleEventsFilter());
 
+    if (typeof events === 'string') {
+      events = JSON.parse(events);
+    }
+    if (events.hasOwnProperty('traceEvents')) {
+      events = events.traceEvents;
+    }
+
     // populate with events
     this._tracingModel.reset();
-    this._tracingModel.addEvents(typeof events === 'string' ? JSON.parse(events) : events);
+
+    ConsoleQuieter.mute({prefix: 'timelineModel'});
+    this._tracingModel.addEvents(events);
     this._tracingModel.tracingComplete();
     this._timelineModel.setEvents(this._tracingModel);
+    ConsoleQuieter.unmuteAndFlush();
 
     return this;
   }

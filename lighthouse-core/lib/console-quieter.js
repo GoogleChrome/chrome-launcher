@@ -1,0 +1,54 @@
+/**
+ * @license
+ * Copyright 2016 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+'use strict';
+
+const log = require('./log.js');
+
+class ConsoleQuieter {
+
+  static mute(opts) {
+    ConsoleQuieter._logs = ConsoleQuieter._logs || [];
+
+    console.log = function() {
+      ConsoleQuieter._logs.push({type: 'log', args: arguments, prefix: opts.prefix});
+    };
+    console.warn = function() {
+      ConsoleQuieter._logs.push({type: 'warn', args: arguments, prefix: opts.prefix});
+    };
+    console.error = function() {
+      ConsoleQuieter._logs.push({type: 'error', args: arguments, prefix: opts.prefix});
+    };
+  }
+
+  static unmuteAndFlush() {
+    console.log = ConsoleQuieter._consolelog;
+    console.warn = ConsoleQuieter._consolewarn;
+    console.error = ConsoleQuieter._consoleerror;
+
+    ConsoleQuieter._logs.forEach(entry => {
+      log.verbose(`${entry.prefix}-${entry.type}`, ...entry.args);
+    });
+    ConsoleQuieter._logs = [];
+  }
+}
+
+ConsoleQuieter._consolelog = console.log.bind(console);
+ConsoleQuieter._consolewarn = console.warn.bind(console);
+ConsoleQuieter._consoleerror = console.error.bind(console);
+
+module.exports = ConsoleQuieter;
