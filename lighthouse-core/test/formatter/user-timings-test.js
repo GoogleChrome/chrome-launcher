@@ -43,9 +43,9 @@ describe('Formatter', () => {
       endTime: 2500,
       duration: 1500
     }]);
-    assert.ok(/Mark/.test(output));
-    assert.ok(/Start Time: 10/.test(output));
-    assert.ok(/Measure/.test(output));
-    assert.ok(/Duration: 1500/.test(output));
+    assert.ok(/mark/.test(output));
+    assert.ok(/start: 10/.test(output));
+    assert.ok(/measure/.test(output));
+    assert.ok(/duration: 1500/.test(output));
   });
 });

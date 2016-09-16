@@ -31,19 +31,16 @@ class UserTimings extends Formatter {
             return '';
           }
 
-          const output = `    - performance.measure events created by the site\n` +
-          events.reduce((prev, event) => {
-            let output = prev + `      - ${event.isMark ? 'Mark' : 'Measure'}: ${event.name}\n` +
-            '        - Start Time: ' + event.startTime.toFixed(2) + 'ms\n';
-            if (!event.isMark) {
-              output += '        - End Time: ' + event.endTime.toFixed(2) + '\n' +
-              '        - Duration: ' + event.duration.toFixed(2) + 'ms\n';
-            }
-
-            return output;
+          const measuresStr = events.filter(e => !e.isMark).reduce((prev, event) => {
+            let output = prev + `    - measure ${event.name}: \t`;
+            output += `duration: ${event.duration.toFixed(1)}ms,\t`;
+            output += `start: ${event.startTime.toFixed(1)}ms,\tend: ${event.endTime.toFixed(1)}`;
+            return output + '\n';
           }, '');
-
-          return output;
+          const marksStr = events.filter(e => e.isMark).reduce((prev, event) => {
+            return prev + `    - mark ${event.name}: \t time: ${event.startTime.toFixed(1)}ms\n`;
+          }, '');
+          return measuresStr + marksStr;
         };
 
       case 'html':
