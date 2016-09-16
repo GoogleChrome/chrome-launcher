@@ -145,18 +145,22 @@ if (cli.verbose) {
   flags.logLevel = 'error';
 }
 
-const cleanups = [];
-process.on('SIGINT', () => {
-  cleanups.forEach(c => c());
-  process.exit(130);
-});
+const cleanup = {
+  fns: [],
+  register(fn) {
+    this.fns.push(fn);
+  },
+  doCleanup() {
+    return Promise.all(this.fns.map(c => c()));
+  }
+};
 
 function launchChromeAndRun(addresses) {
   const launcher = new ChromeLauncher({
     autoSelectChrome: !cli.selectChrome,
   });
 
-  cleanups.push(() => launcher.kill());
+  cleanup.register(() => launcher.kill());
 
   return launcher
     .isDebuggerReady()
@@ -184,13 +188,6 @@ function lighthouseRun(addresses) {
       }
 
       return lighthouseRun(addresses);
-    })
-    .catch(err => {
-      if (err.code === 'ECONNREFUSED') {
-        showConnectionError();
-      } else {
-        showRuntimeError(err);
-      }
     });
 }
 
@@ -209,11 +206,39 @@ function showRuntimeError(err) {
   process.exit(1);
 }
 
+function handleError(err) {
+  if (err.code === 'ECONNREFUSED') {
+    showConnectionError();
+  } else {
+    showRuntimeError(err);
+  }
+}
+
 function run() {
   if (cli.skipAutolaunch) {
-    lighthouseRun(urls);
+    lighthouseRun(urls).catch(handleError);
   } else {
-    launchChromeAndRun(urls);
+    // because you can't cancel a promise yet
+    const SIGINT = Symbol('SIGINT');
+    const isSigint = new Promise((resolve, reject) => {
+      process.on('SIGINT', () => reject(SIGINT));
+    });
+
+    Promise
+      .race([launchChromeAndRun(urls), isSigint])
+      .catch(maybeSigint => {
+        if (maybeSigint === SIGINT) {
+          return cleanup
+            .doCleanup()
+            .then(() => process.exit(130))
+            .catch(err => {
+              console.error(err);
+              console.error(err.stack);
+              process.exit(130);
+            });
+        }
+        return handleError(maybeSigint);
+      });
   }
 }
 
