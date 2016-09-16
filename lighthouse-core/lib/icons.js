@@ -24,9 +24,6 @@ function doExist(manifest) {
   if (!manifest || !manifest.icons) {
     return false;
   }
-  if (!manifest.icons.value) {
-    return false;
-  }
   if (manifest.icons.value.length === 0) {
     return false;
   }
@@ -41,7 +38,7 @@ function doExist(manifest) {
 function sizeAtLeast(sizeRequirement, manifest) {
   // An icon can be provided for a single size, or for multiple sizes.
   // To handle both, we flatten all found sizes into a single array.
-  const iconValues = /** @type {!Array<!ManifestImageNode>} */ (manifest.icons.value);
+  const iconValues = manifest.icons.value;
   const nestedSizes = iconValues.map(icon => icon.value.sizes.value);
   const flattenedSizes = [].concat.apply([], nestedSizes);
 

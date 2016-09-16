@@ -50,13 +50,35 @@ describe('Manifest Parser', function() {
     assert.equal(parsedManifest.value.orientation.value, undefined);
     assert.equal(parsedManifest.value.theme_color.value, undefined);
     assert.equal(parsedManifest.value.background_color.value, undefined);
+    assert.ok(Array.isArray(parsedManifest.value.icons.value));
+    assert.ok(parsedManifest.value.icons.value.length === 0);
     // TODO:
-    // icons
     // related_applications
     // prefer_related_applications
   });
 
   describe('icon parsing', function() {
+    // 9.7
+    it('gives an empty array and an error for erroneous icons entry', () => {
+      let parsedManifest = manifestParser('{"icons": {"16": "img/icons/icon16.png"}}',
+          EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+      assert.ok(!parsedManifest.debugString);
+      const icons = parsedManifest.value.icons;
+      assert.ok(Array.isArray(icons.value));
+      assert.equal(icons.value.length, 0);
+      assert.ok(icons.debugString);
+    });
+
+    it('gives an empty array and no error for missing icons entry', () => {
+      let parsedManifest = manifestParser('{}',
+          EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+      assert.ok(!parsedManifest.debugString);
+      const icons = parsedManifest.value.icons;
+      assert.ok(Array.isArray(icons.value));
+      assert.equal(icons.value.length, 0);
+      assert.ok(!icons.debugString);
+    });
+
     it('parses basic string', function() {
       let parsedManifest = manifestParser('{"icons": [{"src": "192.png", "sizes": "192x192"}]}',
           EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
