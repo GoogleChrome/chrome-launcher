@@ -23,10 +23,12 @@ const parseURL = require('url').parse;
 
 const log = require('../../lib/log.js');
 
+const MAX_WAIT_FOR_LOAD_EVENT = 25 * 1000;
+const PAUSE_AFTER_LOAD = 500;
+
 class Driver {
 
   constructor() {
-    this.PAUSE_AFTER_LOAD = 500;
     this._traceEvents = [];
     this._traceCategories = Driver.traceCategories;
     this._eventEmitter = null;
@@ -252,11 +254,24 @@ class Driver {
           return resolve();
         }
 
-        this.once('Page.loadEventFired', response => {
+        // Resolve PAUSE_AFTER_LOAD milliseconds after onload...
+        let loadTimeout;
+        const loadListener = function() {
           setTimeout(_ => {
-            resolve(response);
-          }, this.PAUSE_AFTER_LOAD);
-        });
+            if (loadTimeout) {
+              clearTimeout(loadTimeout);
+            }
+            resolve();
+          }, PAUSE_AFTER_LOAD);
+        };
+        this.once('Page.loadEventFired', loadListener);
+
+        // ...or MAX_WAIT_FOR_LOAD_EVENT ms from now in case the page load times out.
+        loadTimeout = setTimeout(_ => {
+          log.warn('Driver', 'Timed out waiting for page load. Moving on...');
+          this.off('Page.loadEventFired', loadListener);
+          resolve();
+        }, MAX_WAIT_FOR_LOAD_EVENT);
       });
     });
   }
