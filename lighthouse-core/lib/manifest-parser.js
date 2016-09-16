@@ -233,12 +233,11 @@ function parseIcon(raw, manifestUrl) {
 
 function parseIcons(jsonInput, manifestUrl) {
   const raw = jsonInput.icons;
-  let value;
 
   if (raw === undefined) {
     return {
       raw,
-      value,
+      value: [],
       debugString: undefined
     };
   }
@@ -246,14 +245,14 @@ function parseIcons(jsonInput, manifestUrl) {
   if (!Array.isArray(raw)) {
     return {
       raw,
-      value,
+      value: [],
       debugString: 'ERROR: \'icons\' expected to be an array but is not.'
     };
   }
 
   // TODO(bckenny): spec says to skip icons missing `src`, so debug messages on
   // individual icons are lost. Warn instead?
-  value = raw
+  const value = raw
     // 9.6(3)(1)
     .filter(icon => icon.src !== undefined)
     // 9.6(3)(2)(1)

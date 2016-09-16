@@ -100,7 +100,7 @@ Manifest.prototype.display;
 /** @type {!ManifestNode<(string|undefined)>} */
 Manifest.prototype.orientation;
 
-/** @type {!ManifestNode<(!Array<!ManifestImageNode>|undefined)>} */
+/** @type {!ManifestNode<!Array<!ManifestImageNode>>} */
 Manifest.prototype.icons;
 
 /** @type {!ManifestNode<(!Array<!ManifestApplicationNode>|undefined)>} */
