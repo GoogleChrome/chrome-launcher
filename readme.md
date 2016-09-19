@@ -30,10 +30,6 @@ npm install -g GoogleChrome/lighthouse
 
 ## Run
 ```sh
-# Launch Chrome by reaching into the Lighthouse module
-# and using one of its scripts.
-npm explore -g lighthouse -- npm run chrome
-
 # Kick off a lighthouse run
 lighthouse https://airhorner.com/
 
@@ -114,6 +110,7 @@ Configuration:
   --list-all-audits        Prints a list of all available audits and exits            [boolean]
   --list-trace-categories  Prints a list of all required trace categories and exits   [boolean]
   --config-path            The path to the config JSON.
+  --perf                   Use a performance-test-only configuration                  [boolean]
 
 Output:
   --output       Reporter for the results
@@ -122,8 +119,10 @@ Output:
                  Example: --output-path=./lighthouse-results.html           [default: "stdout"]
 
 Options:
-  --help     Show help                                                                [boolean]
-  --version  Show version number                                                      [boolean]
+  --help             Show help                                                        [boolean]
+  --version          Show version number                                              [boolean]
+  --skip-autolaunch  Skip autolaunch of Chrome when accessing port 9222 fails         [boolean]
+  --select-chrome    Choose Chrome location when multiple installations are found     [boolean]
 ```
 
 ## Lighthouse w/ mobile devices
