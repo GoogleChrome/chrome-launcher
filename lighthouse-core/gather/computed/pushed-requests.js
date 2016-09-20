@@ -25,22 +25,15 @@ class PushedRequests extends ComputedArtifact {
     return 'PushedRequests';
   }
 
-  filterPushed(records) {
+  /**
+   * Return list of network requests that were pushed.
+   * @param {!Array<!WebInspector.NetworkRequest>} records
+   * @return {!Array<!WebInspector.NetworkRequest>}
+   */
+  compute_(records) {
     const pushedRecords = records.filter(r => r._timing && !!r._timing.pushStart);
-    return Promise.resolve(pushedRecords);
+    return pushedRecords;
   }
-
-  request(networkRecords) {
-    if (this.cache.has(networkRecords)) {
-      return this.cache.get(networkRecords);
-    }
-
-    return this.filterPushed(networkRecords).then(records => {
-      this.cache.set(records, networkRecords);
-      return records;
-    });
-  }
-
 }
 
 module.exports = PushedRequests;

@@ -50,7 +50,7 @@ class CriticalRequestChains extends ComputedArtifact {
     return includes(['VeryHigh', 'High', 'Medium'], request.priority());
   }
 
-  getChains(networkRecords) {
+  compute_(networkRecords) {
     // Build a map of requestID -> Node.
     const requestIdToRequests = new Map();
     for (let request of networkRecords) {
@@ -132,20 +132,8 @@ class CriticalRequestChains extends ComputedArtifact {
       };
     }
 
-    return Promise.resolve(criticalRequestChains);
+    return criticalRequestChains;
   }
-
-  request(networkRecords) {
-    if (this.cache.has(networkRecords)) {
-      return this.cache.get(networkRecords);
-    }
-
-    return this.getChains(networkRecords).then(chains => {
-      this.cache.set(chains, networkRecords);
-      return chains;
-    });
-  }
-
 }
 
 module.exports = CriticalRequestChains;

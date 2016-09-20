@@ -344,9 +344,7 @@ class GatherRunner {
       const ArtifactClass = require('./computed/' + file);
       const artifact = new ArtifactClass();
       // define the request* function that will be exposed on `artifacts`
-      computedArtifacts['request' + artifact.name] = function(artifacts) {
-        return Promise.resolve(artifact.request(artifacts));
-      };
+      computedArtifacts['request' + artifact.name] = artifact.request.bind(artifact);
     });
     return computedArtifacts;
   }
