@@ -189,7 +189,7 @@ a {
 
 .menu__header-url {
   opacity: 0.74;
-  font-family: Roboto-Regular;
+  font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
   color: #FFFFFF;
   margin: 0;
