@@ -56,7 +56,7 @@ module.exports = function(url, flags, configJSON) {
     log.setLevel(flags.logLevel);
 
     // Use ConfigParser to generate a valid config file
-    const config = new Config(configJSON, flags.auditWhitelist, flags.configPath);
+    const config = new Config(configJSON, flags.configPath);
 
     const driver = new ChromeProtocol();
 
