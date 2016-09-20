@@ -29,11 +29,7 @@ class Speedline extends ComputedArtifact {
   /**
    * @return {!Promise}
    */
-  request(trace) {
-    if (this.cache.has(trace)) {
-      return this.cache.get(trace);
-    }
-
+  compute_(trace) {
     // speedline() may throw without a promise, so we resolve immediately
     // to get in a promise chain.
     return Promise.resolve().then(_ => {
@@ -41,7 +37,6 @@ class Speedline extends ComputedArtifact {
       return speedline(trace.traceEvents);
     }).then(speedlineResults => {
       ConsoleQuieter.unmuteAndFlush();
-      this.cache.set(trace, speedlineResults);
       return speedlineResults;
     });
   }

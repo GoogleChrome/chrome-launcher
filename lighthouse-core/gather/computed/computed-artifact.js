@@ -22,8 +22,34 @@ class ComputedArtifact {
     this.cache = new Map();
   }
 
-  request() {
-    throw new Error('request() not implemented for computed Artifact' + this.name);
+  /* eslint-disable no-unused-vars */
+
+  /**
+   * Override to implement a computed artifact. Can return a Promise or the
+   * computed artifact itself.
+   * @param {!Object} artifact Input to computation.
+   * @return {!Promise|!Object|!Array}
+   */
+  compute_(artifact) {
+    throw new Error('compute_() not implemented for computed artifact ' + this.name);
+  }
+
+  /* eslint-enable no-unused-vars */
+
+  /**
+   * Request a computed artifact, caching the result on the input artifact.
+   * @param {!OBject} artifact
+   * @return {!Promise}
+   */
+  request(artifact) {
+    if (this.cache.has(artifact)) {
+      return Promise.resolve(this.cache.get(artifact));
+    }
+
+    return Promise.resolve(this.compute_(artifact)).then(computedArtifact => {
+      this.cache.set(artifact, computedArtifact);
+      return computedArtifact;
+    });
   }
 }
 
