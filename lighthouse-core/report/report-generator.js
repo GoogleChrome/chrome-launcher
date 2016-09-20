@@ -22,6 +22,7 @@ const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
+const pkg = require('../../package.json');
 
 class ReportGenerator {
 
@@ -50,6 +51,9 @@ class ReportGenerator {
       const formatter = new Intl.DateTimeFormat('en-US', options);
       return formatter.format(new Date());
     });
+
+    // Lighthouse version at the bottom of the HTML report.
+    Handlebars.registerHelper('version', _ => pkg.version);
 
     // Helper for either saying 'yes' or 'no' for booleans, or simply returning the value if it's
     // of any other type.
