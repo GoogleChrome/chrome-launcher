@@ -16,6 +16,7 @@
  */
 'use strict';
 
+const defaultConfigPath = './default.json';
 const defaultConfig = require('./default.json');
 const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
 
@@ -154,7 +155,7 @@ function getGatherersNeededByAudits(audits) {
   }, new Set());
 }
 
-function requireAudits(audits, rootPath) {
+function requireAudits(audits, configPath) {
   if (!audits) {
     return null;
   }
@@ -162,38 +163,39 @@ function requireAudits(audits, rootPath) {
   const coreList = Runner.getAuditList();
 
   return audits.map(audit => {
-    let AuditClass;
+    let requirePath;
 
-    // Firstly see if the audit is in Lighthouse itself.
+    // First, see if the audit is in Lighthouse itself.
     const coreAudit = coreList.find(a => a === `${audit}.js`);
-    let requirePath = `../audits/${audit}`;
-
-    // If not, see if it can be found another way.
-    if (!coreAudit) {
-      // Firstly try and see if the audit resolves naturally through the usual means.
+    if (coreAudit) {
+      requirePath = `../audits/${audit}`;
+    } else {
+      // If not, see if it can be found another way:
+      // See if the audit resolves relative to the current working directory.
+      const cwdPath = path.resolve(process.cwd(), audit);
       try {
-        require.resolve(audit);
-
-        // If the above works, update the path to the absolute value provided.
-        requirePath = audit;
+        // If resolving this path works, update the path to be used.
+        require.resolve(cwdPath);
+        requirePath = cwdPath;
       } catch (requireError) {
-        // If that fails, try and find it relative to any config path provided.
-        if (rootPath) {
-          requirePath = path.resolve(rootPath, audit);
+        // Also try relative to the config path, if provided.
+        if (!configPath) {
+          throw new Error(`Unable to locate audit: ${audit} (tried at '${cwdPath}')`);
+        }
+
+        const relativePath = path.resolve(configPath, audit);
+        try {
+          // If resolving this path works, update the path to be used.
+          require.resolve(relativePath);
+          requirePath = relativePath;
+        } catch (requireError) {
+          throw new Error(`Unable to locate audit: ${audit} ` +
+              `(tried at '${cwdPath}' and '${relativePath}')`);
         }
       }
     }
 
-    // Now try and require it in. If this fails then the audit file isn't where we expected it.
-    try {
-      AuditClass = require(requirePath);
-    } catch (requireError) {
-      AuditClass = null;
-    }
-
-    if (!AuditClass) {
-      throw new Error(`Unable to locate audit: ${audit} (tried at ${requirePath})`);
-    }
+    const AuditClass = require(requirePath);
 
     // Confirm that the audit appears valid.
     assertValidAudit(audit, AuditClass);
@@ -274,18 +276,22 @@ function expandArtifacts(artifacts) {
   return artifacts;
 }
 
-/**
- * @return {!Config}
- */
 class Config {
   /**
    * @constructor
-   * @param{Object} config
+   * @param {!LighthouseConfig} configJSON
+   * @param {string=} configPath The absolute path to the config file, if there is one.
    */
   constructor(configJSON, configPath) {
     if (!configJSON) {
       configJSON = defaultConfig;
+      configPath = path.resolve(__dirname, defaultConfigPath);
     }
+
+    if (configPath && !path.isAbsolute(configPath)) {
+      throw new Error('configPath must be an absolute path.');
+    }
+
     // We don't want to mutate the original config object
     configJSON = JSON.parse(JSON.stringify(configJSON));
     // Store the directory of the config path, if one was provided.

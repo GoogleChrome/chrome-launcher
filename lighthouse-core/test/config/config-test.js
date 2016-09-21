@@ -159,41 +159,74 @@ describe('Config', () => {
     return assert.equal(typeof config.audits[0], 'function');
   });
 
-  it('throws when it audit is not found', () => {
+  it('throws when an audit is not found', () => {
     return assert.throws(_ => new Config({
       audits: ['/fake-path/non-existent-audit']
+    }), /locate audit/);
+  });
+
+  it('throws on a non-absolute config path', () => {
+    const configPath = '../../config/default.json';
+
+    return assert.throws(_ => new Config({
+      audits: []
+    }, configPath), /absolute path/);
+  });
+
+  it('loads an audit relative to a config path', () => {
+    const configPath = __filename;
+
+    return assert.doesNotThrow(_ => new Config({
+      audits: ['../fixtures/valid-custom-audit']
+    }, configPath));
+  });
+
+  it('loads an audit relative to the working directory', () => {
+    // Construct an audit URL relative to current working directory, regardless
+    // of where test was started from.
+    const absoluteAuditPath = path.resolve(__dirname, '../fixtures/valid-custom-audit');
+    assert.doesNotThrow(_ => require.resolve(absoluteAuditPath));
+    const relativePath = path.relative(process.cwd(), absoluteAuditPath);
+
+    return assert.doesNotThrow(_ => new Config({
+      audits: [relativePath]
     }));
   });
 
-  it('loads an audit relative to a config', () => {
-    return assert.doesNotThrow(_ => new Config({
-      audits: ['../fixtures/valid-custom-audit']
-    }, __filename));
+  it('throws but not for missing audit when audit has a dependency error', () => {
+    return assert.throws(_ => new Config({
+      audits: [path.resolve(__dirname, '../fixtures/invalid-audits/require-error.js')]
+    }), function(err) {
+      // We're expecting not to find parent class Audit, so only reject on our
+      // own custom locate audit error, not the usual MODULE_NOT_FOUND.
+      return !/locate audit/.test(err) && err.code === 'MODULE_NOT_FOUND';
+    });
   });
 
   it('throws when it finds invalid audits', () => {
+    const basePath = path.resolve(__dirname, '../fixtures/invalid-audits');
     assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-audit']
+      audits: [basePath + '/missing-audit']
     }), /audit\(\) method/);
 
     assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-category']
+      audits: [basePath + '/missing-category']
     }), /meta.category property/);
 
     assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-name']
+      audits: [basePath + '/missing-name']
     }), /meta.name property/);
 
     assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-description']
+      audits: [basePath + '/missing-description']
     }), /meta.description property/);
 
     assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-required-artifacts']
+      audits: [basePath + '/missing-required-artifacts']
     }), /meta.requiredArtifacts property/);
 
     return assert.throws(_ => new Config({
-      audits: ['../test/fixtures/invalid-audits/missing-generate-audit-result']
+      audits: [basePath + '/missing-generate-audit-result']
     }), /generateAuditResult\(\) method/);
   });
 
