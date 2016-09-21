@@ -181,6 +181,16 @@ describe('Config', () => {
     }, configPath));
   });
 
+  it('loads an audit from node_modules/', () => {
+    return assert.throws(_ => new Config({
+      // Use a lighthouse dep as a stand in for a module.
+      audits: ['chrome-remote-interface']
+    }), function(err) {
+      // Should throw an audit validation error, but *not* an audit not found error.
+      return !/locate audit/.test(err) && /audit\(\) method/.test(err);
+    });
+  });
+
   it('loads an audit relative to the working directory', () => {
     // Construct an audit URL relative to current working directory, regardless
     // of where test was started from.

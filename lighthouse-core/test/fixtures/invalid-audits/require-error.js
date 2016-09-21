@@ -19,12 +19,12 @@
 // NOTE: this require path does not resolve correctly.
 const LighthouseAudit = require('../terrible/path/come/on/audit');
 
-class ValidCustomAudit extends LighthouseAudit {
+class RequireErrorAudit extends LighthouseAudit {
   static get meta() {
     return {
-      name: 'valid-audit',
+      name: 'require-error',
       category: 'Custom',
-      description: 'Valid Audit',
+      description: 'Require Error',
       requiredArtifacts: ['HTML']
     };
   }
@@ -32,4 +32,4 @@ class ValidCustomAudit extends LighthouseAudit {
   static audit() {}
 }
 
-module.exports = ValidCustomAudit;
+module.exports = RequireErrorAudit;
