@@ -17,19 +17,19 @@ function killBGprocesses() {
 $NODE lighthouse-cli --quiet http://localhost:10200/online-only.html > results
 
 # test that we have results
-if ! grep -q "$offline200result" results; then
+if ! grep --quiet --fixed-strings "$offline200result" results; then
   echo "Fail! Lighthouse run didn't create a result file"
   killBGprocesses; exit 1
 fi
 
 # test that we have a meta viewport defined on a static page
-if ! grep -q "HTML has a viewport <meta>: true" results; then
-  echo "Fail! Meta viewort not detected in the page"
+if ! grep --quiet --fixed-strings "✓[0m HTML has a viewport" results; then
+  echo "Fail! Meta viewport not detected in the page"
   killBGprocesses; exit 1
 fi
 
 # test a static page which should fail the offline test
-if ! grep -q "$offline200result: false" results; then
+if ! grep --quiet --fixed-strings "✘[0m $offline200result" results; then
   echo "Fail! online only site worked while offline"
   cat results
   killBGprocesses; exit 1
@@ -40,7 +40,7 @@ sleep 0.5s
 # run minimal lighthouse run against a basic offline-sw page
 $NODE lighthouse-cli --config-path=$config --quiet http://localhost:10503/offline-ready.html > results
 
-if ! grep -q "$offline200result: true" results; then
+if ! grep --quiet --fixed-strings "✓[0m $offline200result" results; then
   echo "Fail! offline ready site did not work while offline"
   cat results
   killBGprocesses; exit 1

@@ -64,6 +64,32 @@ function checkOutputPath(path) {
   return path;
 }
 
+function formatScore(score, suffix) {
+  suffix = suffix || '';
+  const green = '\x1B[32m';
+  const red = '\x1B[31m';
+  const yellow = '\x1b[33m';
+  const purple = '\x1b[95m';
+  const reset = '\x1B[0m';
+
+  if (typeof score === 'boolean') {
+    const check = `${green}✓${reset}`;
+    const fail = `${red}✘${reset}`;
+    return score ? check : fail;
+  }
+  if (typeof score !== 'number') {
+    return `${purple}${score}${reset}`;
+  }
+  let colorChoice = red;
+  if (score > 45) {
+    colorChoice = yellow;
+  }
+  if (score > 75) {
+    colorChoice = green;
+  }
+  return `${colorChoice}${score}${suffix}${reset}`;
+}
+
 /**
  * Creates the results output in a format based on the `mode`.
  *
@@ -85,26 +111,32 @@ function createOutput(results, outputMode) {
   }
 
   // Pretty printed.
-  let output = `Lighthouse results: ${results.url}\n\n`;
+  const bold = '\x1b[1m';
+  const reset = '\x1B[0m';
+  let output = `\n\n${bold}Lighthouse results:${reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
-    output += `Name: ${aggregation.name}\n`;
-    output += `Description: ${aggregation.description}\n\n`;
+    output += `▫ ${bold}${aggregation.name}${reset}\n\n`;
 
     aggregation.score.forEach(item => {
       let score = (item.overall * 100).toFixed(0);
 
       if (item.name) {
-        output += `${item.name}: ${score}%\n`;
+        output += `${bold}${item.name}${reset}: ${formatScore(Number(score), '%')}\n`;
       }
 
       item.subItems.forEach(subitem => {
         // Get audit object from inside of results.audits under name subitem.
         // Coming soon events are not located inside of results.audits.
         subitem = results.audits[subitem] || subitem;
-        let lineItem = ` -- ${subitem.description}: ${subitem.score}`;
+
+        if (subitem.comingSoon) {
+          return;
+        }
+
+        let lineItem = ` ── ${formatScore(subitem.score)} ${subitem.description}`;
         if (subitem.displayValue) {
-          lineItem += ` (${subitem.displayValue})`;
+          lineItem += ` (${bold}${subitem.displayValue}${reset})`;
         }
         output += `${lineItem}\n`;
         if (subitem.debugString) {
