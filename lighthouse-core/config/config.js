@@ -16,6 +16,7 @@
  */
 'use strict';
 
+const defaultConfigPath = './default.json';
 const defaultConfig = require('./default.json');
 const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
 
@@ -154,7 +155,52 @@ function getGatherersNeededByAudits(audits) {
   }, new Set());
 }
 
-function requireAudits(audits, rootPath) {
+/**
+ * Resolves the location of the specified audit and returns a string path that
+ * can then be loaded via `require()`. Throws an error if no audit is found.
+ * @param {string} audit
+ * @param {string=} configPath The absolute path to the config file, if there is one.
+ * @return {string}
+ * @throws {Error}
+ */
+function resolveAudit(audit, configPath) {
+  // First try straight `require()`. Unlikely to be specified relative to this
+  // file, but adds support for Lighthouse audits in npm modules as `require()`
+  // walks up parent directories looking inside any node_modules/ present. Also
+  // handles absolute paths.
+  try {
+    require.resolve(audit);
+    return audit;
+  } catch (e) {}
+
+  // See if the audit resolves relative to the current working directory. Most
+  // useful to handle the case of invoking Lighthouse as a module, since then
+  // the config is an object and so has no path.
+  const cwdPath = path.resolve(process.cwd(), audit);
+  try {
+    require.resolve(cwdPath);
+    return cwdPath;
+  } catch (e) {}
+
+  const errorString = `Unable to locate audit: ${audit} (tried to require() ` +
+      `from '${__dirname}' and load from '${cwdPath}'`;
+  if (!configPath) {
+    throw new Error(errorString + ')');
+  }
+
+  // Finally, try looking up relative to the config file path. Just like the
+  // relative path passed to `require()` is found relative to the file it's in,
+  // this allows audit paths to be specified relative to the config file.
+  const relativePath = path.resolve(configPath, audit);
+  try {
+    require.resolve(relativePath);
+    return relativePath;
+  } catch (requireError) {}
+
+  throw new Error(errorString + ` and '${relativePath}')`);
+}
+
+function requireAudits(audits, configPath) {
   if (!audits) {
     return null;
   }
@@ -162,38 +208,18 @@ function requireAudits(audits, rootPath) {
   const coreList = Runner.getAuditList();
 
   return audits.map(audit => {
-    let AuditClass;
+    let requirePath;
 
-    // Firstly see if the audit is in Lighthouse itself.
+    // First, see if the audit is a Lighthouse core audit.
     const coreAudit = coreList.find(a => a === `${audit}.js`);
-    let requirePath = `../audits/${audit}`;
-
-    // If not, see if it can be found another way.
-    if (!coreAudit) {
-      // Firstly try and see if the audit resolves naturally through the usual means.
-      try {
-        require.resolve(audit);
-
-        // If the above works, update the path to the absolute value provided.
-        requirePath = audit;
-      } catch (requireError) {
-        // If that fails, try and find it relative to any config path provided.
-        if (rootPath) {
-          requirePath = path.resolve(rootPath, audit);
-        }
-      }
+    if (coreAudit) {
+      requirePath = `../audits/${audit}`;
+    } else {
+      // Otherwise, attempt to find it elsewhere.
+      requirePath = resolveAudit(audit, configPath);
     }
 
-    // Now try and require it in. If this fails then the audit file isn't where we expected it.
-    try {
-      AuditClass = require(requirePath);
-    } catch (requireError) {
-      AuditClass = null;
-    }
-
-    if (!AuditClass) {
-      throw new Error(`Unable to locate audit: ${audit} (tried at ${requirePath})`);
-    }
+    const AuditClass = require(requirePath);
 
     // Confirm that the audit appears valid.
     assertValidAudit(audit, AuditClass);
@@ -274,18 +300,22 @@ function expandArtifacts(artifacts) {
   return artifacts;
 }
 
-/**
- * @return {!Config}
- */
 class Config {
   /**
    * @constructor
-   * @param{Object} config
+   * @param {!LighthouseConfig} configJSON
+   * @param {string=} configPath The absolute path to the config file, if there is one.
    */
   constructor(configJSON, configPath) {
     if (!configJSON) {
       configJSON = defaultConfig;
+      configPath = path.resolve(__dirname, defaultConfigPath);
     }
+
+    if (configPath && !path.isAbsolute(configPath)) {
+      throw new Error('configPath must be an absolute path.');
+    }
+
     // We don't want to mutate the original config object
     configJSON = JSON.parse(JSON.stringify(configJSON));
     // Store the directory of the config path, if one was provided.

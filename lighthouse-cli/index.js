@@ -138,8 +138,8 @@ const flags = cli;
 let config = null;
 if (cli.configPath) {
   // Resolve the config file path relative to where cli was called.
-  const configPath = path.resolve(process.cwd(), cli.configPath);
-  config = require(configPath);
+  cli.configPath = path.resolve(process.cwd(), cli.configPath);
+  config = require(cli.configPath);
 } else if (cli.perf) {
   config = perfOnlyConfig;
 }
