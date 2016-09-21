@@ -130,19 +130,23 @@ class ExtensionDriver extends Driver {
   }
 
   queryCurrentTab_() {
-    const currentTab = {
-      active: true,
-      windowId: chrome.windows.WINDOW_ID_CURRENT
-    };
-
     return new Promise((resolve, reject) => {
-      chrome.tabs.query(currentTab, tabs => {
+      const queryOpts = {
+        active: true,
+        lastFocusedWindow: true,
+        windowType: 'normal'
+      };
+
+      chrome.tabs.query(queryOpts, (tabs => {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
-
+        if (tabs.length === 0) {
+          const message = 'Couldn\'t resolve current tab. Please file a bug.';
+          return reject(new Error(message));
+        }
         resolve(tabs[0]);
-      });
+      }));
     });
   }
 
