@@ -273,42 +273,19 @@ class GatherRunner {
       });
   }
 
-  static getGathererClass(gatherer, rootPath) {
+  static getGathererClass(gatherer, configPath) {
     const Runner = require('../runner');
     const coreList = Runner.getGathererList();
 
-    let GathererClass;
-
-    // First see if it is a core gatherer in Lighthouse itself.
+    // First, see if the gatherer is a Lighthouse core gatherer.
     const coreGatherer = coreList.find(a => a === `${gatherer}.js`);
     let requirePath = `./gatherers/${gatherer}`;
-
-    // If not, see if it can be found another way.
     if (!coreGatherer) {
-      // Firstly try and see if the gatherer resolves naturally through the usual means.
-      try {
-        require.resolve(gatherer);
-
-        // If the above works, update the path to the absolute value provided.
-        requirePath = gatherer;
-      } catch (requireError) {
-        // If that fails, try and find it relative to any config path provided.
-        if (rootPath) {
-          requirePath = path.resolve(rootPath, gatherer);
-        }
-      }
+      // Otherwise, attempt to find it elsewhere. This throws if not found.
+      requirePath = Runner.resolvePlugin(gatherer, configPath, 'gatherer');
     }
 
-    // Now try and require it in. If this fails then the audit file isn't where we expected it.
-    try {
-      GathererClass = require(requirePath);
-    } catch (requireError) {
-      GathererClass = null;
-    }
-
-    if (!GathererClass) {
-      throw new Error(`Unable to locate gatherer: ${gatherer} (tried at: ${requirePath})`);
-    }
+    const GathererClass = require(requirePath);
 
     // Confirm that the gatherer appears valid.
     this.assertValidGatherer(gatherer, GathererClass);

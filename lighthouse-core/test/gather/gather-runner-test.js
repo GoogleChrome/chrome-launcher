@@ -313,6 +313,49 @@ describe('GatherRunner', function() {
     return assert.doesNotThrow(_ => GatherRunner.getGathererClass('valid-custom-gatherer', root));
   });
 
+  it('throws when a gatherer is not found', () => {
+    return assert.throws(_ => GatherRunner.getGathererClass(
+        '/fake-path/non-existent-gatherer'), /locate gatherer/);
+  });
+
+  it('loads a gatherer relative to a config path', () => {
+    const configPath = __dirname;
+
+    return assert.doesNotThrow(_ =>
+        GatherRunner.getGathererClass('../fixtures/valid-custom-gatherer', configPath));
+  });
+
+  it('loads a gatherer from node_modules/', () => {
+    return assert.throws(_ => GatherRunner.getGathererClass(
+        // Use a lighthouse dep as a stand in for a module.
+        'chrome-remote-interface'
+    ), function(err) {
+      // Should throw a gatherer validation error, but *not* a gatherer not found error.
+      return !/locate gatherer/.test(err) && /beforePass\(\) method/.test(err);
+    });
+  });
+
+  it('loads a gatherer relative to the working directory', () => {
+    // Construct a gatherer URL relative to current working directory,
+    // regardless of where test was started from.
+    const absoluteGathererPath = path.resolve(__dirname, '../fixtures/valid-custom-gatherer');
+    assert.doesNotThrow(_ => require.resolve(absoluteGathererPath));
+    const relativeGathererPath = path.relative(process.cwd(), absoluteGathererPath);
+
+    return assert.doesNotThrow(_ =>
+        GatherRunner.getGathererClass(relativeGathererPath));
+  });
+
+  it('throws but not for missing gatherer when it has a dependency error', () => {
+    const gathererPath = path.resolve(__dirname, '../fixtures/invalid-gatherers/require-error.js');
+    return assert.throws(_ => GatherRunner.getGathererClass(gathererPath),
+        function(err) {
+          // We're expecting not to find parent class Gatherer, so only reject on
+          // our own custom locate gatherer error, not the usual MODULE_NOT_FOUND.
+          return !/locate gatherer/.test(err) && err.code === 'MODULE_NOT_FOUND';
+        });
+  });
+
   it('throws for invalid gatherers', () => {
     const root = path.resolve(__dirname, '../fixtures/invalid-gatherers');
 

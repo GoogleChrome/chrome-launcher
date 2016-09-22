@@ -155,51 +155,6 @@ function getGatherersNeededByAudits(audits) {
   }, new Set());
 }
 
-/**
- * Resolves the location of the specified audit and returns a string path that
- * can then be loaded via `require()`. Throws an error if no audit is found.
- * @param {string} audit
- * @param {string=} configPath The absolute path to the config file, if there is one.
- * @return {string}
- * @throws {Error}
- */
-function resolveAudit(audit, configPath) {
-  // First try straight `require()`. Unlikely to be specified relative to this
-  // file, but adds support for Lighthouse audits in npm modules as `require()`
-  // walks up parent directories looking inside any node_modules/ present. Also
-  // handles absolute paths.
-  try {
-    require.resolve(audit);
-    return audit;
-  } catch (e) {}
-
-  // See if the audit resolves relative to the current working directory. Most
-  // useful to handle the case of invoking Lighthouse as a module, since then
-  // the config is an object and so has no path.
-  const cwdPath = path.resolve(process.cwd(), audit);
-  try {
-    require.resolve(cwdPath);
-    return cwdPath;
-  } catch (e) {}
-
-  const errorString = `Unable to locate audit: ${audit} (tried to require() ` +
-      `from '${__dirname}' and load from '${cwdPath}'`;
-  if (!configPath) {
-    throw new Error(errorString + ')');
-  }
-
-  // Finally, try looking up relative to the config file path. Just like the
-  // relative path passed to `require()` is found relative to the file it's in,
-  // this allows audit paths to be specified relative to the config file.
-  const relativePath = path.resolve(configPath, audit);
-  try {
-    require.resolve(relativePath);
-    return relativePath;
-  } catch (requireError) {}
-
-  throw new Error(errorString + ` and '${relativePath}')`);
-}
-
 function requireAudits(audits, configPath) {
   if (!audits) {
     return null;
@@ -208,15 +163,12 @@ function requireAudits(audits, configPath) {
   const coreList = Runner.getAuditList();
 
   return audits.map(audit => {
-    let requirePath;
-
     // First, see if the audit is a Lighthouse core audit.
     const coreAudit = coreList.find(a => a === `${audit}.js`);
-    if (coreAudit) {
-      requirePath = `../audits/${audit}`;
-    } else {
-      // Otherwise, attempt to find it elsewhere.
-      requirePath = resolveAudit(audit, configPath);
+    let requirePath = `../audits/${audit}`;
+    if (!coreAudit) {
+      // Otherwise, attempt to find it elsewhere. This throws if not found.
+      requirePath = Runner.resolvePlugin(audit, configPath, 'audit');
     }
 
     const AuditClass = require(requirePath);
