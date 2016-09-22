@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
 const Audit = require('../../audits/viewport.js');
 const assert = require('assert');
 

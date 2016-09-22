@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
 const Aggregate = require('../../aggregator/aggregate');
 const assert = require('assert');
 
@@ -405,8 +407,6 @@ describe('Aggregate', () => {
   });
 
   it('aggregates', () => {
-    'use strict';
-
     // Make a fake aggregation and test it.
     const aggregation = {
       name: 'name',

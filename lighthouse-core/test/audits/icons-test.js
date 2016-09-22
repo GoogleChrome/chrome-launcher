@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
 const Audit144 = require('../../audits/manifest-icons-min-144.js');
 const Audit192 = require('../../audits/manifest-icons-min-192.js');

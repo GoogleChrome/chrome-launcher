@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
+
 const ReportGenerator = require('../../report/report-generator.js');
 const sampleResults = require('../results/sample.json');
 const assert = require('assert');
