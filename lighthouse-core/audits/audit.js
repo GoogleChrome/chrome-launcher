@@ -62,7 +62,8 @@ class Audit {
       extendedInfo: result.extendedInfo,
       name: this.meta.name,
       category: this.meta.category,
-      description: this.meta.description
+      description: this.meta.description,
+      helpText: this.meta.helpText
     };
   }
 }

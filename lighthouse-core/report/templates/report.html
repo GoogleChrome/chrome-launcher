@@ -114,8 +114,15 @@ limitations under the License.
                     {{#if subItem.displayValue }}
                     <span class="report-section__item-raw-value">({{ subItem.displayValue }})&nbsp;</span>
                     {{/if }}
-                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.score }}">{{ getItemValue subItem.score }}</span>
+                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.score }}">{{{ getItemValue subItem.score }}}</span>
                   </div>
+
+                  {{#if subItem.helpText }}
+                    <div class="report-section__item-helptext">
+                      {{{ subItem.helpText }}}
+                    </div>
+                  {{/if}}
+
                   {{#if subItem.extendedInfo.value}}
                     <div class="report-section__item-extended-info">
                     {{> (lookup . 'name') subItem.extendedInfo.value }}
@@ -150,8 +157,9 @@ limitations under the License.
                       {{#if subItem.rawValue }}
                       <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
                       {{/if }}
-                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{ getItemValue subItem.value }}</span>
+                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{{ getItemValue subItem.value }}}</span>
                     </div>
+
                     {{#if subItem.extendedInfo.value}}
                       <div class="report-section__item-extended-info">
                       {{> (lookup . 'name') subItem.extendedInfo.value }}

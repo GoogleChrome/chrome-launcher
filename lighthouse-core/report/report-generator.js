@@ -55,11 +55,11 @@ class ReportGenerator {
     // Lighthouse version at the bottom of the HTML report.
     Handlebars.registerHelper('version', _ => pkg.version);
 
-    // Helper for either saying 'yes' or 'no' for booleans, or simply returning the value if it's
-    // of any other type.
+    // Helper for either show an "✘" or "✔" booleans, or simply returning the
+    // value if it's of any other type.
     Handlebars.registerHelper('getItemValue', value => {
       if (typeof value === 'boolean') {
-        return value ? 'Yes' : 'No';
+        return value ? '&#10004;' : '&#10008;';
       }
 
       return value;

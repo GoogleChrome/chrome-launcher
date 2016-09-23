@@ -321,7 +321,7 @@ a {
   font-weight: 500;
   color: #719EA8;
   display: flex;
-  margin: 24px 0 6px 0;
+  margin: 24px 0 16px 0;
 }
 
 .report-section__description {
@@ -369,7 +369,15 @@ a {
   font-size: 15px;
   color: #555;
   font-style: italic;
-  padding: 6px 6px 20px 6px;
+  padding: 8px 0px 16px 24px;
+  max-width: 90%;
+}
+.report-section__item-helptext {
+  font-size: 14px;
+  color: #999;
+  font-style: italic;
+  padding: 8px 0px 16px 24px;
+  max-width: 90%;
 }
 
 .report-section__item-raw-value {

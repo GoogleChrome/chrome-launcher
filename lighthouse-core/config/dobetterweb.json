@@ -15,19 +15,17 @@
 
   "aggregations": [{
     "name": "Do Better Web",
-    "description": "Here are some recommendations to modernize your web app.",
+    "description": "We've compiled some recommendations for modernizing your web app.",
     "scored": false,
     "categorizable": true,
     "items": [{
       "name": "Using modern offline features",
       "criteria": {
         "appcache-manifest": {
-          "rawValue": false,
-          "description": "Application Cache is <a href='https://html.spec.whatwg.org/multipage/browsers.html#offline' target='_blank'>deprecated</a> by <a href='https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers' target='_blank'>Service Workers</a>. Consider implementing an offline solution using the <a href='https://developer.mozilla.org/en-US/docs/Web/API/Cache' target='blank'>Cache Storage API</a>."
+          "rawValue": false
         },
         "no-websql": {
-          "rawValue": false,
-          "description": "WebSQL DB is <a href='https://dev.w3.org/html5/webdatabase/' target='_blank'>deprecated</a>. Consider implementing an offline solution using <a href='https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB' target='blank'>IndexedDB</a>."
+          "rawValue": false
         }
       }
     }]
