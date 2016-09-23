@@ -16,7 +16,7 @@
     "coverage": "node $__node_harmony $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*-test.js') --timeout 10000 --reporter progress",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
     "start": "node ./lighthouse-cli/index.js",
-    "test": "npm run lint --silent && npm run unit && npm run closure",
+    "test": "npm run lint --silent && npm run unit",
     "cli-unit": "lighthouse-core/scripts/run-mocha.sh --cli",
     "unit": "lighthouse-core/scripts/run-mocha.sh --default",
     "closure": "cd lighthouse-core && closure/closure-type-checking.js",
