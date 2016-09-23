@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
+/**
+ * @fileoverview Audit a page to ensure that it does not open a database using
+ * the WebSQL API.
+ */
+
 'use strict';
 
 const Audit = require('../audit');
 
-class AppCacheManifestAttr extends Audit {
+class NoWebSQLAudit extends Audit {
 
   /**
    * @return {!AuditMeta}
@@ -27,9 +32,9 @@ class AppCacheManifestAttr extends Audit {
   static get meta() {
     return {
       category: 'Offline',
-      name: 'appcache-manifest',
-      description: 'Site is not using Application Cache',
-      requiredArtifacts: ['AppCacheManifest']
+      name: 'no-websql',
+      description: 'Site is not using WebSQL DB.',
+      requiredArtifacts: ['WebSQL']
     };
   }
 
@@ -38,22 +43,24 @@ class AppCacheManifestAttr extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.AppCacheManifest === 'undefined' ||
-        artifacts.AppCacheManifest === -1) {
-      return AppCacheManifestAttr.generateAuditResult({
-        rawValue: false,
-        debugString: 'Unable to determine if you\'re using AppCache.'
+    if (typeof artifacts.WebSQL === 'undefined' ||
+        artifacts.WebSQL.database === -1) {
+      return NoWebSQLAudit.generateAuditResult({
+        rawValue: -1,
+        debugString: (artifacts.WebSQL ?
+            artifacts.WebSQL.debugString : 'WebSQL gatherer did not run')
       });
     }
 
-    const usingAppcache = artifacts.AppCacheManifest !== null;
-    const displayValue = usingAppcache ? `<html manifest="${artifacts.AppCacheManifest}">` : '';
+    const db = artifacts.WebSQL.database;
+    const displayValue = (db && db.database ?
+        `db name: ${db.database.name}, version: ${db.database.version}` : '');
 
-    return AppCacheManifestAttr.generateAuditResult({
-      rawValue: !usingAppcache,
+    return NoWebSQLAudit.generateAuditResult({
+      rawValue: !db,
       displayValue: displayValue
     });
   }
 }
 
-module.exports = AppCacheManifestAttr;
+module.exports = NoWebSQLAudit;

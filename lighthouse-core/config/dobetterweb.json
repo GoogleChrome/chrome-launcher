@@ -3,12 +3,14 @@
     "network": false,
     "loadPage": true,
     "gatherers": [
-      "../gather/gatherers/dobetterweb/appcache"
+      "../gather/gatherers/dobetterweb/appcache",
+      "../gather/gatherers/dobetterweb/websql"
     ]
   }],
 
   "audits": [
-    "../audits/dobetterweb/appcache-manifest"
+    "../audits/dobetterweb/appcache-manifest",
+    "../audits/dobetterweb/no-websql"
   ],
 
   "aggregations": [{
@@ -17,11 +19,15 @@
     "scored": false,
     "categorizable": true,
     "items": [{
-      "name": "Using modern offline web platform features",
-      "description": "Application Cache is <a href='https://html.spec.whatwg.org/multipage/browsers.html#offline' target='_blank'>deprecated</a> by <a href='https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers' target='_blank'>Service Workers</a>. Consider implementing an offline solution using the <a href='https://developer.mozilla.org/en-US/docs/Web/API/Cache' target='blank'>Cache Storage API</a>.",
+      "name": "Using modern offline features",
       "criteria": {
         "appcache-manifest": {
-          "rawValue": false
+          "rawValue": false,
+          "description": "Application Cache is <a href='https://html.spec.whatwg.org/multipage/browsers.html#offline' target='_blank'>deprecated</a> by <a href='https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers' target='_blank'>Service Workers</a>. Consider implementing an offline solution using the <a href='https://developer.mozilla.org/en-US/docs/Web/API/Cache' target='blank'>Cache Storage API</a>."
+        },
+        "no-websql": {
+          "rawValue": false,
+          "description": "WebSQL DB is <a href='https://dev.w3.org/html5/webdatabase/' target='_blank'>deprecated</a>. Consider implementing an offline solution using <a href='https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB' target='blank'>IndexedDB</a>."
         }
       }
     }]
