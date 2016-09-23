@@ -78,7 +78,8 @@ class GatherRunner {
       // Navigate.
       .then(_ => driver.gotoURL(options.url, {
         waitForLoad: true,
-        disableJavaScript: !!options.disableJavaScript
+        disableJavaScript: !!options.disableJavaScript,
+        flags: options.flags,
       }));
   }
 

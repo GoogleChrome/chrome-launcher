@@ -241,8 +241,9 @@ class Driver {
    * @return {!Promise}
    */
   gotoURL(url, options) {
-    const waitForLoad = (options && options.waitForLoad) || false;
-    const disableJavaScript = (options && options.disableJavaScript) || false;
+    const _options = options || {};
+    const waitForLoad = (_options.waitForLoad) || false;
+    const disableJavaScript = (_options.disableJavaScript) || false;
     return this.sendCommand('Page.enable')
     .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJavaScript}))
     .then(_ => this.sendCommand('Page.navigate', {url}))
@@ -262,7 +263,7 @@ class Driver {
               clearTimeout(loadTimeout);
             }
             resolve();
-          }, PAUSE_AFTER_LOAD);
+          }, (_options.flags || {}).pauseAfterLoad || PAUSE_AFTER_LOAD);
         };
         this.once('Page.loadEventFired', loadListener);
 
