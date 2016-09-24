@@ -281,8 +281,6 @@ class Driver {
     .then(_ => this.sendCommand('Page.navigate', {url}))
     .then(_ => {
       return new Promise((resolve, reject) => {
-        this.url = url;
-
         if (!waitForLoad) {
           return resolve();
         }

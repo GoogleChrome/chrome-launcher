@@ -89,7 +89,6 @@ class CriDriver extends Driver {
       this._tab = null;
       this._cri = null;
       this._eventEmitter = null;
-      this.url = null;
     });
   }
 
