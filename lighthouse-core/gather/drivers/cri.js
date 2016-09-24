@@ -101,7 +101,7 @@ class CriDriver extends Driver {
    */
   sendCommand(command, params) {
     if (this._cri === null) {
-      throw new Error('connect() must be called before attempting to send a command.');
+      return Promise.reject('connect() must be called before attempting to send a command.');
     }
 
     return new Promise((resolve, reject) => {
