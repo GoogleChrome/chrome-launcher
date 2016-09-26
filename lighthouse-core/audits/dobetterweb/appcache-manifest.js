@@ -15,6 +15,10 @@
  * limitations under the License.
  */
 
+/**
+ * @fileoverview Audit a page to ensure it is not using the Application Cache API.
+ */
+
 'use strict';
 
 const Audit = require('../audit');

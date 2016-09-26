@@ -28,6 +28,6 @@ describe('URL gatherer', () => {
       url: url
     });
 
-    return assert.equal(urlGather.artifact, url);
+    return assert.equal(urlGather.artifact.finalUrl, url);
   });
 });

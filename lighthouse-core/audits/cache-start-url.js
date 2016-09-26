@@ -48,7 +48,8 @@ class CacheStartUrl extends Audit {
       });
     }
 
-    if (!(Array.isArray(cacheContents) && artifacts.URL)) {
+    if (!(Array.isArray(cacheContents) && artifacts.URL &&
+          artifacts.URL.finalUrl)) {
       return CacheStartUrl.generateAuditResult({
         rawValue: false,
         debugString: 'No cache or URL detected'

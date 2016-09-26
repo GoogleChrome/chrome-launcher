@@ -66,9 +66,10 @@ class ServiceWorker extends Audit {
       });
     }
 
-    // Find active service worker for this URL. Match against artifacts.URL so
-    // audit accounts for any redirects.
-    const version = getActivatedServiceWorker(artifacts.ServiceWorker.versions, artifacts.URL);
+    // Find active service worker for this URL. Match against
+    // artifacts.URL.finalUrl so audit accounts for any redirects.
+    const version = getActivatedServiceWorker(
+        artifacts.ServiceWorker.versions, artifacts.URL.finalUrl);
     const debugString = version ? undefined : 'No active service worker found for this origin.';
 
     return ServiceWorker.generateAuditResult({

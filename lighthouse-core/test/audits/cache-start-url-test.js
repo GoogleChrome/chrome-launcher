@@ -32,7 +32,7 @@ describe('Cache: start_url audit', () => {
   });
 
   it('fails when no cache contents given', () => {
-    const artifacts = {Manifest: exampleManifest, URL};
+    const artifacts = {Manifest: exampleManifest, URL: {finalUrl: URL}};
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.debugString, 'No cache or URL detected');
@@ -49,7 +49,7 @@ describe('Cache: start_url audit', () => {
     return assert.equal(Audit.audit({
       Manifest: exampleManifest,
       CacheContents,
-      URL
+      URL: {finalUrl: URL}
     }).rawValue, true);
   });
 
@@ -57,7 +57,7 @@ describe('Cache: start_url audit', () => {
     return assert.equal(Audit.audit({
       Manifest: exampleManifest,
       CacheContents,
-      URL: AltURL
+      URL: {finalUrl: AltURL}
     }).rawValue, true);
   });
 });

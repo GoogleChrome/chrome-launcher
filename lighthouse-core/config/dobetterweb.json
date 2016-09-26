@@ -1,16 +1,20 @@
 {
   "passes": [{
-    "network": false,
+    "network": true,
     "loadPage": true,
     "gatherers": [
       "../gather/gatherers/dobetterweb/appcache",
-      "../gather/gatherers/dobetterweb/websql"
+      "../gather/gatherers/dobetterweb/websql",
+      "../gather/gatherers/https",
+      "../gather/gatherers/url"
     ]
   }],
 
   "audits": [
     "../audits/dobetterweb/appcache-manifest",
-    "../audits/dobetterweb/no-websql"
+    "../audits/dobetterweb/no-websql",
+    "../audits/dobetterweb/uses-http2",
+    "../audits/is-on-https"
   ],
 
   "aggregations": [{
@@ -26,6 +30,17 @@
         },
         "no-websql": {
           "rawValue": false
+        }
+      }
+    }, {
+      "name": "Using modern protocols",
+      "criteria": {
+        "is-on-https": {
+          "rawValue": false
+        },
+        "uses-http2": {
+          "rawValue": false,
+          "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
         }
       }
     }]
