@@ -29,10 +29,10 @@ class WebSQL extends Gatherer {
     return new Promise((resolve, reject) => {
       driver.once('Database.addDatabase', db => {
         clearTimeout(timeout);
-        driver.sendCommand('Database.disable').then(_ => resolve(db));
+        driver.sendCommand('Database.disable').then(_ => resolve(db), reject);
       });
 
-      driver.sendCommand('Database.enable');
+      driver.sendCommand('Database.enable').catch(reject);
 
       // Wait for a websql db to be opened. Reject the Promise no dbs were created.
       // TODO(ericbidelman): this assumes dbs are opened on page load.

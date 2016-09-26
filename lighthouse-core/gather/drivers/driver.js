@@ -181,7 +181,7 @@ class Driver {
       this.sendCommand('Runtime.evaluate', {
         expression,
         includeCommandLineAPI: true
-      });
+      }).catch(reject);
 
       // If this gets to 60s and it hasn't been resolved, reject the Promise.
       asyncTimeout = setTimeout(
@@ -194,22 +194,22 @@ class Driver {
   getSecurityState() {
     return new Promise((resolve, reject) => {
       this.once('Security.securityStateChanged', data => {
-        this.sendCommand('Security.disable');
-        resolve(data);
+        this.sendCommand('Security.disable')
+          .then(_ => resolve(data), reject);
       });
 
-      this.sendCommand('Security.enable');
+      this.sendCommand('Security.enable').catch(reject);
     });
   }
 
   getServiceWorkerVersions() {
     return new Promise((resolve, reject) => {
       this.once('ServiceWorker.workerVersionUpdated', data => {
-        this.sendCommand('ServiceWorker.disable');
-        resolve(data);
+        this.sendCommand('ServiceWorker.disable')
+          .then(_ => resolve(data), reject);
       });
 
-      this.sendCommand('ServiceWorker.enable');
+      this.sendCommand('ServiceWorker.enable').catch(reject);
     });
   }
 
@@ -317,11 +317,11 @@ class Driver {
       // When the tracing has ended this will fire with a stream handle.
       this.once('Tracing.tracingComplete', streamHandle => {
         this._readTraceFromStream(streamHandle)
-            .then(traceContents => resolve(traceContents));
+            .then(traceContents => resolve(traceContents), reject);
       });
 
       // Issue the command to stop tracing.
-      this.sendCommand('Tracing.end');
+      this.sendCommand('Tracing.end').catch(reject);
     });
   }
 
@@ -352,7 +352,7 @@ class Driver {
         return this.sendCommand('IO.read', readArguments).then(onChunkRead);
       };
 
-      this.sendCommand('IO.read', readArguments).then(onChunkRead);
+      this.sendCommand('IO.read', readArguments).then(onChunkRead).catch(reject);
     });
   }
 
@@ -370,9 +370,7 @@ class Driver {
       this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
       this.on('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
 
-      this.sendCommand('Network.enable').then(_ => {
-        resolve();
-      });
+      this.sendCommand('Network.enable').then(resolve, reject);
     });
   }
 
