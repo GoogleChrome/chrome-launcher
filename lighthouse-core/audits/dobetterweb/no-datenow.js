@@ -37,7 +37,7 @@ class NoDateNowAudit extends Audit {
       name: 'no-datenow',
       description: 'Site does not use Date.now() in its own scripts',
       helpText: '<a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now" target="_blank">performance.now()</a> has better precision than <code>Date.now()</code> and always increases at a constant rate, independent of the system clock.',
-      requiredArtifacts: ['url', 'DateNowUse']
+      requiredArtifacts: ['URL', 'DateNowUse']
     };
   }
 
