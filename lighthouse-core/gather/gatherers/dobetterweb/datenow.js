@@ -17,7 +17,6 @@
 
 /**
  * @fileoverview Tests whether the page is using Date.now().
- * @author Eric Bidelman
  */
 
 /* global window, __returnResults */
