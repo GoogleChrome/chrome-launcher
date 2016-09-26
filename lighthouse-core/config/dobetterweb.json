@@ -3,15 +3,17 @@
     "network": true,
     "loadPage": true,
     "gatherers": [
-      "../gather/gatherers/dobetterweb/appcache",
-      "../gather/gatherers/dobetterweb/websql",
       "../gather/gatherers/https",
-      "../gather/gatherers/url"
+      "../gather/gatherers/url",
+      "../gather/gatherers/dobetterweb/appcache",
+      "../gather/gatherers/dobetterweb/datenow",
+      "../gather/gatherers/dobetterweb/websql"
     ]
   }],
 
   "audits": [
     "../audits/dobetterweb/appcache-manifest",
+    "../audits/dobetterweb/no-datenow",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
     "../audits/is-on-https"
@@ -41,6 +43,13 @@
         "uses-http2": {
           "rawValue": false,
           "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
+        }
+      }
+    }, {
+      "name": "Using modern JavaScript features",
+      "criteria": {
+        "no-datenow": {
+          "rawValue": false
         }
       }
     }]

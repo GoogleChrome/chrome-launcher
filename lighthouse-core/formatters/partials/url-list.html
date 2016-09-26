@@ -15,7 +15,10 @@
     <summary>URLs</summary>
     {{#each this}}
       <div class="http-resource">
-        <span class="http-resource__url">{{this.url}}</span><span class="http-resource__protocol">({{this.protocol}})</span>
+        <span class="http-resource__url">{{this.url}}</span>
+        {{#if this.protocol}}
+          <span class="http-resource__protocol">({{this.protocol}})</span>
+        {{/if}}
       </div>
     {{/each}}
   </details>
