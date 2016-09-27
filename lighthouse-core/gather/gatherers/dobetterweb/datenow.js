@@ -28,21 +28,22 @@ const Gatherer = require('../gatherer');
 function patchDateNow() {
   window.__stackTraceErrors = [];
   // Override Date.now() so we know when if it's called.
-  const orig = Date.now;
+  const origDateNow = Date.now;
+  const originalPrepareStackTrace = Error.prepareStackTrace;
   Date.now = function() {
-    try {
-      throw Error('__called Date.now()__');
-    } catch (e) {
-      if (e.stack) {
-        const split = e.stack.split('\n');
-        const m = split[split.length - 1].match(/(https?:\/\/.*):(\d+):(\d+)/);
-        if (m) {
-          window.__stackTraceErrors.push({url: m[1], line: m[2], col: m[3]});
-        }
-      }
-    }
-
-    return orig();
+    // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
+    Error.prepareStackTrace = function(error, structStackTrace) {
+      const lastCallFrame = structStackTrace[structStackTrace.length - 1];
+      const file = lastCallFrame.getFileName();
+      const line = lastCallFrame.getLineNumber();
+      const col = lastCallFrame.getColumnNumber();
+      window.__stackTraceErrors.push({url: file, line, col});
+      return {url: file, line, col}; // return value populates e.stack.
+    };
+    Error.captureStackTrace(new Error('__called Date.now()__'));
+    // Remove custom formatter so future results use v8's formatter.
+    Error.prepareStackTrace = originalPrepareStackTrace;
+    return origDateNow();
   };
 }
 
@@ -58,8 +59,8 @@ class DateNowUse extends Gatherer {
 
   afterPass(options) {
     return options.driver.evaluateAsync(`(${collectDateNowUsage.toString()}())`)
-        .then(errors => {
-          this.artifact.errors = errors;
+        .then(dateNowUses => {
+          this.artifact.dateNowUses = dateNowUses;
         }, _ => {
           this.artifact = -1;
           return;

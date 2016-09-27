@@ -31,7 +31,21 @@ describe('Page does not use Date.now()', () => {
 
   it('passes when Date.now() is not used', () => {
     const auditResult = DateNowUseAudit.audit({
-      DateNowUse: {errors: []},
+      DateNowUse: {dateNowUses: []},
+      URL: {finalUrl: URL},
+    });
+    assert.equal(auditResult.rawValue, true);
+    assert.equal(auditResult.extendedInfo.value.length, 0);
+  });
+
+  it('passes when Date.now() is used on a different origin', () => {
+    const auditResult = DateNowUseAudit.audit({
+      DateNowUse: {
+        dateNowUses: [
+          {url: 'http://different.com/two', line: 2, col: 2},
+          {url: 'http://example2.com/two', line: 2, col: 22}
+        ]
+      },
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, true);
@@ -41,10 +55,10 @@ describe('Page does not use Date.now()', () => {
   it('fails when Date.now() is used on the origin', () => {
     const auditResult = DateNowUseAudit.audit({
       DateNowUse: {
-        errors: [
-          {url: 'http://example.com/one', line: '1', col: '1'},
-          {url: 'http://example.com/two', line: '10', col: '1'},
-          {url: 'http://example2.com/two', line: '2', col: '2'}
+        dateNowUses: [
+          {url: 'http://example.com/one', line: 1, col: 1},
+          {url: 'http://example.com/two', line: 10, col: 1},
+          {url: 'http://example2.com/two', line: 2, col: 22}
         ]
       },
       URL: {finalUrl: URL},
@@ -53,16 +67,17 @@ describe('Page does not use Date.now()', () => {
     assert.equal(auditResult.extendedInfo.value.length, 2);
   });
 
-  it('passes when Date.now() is only used on a different origin', () => {
+  it('same file:line:col usage is deduped', () => {
     const auditResult = DateNowUseAudit.audit({
       DateNowUse: {
-        errors: [
-          {url: 'http://different.com/two', line: '2', col: '2'}
+        dateNowUses: [
+          {url: 'http://example.com/dupe', line: 1, col: 1},
+          {url: 'http://example.com/dupe', line: 1, col: 1}
         ]
       },
       URL: {finalUrl: URL},
     });
-    assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.extendedInfo.value.length, 1);
   });
 });
