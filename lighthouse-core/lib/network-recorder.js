@@ -18,6 +18,7 @@
 
 const NetworkManager = require('./web-inspector').NetworkManager;
 const EventEmitter = require('events').EventEmitter;
+const log = require('../lib/log.js');
 
 class NetworkRecorder extends EventEmitter {
   constructor(recordArray) {
@@ -26,11 +27,13 @@ class NetworkRecorder extends EventEmitter {
     this._records = recordArray;
     this.networkManager = NetworkManager.createWithFakeTarget();
 
-    // TODO(bckenny): loadingFailed calls are not recorded in REQUEST_FINISHED.
-    this.networkManager.addEventListener(this.EventTypes.RequestFinished, request => {
-      this._records.push(request.data);
-      this.emit('requestloaded', request.data);
-    });
+    this.startedRequestCount = 0;
+    this.finishedRequestCount = 0;
+
+    this.networkManager.addEventListener(this.EventTypes.RequestStarted,
+        this.onRequestStarted.bind(this));
+    this.networkManager.addEventListener(this.EventTypes.RequestFinished,
+        this.onRequestFinished.bind(this));
 
     this.onRequestWillBeSent = this.onRequestWillBeSent.bind(this);
     this.onRequestServedFromCache = this.onRequestServedFromCache.bind(this);
@@ -43,6 +46,56 @@ class NetworkRecorder extends EventEmitter {
 
   get EventTypes() {
     return NetworkManager.EventTypes;
+  }
+
+  activeRequestCount() {
+    return this.startedRequestCount - this.finishedRequestCount;
+  }
+
+  isIdle() {
+    return this.activeRequestCount() === 0;
+  }
+
+  /**
+   * Listener for the NetworkManager's RequestStarted event, which includes both
+   * web socket and normal request creation.
+   * @private
+   */
+  onRequestStarted() {
+    this.startedRequestCount++;
+
+    const activeCount = this.activeRequestCount();
+    log.verbose('NetworkRecorder', `Request started. ${activeCount} requests in progress` +
+        ` (${this.startedRequestCount} started and ${this.finishedRequestCount} finished).`);
+
+    // If only one request in progress, emit event that we've transitioned from
+    // idle to busy.
+    if (activeCount === 1) {
+      this.emit('networkbusy');
+    }
+  }
+
+  /**
+   * Listener for the NetworkManager's RequestFinished event, which includes
+   * request finish, failure, and redirect, as well as the closing of web
+   * sockets.
+   * @param {!WebInspector.NetworkRequest} request
+   * @private
+   */
+  onRequestFinished(request) {
+    this.finishedRequestCount++;
+    this._records.push(request.data);
+    this.emit('requestloaded', request.data);
+
+    const activeCount = this.activeRequestCount();
+    log.verbose('NetworkRecorder', `Request finished. ${activeCount} requests in progress` +
+        ` (${this.startedRequestCount} started and ${this.finishedRequestCount} finished).`);
+
+    // If no requests in progress, emit event that we've transitioned from busy
+    // to idle.
+    if (this.isIdle()) {
+      this.emit('networkidle');
+    }
   }
 
   // There are a few differences between the debugging protocol naming and
