@@ -80,11 +80,16 @@ class Runner {
 
       // Ignoring these two flags for coverage as this functionality is not exposed by the module.
       /* istanbul ignore next */
-      if (opts.flags.saveArtifacts || opts.flags.saveAssets) {
+      if (opts.flags.saveArtifacts) {
         run = run.then(artifacts => {
           opts.flags.saveArtifacts && assetSaver.saveArtifacts(artifacts);
-          opts.flags.saveAssets && assetSaver.saveAssets(opts, artifacts);
           return artifacts;
+        });
+      }
+      if (opts.flags.saveAssets) {
+        run = run.then(artifacts => {
+          return assetSaver.saveAssets(opts, artifacts)
+            .then(_ => artifacts);
         });
       }
 

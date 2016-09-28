@@ -85,28 +85,53 @@ function saveArtifacts(artifacts, filename) {
   log.log('artifacts file saved to disk', artifactsFilename);
 }
 
+/**
+ * Filter traces and extract screenshots to prepare for saving.
+ * @param {!Object} options
+ * @param {!Artifacts} artifacts
+ * @return {!Promise<!Array<{traceData: !Object, html: string}>>}
+ */
 function prepareAssets(options, artifacts) {
-  const traceData = Object.keys(artifacts.traces).map(passName => {
-    const filteredTrace = Object.assign({}, artifacts.traces[passName]);
-    filteredTrace.traceEvents = filterForSize(filteredTrace.traceEvents);
-    return filteredTrace;
-  });
-  const html = screenshotDump(options, artifacts.ScreenshotFilmstrip);
-  return {traceData, html};
+  const passNames = Object.keys(artifacts.traces);
+  const assets = [];
+
+  return passNames.reduce((chain, passName) => {
+    const trace = artifacts.traces[passName];
+
+    return chain.then(_ => artifacts.requestScreenshots(trace))
+      .then(screenshots => {
+        const traceData = Object.assign({}, trace);
+        traceData.traceEvents = filterForSize(traceData.traceEvents);
+        const html = screenshotDump(options, screenshots);
+
+        assets.push({
+          traceData,
+          html
+        });
+      });
+  }, Promise.resolve())
+    .then(_ => assets);
 }
 
+/**
+ * Writes trace(s) and associated screenshot(s) to disk.
+ * @param {!Object} options
+ * @param {!Artifacts} artifacts
+ * @return {!Promise}
+ */
 function saveAssets(options, artifacts) {
-  const assets = prepareAssets(options, artifacts);
+  return prepareAssets(options, artifacts).then(assets => {
+    assets.forEach((data, index) => {
+      const filenamePrefix = getFilenamePrefix(options);
 
-  assets.traceData.forEach((data, index) => {
-    const traceFilename = getFilenamePrefix(options);
-    fs.writeFileSync(`${traceFilename}${index}.trace.json`, stringify(data, null, 2));
-    log.log('trace file saved to disk', traceFilename);
+      const traceData = data.traceData;
+      fs.writeFileSync(`${filenamePrefix}-${index}.trace.json`, stringify(traceData, null, 2));
+      log.log('trace file saved to disk', filenamePrefix);
+
+      fs.writeFileSync(`${filenamePrefix}-${index}.screenshots.html`, data.html);
+      log.log('screenshots saved to disk', filenamePrefix);
+    });
   });
-
-  const screenshotsFilename = getFilenamePrefix(options);
-  fs.writeFileSync(screenshotsFilename + '.screenshots.html', assets.html);
-  log.log('screenshots saved to disk', screenshotsFilename);
 }
 
 module.exports = {

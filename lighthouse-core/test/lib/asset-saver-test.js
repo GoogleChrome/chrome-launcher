@@ -21,7 +21,7 @@ const assetSaver = require('../../lib/asset-saver');
 const assert = require('assert');
 const fs = require('fs');
 
-const ScreenshotFilmstrip = require('../fixtures/traces/screenshots.json');
+const screenshotFilmstrip = require('../fixtures/traces/screenshots.json');
 const traceEvents = require('../fixtures/traces/progressive-app.json');
 const Audit = require('../../audits/audit.js');
 
@@ -29,9 +29,17 @@ const Audit = require('../../audits/audit.js');
 describe('asset-saver helper', () => {
   it('generates HTML', () => {
     const options = {url: 'https://testexample.com'};
-    const artifacts = {screenshots: [], traces: []};
-    const output = assetSaver.prepareAssets(options, artifacts);
-    assert.ok(/<!doctype/gim.test(output.html));
+    const artifacts = {
+      traces: {
+        [Audit.DEFAULT_PASS]: {
+          traceEvents: []
+        }
+      },
+      requestScreenshots: () => Promise.resolve([]),
+    };
+    return assetSaver.prepareAssets(options, artifacts).then(assets => {
+      assert.ok(/<!doctype/gim.test(assets[0].html));
+    });
   });
 
   describe('saves files to disk with real filenames', function() {
@@ -48,20 +56,20 @@ describe('asset-saver helper', () => {
           traceEvents
         }
       },
-      ScreenshotFilmstrip
+      requestScreenshots: () => Promise.resolve(screenshotFilmstrip)
     };
 
     assetSaver.saveAssets(options, artifacts);
 
     it('trace file saved to disk with data', () => {
-      const traceFilename = assetSaver.getFilenamePrefix(options) + '0.trace.json';
+      const traceFilename = assetSaver.getFilenamePrefix(options) + '-0.trace.json';
       const traceFileContents = fs.readFileSync(traceFilename, 'utf8');
       assert.ok(traceFileContents.length > 3000000);
       fs.unlinkSync(traceFilename);
     });
 
     it('screenshots file saved to disk with data', () => {
-      const ssFilename = assetSaver.getFilenamePrefix(options) + '.screenshots.html';
+      const ssFilename = assetSaver.getFilenamePrefix(options) + '-0.screenshots.html';
       const ssFileContents = fs.readFileSync(ssFilename, 'utf8');
       assert.ok(/<!doctype/gim.test(ssFileContents));
       assert.ok(ssFileContents.includes('{"timestamp":674089419.919'));
