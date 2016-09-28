@@ -16,8 +16,7 @@
  */
 
 /**
- * @fileoverview Audit a page to see if it's using Date.now() (instead of a
- * newer API like performance.now()).
+ * @fileoverview Audit a page to see if it's using console.time()/console.timeEnd.
  */
 
 'use strict';
@@ -26,7 +25,7 @@ const url = require('url');
 const Audit = require('../audit');
 const Formatter = require('../../formatters/formatter');
 
-class NoDateNowAudit extends Audit {
+class NoConsoleTimeAudit extends Audit {
 
   /**
    * @return {!AuditMeta}
@@ -34,10 +33,10 @@ class NoDateNowAudit extends Audit {
   static get meta() {
     return {
       category: 'JavaScript',
-      name: 'no-datenow',
-      description: 'Site does not use Date.now() in its own scripts',
-      helpText: 'Consider using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now" target="_blank">performance.now()</a>, which as better precision than <code>Date.now()</code> and always increases at a constant rate, independent of the system clock.',
-      requiredArtifacts: ['URL', 'DateNowUse']
+      name: 'no-console-time',
+      description: 'Site does not use console.time() in its own scripts',
+      helpText: 'Consider using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API" target="_blank">User Timine API</a> (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark" target="_blank">performance.mark()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/measure" target="_blank">performance.measure()</a>), which is a standard, uses high resolution timestamps, and has the added benefit of integrating with the DevTools timeline.',
+      requiredArtifacts: ['URL', 'ConsoleTimeUsage']
     };
   }
 
@@ -46,17 +45,17 @@ class NoDateNowAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.DateNowUse === 'undefined' ||
-        artifacts.DateNowUse === -1) {
-      return NoDateNowAudit.generateAuditResult({
+    if (typeof artifacts.ConsoleTimeUsage === 'undefined' ||
+        artifacts.ConsoleTimeUsage === -1) {
+      return NoConsoleTimeAudit.generateAuditResult({
         rawValue: -1,
-        debugString: 'DateNowUse gatherer did not run'
+        debugString: 'ConsoleTimeUsage gatherer did not run'
       });
     }
 
     const pageHost = url.parse(artifacts.URL.finalUrl).host;
     // Filter usage from other hosts.
-    const results = artifacts.DateNowUse.usage.filter(err => {
+    const results = artifacts.ConsoleTimeUsage.usage.filter(err => {
       return url.parse(err.url).host === pageHost;
     }).map(err => {
       return Object.assign({
@@ -64,7 +63,7 @@ class NoDateNowAudit extends Audit {
       }, err);
     });
 
-    return NoDateNowAudit.generateAuditResult({
+    return NoConsoleTimeAudit.generateAuditResult({
       rawValue: results.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
@@ -74,4 +73,4 @@ class NoDateNowAudit extends Audit {
   }
 }
 
-module.exports = NoDateNowAudit;
+module.exports = NoConsoleTimeAudit;

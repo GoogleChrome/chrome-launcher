@@ -15,32 +15,32 @@
  */
 'use strict';
 
-const DateNowUseAudit = require('../../../audits/dobetterweb/no-datenow.js');
+const NoConsoleTimeAudit = require('../../../audits/dobetterweb/no-console-time.js');
 const assert = require('assert');
 
 const URL = 'https://example.com';
 
 /* eslint-env mocha */
 
-describe('Page does not use Date.now()', () => {
+describe('Page does not use console.time()', () => {
   it('fails when no input present', () => {
-    const auditResult = DateNowUseAudit.audit({});
+    const auditResult = NoConsoleTimeAudit.audit({});
     assert.equal(auditResult.rawValue, -1);
     assert.ok(auditResult.debugString);
   });
 
-  it('passes when Date.now() is not used', () => {
-    const auditResult = DateNowUseAudit.audit({
-      DateNowUse: {usage: []},
+  it('passes when console.time() is not used', () => {
+    const auditResult = NoConsoleTimeAudit.audit({
+      ConsoleTimeUsage: {usage: []},
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, true);
     assert.equal(auditResult.extendedInfo.value.length, 0);
   });
 
-  it('passes when Date.now() is used on a different origin', () => {
-    const auditResult = DateNowUseAudit.audit({
-      DateNowUse: {
+  it('passes when console.time() is used on a different origin', () => {
+    const auditResult = NoConsoleTimeAudit.audit({
+      ConsoleTimeUsage: {
         usage: [
           {url: 'http://different.com/two', line: 2, col: 2},
           {url: 'http://example2.com/two', line: 2, col: 22}
@@ -52,9 +52,9 @@ describe('Page does not use Date.now()', () => {
     assert.equal(auditResult.extendedInfo.value.length, 0);
   });
 
-  it('fails when Date.now() is used on the origin', () => {
-    const auditResult = DateNowUseAudit.audit({
-      DateNowUse: {
+  it('fails when console.time() is used on the origin', () => {
+    const auditResult = NoConsoleTimeAudit.audit({
+      ConsoleTimeUsage: {
         usage: [
           {url: 'http://example.com/one', line: 1, col: 1},
           {url: 'http://example.com/two', line: 10, col: 1},

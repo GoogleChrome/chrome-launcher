@@ -16,22 +16,22 @@
  */
 
 /**
- * @fileoverview Tests whether the page is using Date.now().
+ * @fileoverview Tests whether the page is using console.time().
  */
 
 'use strict';
 
 const Gatherer = require('../gatherer');
 
-class DateNowUse extends Gatherer {
+class ConsoleTimeUsage extends Gatherer {
 
   beforePass(options) {
-    this.collectUsage = options.driver.captureFunctionCallSites('Date.now');
+    this.collectUsage = options.driver.captureFunctionCallSites('console.time');
   }
 
   afterPass() {
-    return this.collectUsage().then(dateNowUses => {
-      this.artifact.usage = dateNowUses;
+    return this.collectUsage().then(consoleTimeUsage => {
+      this.artifact.usage = consoleTimeUsage;
     }, _ => {
       this.artifact = -1;
       return;
@@ -39,4 +39,4 @@ class DateNowUse extends Gatherer {
   }
 }
 
-module.exports = DateNowUse;
+module.exports = ConsoleTimeUsage;

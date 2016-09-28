@@ -6,6 +6,7 @@
       "../gather/gatherers/https",
       "../gather/gatherers/url",
       "../gather/gatherers/dobetterweb/appcache",
+      "../gather/gatherers/dobetterweb/console-time-usage",
       "../gather/gatherers/dobetterweb/datenow",
       "../gather/gatherers/dobetterweb/websql"
     ]
@@ -13,6 +14,7 @@
 
   "audits": [
     "../audits/dobetterweb/appcache-manifest",
+    "../audits/dobetterweb/no-console-time",
     "../audits/dobetterweb/no-datenow",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
@@ -49,6 +51,9 @@
       "name": "Using modern JavaScript features",
       "criteria": {
         "no-datenow": {
+          "rawValue": false
+        },
+        "no-console-time": {
           "rawValue": false
         }
       }

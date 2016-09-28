@@ -34,13 +34,6 @@ describe('HTML without JavaScript gatherer', () => {
     return assert.equal(opts.disableJavaScript, true);
   });
 
-  it('updates the options', () => {
-    const opts = {disableJavaScript: false};
-    htmlWithoutJavaScriptGather.beforePass(opts);
-
-    return assert.equal(opts.disableJavaScript, true);
-  });
-
   it('resets the options', () => {
     const opts = {
       disableJavaScript: true,
