@@ -473,9 +473,23 @@ class Driver {
     const origin = `${parsedURL.protocol}//${parsedURL.hostname}` +
       (parsedURL.port ? `:${parsedURL.port}` : '');
 
+    // Clear all types of storage except cookies, so the user isn't logged out.
+    //   https://chromedevtools.github.io/debugger-protocol-viewer/tot/Storage/#type-StorageType
+    const typesToClear = [
+      'appcache',
+      // 'cookies',
+      'file_systems',
+      'indexeddb',
+      'local_storage',
+      'shader_cache',
+      'websql',
+      'service_workers',
+      'cache_storage'
+    ].join(',');
+
     return this.sendCommand('Storage.clearDataForOrigin', {
-      origin,
-      storageTypes: 'all',
+      origin: origin,
+      storageTypes: typesToClear
     });
   }
 
