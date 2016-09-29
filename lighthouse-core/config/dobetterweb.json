@@ -8,6 +8,7 @@
       "../gather/gatherers/dobetterweb/appcache",
       "../gather/gatherers/dobetterweb/console-time-usage",
       "../gather/gatherers/dobetterweb/datenow",
+      "../gather/gatherers/dobetterweb/document-write",
       "../gather/gatherers/dobetterweb/websql"
     ]
   }],
@@ -16,6 +17,7 @@
     "../audits/dobetterweb/appcache-manifest",
     "../audits/dobetterweb/no-console-time",
     "../audits/dobetterweb/no-datenow",
+    "../audits/dobetterweb/no-document-write",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
     "../audits/is-on-https"
@@ -54,6 +56,13 @@
           "rawValue": false
         },
         "no-console-time": {
+          "rawValue": false
+        }
+      }
+    }, {
+      "name": "Avoiding APIs that harm the user experience",
+      "criteria": {
+        "no-document-write": {
           "rawValue": false
         }
       }
