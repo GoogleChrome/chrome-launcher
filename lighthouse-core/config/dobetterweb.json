@@ -25,7 +25,7 @@
 
   "aggregations": [{
     "name": "Do Better Web",
-    "description": "We've compiled some recommendations for modernizing your web app.",
+    "description": "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls.",
     "scored": false,
     "categorizable": true,
     "items": [{
