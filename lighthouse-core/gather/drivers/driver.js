@@ -26,37 +26,6 @@ const log = require('../../lib/log.js');
 const MAX_WAIT_FOR_FULLY_LOADED = 25 * 1000;
 const PAUSE_AFTER_LOAD = 500;
 
-/**
- * Tracks function call usage. Used by captureJSCalls to inject code into the page.
- * @param {function(...*): *} funcRef The function call to track.
- * @param {!Set} set An empty set to populate with stack traces. Should be
- *     on the global object.
- * @return {function(...*): *} A wrapper around the original function.
- */
-function captureJSCallUsage(funcRef, set) {
-  const originalFunc = funcRef;
-  const originalPrepareStackTrace = Error.prepareStackTrace;
-
-  return function() {
-    // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
-    Error.prepareStackTrace = function(error, structStackTrace) {
-      const lastCallFrame = structStackTrace[structStackTrace.length - 1];
-      const file = lastCallFrame.getFileName();
-      const line = lastCallFrame.getLineNumber();
-      const col = lastCallFrame.getColumnNumber();
-      return {url: file, line, col}; // return value is e.stack
-    };
-    const e = new Error(`__called ${funcRef.name}__`);
-    set.add(JSON.stringify(e.stack));
-
-    // Restore prepareStackTrace so future errors use v8's formatter and not
-    // our custom one.
-    Error.prepareStackTrace = originalPrepareStackTrace;
-
-    return originalFunc.apply(this, arguments);
-  };
-}
-
 class Driver {
 
   constructor() {
@@ -615,5 +584,35 @@ class Driver {
   }
 }
 
-module.exports = Driver;
+/**
+ * Tracks function call usage. Used by captureJSCalls to inject code into the page.
+ * @param {function(...*): *} funcRef The function call to track.
+ * @param {!Set} set An empty set to populate with stack traces. Should be
+ *     on the global object.
+ * @return {function(...*): *} A wrapper around the original function.
+ */
+function captureJSCallUsage(funcRef, set) {
+  const originalFunc = funcRef;
+  const originalPrepareStackTrace = Error.prepareStackTrace;
 
+  return function() {
+    // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
+    Error.prepareStackTrace = function(error, structStackTrace) {
+      const lastCallFrame = structStackTrace[structStackTrace.length - 1];
+      const file = lastCallFrame.getFileName();
+      const line = lastCallFrame.getLineNumber();
+      const col = lastCallFrame.getColumnNumber();
+      return {url: file, line, col}; // return value is e.stack
+    };
+    const e = new Error(`__called ${funcRef.name}__`);
+    set.add(JSON.stringify(e.stack));
+
+    // Restore prepareStackTrace so future errors use v8's formatter and not
+    // our custom one.
+    Error.prepareStackTrace = originalPrepareStackTrace;
+
+    return originalFunc.apply(this, arguments);
+  };
+}
+
+module.exports = Driver;
