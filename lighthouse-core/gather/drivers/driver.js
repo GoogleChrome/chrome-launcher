@@ -23,7 +23,7 @@ const parseURL = require('url').parse;
 
 const log = require('../../lib/log.js');
 
-const MAX_WAIT_FOR_LOAD_EVENT = 25 * 1000;
+const MAX_WAIT_FOR_FULLY_LOADED = 25 * 1000;
 const PAUSE_AFTER_LOAD = 500;
 
 /**
@@ -263,10 +263,134 @@ class Driver {
   }
 
   /**
+   * Returns a promise that resolves when the network has been idle for
+   * `pauseAfterLoadMs` ms and a method to cancel internal network listeners and
+   * timeout.
+   * @param {string} pauseAfterLoadMs
+   * @return {{promise: !Promise, cancel: function()}}
+   * @private
+   */
+  _waitForNetworkIdle(pauseAfterLoadMs) {
+    let idleTimeout;
+    let cancel;
+
+    const promise = new Promise((resolve, reject) => {
+      const onIdle = () => {
+        // eslint-disable-next-line no-use-before-define
+        this._networkRecorder.once('networkbusy', onBusy);
+        idleTimeout = setTimeout(_ => {
+          cancel();
+          resolve();
+        }, pauseAfterLoadMs);
+      };
+
+      const onBusy = () => {
+        this._networkRecorder.once('networkidle', onIdle);
+        clearTimeout(idleTimeout);
+      };
+
+      cancel = () => {
+        clearTimeout(idleTimeout);
+        this._networkRecorder.removeListener('networkbusy', onBusy);
+        this._networkRecorder.removeListener('networkidle', onIdle);
+      };
+
+      if (this._networkRecorder.isIdle()) {
+        onIdle();
+      } else {
+        onBusy();
+      }
+    });
+
+    return {
+      promise,
+      cancel
+    };
+  }
+
+  /**
+   * Return a promise that resolves `pauseAfterLoadMs` after the load event
+   * fires and a method to cancel internal listeners and timeout.
+   * @param {number} pauseAfterLoadMs
+   * @return {{promise: !Promise, cancel: function()}}
+   * @private
+   */
+  _waitForLoadEvent(pauseAfterLoadMs) {
+    let loadListener;
+    let loadTimeout;
+
+    const promise = new Promise((resolve, reject) => {
+      loadListener = function() {
+        loadTimeout = setTimeout(resolve, pauseAfterLoadMs);
+      };
+      this.once('Page.loadEventFired', loadListener);
+    });
+    const cancel = () => {
+      this.off('Page.loadEventFired', loadListener);
+      clearTimeout(loadTimeout);
+    };
+
+    return {
+      promise,
+      cancel
+    };
+  }
+
+  /**
+   * Returns a promise that resolves when:
+   * - it's been pauseAfterLoadMs milliseconds after both onload and the network
+   * has gone idle, or
+   * - MAX_WAIT_FOR_FULLY_LOADED milliseconds have passed.
+   * See https://github.com/GoogleChrome/lighthouse/issues/627 for more.
+   * @param {number} pauseAfterLoadMs
+   * @return {!Promise}
+   * @private
+   */
+  _waitForFullyLoaded(pauseAfterLoadMs) {
+    let maxTimeoutHandle;
+
+    // Listener for onload. Resolves pauseAfterLoadMs ms after load.
+    const waitForLoadEvent = this._waitForLoadEvent(pauseAfterLoadMs);
+    // Network listener. Resolves when the network has been idle for pauseAfterLoadMs.
+    const waitForNetworkIdle = this._waitForNetworkIdle(pauseAfterLoadMs);
+
+    // Wait for both load promises. Resolves on cleanup function the clears load
+    // timeout timer.
+    const loadPromise = Promise.all([
+      waitForLoadEvent.promise,
+      waitForNetworkIdle.promise
+    ]).then(_ => {
+      return function() {
+        log.verbose('Driver', 'loadEventFired and network considered idle');
+        clearTimeout(maxTimeoutHandle);
+      };
+    });
+
+    // Last resort timeout. Resolves MAX_WAIT_FOR_FULLY_LOADED ms from now on
+    // cleanup function that removes loadEvent and network idle listeners.
+    const maxTimeoutPromise = new Promise((resolve, reject) => {
+      maxTimeoutHandle = setTimeout(resolve, MAX_WAIT_FOR_FULLY_LOADED);
+    }).then(_ => {
+      return function() {
+        log.warn('Driver', 'Timed out waiting for page load. Moving on...');
+        waitForLoadEvent.cancel();
+        waitForNetworkIdle.cancel();
+      };
+    });
+
+    // Wait for load or timeout and run the cleanup function the winner returns.
+    return Promise.race([
+      loadPromise,
+      maxTimeoutPromise
+    ]).then(cleanup => cleanup());
+  }
+
+  /**
    * Navigate to the given URL. Use of this method directly isn't advised: if
    * the current page is already at the given URL, navigation will not occur and
-   * so the returned promise will never resolve. See https://github.com/GoogleChrome/lighthouse/pull/185
-   * for one possible workaround.
+   * so the returned promise will only resolve after the MAX_WAIT_FOR_FULLY_LOADED
+   * timeout. See https://github.com/GoogleChrome/lighthouse/pull/185 for one
+   * possible workaround.
    * @param {string} url
    * @param {!Object} options
    * @return {!Promise}
@@ -274,39 +398,13 @@ class Driver {
   gotoURL(url, options) {
     const _options = options || {};
     const waitForLoad = _options.waitForLoad || false;
-    const disableJavaScript = _options.disableJavaScript || false;
+    const disableJS = _options.disableJavaScript || false;
     const pauseAfterLoadMs = (_options.flags && _options.flags.pauseAfterLoad) || PAUSE_AFTER_LOAD;
+
     return this.sendCommand('Page.enable')
-    .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJavaScript}))
-    .then(_ => this.sendCommand('Page.navigate', {url}))
-    .then(_ => {
-      return new Promise((resolve, reject) => {
-        this.url = url;
-
-        if (!waitForLoad) {
-          return resolve();
-        }
-
-        // Resolve PAUSE_AFTER_LOAD milliseconds after onload...
-        let loadTimeout;
-        const loadListener = function() {
-          setTimeout(_ => {
-            if (loadTimeout) {
-              clearTimeout(loadTimeout);
-            }
-            resolve();
-          }, pauseAfterLoadMs);
-        };
-        this.once('Page.loadEventFired', loadListener);
-
-        // ...or MAX_WAIT_FOR_LOAD_EVENT ms from now in case the page load times out.
-        loadTimeout = setTimeout(_ => {
-          log.warn('Driver', 'Timed out waiting for page load. Moving on...');
-          this.off('Page.loadEventFired', loadListener);
-          resolve();
-        }, MAX_WAIT_FOR_LOAD_EVENT);
-      });
-    });
+      .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJS}))
+      .then(_ => this.sendCommand('Page.navigate', {url}))
+      .then(_ => waitForLoad && this._waitForFullyLoaded(pauseAfterLoadMs));
   }
 
   reloadForCleanStateIfNeeded() {
