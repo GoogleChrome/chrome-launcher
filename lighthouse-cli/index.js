@@ -87,6 +87,7 @@ Example: --output-path=./lighthouse-results.html`
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
+    'mobile',
     'perf',
     'skip-autolaunch',
     'select-chrome',
