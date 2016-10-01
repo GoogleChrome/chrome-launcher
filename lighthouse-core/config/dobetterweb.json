@@ -1,6 +1,6 @@
 {
   "passes": [{
-    "network": true,
+    "recordNetwork": true,
     "gatherers": [
       "../gather/gatherers/https",
       "../gather/gatherers/url",

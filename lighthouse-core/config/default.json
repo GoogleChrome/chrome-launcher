@@ -1,7 +1,7 @@
 {
   "passes": [{
-    "network": true,
-    "trace": true,
+    "recordNetwork": true,
+    "recordTrace": true,
     "gatherers": [
       "url",
       "https",
@@ -16,7 +16,7 @@
   },
   {
     "passName": "offlinePass",
-    "network": true,
+    "recordNetwork": true,
     "gatherers": [
       "service-worker",
       "offline"

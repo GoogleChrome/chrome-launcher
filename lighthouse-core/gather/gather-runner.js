@@ -72,7 +72,7 @@ class GatherRunner {
   static loadPage(driver, options) {
     return Promise.resolve()
       // Begin tracing only if requested by config.
-      .then(_ => options.config.trace && driver.beginTrace())
+      .then(_ => options.config.recordTrace && driver.beginTrace())
       // Network is always recorded for internal use, even if not saved as artifact.
       .then(_ => driver.beginNetworkCollect(options))
       // Navigate.
@@ -150,7 +150,7 @@ class GatherRunner {
 
     let pass = Promise.resolve();
 
-    if (config.trace) {
+    if (config.recordTrace) {
       pass = pass.then(_ => {
         log.log('status', 'Retrieving trace');
         return driver.endTrace();
@@ -170,7 +170,7 @@ class GatherRunner {
       return driver.endNetworkCollect();
     }).then(networkRecords => {
       // Network records only given to gatherers if requested by config.
-      config.network && (passData.networkRecords = networkRecords);
+      config.recordNetwork && (passData.networkRecords = networkRecords);
       log.verbose('statusEnd', status);
     });
 
@@ -233,8 +233,9 @@ class GatherRunner {
               // If requested by config, merge trace and network data for this
               // pass into tracingData.
               const passName = config.passName || Audit.DEFAULT_PASS;
-              config.trace && (tracingData.traces[passName] = passData.trace);
-              config.network && (tracingData.networkRecords[passName] = passData.networkRecords);
+              config.recordTrace && (tracingData.traces[passName] = passData.trace);
+              config.recordNetwork &&
+                  (tracingData.networkRecords[passName] = passData.networkRecords);
 
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;

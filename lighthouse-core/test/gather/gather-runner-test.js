@@ -129,7 +129,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      trace: true,
+      recordTrace: true,
       gatherers: [{}]
     };
 
@@ -152,7 +152,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      trace: true,
+      recordTrace: true,
       gatherers: [{
         afterPass() {}
       }]
@@ -177,7 +177,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      network: true,
+      recordNetwork: true,
       gatherers: [{}]
     };
 
@@ -196,7 +196,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      network: true,
+      recordNetwork: true,
       gatherers: [{
         afterPass() {}
       }]
@@ -230,8 +230,8 @@ describe('GatherRunner', function() {
     const flags = {};
 
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
       gatherers: [
         t1
@@ -258,13 +258,13 @@ describe('GatherRunner', function() {
 
   it('respects trace names', () => {
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
       gatherers: [new TestGatherer()]
     }, {
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'secondPass',
       gatherers: [new TestGatherer()]
     }];
@@ -285,8 +285,8 @@ describe('GatherRunner', function() {
     const flags = {};
 
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
       gatherers: [
         t1
@@ -377,8 +377,8 @@ describe('GatherRunner', function() {
 
   it('will instantiate computed artifacts during a run', () => {
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
       gatherers: [new TestGatherer()]
     }];

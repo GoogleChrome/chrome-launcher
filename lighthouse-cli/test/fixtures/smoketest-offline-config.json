@@ -5,7 +5,7 @@
       "url"
     ]
   },{
-    "network": true,
+    "recordNetwork": true,
     "gatherers": [
       "service-worker",
       "offline"

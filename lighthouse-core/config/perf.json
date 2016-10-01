@@ -1,7 +1,7 @@
 {
   "passes": [{
-    "network": true,
-    "trace": true,
+    "recordNetwork": true,
+    "recordTrace": true,
     "gatherers": []
   }],
 
