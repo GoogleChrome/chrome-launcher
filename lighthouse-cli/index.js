@@ -96,7 +96,7 @@ Example: --output-path=./lighthouse-results.html`
     'help'
   ])
 
-  .choices('output', Object.values(Printer.OUTPUT_MODE))
+  .choices('output', Object.keys(Printer.OUTPUT_MODE))
 
   // default values
   .default('mobile', true)

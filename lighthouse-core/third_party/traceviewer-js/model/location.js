@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("../base/base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   /**
    * YComponent is a class that handles storing the stableId and the percentage
    * offset in the y direction of all tracks within a specific viewX and viewY
@@ -21,7 +22,7 @@ global.tr.exportTo('tr.model', function() {
   }
 
   YComponent.prototype = {
-    toDict: function() {
+    toDict: function () {
       return {
         stableId: this.stableId,
         yPercentOffset: this.yPercentOffset
@@ -45,34 +46,30 @@ global.tr.exportTo('tr.model', function() {
    * Returns a new Location given by x and y coordinates with respect to
    * the timeline's drawing canvas.
    */
-  Location.fromViewCoordinates = function(viewport, viewX, viewY) {
+  Location.fromViewCoordinates = function (viewport, viewX, viewY) {
     var dt = viewport.currentDisplayTransform;
     var xWorld = dt.xViewToWorld(viewX);
     var yComponents = [];
 
     // Since we're given coordinates within the timeline canvas, we need to
     // convert them to document coordinates to get the element.
-    var elem = document.elementFromPoint(
-          viewX + viewport.modelTrackContainer.canvas.offsetLeft,
-          viewY + viewport.modelTrackContainer.canvas.offsetTop);
+    var elem = document.elementFromPoint(viewX + viewport.modelTrackContainer.canvas.offsetLeft, viewY + viewport.modelTrackContainer.canvas.offsetTop);
     // Build yComponents by calculating percentage offset with respect to
     // each parent track.
     while (elem instanceof tr.ui.tracks.Track) {
       if (elem.eventContainer) {
         var boundRect = elem.getBoundingClientRect();
         var yPercentOffset = (viewY - boundRect.top) / boundRect.height;
-        yComponents.push(
-            new YComponent(elem.eventContainer.stableId, yPercentOffset));
+        yComponents.push(new YComponent(elem.eventContainer.stableId, yPercentOffset));
       }
       elem = elem.parentElement;
     }
 
-    if (yComponents.length == 0)
-      return;
+    if (yComponents.length == 0) return;
     return new Location(xWorld, yComponents);
-  }
+  };
 
-  Location.fromStableIdAndTimestamp = function(viewport, stableId, ts) {
+  Location.fromStableIdAndTimestamp = function (viewport, stableId, ts) {
     var xWorld = ts;
     var yComponents = [];
 
@@ -80,24 +77,21 @@ global.tr.exportTo('tr.model', function() {
     // the boundingRect's top of containing track.
     var containerToTrack = viewport.containerToTrackMap;
     var elem = containerToTrack.getTrackByStableId(stableId);
-    if (!elem)
-      return;
+    if (!elem) return;
 
     var firstY = elem.getBoundingClientRect().top;
     while (elem instanceof tr.ui.tracks.Track) {
       if (elem.eventContainer) {
         var boundRect = elem.getBoundingClientRect();
         var yPercentOffset = (firstY - boundRect.top) / boundRect.height;
-        yComponents.push(
-            new YComponent(elem.eventContainer.stableId, yPercentOffset));
+        yComponents.push(new YComponent(elem.eventContainer.stableId, yPercentOffset));
       }
       elem = elem.parentElement;
     }
 
-    if (yComponents.length == 0)
-      return;
+    if (yComponents.length == 0) return;
     return new Location(xWorld, yComponents);
-  }
+  };
 
   Location.prototype = {
 
@@ -109,13 +103,12 @@ global.tr.exportTo('tr.model', function() {
      * Returns the first valid containing track based on the
      * internal yComponents.
      */
-    getContainingTrack: function(viewport) {
+    getContainingTrack: function (viewport) {
       var containerToTrack = viewport.containerToTrackMap;
       for (var i in this.yComponents_) {
         var yComponent = this.yComponents_[i];
         var track = containerToTrack.getTrackByStableId(yComponent.stableId);
-        if (track !== undefined)
-          return track;
+        if (track !== undefined) return track;
       }
     },
 
@@ -123,7 +116,7 @@ global.tr.exportTo('tr.model', function() {
      * Calculates and returns x and y coordinates of the current location with
      * respect to the timeline's canvas.
      */
-    toViewCoordinates: function(viewport) {
+    toViewCoordinates: function (viewport) {
       var dt = viewport.currentDisplayTransform;
       var containerToTrack = viewport.containerToTrackMap;
       var viewX = dt.xWorldToView(this.xWorld_);
@@ -145,7 +138,7 @@ global.tr.exportTo('tr.model', function() {
       };
     },
 
-    toDict: function() {
+    toDict: function () {
       return {
         xWorld: this.xWorld_,
         yComponents: this.yComponents_

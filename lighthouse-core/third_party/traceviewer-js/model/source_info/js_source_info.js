@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./source_info.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model.source_info', function() {
+global.tr.exportTo('tr.model.source_info', function () {
   function JSSourceInfo(file, line, column, isNative, scriptId, state) {
     tr.model.source_info.SourceInfo.call(this, file, line, column);
 
@@ -32,10 +33,9 @@ global.tr.exportTo('tr.model.source_info', function() {
       return this.scriptId_;
     },
 
-    toString: function() {
+    toString: function () {
       var str = this.isNative_ ? '[native v8] ' : '';
-      return str +
-          tr.model.source_info.SourceInfo.prototype.toString.call(this);
+      return str + tr.model.source_info.SourceInfo.prototype.toString.call(this);
     }
   };
 

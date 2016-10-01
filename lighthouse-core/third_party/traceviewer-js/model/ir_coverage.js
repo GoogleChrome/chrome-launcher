@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,15 +10,14 @@ require("./event_set.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   function getAssociatedEvents(irs) {
     var allAssociatedEvents = new tr.model.EventSet();
-    irs.forEach(function(ir) {
-      ir.associatedEvents.forEach(function(event) {
+    irs.forEach(function (ir) {
+      ir.associatedEvents.forEach(function (event) {
         // FlowEvents don't have parentContainers or cpuDurations, and it's
         // annoying to highlight them.
-        if (event instanceof tr.model.FlowEvent)
-          return;
+        if (event instanceof tr.model.FlowEvent) return;
         allAssociatedEvents.push(event);
       });
     });
@@ -30,20 +30,15 @@ global.tr.exportTo('tr.model', function() {
     // the set of associated events.
     // Only add event to the set of unassociated events if it is not in
     // the set of associated events.
-    for (var proc of model.getAllProcesses())
-      for (var thread of tr.b.dictionaryValues(proc.threads))
-        for (var event of thread.sliceGroup.getDescendantEvents())
-          if (!associatedEvents.contains(event))
-            unassociatedEvents.push(event);
+    for (var proc of model.getAllProcesses()) for (var thread of tr.b.dictionaryValues(proc.threads)) for (var event of thread.sliceGroup.getDescendantEvents()) if (!associatedEvents.contains(event)) unassociatedEvents.push(event);
     return unassociatedEvents;
   }
 
   function getTotalCpuDuration(events) {
     var cpuMs = 0;
-    events.forEach(function(event) {
+    events.forEach(function (event) {
       // Add up events' cpu self time if they have any.
-      if (event.cpuSelfTime)
-        cpuMs += event.cpuSelfTime;
+      if (event.cpuSelfTime) cpuMs += event.cpuSelfTime;
     });
     return cpuMs;
   }
@@ -51,11 +46,9 @@ global.tr.exportTo('tr.model', function() {
   function getIRCoverageFromModel(model) {
     var associatedEvents = getAssociatedEvents(model.userModel.expectations);
 
-    if (!associatedEvents.length)
-      return undefined;
+    if (!associatedEvents.length) return undefined;
 
-    var unassociatedEvents = getUnassociatedEvents(
-        model, associatedEvents);
+    var unassociatedEvents = getUnassociatedEvents(model, associatedEvents);
 
     var associatedCpuMs = getTotalCpuDuration(associatedEvents);
     var unassociatedCpuMs = getTotalCpuDuration(unassociatedEvents);
@@ -63,8 +56,7 @@ global.tr.exportTo('tr.model', function() {
     var totalEventCount = associatedEvents.length + unassociatedEvents.length;
     var totalCpuMs = associatedCpuMs + unassociatedCpuMs;
     var coveredEventsCpuTimeRatio = undefined;
-    if (totalCpuMs !== 0)
-      coveredEventsCpuTimeRatio = associatedCpuMs / totalCpuMs;
+    if (totalCpuMs !== 0) coveredEventsCpuTimeRatio = associatedCpuMs / totalCpuMs;
 
     return {
       associatedEventsCount: associatedEvents.length,

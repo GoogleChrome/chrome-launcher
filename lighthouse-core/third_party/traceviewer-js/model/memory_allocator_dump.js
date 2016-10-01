@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,15 +6,15 @@ found in the LICENSE file.
 **/
 
 require("../base/iteration_helpers.js");
+require("../base/unit.js");
 require("../value/numeric.js");
-require("../value/unit.js");
 
 'use strict';
 
 /**
  * @fileoverview Provides the MemoryAllocatorDump class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   /**
    * @constructor
    */
@@ -57,7 +58,7 @@ global.tr.exportTo('tr.model', function() {
 
     // For debugging purposes.
     this.guid = opt_guid;
-  };
+  }
 
   /**
    * Size numeric names. Please refer to the Memory Dump Graph Metric
@@ -66,8 +67,7 @@ global.tr.exportTo('tr.model', function() {
   MemoryAllocatorDump.SIZE_NUMERIC_NAME = 'size';
   MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME = 'effective_size';
   MemoryAllocatorDump.RESIDENT_SIZE_NUMERIC_NAME = 'resident_size';
-  MemoryAllocatorDump.DISPLAYED_SIZE_NUMERIC_NAME =
-      MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME;
+  MemoryAllocatorDump.DISPLAYED_SIZE_NUMERIC_NAME = MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME;
 
   MemoryAllocatorDump.prototype = {
     get name() {
@@ -75,81 +75,70 @@ global.tr.exportTo('tr.model', function() {
     },
 
     get quantifiedName() {
-      return '\'' + this.fullName + '\' in ' +
-          this.containerMemoryDump.containerName;
+      return '\'' + this.fullName + '\' in ' + this.containerMemoryDump.containerName;
     },
 
-    getDescendantDumpByFullName: function(fullName) {
-      return this.containerMemoryDump.getMemoryAllocatorDumpByFullName(
-          this.fullName + '/' + fullName);
+    getDescendantDumpByFullName: function (fullName) {
+      return this.containerMemoryDump.getMemoryAllocatorDumpByFullName(this.fullName + '/' + fullName);
     },
 
-    isDescendantOf: function(otherDump) {
+    isDescendantOf: function (otherDump) {
       var dump = this;
       while (dump !== undefined) {
-        if (dump === otherDump)
-          return true;
+        if (dump === otherDump) return true;
         dump = dump.parent;
       }
       return false;
     },
 
-    addNumeric: function(name, numeric) {
-      if (!(numeric instanceof tr.v.ScalarNumeric))
-        throw new Error('Numeric value must be an instance of ScalarNumeric.');
-      if (name in this.numerics)
-        throw new Error('Duplicate numeric name: ' + name + '.');
+    addNumeric: function (name, numeric) {
+      if (!(numeric instanceof tr.v.ScalarNumeric)) throw new Error('Numeric value must be an instance of ScalarNumeric.');
+      if (name in this.numerics) throw new Error('Duplicate numeric name: ' + name + '.');
       this.numerics[name] = numeric;
     },
 
-    addDiagnostic: function(name, text) {
-      if (typeof text !== 'string')
-        throw new Error('Diagnostic text must be a string.');
-      if (name in this.diagnostics)
-        throw new Error('Duplicate diagnostic name: ' + name + '.');
+    addDiagnostic: function (name, text) {
+      if (typeof text !== 'string') throw new Error('Diagnostic text must be a string.');
+      if (name in this.diagnostics) throw new Error('Duplicate diagnostic name: ' + name + '.');
       this.diagnostics[name] = text;
     },
 
-    aggregateNumericsRecursively: function(opt_model) {
+    aggregateNumericsRecursively: function (opt_model) {
       var numericNames = new Set();
 
       // Aggregate descendants's numerics recursively and gather children's
       // numeric names.
-      this.children.forEach(function(child) {
+      this.children.forEach(function (child) {
         child.aggregateNumericsRecursively(opt_model);
         tr.b.iterItems(child.numerics, numericNames.add, numericNames);
       }, this);
 
       // Aggregate children's numerics.
-      numericNames.forEach(function(numericName) {
-        if (numericName === MemoryAllocatorDump.SIZE_NUMERIC_NAME ||
-            numericName === MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME ||
-            this.numerics[numericName] !== undefined) {
-            // Don't aggregate size and effective size numerics. These are
-            // calculated in GlobalMemoryDump.prototype.calculateSizes() and
-            // GlobalMemoryDump.prototype.calculateEffectiveSizes respectively.
-            // Also don't aggregate numerics that the parent already has.
+      numericNames.forEach(function (numericName) {
+        if (numericName === MemoryAllocatorDump.SIZE_NUMERIC_NAME || numericName === MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME || this.numerics[numericName] !== undefined) {
+          // Don't aggregate size and effective size numerics. These are
+          // calculated in GlobalMemoryDump.prototype.calculateSizes() and
+          // GlobalMemoryDump.prototype.calculateEffectiveSizes respectively.
+          // Also don't aggregate numerics that the parent already has.
           return;
         }
 
-        this.numerics[numericName] = MemoryAllocatorDump.aggregateNumerics(
-            this.children.map(function(child) {
-              return child.numerics[numericName];
-            }), opt_model);
+        this.numerics[numericName] = MemoryAllocatorDump.aggregateNumerics(this.children.map(function (child) {
+          return child.numerics[numericName];
+        }), opt_model);
       }, this);
     }
   };
 
-  // TODO(petrcermak): Consider moving this to tr.v.Numeric.
-  MemoryAllocatorDump.aggregateNumerics = function(numerics, opt_model) {
+  // TODO(petrcermak): Consider moving this to tr.v.Histogram.
+  MemoryAllocatorDump.aggregateNumerics = function (numerics, opt_model) {
     var shouldLogWarning = !!opt_model;
     var aggregatedUnit = undefined;
     var aggregatedValue = 0;
 
     // Aggregate the units and sum up the values of the numerics.
-    numerics.forEach(function(numeric) {
-      if (numeric === undefined)
-        return;
+    numerics.forEach(function (numeric) {
+      if (numeric === undefined) return;
 
       var unit = numeric.unit;
       if (aggregatedUnit === undefined) {
@@ -158,21 +147,19 @@ global.tr.exportTo('tr.model', function() {
         if (shouldLogWarning) {
           opt_model.importWarning({
             type: 'numeric_parse_error',
-            message: 'Multiple units provided for numeric: \'' +
-                aggregatedUnit.unitName + '\' and \'' + unit.unitName + '\'.'
+            message: 'Multiple units provided for numeric: \'' + aggregatedUnit.unitName + '\' and \'' + unit.unitName + '\'.'
           });
-          shouldLogWarning = false;  // Don't log multiple warnings.
+          shouldLogWarning = false; // Don't log multiple warnings.
         }
         // Use the most generic unit when the numerics don't agree (best
         // effort).
-        aggregatedUnit = tr.v.Unit.byName.unitlessNumber_smallerIsBetter;
+        aggregatedUnit = tr.b.Unit.byName.unitlessNumber_smallerIsBetter;
       }
 
       aggregatedValue += numeric.value;
     }, this);
 
-    if (aggregatedUnit === undefined)
-      return undefined;
+    if (aggregatedUnit === undefined) return undefined;
 
     return new tr.v.ScalarNumeric(aggregatedUnit, aggregatedValue);
   };

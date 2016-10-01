@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -16,10 +17,9 @@ require("./thread_slice.js");
 /**
  * @fileoverview Provides the Thread class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var AsyncSlice = tr.model.AsyncSlice;
   var AsyncSliceGroup = tr.model.AsyncSliceGroup;
-  var Slice = tr.model.Slice;
   var SliceGroup = tr.model.SliceGroup;
   var ThreadSlice = tr.model.ThreadSlice;
   var ThreadTimeSlice = tr.model.ThreadTimeSlice;
@@ -37,8 +37,7 @@ global.tr.exportTo('tr.model', function() {
    * @extends {tr.model.EventContainer}
    */
   function Thread(parent, tid) {
-    if (!parent)
-      throw new Error('Parent must be provided.');
+    if (!parent) throw new Error('Parent must be provided.');
 
     tr.model.EventContainer.call(this);
     this.parent = parent;
@@ -51,8 +50,7 @@ global.tr.exportTo('tr.model', function() {
 
     this.sliceGroup = new SliceGroup(this, ThreadSlice, 'slices');
     this.timeSlices = undefined;
-    this.kernelSliceGroup = new SliceGroup(
-        this, ThreadSlice, 'kernel-slices');
+    this.kernelSliceGroup = new SliceGroup(this, ThreadSlice, 'kernel-slices');
     this.asyncSliceGroup = new AsyncSliceGroup(this, 'async-slices');
   }
 
@@ -67,28 +65,23 @@ global.tr.exportTo('tr.model', function() {
       return this.parent.stableId + '.' + this.tid;
     },
 
-    compareTo: function(that) {
+    compareTo: function (that) {
       return Thread.compare(this, that);
     },
 
-    childEventContainers: function*() {
-      if (this.sliceGroup.length)
-        yield this.sliceGroup;
-      if (this.kernelSliceGroup.length)
-        yield this.kernelSliceGroup;
-      if (this.asyncSliceGroup.length)
-        yield this.asyncSliceGroup;
+    childEventContainers: function* () {
+      if (this.sliceGroup.length) yield this.sliceGroup;
+      if (this.kernelSliceGroup.length) yield this.kernelSliceGroup;
+      if (this.asyncSliceGroup.length) yield this.asyncSliceGroup;
     },
 
-    childEvents: function*() {
-      if (this.timeSlices)
-        yield * this.timeSlices;
+    childEvents: function* () {
+      if (this.timeSlices) yield* this.timeSlices;
     },
 
-    iterateAllPersistableObjects: function(cb) {
+    iterateAllPersistableObjects: function (cb) {
       cb(this);
-      if (this.sliceGroup.length)
-        cb(this.sliceGroup);
+      if (this.sliceGroup.length) cb(this.sliceGroup);
       this.asyncSliceGroup.viewSubGroups.forEach(cb);
     },
 
@@ -96,7 +89,7 @@ global.tr.exportTo('tr.model', function() {
      * Shifts all the timestamps inside this thread forward by the amount
      * specified.
      */
-    shiftTimestampsForward: function(amount) {
+    shiftTimestampsForward: function (amount) {
       this.sliceGroup.shiftTimestampsForward(amount);
 
       if (this.timeSlices) {
@@ -115,18 +108,12 @@ global.tr.exportTo('tr.model', function() {
      * that it should be pruned from the model.
      */
     get isEmpty() {
-      if (this.sliceGroup.length)
-        return false;
-      if (this.sliceGroup.openSliceCount)
-        return false;
-      if (this.timeSlices && this.timeSlices.length)
-        return false;
-      if (this.kernelSliceGroup.length)
-        return false;
-      if (this.asyncSliceGroup.length)
-        return false;
-      if (this.samples_.length)
-        return false;
+      if (this.sliceGroup.length) return false;
+      if (this.sliceGroup.openSliceCount) return false;
+      if (this.timeSlices && this.timeSlices.length) return false;
+      if (this.kernelSliceGroup.length) return false;
+      if (this.asyncSliceGroup.length) return false;
+      if (this.samples_.length) return false;
       return true;
     },
 
@@ -134,7 +121,7 @@ global.tr.exportTo('tr.model', function() {
      * Updates the bounds based on the
      * current objects associated with the thread.
      */
-    updateBounds: function() {
+    updateBounds: function () {
       this.bounds.reset();
 
       this.sliceGroup.updateBounds();
@@ -148,48 +135,41 @@ global.tr.exportTo('tr.model', function() {
 
       if (this.timeSlices && this.timeSlices.length) {
         this.bounds.addValue(this.timeSlices[0].start);
-        this.bounds.addValue(
-            this.timeSlices[this.timeSlices.length - 1].end);
+        this.bounds.addValue(this.timeSlices[this.timeSlices.length - 1].end);
       }
 
       if (this.samples_ && this.samples_.length) {
         this.bounds.addValue(this.samples_[0].start);
-        this.bounds.addValue(
-            this.samples_[this.samples_.length - 1].end);
+        this.bounds.addValue(this.samples_[this.samples_.length - 1].end);
       }
     },
 
-    addCategoriesToDict: function(categoriesDict) {
-      for (var i = 0; i < this.sliceGroup.length; i++)
-        categoriesDict[this.sliceGroup.slices[i].category] = true;
-      for (var i = 0; i < this.kernelSliceGroup.length; i++)
-        categoriesDict[this.kernelSliceGroup.slices[i].category] = true;
-      for (var i = 0; i < this.asyncSliceGroup.length; i++)
-        categoriesDict[this.asyncSliceGroup.slices[i].category] = true;
+    addCategoriesToDict: function (categoriesDict) {
+      for (var i = 0; i < this.sliceGroup.length; i++) categoriesDict[this.sliceGroup.slices[i].category] = true;
+      for (var i = 0; i < this.kernelSliceGroup.length; i++) categoriesDict[this.kernelSliceGroup.slices[i].category] = true;
+      for (var i = 0; i < this.asyncSliceGroup.length; i++) categoriesDict[this.asyncSliceGroup.slices[i].category] = true;
       if (this.samples_) {
-        for (var i = 0; i < this.samples_.length; i++)
-          categoriesDict[this.samples_[i].category] = true;
+        for (var i = 0; i < this.samples_.length; i++) categoriesDict[this.samples_[i].category] = true;
       }
     },
 
-    autoCloseOpenSlices: function() {
+    autoCloseOpenSlices: function () {
       this.sliceGroup.autoCloseOpenSlices();
       this.kernelSliceGroup.autoCloseOpenSlices();
     },
 
-    mergeKernelWithUserland: function() {
+    mergeKernelWithUserland: function () {
       if (this.kernelSliceGroup.length > 0) {
-        var newSlices = SliceGroup.merge(
-            this.sliceGroup, this.kernelSliceGroup);
+        var newSlices = SliceGroup.merge(this.sliceGroup, this.kernelSliceGroup);
         this.sliceGroup.slices = newSlices.slices;
         this.kernelSliceGroup = new SliceGroup(this);
         this.updateBounds();
       }
     },
 
-    createSubSlices: function() {
+    createSubSlices: function () {
       this.sliceGroup.createSubSlices();
-      this.samples_ = this.parent.model.samples.filter(function(sample) {
+      this.samples_ = this.parent.model.samples.filter(function (sample) {
         return sample.thread == this;
       }, this);
     },
@@ -205,33 +185,28 @@ global.tr.exportTo('tr.model', function() {
      * @return {String} User friendly details about this thread.
      */
     get userFriendlyDetails() {
-      return 'tid: ' + this.tid +
-          (this.name ? ', name: ' + this.name : '');
+      return 'tid: ' + this.tid + (this.name ? ', name: ' + this.name : '');
     },
 
-    getSettingsKey: function() {
-      if (!this.name)
-        return undefined;
+    getSettingsKey: function () {
+      if (!this.name) return undefined;
       var parentKey = this.parent.getSettingsKey();
-      if (!parentKey)
-        return undefined;
+      if (!parentKey) return undefined;
       return parentKey + '.' + this.name;
     },
 
-    getProcess: function() {
+    getProcess: function () {
       return this.parent;
     },
 
     /*
      * Returns the index of the slice in the timeSlices array, or undefined.
      */
-    indexOfTimeSlice: function(timeSlice) {
-      var i = tr.b.findLowIndexInSortedArray(
-          this.timeSlices,
-          function(slice) { return slice.start; },
-          timeSlice.start);
-      if (this.timeSlices[i] !== timeSlice)
-        return undefined;
+    indexOfTimeSlice: function (timeSlice) {
+      var i = tr.b.findLowIndexInSortedArray(this.timeSlices, function (slice) {
+        return slice.start;
+      }, timeSlice.start);
+      if (this.timeSlices[i] !== timeSlice) return undefined;
       return i;
     },
 
@@ -242,39 +217,34 @@ global.tr.exportTo('tr.model', function() {
      * Additionally, stats.total contains the total time
      * spent running on all CPUs.
      */
-    getCpuStatsForRange: function(range) {
+    getCpuStatsForRange: function (range) {
       var stats = {};
       stats.total = 0;
 
-      if (!this.timeSlices)
-        return stats;
+      if (!this.timeSlices) return stats;
 
       function addStatsForSlice(threadTimeSlice) {
-        var freqRange = tr.b.Range.fromExplicitRange(threadTimeSlice.start,
-            threadTimeSlice.end);
+        var freqRange = tr.b.Range.fromExplicitRange(threadTimeSlice.start, threadTimeSlice.end);
         var intersection = freqRange.findIntersection(range);
 
-        if (threadTimeSlice.schedulingState ==
-            tr.model.SCHEDULING_STATE.RUNNING) {
+        if (threadTimeSlice.schedulingState == tr.model.SCHEDULING_STATE.RUNNING) {
           var cpu = threadTimeSlice.cpuOnWhichThreadWasRunning;
-          if (!(cpu.cpuNumber in stats))
-            stats[cpu.cpuNumber] = 0;
+          if (!(cpu.cpuNumber in stats)) stats[cpu.cpuNumber] = 0;
 
           stats[cpu.cpuNumber] += intersection.duration;
           stats.total += intersection.duration;
         }
       }
 
-      tr.b.iterateOverIntersectingIntervals(this.timeSlices,
-                                            function(x) { return x.start; },
-                                            function(x) { return x.end; },
-                                            range.min,
-                                            range.max,
-                                            addStatsForSlice);
+      tr.b.iterateOverIntersectingIntervals(this.timeSlices, function (x) {
+        return x.start;
+      }, function (x) {
+        return x.end;
+      }, range.min, range.max, addStatsForSlice);
       return stats;
     },
 
-    getSchedulingStatsForRange: function(start, end) {
+    getSchedulingStatsForRange: function (start, end) {
       var stats = {};
 
       if (!this.timeSlices) return stats;
@@ -284,17 +254,15 @@ global.tr.exportTo('tr.model', function() {
         var overlapEnd = Math.min(threadTimeSlice.end, end);
         var schedulingState = threadTimeSlice.schedulingState;
 
-        if (!(schedulingState in stats))
-          stats[schedulingState] = 0;
+        if (!(schedulingState in stats)) stats[schedulingState] = 0;
         stats[schedulingState] += overlapEnd - overlapStart;
       }
 
-      tr.b.iterateOverIntersectingIntervals(this.timeSlices,
-                                            function(x) { return x.start; },
-                                            function(x) { return x.end; },
-                                            start,
-                                            end,
-                                            addStatsForSlice);
+      tr.b.iterateOverIntersectingIntervals(this.timeSlices, function (x) {
+        return x.start;
+      }, function (x) {
+        return x.end;
+      }, start, end, addStatsForSlice);
       return stats;
     },
 
@@ -307,20 +275,17 @@ global.tr.exportTo('tr.model', function() {
    * Comparison between threads that orders first by parent.compareTo,
    * then by names, then by tid.
    */
-  Thread.compare = function(x, y) {
+  Thread.compare = function (x, y) {
     var tmp = x.parent.compareTo(y.parent);
-    if (tmp)
-      return tmp;
+    if (tmp) return tmp;
 
     tmp = x.sortIndex - y.sortIndex;
-    if (tmp)
-      return tmp;
+    if (tmp) return tmp;
 
-    tmp = tr.b.comparePossiblyUndefinedValues(
-        x.name, y.name,
-        function(x, y) { return x.localeCompare(y); });
-    if (tmp)
-      return tmp;
+    tmp = tr.b.comparePossiblyUndefinedValues(x.name, y.name, function (x, y) {
+      return x.localeCompare(y);
+    });
+    if (tmp) return tmp;
 
     return x.tid - y.tid;
   };

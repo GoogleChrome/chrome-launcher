@@ -1,9 +1,9 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
-
 
 'use strict';
 
@@ -13,9 +13,9 @@ found in the LICENSE file.
  * @const
  */
 
-
 /** Platform, package, object property, and Event support. */
-global.tr = (function() {
+
+global.tr = function () {
   if (global.tr) {
     console.warn('Base was multiply initialized. First init wins.');
     return global.tr;
@@ -65,8 +65,7 @@ global.tr = (function() {
     for (var i = 0; i < parts.length; i++) {
       var partName = parts[i];
       var nextObject = curObject[partName];
-      if (nextObject === undefined)
-        return false;
+      if (nextObject === undefined) return false;
       curObject = nextObject;
     }
     return true;
@@ -75,8 +74,7 @@ global.tr = (function() {
   var panicElement = undefined;
   var rawPanicMessages = [];
   function showPanicElementIfNeeded() {
-    if (panicElement)
-      return;
+    if (panicElement) return;
 
     var panicOverlay = document.createElement('div');
     panicOverlay.style.backgroundColor = 'white';
@@ -95,37 +93,31 @@ global.tr = (function() {
     panicElement = document.createElement('div');
     panicElement.style.webkitFlex = '1 1 auto';
     panicElement.style.overflow = 'auto';
-    Polymer.dom(panicOverlay).appendChild(panicElement);
+    panicOverlay.appendChild(panicElement);
 
     if (!document.body) {
-      setTimeout(function() {
-        Polymer.dom(document.body).appendChild(panicOverlay);
+      setTimeout(function () {
+        document.body.appendChild(panicOverlay);
       }, 150);
     } else {
-      Polymer.dom(document.body).appendChild(panicOverlay);
+      document.body.appendChild(panicOverlay);
     }
   }
 
   function showPanic(panicTitle, panicDetails) {
     if (tr.isHeadless) {
-      if (panicDetails instanceof Error)
-        throw panicDetails;
+      if (panicDetails instanceof Error) throw panicDetails;
       throw new Error('Panic: ' + panicTitle + ':\n' + panicDetails);
     }
 
-    if (panicDetails instanceof Error)
-      panicDetails = panicDetails.stack;
+    if (panicDetails instanceof Error) panicDetails = panicDetails.stack;
 
     showPanicElementIfNeeded();
     var panicMessageEl = document.createElement('div');
-    Polymer.dom(panicMessageEl).innerHTML =
-        '<h2 id="message"></h2>' +
-        '<pre id="details"></pre>';
-    Polymer.dom(Polymer.dom(panicMessageEl).querySelector('#message')).
-        textContent = panicTitle;
-    Polymer.dom(Polymer.dom(panicMessageEl).querySelector('#details')).
-        textContent = panicDetails;
-    Polymer.dom(panicElement).appendChild(panicMessageEl);
+    panicMessageEl.innerHTML = '<h2 id="message"></h2>' + '<pre id="details"></pre>';
+    panicMessageEl.querySelector('#message').textContent = panicTitle;
+    panicMessageEl.querySelector('#details').textContent = panicDetails;
+    panicElement.appendChild(panicMessageEl);
 
     rawPanicMessages.push({
       title: panicTitle,
@@ -137,7 +129,7 @@ global.tr = (function() {
     return rawPanicMessages.length !== 0;
   }
   function getPanicText() {
-    return rawPanicMessages.map(function(msg) {
+    return rawPanicMessages.map(function (msg) {
       return msg.title;
     }).join(', ');
   }
@@ -150,10 +142,8 @@ global.tr = (function() {
       // Maybe we should check the prototype chain here? The current usage
       // pattern is always using an object literal so we only care about own
       // properties.
-      var propertyDescriptor = Object.getOwnPropertyDescriptor(exports,
-                                                               propertyName);
-      if (propertyDescriptor)
-        Object.defineProperty(obj, propertyName, propertyDescriptor);
+      var propertyDescriptor = Object.getOwnPropertyDescriptor(exports, propertyName);
+      if (propertyDescriptor) Object.defineProperty(obj, propertyName, propertyDescriptor);
     }
   };
 
@@ -189,6 +179,6 @@ global.tr = (function() {
     hasPanic: hasPanic,
     getPanicText: getPanicText
   };
-})();
+}();
 
 tr.initialize();

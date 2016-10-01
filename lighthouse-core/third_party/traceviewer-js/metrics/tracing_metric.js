@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -6,181 +7,154 @@ found in the LICENSE file.
 
 require("../base/iteration_helpers.js");
 require("./metric_registry.js");
-require("../value/numeric.js");
-require("../value/value.js");
+require("../value/diagnostics/diagnostic_map.js");
+require("../value/histogram.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics', function() {
-  var MEMORY_INFRA_TRACING_CATEGORY = 'disabled-by-default-memory-infra';
+global.tr.exportTo('tr.metrics', function () {
+    var MEMORY_INFRA_TRACING_CATEGORY = 'disabled-by-default-memory-infra';
 
-  function addTimeDurationValue(valueName, duration, allValues) {
-    var scalarNumericValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.timeDurationInMs_smallerIsBetter, duration);
-    var numericValue = new tr.v.NumericValue(valueName, scalarNumericValue);
-    allValues.addValue(numericValue);
-  }
+    var TIME_BOUNDARIES = tr.v.HistogramBinBoundaries.createExponential(1e-3, 1e5, 30);
 
-  // Adds values specific to memory-infra dumps.
-  function addMemoryInfraValues(values, model, categoryNamesToTotalEventSizes) {
-    var memoryDumpCount = model.globalMemoryDumps.length;
-    if (memoryDumpCount === 0)
-      return;
+    var BYTE_BOUNDARIES = tr.v.HistogramBinBoundaries.createExponential(1, 1e9, 30);
 
-    var totalOverhead = 0;
-    var nonMemoryInfraThreadOverhead = 0;
-    var overheadByProvider = {};
-    tr.b.iterItems(model.processes, function(pid, process) {
-      tr.b.iterItems(process.threads, function(tid, thread) {
-        tr.b.iterItems(thread.sliceGroup.slices, function(slice_id, slice) {
-          if (slice.category !== MEMORY_INFRA_TRACING_CATEGORY)
-            return;
-          totalOverhead += slice.duration;
-          if (thread.name !== 'MemoryInfra')
-            nonMemoryInfraThreadOverhead += slice.duration;
-          if (slice.args && slice.args['dump_provider.name']) {
-            var providerName = slice.args['dump_provider.name'];
-            overheadByProvider[providerName] =
-                (overheadByProvider[providerName] || 0) + slice.duration;
-          }
+    var COUNT_BOUNDARIES = tr.v.HistogramBinBoundaries.createExponential(1, 1e5, 30);
+
+    function addTimeDurationValue(valueName, duration, allValues) {
+        var hist = new tr.v.Histogram(valueName, tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, TIME_BOUNDARIES);
+        hist.addSample(duration);
+        allValues.addHistogram(hist);
+    }
+
+    // Adds values specific to memory-infra dumps.
+    function addMemoryInfraValues(values, model, categoryNamesToTotalEventSizes) {
+        var memoryDumpCount = model.globalMemoryDumps.length;
+        if (memoryDumpCount === 0) return;
+
+        var totalOverhead = 0;
+        var nonMemoryInfraThreadOverhead = 0;
+        var overheadByProvider = {};
+        tr.b.iterItems(model.processes, function (pid, process) {
+            tr.b.iterItems(process.threads, function (tid, thread) {
+                tr.b.iterItems(thread.sliceGroup.slices, (unusedSliceId, slice) => {
+                    if (slice.category !== MEMORY_INFRA_TRACING_CATEGORY) return;
+                    totalOverhead += slice.duration;
+                    if (thread.name !== 'MemoryInfra') nonMemoryInfraThreadOverhead += slice.duration;
+                    if (slice.args && slice.args['dump_provider.name']) {
+                        var providerName = slice.args['dump_provider.name'];
+                        var durationAndCount = overheadByProvider[providerName];
+                        if (durationAndCount === undefined) {
+                            overheadByProvider[providerName] = durationAndCount = { duration: 0, count: 0 };
+                        }
+                        durationAndCount.duration += slice.duration;
+                        durationAndCount.count++;
+                    }
+                });
+            });
         });
-      });
-    });
 
-    addTimeDurationValue(
-        'Average CPU overhead on all threads per memory-infra dump',
-        totalOverhead / memoryDumpCount, values);
-    addTimeDurationValue(
-        'Average CPU overhead on non-memory-infra threads per memory-infra ' +
-            'dump',
-        nonMemoryInfraThreadOverhead / memoryDumpCount, values);
-    tr.b.iterItems(overheadByProvider, function(providerName, overhead) {
-      addTimeDurationValue(
-          'Average CPU overhead of ' + providerName + ' per memory-infra dump',
-          overhead / memoryDumpCount, values);
-    });
+        addTimeDurationValue('Average CPU overhead on all threads per memory-infra dump', totalOverhead / memoryDumpCount, values);
+        addTimeDurationValue('Average CPU overhead on non-memory-infra threads per memory-infra ' + 'dump', nonMemoryInfraThreadOverhead / memoryDumpCount, values);
+        tr.b.iterItems(overheadByProvider, function (providerName, overhead) {
+            addTimeDurationValue('Average CPU overhead of ' + providerName + ' per OnMemoryDump call', overhead.duration / overhead.count, values);
+        });
 
-    var memoryInfraEventsSize =
-        categoryNamesToTotalEventSizes.get(MEMORY_INFRA_TRACING_CATEGORY);
-    var memoryInfraTraceBytesValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.sizeInBytes_smallerIsBetter, memoryInfraEventsSize);
-    values.addValue(new tr.v.NumericValue(
-        'Total trace size of memory-infra dumps in bytes',
-        memoryInfraTraceBytesValue));
+        var memoryInfraEventsSize = categoryNamesToTotalEventSizes.get(MEMORY_INFRA_TRACING_CATEGORY);
+        var memoryInfraTraceBytesValue = new tr.v.Histogram('Total trace size of memory-infra dumps in bytes', tr.b.Unit.byName.sizeInBytes_smallerIsBetter, BYTE_BOUNDARIES);
+        memoryInfraTraceBytesValue.addSample(memoryInfraEventsSize);
+        values.addHistogram(memoryInfraTraceBytesValue);
 
-    var traceBytesPerDumpValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.sizeInBytes_smallerIsBetter,
-        memoryInfraEventsSize / memoryDumpCount);
-    values.addValue(new tr.v.NumericValue(
-        'Average trace size of memory-infra dumps in bytes',
-        traceBytesPerDumpValue));
-  }
-
-  function tracingMetric(values, model) {
-    if (!model.stats.hasEventSizesinBytes) {
-      throw new Error('Model stats does not have event size information. ' +
-                      'Please enable ImportOptions.trackDetailedModelStats.');
+        var traceBytesPerDumpValue = new tr.v.Histogram('Average trace size of memory-infra dumps in bytes', tr.b.Unit.byName.sizeInBytes_smallerIsBetter, BYTE_BOUNDARIES);
+        traceBytesPerDumpValue.addSample(memoryInfraEventsSize / memoryDumpCount);
+        values.addHistogram(traceBytesPerDumpValue);
     }
 
-    var eventStats = model.stats.allTraceEventStatsInTimeIntervals;
-    eventStats.sort(function(a, b) {
-      return a.timeInterval - b.timeInterval;
-    });
+    function tracingMetric(values, model) {
+        if (!model.stats.hasEventSizesinBytes) {
+            throw new Error('Model stats does not have event size information. ' + 'Please enable ImportOptions.trackDetailedModelStats.');
+        }
 
-    var totalTraceBytes = eventStats.reduce((a, b) =>
-                                            (a + b.totalEventSizeinBytes), 0);
+        var eventStats = model.stats.allTraceEventStatsInTimeIntervals;
+        eventStats.sort(function (a, b) {
+            return a.timeInterval - b.timeInterval;
+        });
 
-    // We maintain a sliding window of records [start ... end-1] where end
-    // increments each time through the loop, and we move start just far enough
-    // to keep the window less than 1 second wide. Note that we need to compute
-    // the number of time intervals (i.e. units that timeInterval is given in)
-    // in one second to know how wide the sliding window should be.
-    var maxEventCountPerSec = 0;
-    var maxEventBytesPerSec = 0;
-    var INTERVALS_PER_SEC = Math.floor(
-        1000 / model.stats.TIME_INTERVAL_SIZE_IN_MS);
+        var totalTraceBytes = eventStats.reduce((a, b) => a + b.totalEventSizeinBytes, 0);
 
-    var runningEventNumPerSec = 0;
-    var runningEventBytesPerSec = 0;
-    var start = 0;
-    var end = 0;
+        // We maintain a sliding window of records [start ... end-1] where end
+        // increments each time through the loop, and we move start just far enough
+        // to keep the window less than 1 second wide. Note that we need to compute
+        // the number of time intervals (i.e. units that timeInterval is given in)
+        // in one second to know how wide the sliding window should be.
+        var maxEventCountPerSec = 0;
+        var maxEventBytesPerSec = 0;
+        var INTERVALS_PER_SEC = Math.floor(1000 / model.stats.TIME_INTERVAL_SIZE_IN_MS);
 
-    while (end < eventStats.length) {
-      // Slide the end marker forward. Moving the end marker from N
-      // to N+1 adds eventStats[N] to the sliding window.
-      runningEventNumPerSec += eventStats[end].numEvents;
-      runningEventBytesPerSec += eventStats[end].totalEventSizeinBytes;
-      end++;
+        var runningEventNumPerSec = 0;
+        var runningEventBytesPerSec = 0;
+        var start = 0;
+        var end = 0;
 
-      // Slide the start marker forward so that the time interval covered
-      // by the window is less than 1 second wide.
-      while ((eventStats[end - 1].timeInterval -
-              eventStats[start].timeInterval) >= INTERVALS_PER_SEC) {
-        runningEventNumPerSec -= eventStats[start].numEvents;
-        runningEventBytesPerSec -= eventStats[start].totalEventSizeinBytes;
-        start++;
-      }
+        while (end < eventStats.length) {
+            // Slide the end marker forward. Moving the end marker from N
+            // to N+1 adds eventStats[N] to the sliding window.
+            runningEventNumPerSec += eventStats[end].numEvents;
+            runningEventBytesPerSec += eventStats[end].totalEventSizeinBytes;
+            end++;
 
-      // Update maximum values.
-      maxEventCountPerSec = Math.max(maxEventCountPerSec,
-                                     runningEventNumPerSec);
-      maxEventBytesPerSec = Math.max(maxEventBytesPerSec,
-                                     runningEventBytesPerSec);
+            // Slide the start marker forward so that the time interval covered
+            // by the window is less than 1 second wide.
+            while (eventStats[end - 1].timeInterval - eventStats[start].timeInterval >= INTERVALS_PER_SEC) {
+                runningEventNumPerSec -= eventStats[start].numEvents;
+                runningEventBytesPerSec -= eventStats[start].totalEventSizeinBytes;
+                start++;
+            }
 
+            // Update maximum values.
+            maxEventCountPerSec = Math.max(maxEventCountPerSec, runningEventNumPerSec);
+            maxEventBytesPerSec = Math.max(maxEventBytesPerSec, runningEventBytesPerSec);
+        }
+
+        var stats = model.stats.allTraceEventStats;
+        var categoryNamesToTotalEventSizes = stats.reduce((map, stat) => map.set(stat.category, (map.get(stat.category) || 0) + stat.totalEventSizeinBytes), new Map());
+
+        // Determine the category with the highest total event size.
+        var maxCatNameAndBytes = Array.from(categoryNamesToTotalEventSizes.entries()).reduce((a, b) => b[1] >= a[1] ? b : a);
+        var maxEventBytesPerCategory = maxCatNameAndBytes[1];
+        var categoryWithMaxEventBytes = maxCatNameAndBytes[0];
+
+        var maxEventCountPerSecValue = new tr.v.Histogram('Max number of events per second', tr.b.Unit.byName.count_smallerIsBetter, COUNT_BOUNDARIES);
+        maxEventCountPerSecValue.addSample(maxEventCountPerSec);
+
+        var maxEventBytesPerSecValue = new tr.v.Histogram('Max event size in bytes per second', tr.b.Unit.byName.sizeInBytes_smallerIsBetter, BYTE_BOUNDARIES);
+        maxEventBytesPerSecValue.addSample(maxEventBytesPerSec);
+
+        var totalTraceBytesValue = new tr.v.Histogram('Total trace size in bytes', tr.b.Unit.byName.sizeInBytes_smallerIsBetter, BYTE_BOUNDARIES);
+        totalTraceBytesValue.addSample(totalTraceBytes);
+
+        var biggestCategory = {
+            name: categoryWithMaxEventBytes,
+            size_in_bytes: maxEventBytesPerCategory
+        };
+
+        totalTraceBytesValue.diagnostics.set('category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
+        values.addHistogram(totalTraceBytesValue);
+
+        maxEventCountPerSecValue.diagnostics.set('category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
+        values.addHistogram(maxEventCountPerSecValue);
+
+        maxEventBytesPerSecValue.diagnostics.set('category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
+        values.addHistogram(maxEventBytesPerSecValue);
+
+        addMemoryInfraValues(values, model, categoryNamesToTotalEventSizes);
     }
 
-    var stats = model.stats.allTraceEventStats;
-    var categoryNamesToTotalEventSizes = (
-        stats.reduce((map, stat) => (
-            map.set(stat.category,
-                   ((map.get(stat.category) || 0) +
-                    stat.totalEventSizeinBytes))), new Map()));
+    tr.metrics.MetricRegistry.register(tracingMetric);
 
-    // Determine the category with the highest total event size.
-    var maxCatNameAndBytes = Array.from(
-        categoryNamesToTotalEventSizes.entries()).reduce(
-            (a, b) => (b[1] >= a[1]) ? b : a);
-    var maxEventBytesPerCategory = maxCatNameAndBytes[1];
-    var categoryWithMaxEventBytes = maxCatNameAndBytes[0];
-
-    var maxEventCountPerSecValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.unitlessNumber_smallerIsBetter, maxEventCountPerSec);
-    var maxEventBytesPerSecValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.sizeInBytes_smallerIsBetter, maxEventBytesPerSec);
-    var totalTraceBytesValue = new tr.v.ScalarNumeric(
-        tr.v.Unit.byName.sizeInBytes_smallerIsBetter, totalTraceBytes);
-
-    var biggestCategory = {
-      name: categoryWithMaxEventBytes,
-      size_in_bytes: maxEventBytesPerCategory
+    return {
+        tracingMetric: tracingMetric,
+        // For testing only:
+        MEMORY_INFRA_TRACING_CATEGORY: MEMORY_INFRA_TRACING_CATEGORY
     };
-
-    var totalBytes = new tr.v.NumericValue(
-        'Total trace size in bytes', totalTraceBytesValue);
-    totalBytes.diagnostics.add(
-        'category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
-    values.addValue(totalBytes);
-
-    var peakEvents = new tr.v.NumericValue(
-        'Max number of events per second', maxEventCountPerSecValue);
-    peakEvents.diagnostics.add(
-        'category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
-    values.addValue(peakEvents);
-
-    var peakBytes = new tr.v.NumericValue(
-        'Max event size in bytes per second', maxEventBytesPerSecValue);
-    peakBytes.diagnostics.add(
-        'category_with_max_event_size', new tr.v.d.Generic(biggestCategory));
-    values.addValue(peakBytes);
-
-    addMemoryInfraValues(values, model, categoryNamesToTotalEventSizes);
-  }
-
-  tr.metrics.MetricRegistry.register(tracingMetric);
-
-  return {
-    tracingMetric: tracingMetric,
-    // For testing only:
-    MEMORY_INFRA_TRACING_CATEGORY: MEMORY_INFRA_TRACING_CATEGORY
-  };
 });

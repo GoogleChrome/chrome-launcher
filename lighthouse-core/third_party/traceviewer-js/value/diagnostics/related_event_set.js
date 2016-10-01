@@ -1,75 +1,71 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 require("../../model/event_set.js");
 require("./diagnostic.js");
+require("./event_ref.js");
 
 'use strict';
 
-global.tr.exportTo('tr.v.d', function() {
+global.tr.exportTo('tr.v.d', function () {
   /**
-   * Similar to ValueRef, this is a placeholder in case the referenced Event
-   * isn't available in memory to point to directly.
-   *
-   * @constructor
-   * @param {!Object} event
-   * @param {string} event.stableId
-   * @param {string} event.title
-   * @param {number} event.start
-   * @param {number} event.duration
+   * @typedef {!(tr.v.d.EventRef|tr.model.Event)} EventLike
    */
-  function EventRef(event) {
-    this.stableId = event.stableId;
-    this.title = event.title;
-    this.start = event.start;
-    this.duration = event.duration;
-    this.end = this.start + this.duration;
-
-    // tr.v.d.RelatedEventSet identifies events using stableId, but
-    // tr.model.EventSet uses guid.
-    this.guid = tr.b.GUID.allocateSimple();
-  }
 
   /**
    * A RelatedEventSet diagnostic contains references to Events
-   *
-   * @constructor
-   * @param {(!tr.model.EventSet|Array.<!(EventRef|tr.model.Event)>|!EventRef|!tr.model.Event)=} opt_events
    */
-  function RelatedEventSet(opt_events) {
-    this.eventsByStableId_ = {};
-
-    if (opt_events) {
-      if (opt_events instanceof tr.model.EventSet ||
-          opt_events instanceof Array)
-        opt_events.forEach(this.push.bind(this));
-      else
-        this.push(opt_events);
+  class RelatedEventSet extends tr.v.d.Diagnostic {
+    /**
+     * @param {!(tr.model.EventSet|Array.<EventLike>|EventLike)=} opt_events
+     */
+    constructor(opt_events) {
+      super();
+      this.eventsByStableId_ = new Map();
+      if (opt_events) {
+        if (opt_events instanceof tr.model.EventSet || opt_events instanceof Array) {
+          for (var event of opt_events) this.add(event);
+        } else {
+          this.add(opt_events);
+        }
+      }
     }
-  }
-
-  RelatedEventSet.prototype = {
-    __proto__: tr.v.d.Diagnostic.prototype,
 
     /**
-     * Add an event to this set.
-     *
-     * @param {!(EventRef|tr.model.Event)} event
+     * @param {!(tr.v.d.EventRef|tr.model.Event)} event
      */
-    push: function(event) {
-      this.eventsByStableId_[event.stableId] = event;
-    },
+    add(event) {
+      this.eventsByStableId_.set(event.stableId, event);
+    }
 
     /**
-     * @return {!Array.<!(EventRef|tr.model.Event)>}
+     * @param {!(tr.v.d.EventRef|tr.model.Event)} event
+     * @return {boolean}
      */
-    get events() {
-      return new tr.model.EventSet(
-          tr.b.dictionaryValues(this.eventsByStableId_));
-    },
+    has(event) {
+      return this.eventsByStableId_.has(event.stableId);
+    }
+
+    get length() {
+      return this.eventsByStableId_.size;
+    }
+
+    *[Symbol.iterator]() {
+      for (var _ref of this.eventsByStableId_) {
+        var _ref2 = _slicedToArray(_ref, 2);
+
+        var stableId = _ref2[0];
+        var event = _ref2[1];
+
+        yield event;
+      }
+    }
 
     /**
      * Resolve all EventRefs into Events by finding their stableIds in |model|.
@@ -81,34 +77,36 @@ global.tr.exportTo('tr.v.d', function() {
      * @param {!tr.model.Model} model
      * @param {boolean=} opt_required
      */
-    resolve: function(model, opt_required) {
-      tr.b.iterItems(this.eventsByStableId_, function(stableId, event) {
-        if (!(event instanceof EventRef))
-          return;
+    resolve(model, opt_required) {
+      for (var _ref3 of this.eventsByStableId_) {
+        var _ref4 = _slicedToArray(_ref3, 2);
+
+        var stableId = _ref4[0];
+        var event = _ref4[1];
+
+        if (!(event instanceof tr.v.d.EventRef)) continue;
 
         event = model.getEventByStableId(stableId);
-        if (event instanceof tr.model.Event)
-          this.eventsByStableId_[stableId] = event;
-        else if (opt_required)
-          throw new Error('Unable to find Event ' + ref.stableId);
-      }, this);
-    },
+        if (event instanceof tr.model.Event) this.eventsByStableId_.set(stableId, event);else if (opt_required) throw new Error('Unable to find Event ' + stableId);
+      }
+    }
 
-    asDictInto_: function(d) {
-      d.events = this.events.map(function eventAsDict(event) {
-        return {
+    asDictInto_(d) {
+      d.events = [];
+      for (var event of this) {
+        d.events.push({
           stableId: event.stableId,
           title: event.title,
           start: event.start,
           duration: event.duration
-        };
-      });
+        });
+      }
     }
-  };
 
-  RelatedEventSet.fromDict = function(d) {
-    return new RelatedEventSet(d.events.map(event => new EventRef(event)));
-  };
+    static fromDict(d) {
+      return new RelatedEventSet(d.events.map(event => new tr.v.d.EventRef(event)));
+    }
+  }
 
   tr.v.d.Diagnostic.register(RelatedEventSet, {
     elementName: 'tr-v-ui-related-event-set-span'

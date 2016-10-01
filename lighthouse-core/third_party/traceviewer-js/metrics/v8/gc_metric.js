@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,15 +6,14 @@ found in the LICENSE file.
 **/
 
 require("../../base/range.js");
+require("../../base/unit.js");
 require("../metric_registry.js");
 require("./utils.js");
-require("../../value/numeric.js");
-require("../../value/unit.js");
-require("../../value/value.js");
+require("../../value/histogram.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.v8', function() {
+global.tr.exportTo('tr.metrics.v8', function () {
   // The time window size for mutator utilization computation.
   // It is equal to the duration of one frame corresponding to 60 FPS rendering.
   var TARGET_FPS = 60;
@@ -26,81 +26,87 @@ global.tr.exportTo('tr.metrics.v8', function() {
     addDurationOfSubEvents(values, model);
     addIdleTimesOfTopEvents(values, model);
     addTotalIdleTimesOfTopEvents(values, model);
+    addPercentageInV8ExecuteOfTopEvents(values, model);
+    addTotalPercentageInV8Execute(values, model);
     addV8ExecuteMutatorUtilization(values, model);
   }
 
   tr.metrics.MetricRegistry.register(gcMetric);
 
-  var timeDurationInMs_smallerIsBetter =
-      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter;
-  var percentage_biggerIsBetter =
-      tr.v.Unit.byName.normalizedPercentage_biggerIsBetter;
+  var timeDurationInMs_smallerIsBetter = tr.b.Unit.byName.timeDurationInMs_smallerIsBetter;
+  var percentage_biggerIsBetter = tr.b.Unit.byName.normalizedPercentage_biggerIsBetter;
+  var percentage_smallerIsBetter = tr.b.Unit.byName.normalizedPercentage_smallerIsBetter;
 
-  var numericBuilder = new tr.v.NumericBuilder(
-      timeDurationInMs_smallerIsBetter, 0);
   // 0.1 steps from 0 to 20 since it is the most common range.
-  numericBuilder.addLinearBins(20, 200);
   // Exponentially increasing steps from 20 to 200.
-  numericBuilder.addExponentialBins(200, 100);
+  var CUSTOM_BOUNDARIES = tr.v.HistogramBinBoundaries.createLinear(0, 20, 200).addExponentialBins(200, 100);
 
-  function createNumericForTopEventTime() {
-    var n = numericBuilder.build();
+  function createNumericForTopEventTime(name) {
+    var n = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
     n.customizeSummaryOptions({
-        avg: true,
-        count: true,
-        max: true,
-        min: false,
-        std: true,
-        sum: true,
-        percentile: [0.90]});
+      avg: true,
+      count: true,
+      max: true,
+      min: false,
+      std: true,
+      sum: true,
+      percentile: [0.90] });
     return n;
   }
 
-  function createNumericForSubEventTime() {
-    var n = numericBuilder.build();
+  function createNumericForSubEventTime(name) {
+    var n = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
     n.customizeSummaryOptions({
-        avg: true,
-        count: false,
-        max: true,
-        min: false,
-        std: false,
-        sum: false,
-        percentile: [0.90]
+      avg: true,
+      count: false,
+      max: true,
+      min: false,
+      std: false,
+      sum: false,
+      percentile: [0.90]
     });
     return n;
   }
 
-  function createNumericForIdleTime() {
-    var n = numericBuilder.build();
+  function createNumericForIdleTime(name) {
+    var n = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
     n.customizeSummaryOptions({
-        avg: true,
-        count: false,
-        max: true,
-        min: false,
-        std: false,
-        sum: true,
-        percentile: []
+      avg: true,
+      count: false,
+      max: true,
+      min: false,
+      std: false,
+      sum: true,
+      percentile: []
     });
     return n;
   }
 
-  function createPercentage(numerator, denominator) {
-    var percentage = denominator === 0 ? 0 : numerator / denominator * 100;
-    return new tr.v.ScalarNumeric(percentage_biggerIsBetter, percentage);
+  function createPercentage(name, numerator, denominator, unit) {
+    var hist = new tr.v.Histogram(name, unit);
+    if (denominator === 0) hist.addSample(0);else hist.addSample(numerator / denominator);
+    hist.customizeSummaryOptions({
+      avg: true,
+      count: false,
+      max: false,
+      min: false,
+      std: false,
+      sum: false,
+      percentile: []
+    });
+    return hist;
   }
 
   function isNotForcedTopGarbageCollectionEvent(event) {
     // We exclude garbage collection events forced by benchmark runner,
     // because they cannot happen in real world.
-    return tr.metrics.v8.utils.isTopGarbageCollectionEvent(event) &&
-           !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
+    return tr.metrics.v8.utils.isTopGarbageCollectionEvent(event) && !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
   }
 
   function isNotForcedSubGarbageCollectionEvent(event) {
     // We exclude garbage collection events forced by benchmark runner,
     // because they cannot happen in real world.
-    return tr.metrics.v8.utils.isSubGarbageCollectionEvent(event) &&
-           !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
+    return tr.metrics.v8.utils.isSubGarbageCollectionEvent(event) && !tr.metrics.v8.utils.isForcedGarbageCollectionEvent(event);
   }
 
   /**
@@ -108,17 +114,13 @@ global.tr.exportTo('tr.metrics.v8', function() {
    * - v8-gc-full-mark-compactor.
    */
   function addDurationOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isNotForcedTopGarbageCollectionEvent,
-      tr.metrics.v8.utils.topGarbageCollectionEventName,
-      function(name, events) {
-        var cpuDuration = createNumericForTopEventTime();
-        events.forEach(function(event) {
-          cpuDuration.add(event.cpuDuration);
-        });
-        values.addValue(new tr.v.NumericValue(name, cpuDuration));
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, tr.metrics.v8.utils.topGarbageCollectionEventName, function (name, events) {
+      var cpuDuration = createNumericForTopEventTime(name);
+      events.forEach(function (event) {
+        cpuDuration.addSample(event.cpuDuration);
+      });
+      values.addHistogram(cpuDuration);
+    });
   }
 
   /**
@@ -126,17 +128,13 @@ global.tr.exportTo('tr.metrics.v8', function() {
    * - v8-gc-total
    */
   function addTotalDurationOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isNotForcedTopGarbageCollectionEvent,
-      event => 'v8-gc-total',
-      function(name, events) {
-        var cpuDuration = createNumericForTopEventTime();
-        events.forEach(function(event) {
-          cpuDuration.add(event.cpuDuration);
-        });
-        values.addValue(new tr.v.NumericValue(name, cpuDuration));
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, event => 'v8-gc-total', function (name, events) {
+      var cpuDuration = createNumericForTopEventTime(name);
+      events.forEach(function (event) {
+        cpuDuration.addSample(event.cpuDuration);
+      });
+      values.addHistogram(cpuDuration);
+    });
   }
 
   /**
@@ -144,17 +142,13 @@ global.tr.exportTo('tr.metrics.v8', function() {
    * - v8-gc-full-mark-compactor-evacuate.
    */
   function addDurationOfSubEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isNotForcedSubGarbageCollectionEvent,
-      tr.metrics.v8.utils.subGarbageCollectionEventName,
-      function(name, events) {
-        var cpuDuration = createNumericForSubEventTime();
-        events.forEach(function(event) {
-          cpuDuration.add(event.cpuDuration);
-        });
-        values.addValue(new tr.v.NumericValue(name, cpuDuration));
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedSubGarbageCollectionEvent, tr.metrics.v8.utils.subGarbageCollectionEventName, function (name, events) {
+      var cpuDuration = createNumericForSubEventTime(name);
+      events.forEach(function (event) {
+        cpuDuration.addSample(event.cpuDuration);
+      });
+      values.addHistogram(cpuDuration);
+    });
   }
 
   /**
@@ -164,13 +158,9 @@ global.tr.exportTo('tr.metrics.v8', function() {
    * - v8-gc-full-mark-compactor_percentage_idle.
    */
   function addIdleTimesOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isNotForcedTopGarbageCollectionEvent,
-      tr.metrics.v8.utils.topGarbageCollectionEventName,
-      function(name, events) {
-        addIdleTimes(values, model, name, events);
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, tr.metrics.v8.utils.topGarbageCollectionEventName, function (name, events) {
+      addIdleTimes(values, model, name, events);
+    });
   }
 
   /**
@@ -180,23 +170,18 @@ global.tr.exportTo('tr.metrics.v8', function() {
    * - v8-gc-total_percentage_idle.
    */
   function addTotalIdleTimesOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isNotForcedTopGarbageCollectionEvent,
-      event => 'v8-gc-total',
-      function(name, events) {
-        addIdleTimes(values, model, name, events);
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, event => 'v8-gc-total', function (name, events) {
+      addIdleTimes(values, model, name, events);
+    });
   }
 
   function addIdleTimes(values, model, name, events) {
     var cpuDuration = createNumericForIdleTime();
     var insideIdle = createNumericForIdleTime();
-    var outsideIdle = createNumericForIdleTime();
-    var idleDeadlineOverrun = createNumericForIdleTime();
-    events.forEach(function(event) {
-      var idleTask = tr.metrics.v8.utils.findParent(
-          event, tr.metrics.v8.utils.isIdleTask);
+    var outsideIdle = createNumericForIdleTime(name + '_outside_idle');
+    var idleDeadlineOverrun = createNumericForIdleTime(name + '_idle_deadline_overrun');
+    events.forEach(function (event) {
+      var idleTask = tr.metrics.v8.utils.findParent(event, tr.metrics.v8.utils.isIdleTask);
       var inside = 0;
       var overrun = 0;
       if (idleTask) {
@@ -213,59 +198,79 @@ global.tr.exportTo('tr.metrics.v8', function() {
           inside = event.cpuDuration;
         }
       }
-      cpuDuration.add(event.cpuDuration);
-      insideIdle.add(inside);
-      outsideIdle.add(event.cpuDuration - inside);
-      idleDeadlineOverrun.add(overrun);
+      cpuDuration.addSample(event.cpuDuration);
+      insideIdle.addSample(inside);
+      outsideIdle.addSample(event.cpuDuration - inside);
+      idleDeadlineOverrun.addSample(overrun);
     });
-    values.addValue(new tr.v.NumericValue(
-        name + '_idle_deadline_overrun',
-        idleDeadlineOverrun));
-    values.addValue(new tr.v.NumericValue(
-        name + '_outside_idle', outsideIdle));
-    var percentage = createPercentage(insideIdle.sum,
-                                      cpuDuration.sum);
-    values.addValue(new tr.v.NumericValue(
-        name + '_percentage_idle', percentage));
+    values.addHistogram(idleDeadlineOverrun);
+    values.addHistogram(outsideIdle);
+    var percentage = createPercentage(name + '_percentage_idle', insideIdle.sum, cpuDuration.sum, percentage_biggerIsBetter);
+    values.addHistogram(percentage);
+  }
+
+  /**
+   * Example output:
+   * - v8-gc-full-mark-compactor_percentage_in_v8_execute.
+   */
+  function addPercentageInV8ExecuteOfTopEvents(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, tr.metrics.v8.utils.topGarbageCollectionEventName, function (name, events) {
+      addPercentageInV8Execute(values, model, name, events);
+    });
+  }
+
+  /**
+   * Example output:
+   * - v8-gc-total_percentage_in_v8_execute.
+   */
+  function addTotalPercentageInV8Execute(values, model) {
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isNotForcedTopGarbageCollectionEvent, event => 'v8-gc-total', function (name, events) {
+      addPercentageInV8Execute(values, model, name, events);
+    });
+  }
+
+  function addPercentageInV8Execute(values, model, name, events) {
+    var cpuDurationInV8Execute = 0;
+    var cpuDurationTotal = 0;
+    events.forEach(function (event) {
+      var v8Execute = tr.metrics.v8.utils.findParent(event, tr.metrics.v8.utils.isV8ExecuteEvent);
+      if (v8Execute) {
+        cpuDurationInV8Execute += event.cpuDuration;
+      }
+      cpuDurationTotal += event.cpuDuration;
+    });
+    var percentage = createPercentage(name + '_percentage_in_v8_execute', cpuDurationInV8Execute, cpuDurationTotal, percentage_smallerIsBetter);
+    values.addHistogram(percentage);
   }
 
   function addV8ExecuteMutatorUtilization(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-        tr.metrics.v8.utils.isTopV8ExecuteEvent,
-        event => 'v8-execute',
-        function(name, events) {
-          events.sort((a, b) => a.start - b.start);
-          var time = 0;
-          var pauses = [];
-          // Glue together the v8.execute events and adjust the GC pause
-          // times accordingly.
-          for (var topEvent of events) {
-            for (var e of topEvent.enumerateAllDescendents()) {
-              if (isNotForcedTopGarbageCollectionEvent(e)) {
-                pauses.push({ start: e.start - topEvent.start + time,
-                              end: e.end - topEvent.start + time });
-              }
-            }
-            time += topEvent.duration;
+    tr.metrics.v8.utils.groupAndProcessEvents(model, tr.metrics.v8.utils.isTopV8ExecuteEvent, event => 'v8-execute', function (name, events) {
+      events.sort((a, b) => a.start - b.start);
+      var time = 0;
+      var pauses = [];
+      // Glue together the v8.execute events and adjust the GC pause
+      // times accordingly.
+      for (var topEvent of events) {
+        for (var e of topEvent.enumerateAllDescendents()) {
+          if (isNotForcedTopGarbageCollectionEvent(e)) {
+            pauses.push({ start: e.start - topEvent.start + time,
+              end: e.end - topEvent.start + time });
           }
-          // Now we have one big v8.execute interval from 0 to |time| and
-          // a list of GC pauses.
-          var mutatorUtilization = tr.metrics.v8.utils.mutatorUtilization(
-              0, time, WINDOW_SIZE_MS, pauses);
-          [0.90, 0.95, 0.99].forEach(function(percent) {
-            var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
-                mutatorUtilization.percentile(1.0 - percent) * 100);
-            values.addValue(new tr.v.NumericValue(
-                'v8-execute-mutator-utilization_pct_0' +
-                percent * 100,
-                value));
-          });
-          var value = new tr.v.ScalarNumeric(percentage_biggerIsBetter,
-              mutatorUtilization.min);
-          values.addValue(new tr.v.NumericValue(
-              'v8-execute-mutator-utilization_min', value));
         }
-    );
+        time += topEvent.duration;
+      }
+      // Now we have one big v8.execute interval from 0 to |time| and
+      // a list of GC pauses.
+      var mutatorUtilization = tr.metrics.v8.utils.mutatorUtilization(0, time, WINDOW_SIZE_MS, pauses);
+      [0.90, 0.95, 0.99].forEach(function (percent) {
+        var hist = new tr.v.Histogram('v8-execute-mutator-utilization_pct_0' + percent * 100, percentage_biggerIsBetter);
+        hist.addSample(mutatorUtilization.percentile(1.0 - percent));
+        values.addHistogram(hist);
+      });
+      var hist = new tr.v.Histogram('v8-execute-mutator-utilization_min', percentage_biggerIsBetter);
+      hist.addSample(mutatorUtilization.min);
+      values.addHistogram(hist);
+    });
   }
 
   return {

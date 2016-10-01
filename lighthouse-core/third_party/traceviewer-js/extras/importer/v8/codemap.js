@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2012 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -11,7 +12,7 @@ require("./splaytree.js");
 /**
  * @fileoverview Map addresses to dynamically created functions.
  */
-global.tr.exportTo('tr.e.importer.v8', function() {
+global.tr.exportTo('tr.e.importer.v8', function () {
   /**
    * Constructs a mapper that maps addresses into code entries.
    *
@@ -42,7 +43,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
      * Map of memory pages occupied with static code.
      */
     this.pages_ = [];
-  };
+  }
 
   /**
    * The number of alignment bits in a page address.
@@ -60,7 +61,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {number} start The starting address.
    * @param {CodeMap.CodeEntry} codeEntry Code entry object.
    */
-  CodeMap.prototype.addCode = function(start, codeEntry) {
+  CodeMap.prototype.addCode = function (start, codeEntry) {
     this.deleteAllCoveredNodes_(this.dynamics_, start, start + codeEntry.size);
     this.dynamics_.insert(start, codeEntry);
   };
@@ -72,10 +73,9 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {number} from The starting address of the entry being moved.
    * @param {number} to The destination address.
    */
-  CodeMap.prototype.moveCode = function(from, to) {
+  CodeMap.prototype.moveCode = function (from, to) {
     var removedNode = this.dynamics_.remove(from);
-    this.deleteAllCoveredNodes_(this.dynamics_, to,
-                                to + removedNode.value.size);
+    this.deleteAllCoveredNodes_(this.dynamics_, to, to + removedNode.value.size);
     this.dynamics_.insert(to, removedNode.value);
   };
 
@@ -85,7 +85,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    *
    * @param {number} start The starting address of the entry being deleted.
    */
-  CodeMap.prototype.deleteCode = function(start) {
+  CodeMap.prototype.deleteCode = function (start) {
     var removedNode = this.dynamics_.remove(start);
   };
 
@@ -95,8 +95,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {number} start The starting address.
    * @param {CodeMap.CodeEntry} codeEntry Code entry object.
    */
-  CodeMap.prototype.addLibrary = function(
-      start, codeEntry) {
+  CodeMap.prototype.addLibrary = function (start, codeEntry) {
     this.markPages_(start, start + codeEntry.size);
     this.libraries_.insert(start, codeEntry);
   };
@@ -107,17 +106,15 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {number} start The starting address.
    * @param {CodeMap.CodeEntry} codeEntry Code entry object.
    */
-  CodeMap.prototype.addStaticCode = function(
-      start, codeEntry) {
+  CodeMap.prototype.addStaticCode = function (start, codeEntry) {
     this.statics_.insert(start, codeEntry);
   };
 
   /**
    * @private
    */
-  CodeMap.prototype.markPages_ = function(start, end) {
-    for (var addr = start; addr <= end;
-         addr += CodeMap.PAGE_SIZE) {
+  CodeMap.prototype.markPages_ = function (start, end) {
+    for (var addr = start; addr <= end; addr += CodeMap.PAGE_SIZE) {
       this.pages_[addr >>> CodeMap.PAGE_ALIGNMENT] = 1;
     }
   };
@@ -125,30 +122,31 @@ global.tr.exportTo('tr.e.importer.v8', function() {
   /**
    * @private
    */
-  CodeMap.prototype.deleteAllCoveredNodes_ = function(tree, start, end) {
-    var to_delete = [];
+  CodeMap.prototype.deleteAllCoveredNodes_ = function (tree, start, end) {
+    var toDelete = [];
     var addr = end - 1;
     while (addr >= start) {
       var node = tree.findGreatestLessThan(addr);
       if (!node) break;
-      var start2 = node.key, end2 = start2 + node.value.size;
-      if (start2 < end && start < end2) to_delete.push(start2);
+      var start2 = node.key,
+          end2 = start2 + node.value.size;
+      if (start2 < end && start < end2) toDelete.push(start2);
       addr = start2 - 1;
     }
-    for (var i = 0, l = to_delete.length; i < l; ++i) tree.remove(to_delete[i]);
+    for (var i = 0, l = toDelete.length; i < l; ++i) tree.remove(toDelete[i]);
   };
 
   /**
    * @private
    */
-  CodeMap.prototype.isAddressBelongsTo_ = function(addr, node) {
-    return addr >= node.key && addr < (node.key + node.value.size);
+  CodeMap.prototype.isAddressBelongsTo_ = function (addr, node) {
+    return addr >= node.key && addr < node.key + node.value.size;
   };
 
   /**
    * @private
    */
-  CodeMap.prototype.findInTree_ = function(tree, addr) {
+  CodeMap.prototype.findInTree_ = function (tree, addr) {
     var node = tree.findGreatestLessThan(addr);
     return node && this.isAddressBelongsTo_(addr, node) ? node.value : null;
   };
@@ -158,10 +156,9 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    *
    * @param {number} addr Address.
    */
-  CodeMap.prototype.findEntryInLibraries = function(addr) {
+  CodeMap.prototype.findEntryInLibraries = function (addr) {
     var pageAddr = addr >>> CodeMap.PAGE_ALIGNMENT;
-    if (pageAddr in this.pages_)
-      return this.findInTree_(this.libraries_, addr);
+    if (pageAddr in this.pages_) return this.findInTree_(this.libraries_, addr);
     return undefined;
   };
 
@@ -171,17 +168,16 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    *
    * @param {number} addr Address.
    */
-  CodeMap.prototype.findEntry = function(addr) {
+  CodeMap.prototype.findEntry = function (addr) {
     var pageAddr = addr >>> CodeMap.PAGE_ALIGNMENT;
     if (pageAddr in this.pages_) {
       // Static code entries can contain "holes" of unnamed code.
       // In this case, the whole library is assigned to this address.
-      return this.findInTree_(this.statics_, addr) ||
-          this.findInTree_(this.libraries_, addr);
+      return this.findInTree_(this.statics_, addr) || this.findInTree_(this.libraries_, addr);
     }
     var min = this.dynamics_.findMin();
     var max = this.dynamics_.findMax();
-    if (max != null && addr < (max.key + max.value.size) && addr >= min.key) {
+    if (max != null && addr < max.key + max.value.size && addr >= min.key) {
       var dynaEntry = this.findInTree_(this.dynamics_, addr);
       if (dynaEntry == null) return null;
       // Dedupe entry name.
@@ -199,8 +195,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    *
    * @param {number} addr Address.
    */
-  CodeMap.prototype.findDynamicEntryByStartAddress =
-      function(addr) {
+  CodeMap.prototype.findDynamicEntryByStartAddress = function (addr) {
     var node = this.dynamics_.find(addr);
     return node ? node.value : null;
   };
@@ -208,28 +203,28 @@ global.tr.exportTo('tr.e.importer.v8', function() {
   /**
    * Returns an array of all dynamic code entries.
    */
-  CodeMap.prototype.getAllDynamicEntries = function() {
+  CodeMap.prototype.getAllDynamicEntries = function () {
     return this.dynamics_.exportValues();
   };
 
   /**
    * Returns an array of pairs of all dynamic code entries and their addresses.
    */
-  CodeMap.prototype.getAllDynamicEntriesWithAddresses = function() {
+  CodeMap.prototype.getAllDynamicEntriesWithAddresses = function () {
     return this.dynamics_.exportKeysAndValues();
   };
 
   /**
    * Returns an array of all static code entries.
    */
-  CodeMap.prototype.getAllStaticEntries = function() {
+  CodeMap.prototype.getAllStaticEntries = function () {
     return this.statics_.exportValues();
   };
 
   /**
    * Returns an array of all libraries entries.
    */
-  CodeMap.prototype.getAllLibrariesEntries = function() {
+  CodeMap.prototype.getAllLibrariesEntries = function () {
     return this.libraries_.exportValues();
   };
 
@@ -251,7 +246,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {string=} opt_name Code entry name.
    * @constructor
    */
-  CodeMap.CodeEntry = function(size, opt_name, opt_type) {
+  CodeMap.CodeEntry = function (size, opt_name, opt_type) {
     this.id = tr.b.GUID.allocateSimple();
     this.size = size;
     this.name_ = opt_name || '';
@@ -270,7 +265,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
       this.name_ = value;
     },
 
-    toString: function() {
+    toString: function () {
       this.name_ + ': ' + this.size.toString(16);
     }
   };
@@ -289,7 +284,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {CodeMap.CodeState} state Code optimization state.
    * @constructor
    */
-  CodeMap.DynamicFuncCodeEntry = function(size, type, func, state) {
+  CodeMap.DynamicFuncCodeEntry = function (size, type, func, state) {
     CodeMap.CodeEntry.call(this, size, '', type);
     this.func = func;
     this.state = state;
@@ -304,8 +299,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
      * Returns node name.
      */
     get name() {
-      return CodeMap.DynamicFuncCodeEntry.STATE_PREFIX[this.state] +
-        this.func.name;
+      return CodeMap.DynamicFuncCodeEntry.STATE_PREFIX[this.state] + this.func.name;
     },
 
     set name(value) {
@@ -315,15 +309,15 @@ global.tr.exportTo('tr.e.importer.v8', function() {
     /**
      * Returns raw node name (without type decoration).
      */
-    getRawName: function() {
+    getRawName: function () {
       return this.func.getName();
     },
 
-    isJSFunction: function() {
+    isJSFunction: function () {
       return true;
     },
 
-    toString: function() {
+    toString: function () {
       return this.type + ': ' + this.name + ': ' + this.size.toString(16);
     }
   };
@@ -334,7 +328,7 @@ global.tr.exportTo('tr.e.importer.v8', function() {
    * @param {string} name Function name.
    * @constructor
    */
-  CodeMap.FunctionEntry = function(name) {
+  CodeMap.FunctionEntry = function (name) {
     CodeMap.CodeEntry.call(this, 0, name);
   };
 
@@ -360,11 +354,11 @@ global.tr.exportTo('tr.e.importer.v8', function() {
     }
   };
 
-  CodeMap.NameGenerator = function() {
+  CodeMap.NameGenerator = function () {
     this.knownNames_ = {};
   };
 
-  CodeMap.NameGenerator.prototype.getName = function(name) {
+  CodeMap.NameGenerator.prototype.getName = function (name) {
     if (!(name in this.knownNames_)) {
       this.knownNames_[name] = 0;
       return name;

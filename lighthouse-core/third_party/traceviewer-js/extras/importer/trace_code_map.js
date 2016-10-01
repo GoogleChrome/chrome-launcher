@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./trace_code_entry.js");
 
 'use strict';
 
-global.tr.exportTo('tr.e.importer', function() {
+global.tr.exportTo('tr.e.importer', function () {
   // This code is a tracification of:
   // devtools/front_end/timeline/TimelineJSProfile.js
   function TraceCodeMap() {
@@ -16,43 +17,39 @@ global.tr.exportTo('tr.e.importer', function() {
   }
 
   TraceCodeMap.prototype = {
-    addEntry: function(addressHex, size, name, scriptId) {
-      var entry = new tr.e.importer.TraceCodeEntry(
-          this.getAddress_(addressHex), size, name, scriptId);
+    addEntry: function (addressHex, size, name, scriptId) {
+      var entry = new tr.e.importer.TraceCodeEntry(this.getAddress_(addressHex), size, name, scriptId);
 
       this.addEntry_(addressHex, entry);
     },
 
-    moveEntry: function(oldAddressHex, newAddressHex, size) {
-      var entry = this.getBank_(oldAddressHex)
-          .removeEntry(this.getAddress_(oldAddressHex));
-      if (!entry)
-          return;
+    moveEntry: function (oldAddressHex, newAddressHex, size) {
+      var entry = this.getBank_(oldAddressHex).removeEntry(this.getAddress_(oldAddressHex));
+      if (!entry) return;
 
       entry.address = this.getAddress_(newAddressHex);
       entry.size = size;
       this.addEntry_(newAddressHex, entry);
     },
 
-    lookupEntry: function(addressHex) {
-      return this.getBank_(addressHex)
-          .lookupEntry(this.getAddress_(addressHex));
+    lookupEntry: function (addressHex) {
+      return this.getBank_(addressHex).lookupEntry(this.getAddress_(addressHex));
     },
 
-    addEntry_: function(addressHex, entry) {
+    addEntry_: function (addressHex, entry) {
       // FIXME: Handle bank spanning addresses ...
       this.getBank_(addressHex).addEntry(entry);
     },
 
-    getAddress_: function(addressHex) {
+    getAddress_: function (addressHex) {
       // 13 hex digits == 52 bits, double mantissa fits 53 bits.
       var bankSizeHexDigits = 13;
-      addressHex = addressHex.slice(2);  // cut 0x prefix.
+      addressHex = addressHex.slice(2); // cut 0x prefix.
       return parseInt(addressHex.slice(-bankSizeHexDigits), 16);
     },
 
-    getBank_: function(addressHex) {
-      addressHex = addressHex.slice(2);  // cut 0x prefix.
+    getBank_: function (addressHex) {
+      addressHex = addressHex.slice(2); // cut 0x prefix.
 
       // 13 hex digits == 52 bits, double mantissa fits 53 bits.
       var bankSizeHexDigits = 13;
@@ -60,8 +57,8 @@ global.tr.exportTo('tr.e.importer', function() {
       var bankName = addressHex.slice(-maxHexDigits, -bankSizeHexDigits);
       var bank = this.banks_.get(bankName);
       if (!bank) {
-          bank = new TraceCodeBank();
-          this.banks_.set(bankName, bank);
+        bank = new TraceCodeBank();
+        this.banks_.set(bankName, bank);
       }
       return bank;
     }
@@ -72,45 +69,43 @@ global.tr.exportTo('tr.e.importer', function() {
   }
 
   TraceCodeBank.prototype = {
-    removeEntry: function(address) {
+    removeEntry: function (address) {
       // findLowIndexInSortedArray returns 1 for empty. Just handle the
       // empty list and bail early.
-      if (this.entries_.length === 0)
-        return undefined;
+      if (this.entries_.length === 0) return undefined;
 
-      var index = tr.b.findLowIndexInSortedArray(
-          this.entries_, function(entry) { return entry.address; }, address);
+      var index = tr.b.findLowIndexInSortedArray(this.entries_, function (entry) {
+        return entry.address;
+      }, address);
       var entry = this.entries_[index];
-      if (!entry || entry.address !== address)
-        return undefined;
+      if (!entry || entry.address !== address) return undefined;
 
       this.entries_.splice(index, 1);
       return entry;
     },
 
-    lookupEntry: function(address) {
-      var index = tr.b.findHighIndexInSortedArray(
-          this.entries_, function(e) { return address - e.address; }) - 1;
+    lookupEntry: function (address) {
+      var index = tr.b.findHighIndexInSortedArray(this.entries_, function (e) {
+        return address - e.address;
+      }) - 1;
       var entry = this.entries_[index];
-      return entry &&
-          address < entry.address + entry.size ? entry : undefined;
+      return entry && address < entry.address + entry.size ? entry : undefined;
     },
 
-    addEntry: function(newEntry) {
+    addEntry: function (newEntry) {
       // findLowIndexInSortedArray returns 1 for empty list. Just push the
       // new address as it's the only item.
-      if (this.entries_.length === 0)
-        this.entries_.push(newEntry);
+      if (this.entries_.length === 0) this.entries_.push(newEntry);
 
       var endAddress = newEntry.address + newEntry.size;
-      var lastIndex = tr.b.findLowIndexInSortedArray(
-          this.entries_, function(entry) { return entry.address; }, endAddress);
+      var lastIndex = tr.b.findLowIndexInSortedArray(this.entries_, function (entry) {
+        return entry.address;
+      }, endAddress);
       var index;
       for (index = lastIndex - 1; index >= 0; --index) {
-          var entry = this.entries_[index];
-          var entryEndAddress = entry.address + entry.size;
-          if (entryEndAddress <= newEntry.address)
-              break;
+        var entry = this.entries_[index];
+        var entryEndAddress = entry.address + entry.size;
+        if (entryEndAddress <= newEntry.address) break;
       }
       ++index;
       this.entries_.splice(index, lastIndex - index, newEntry);
@@ -121,4 +116,3 @@ global.tr.exportTo('tr.e.importer', function() {
     TraceCodeMap: TraceCodeMap
   };
 });
-

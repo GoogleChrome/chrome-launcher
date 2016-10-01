@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -16,7 +17,7 @@ require("./time_to_object_instance_map.js");
 /**
  * @fileoverview Provides the ObjectCollection class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var ObjectInstance = tr.model.ObjectInstance;
   var ObjectSnapshot = tr.model.ObjectSnapshot;
 
@@ -38,19 +39,16 @@ global.tr.exportTo('tr.model', function() {
   ObjectCollection.prototype = {
     __proto__: tr.model.EventContainer.prototype,
 
-    childEvents: function*() {
+    childEvents: function* () {
       for (var instance of this.getAllObjectInstances()) {
         yield instance;
-        yield * instance.snapshots;
+        yield* instance.snapshots;
       }
     },
 
-    createObjectInstance_: function(
-        parent, scopedId, category, name, creationTs, opt_baseTypeName) {
-      var constructor = tr.model.ObjectInstance.getConstructor(
-          category, name);
-      var instance = new constructor(
-          parent, scopedId, category, name, creationTs, opt_baseTypeName);
+    createObjectInstance_: function (parent, scopedId, category, name, creationTs, opt_baseTypeName) {
+      var constructor = tr.model.ObjectInstance.subTypes.getConstructor(category, name);
+      var instance = new constructor(parent, scopedId, category, name, creationTs, opt_baseTypeName);
       var typeName = instance.typeName;
       var instancesOfTypeName = this.instancesByTypeName_[typeName];
       if (!instancesOfTypeName) {
@@ -61,7 +59,7 @@ global.tr.exportTo('tr.model', function() {
       return instance;
     },
 
-    getOrCreateInstanceMap_: function(scopedId) {
+    getOrCreateInstanceMap_: function (scopedId) {
       var dict;
       if (scopedId.scope in this.instanceMapsByScopedId_) {
         dict = this.instanceMapsByScopedId_[scopedId.scope];
@@ -70,75 +68,52 @@ global.tr.exportTo('tr.model', function() {
         this.instanceMapsByScopedId_[scopedId.scope] = dict;
       }
       var instanceMap = dict[scopedId.id];
-      if (instanceMap)
-        return instanceMap;
-      instanceMap = new tr.model.TimeToObjectInstanceMap(
-          this.createObjectInstance_, this.parent, scopedId);
+      if (instanceMap) return instanceMap;
+      instanceMap = new tr.model.TimeToObjectInstanceMap(this.createObjectInstance_, this.parent, scopedId);
       dict[scopedId.id] = instanceMap;
       return instanceMap;
     },
 
-    idWasCreated: function(scopedId, category, name, ts) {
+    idWasCreated: function (scopedId, category, name, ts) {
       var instanceMap = this.getOrCreateInstanceMap_(scopedId);
       return instanceMap.idWasCreated(category, name, ts);
     },
 
-    addSnapshot: function(
-        scopedId, category, name, ts, args, opt_baseTypeName) {
+    addSnapshot: function (scopedId, category, name, ts, args, opt_baseTypeName) {
       var instanceMap = this.getOrCreateInstanceMap_(scopedId);
-      var snapshot = instanceMap.addSnapshot(
-          category, name, ts, args, opt_baseTypeName);
+      var snapshot = instanceMap.addSnapshot(category, name, ts, args, opt_baseTypeName);
       if (snapshot.objectInstance.category != category) {
-        var msg = 'Added snapshot name=' + name + ' with cat=' + category +
-            ' impossible. It instance was created/snapshotted with cat=' +
-            snapshot.objectInstance.category + ' name=' +
-            snapshot.objectInstance.name;
+        var msg = 'Added snapshot name=' + name + ' with cat=' + category + ' impossible. It instance was created/snapshotted with cat=' + snapshot.objectInstance.category + ' name=' + snapshot.objectInstance.name;
         throw new Error(msg);
       }
-      if (opt_baseTypeName &&
-          snapshot.objectInstance.baseTypeName != opt_baseTypeName) {
-        throw new Error('Could not add snapshot with baseTypeName=' +
-                        opt_baseTypeName + '. It ' +
-                        'was previously created with name=' +
-                        snapshot.objectInstance.baseTypeName);
+      if (opt_baseTypeName && snapshot.objectInstance.baseTypeName != opt_baseTypeName) {
+        throw new Error('Could not add snapshot with baseTypeName=' + opt_baseTypeName + '. It ' + 'was previously created with name=' + snapshot.objectInstance.baseTypeName);
       }
       if (snapshot.objectInstance.name != name) {
-        throw new Error('Could not add snapshot with name=' + name + '. It ' +
-                        'was previously created with name=' +
-                        snapshot.objectInstance.name);
+        throw new Error('Could not add snapshot with name=' + name + '. It ' + 'was previously created with name=' + snapshot.objectInstance.name);
       }
       return snapshot;
     },
 
-    idWasDeleted: function(scopedId, category, name, ts) {
+    idWasDeleted: function (scopedId, category, name, ts) {
       var instanceMap = this.getOrCreateInstanceMap_(scopedId);
       var deletedInstance = instanceMap.idWasDeleted(category, name, ts);
-      if (!deletedInstance)
-        return;
+      if (!deletedInstance) return;
       if (deletedInstance.category != category) {
-        var msg = 'Deleting object ' + deletedInstance.name +
-            ' with a different category ' +
-            'than when it was created. It previous had cat=' +
-            deletedInstance.category + ' but the delete command ' +
-            'had cat=' + category;
+        var msg = 'Deleting object ' + deletedInstance.name + ' with a different category ' + 'than when it was created. It previous had cat=' + deletedInstance.category + ' but the delete command ' + 'had cat=' + category;
         throw new Error(msg);
       }
       if (deletedInstance.baseTypeName != name) {
-        throw new Error('Deletion requested for name=' +
-                        name + ' could not proceed: ' +
-                        'An existing object with baseTypeName=' +
-                        deletedInstance.baseTypeName + ' existed.');
+        throw new Error('Deletion requested for name=' + name + ' could not proceed: ' + 'An existing object with baseTypeName=' + deletedInstance.baseTypeName + ' existed.');
       }
     },
 
-    autoDeleteObjects: function(maxTimestamp) {
-      tr.b.iterItems(this.instanceMapsByScopedId_, function(scope, imapById) {
-        tr.b.iterItems(imapById, function(id, i2imap) {
+    autoDeleteObjects: function (maxTimestamp) {
+      tr.b.iterItems(this.instanceMapsByScopedId_, function (scope, imapById) {
+        tr.b.iterItems(imapById, function (id, i2imap) {
           var lastInstance = i2imap.lastInstance;
-          if (lastInstance.deletionTs != Number.MAX_VALUE)
-            return;
-          i2imap.idWasDeleted(
-              lastInstance.category, lastInstance.name, maxTimestamp);
+          if (lastInstance.deletionTs != Number.MAX_VALUE) return;
+          i2imap.idWasDeleted(lastInstance.category, lastInstance.name, maxTimestamp);
           // idWasDeleted will cause lastInstance.deletionTsWasExplicit to be
           // set to true. Unset it here.
           lastInstance.deletionTsWasExplicit = false;
@@ -146,79 +121,78 @@ global.tr.exportTo('tr.model', function() {
       });
     },
 
-    getObjectInstanceAt: function(scopedId, ts) {
+    getObjectInstanceAt: function (scopedId, ts) {
       var instanceMap;
-      if (scopedId.scope in this.instanceMapsByScopedId_)
-        instanceMap = this.instanceMapsByScopedId_[scopedId.scope][scopedId.id];
-      if (!instanceMap)
-        return undefined;
+      if (scopedId.scope in this.instanceMapsByScopedId_) instanceMap = this.instanceMapsByScopedId_[scopedId.scope][scopedId.id];
+      if (!instanceMap) return undefined;
       return instanceMap.getInstanceAt(ts);
     },
 
-    getSnapshotAt: function(scopedId, ts) {
+    getSnapshotAt: function (scopedId, ts) {
       var instance = this.getObjectInstanceAt(scopedId, ts);
-      if (!instance)
-        return undefined;
+      if (!instance) return undefined;
       return instance.getSnapshotAt(ts);
     },
 
-    iterObjectInstances: function(iter, opt_this) {
+    iterObjectInstances: function (iter, opt_this) {
       opt_this = opt_this || this;
-      tr.b.iterItems(this.instanceMapsByScopedId_, function(scope, imapById) {
-        tr.b.iterItems(imapById, function(id, i2imap) {
+      tr.b.iterItems(this.instanceMapsByScopedId_, function (scope, imapById) {
+        tr.b.iterItems(imapById, function (id, i2imap) {
           i2imap.instances.forEach(iter, opt_this);
         });
       });
     },
 
-    getAllObjectInstances: function() {
+    getAllObjectInstances: function () {
       var instances = [];
-      this.iterObjectInstances(function(i) { instances.push(i); });
+      this.iterObjectInstances(function (i) {
+        instances.push(i);
+      });
       return instances;
     },
 
-    getAllInstancesNamed: function(name) {
+    getAllInstancesNamed: function (name) {
       return this.instancesByTypeName_[name];
     },
 
-    getAllInstancesByTypeName: function() {
+    getAllInstancesByTypeName: function () {
       return this.instancesByTypeName_;
     },
 
-    preInitializeAllObjects: function() {
-      this.iterObjectInstances(function(instance) {
+    preInitializeAllObjects: function () {
+      this.iterObjectInstances(function (instance) {
         instance.preInitialize();
       });
     },
 
-    initializeAllObjects: function() {
-      this.iterObjectInstances(function(instance) {
+    initializeAllObjects: function () {
+      this.iterObjectInstances(function (instance) {
         instance.initialize();
       });
     },
 
-    initializeInstances: function() {
-      this.iterObjectInstances(function(instance) {
+    initializeInstances: function () {
+      this.iterObjectInstances(function (instance) {
         instance.initialize();
       });
     },
 
-    updateBounds: function() {
+    updateBounds: function () {
       this.bounds.reset();
-      this.iterObjectInstances(function(instance) {
+      this.iterObjectInstances(function (instance) {
         instance.updateBounds();
         this.bounds.addRange(instance.bounds);
       }, this);
     },
 
-    shiftTimestampsForward: function(amount) {
-      this.iterObjectInstances(function(instance) {
+    shiftTimestampsForward: function (amount) {
+      this.iterObjectInstances(function (instance) {
         instance.shiftTimestampsForward(amount);
       });
     },
 
-    addCategoriesToDict: function(categoriesDict) {
-      this.iterObjectInstances(function(instance) {
+    addCategoriesToDict: function (categoriesDict) {
+      this.iterObjectInstances(function (instance) {
         categoriesDict[instance.category] = true;
       });
     }

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2012 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("../base/base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.c', function() {
+global.tr.exportTo('tr.c', function () {
   function makeCaseInsensitiveRegex(pattern) {
     // See https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/
     // Regular_Expressions.
@@ -20,28 +21,28 @@ global.tr.exportTo('tr.c', function() {
    * @constructor The generic base class for filtering a Model based on
    * various rules. The base class returns true for everything.
    */
-  function Filter() { }
+  function Filter() {}
 
   Filter.prototype = {
     __proto__: Object.prototype,
 
-    matchCounter: function(counter) {
+    matchCounter: function (counter) {
       return true;
     },
 
-    matchCpu: function(cpu) {
+    matchCpu: function (cpu) {
       return true;
     },
 
-    matchProcess: function(process) {
+    matchProcess: function (process) {
       return true;
     },
 
-    matchSlice: function(slice) {
+    matchSlice: function (slice) {
       return true;
     },
 
-    matchThread: function(thread) {
+    matchThread: function (thread) {
       return true;
     }
   };
@@ -55,18 +56,15 @@ global.tr.exportTo('tr.c', function() {
     Filter.call(this);
     this.regex_ = makeCaseInsensitiveRegex(text);
 
-    if (!text.length)
-      throw new Error('Filter text is empty.');
+    if (!text.length) throw new Error('Filter text is empty.');
   }
   TitleOrCategoryFilter.prototype = {
     __proto__: Filter.prototype,
 
-    matchSlice: function(slice) {
-      if (slice.title === undefined && slice.category === undefined)
-        return false;
+    matchSlice: function (slice) {
+      if (slice.title === undefined && slice.category === undefined) return false;
 
-      return this.regex_.test(slice.title) ||
-          (!!slice.category && this.regex_.test(slice.category));
+      return this.regex_.test(slice.title) || !!slice.category && this.regex_.test(slice.category);
     }
   };
 
@@ -77,13 +75,12 @@ global.tr.exportTo('tr.c', function() {
     Filter.call(this);
     this.text_ = text;
 
-    if (!text.length)
-      throw new Error('Filter text is empty.');
+    if (!text.length) throw new Error('Filter text is empty.');
   }
   ExactTitleFilter.prototype = {
     __proto__: Filter.prototype,
 
-    matchSlice: function(slice) {
+    matchSlice: function (slice) {
       return slice.title === this.text_;
     }
   };
@@ -102,21 +99,17 @@ global.tr.exportTo('tr.c', function() {
   FullTextFilter.prototype = {
     __proto__: Filter.prototype,
 
-    matchObject_: function(obj) {
+    matchObject_: function (obj) {
       for (var key in obj) {
-        if (!obj.hasOwnProperty(key))
-          continue;
-        if (this.regex_.test(key))
-          return true;
-        if (this.regex_.test(obj[key]))
-          return true;
+        if (!obj.hasOwnProperty(key)) continue;
+        if (this.regex_.test(key)) return true;
+        if (this.regex_.test(obj[key])) return true;
       }
       return false;
     },
 
-    matchSlice: function(slice) {
-      if (this.titleOrCategoryFilter_.matchSlice(slice))
-        return true;
+    matchSlice: function (slice) {
+      if (this.titleOrCategoryFilter_.matchSlice(slice)) return true;
       return this.matchObject_(slice.args);
     }
   };

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
 
   /**
    * Converts any object which is either (a) an iterable, or (b) an
@@ -17,12 +18,7 @@ global.tr.exportTo('tr.b', function() {
    */
   function asArray(x) {
     var values = [];
-    if (x[Symbol.iterator])
-      for (var value of x)
-        values.push(value);
-    else
-      for (var i = 0; i < x.length; i++)
-        values.push(x[i]);
+    if (x[Symbol.iterator]) for (var value of x) values.push(value);else for (var i = 0; i < x.length; i++) values.push(x[i]);
     return values;
   }
 
@@ -34,13 +30,10 @@ global.tr.exportTo('tr.b', function() {
     var iterator = iterable[Symbol.iterator]();
 
     var firstIteration = iterator.next();
-    if (firstIteration.done)
-      throw new Error('getOnlyElement was passed an empty iterable.');
+    if (firstIteration.done) throw new Error('getOnlyElement was passed an empty iterable.');
 
     var secondIteration = iterator.next();
-    if (!secondIteration.done)
-      throw new Error(
-          'getOnlyElement was passed an iterable with multiple elements.');
+    if (!secondIteration.done) throw new Error('getOnlyElement was passed an iterable with multiple elements.');
 
     return firstIteration.value;
   }
@@ -52,8 +45,7 @@ global.tr.exportTo('tr.b', function() {
   function getFirstElement(iterable) {
     var iterator = iterable[Symbol.iterator]();
     var result = iterator.next();
-    if (result.done)
-      throw new Error('getFirstElement was passed an empty iterable.');
+    if (result.done) throw new Error('getFirstElement was passed an empty iterable.');
 
     return result.value;
   }
@@ -62,14 +54,11 @@ global.tr.exportTo('tr.b', function() {
     var minLength = Math.min(x.length, y.length);
     for (var i = 0; i < minLength; i++) {
       var tmp = elementCmp(x[i], y[i]);
-      if (tmp)
-        return tmp;
+      if (tmp) return tmp;
     }
-    if (x.length == y.length)
-      return 0;
+    if (x.length == y.length) return 0;
 
-    if (x[i] === undefined)
-      return -1;
+    if (x[i] === undefined) return -1;
 
     return 1;
   }
@@ -79,12 +68,9 @@ global.tr.exportTo('tr.b', function() {
    * values are sorted after defined.
    */
   function comparePossiblyUndefinedValues(x, y, cmp, opt_this) {
-    if (x !== undefined && y !== undefined)
-      return cmp.call(opt_this, x, y);
-    if (x !== undefined)
-      return -1;
-    if (y !== undefined)
-      return 1;
+    if (x !== undefined && y !== undefined) return cmp.call(opt_this, x, y);
+    if (x !== undefined) return -1;
+    if (y !== undefined) return 1;
     return 0;
   }
 
@@ -93,26 +79,22 @@ global.tr.exportTo('tr.b', function() {
    * Undefined / NaN values are sorted after others.
    */
   function compareNumericWithNaNs(x, y) {
-    if (!isNaN(x) && !isNaN(y))
-      return x - y;
-    if (isNaN(x))
-      return 1;
-    if (isNaN(y))
-      return -1;
+    if (!isNaN(x) && !isNaN(y)) return x - y;
+    if (isNaN(x)) return 1;
+    if (isNaN(y)) return -1;
     return 0;
   }
 
-  function concatenateArrays(/*arguments*/) {
+  function concatenateArrays() /*arguments*/{
     var values = [];
     for (var i = 0; i < arguments.length; i++) {
-      if (!(arguments[i] instanceof Array))
-        throw new Error('Arguments ' + i + 'is not an array');
+      if (!(arguments[i] instanceof Array)) throw new Error('Arguments ' + i + 'is not an array');
       values.push.apply(values, arguments[i]);
     }
     return values;
   }
 
-  function concatenateObjects(/*arguments*/) {
+  function concatenateObjects() /*arguments*/{
     var result = {};
     for (var i = 0; i < arguments.length; i++) {
       var object = arguments[i];
@@ -133,29 +115,24 @@ global.tr.exportTo('tr.b', function() {
 
   function dictionaryKeys(dict) {
     var keys = [];
-    for (var key in dict)
-      keys.push(key);
+    for (var key in dict) keys.push(key);
     return keys;
   }
 
   function dictionaryValues(dict) {
     var values = [];
-    for (var key in dict)
-      values.push(dict[key]);
+    for (var key in dict) values.push(dict[key]);
     return values;
   }
 
   function dictionaryLength(dict) {
     var n = 0;
-    for (var key in dict)
-      n++;
+    for (var key in dict) n++;
     return n;
   }
 
   function dictionaryContainsValue(dict, value) {
-    for (var key in dict)
-      if (dict[key] === value)
-        return true;
+    for (var key in dict) if (dict[key] === value) return true;
     return false;
   }
 
@@ -163,9 +140,7 @@ global.tr.exportTo('tr.b', function() {
    * Returns true if all the elements of the iterable pass the predicate.
    */
   function every(iterable, predicate) {
-    for (var x of iterable)
-      if (!predicate(x))
-        return false;
+    for (var x of iterable) if (!predicate(x)) return false;
     return true;
   }
 
@@ -177,14 +152,36 @@ global.tr.exportTo('tr.b', function() {
    * value and the map key.
    * @param {*=} opt_this
    */
-  function group(ary, callback, opt_this) {
+  function group(ary, callback, opt_this, opt_arrayConstructor) {
+    var arrayConstructor = opt_arrayConstructor || Array;
     var results = {};
     for (var element of ary) {
       var key = callback.call(opt_this, element);
-      if (key in results)
-        results[key].push(element);
-      else
-        results[key] = [element];
+      if (!(key in results)) results[key] = new arrayConstructor();
+      results[key].push(element);
+    }
+    return results;
+  }
+
+  /**
+   * Returns a new Map with items grouped by the return value of the
+   * specified function being called on each item.
+   * @param {!Array.<!*>} ary The array being iterated through
+   * @param {!function(!*):!*} callback The mapping function between the array
+   * value and the map key.
+   * @param {*=} opt_this
+   */
+  function groupIntoMap(ary, callback, opt_this, opt_arrayConstructor) {
+    var arrayConstructor = opt_arrayConstructor || Array;
+    var results = new Map();
+    for (var element of ary) {
+      var key = callback.call(opt_this, element);
+      var items = results.get(key);
+      if (items === undefined) {
+        items = new arrayConstructor();
+        results.set(key, items);
+      }
+      items.push(element);
     }
     return results;
   }
@@ -227,15 +224,13 @@ global.tr.exportTo('tr.b', function() {
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
       var value = dict[key];
-      if (predicate.call(opt_this, key, value))
-        result[key] = value;
+      if (predicate.call(opt_this, key, value)) result[key] = value;
     }
     return result;
   }
 
   function iterObjectFieldsRecursively(object, func) {
-    if (!(object instanceof Object))
-      return;
+    if (!(object instanceof Object)) return;
 
     if (object instanceof Array) {
       for (var i = 0; i < object.length; i++) {
@@ -289,15 +284,12 @@ global.tr.exportTo('tr.b', function() {
     var result = {};
     for (var i = 0; i < array.length; i++) {
       var item = array[i];
-      if (item === undefined)
-        continue;
+      if (item === undefined) continue;
       var dict = opt_dictGetter ? opt_dictGetter.call(opt_this, item) : item;
-      if (dict === undefined)
-        continue;
+      if (dict === undefined) continue;
       for (var key in dict) {
         var valueList = result[key];
-        if (valueList === undefined)
-          result[key] = valueList = new Array(array.length);
+        if (valueList === undefined) result[key] = valueList = new Array(array.length);
         valueList[i] = dict[key];
       }
     }
@@ -347,8 +339,7 @@ global.tr.exportTo('tr.b', function() {
   function findFirstIndexInArray(ary, opt_func, opt_this) {
     var func = opt_func || identity;
     for (var i = 0; i < ary.length; i++) {
-      if (func.call(opt_this, ary[i], i))
-        return i;
+      if (func.call(opt_this, ary[i], i)) return i;
     }
     return -1;
   }
@@ -365,8 +356,7 @@ global.tr.exportTo('tr.b', function() {
    */
   function findFirstInArray(ary, opt_func, opt_this) {
     var i = findFirstIndexInArray(ary, opt_func, opt_func);
-    if (i === -1)
-      return undefined;
+    if (i === -1) return undefined;
     return ary[i];
   }
 
@@ -384,8 +374,7 @@ global.tr.exportTo('tr.b', function() {
   function findFirstKeyInDictMatching(dict, opt_func, opt_this) {
     var func = opt_func || identity;
     for (var key in dict) {
-      if (func.call(opt_this, key, dict[key]))
-        return key;
+      if (func.call(opt_this, key, dict[key])) return key;
     }
     return undefined;
   }
@@ -393,8 +382,7 @@ global.tr.exportTo('tr.b', function() {
   /** Returns the values in an ES6 Map object. */
   function mapValues(map) {
     var values = [];
-    for (var value of map.values())
-      values.push(value);
+    for (var value of map.values()) values.push(value);
     return values;
   }
 
@@ -409,8 +397,7 @@ global.tr.exportTo('tr.b', function() {
    */
   function iterMapItems(map, fn, opt_this) {
     opt_this = opt_this || this;
-    for (var key of map.keys())
-      fn.call(opt_this, key, map.get(key));
+    for (var key of map.keys()) fn.call(opt_this, key, map.get(key));
   }
 
   return {
@@ -429,6 +416,7 @@ global.tr.exportTo('tr.b', function() {
     getOnlyElement: getOnlyElement,
     getFirstElement: getFirstElement,
     group: group,
+    groupIntoMap: groupIntoMap,
     iterItems: iterItems,
     mapItems: mapItems,
     filterItems: filterItems,

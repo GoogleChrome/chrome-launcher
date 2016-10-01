@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -13,7 +14,7 @@ require("./base.js");
  * over sorted arrays and intervals.
  *
  */
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   /**
    * Finds the first index in the array whose value is >= loVal.
    *
@@ -30,8 +31,7 @@ global.tr.exportTo('tr.b', function() {
    *     the array.
    */
   function findLowIndexInSortedArray(ary, mapFn, loVal) {
-    if (ary.length == 0)
-      return 1;
+    if (ary.length == 0) return 1;
 
     var low = 0;
     var high = ary.length - 1;
@@ -41,9 +41,9 @@ global.tr.exportTo('tr.b', function() {
       i = Math.floor((low + high) / 2);
       comparison = mapFn(ary[i]) - loVal;
       if (comparison < 0) {
-        low = i + 1; continue;
+        low = i + 1;continue;
       } else if (comparison > 0) {
-        high = i - 1; continue;
+        high = i - 1;continue;
       } else {
         hitPos = i;
         high = i - 1;
@@ -58,11 +58,8 @@ global.tr.exportTo('tr.b', function() {
     var lo = loVal || 0;
     var hi = hiVal !== undefined ? hiVal : ary.length;
     while (lo < hi) {
-      var mid = (lo + hi) >> 1;
-      if (mapFn(ary[mid]) >= 0)
-        lo = mid + 1;
-      else
-        hi = mid;
+      var mid = lo + hi >> 1;
+      if (mapFn(ary[mid]) >= 0) lo = mid + 1;else hi = mid;
     }
     return hi;
   }
@@ -92,27 +89,21 @@ global.tr.exportTo('tr.b', function() {
   function findIndexInSortedIntervals(ary, mapLoFn, mapWidthFn, loVal) {
     var first = findLowIndexInSortedArray(ary, mapLoFn, loVal);
     if (first == 0) {
-      if (loVal >= mapLoFn(ary[0]) &&
-          loVal < mapLoFn(ary[0]) + mapWidthFn(ary[0], 0)) {
+      if (loVal >= mapLoFn(ary[0]) && loVal < mapLoFn(ary[0]) + mapWidthFn(ary[0], 0)) {
         return 0;
       } else {
         return -1;
       }
     } else if (first < ary.length) {
-      if (loVal >= mapLoFn(ary[first]) &&
-          loVal < mapLoFn(ary[first]) + mapWidthFn(ary[first], first)) {
+      if (loVal >= mapLoFn(ary[first]) && loVal < mapLoFn(ary[first]) + mapWidthFn(ary[first], first)) {
         return first;
-      } else if (loVal >= mapLoFn(ary[first - 1]) &&
-                 loVal < mapLoFn(ary[first - 1]) +
-                 mapWidthFn(ary[first - 1], first - 1)) {
+      } else if (loVal >= mapLoFn(ary[first - 1]) && loVal < mapLoFn(ary[first - 1]) + mapWidthFn(ary[first - 1], first - 1)) {
         return first - 1;
       } else {
         return ary.length;
       }
     } else if (first == ary.length) {
-      if (loVal >= mapLoFn(ary[first - 1]) &&
-          loVal < mapLoFn(ary[first - 1]) +
-          mapWidthFn(ary[first - 1], first - 1)) {
+      if (loVal >= mapLoFn(ary[first - 1]) && loVal < mapLoFn(ary[first - 1]) + mapWidthFn(ary[first - 1], first - 1)) {
         return first - 1;
       } else {
         return ary.length;
@@ -149,25 +140,21 @@ global.tr.exportTo('tr.b', function() {
   function findIndexInSortedClosedIntervals(ary, mapLoFn, mapHiFn, val) {
     var i = findLowIndexInSortedArray(ary, mapLoFn, val);
     if (i === 0) {
-      if (val >= mapLoFn(ary[0], 0) &&
-          val <= mapHiFn(ary[0], 0)) {
+      if (val >= mapLoFn(ary[0], 0) && val <= mapHiFn(ary[0], 0)) {
         return 0;
       } else {
         return -1;
-    }
+      }
     } else if (i < ary.length) {
-      if (val >= mapLoFn(ary[i - 1], i - 1) &&
-          val <= mapHiFn(ary[i - 1], i - 1)) {
+      if (val >= mapLoFn(ary[i - 1], i - 1) && val <= mapHiFn(ary[i - 1], i - 1)) {
         return i - 1;
-      } else if (val >= mapLoFn(ary[i], i) &&
-          val <= mapHiFn(ary[i], i)) {
+      } else if (val >= mapLoFn(ary[i], i) && val <= mapHiFn(ary[i], i)) {
         return i;
       } else {
         return ary.length;
       }
     } else if (i == ary.length) {
-      if (val >= mapLoFn(ary[i - 1], i - 1) &&
-          val <= mapHiFn(ary[i - 1], i - 1)) {
+      if (val >= mapLoFn(ary[i - 1], i - 1) && val <= mapHiFn(ary[i - 1], i - 1)) {
         return i - 1;
       } else {
         return ary.length;
@@ -196,10 +183,8 @@ global.tr.exportTo('tr.b', function() {
    * @param {number} hiVal The high value for the search, non inclusive.
    * @param {function():*} cb The function to run for intersecting intervals.
    */
-  function iterateOverIntersectingIntervals(ary, mapLoFn, mapWidthFn, loVal,
-                                            hiVal, cb) {
-    if (ary.length == 0)
-      return;
+  function iterateOverIntersectingIntervals(ary, mapLoFn, mapWidthFn, loVal, hiVal, cb) {
+    if (ary.length == 0) return;
 
     if (loVal > hiVal) return;
 
@@ -219,8 +204,7 @@ global.tr.exportTo('tr.b', function() {
 
     for (var n = ary.length; i < n; i++) {
       var lo = mapLoFn(ary[i]);
-      if (lo >= hiVal)
-        break;
+      if (lo >= hiVal) break;
       cb(ary[i], i);
     }
   }
@@ -232,10 +216,9 @@ global.tr.exportTo('tr.b', function() {
    */
   function getIntersectingIntervals(ary, mapLoFn, mapWidthFn, loVal, hiVal) {
     var tmp = [];
-    iterateOverIntersectingIntervals(ary, mapLoFn, mapWidthFn, loVal, hiVal,
-                                     function(d) {
-                                       tmp.push(d);
-                                     });
+    iterateOverIntersectingIntervals(ary, mapLoFn, mapWidthFn, loVal, hiVal, function (d) {
+      tmp.push(d);
+    });
     return tmp;
   }
 
@@ -254,20 +237,17 @@ global.tr.exportTo('tr.b', function() {
    *     null if no object is within range.
    */
   function findClosestElementInSortedArray(ary, mapFn, val, maxDiff) {
-    if (ary.length === 0)
-      return null;
+    if (ary.length === 0) return null;
 
     var aftIdx = findLowIndexInSortedArray(ary, mapFn, val);
     var befIdx = aftIdx > 0 ? aftIdx - 1 : 0;
 
-    if (aftIdx === ary.length)
-      aftIdx -= 1;
+    if (aftIdx === ary.length) aftIdx -= 1;
 
     var befDiff = Math.abs(val - mapFn(ary[befIdx]));
     var aftDiff = Math.abs(val - mapFn(ary[aftIdx]));
 
-    if (befDiff > maxDiff && aftDiff > maxDiff)
-      return null;
+    if (befDiff > maxDiff && aftDiff > maxDiff) return null;
 
     var idx = befDiff < aftDiff ? befIdx : aftIdx;
     return ary[idx];
@@ -293,31 +273,23 @@ global.tr.exportTo('tr.b', function() {
    * @return {interval} Interval in the array whose high or low value is closest
    *     to |val|, or null if no interval is within range.
    */
-  function findClosestIntervalInSortedIntervals(ary, mapLoFn, mapHiFn, val,
-                                                maxDiff) {
-    if (ary.length === 0)
-      return null;
+  function findClosestIntervalInSortedIntervals(ary, mapLoFn, mapHiFn, val, maxDiff) {
+    if (ary.length === 0) return null;
 
     var idx = findLowIndexInSortedArray(ary, mapLoFn, val);
-    if (idx > 0)
-      idx -= 1;
+    if (idx > 0) idx -= 1;
 
     var hiInt = ary[idx];
     var loInt = hiInt;
 
-    if (val > mapHiFn(hiInt) && idx + 1 < ary.length)
-      loInt = ary[idx + 1];
+    if (val > mapHiFn(hiInt) && idx + 1 < ary.length) loInt = ary[idx + 1];
 
     var loDiff = Math.abs(val - mapLoFn(loInt));
     var hiDiff = Math.abs(val - mapHiFn(hiInt));
 
-    if (loDiff > maxDiff && hiDiff > maxDiff)
-      return null;
+    if (loDiff > maxDiff && hiDiff > maxDiff) return null;
 
-    if (loDiff < hiDiff)
-      return loInt;
-    else
-      return hiInt;
+    if (loDiff < hiDiff) return loInt;else return hiInt;
   }
 
   return {

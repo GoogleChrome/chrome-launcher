@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   function RegisteredTypeInfo(constructor, metadata) {
     this.constructor = constructor;
     this.metadata = metadata;
@@ -16,13 +17,11 @@ global.tr.exportTo('tr.b', function() {
 
   var BASIC_REGISTRY_MODE = 'BASIC_REGISTRY_MODE';
   var TYPE_BASED_REGISTRY_MODE = 'TYPE_BASED_REGISTRY_MODE';
-  var ALL_MODES = {BASIC_REGISTRY_MODE: true, TYPE_BASED_REGISTRY_MODE: true};
+  var ALL_MODES = { BASIC_REGISTRY_MODE: true, TYPE_BASED_REGISTRY_MODE: true };
 
   function ExtensionRegistryOptions(mode) {
-    if (mode === undefined)
-      throw new Error('Mode is required');
-    if (!ALL_MODES[mode])
-      throw new Error('Not a mode.');
+    if (mode === undefined) throw new Error('Mode is required');
+    if (!ALL_MODES[mode]) throw new Error('Not a mode.');
 
     this.mode_ = mode;
     this.defaultMetadata_ = {};
@@ -31,9 +30,8 @@ global.tr.exportTo('tr.b', function() {
     this.frozen_ = false;
   }
   ExtensionRegistryOptions.prototype = {
-    freeze: function() {
-      if (this.frozen_)
-        throw new Error('Frozen');
+    freeze: function () {
+      if (this.frozen_) throw new Error('Frozen');
       this.frozen_ = true;
     },
 
@@ -46,8 +44,7 @@ global.tr.exportTo('tr.b', function() {
     },
 
     set defaultMetadata(defaultMetadata) {
-      if (this.frozen_)
-        throw new Error('Frozen');
+      if (this.frozen_) throw new Error('Frozen');
       this.defaultMetadata_ = defaultMetadata;
       this.defaultTypeInfo_ = undefined;
     },
@@ -57,24 +54,20 @@ global.tr.exportTo('tr.b', function() {
     },
 
     set defaultConstructor(defaultConstructor) {
-      if (this.frozen_)
-        throw new Error('Frozen');
+      if (this.frozen_) throw new Error('Frozen');
       this.defaultConstructor_ = defaultConstructor;
       this.defaultTypeInfo_ = undefined;
     },
 
     get defaultTypeInfo() {
       if (this.defaultTypeInfo_ === undefined && this.defaultConstructor_) {
-        this.defaultTypeInfo_ = new RegisteredTypeInfo(
-            this.defaultConstructor,
-            this.defaultMetadata);
+        this.defaultTypeInfo_ = new RegisteredTypeInfo(this.defaultConstructor, this.defaultMetadata);
       }
       return this.defaultTypeInfo_;
     },
 
-    validateConstructor: function(constructor) {
-      if (!this.mandatoryBaseClass)
-        return;
+    validateConstructor: function (constructor) {
+      if (!this.mandatoryBaseClass) return;
       var curProto = constructor.prototype.__proto__;
       var ok = false;
       while (curProto) {
@@ -84,8 +77,7 @@ global.tr.exportTo('tr.b', function() {
         }
         curProto = curProto.__proto__;
       }
-      if (!ok)
-        throw new Error(constructor + 'must be subclass of ' + registry);
+      if (!ok) throw new Error(constructor + 'must be subclass of ' + registry);
     }
   };
 
@@ -97,4 +89,3 @@ global.tr.exportTo('tr.b', function() {
     RegisteredTypeInfo: RegisteredTypeInfo
   };
 });
-

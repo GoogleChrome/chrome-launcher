@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,10 +9,10 @@ require("./user_expectation.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model.um', function() {
+global.tr.exportTo('tr.model.um', function () {
   var LOAD_SUBTYPE_NAMES = {
     SUCCESSFUL: 'Successful',
-    FAILED: 'Failed',
+    FAILED: 'Failed'
   };
 
   var DOES_LOAD_SUBTYPE_NAME_EXIST = {};
@@ -20,11 +21,9 @@ global.tr.exportTo('tr.model.um', function() {
   }
 
   function LoadExpectation(parentModel, initiatorTitle, start, duration) {
-    if (!DOES_LOAD_SUBTYPE_NAME_EXIST[initiatorTitle])
-      throw new Error(initiatorTitle + ' is not in LOAD_SUBTYPE_NAMES');
+    if (!DOES_LOAD_SUBTYPE_NAME_EXIST[initiatorTitle]) throw new Error(initiatorTitle + ' is not in LOAD_SUBTYPE_NAMES');
 
-    tr.model.um.UserExpectation.call(
-        this, parentModel, initiatorTitle, start, duration);
+    tr.model.um.UserExpectation.call(this, parentModel, initiatorTitle, start, duration);
 
     // |renderProcess| is the renderer process that contains the loading
     // RenderFrame.
@@ -54,7 +53,7 @@ global.tr.exportTo('tr.model.um', function() {
     constructor: LoadExpectation
   };
 
-  tr.model.um.UserExpectation.register(LoadExpectation, {
+  tr.model.um.UserExpectation.subTypes.register(LoadExpectation, {
     stageTitle: 'Load',
     colorId: tr.b.ColorScheme.getColorIdForReservedName('rail_load')
   });

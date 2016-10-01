@@ -1,27 +1,29 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../base/unit.js");
 require("./timed_event.js");
-require("../value/unit.js");
 
 'use strict';
 
 /**
  * @fileoverview Provides the Slice class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   /**
    * A Slice represents an interval of time plus parameters associated
    * with that interval.
    *
    * @constructor
    */
-  function Slice(category, title, colorId, start, args, opt_duration,
-                 opt_cpuStart, opt_cpuDuration, opt_argsStripped,
-                 opt_bind_id) {
+  function Slice(category, title, colorId, start, args, opt_duration, opt_cpuStart, opt_cpuDuration, opt_argsStripped, opt_bindId) {
+    if (!(this instanceof Slice)) {
+      throw new Error("Can't instantiate pure virtual class Slice");
+    }
     tr.model.TimedEvent.call(this, start);
 
     this.category = category || '';
@@ -40,7 +42,7 @@ global.tr.exportTo('tr.model', function() {
     this.parentContainer = undefined;
     this.argsStripped = false;
 
-    this.bind_id_ = opt_bind_id;
+    this.bind_id_ = opt_bindId;
 
     // parentSlice and isTopLevel will be set by SliceGroup.
     this.parentSlice = undefined;
@@ -48,45 +50,36 @@ global.tr.exportTo('tr.model', function() {
     // After SliceGroup processes Slices, isTopLevel should be equivalent to
     // !parentSlice.
 
-    if (opt_duration !== undefined)
-      this.duration = opt_duration;
+    if (opt_duration !== undefined) this.duration = opt_duration;
 
-    if (opt_cpuStart !== undefined)
-      this.cpuStart = opt_cpuStart;
+    if (opt_cpuStart !== undefined) this.cpuStart = opt_cpuStart;
 
-    if (opt_cpuDuration !== undefined)
-      this.cpuDuration = opt_cpuDuration;
+    if (opt_cpuDuration !== undefined) this.cpuDuration = opt_cpuDuration;
 
-    if (opt_argsStripped !== undefined)
-      this.argsStripped = true;
+    if (opt_argsStripped !== undefined) this.argsStripped = true;
   }
 
   Slice.prototype = {
     __proto__: tr.model.TimedEvent.prototype,
-
 
     get analysisTypeName() {
       return this.title;
     },
 
     get userFriendlyName() {
-      return 'Slice ' + this.title + ' at ' +
-          tr.v.Unit.byName.timeStampInMs.format(this.start);
+      return 'Slice ' + this.title + ' at ' + tr.b.Unit.byName.timeStampInMs.format(this.start);
     },
 
     get stableId() {
       var parentSliceGroup = this.parentContainer.sliceGroup;
-      return parentSliceGroup.stableId + '.' +
-          parentSliceGroup.slices.indexOf(this);
+      return parentSliceGroup.stableId + '.' + parentSliceGroup.slices.indexOf(this);
     },
 
-    findDescendentSlice: function(targetTitle) {
-      if (!this.subSlices)
-        return undefined;
+    findDescendentSlice: function (targetTitle) {
+      if (!this.subSlices) return undefined;
 
       for (var i = 0; i < this.subSlices.length; i++) {
-        if (this.subSlices[i].title == targetTitle)
-          return this.subSlices[i];
+        if (this.subSlices[i].title == targetTitle) return this.subSlices[i];
         var slice = this.subSlices[i].findDescendentSlice(targetTitle);
         if (slice) return slice;
       }
@@ -95,23 +88,20 @@ global.tr.exportTo('tr.model', function() {
 
     get mostTopLevelSlice() {
       var curSlice = this;
-      while (curSlice.parentSlice)
-        curSlice = curSlice.parentSlice;
+      while (curSlice.parentSlice) curSlice = curSlice.parentSlice;
 
       return curSlice;
     },
 
-    getProcess: function() {
+    getProcess: function () {
       var thread = this.parentContainer;
-      if (thread && thread.getProcess)
-        return thread.getProcess();
+      if (thread && thread.getProcess) return thread.getProcess();
       return undefined;
     },
 
     get model() {
       var process = this.getProcess();
-      if (process !== undefined)
-        return this.getProcess().model;
+      if (process !== undefined) return this.getProcess().model;
       return undefined;
     },
 
@@ -133,13 +123,12 @@ global.tr.exportTo('tr.model', function() {
      * [      D     ]
      *   [C1]  [C2]
      */
-    findTopmostSlicesRelativeToThisSlice: function*(eventPredicate) {
+    findTopmostSlicesRelativeToThisSlice: function* (eventPredicate) {
       if (eventPredicate(this)) {
         yield this;
         return;
       }
-      for (var s of this.subSlices)
-        yield * s.findTopmostSlicesRelativeToThisSlice(eventPredicate);
+      for (var s of this.subSlices) yield* s.findTopmostSlicesRelativeToThisSlice(eventPredicate);
     },
 
     /**
@@ -164,7 +153,7 @@ global.tr.exportTo('tr.model', function() {
      * to the function call order. We just need to perform a DFS, and start
      * recording the slices after we see the occurance of E.
      */
-    iterateAllSubsequentSlices: function(callback, opt_this) {
+    iterateAllSubsequentSlices: function (callback, opt_this) {
       var parentStack = [];
       var started = false;
 
@@ -176,10 +165,7 @@ global.tr.exportTo('tr.model', function() {
       while (parentStack.length !== 0) {
         var curSlice = parentStack.pop();
 
-        if (started)
-          callback.call(opt_this, curSlice);
-        else
-          started = (curSlice.guid === this.guid);
+        if (started) callback.call(opt_this, curSlice);else started = curSlice.guid === this.guid;
 
         for (var i = curSlice.subSlices.length - 1; i >= 0; i--) {
           parentStack.push(curSlice.subSlices[i]);
@@ -190,7 +176,7 @@ global.tr.exportTo('tr.model', function() {
     get subsequentSlices() {
       var res = [];
 
-      this.iterateAllSubsequentSlices(function(subseqSlice) {
+      this.iterateAllSubsequentSlices(function (subseqSlice) {
         res.push(subseqSlice);
       });
 
@@ -206,7 +192,7 @@ global.tr.exportTo('tr.model', function() {
      *  [C] [E][F]  [H]
      * will yield D, then A, in the order from the leaves to the root.
      */
-    enumerateAllAncestors: function*() {
+    enumerateAllAncestors: function* () {
       var curSlice = this;
 
       while (curSlice.parentSlice) {
@@ -217,12 +203,11 @@ global.tr.exportTo('tr.model', function() {
 
     get ancestorSlices() {
       var res = [];
-      for (var slice of this.enumerateAllAncestors())
-        res.push(slice);
+      for (var slice of this.enumerateAllAncestors()) res.push(slice);
       return res;
     },
 
-    iterateEntireHierarchy: function(callback, opt_this) {
+    iterateEntireHierarchy: function (callback, opt_this) {
       var mostTopLevelSlice = this.mostTopLevelSlice;
       callback.call(opt_this, mostTopLevelSlice);
       mostTopLevelSlice.iterateAllSubsequentSlices(callback, opt_this);
@@ -231,7 +216,7 @@ global.tr.exportTo('tr.model', function() {
     get entireHierarchy() {
       var res = [];
 
-      this.iterateEntireHierarchy(function(slice) {
+      this.iterateEntireHierarchy(function (slice) {
         res.push(slice);
       });
 
@@ -253,27 +238,23 @@ global.tr.exportTo('tr.model', function() {
 
       res.push(this);
 
-      for (var aSlice of this.enumerateAllAncestors())
-        res.push(aSlice);
+      for (var aSlice of this.enumerateAllAncestors()) res.push(aSlice);
 
-      this.iterateAllSubsequentSlices(function(sSlice) {
+      this.iterateAllSubsequentSlices(function (sSlice) {
         res.push(sSlice);
       });
 
       return res;
     },
 
-    enumerateAllDescendents: function*() {
-      for (var slice of this.subSlices)
-        yield slice;
-      for (var slice of this.subSlices)
-        yield * slice.enumerateAllDescendents();
+    enumerateAllDescendents: function* () {
+      for (var slice of this.subSlices) yield slice;
+      for (var slice of this.subSlices) yield* slice.enumerateAllDescendents();
     },
 
     get descendentSlices() {
       var res = [];
-      for (var slice of this.enumerateAllDescendents())
-        res.push(slice);
+      for (var slice of this.enumerateAllDescendents()) res.push(slice);
       return res;
     }
 

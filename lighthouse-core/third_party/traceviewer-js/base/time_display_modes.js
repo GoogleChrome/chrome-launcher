@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -11,18 +12,18 @@ require("./unit_scale.js");
 /**
  * @fileoverview Time currentDisplayUnit
  */
-global.tr.exportTo('tr.v', function() {
+global.tr.exportTo('tr.b', function () {
   var msDisplayMode = {
     scale: 1e-3,
     suffix: 'ms',
     // Compares a < b with adjustments to precision errors.
-    roundedLess: function(a, b) {
+    roundedLess: function (a, b) {
       return Math.round(a * 1000) < Math.round(b * 1000);
     },
     formatSpec: {
       unit: 's',
-      unitPrefix: tr.v.UnitScale.MetricTime.MILLI,
-      minimumFractionDigits: 3,
+      unitPrefix: tr.b.UnitScale.Metric.MILLI,
+      minimumFractionDigits: 3
     }
   };
 
@@ -30,12 +31,12 @@ global.tr.exportTo('tr.v', function() {
     scale: 1e-9,
     suffix: 'ns',
     // Compares a < b with adjustments to precision errors.
-    roundedLess: function(a, b) {
+    roundedLess: function (a, b) {
       return Math.round(a * 1000000) < Math.round(b * 1000000);
     },
     formatSpec: {
       unit: 's',
-      unitPrefix: tr.v.UnitScale.MetricTime.NANO,
+      unitPrefix: tr.b.UnitScale.Metric.NANO,
       maximumFractionDigits: 0
     }
   };

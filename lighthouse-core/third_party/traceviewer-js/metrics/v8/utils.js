@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -7,14 +8,13 @@ found in the LICENSE file.
 require("../../base/piecewise_linear_function.js");
 require("../../base/range.js");
 require("../../base/range_utils.js");
+require("../../base/unit.js");
 require("../metric_registry.js");
-require("../../value/numeric.js");
-require("../../value/unit.js");
-require("../../value/value.js");
+require("../../value/histogram.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.v8.utils', function() {
+global.tr.exportTo('tr.metrics.v8.utils', function () {
   // The title of the idle task event.
   var IDLE_TASK_EVENT = 'SingleThreadIdleTaskRunner::RunTask';
 
@@ -34,14 +34,14 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
 
   // Maps the top-level GC events in timeline to telemetry friendly names.
   var TOP_GC_EVENTS = {
-      'V8.GCCompactor': 'v8-gc-full-mark-compactor',
-      'V8.GCFinalizeMC': 'v8-gc-latency-mark-compactor',
-      'V8.GCFinalizeMCReduceMemory': 'v8-gc-memory-mark-compactor',
-      'V8.GCIncrementalMarking': 'v8-gc-incremental-step',
-      'V8.GCIncrementalMarkingFinalize': 'v8-gc-incremental-finalize',
-      'V8.GCIncrementalMarkingStart': 'v8-gc-incremental-start',
-      'V8.GCPhantomHandleProcessingCallback' : 'v8-gc-phantom-handle-callback',
-      'V8.GCScavenger': 'v8-gc-scavenger'
+    'V8.GCCompactor': 'v8-gc-full-mark-compactor',
+    'V8.GCFinalizeMC': 'v8-gc-latency-mark-compactor',
+    'V8.GCFinalizeMCReduceMemory': 'v8-gc-memory-mark-compactor',
+    'V8.GCIncrementalMarking': 'v8-gc-incremental-step',
+    'V8.GCIncrementalMarkingFinalize': 'v8-gc-incremental-finalize',
+    'V8.GCIncrementalMarkingStart': 'v8-gc-incremental-start',
+    'V8.GCPhantomHandleProcessingCallback': 'v8-gc-phantom-handle-callback',
+    'V8.GCScavenger': 'v8-gc-scavenger'
   };
 
   var LOW_MEMORY_MARK_COMPACTOR = 'v8-gc-low-memory-mark-compactor';
@@ -79,8 +79,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
   function isGarbageCollectionEvent(event) {
     // Low memory notification is handled specially because it contains
     // several full mark compact events.
-    return event.title && event.title.startsWith(GC_EVENT_PREFIX) &&
-           event.title != LOW_MEMORY_EVENT;
+    return event.title && event.title.startsWith(GC_EVENT_PREFIX) && event.title != LOW_MEMORY_EVENT;
   }
 
   function isTopGarbageCollectionEvent(event) {
@@ -95,11 +94,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     // To reduce number of results, we return only the first level of GC
     // subevents. Some subevents are nested in MajorGC or MinorGC events, so
     // we have to check for it explicitly.
-    return isGarbageCollectionEvent(event) &&
-           event.parentSlice &&
-           (isTopGarbageCollectionEvent(event.parentSlice) ||
-            event.parentSlice.title === MAJOR_GC_EVENT ||
-            event.parentSlice.title === MINOR_GC_EVENT);
+    return isGarbageCollectionEvent(event) && event.parentSlice && (isTopGarbageCollectionEvent(event.parentSlice) || event.parentSlice.title === MAJOR_GC_EVENT || event.parentSlice.title === MINOR_GC_EVENT);
   }
 
   function topGarbageCollectionEventName(event) {
@@ -117,10 +112,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     var topEvent = findParent(event, isTopGarbageCollectionEvent);
     var prefix = topEvent ? topGarbageCollectionEventName(topEvent) : 'unknown';
     // Remove redundant prefixes and convert to lower case.
-    var name = event.title.replace('V8.GC_MC_', '')
-                          .replace('V8.GC_SCAVENGER_', '')
-                          .replace('V8.GC_', '')
-                          .replace(/_/g, '-').toLowerCase();
+    var name = event.title.replace('V8.GC_MC_', '').replace('V8.GC_SCAVENGER_', '').replace('V8.GC_', '').replace(/_/g, '-').toLowerCase();
     return prefix + '-' + name;
   }
 
@@ -132,8 +124,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
    * @param {Function} nameCallback Takes event and returns a string.
    * @param {Function} processCallback Takes a name, and an array of events.
    */
-  function groupAndProcessEvents(model, filterCallback,
-                                 nameCallback, processCallback) {
+  function groupAndProcessEvents(model, filterCallback, nameCallback, processCallback) {
     // Map: name -> [events].
     var nameToEvents = {};
     for (var event of model.getDescendantEvents()) {
@@ -142,7 +133,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
       nameToEvents[name] = nameToEvents[name] || [];
       nameToEvents[name].push(event);
     }
-    tr.b.iterItems(nameToEvents, function(name, events) {
+    tr.b.iterItems(nameToEvents, function (name, events) {
       processCallback(name, events);
     });
   }
@@ -152,17 +143,13 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
   * intervals merged into a single interval.
   */
   function unionOfIntervals(intervals) {
-    if (intervals.length === 0)
-      return [];
-    return tr.b.mergeRanges(
-      intervals.map(x => ({min: x.start, max: x.end})), 1e-6,
-      function(ranges) {
-        return {
-          start: ranges.reduce((acc, x) => Math.min(acc, x.min), ranges[0].min),
-          end: ranges.reduce((acc, x) => Math.max(acc, x.max), ranges[0].max)
-        };
-      }
-    );
+    if (intervals.length === 0) return [];
+    return tr.b.mergeRanges(intervals.map(x => ({ min: x.start, max: x.end })), 1e-6, function (ranges) {
+      return {
+        start: ranges.reduce((acc, x) => Math.min(acc, x.min), ranges[0].min),
+        end: ranges.reduce((acc, x) => Math.max(acc, x.max), ranges[0].max)
+      };
+    });
   }
 
   /**
@@ -187,24 +174,20 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
 
   WindowEndpoint.prototype = {
     // Advance the end-point by the given |delta|.
-    advance: function(delta) {
+    advance: function (delta) {
       var points = this.points;
       if (delta < this.distanceUntilNextPoint) {
         this.position += delta;
         this.cummulativePause += this.stackDepth > 0 ? delta : 0;
-        this.distanceUntilNextPoint =
-            points[this.lastIndex + 1].position - this.position;
+        this.distanceUntilNextPoint = points[this.lastIndex + 1].position - this.position;
       } else {
         this.position += this.distanceUntilNextPoint;
-        this.cummulativePause +=
-            this.stackDepth > 0 ? this.distanceUntilNextPoint : 0;
+        this.cummulativePause += this.stackDepth > 0 ? this.distanceUntilNextPoint : 0;
         this.distanceUntilNextPoint = 0;
         this.lastIndex++;
         if (this.lastIndex < points.length) {
           this.stackDepth += points[this.lastIndex].delta;
-          if (this.lastIndex + 1 < points.length)
-            this.distanceUntilNextPoint =
-                points[this.lastIndex + 1].position - this.position;
+          if (this.lastIndex + 1 < points.length) this.distanceUntilNextPoint = points[this.lastIndex + 1].position - this.position;
         }
       }
     }
@@ -232,8 +215,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     var mu = new tr.b.PiecewiseLinearFunction();
     // If the interval is smaller than the time window, then the function is
     // empty.
-    if (end - start <= timeWindow)
-      return mu;
+    if (end - start <= timeWindow) return mu;
     // If there are GC pauses then the mutator utilization is 1.0.
     if (intervals.length === 0) {
       mu.push(start, 1.0, end - timeWindow, 1.0);
@@ -242,23 +224,21 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
     intervals = unionOfIntervals(intervals);
     // Create a point for the start and the end of each interval.
     var points = [];
-    intervals.forEach(function(interval) {
-      points.push({position: interval.start, delta: 1});
-      points.push({position: interval.end, delta: -1});
+    intervals.forEach(function (interval) {
+      points.push({ position: interval.start, delta: 1 });
+      points.push({ position: interval.end, delta: -1 });
     });
     points.sort((a, b) => a.position - b.position);
-    points.push({position: end, delta: 0});
+    points.push({ position: end, delta: 0 });
     // The left and the right limit of the sliding window.
     var left = new WindowEndpoint(start, points);
     var right = new WindowEndpoint(start, points);
     // Advance the right end-point until we get the correct window size.
-    while (right.position - left.position < timeWindow)
-      right.advance(timeWindow - (right.position - left.position));
+    while (right.position - left.position < timeWindow) right.advance(timeWindow - (right.position - left.position));
     while (right.lastIndex < points.length) {
       // Advance the window end-points by the largest possible amount
       // without jumping over a point.
-      var distanceUntilNextPoint =
-          Math.min(left.distanceUntilNextPoint, right.distanceUntilNextPoint);
+      var distanceUntilNextPoint = Math.min(left.distanceUntilNextPoint, right.distanceUntilNextPoint);
       var position1 = left.position;
       var value1 = right.cummulativePause - left.cummulativePause;
       left.advance(distanceUntilNextPoint);
@@ -267,8 +247,7 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
       if (distanceUntilNextPoint > 0) {
         var position2 = left.position;
         var value2 = right.cummulativePause - left.cummulativePause;
-        mu.push(position1, 1.0 - value1 / timeWindow,
-                position2, 1.0 - value2 / timeWindow);
+        mu.push(position1, 1.0 - value1 / timeWindow, position2, 1.0 - value2 / timeWindow);
       }
     }
     return mu;
@@ -276,18 +255,15 @@ global.tr.exportTo('tr.metrics.v8.utils', function() {
 
   function hasV8Stats(globalMemoryDump) {
     var v8stats = undefined;
-    globalMemoryDump.iterateContainerDumps(function(dump) {
+    globalMemoryDump.iterateContainerDumps(function (dump) {
       v8stats = v8stats || dump.getMemoryAllocatorDumpByFullName('v8');
     });
     return !!v8stats;
   }
 
   function rangeForMemoryDumps(model) {
-    var startOfFirstDumpWithV8 =
-        model.globalMemoryDumps.filter(hasV8Stats).reduce(
-            (start, dump) => Math.min(start, dump.start), Infinity);
-    if (startOfFirstDumpWithV8 === Infinity)
-      return new tr.b.Range(); // Empty range.
+    var startOfFirstDumpWithV8 = model.globalMemoryDumps.filter(hasV8Stats).reduce((start, dump) => Math.min(start, dump.start), Infinity);
+    if (startOfFirstDumpWithV8 === Infinity) return new tr.b.Range(); // Empty range.
     return tr.b.Range.fromExplicitRange(startOfFirstDumpWithV8, Infinity);
   }
 

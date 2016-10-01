@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -12,7 +13,7 @@ require("./importer.js");
 /**
  * @fileoverview Base class for trace data importers.
  */
-global.tr.exportTo('tr.importer', function() {
+global.tr.exportTo('tr.importer', function () {
   /**
    * Importer for empty strings and arrays.
    * @constructor
@@ -21,10 +22,9 @@ global.tr.exportTo('tr.importer', function() {
     this.importPriority = 0;
   };
 
-  EmptyImporter.canImport = function(eventData) {
-    if (eventData instanceof Array && eventData.length == 0)
-      return true;
-    if (typeof(eventData) === 'string' || eventData instanceof String) {
+  EmptyImporter.canImport = function (eventData) {
+    if (eventData instanceof Array && eventData.length == 0) return true;
+    if (typeof eventData === 'string' || eventData instanceof String) {
       return eventData.length == 0;
     }
     return false;

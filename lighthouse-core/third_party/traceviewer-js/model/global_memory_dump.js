@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,18 +6,18 @@ found in the LICENSE file.
 **/
 
 require("../base/iteration_helpers.js");
+require("../base/unit.js");
 require("./container_memory_dump.js");
 require("./event_registry.js");
 require("./memory_allocator_dump.js");
 require("../value/numeric.js");
-require("../value/unit.js");
 
 'use strict';
 
 /**
  * @fileoverview Provides the GlobalMemoryDump class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   /**
    * The GlobalMemoryDump represents a simultaneous memory dump of all
    * processes.
@@ -30,36 +31,29 @@ global.tr.exportTo('tr.model', function() {
 
   // Size numeric names.
   var SIZE_NUMERIC_NAME = tr.model.MemoryAllocatorDump.SIZE_NUMERIC_NAME;
-  var EFFECTIVE_SIZE_NUMERIC_NAME =
-      tr.model.MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME;
+  var EFFECTIVE_SIZE_NUMERIC_NAME = tr.model.MemoryAllocatorDump.EFFECTIVE_SIZE_NUMERIC_NAME;
 
   // Size numeric info types.
   var MemoryAllocatorDumpInfoType = tr.model.MemoryAllocatorDumpInfoType;
-  var PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN =
-      MemoryAllocatorDumpInfoType.PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN;
-  var PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER =
-      MemoryAllocatorDumpInfoType.PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER;
+  var PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN = MemoryAllocatorDumpInfoType.PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN;
+  var PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER = MemoryAllocatorDumpInfoType.PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER;
 
   // TODO(petrcermak): Move this to tracing/base/iteration_helpers.html.
   function inPlaceFilter(array, predicate, opt_this) {
     opt_this = opt_this || this;
     var nextPosition = 0;
     for (var i = 0; i < array.length; i++) {
-      if (!predicate.call(opt_this, array[i], i))
-        continue;
-      if (nextPosition < i)
-        array[nextPosition] = array[i];  // Move elements only if necessary.
+      if (!predicate.call(opt_this, array[i], i)) continue;
+      if (nextPosition < i) array[nextPosition] = array[i]; // Move elements only if necessary.
       nextPosition++;
     }
 
-    if (nextPosition < array.length)
-      array.length = nextPosition;  // Truncate the array only if necessary.
+    if (nextPosition < array.length) array.length = nextPosition; // Truncate the array only if necessary.
   }
 
   function getSize(dump) {
     var numeric = dump.numerics[SIZE_NUMERIC_NAME];
-    if (numeric === undefined)
-      return 0;
+    if (numeric === undefined) return 0;
     return numeric.value;
   }
 
@@ -68,8 +62,7 @@ global.tr.exportTo('tr.model', function() {
   }
 
   function optional(value, defaultValue) {
-    if (value === undefined)
-      return defaultValue;
+    if (value === undefined) return defaultValue;
     return value;
   }
 
@@ -77,15 +70,14 @@ global.tr.exportTo('tr.model', function() {
     __proto__: tr.model.ContainerMemoryDump.prototype,
 
     get userFriendlyName() {
-      return 'Global memory dump at ' +
-          tr.v.Unit.byName.timeStampInMs.format(this.start);
+      return 'Global memory dump at ' + tr.b.Unit.byName.timeStampInMs.format(this.start);
     },
 
     get containerName() {
       return 'global space';
     },
 
-    finalizeGraph: function() {
+    finalizeGraph: function () {
       // 1. Transitively remove weak memory allocator dumps and all their
       // owners and descendants from the model. This must be performed before
       // any other steps.
@@ -125,20 +117,18 @@ global.tr.exportTo('tr.model', function() {
       this.forceRebuildingMemoryAllocatorDumpByFullNameIndices();
     },
 
-    removeWeakDumps: function() {
+    removeWeakDumps: function () {
       // Mark all transitive owners and children of weak memory allocator dumps
       // as weak.
-      this.traverseAllocatorDumpsInDepthFirstPreOrder(function(dump) {
-        if (dump.weak)
-          return;
-        if ((dump.owns !== undefined && dump.owns.target.weak) ||
-            (dump.parent !== undefined && dump.parent.weak)) {
+      this.traverseAllocatorDumpsInDepthFirstPreOrder(function (dump) {
+        if (dump.weak) return;
+        if (dump.owns !== undefined && dump.owns.target.weak || dump.parent !== undefined && dump.parent.weak) {
           dump.weak = true;
         }
       });
 
       function removeWeakDumpsFromListRecursively(dumps) {
-        inPlaceFilter(dumps, function(dump) {
+        inPlaceFilter(dumps, function (dump) {
           if (dump.weak) {
             // The dump is weak, so remove it. This will implicitly remove all
             // its descendants, which are also weak due to the initial marking
@@ -149,7 +139,7 @@ global.tr.exportTo('tr.model', function() {
           // This dump is non-weak, so keep it. Recursively remove its weak
           // descendants and ownership links from weak dumps instead.
           removeWeakDumpsFromListRecursively(dump.children);
-          inPlaceFilter(dump.ownedBy, function(ownershipLink) {
+          inPlaceFilter(dump.ownedBy, function (ownershipLink) {
             return !ownershipLink.source.weak;
           });
 
@@ -157,10 +147,9 @@ global.tr.exportTo('tr.model', function() {
         });
       }
 
-      this.iterateContainerDumps(function(containerDump) {
+      this.iterateContainerDumps(function (containerDump) {
         var memoryAllocatorDumps = containerDump.memoryAllocatorDumps;
-        if (memoryAllocatorDumps !== undefined)
-          removeWeakDumpsFromListRecursively(memoryAllocatorDumps);
+        if (memoryAllocatorDumps !== undefined) removeWeakDumpsFromListRecursively(memoryAllocatorDumps);
       });
     },
 
@@ -182,9 +171,8 @@ global.tr.exportTo('tr.model', function() {
      * Please refer to the Memory Dump Graph Metric Calculation design document
      * for more details (https://goo.gl/fKg0dt).
      */
-    calculateSizes: function() {
-      this.traverseAllocatorDumpsInDepthFirstPostOrder(
-          this.calculateMemoryAllocatorDumpSize_.bind(this));
+    calculateSizes: function () {
+      this.traverseAllocatorDumpsInDepthFirstPostOrder(this.calculateMemoryAllocatorDumpSize_.bind(this));
     },
 
     /**
@@ -192,7 +180,7 @@ global.tr.exportTo('tr.model', function() {
      * that the size of both the children and owners of the dump has already
      * been calculated.
      */
-    calculateMemoryAllocatorDumpSize_: function(dump) {
+    calculateMemoryAllocatorDumpSize_: function (dump) {
       // This flag becomes true if the size numeric of the current dump should
       // be defined, i.e. if (1) the current dump's size numeric is defined,
       // (2) the size of at least one of its children is defined or (3) the
@@ -206,8 +194,7 @@ global.tr.exportTo('tr.model', function() {
       // left unchanged).
       function getDependencySize(dependencyDump) {
         var numeric = dependencyDump.numerics[SIZE_NUMERIC_NAME];
-        if (numeric === undefined)
-          return 0;
+        if (numeric === undefined) return 0;
         shouldDefineSize = true;
         return numeric.value;
       }
@@ -217,29 +204,21 @@ global.tr.exportTo('tr.model', function() {
       // than all its children aggregated together and/or its largest owner).
       var sizeNumeric = dump.numerics[SIZE_NUMERIC_NAME];
       var size = 0;
-      var checkDependencySizeIsConsistent = function() { /* no-op */ };
+      var checkDependencySizeIsConsistent = function () {/* no-op */};
       if (sizeNumeric !== undefined) {
         size = sizeNumeric.value;
         shouldDefineSize = true;
-        if (sizeNumeric.unit !== tr.v.Unit.byName.sizeInBytes_smallerIsBetter) {
+        if (sizeNumeric.unit !== tr.b.Unit.byName.sizeInBytes_smallerIsBetter) {
           this.model.importWarning({
             type: 'memory_dump_parse_error',
-            message: 'Invalid unit of \'size\' numeric of memory allocator ' +
-                'dump ' + dump.quantifiedName + ': ' +
-                sizeNumeric.unit.unitName + '.'
+            message: 'Invalid unit of \'size\' numeric of memory allocator ' + 'dump ' + dump.quantifiedName + ': ' + sizeNumeric.unit.unitName + '.'
           });
         }
-        checkDependencySizeIsConsistent = function(
-            dependencySize, dependencyInfoType, dependencyName) {
-          if (size >= dependencySize)
-            return;
+        checkDependencySizeIsConsistent = function (dependencySize, dependencyInfoType, dependencyName) {
+          if (size >= dependencySize) return;
           this.model.importWarning({
             type: 'memory_dump_parse_error',
-            message: 'Size provided by memory allocator dump \'' +
-                dump.fullName + '\'' +
-                tr.v.Unit.byName.sizeInBytes.format(size) +
-                ') is less than ' + dependencyName + ' (' +
-                tr.v.Unit.byName.sizeInBytes.format(dependencySize) + ').'
+            message: 'Size provided by memory allocator dump \'' + dump.fullName + '\'' + tr.b.Unit.byName.sizeInBytes.format(size) + ') is less than ' + dependencyName + ' (' + tr.b.Unit.byName.sizeInBytes.format(dependencySize) + ').'
           });
           dump.infos.push({
             type: dependencyInfoType,
@@ -255,29 +234,24 @@ global.tr.exportTo('tr.model', function() {
       var aggregatedChildrenSize = 0;
       // Owned child dump name -> (Owner child dump name -> overlapping size).
       var allOverlaps = {};
-      dump.children.forEach(function(childDump) {
+      dump.children.forEach(function (childDump) {
         function aggregateDescendantDump(descendantDump) {
           // Don't count this descendant dump if it owns another descendant of
           // the current dump (would cause double-counting).
           var ownedDumpLink = descendantDump.owns;
-          if (ownedDumpLink !== undefined &&
-              ownedDumpLink.target.isDescendantOf(dump)) {
+          if (ownedDumpLink !== undefined && ownedDumpLink.target.isDescendantOf(dump)) {
             // If the target owned dump is a descendant of a *different* child
             // of the the current dump (i.e. not childDump), then we remember
             // the ownership so that we could explain why the size of the
             // current dump is not equal to the sum of its children.
             var ownedChildDump = ownedDumpLink.target;
-            while (ownedChildDump.parent !== dump)
-              ownedChildDump = ownedChildDump.parent;
+            while (ownedChildDump.parent !== dump) ownedChildDump = ownedChildDump.parent;
             if (childDump !== ownedChildDump) {
               var ownedBySiblingSize = getDependencySize(descendantDump);
               if (ownedBySiblingSize > 0) {
-                var previousTotalOwnedBySiblingSize =
-                    ownedChildDump.ownedBySiblingSizes.get(childDump) || 0;
-                var updatedTotalOwnedBySiblingSize =
-                    previousTotalOwnedBySiblingSize + ownedBySiblingSize;
-                ownedChildDump.ownedBySiblingSizes.set(
-                    childDump, updatedTotalOwnedBySiblingSize);
+                var previousTotalOwnedBySiblingSize = ownedChildDump.ownedBySiblingSizes.get(childDump) || 0;
+                var updatedTotalOwnedBySiblingSize = previousTotalOwnedBySiblingSize + ownedBySiblingSize;
+                ownedChildDump.ownedBySiblingSizes.set(childDump, updatedTotalOwnedBySiblingSize);
               }
             }
             return;
@@ -297,22 +271,16 @@ global.tr.exportTo('tr.model', function() {
         }
         aggregateDescendantDump(childDump);
       });
-      checkDependencySizeIsConsistent(
-          aggregatedChildrenSize,
-          PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN,
-          'the aggregated size of its children');
+      checkDependencySizeIsConsistent(aggregatedChildrenSize, PROVIDED_SIZE_LESS_THAN_AGGREGATED_CHILDREN, 'the aggregated size of its children');
 
       // 3. Calculate the largest owner size.
       var largestOwnerSize = 0;
-      dump.ownedBy.forEach(function(ownershipLink) {
+      dump.ownedBy.forEach(function (ownershipLink) {
         var owner = ownershipLink.source;
         var ownerSize = getDependencySize(owner);
         largestOwnerSize = Math.max(largestOwnerSize, ownerSize);
       });
-      checkDependencySizeIsConsistent(
-          largestOwnerSize,
-          PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER,
-          'the size of its largest owner');
+      checkDependencySizeIsConsistent(largestOwnerSize, PROVIDED_SIZE_LESS_THAN_LARGEST_OWNER, 'the size of its largest owner');
 
       // If neither the dump nor any of its dependencies (children and owners)
       // provide a size, do NOT add a zero size numeric.
@@ -327,20 +295,15 @@ global.tr.exportTo('tr.model', function() {
       // together and/or its largest owner.
       size = Math.max(size, aggregatedChildrenSize, largestOwnerSize);
 
-      dump.numerics[SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(
-          tr.v.Unit.byName.sizeInBytes_smallerIsBetter, size);
+      dump.numerics[SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(tr.b.Unit.byName.sizeInBytes_smallerIsBetter, size);
 
       // Add a virtual child to make up for extra size of the dump with
       // respect to its children (if applicable).
-      if (aggregatedChildrenSize < size &&
-          dump.children !== undefined && dump.children.length > 0) {
-        var virtualChild = new tr.model.MemoryAllocatorDump(
-            dump.containerMemoryDump, dump.fullName + '/<unspecified>');
+      if (aggregatedChildrenSize < size && dump.children !== undefined && dump.children.length > 0) {
+        var virtualChild = new tr.model.MemoryAllocatorDump(dump.containerMemoryDump, dump.fullName + '/<unspecified>');
         virtualChild.parent = dump;
         dump.children.unshift(virtualChild);
-        virtualChild.numerics[SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(
-            tr.v.Unit.byName.sizeInBytes_smallerIsBetter,
-            size - aggregatedChildrenSize);
+        virtualChild.numerics[SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(tr.b.Unit.byName.sizeInBytes_smallerIsBetter, size - aggregatedChildrenSize);
       }
     },
 
@@ -364,26 +327,22 @@ global.tr.exportTo('tr.model', function() {
      * This method assumes that the size of all contained memory allocator
      * dumps has already been calculated [see calculateSizes()].
      */
-    calculateEffectiveSizes: function() {
+    calculateEffectiveSizes: function () {
       // 1. Calculate not-owned and not-owning sub-sizes of all MADs
       // (depth-first post-order traversal).
-      this.traverseAllocatorDumpsInDepthFirstPostOrder(
-          this.calculateDumpSubSizes_.bind(this));
+      this.traverseAllocatorDumpsInDepthFirstPostOrder(this.calculateDumpSubSizes_.bind(this));
 
       // 2. Calculate owned and owning coefficients of owned and owner MADs
       // respectively (arbitrary traversal).
-      this.traverseAllocatorDumpsInDepthFirstPostOrder(
-          this.calculateDumpOwnershipCoefficient_.bind(this));
+      this.traverseAllocatorDumpsInDepthFirstPostOrder(this.calculateDumpOwnershipCoefficient_.bind(this));
 
       // 3. Calculate cumulative owned and owning coefficients of all MADs
       // (depth-first pre-order traversal).
-      this.traverseAllocatorDumpsInDepthFirstPreOrder(
-          this.calculateDumpCumulativeOwnershipCoefficient_.bind(this));
+      this.traverseAllocatorDumpsInDepthFirstPreOrder(this.calculateDumpCumulativeOwnershipCoefficient_.bind(this));
 
       // 4. Calculate the effective sizes of all MADs (depth-first post-order
       // traversal).
-      this.traverseAllocatorDumpsInDepthFirstPostOrder(
-          this.calculateDumpEffectiveSize_.bind(this));
+      this.traverseAllocatorDumpsInDepthFirstPostOrder(this.calculateDumpEffectiveSize_.bind(this));
     },
 
     /**
@@ -421,10 +380,9 @@ global.tr.exportTo('tr.model', function() {
      * sub-sizes of both the children and owners of the dump have already been
      * calculated [depth-first post-order traversal].
      */
-    calculateDumpSubSizes_: function(dump) {
+    calculateDumpSubSizes_: function (dump) {
       // Completely skip dumps with undefined size.
-      if (!hasSize(dump))
-        return;
+      if (!hasSize(dump)) return;
 
       // If the dump is a leaf node, then both sub-sizes are equal to the size.
       if (dump.children === undefined || dump.children.length === 0) {
@@ -437,16 +395,15 @@ global.tr.exportTo('tr.model', function() {
       // Calculate this dump's not-owning sub-size by summing up the not-owning
       // sub-sizes of children MADs which do not own another MAD.
       var notOwningSubSize = 0;
-      dump.children.forEach(function(childDump) {
-        if (childDump.owns !== undefined)
-          return;
+      dump.children.forEach(function (childDump) {
+        if (childDump.owns !== undefined) return;
         notOwningSubSize += optional(childDump.notOwningSubSize_, 0);
       });
       dump.notOwningSubSize_ = notOwningSubSize;
 
       // Calculate this dump's not-owned sub-size.
       var notOwnedSubSize = 0;
-      dump.children.forEach(function(childDump) {
+      dump.children.forEach(function (childDump) {
         // If the child dump is not owned, then add its not-owned sub-size.
         if (childDump.ownedBy.length === 0) {
           notOwnedSubSize += optional(childDump.notOwnedSubSize_, 0);
@@ -455,9 +412,8 @@ global.tr.exportTo('tr.model', function() {
         // If the child dump is owned, then add the difference between its size
         // and the largest owner.
         var largestChildOwnerSize = 0;
-        childDump.ownedBy.forEach(function(ownershipLink) {
-          largestChildOwnerSize = Math.max(
-              largestChildOwnerSize, getSize(ownershipLink.source));
+        childDump.ownedBy.forEach(function (ownershipLink) {
+          largestChildOwnerSize = Math.max(largestChildOwnerSize, getSize(ownershipLink.source));
         });
         notOwnedSubSize += getSize(childDump) - largestChildOwnerSize;
       });
@@ -515,27 +471,24 @@ global.tr.exportTo('tr.model', function() {
      * been calculated. Note that the method doesn't make any assumptions about
      * the order in which dumps are visited.
      */
-    calculateDumpOwnershipCoefficient_: function(dump) {
+    calculateDumpOwnershipCoefficient_: function (dump) {
       // Completely skip dumps with undefined size.
-      if (!hasSize(dump))
-        return;
+      if (!hasSize(dump)) return;
 
       // We only need to consider owned dumps.
-      if (dump.ownedBy.length === 0)
-        return;
+      if (dump.ownedBy.length === 0) return;
 
       // Sort the owners in decreasing order of ownership importance and
       // increasing order of not-owning sub-size (in case of equal importance).
-      var owners = dump.ownedBy.map(function(ownershipLink) {
+      var owners = dump.ownedBy.map(function (ownershipLink) {
         return {
           dump: ownershipLink.source,
           importance: optional(ownershipLink.importance, 0),
           notOwningSubSize: optional(ownershipLink.source.notOwningSubSize_, 0)
         };
       });
-      owners.sort(function(a, b) {
-        if (a.importance === b.importance)
-          return a.notOwningSubSize - b.notOwningSubSize;
+      owners.sort(function (a, b) {
+        if (a.importance === b.importance) return a.notOwningSubSize - b.notOwningSubSize;
         return b.importance - a.importance;
       });
 
@@ -549,9 +502,7 @@ global.tr.exportTo('tr.model', function() {
 
         // Find the position of the first owner with lower priority.
         var nextImportanceStartPos = currentImportanceStartPos + 1;
-        while (nextImportanceStartPos < owners.length &&
-               owners[nextImportanceStartPos].importance ===
-                  currentImportance) {
+        while (nextImportanceStartPos < owners.length && owners[nextImportanceStartPos].importance === currentImportance) {
           nextImportanceStartPos++;
         }
 
@@ -559,20 +510,16 @@ global.tr.exportTo('tr.model', function() {
         // not-owned sub-size, split the owned memory among them appropriately,
         // and calculate their owning coefficients.
         var attributedNotOwningSubSize = 0;
-        for (var pos = currentImportanceStartPos; pos < nextImportanceStartPos;
-             pos++) {
+        for (var pos = currentImportanceStartPos; pos < nextImportanceStartPos; pos++) {
           var owner = owners[pos];
           var notOwningSubSize = owner.notOwningSubSize;
           if (notOwningSubSize > alreadyAttributedSubSize) {
-            attributedNotOwningSubSize +=
-                (notOwningSubSize - alreadyAttributedSubSize) /
-                (nextImportanceStartPos - pos);
+            attributedNotOwningSubSize += (notOwningSubSize - alreadyAttributedSubSize) / (nextImportanceStartPos - pos);
             alreadyAttributedSubSize = notOwningSubSize;
           }
 
           var owningCoefficient = 0;
-          if (notOwningSubSize !== 0)
-            owningCoefficient = attributedNotOwningSubSize / notOwningSubSize;
+          if (notOwningSubSize !== 0) owningCoefficient = attributedNotOwningSubSize / notOwningSubSize;
           owner.dump.owningCoefficient_ = owningCoefficient;
         }
 
@@ -584,8 +531,7 @@ global.tr.exportTo('tr.model', function() {
       var notOwnedSubSize = optional(dump.notOwnedSubSize_, 0);
       var remainderSubSize = notOwnedSubSize - alreadyAttributedSubSize;
       var ownedCoefficient = 0;
-      if (notOwnedSubSize !== 0)
-        ownedCoefficient = remainderSubSize / notOwnedSubSize;
+      if (notOwnedSubSize !== 0) ownedCoefficient = remainderSubSize / notOwnedSubSize;
       dump.ownedCoefficient_ = ownedCoefficient;
     },
 
@@ -634,21 +580,18 @@ global.tr.exportTo('tr.model', function() {
      * coefficients of the dump's parent and owned MADs (if present)
      * [depth-first pre-order traversal] have already been calculated.
      */
-    calculateDumpCumulativeOwnershipCoefficient_: function(dump) {
+    calculateDumpCumulativeOwnershipCoefficient_: function (dump) {
       // Completely skip dumps with undefined size.
-      if (!hasSize(dump))
-        return;
+      if (!hasSize(dump)) return;
 
       var cumulativeOwnedCoefficient = optional(dump.ownedCoefficient_, 1);
       var parent = dump.parent;
-      if (dump.parent !== undefined)
-        cumulativeOwnedCoefficient *= dump.parent.cumulativeOwnedCoefficient_;
+      if (dump.parent !== undefined) cumulativeOwnedCoefficient *= dump.parent.cumulativeOwnedCoefficient_;
       dump.cumulativeOwnedCoefficient_ = cumulativeOwnedCoefficient;
 
       var cumulativeOwningCoefficient;
       if (dump.owns !== undefined) {
-        cumulativeOwningCoefficient = dump.owningCoefficient_ *
-            dump.owns.target.cumulativeOwningCoefficient_;
+        cumulativeOwningCoefficient = dump.owningCoefficient_ * dump.owns.target.cumulativeOwningCoefficient_;
       } else if (dump.parent !== undefined) {
         cumulativeOwningCoefficient = dump.parent.cumulativeOwningCoefficient_;
       } else {
@@ -674,7 +617,7 @@ global.tr.exportTo('tr.model', function() {
      * it's a non-leaf node) [depth-first post-order traversal] have already
      * been calculated.
      */
-    calculateDumpEffectiveSize_: function(dump) {
+    calculateDumpEffectiveSize_: function (dump) {
       // Completely skip dumps with undefined size. As a result, each dump will
       // have defined effective size if and only if it has defined size.
       if (!hasSize(dump)) {
@@ -687,45 +630,40 @@ global.tr.exportTo('tr.model', function() {
       var effectiveSize;
       if (dump.children === undefined || dump.children.length === 0) {
         // Leaf dump.
-        effectiveSize = getSize(dump) * dump.cumulativeOwningCoefficient_ *
-            dump.cumulativeOwnedCoefficient_;
+        effectiveSize = getSize(dump) * dump.cumulativeOwningCoefficient_ * dump.cumulativeOwnedCoefficient_;
       } else {
         // Non-leaf dump.
         effectiveSize = 0;
-        dump.children.forEach(function(childDump) {
-          if (!hasSize(childDump))
-            return;
-          effectiveSize +=
-              childDump.numerics[EFFECTIVE_SIZE_NUMERIC_NAME].value;
+        dump.children.forEach(function (childDump) {
+          if (!hasSize(childDump)) return;
+          effectiveSize += childDump.numerics[EFFECTIVE_SIZE_NUMERIC_NAME].value;
         });
       }
-      dump.numerics[EFFECTIVE_SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(
-          tr.v.Unit.byName.sizeInBytes_smallerIsBetter, effectiveSize);
+      dump.numerics[EFFECTIVE_SIZE_NUMERIC_NAME] = new tr.v.ScalarNumeric(tr.b.Unit.byName.sizeInBytes_smallerIsBetter, effectiveSize);
     },
 
-    aggregateNumerics: function() {
+    aggregateNumerics: function () {
       // 1. Aggregate numerics in this global memory dump.
-      this.iterateRootAllocatorDumps(function(dump) {
+      this.iterateRootAllocatorDumps(function (dump) {
         dump.aggregateNumericsRecursively(this.model);
       });
 
       // 2. Propagate numerics and diagnostics from global memory allocator
       // dumps to their owners.
-      this.iterateRootAllocatorDumps(
-          this.propagateNumericsAndDiagnosticsRecursively);
+      this.iterateRootAllocatorDumps(this.propagateNumericsAndDiagnosticsRecursively);
 
       // 3. Aggregate numerics in the associated process memory dumps.
-      tr.b.iterItems(this.processMemoryDumps, function(pid, processMemoryDump) {
-        processMemoryDump.iterateRootAllocatorDumps(function(dump) {
+      tr.b.iterItems(this.processMemoryDumps, function (pid, processMemoryDump) {
+        processMemoryDump.iterateRootAllocatorDumps(function (dump) {
           dump.aggregateNumericsRecursively(this.model);
         }, this);
       }, this);
     },
 
-    propagateNumericsAndDiagnosticsRecursively: function(globalAllocatorDump) {
-      ['numerics', 'diagnostics'].forEach(function(field) {
-        tr.b.iterItems(globalAllocatorDump[field], function(name, value) {
-          globalAllocatorDump.ownedBy.forEach(function(ownershipLink) {
+    propagateNumericsAndDiagnosticsRecursively: function (globalAllocatorDump) {
+      ['numerics', 'diagnostics'].forEach(function (field) {
+        tr.b.iterItems(globalAllocatorDump[field], function (name, value) {
+          globalAllocatorDump.ownedBy.forEach(function (ownershipLink) {
             var processAllocatorDump = ownershipLink.source;
             if (processAllocatorDump[field][name] !== undefined) {
               // Numerics and diagnostics provided by process memory allocator
@@ -739,39 +677,38 @@ global.tr.exportTo('tr.model', function() {
       });
 
       // Recursively propagate numerics from all child memory allocator dumps.
-      globalAllocatorDump.children.forEach(
-          this.propagateNumericsAndDiagnosticsRecursively, this);
+      globalAllocatorDump.children.forEach(this.propagateNumericsAndDiagnosticsRecursively, this);
     },
 
-    setUpTracingOverheadOwnership: function() {
-      tr.b.iterItems(this.processMemoryDumps, function(pid, dump) {
+    setUpTracingOverheadOwnership: function () {
+      tr.b.iterItems(this.processMemoryDumps, function (pid, dump) {
         dump.setUpTracingOverheadOwnership(this.model);
       }, this);
     },
 
-    discountTracingOverheadFromVmRegions: function() {
+    discountTracingOverheadFromVmRegions: function () {
       // TODO(petrcermak): Consider factoring out all the finalization code and
       // constants to a single file.
-      tr.b.iterItems(this.processMemoryDumps, function(pid, dump) {
+      tr.b.iterItems(this.processMemoryDumps, function (pid, dump) {
         dump.discountTracingOverheadFromVmRegions(this.model);
       }, this);
     },
 
-    forceRebuildingMemoryAllocatorDumpByFullNameIndices: function() {
-      this.iterateContainerDumps(function(containerDump) {
+    forceRebuildingMemoryAllocatorDumpByFullNameIndices: function () {
+      this.iterateContainerDumps(function (containerDump) {
         containerDump.forceRebuildingMemoryAllocatorDumpByFullNameIndex();
       });
     },
 
-    iterateContainerDumps: function(fn) {
+    iterateContainerDumps: function (fn) {
       fn.call(this, this);
-      tr.b.iterItems(this.processMemoryDumps, function(pid, processDump) {
+      tr.b.iterItems(this.processMemoryDumps, function (pid, processDump) {
         fn.call(this, processDump);
       }, this);
     },
 
-    iterateAllRootAllocatorDumps: function(fn) {
-      this.iterateContainerDumps(function(containerDump) {
+    iterateAllRootAllocatorDumps: function (fn) {
+      this.iterateContainerDumps(function (containerDump) {
         containerDump.iterateRootAllocatorDumps(fn, this);
       });
     },
@@ -782,20 +719,18 @@ global.tr.exportTo('tr.model', function() {
      * dump itself. This method will throw an exception if the graph contains
      * a cycle.
      */
-    traverseAllocatorDumpsInDepthFirstPostOrder: function(fn) {
+    traverseAllocatorDumpsInDepthFirstPostOrder: function (fn) {
       var visitedDumps = new WeakSet();
       var openDumps = new WeakSet();
 
       function visit(dump) {
-        if (visitedDumps.has(dump))
-          return;
+        if (visitedDumps.has(dump)) return;
 
-        if (openDumps.has(dump))
-          throw new Error(dump.userFriendlyName + ' contains a cycle');
+        if (openDumps.has(dump)) throw new Error(dump.userFriendlyName + ' contains a cycle');
         openDumps.add(dump);
 
         // Visit owners before the dumps they own.
-        dump.ownedBy.forEach(function(ownershipLink) {
+        dump.ownedBy.forEach(function (ownershipLink) {
           visit.call(this, ownershipLink.source);
         }, this);
 
@@ -818,29 +753,26 @@ global.tr.exportTo('tr.model', function() {
      * dump itself. This method will not visit some dumps if the graph contains
      * a cycle.
      */
-    traverseAllocatorDumpsInDepthFirstPreOrder: function(fn) {
+    traverseAllocatorDumpsInDepthFirstPreOrder: function (fn) {
       var visitedDumps = new WeakSet();
 
       function visit(dump) {
-        if (visitedDumps.has(dump))
-          return;
+        if (visitedDumps.has(dump)) return;
 
         // If this dumps owns another dump which hasn't been visited yet, then
         // wait for this dump to be visited later.
-        if (dump.owns !== undefined && !visitedDumps.has(dump.owns.target))
-          return;
+        if (dump.owns !== undefined && !visitedDumps.has(dump.owns.target)) return;
 
         // If this dump's parent hasn't been visited yet, then wait for this
         // dump to be visited later.
-        if (dump.parent !== undefined && !visitedDumps.has(dump.parent))
-          return;
+        if (dump.parent !== undefined && !visitedDumps.has(dump.parent)) return;
 
         // Actually visit the current memory allocator dump.
         fn.call(this, dump);
         visitedDumps.add(dump);
 
         // Visit owners after the dumps they own.
-        dump.ownedBy.forEach(function(ownershipLink) {
+        dump.ownedBy.forEach(function (ownershipLink) {
           visit.call(this, ownershipLink.source);
         }, this);
 
@@ -852,14 +784,10 @@ global.tr.exportTo('tr.model', function() {
     }
   };
 
-  tr.model.EventRegistry.register(
-      GlobalMemoryDump,
-      {
-        name: 'globalMemoryDump',
-        pluralName: 'globalMemoryDumps',
-        singleViewElementName: 'tr-ui-a-container-memory-dump-sub-view',
-        multiViewElementName: 'tr-ui-a-container-memory-dump-sub-view'
-      });
+  tr.model.EventRegistry.register(GlobalMemoryDump, {
+    name: 'globalMemoryDump',
+    pluralName: 'globalMemoryDumps'
+  });
 
   return {
     GlobalMemoryDump: GlobalMemoryDump

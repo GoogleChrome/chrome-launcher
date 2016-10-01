@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   var PERCENTILE_PRECISION = 1e-7;
   /**
    * A function that consists of linear pieces.
@@ -25,22 +26,19 @@ global.tr.exportTo('tr.b', function() {
      * (x1, y1) and (x2, y2).
      * Pieces must be pushed in the order of increasing x coordinate.
      */
-    push: function(x1, y1, x2, y2) {
-      if (x1 >= x2)
-        throw new Error('Invalid segment');
-      if (this.pieces.length > 0 &&
-          this.pieces[this.pieces.length - 1].x2 > x1) {
+    push: function (x1, y1, x2, y2) {
+      if (x1 >= x2) throw new Error('Invalid segment');
+      if (this.pieces.length > 0 && this.pieces[this.pieces.length - 1].x2 > x1) {
         throw new Error('Potentially overlapping segments');
       }
-      if (x1 < x2)
-        this.pieces.push(new Piece(x1, y1, x2, y2));
+      if (x1 < x2) this.pieces.push(new Piece(x1, y1, x2, y2));
     },
 
     /**
      *  Returns the size of the set A such that for all x in A: f(x) < y.
      */
-    partBelow: function(y) {
-      return this.pieces.reduce((acc, p) => (acc + p.partBelow(y)), 0);
+    partBelow: function (y) {
+      return this.pieces.reduce((acc, p) => acc + p.partBelow(y), 0);
     },
 
     get min() {
@@ -54,12 +52,11 @@ global.tr.exportTo('tr.b', function() {
     get average() {
       var weightedSum = 0;
       var totalWeight = 0;
-      this.pieces.forEach(function(piece) {
+      this.pieces.forEach(function (piece) {
         weightedSum += piece.width * piece.average;
         totalWeight += piece.width;
       });
-      if (totalWeight === 0)
-        return 0;
+      if (totalWeight === 0) return 0;
       return weightedSum / totalWeight;
     },
 
@@ -67,21 +64,16 @@ global.tr.exportTo('tr.b', function() {
     * Returns the minimum possible value y such that the percentage of x points
     * that have f(x) <= y is approximately equal to the given |percent|.
     */
-    percentile: function(percent) {
-      if (!(percent >= 0 && percent <= 1))
-        throw new Error('percent must be [0,1]');
+    percentile: function (percent) {
+      if (!(percent >= 0 && percent <= 1)) throw new Error('percent must be [0,1]');
       var lower = this.min;
       var upper = this.max;
       var total = this.partBelow(upper);
-      if (total === 0)
-        return 0;
+      if (total === 0) return 0;
       while (upper - lower > PERCENTILE_PRECISION) {
         var middle = (lower + upper) / 2;
         var below = this.partBelow(middle);
-        if (below / total < percent)
-          lower = middle;
-        else
-          upper = middle;
+        if (below / total < percent) lower = middle;else upper = middle;
       }
       return (lower + upper) / 2;
     }
@@ -104,16 +96,13 @@ global.tr.exportTo('tr.b', function() {
     * More formally:
     * max(x2 - x1) such that for all x in [x1 .. x2]: f(x) < y.
     */
-    partBelow: function(y) {
+    partBelow: function (y) {
       var width = this.width;
-      if (width === 0)
-        return 0;
+      if (width === 0) return 0;
       var minY = this.min;
       var maxY = this.max;
-      if (y >= maxY)
-        return width;
-      if (y < minY)
-        return 0;
+      if (y >= maxY) return width;
+      if (y < minY) return 0;
       return (y - minY) / (maxY - minY) * width;
     },
 

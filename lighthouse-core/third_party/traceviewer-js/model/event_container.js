@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -10,7 +11,7 @@ require("../base/range.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   /**
    * EventContainer is a base class for any class in the trace model that
@@ -56,7 +57,7 @@ global.tr.exportTo('tr.model', function() {
      * Updates the bounds of the event container. After updating, this.bounds
      * will describe the range of timestamps of all ancestor events.
      */
-    updateBounds: function() {
+    updateBounds: function () {
       throw new Error('Not implemented');
     },
 
@@ -65,48 +66,42 @@ global.tr.exportTo('tr.model', function() {
     /**
      * Shifts the timestamps for ancestor events by 'amount' milliseconds.
      */
-    shiftTimestampsForward: function(amount) {
+    shiftTimestampsForward: function (amount) {
       throw new Error('Not implemented');
     },
-
 
     /**
     * Returns an iterable of all child events.
     */
-    childEvents: function*() {
-    },
+    childEvents: function* () {},
 
     /**
      * Returns an iterable of all events in this and descendant
      * event containers.
      */
-    getDescendantEvents: function*() {
-      yield * this.childEvents();
-      for (var container of this.childEventContainers())
-        yield * container.getDescendantEvents();
+    getDescendantEvents: function* () {
+      yield* this.childEvents();
+      for (var container of this.childEventContainers()) yield* container.getDescendantEvents();
     },
 
     /**
      * Returns an iterable of all child event containers.
      */
-    childEventContainers: function*() {
-    },
+    childEventContainers: function* () {},
 
     /**
     * Returns an iterable containing this and all descendant event containers.
     */
-    getDescendantEventContainers: function*() {
+    getDescendantEventContainers: function* () {
       yield this;
-      for (var container of this.childEventContainers())
-        yield * container.getDescendantEventContainers();
+      for (var container of this.childEventContainers()) yield* container.getDescendantEventContainers();
     },
 
     /**
      * Finds topmost slices in this container (see docstring for
      * findTopmostSlices).
      */
-    findTopmostSlicesInThisContainer: function*(eventPredicate, opt_this) {
-    },
+    findTopmostSlicesInThisContainer: function* (eventPredicate, opt_this) {},
 
     /**
      * The findTopmostSlices* series of helpers find all topmost slices
@@ -122,13 +117,12 @@ global.tr.exportTo('tr.model', function() {
      * the  left is not the topmost C, and the right one is, even though it is
      * not itself a top-level slice.
      */
-    findTopmostSlices: function*(eventPredicate) {
-      for (var ec of this.getDescendantEventContainers())
-        yield * ec.findTopmostSlicesInThisContainer(eventPredicate);
+    findTopmostSlices: function* (eventPredicate) {
+      for (var ec of this.getDescendantEventContainers()) yield* ec.findTopmostSlicesInThisContainer(eventPredicate);
     },
 
-    findTopmostSlicesNamed: function*(name) {
-      yield * this.findTopmostSlices(e => e.title === name);
+    findTopmostSlicesNamed: function* (name) {
+      yield* this.findTopmostSlices(e => e.title === name);
     }
   };
 

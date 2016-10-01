@@ -1,10 +1,10 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../base/extension_registry.js");
 require("../base/range.js");
 require("../base/sorted_array_utils.js");
 require("./event.js");
@@ -15,7 +15,7 @@ require("./object_snapshot.js");
 /**
  * @fileoverview Provides the ObjectSnapshot and ObjectHistory classes.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var ObjectSnapshot = tr.model.ObjectSnapshot;
 
   /**
@@ -24,8 +24,7 @@ global.tr.exportTo('tr.model', function() {
    *
    * @constructor
    */
-  function ObjectInstance(
-      parent, scopedId, category, name, creationTs, opt_baseTypeName) {
+  function ObjectInstance(parent, scopedId, category, name, creationTs, opt_baseTypeName) {
     tr.model.Event.call(this);
     this.parent = parent;
     this.scopedId = scopedId;
@@ -49,54 +48,41 @@ global.tr.exportTo('tr.model', function() {
       return this.name;
     },
 
-    addBoundsToRange: function(range) {
+    addBoundsToRange: function (range) {
       range.addRange(this.bounds);
     },
 
-    addSnapshot: function(ts, args, opt_name, opt_baseTypeName) {
-      if (ts < this.creationTs)
-        throw new Error('Snapshots must be >= instance.creationTs');
-      if (ts >= this.deletionTs)
-        throw new Error('Snapshots cannot be added after ' +
-                        'an objects deletion timestamp.');
+    addSnapshot: function (ts, args, opt_name, opt_baseTypeName) {
+      if (ts < this.creationTs) throw new Error('Snapshots must be >= instance.creationTs');
+      if (ts >= this.deletionTs) throw new Error('Snapshots cannot be added after ' + 'an objects deletion timestamp.');
 
       var lastSnapshot;
       if (this.snapshots.length > 0) {
         lastSnapshot = this.snapshots[this.snapshots.length - 1];
-        if (lastSnapshot.ts == ts)
-          throw new Error('Snapshots already exists at this time!');
+        if (lastSnapshot.ts == ts) throw new Error('Snapshots already exists at this time!');
         if (ts < lastSnapshot.ts) {
-          throw new Error(
-              'Snapshots must be added in increasing timestamp order');
+          throw new Error('Snapshots must be added in increasing timestamp order');
         }
       }
 
       // Update baseTypeName if needed.
-      if (opt_name &&
-          (this.name != opt_name)) {
-        if (!opt_baseTypeName)
-          throw new Error('Must provide base type name for name update');
-        if (this.baseTypeName != opt_baseTypeName)
-          throw new Error('Cannot update type name: base types dont match');
+      if (opt_name && this.name != opt_name) {
+        if (!opt_baseTypeName) throw new Error('Must provide base type name for name update');
+        if (this.baseTypeName != opt_baseTypeName) throw new Error('Cannot update type name: base types dont match');
         this.name = opt_name;
       }
 
-      var snapshotConstructor =
-          tr.model.ObjectSnapshot.getConstructor(
-              this.category, this.name);
+      var snapshotConstructor = tr.model.ObjectSnapshot.subTypes.getConstructor(this.category, this.name);
       var snapshot = new snapshotConstructor(this, ts, args);
       this.snapshots.push(snapshot);
       return snapshot;
     },
 
-    wasDeleted: function(ts) {
+    wasDeleted: function (ts) {
       var lastSnapshot;
       if (this.snapshots.length > 0) {
         lastSnapshot = this.snapshots[this.snapshots.length - 1];
-        if (lastSnapshot.ts > ts)
-          throw new Error(
-              'Instance cannot be deleted at ts=' +
-              ts + '. A snapshot exists that is older.');
+        if (lastSnapshot.ts > ts) throw new Error('Instance cannot be deleted at ts=' + ts + '. A snapshot exists that is older.');
       }
       this.deletionTs = ts;
       this.deletionTsWasExplicit = true;
@@ -105,47 +91,38 @@ global.tr.exportTo('tr.model', function() {
     /**
      * See ObjectSnapshot constructor notes on object initialization.
      */
-    preInitialize: function() {
-      for (var i = 0; i < this.snapshots.length; i++)
-        this.snapshots[i].preInitialize();
+    preInitialize: function () {
+      for (var i = 0; i < this.snapshots.length; i++) this.snapshots[i].preInitialize();
     },
 
     /**
      * See ObjectSnapshot constructor notes on object initialization.
      */
-    initialize: function() {
-      for (var i = 0; i < this.snapshots.length; i++)
-        this.snapshots[i].initialize();
+    initialize: function () {
+      for (var i = 0; i < this.snapshots.length; i++) this.snapshots[i].initialize();
     },
 
-    isAliveAt: function(ts) {
-      if (ts < this.creationTs && this.creationTsWasExplicit)
-        return false;
-      if (ts > this.deletionTs)
-        return false;
+    isAliveAt: function (ts) {
+      if (ts < this.creationTs && this.creationTsWasExplicit) return false;
+      if (ts > this.deletionTs) return false;
 
       return true;
     },
 
-    getSnapshotAt: function(ts) {
+    getSnapshotAt: function (ts) {
       if (ts < this.creationTs) {
-        if (this.creationTsWasExplicit)
-          throw new Error('ts must be within lifetime of this instance');
+        if (this.creationTsWasExplicit) throw new Error('ts must be within lifetime of this instance');
         return this.snapshots[0];
       }
-      if (ts > this.deletionTs)
-        throw new Error('ts must be within lifetime of this instance');
+      if (ts > this.deletionTs) throw new Error('ts must be within lifetime of this instance');
 
       var snapshots = this.snapshots;
-      var i = tr.b.findIndexInSortedIntervals(
-          snapshots,
-          function(snapshot) { return snapshot.ts; },
-          function(snapshot, i) {
-            if (i == snapshots.length - 1)
-              return snapshots[i].objectInstance.deletionTs;
-            return snapshots[i + 1].ts - snapshots[i].ts;
-          },
-          ts);
+      var i = tr.b.findIndexInSortedIntervals(snapshots, function (snapshot) {
+        return snapshot.ts;
+      }, function (snapshot, i) {
+        if (i == snapshots.length - 1) return snapshots[i].objectInstance.deletionTs;
+        return snapshots[i + 1].ts - snapshots[i].ts;
+      }, ts);
       if (i < 0) {
         // Note, this is a little bit sketchy: this lets early ts point at the
         // first snapshot, even before it is taken. We do this because raster
@@ -154,25 +131,20 @@ global.tr.exportTo('tr.model', function() {
         // confusing object references showing up in the traces.
         return this.snapshots[0];
       }
-      if (i >= this.snapshots.length)
-        return this.snapshots[this.snapshots.length - 1];
+      if (i >= this.snapshots.length) return this.snapshots[this.snapshots.length - 1];
       return this.snapshots[i];
     },
 
-    updateBounds: function() {
+    updateBounds: function () {
       this.bounds.reset();
       this.bounds.addValue(this.creationTs);
-      if (this.deletionTs != Number.MAX_VALUE)
-        this.bounds.addValue(this.deletionTs);
-      else if (this.snapshots.length > 0)
-        this.bounds.addValue(this.snapshots[this.snapshots.length - 1].ts);
+      if (this.deletionTs != Number.MAX_VALUE) this.bounds.addValue(this.deletionTs);else if (this.snapshots.length > 0) this.bounds.addValue(this.snapshots[this.snapshots.length - 1].ts);
     },
 
-    shiftTimestampsForward: function(amount) {
+    shiftTimestampsForward: function (amount) {
       this.creationTs += amount;
-      if (this.deletionTs != Number.MAX_VALUE)
-        this.deletionTs += amount;
-      this.snapshots.forEach(function(snapshot) {
+      if (this.deletionTs != Number.MAX_VALUE) this.deletionTs += amount;
+      this.snapshots.forEach(function (snapshot) {
         snapshot.ts += amount;
       });
     },
@@ -182,20 +154,10 @@ global.tr.exportTo('tr.model', function() {
     }
   };
 
-  tr.model.EventRegistry.register(
-    ObjectInstance,
-    {
-      name: 'objectInstance',
-      pluralName: 'objectInstances',
-      singleViewElementName: 'tr-ui-a-single-object-instance-sub-view',
-      multiViewElementName: 'tr-ui-a-multi-object-sub-view'
-    });
-
-  var options = new tr.b.ExtensionRegistryOptions(
-      tr.b.TYPE_BASED_REGISTRY_MODE);
-  options.mandatoryBaseClass = ObjectInstance;
-  options.defaultConstructor = ObjectInstance;
-  tr.b.decorateExtensionRegistry(ObjectInstance, options);
+  tr.model.EventRegistry.register(ObjectInstance, {
+    name: 'objectInstance',
+    pluralName: 'objectInstances'
+  });
 
   return {
     ObjectInstance: ObjectInstance

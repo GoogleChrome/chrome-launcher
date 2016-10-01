@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,198 +6,154 @@ found in the LICENSE file.
 **/
 
 require("../../base/range.js");
+require("../../base/unit.js");
 require("../metric_registry.js");
-require("../../value/numeric.js");
-require("../../value/unit.js");
-require("../../value/value.js");
+require("../../value/histogram.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.v8', function() {
-  var DURATION_NUMERIC_BUILDER = tr.v.NumericBuilder.createLinear(
-      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter,
-      tr.b.Range.fromExplicitRange(4, 200), 100);
+global.tr.exportTo('tr.metrics.v8', function () {
+  var CUSTOM_BOUNDARIES = tr.v.HistogramBinBoundaries.createLinear(4, 200, 100);
 
   function computeExecuteMetrics(values, model) {
-    var cpuTotalExecution = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalExecution = DURATION_NUMERIC_BUILDER.build();
-    var cpuSelfExecution = DURATION_NUMERIC_BUILDER.build();
-    var wallSelfExecution = DURATION_NUMERIC_BUILDER.build();
+    var cpuTotalExecution = new tr.v.Histogram('v8_execution_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalExecution.description = 'cpu total time spent in script execution';
+    var wallTotalExecution = new tr.v.Histogram('v8_execution_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalExecution.description = 'wall total time spent in script execution';
+    var cpuSelfExecution = new tr.v.Histogram('v8_execution_cpu_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuSelfExecution.description = 'cpu self time spent in script execution';
+    var wallSelfExecution = new tr.v.Histogram('v8_execution_wall_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallSelfExecution.description = 'wall self time spent in script execution';
 
     for (var e of model.findTopmostSlicesNamed('V8.Execute')) {
-      cpuTotalExecution.add(e.cpuDuration);
-      wallTotalExecution.add(e.duration);
-      cpuSelfExecution.add(e.cpuSelfTime);
-      wallSelfExecution.add(e.selfTime);
+      cpuTotalExecution.addSample(e.cpuDuration);
+      wallTotalExecution.addSample(e.duration);
+      cpuSelfExecution.addSample(e.cpuSelfTime);
+      wallSelfExecution.addSample(e.selfTime);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_execution_cpu_total', cpuTotalExecution,
-        { description: 'cpu total time spent in script execution' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_execution_wall_total', wallTotalExecution,
-        { description: 'wall total time spent in script execution' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_execution_cpu_self', cpuSelfExecution,
-        { description: 'cpu self time spent in script execution' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_execution_wall_self', wallSelfExecution,
-        { description: 'wall self time spent in script execution' }));
+    values.addHistogram(cpuTotalExecution);
+    values.addHistogram(wallTotalExecution);
+    values.addHistogram(cpuSelfExecution);
+    values.addHistogram(wallSelfExecution);
   }
 
   function computeParseLazyMetrics(values, model) {
-    var cpuSelfParseLazy = DURATION_NUMERIC_BUILDER.build();
-    var wallSelfParseLazy = DURATION_NUMERIC_BUILDER.build();
+    var cpuSelfParseLazy = new tr.v.Histogram('v8_parse_lazy_cpu_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuSelfParseLazy.description = 'cpu self time spent performing lazy parsing';
+    var wallSelfParseLazy = new tr.v.Histogram('v8_parse_lazy_wall_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallSelfParseLazy.description = 'wall self time spent performing lazy parsing';
 
     for (var e of model.findTopmostSlicesNamed('V8.ParseLazyMicroSeconds')) {
-      cpuSelfParseLazy.add(e.cpuSelfTime);
-      wallSelfParseLazy.add(e.selfTime);
+      cpuSelfParseLazy.addSample(e.cpuSelfTime);
+      wallSelfParseLazy.addSample(e.selfTime);
     }
     for (var e of model.findTopmostSlicesNamed('V8.ParseLazy')) {
-      cpuSelfParseLazy.add(e.cpuSelfTime);
-      wallSelfParseLazy.add(e.selfTime);
+      cpuSelfParseLazy.addSample(e.cpuSelfTime);
+      wallSelfParseLazy.addSample(e.selfTime);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_parse_lazy_cpu_self', cpuSelfParseLazy,
-        { description: 'cpu self time spent performing lazy parsing' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_parse_lazy_wall_self', wallSelfParseLazy,
-        { description: 'wall self time spent performing lazy parsing' }));
+    values.addHistogram(cpuSelfParseLazy);
+    values.addHistogram(wallSelfParseLazy);
   }
 
   function computeCompileFullCodeMetrics(values, model) {
-    var cpuSelfCompileFullCode = DURATION_NUMERIC_BUILDER.build();
-    var wallSelfCompileFullCode = DURATION_NUMERIC_BUILDER.build();
+    var cpuSelfCompileFullCode = new tr.v.Histogram('v8_compile_full_code_cpu_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuSelfCompileFullCode.description = 'cpu self time spent performing compiling full code';
+    var wallSelfCompileFullCode = new tr.v.Histogram('v8_compile_full_code_wall_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallSelfCompileFullCode.description = 'wall self time spent performing compiling full code';
 
     for (var e of model.findTopmostSlicesNamed('V8.CompileFullCode')) {
-      cpuSelfCompileFullCode.add(e.cpuSelfTime);
-      wallSelfCompileFullCode.add(e.selfTime);
+      cpuSelfCompileFullCode.addSample(e.cpuSelfTime);
+      wallSelfCompileFullCode.addSample(e.selfTime);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_compile_full_code_cpu_self',
-        cpuSelfCompileFullCode,
-        { description: 'cpu self time spent performing compiling full code' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_compile_full_code_wall_self',
-        wallSelfCompileFullCode, {
-          description: 'wall self time spent performing compiling full code'
-        }));
+    values.addHistogram(cpuSelfCompileFullCode);
+    values.addHistogram(wallSelfCompileFullCode);
   }
 
   function computeCompileIgnitionMetrics(values, model) {
-    var cpuSelfCompileIgnition = DURATION_NUMERIC_BUILDER.build();
-    var wallSelfCompileIgnition = DURATION_NUMERIC_BUILDER.build();
+    var cpuSelfCompileIgnition = new tr.v.Histogram('v8_compile_ignition_cpu_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuSelfCompileIgnition.description = 'cpu self time spent in compile ignition';
+    var wallSelfCompileIgnition = new tr.v.Histogram('v8_compile_ignition_wall_self', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallSelfCompileIgnition.description = 'wall self time spent in compile ignition';
 
     for (var e of model.findTopmostSlicesNamed('V8.CompileIgnition')) {
-      cpuSelfCompileIgnition.add(e.cpuSelfTime);
-      wallSelfCompileIgnition.add(e.selfTime);
+      cpuSelfCompileIgnition.addSample(e.cpuSelfTime);
+      wallSelfCompileIgnition.addSample(e.selfTime);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_compile_ignition_cpu_self',
-        cpuSelfCompileIgnition,
-        { description: 'cpu self time spent in compile ignition' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_compile_ignition_wall_self',
-        wallSelfCompileIgnition, {
-          description: 'wall self time spent in compile ignition'
-        }));
+    values.addHistogram(cpuSelfCompileIgnition);
+    values.addHistogram(wallSelfCompileIgnition);
   }
 
   function computeRecompileMetrics(values, model) {
-    var cpuTotalRecompileSynchronous = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalRecompileSynchronous = DURATION_NUMERIC_BUILDER.build();
-    var cpuTotalRecompileConcurrent = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalRecompileConcurrent = DURATION_NUMERIC_BUILDER.build();
+    var cpuTotalRecompileSynchronous = new tr.v.Histogram('v8_recompile_synchronous_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalRecompileSynchronous.description = 'cpu total time spent in synchronous recompilation';
+    var wallTotalRecompileSynchronous = new tr.v.Histogram('v8_recompile_synchronous_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalRecompileSynchronous.description = 'wall total time spent in synchronous recompilation';
+    var cpuTotalRecompileConcurrent = new tr.v.Histogram('v8_recompile_concurrent_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalRecompileConcurrent.description = 'cpu total time spent in concurrent recompilation';
+    var wallTotalRecompileConcurrent = new tr.v.Histogram('v8_recompile_concurrent_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalRecompileConcurrent.description = 'wall total time spent in concurrent recompilation';
     // TODO(eakuefner): Stop computing overall values once dash v2 is ready.
     // https://github.com/catapult-project/catapult/issues/2180
-    var cpuTotalRecompileOverall = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalRecompileOverall = DURATION_NUMERIC_BUILDER.build();
+    var cpuTotalRecompileOverall = new tr.v.Histogram('v8_recompile_overall_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalRecompileOverall.description = 'cpu total time spent in synchronous or concurrent recompilation';
+    var wallTotalRecompileOverall = new tr.v.Histogram('v8_recompile_overall_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalRecompileOverall.description = 'wall total time spent in synchronous or concurrent recompilation';
 
     for (var e of model.findTopmostSlicesNamed('V8.RecompileSynchronous')) {
-      cpuTotalRecompileSynchronous.add(e.cpuDuration);
-      wallTotalRecompileSynchronous.add(e.duration);
-      cpuTotalRecompileOverall.add(e.cpuDuration);
-      wallTotalRecompileOverall.add(e.duration);
+      cpuTotalRecompileSynchronous.addSample(e.cpuDuration);
+      wallTotalRecompileSynchronous.addSample(e.duration);
+      cpuTotalRecompileOverall.addSample(e.cpuDuration);
+      wallTotalRecompileOverall.addSample(e.duration);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_synchronous_cpu_total',
-        cpuTotalRecompileSynchronous,
-        { description: 'cpu total time spent in synchronous recompilation' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_synchronous_wall_total',
-        wallTotalRecompileSynchronous,
-        { description: 'wall total time spent in synchronous recompilation' }));
-
+    values.addHistogram(cpuTotalRecompileSynchronous);
+    values.addHistogram(wallTotalRecompileSynchronous);
 
     for (var e of model.findTopmostSlicesNamed('V8.RecompileConcurrent')) {
-      cpuTotalRecompileConcurrent.add(e.cpuDuration);
-      wallTotalRecompileConcurrent.add(e.duration);
-      cpuTotalRecompileOverall.add(e.cpuDuration);
-      wallTotalRecompileOverall.add(e.duration);
+      cpuTotalRecompileConcurrent.addSample(e.cpuDuration);
+      wallTotalRecompileConcurrent.addSample(e.duration);
+      cpuTotalRecompileOverall.addSample(e.cpuDuration);
+      wallTotalRecompileOverall.addSample(e.duration);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_concurrent_cpu_total',
-        cpuTotalRecompileConcurrent,
-        { description: 'cpu total time spent in concurrent recompilation' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_concurrent_wall_total',
-        wallTotalRecompileConcurrent,
-        { description: 'wall total time spent in concurrent recompilation' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_overall_cpu_total',
-        cpuTotalRecompileOverall, {
-          description:
-              'cpu total time spent in synchronous or concurrent recompilation'
-        }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_recompile_overall_wall_total',
-        wallTotalRecompileOverall, {
-          description:
-              'wall total time spent in synchronous or concurrent recompilation'
-        }));
+    values.addHistogram(cpuTotalRecompileConcurrent);
+    values.addHistogram(wallTotalRecompileConcurrent);
+    values.addHistogram(cpuTotalRecompileOverall);
+    values.addHistogram(wallTotalRecompileOverall);
   }
 
   function computeOptimizeCodeMetrics(values, model) {
-    var cpuTotalOptimizeCode = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalOptimizeCode = DURATION_NUMERIC_BUILDER.build();
+    var cpuTotalOptimizeCode = new tr.v.Histogram('v8_optimize_code_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalOptimizeCode.description = 'cpu total time spent in code optimization';
+    var wallTotalOptimizeCode = new tr.v.Histogram('v8_optimize_code_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalOptimizeCode.description = 'wall total time spent in code optimization';
 
     for (var e of model.findTopmostSlicesNamed('V8.OptimizeCode')) {
-      cpuTotalOptimizeCode.add(e.cpuDuration);
-      wallTotalOptimizeCode.add(e.duration);
+      cpuTotalOptimizeCode.addSample(e.cpuDuration);
+      wallTotalOptimizeCode.addSample(e.duration);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_optimize_code_cpu_total',
-        cpuTotalOptimizeCode,
-        { description: 'cpu total time spent in code optimization' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_optimize_code_wall_total',
-        wallTotalOptimizeCode,
-        { description: 'wall total time spent in code optimization' }));
+    values.addHistogram(cpuTotalOptimizeCode);
+    values.addHistogram(wallTotalOptimizeCode);
   }
 
   function computeDeoptimizeCodeMetrics(values, model) {
-    var cpuTotalDeoptimizeCode = DURATION_NUMERIC_BUILDER.build();
-    var wallTotalDeoptimizeCode = DURATION_NUMERIC_BUILDER.build();
+    var cpuTotalDeoptimizeCode = new tr.v.Histogram('v8_deoptimize_code_cpu_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    cpuTotalDeoptimizeCode.description = 'cpu total time spent in code deoptimization';
+    var wallTotalDeoptimizeCode = new tr.v.Histogram('v8_deoptimize_code_wall_total', tr.b.Unit.byName.timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
+    wallTotalDeoptimizeCode.description = 'wall total time spent in code deoptimization';
 
     for (var e of model.findTopmostSlicesNamed('V8.DeoptimizeCode')) {
-      cpuTotalDeoptimizeCode.add(e.cpuDuration);
-      wallTotalDeoptimizeCode.add(e.duration);
+      cpuTotalDeoptimizeCode.addSample(e.cpuDuration);
+      wallTotalDeoptimizeCode.addSample(e.duration);
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'v8_deoptimize_code_cpu_total',
-        cpuTotalDeoptimizeCode,
-        { description: 'cpu total time spent in code deoptimization' }));
-    values.addValue(new tr.v.NumericValue(
-        'v8_deoptimize_code_wall_total',
-        wallTotalDeoptimizeCode,
-        { description: 'wall total time spent in code deoptimization' }));
+    values.addHistogram(cpuTotalDeoptimizeCode);
+    values.addHistogram(wallTotalDeoptimizeCode);
   }
 
   function executionMetric(values, model) {

@@ -1,15 +1,15 @@
+"use strict";
 /**
 Copyright (c) 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../base/base.js");
-require("../value/unit.js");
+require("../base/unit.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   /**
    * @constructor
@@ -27,8 +27,7 @@ global.tr.exportTo('tr.model', function() {
   ModelStats.prototype = {
     TIME_INTERVAL_SIZE_IN_MS: 100,
 
-    willProcessBasicTraceEvent: function(phase, category, title, ts,
-                                         opt_eventSizeinBytes) {
+    willProcessBasicTraceEvent: function (phase, category, title, ts, opt_eventSizeinBytes) {
       var key = phase + '/' + category + '/' + title;
       var eventStats = this.traceEventCountsByKey_.get(key);
       if (eventStats === undefined) {
@@ -44,18 +43,15 @@ global.tr.exportTo('tr.model', function() {
       }
       eventStats.numEvents++;
 
-      var timeIntervalKey = Math.floor(
-          tr.v.Unit.timestampFromUs(ts) / this.TIME_INTERVAL_SIZE_IN_MS);
-      var eventStatsByTimeInverval =
-          this.traceEventStatsInTimeIntervals_.get(timeIntervalKey);
+      var timeIntervalKey = Math.floor(tr.b.Unit.timestampFromUs(ts) / this.TIME_INTERVAL_SIZE_IN_MS);
+      var eventStatsByTimeInverval = this.traceEventStatsInTimeIntervals_.get(timeIntervalKey);
       if (eventStatsByTimeInverval === undefined) {
         eventStatsByTimeInverval = {
           timeInterval: timeIntervalKey,
           numEvents: 0,
           totalEventSizeinBytes: 0
         };
-        this.traceEventStatsInTimeIntervals_.set(timeIntervalKey,
-                                                eventStatsByTimeInverval);
+        this.traceEventStatsInTimeIntervals_.set(timeIntervalKey, eventStatsByTimeInverval);
         this.allTraceEventStatsInTimeIntervals_.push(eventStatsByTimeInverval);
       }
       eventStatsByTimeInverval.numEvents++;

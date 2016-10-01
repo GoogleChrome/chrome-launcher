@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("../base/base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   /**
    * HeapEntry represents a single value describing the state of the heap of an
@@ -49,9 +50,8 @@ global.tr.exportTo('tr.model', function() {
   }
 
   HeapDump.prototype = {
-    addEntry: function(leafStackFrame, objectTypeName, size, count) {
-      var entry = new HeapEntry(
-          this, leafStackFrame, objectTypeName, size, count);
+    addEntry: function (leafStackFrame, objectTypeName, size, count) {
+      var entry = new HeapEntry(this, leafStackFrame, objectTypeName, size, count);
       this.entries.push(entry);
       return entry;
     }

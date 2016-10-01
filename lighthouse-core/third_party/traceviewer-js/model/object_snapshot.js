@@ -1,16 +1,16 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
-require("../base/extension_registry.js");
+require("../base/unit.js");
 require("./event.js");
-require("../value/unit.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   /**
    * A snapshot of an object instance, at a given moment in time.
    *
@@ -46,14 +46,12 @@ global.tr.exportTo('tr.model', function() {
     /**
      * See ObjectSnapshot constructor notes on object initialization.
      */
-    preInitialize: function() {
-    },
+    preInitialize: function () {},
 
     /**
      * See ObjectSnapshot constructor notes on object initialization.
      */
-    initialize: function() {
-    },
+    initialize: function () {},
 
     /**
      * Called when an object reference is resolved as this ObjectSnapshot.
@@ -62,35 +60,21 @@ global.tr.exportTo('tr.model', function() {
      * @param {Object} object The object directly containing the reference.
      * @param {String} field The field name of the reference in |object|.
      */
-    referencedAt: function(item, object, field) {
-    },
+    referencedAt: function (item, object, field) {},
 
-    addBoundsToRange: function(range) {
+    addBoundsToRange: function (range) {
       range.addValue(this.ts);
     },
 
     get userFriendlyName() {
-      return 'Snapshot of ' +
-             this.objectInstance.typeName + ' ' +
-             this.objectInstance.id + ' @ ' +
-             tr.v.Unit.byName.timeStampInMs.format(this.ts);
+      return 'Snapshot of ' + this.objectInstance.typeName + ' ' + this.objectInstance.id + ' @ ' + tr.b.Unit.byName.timeStampInMs.format(this.ts);
     }
   };
 
-  tr.model.EventRegistry.register(
-      ObjectSnapshot,
-      {
-        name: 'objectSnapshot',
-        pluralName: 'objectSnapshots',
-        singleViewElementName: 'tr-ui-a-single-object-snapshot-sub-view',
-        multiViewElementName: 'tr-ui-a-multi-object-sub-view'
-      });
-
-  var options = new tr.b.ExtensionRegistryOptions(
-      tr.b.TYPE_BASED_REGISTRY_MODE);
-  options.mandatoryBaseClass = ObjectSnapshot;
-  options.defaultConstructor = ObjectSnapshot;
-  tr.b.decorateExtensionRegistry(ObjectSnapshot, options);
+  tr.model.EventRegistry.register(ObjectSnapshot, {
+    name: 'objectSnapshot',
+    pluralName: 'objectSnapshots'
+  });
 
   return {
     ObjectSnapshot: ObjectSnapshot

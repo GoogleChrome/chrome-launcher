@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("../../model/user_model/user_expectation.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.sh', function() {
+global.tr.exportTo('tr.metrics.sh', function () {
   // Returns a weight for this score.
   // score should be a number between 0 and 1 inclusive.
   // This function is expected to be passed to tr.b.Statistics.weightedMean as
@@ -23,13 +24,10 @@ global.tr.exportTo('tr.metrics.sh', function() {
 
   function filterExpectationsByRange(irs, opt_range) {
     var filteredExpectations = [];
-    irs.forEach(function(ir) {
-      if (!(ir instanceof tr.model.um.UserExpectation))
-        return;
+    irs.forEach(function (ir) {
+      if (!(ir instanceof tr.model.um.UserExpectation)) return;
 
-      if (!opt_range ||
-          opt_range.intersectsExplicitRangeInclusive(ir.start, ir.end))
-        filteredExpectations.push(ir);
+      if (!opt_range || opt_range.intersectsExplicitRangeInclusive(ir.start, ir.end)) filteredExpectations.push(ir);
     });
     return filteredExpectations;
   }

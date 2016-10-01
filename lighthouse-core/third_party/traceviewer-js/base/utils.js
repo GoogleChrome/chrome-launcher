@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   /**
    * Adds a {@code getInstance} static method that always return the same
    * instance object.
@@ -16,34 +17,28 @@ global.tr.exportTo('tr.b', function() {
    *     method to.
    */
   function addSingletonGetter(ctor) {
-    ctor.getInstance = function() {
+    ctor.getInstance = function () {
       return ctor.instance_ || (ctor.instance_ = new ctor());
     };
   }
 
   function deepCopy(value) {
     if (!(value instanceof Object)) {
-      if (value === undefined || value === null)
-        return value;
-      if (typeof value == 'string')
-        return value.substring();
-      if (typeof value == 'boolean')
-        return value;
-      if (typeof value == 'number')
-        return value;
+      if (value === undefined || value === null) return value;
+      if (typeof value == 'string') return value.substring();
+      if (typeof value == 'boolean') return value;
+      if (typeof value == 'number') return value;
       throw new Error('Unrecognized: ' + typeof value);
     }
 
     var object = value;
     if (object instanceof Array) {
       var res = new Array(object.length);
-      for (var i = 0; i < object.length; i++)
-        res[i] = deepCopy(object[i]);
+      for (var i = 0; i < object.length; i++) res[i] = deepCopy(object[i]);
       return res;
     }
 
-    if (object.__proto__ != Object.prototype)
-      throw new Error('Can only clone simple types');
+    if (object.__proto__ != Object.prototype) throw new Error('Can only clone simple types');
     var res = {};
     for (var key in object) {
       res[key] = deepCopy(object[key]);
@@ -60,7 +55,7 @@ global.tr.exportTo('tr.b', function() {
       };
     }
 
-    if (typeof(e) == 'string') {
+    if (typeof e == 'string') {
       return {
         typeName: 'StringError',
         message: e,
@@ -98,9 +93,9 @@ global.tr.exportTo('tr.b', function() {
     return stack.slice(2);
   }
 
-  function getUsingPath(path, from_dict) {
+  function getUsingPath(path, fromDict) {
     var parts = path.split('.');
-    var cur = from_dict;
+    var cur = fromDict;
 
     for (var part; parts.length && (part = parts.shift());) {
       if (!parts.length) {

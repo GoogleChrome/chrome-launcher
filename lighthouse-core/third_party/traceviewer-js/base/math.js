@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -13,10 +14,9 @@ require("./base.js");
 // assumes that glMatrix is in the global scope. So, in Node only, we
 // require() it in, and then take all its exports and shove them into the
 // global scope by hand.
-(function() {
+(function () {
   if (tr.isNode) {
-    var glMatrixAbsPath = HTMLImportsLoader.hrefToAbsolutePath(
-        '/gl-matrix-min.js');
+    var glMatrixAbsPath = HTMLImportsLoader.hrefToAbsolutePath('/gl-matrix-min.js');
     var glMatrixModule = require(glMatrixAbsPath);
     for (var exportName in glMatrixModule) {
       global[exportName] = glMatrixModule[exportName];
@@ -26,11 +26,10 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   /* Returns true when x and y are within delta of each other. */
   function approximately(x, y, delta) {
-    if (delta === undefined)
-      delta = 1e-9;
+    if (delta === undefined) delta = 1e-9;
     return Math.abs(x - y) < delta;
   }
 
@@ -48,7 +47,7 @@ global.tr.exportTo('tr.b', function() {
   }
 
   function deg2rad(deg) {
-    return (Math.PI * deg) / 180.0;
+    return Math.PI * deg / 180.0;
   }
 
   /* The Gauss error function gives the probability that a measurement (which is
@@ -64,7 +63,7 @@ global.tr.exportTo('tr.b', function() {
   function erf(x) {
     // save the sign of x
     // erf(-x) = -erf(x);
-    var sign = (x >= 0) ? 1 : -1;
+    var sign = x >= 0 ? 1 : -1;
     x = Math.abs(x);
 
     // constants
@@ -78,44 +77,41 @@ global.tr.exportTo('tr.b', function() {
     // Abramowitz and Stegun formula 7.1.26
     // maximum error: 1.5e-7
     var t = 1.0 / (1.0 + p * x);
-    var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t *
-      Math.exp(-x * x);
+    var y = 1.0 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
     return sign * y;
   }
 
-  var tmp_vec2 = vec2.create();
-  var tmp_vec2b = vec2.create();
-  var tmp_vec4 = vec4.create();
-  var tmp_mat2d = mat2d.create();
+  var tmpVec2 = vec2.create();
+  var tmpVec2b = vec2.create();
+  var tmpVec4 = vec4.create();
+  var tmpMat2d = mat2d.create();
 
-  vec2.createFromArray = function(arr) {
-    if (arr.length != 2)
-      throw new Error('Should be length 2');
+  vec2.createFromArray = function (arr) {
+    if (arr.length != 2) throw new Error('Should be length 2');
     var v = vec2.create();
     vec2.set(v, arr[0], arr[1]);
     return v;
   };
 
-  vec2.createXY = function(x, y) {
+  vec2.createXY = function (x, y) {
     var v = vec2.create();
     vec2.set(v, x, y);
     return v;
   };
 
-  vec2.toString = function(a) {
+  vec2.toString = function (a) {
     return '[' + a[0] + ', ' + a[1] + ']';
   };
 
-  vec2.addTwoScaledUnitVectors = function(out, u1, scale1, u2, scale2) {
+  vec2.addTwoScaledUnitVectors = function (out, u1, scale1, u2, scale2) {
     // out = u1 * scale1 + u2 * scale2
-    vec2.scale(tmp_vec2, u1, scale1);
-    vec2.scale(tmp_vec2b, u2, scale2);
-    vec2.add(out, tmp_vec2, tmp_vec2b);
+    vec2.scale(tmpVec2, u1, scale1);
+    vec2.scale(tmpVec2b, u2, scale2);
+    vec2.add(out, tmpVec2, tmpVec2b);
   };
 
-  vec2.interpolatePiecewiseFunction = function(points, x) {
-    if (x < points[0][0])
-      return points[0][1];
+  vec2.interpolatePiecewiseFunction = function (points, x) {
+    if (x < points[0][0]) return points[0][1];
     for (var i = 1; i < points.length; ++i) {
       if (x < points[i][0]) {
         var percent = normalize(x, points[i - 1][0], points[i][0]);
@@ -125,27 +121,27 @@ global.tr.exportTo('tr.b', function() {
     return points[points.length - 1][1];
   };
 
-  vec3.createXYZ = function(x, y, z) {
+  vec3.createXYZ = function (x, y, z) {
     var v = vec3.create();
     vec3.set(v, x, y, z);
     return v;
   };
 
-  vec3.toString = function(a) {
+  vec3.toString = function (a) {
     return 'vec3(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')';
   };
 
-  mat2d.translateXY = function(out, x, y) {
-    vec2.set(tmp_vec2, x, y);
-    mat2d.translate(out, out, tmp_vec2);
+  mat2d.translateXY = function (out, x, y) {
+    vec2.set(tmpVec2, x, y);
+    mat2d.translate(out, out, tmpVec2);
   };
 
-  mat2d.scaleXY = function(out, x, y) {
-    vec2.set(tmp_vec2, x, y);
-    mat2d.scale(out, out, tmp_vec2);
+  mat2d.scaleXY = function (out, x, y) {
+    vec2.set(tmpVec2, x, y);
+    mat2d.scale(out, out, tmpVec2);
   };
 
-  vec4.unitize = function(out, a) {
+  vec4.unitize = function (out, a) {
     out[0] = a[0] / a[3];
     out[1] = a[1] / a[3];
     out[2] = a[2] / a[3];
@@ -153,9 +149,9 @@ global.tr.exportTo('tr.b', function() {
     return out;
   };
 
-  vec2.copyFromVec4 = function(out, a) {
-    vec4.unitize(tmp_vec4, a);
-    vec2.copy(out, tmp_vec4);
+  vec2.copyFromVec4 = function (out, a) {
+    vec4.unitize(tmpVec4, a);
+    vec2.copy(out, tmpVec4);
   };
 
   return {

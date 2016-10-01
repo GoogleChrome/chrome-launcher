@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,6 +6,7 @@ found in the LICENSE file.
 **/
 
 require("../base/guid.js");
+require("../base/range.js");
 require("./event_set.js");
 require("./selectable_item.js");
 require("./selection_state.js");
@@ -14,7 +16,7 @@ require("./selection_state.js");
 /**
  * @fileoverview Provides the Event class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var SelectableItem = tr.model.SelectableItem;
   var SelectionState = tr.model.SelectionState;
   var IMMUTABLE_EMPTY_SET = tr.model.EventSet.IMMUTABLE_EMPTY_SET;
@@ -44,20 +46,25 @@ global.tr.exportTo('tr.model', function() {
       return undefined;
     },
 
+    get range() {
+      var range = new tr.b.Range();
+      this.addBoundsToRange(range);
+      return range;
+    },
+
     // Empty by default. Lazily initialized on an instance in
     // addAssociatedAlert(). See #1930.
     associatedAlerts: IMMUTABLE_EMPTY_SET,
 
-    addAssociatedAlert: function(alert) {
-      if (this.associatedAlerts === IMMUTABLE_EMPTY_SET)
-        this.associatedAlerts = new tr.model.EventSet();
+    addAssociatedAlert: function (alert) {
+      if (this.associatedAlerts === IMMUTABLE_EMPTY_SET) this.associatedAlerts = new tr.model.EventSet();
       this.associatedAlerts.push(alert);
     },
 
-    /** Adds the range of timestamps for this event to the specified range. */
-    addBoundsToRange: function(range) {
-      throw new Error('Not implemented');
-    }
+    // Adds the range of timestamps for this event to the specified range.
+    // If this is not overridden in subclass, it means that type of event
+    // doesn't have timestamps.
+    addBoundsToRange: function (range) {}
   };
 
   return {

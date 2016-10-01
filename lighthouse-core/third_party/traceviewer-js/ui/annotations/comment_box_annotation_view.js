@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./annotation_view.js");
 
 'use strict';
 
-global.tr.exportTo('tr.ui.annotations', function() {
+global.tr.exportTo('tr.ui.annotations', function () {
   /**
    * A view of a comment box consisting of a textarea and a line to the
    * actual location.
@@ -30,16 +31,14 @@ global.tr.exportTo('tr.ui.annotations', function() {
   CommentBoxAnnotationView.prototype = {
     __proto__: tr.ui.annotations.AnnotationView.prototype,
 
-    removeTextArea: function() {
-      Polymer.dom(Polymer.dom(this.textArea_).parentNode).removeChild(
-          this.textArea_);
+    removeTextArea: function () {
+      Polymer.dom(Polymer.dom(this.textArea_).parentNode).removeChild(this.textArea_);
     },
 
-    draw: function(ctx) {
+    draw: function (ctx) {
       var coords = this.annotation_.location.toViewCoordinates(this.viewport_);
       if (coords.viewX < 0) {
-        if (this.textArea_)
-          this.textArea_.style.visibility = 'hidden';
+        if (this.textArea_) this.textArea_.style.visibility = 'hidden';
         return;
       }
 
@@ -51,8 +50,7 @@ global.tr.exportTo('tr.ui.annotations', function() {
         this.textArea_.value = this.annotation_.text;
         // Set the z-index so that this is shown on top of canvas.
         this.textArea_.style.zIndex = 1;
-        Polymer.dom(Polymer.dom(ctx.canvas).parentNode)
-            .appendChild(this.textArea_);
+        Polymer.dom(Polymer.dom(ctx.canvas).parentNode).appendChild(this.textArea_);
       }
 
       this.textArea_.style.width = this.styleWidth + 'px';
@@ -61,22 +59,14 @@ global.tr.exportTo('tr.ui.annotations', function() {
       this.textArea_.style.visibility = 'visible';
 
       // Update positions to latest coordinate.
-      this.textArea_.style.left =
-          coords.viewX + ctx.canvas.getBoundingClientRect().left +
-          this.rightOffset + 'px';
-      this.textArea_.style.top =
-          coords.viewY - ctx.canvas.getBoundingClientRect().top -
-          this.topOffset + 'px';
+      this.textArea_.style.left = coords.viewX + ctx.canvas.getBoundingClientRect().left + this.rightOffset + 'px';
+      this.textArea_.style.top = coords.viewY - ctx.canvas.getBoundingClientRect().top - this.topOffset + 'px';
 
       // Draw pointer line from offset to actual location.
       ctx.strokeStyle = 'rgb(0, 0, 0)';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      tr.ui.b.drawLine(ctx, coords.viewX,
-          coords.viewY - ctx.canvas.getBoundingClientRect().top,
-          coords.viewX + this.rightOffset,
-          coords.viewY - this.topOffset -
-            ctx.canvas.getBoundingClientRect().top);
+      tr.ui.b.drawLine(ctx, coords.viewX, coords.viewY - ctx.canvas.getBoundingClientRect().top, coords.viewX + this.rightOffset, coords.viewY - this.topOffset - ctx.canvas.getBoundingClientRect().top);
       ctx.stroke();
     }
   };

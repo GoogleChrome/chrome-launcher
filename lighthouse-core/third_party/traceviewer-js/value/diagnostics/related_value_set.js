@@ -1,53 +1,56 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 require("../../base/iteration_helpers.js");
 require("./diagnostic.js");
+require("./value_ref.js");
 
 'use strict';
 
-global.tr.exportTo('tr.v.d', function() {
-  /** @constructor */
-  function ValueRef(guid) {
-    this.guid = guid;
-  }
+global.tr.exportTo('tr.v.d', function () {
+  class RelatedValueSet extends tr.v.d.Diagnostic {
+    constructor(opt_values) {
+      super();
+      this.valuesByGuid_ = new Map();
 
-  /** @constructor */
-  function RelatedValueSet(opt_values) {
-    this.valuesByGuid_ = {};
-
-    if (opt_values)
-      opt_values.forEach(this.add, this);
-  }
-
-  RelatedValueSet.prototype = {
-    __proto__: tr.v.d.Diagnostic.prototype,
+      if (opt_values) for (var value of opt_values) this.add(value);
+    }
 
     /**
-     * Add a Value to this set.
-     *
-     * @param {!(ValueRef|tr.v.Value)} v
+     * @param {!(tr.v.d.ValueRef|tr.v.Histogram)} v
      */
-    add: function(value) {
-      if (!(value instanceof tr.v.Value) &&
-          !(value instanceof ValueRef))
-        throw new Error('Must be instanceof Value or ValueRef: ' + value);
+    add(value) {
+      if (!(value instanceof tr.v.Histogram) && !(value instanceof tr.v.d.ValueRef)) throw new Error('Must be instanceof Histogram or ValueRef: ' + value);
 
-      if (this.valuesByGuid_[value.guid])
-        throw new Error('Tried to add same value twice');
+      if (this.valuesByGuid_.get(value.guid)) throw new Error('Tried to add same value twice');
 
-      this.valuesByGuid_[value.guid] = value;
-    },
+      this.valuesByGuid_.set(value.guid, value);
+    }
 
-    /**
-     * @return {Array.<(ValueRef|tr.v.Value)>}
-     */
-    get values() {
-      return tr.b.dictionaryValues(this.valuesByGuid_);
-    },
+    has(value) {
+      return this.valuesByGuid_.has(value.guid);
+    }
+
+    get length() {
+      return this.valuesByGuid_.size;
+    }
+
+    *[Symbol.iterator]() {
+      for (var _ref of this.valuesByGuid_) {
+        var _ref2 = _slicedToArray(_ref, 2);
+
+        var guid = _ref2[0];
+        var value = _ref2[1];
+
+        yield value;
+      }
+    }
 
     /**
      * Resolve all ValueRefs into Values by looking up their guids in
@@ -60,34 +63,35 @@ global.tr.exportTo('tr.v.d', function() {
      * @param {!tr.v.ValueSet} valueSet
      * @param {boolean=} opt_required
      */
-    resolve: function(valueSet, opt_required) {
-      tr.b.iterItems(this.valuesByGuid_, function(guid, value) {
-        if (!(value instanceof ValueRef))
-          return;
+    resolve(valueSet, opt_required) {
+      for (var _ref3 of this.valuesByGuid_) {
+        var _ref4 = _slicedToArray(_ref3, 2);
+
+        var guid = _ref4[0];
+        var value = _ref4[1];
+
+        if (!(value instanceof tr.v.d.ValueRef)) continue;
 
         value = valueSet.lookup(guid);
-        if (value instanceof tr.v.Value)
-          this.valuesByGuid_[guid] = value;
-        else if (opt_required)
-          throw new Error('Unable to find Value ' + guid);
-      }, this);
-    },
-
-    asDictInto_: function(d) {
-      d.guids = tr.b.dictionaryKeys(this.valuesByGuid_);
+        if (value instanceof tr.v.Histogram) this.valuesByGuid_.set(guid, value);else if (opt_required) throw new Error('Unable to find Histogram ' + guid);
+      }
     }
-  };
 
-  RelatedValueSet.fromDict = function(d) {
-    return new RelatedValueSet(d.guids.map(guid => new ValueRef(guid)));
-  };
+    asDictInto_(d) {
+      d.guids = [];
+      for (var value of this) d.guids.push(value.guid);
+    }
+
+    static fromDict(d) {
+      return new RelatedValueSet(d.guids.map(guid => new tr.v.d.ValueRef(guid)));
+    }
+  }
 
   tr.v.d.Diagnostic.register(RelatedValueSet, {
     elementName: 'tr-v-ui-related-value-set-span'
   });
 
   return {
-    RelatedValueSet: RelatedValueSet,
-    ValueRef: ValueRef
+    RelatedValueSet: RelatedValueSet
   };
 });

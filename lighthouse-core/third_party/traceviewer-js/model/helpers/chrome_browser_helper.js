@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -12,13 +13,16 @@ require("./chrome_process_helper.js");
 /**
  * @fileoverview Utilities for accessing trace data about the Chrome browser.
  */
-global.tr.exportTo('tr.model.helpers', function() {
+global.tr.exportTo('tr.model.helpers', function () {
   function ChromeBrowserHelper(modelHelper, process) {
     tr.model.helpers.ChromeProcessHelper.call(this, modelHelper, process);
     this.mainThread_ = process.findAtMostOneThreadNamed('CrBrowserMain');
+    if (!process.name) process.name = ChromeBrowserHelper.PROCESS_NAME;
   }
 
-  ChromeBrowserHelper.isBrowserProcess = function(process) {
+  ChromeBrowserHelper.PROCESS_NAME = 'Browser';
+
+  ChromeBrowserHelper.isBrowserProcess = function (process) {
     return !!process.findAtMostOneThreadNamed('CrBrowserMain');
   };
 
@@ -28,8 +32,7 @@ global.tr.exportTo('tr.model.helpers', function() {
     // TODO(petrcermak): Pass browser name in a metadata event (see
     // crbug.com/605088).
     get browserName() {
-      var hasInProcessRendererThread = this.process.findAllThreadsNamed(
-          'Chrome_InProcRendererThread').length > 0;
+      var hasInProcessRendererThread = this.process.findAllThreadsNamed('Chrome_InProcRendererThread').length > 0;
       return hasInProcessRendererThread ? 'webview' : 'chrome';
     },
 
@@ -37,83 +40,68 @@ global.tr.exportTo('tr.model.helpers', function() {
       return this.modelHelper.rendererHelpers;
     },
 
-    getLoadingEventsInRange: function(rangeOfInterest) {
-      return this.getAllAsyncSlicesMatching(function(slice) {
-        return slice.title.indexOf('WebContentsImpl Loading') === 0 &&
-            rangeOfInterest.intersectsExplicitRangeInclusive(
-                slice.start, slice.end);
+    getLoadingEventsInRange: function (rangeOfInterest) {
+      return this.getAllAsyncSlicesMatching(function (slice) {
+        return slice.title.indexOf('WebContentsImpl Loading') === 0 && rangeOfInterest.intersectsExplicitRangeInclusive(slice.start, slice.end);
       });
     },
 
-    getCommitProvisionalLoadEventsInRange: function(rangeOfInterest) {
-      return this.getAllAsyncSlicesMatching(function(slice) {
-        return slice.title === 'RenderFrameImpl::didCommitProvisionalLoad' &&
-            rangeOfInterest.intersectsExplicitRangeInclusive(
-                slice.start, slice.end);
+    getCommitProvisionalLoadEventsInRange: function (rangeOfInterest) {
+      return this.getAllAsyncSlicesMatching(function (slice) {
+        return slice.title === 'RenderFrameImpl::didCommitProvisionalLoad' && rangeOfInterest.intersectsExplicitRangeInclusive(slice.start, slice.end);
       });
     },
 
     get hasLatencyEvents() {
       var hasLatency = false;
-      for (var thread of this.modelHelper.model.getAllThreads())
-        for (var event of thread.getDescendantEvents()) {
-          if (!event.isTopLevel)
-            continue;
-          if (!(event instanceof tr.e.cc.InputLatencyAsyncSlice))
-            continue;
-          hasLatency = true;
-        }
+      for (var thread of this.modelHelper.model.getAllThreads()) for (var event of thread.getDescendantEvents()) {
+        if (!event.isTopLevel) continue;
+        if (!(event instanceof tr.e.cc.InputLatencyAsyncSlice)) continue;
+        hasLatency = true;
+      }
       return hasLatency;
     },
 
-    getLatencyEventsInRange: function(rangeOfInterest) {
-      return this.getAllAsyncSlicesMatching(function(slice) {
-        return (slice.title.indexOf('InputLatency') === 0) &&
-            rangeOfInterest.intersectsExplicitRangeInclusive(
-                slice.start, slice.end);
+    getLatencyEventsInRange: function (rangeOfInterest) {
+      return this.getAllAsyncSlicesMatching(function (slice) {
+        return slice.title.indexOf('InputLatency') === 0 && rangeOfInterest.intersectsExplicitRangeInclusive(slice.start, slice.end);
       });
     },
 
-    getAllAsyncSlicesMatching: function(pred, opt_this) {
+    getAllAsyncSlicesMatching: function (pred, opt_this) {
       var events = [];
-      this.iterAllThreads(function(thread) {
-        for (var slice of thread.getDescendantEvents())
-          if (pred.call(opt_this, slice))
-            events.push(slice);
+      this.iterAllThreads(function (thread) {
+        for (var slice of thread.getDescendantEvents()) if (pred.call(opt_this, slice)) events.push(slice);
       });
       return events;
     },
 
-    getAllNetworkEventsInRange: function(rangeOfInterest) {
+    getAllNetworkEventsInRange: function (rangeOfInterest) {
       var networkEvents = [];
-      this.modelHelper.model.getAllThreads().forEach(function(thread) {
-        thread.asyncSliceGroup.slices.forEach(function(slice) {
+      this.modelHelper.model.getAllThreads().forEach(function (thread) {
+        thread.asyncSliceGroup.slices.forEach(function (slice) {
           var match = false;
-          if (slice.category == 'net' ||  // old-style URLRequest/Resource
-              slice.category == 'disabled-by-default-netlog' ||
-              slice.category == 'netlog') {
+          if (slice.category == 'net' || // old-style URLRequest/Resource
+          slice.category == 'disabled-by-default-netlog' || slice.category == 'netlog') {
             match = true;
           }
 
-          if (!match)
-            return;
+          if (!match) return;
 
-          if (rangeOfInterest.intersectsExplicitRangeInclusive(
-                slice.start, slice.end))
-            networkEvents.push(slice);
+          if (rangeOfInterest.intersectsExplicitRangeInclusive(slice.start, slice.end)) networkEvents.push(slice);
         });
       });
       return networkEvents;
     },
 
-    iterAllThreads: function(func, opt_this) {
-      tr.b.iterItems(this.process.threads, function(tid, thread) {
+    iterAllThreads: function (func, opt_this) {
+      tr.b.iterItems(this.process.threads, function (tid, thread) {
         func.call(opt_this, thread);
       });
 
-      tr.b.iterItems(this.rendererHelpers, function(pid, rendererHelper) {
+      tr.b.iterItems(this.rendererHelpers, function (pid, rendererHelper) {
         var rendererProcess = rendererHelper.process;
-        tr.b.iterItems(rendererProcess.threads, function(tid, thread) {
+        tr.b.iterItems(rendererProcess.threads, function (tid, thread) {
           func.call(opt_this, thread);
         });
       }, this);

@@ -1,20 +1,21 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../base/unit.js");
 require("./container_memory_dump.js");
 require("./memory_allocator_dump.js");
 require("./vm_region.js");
-require("../value/unit.js");
 
 'use strict';
 
 /**
  * @fileoverview Provides the ProcessMemoryDump class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   // Names of MemoryAllocatorDump(s) from which tracing overhead should be
   // discounted.
@@ -25,13 +26,11 @@ global.tr.exportTo('tr.model', function() {
   var TRACING_OVERHEAD_PATH = ['allocated_objects', 'tracing_overhead'];
 
   var SIZE_NUMERIC_NAME = tr.model.MemoryAllocatorDump.SIZE_NUMERIC_NAME;
-  var RESIDENT_SIZE_NUMERIC_NAME =
-      tr.model.MemoryAllocatorDump.RESIDENT_SIZE_NUMERIC_NAME;
+  var RESIDENT_SIZE_NUMERIC_NAME = tr.model.MemoryAllocatorDump.RESIDENT_SIZE_NUMERIC_NAME;
 
   function getSizeNumericValue(dump, sizeNumericName) {
     var sizeNumeric = dump.numerics[sizeNumericName];
-    if (sizeNumeric === undefined)
-      return 0;
+    if (sizeNumeric === undefined) return 0;
     return sizeNumeric.value;
   }
 
@@ -61,14 +60,13 @@ global.tr.exportTo('tr.model', function() {
 
     this.tracingOverheadOwnershipSetUp_ = false;
     this.tracingOverheadDiscountedFromVmRegions_ = false;
-  };
+  }
 
   ProcessMemoryDump.prototype = {
     __proto__: tr.model.ContainerMemoryDump.prototype,
 
     get userFriendlyName() {
-      return 'Process memory dump at ' +
-          tr.v.Unit.byName.timeStampInMs.format(this.start);
+      return 'Process memory dump at ' + tr.b.Unit.byName.timeStampInMs.format(this.start);
     },
 
     get containerName() {
@@ -85,11 +83,10 @@ global.tr.exportTo('tr.model', function() {
       return this.vmRegions !== undefined;
     },
 
-    setUpTracingOverheadOwnership: function(opt_model) {
+    setUpTracingOverheadOwnership: function (opt_model) {
       // Make sure that calling this method twice won't lead to
       // 'double-discounting'.
-      if (this.tracingOverheadOwnershipSetUp_)
-        return;
+      if (this.tracingOverheadOwnershipSetUp_) return;
       this.tracingOverheadOwnershipSetUp_ = true;
 
       var tracingDump = this.getMemoryAllocatorDumpByFullName('tracing');
@@ -99,19 +96,15 @@ global.tr.exportTo('tr.model', function() {
         return;
       }
 
-      if (tracingDump.owns !== undefined)
-        return;
+      if (tracingDump.owns !== undefined) return;
 
       // Add an ownership link from tracing to
       // malloc/allocated_objects/tracing_overhead or
       // winheap/allocated_objects/tracing_overhead.
-      var hasDiscountedFromAllocatorDumps = DISCOUNTED_ALLOCATOR_NAMES.some(
-          function(allocatorName) {
+      var hasDiscountedFromAllocatorDumps = DISCOUNTED_ALLOCATOR_NAMES.some(function (allocatorName) {
         // First check if the allocator root exists.
-        var allocatorDump = this.getMemoryAllocatorDumpByFullName(
-            allocatorName);
-        if (allocatorDump === undefined)
-          return false;  // Allocator doesn't exist, try another one.
+        var allocatorDump = this.getMemoryAllocatorDumpByFullName(allocatorName);
+        if (allocatorDump === undefined) return false; // Allocator doesn't exist, try another one.
 
         var nextPathIndex = 0;
         var currentDump = allocatorDump;
@@ -120,12 +113,9 @@ global.tr.exportTo('tr.model', function() {
         // Descend from the root towards tracing_overhead as long as the dumps
         // on the path exist.
         for (; nextPathIndex < TRACING_OVERHEAD_PATH.length; nextPathIndex++) {
-          var childFullName = currentFullName + '/' +
-              TRACING_OVERHEAD_PATH[nextPathIndex];
-          var childDump = this.getMemoryAllocatorDumpByFullName(
-              childFullName);
-          if (childDump === undefined)
-            break;
+          var childFullName = currentFullName + '/' + TRACING_OVERHEAD_PATH[nextPathIndex];
+          var childDump = this.getMemoryAllocatorDumpByFullName(childFullName);
+          if (childDump === undefined) break;
 
           currentDump = childDump;
           currentFullName = childFullName;
@@ -134,10 +124,8 @@ global.tr.exportTo('tr.model', function() {
         // Create the missing descendant dumps on the path from the root
         // towards tracing_overhead.
         for (; nextPathIndex < TRACING_OVERHEAD_PATH.length; nextPathIndex++) {
-          var childFullName = currentFullName + '/' +
-              TRACING_OVERHEAD_PATH[nextPathIndex];
-          var childDump = new tr.model.MemoryAllocatorDump(
-              currentDump.containerMemoryDump, childFullName);
+          var childFullName = currentFullName + '/' + TRACING_OVERHEAD_PATH[nextPathIndex];
+          var childDump = new tr.model.MemoryAllocatorDump(currentDump.containerMemoryDump, childFullName);
           childDump.parent = currentDump;
           currentDump.children.push(childDump);
 
@@ -146,8 +134,7 @@ global.tr.exportTo('tr.model', function() {
         }
 
         // Add the ownership link.
-        var ownershipLink =
-            new tr.model.MemoryAllocatorDumpLink(tracingDump, currentDump);
+        var ownershipLink = new tr.model.MemoryAllocatorDumpLink(tracingDump, currentDump);
         tracingDump.owns = ownershipLink;
         currentDump.ownedBy.push(ownershipLink);
         return true;
@@ -155,35 +142,27 @@ global.tr.exportTo('tr.model', function() {
 
       // Force rebuilding the memory allocator dump index (if we've just added
       // a new memory allocator dump).
-      if (hasDiscountedFromAllocatorDumps)
-        this.forceRebuildingMemoryAllocatorDumpByFullNameIndex();
+      if (hasDiscountedFromAllocatorDumps) this.forceRebuildingMemoryAllocatorDumpByFullNameIndex();
     },
 
-    discountTracingOverheadFromVmRegions: function(opt_model) {
+    discountTracingOverheadFromVmRegions: function (opt_model) {
       // Make sure that calling this method twice won't lead to
       // 'double-discounting'.
-      if (this.tracingOverheadDiscountedFromVmRegions_)
-        return;
+      if (this.tracingOverheadDiscountedFromVmRegions_) return;
       this.tracingOverheadDiscountedFromVmRegions_ = true;
 
       var tracingDump = this.getMemoryAllocatorDumpByFullName('tracing');
-      if (tracingDump === undefined)
-        return;
+      if (tracingDump === undefined) return;
 
-      var discountedSize =
-          getSizeNumericValue(tracingDump, SIZE_NUMERIC_NAME);
-      var discountedResidentSize =
-          getSizeNumericValue(tracingDump, RESIDENT_SIZE_NUMERIC_NAME);
+      var discountedSize = getSizeNumericValue(tracingDump, SIZE_NUMERIC_NAME);
+      var discountedResidentSize = getSizeNumericValue(tracingDump, RESIDENT_SIZE_NUMERIC_NAME);
 
-      if (discountedSize <= 0 && discountedResidentSize <= 0)
-        return;
+      if (discountedSize <= 0 && discountedResidentSize <= 0) return;
 
       // Subtract the tracing size from the totals.
       if (this.totals !== undefined) {
-        if (this.totals.residentBytes !== undefined)
-          this.totals.residentBytes -= discountedResidentSize;
-        if (this.totals.peakResidentBytes !== undefined)
-          this.totals.peakResidentBytes -= discountedResidentSize;
+        if (this.totals.residentBytes !== undefined) this.totals.residentBytes -= discountedResidentSize;
+        if (this.totals.peakResidentBytes !== undefined) this.totals.peakResidentBytes -= discountedResidentSize;
       }
 
       // Subtract the tracing size from VM regions. More precisely, subtract
@@ -192,19 +171,13 @@ global.tr.exportTo('tr.model', function() {
       // negative values.
       if (this.vmRegions !== undefined) {
         var hasSizeInBytes = this.vmRegions.sizeInBytes !== undefined;
-        var hasPrivateDirtyResident =
-            this.vmRegions.byteStats.privateDirtyResident !== undefined;
-        var hasProportionalResident =
-            this.vmRegions.byteStats.proportionalResident !== undefined;
+        var hasPrivateDirtyResident = this.vmRegions.byteStats.privateDirtyResident !== undefined;
+        var hasProportionalResident = this.vmRegions.byteStats.proportionalResident !== undefined;
 
-        if ((hasSizeInBytes && discountedSize > 0) ||
-            ((hasPrivateDirtyResident || hasProportionalResident) &&
-                discountedResidentSize > 0)) {
+        if (hasSizeInBytes && discountedSize > 0 || (hasPrivateDirtyResident || hasProportionalResident) && discountedResidentSize > 0) {
           var byteStats = {};
-          if (hasPrivateDirtyResident)
-            byteStats.privateDirtyResident = -discountedResidentSize;
-          if (hasProportionalResident)
-            byteStats.proportionalResident = -discountedResidentSize;
+          if (hasPrivateDirtyResident) byteStats.privateDirtyResident = -discountedResidentSize;
+          if (hasProportionalResident) byteStats.proportionalResident = -discountedResidentSize;
           this.vmRegions.addRegion(tr.model.VMRegion.fromDict({
             mappedFile: '[discounted tracing overhead]',
             sizeInBytes: hasSizeInBytes ? -discountedSize : undefined,
@@ -215,27 +188,22 @@ global.tr.exportTo('tr.model', function() {
     }
   };
 
-  ProcessMemoryDump.hookUpMostRecentVmRegionsLinks = function(processDumps) {
+  ProcessMemoryDump.hookUpMostRecentVmRegionsLinks = function (processDumps) {
     var mostRecentVmRegions = undefined;
 
-    processDumps.forEach(function(processDump) {
+    processDumps.forEach(function (processDump) {
       // Update the most recent VM regions from the current dump.
-      if (processDump.vmRegions !== undefined)
-        mostRecentVmRegions = processDump.vmRegions;
+      if (processDump.vmRegions !== undefined) mostRecentVmRegions = processDump.vmRegions;
 
       // Set the most recent VM regions of the current dump.
       processDump.mostRecentVmRegions = mostRecentVmRegions;
     });
   };
 
-  tr.model.EventRegistry.register(
-      ProcessMemoryDump,
-      {
-        name: 'processMemoryDump',
-        pluralName: 'processMemoryDumps',
-        singleViewElementName: 'tr-ui-a-container-memory-dump-sub-view',
-        multiViewElementName: 'tr-ui-a-container-memory-dump-sub-view'
-      });
+  tr.model.EventRegistry.register(ProcessMemoryDump, {
+    name: 'processMemoryDump',
+    pluralName: 'processMemoryDumps'
+  });
 
   return {
     ProcessMemoryDump: ProcessMemoryDump

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -11,27 +12,21 @@ require("../../base/base.js");
 /**
  * @fileoverview Utilities for accessing trace data about the Chrome browser.
  */
-global.tr.exportTo('tr.model.helpers', function() {
+global.tr.exportTo('tr.model.helpers', function () {
   var MAIN_FRAMETIME_TYPE = 'main_frametime_type';
   var IMPL_FRAMETIME_TYPE = 'impl_frametime_type';
 
-  var MAIN_RENDERING_STATS =
-      'BenchmarkInstrumentation::MainThreadRenderingStats';
-  var IMPL_RENDERING_STATS =
-      'BenchmarkInstrumentation::ImplThreadRenderingStats';
-
+  var MAIN_RENDERING_STATS = 'BenchmarkInstrumentation::MainThreadRenderingStats';
+  var IMPL_RENDERING_STATS = 'BenchmarkInstrumentation::ImplThreadRenderingStats';
 
   function getSlicesIntersectingRange(rangeOfInterest, slices) {
     var slicesInFilterRange = [];
     for (var i = 0; i < slices.length; i++) {
       var slice = slices[i];
-      if (rangeOfInterest.intersectsExplicitRangeInclusive(
-            slice.start, slice.end))
-        slicesInFilterRange.push(slice);
+      if (rangeOfInterest.intersectsExplicitRangeInclusive(slice.start, slice.end)) slicesInFilterRange.push(slice);
     }
     return slicesInFilterRange;
   }
-
 
   function ChromeProcessHelper(modelHelper, process) {
     this.modelHelper = modelHelper;
@@ -43,17 +38,15 @@ global.tr.exportTo('tr.model.helpers', function() {
       return this.process.pid;
     },
 
-    getFrameEventsInRange: function(frametimeType, range) {
-      var titleToGet = (frametimeType === MAIN_FRAMETIME_TYPE ?
-        MAIN_RENDERING_STATS : IMPL_RENDERING_STATS);
+    getFrameEventsInRange: function (frametimeType, range) {
+      var titleToGet = frametimeType === MAIN_FRAMETIME_TYPE ? MAIN_RENDERING_STATS : IMPL_RENDERING_STATS;
 
       var frameEvents = [];
-      for (var event of this.process.getDescendantEvents())
-        if (event.title === titleToGet)
-          if (range.intersectsExplicitRangeInclusive(event.start, event.end))
-            frameEvents.push(event);
+      for (var event of this.process.getDescendantEvents()) if (event.title === titleToGet) if (range.intersectsExplicitRangeInclusive(event.start, event.end)) frameEvents.push(event);
 
-      frameEvents.sort(function(a, b) {return a.start - b.start});
+      frameEvents.sort(function (a, b) {
+        return a.start - b.start;
+      });
       return frameEvents;
     }
   };

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -13,15 +14,14 @@ require("../base/base.js");
  *
  * See https://goo.gl/5SSPv0 for more details.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   /**
    * A single virtual memory region (also called a memory map).
    *
    * @constructor
    */
-  function VMRegion(startAddress, sizeInBytes, protectionFlags,
-      mappedFile, byteStats) {
+  function VMRegion(startAddress, sizeInBytes, protectionFlags, mappedFile, byteStats) {
     this.startAddress = startAddress;
     this.sizeInBytes = sizeInBytes;
     this.protectionFlags = protectionFlags;
@@ -41,25 +41,13 @@ global.tr.exportTo('tr.model', function() {
     },
 
     get protectionFlagsToString() {
-      if (this.protectionFlags === undefined)
-        return undefined;
-      return (
-          (this.protectionFlags & VMRegion.PROTECTION_FLAG_READ ? 'r' : '-') +
-          (this.protectionFlags & VMRegion.PROTECTION_FLAG_WRITE ? 'w' : '-') +
-          (this.protectionFlags & VMRegion.PROTECTION_FLAG_EXECUTE ?
-              'x' : '-') +
-          (this.protectionFlags & VMRegion.PROTECTION_FLAG_MAYSHARE ? 's' : 'p')
-      );
+      if (this.protectionFlags === undefined) return undefined;
+      return (this.protectionFlags & VMRegion.PROTECTION_FLAG_READ ? 'r' : '-') + (this.protectionFlags & VMRegion.PROTECTION_FLAG_WRITE ? 'w' : '-') + (this.protectionFlags & VMRegion.PROTECTION_FLAG_EXECUTE ? 'x' : '-') + (this.protectionFlags & VMRegion.PROTECTION_FLAG_MAYSHARE ? 's' : 'p');
     }
   };
 
-  VMRegion.fromDict = function(dict) {
-    return new VMRegion(
-        dict.startAddress,
-        dict.sizeInBytes,
-        dict.protectionFlags,
-        dict.mappedFile,
-        dict.byteStats);
+  VMRegion.fromDict = function (dict) {
+    return new VMRegion(dict.startAddress, dict.sizeInBytes, dict.protectionFlags, dict.mappedFile, dict.byteStats);
   };
 
   /**
@@ -100,128 +88,95 @@ global.tr.exportTo('tr.model', function() {
    */
   VMRegionClassificationNode.CLASSIFICATION_RULES = {
     name: 'Total',
-    children: [
-      {
-        name: 'Android',
-        file: /^\/dev\/ashmem(?!\/libc malloc)/,
-        children: [
-          {
-            name: 'Java runtime',
-            file: /^\/dev\/ashmem\/dalvik-/,
-            children: [
-              {
-                name: 'Spaces',
-                file: /\/dalvik-(alloc|main|large object|non moving|zygote) space/,  // @suppress longLineCheck
-                children: [
-                  {
-                    name: 'Normal',
-                    file: /\/dalvik-(alloc|main)/
-                  },
-                  {
-                    name: 'Large',
-                    file: /\/dalvik-large object/
-                  },
-                  {
-                    name: 'Zygote',
-                    file: /\/dalvik-zygote/
-                  },
-                  {
-                    name: 'Non-moving',
-                    file: /\/dalvik-non moving/
-                  }
-                ]
-              },
-              {
-                name: 'Linear Alloc',
-                file: /\/dalvik-LinearAlloc/
-              },
-              {
-                name: 'Indirect Reference Table',
-                file: /\/dalvik-indirect.ref/
-              },
-              {
-                name: 'Cache',
-                file: /\/dalvik-jit-code-cache/
-              },
-              {
-                name: 'Accounting'
-              }
-            ]
-          },
-          {
-            name: 'Cursor',
-            file: /\/CursorWindow/
-          },
-          {
-            name: 'Ashmem'
-          }
-        ]
-      },
-      {
-        name: 'Native heap',
-        file: /^((\[heap\])|(\[anon:)|(\/dev\/ashmem\/libc malloc)|(\[discounted tracing overhead\])|$)/  // @suppress longLineCheck
-      },
-      {
-        name: 'Stack',
-        file: /^\[stack/
-      },
-      {
-        name: 'Files',
-        file: /\.((((jar)|(apk)|(ttf)|(odex)|(oat)|(art))$)|(dex)|(so))/,
-        children: [
-          {
-            name: 'so',
-            file: /\.so/
-          },
-          {
-            name: 'jar',
-            file: /\.jar$/
-          },
-          {
-            name: 'apk',
-            file: /\.apk$/
-          },
-          {
-            name: 'ttf',
-            file: /\.ttf$/
-          },
-          {
-            name: 'dex',
-            file: /\.((dex)|(odex$))/
-          },
-          {
-            name: 'oat',
-            file: /\.oat$/
-          },
-          {
-            name: 'art',
-            file: /\.art$/
-          }
-        ]
-      },
-      {
-        name: 'Devices',
-        file: /(^\/dev\/)|(anon_inode:dmabuf)/,
-        children: [
-          {
-            name: 'GPU',
-            file: /\/((nv)|(mali)|(kgsl))/
-          },
-          {
-            name: 'DMA',
-            file: /anon_inode:dmabuf/
-          }
-        ]
-      }
-    ]
+    children: [{
+      name: 'Android',
+      file: /^\/dev\/ashmem(?!\/libc malloc)/,
+      children: [{
+        name: 'Java runtime',
+        file: /^\/dev\/ashmem\/dalvik-/,
+        children: [{
+          name: 'Spaces',
+          file: /\/dalvik-(alloc|main|large object|non moving|zygote) space/, // @suppress longLineCheck
+          children: [{
+            name: 'Normal',
+            file: /\/dalvik-(alloc|main)/
+          }, {
+            name: 'Large',
+            file: /\/dalvik-large object/
+          }, {
+            name: 'Zygote',
+            file: /\/dalvik-zygote/
+          }, {
+            name: 'Non-moving',
+            file: /\/dalvik-non moving/
+          }]
+        }, {
+          name: 'Linear Alloc',
+          file: /\/dalvik-LinearAlloc/
+        }, {
+          name: 'Indirect Reference Table',
+          file: /\/dalvik-indirect.ref/
+        }, {
+          name: 'Cache',
+          file: /\/dalvik-jit-code-cache/
+        }, {
+          name: 'Accounting'
+        }]
+      }, {
+        name: 'Cursor',
+        file: /\/CursorWindow/
+      }, {
+        name: 'Ashmem'
+      }]
+    }, {
+      name: 'Native heap',
+      file: /^((\[heap\])|(\[anon:)|(\/dev\/ashmem\/libc malloc)|(\[discounted tracing overhead\])|$)/ // @suppress longLineCheck
+    }, {
+      name: 'Stack',
+      file: /^\[stack/
+    }, {
+      name: 'Files',
+      file: /\.((((jar)|(apk)|(ttf)|(odex)|(oat)|(art))$)|(dex)|(so))/,
+      children: [{
+        name: 'so',
+        file: /\.so/
+      }, {
+        name: 'jar',
+        file: /\.jar$/
+      }, {
+        name: 'apk',
+        file: /\.apk$/
+      }, {
+        name: 'ttf',
+        file: /\.ttf$/
+      }, {
+        name: 'dex',
+        file: /\.((dex)|(odex$))/
+      }, {
+        name: 'oat',
+        file: /\.oat$/
+      }, {
+        name: 'art',
+        file: /\.art$/
+      }]
+    }, {
+      name: 'Devices',
+      file: /(^\/dev\/)|(anon_inode:dmabuf)/,
+      children: [{
+        name: 'GPU',
+        file: /\/((nv)|(mali)|(kgsl))/
+      }, {
+        name: 'DMA',
+        file: /anon_inode:dmabuf/
+      }]
+    }]
   };
   VMRegionClassificationNode.OTHER_RULE = { name: 'Other' };
 
-  VMRegionClassificationNode.fromRegions = function(regions, opt_rules) {
+  VMRegionClassificationNode.fromRegions = function (regions, opt_rules) {
     var tree = new VMRegionClassificationNode(opt_rules);
     tree.regions_ = regions;
-    for (var i = 0; i < regions.length; i++)
-      tree.addStatsFromRegion_(regions[i]);
+    for (var i = 0; i < regions.length; i++) tree.addStatsFromRegion_(regions[i]);
     return tree;
   };
 
@@ -231,10 +186,8 @@ global.tr.exportTo('tr.model', function() {
     },
 
     get children() {
-      if (this.isLeafNode)
-        return undefined;  // Leaf nodes don't have children (by definition).
-      if (this.children_ === undefined)
-        this.buildTree_();  // Lazily classify VM regions.
+      if (this.isLeafNode) return undefined; // Leaf nodes don't have children (by definition).
+      if (this.children_ === undefined) this.buildTree_(); // Lazily classify VM regions.
       return this.children_;
     },
 
@@ -250,8 +203,7 @@ global.tr.exportTo('tr.model', function() {
     get allRegionsForTesting() {
       if (this.regions_ !== undefined) {
         if (this.children_ !== undefined) {
-          throw new Error('Internal error: a VM region classification node ' +
-              'cannot have both regions and children');
+          throw new Error('Internal error: a VM region classification node ' + 'cannot have both regions and children');
         }
         // Leaf node (or caching internal node).
         return this.regions_;
@@ -259,7 +211,7 @@ global.tr.exportTo('tr.model', function() {
 
       // Intermediate node.
       var regions = [];
-      this.children_.forEach(function(childNode) {
+      this.children_.forEach(function (childNode) {
         regions = regions.concat(childNode.allRegionsForTesting);
       });
       return regions;
@@ -270,30 +222,28 @@ global.tr.exportTo('tr.model', function() {
       return children === undefined || children.length === 0;
     },
 
-    addRegion: function(region) {
+    addRegion: function (region) {
       this.addRegionRecursively_(region, true /* addStatsToThisNode */);
     },
 
-    someRegion: function(fn, opt_this) {
+    someRegion: function (fn, opt_this) {
       if (this.regions_ !== undefined) {
         // Leaf node (or caching internal node).
         return this.regions_.some(fn, opt_this);
       }
 
       // Intermediate node.
-      return this.children_.some(function(childNode) {
+      return this.children_.some(function (childNode) {
         return childNode.someRegion(fn, opt_this);
       });
     },
 
-    addRegionRecursively_: function(region, addStatsToThisNode) {
-      if (addStatsToThisNode)
-        this.addStatsFromRegion_(region);
+    addRegionRecursively_: function (region, addStatsToThisNode) {
+      if (addStatsToThisNode) this.addStatsFromRegion_(region);
 
       if (this.regions_ !== undefined) {
         if (this.children_ !== undefined) {
-          throw new Error('Internal error: a VM region classification node ' +
-              'cannot have both regions and children');
+          throw new Error('Internal error: a VM region classification node ' + 'cannot have both regions and children');
         }
         // Leaf node or an intermediate node caching VM regions (add the
         // region to this node and don't classify further).
@@ -304,26 +254,22 @@ global.tr.exportTo('tr.model', function() {
       // Non-leaf rule (classify region row further down the tree).
       function regionRowMatchesChildNide(child) {
         var fileRegExp = child.rule_.file;
-        if (fileRegExp === undefined)
-          return true;
+        if (fileRegExp === undefined) return true;
         return fileRegExp.test(region.mappedFile);
       }
 
-      var matchedChild = tr.b.findFirstInArray(
-          this.children_, regionRowMatchesChildNide);
+      var matchedChild = tr.b.findFirstInArray(this.children_, regionRowMatchesChildNide);
       if (matchedChild === undefined) {
         // Region belongs to the 'Other' node (created lazily).
-        if (this.children_.length !== this.rule_.children.length)
-          throw new Error('Internal error');
-        matchedChild = new VMRegionClassificationNode(
-            VMRegionClassificationNode.OTHER_RULE);
+        if (this.children_.length !== this.rule_.children.length) throw new Error('Internal error');
+        matchedChild = new VMRegionClassificationNode(VMRegionClassificationNode.OTHER_RULE);
         this.children_.push(matchedChild);
       }
 
       matchedChild.addRegionRecursively_(region, true);
     },
 
-    buildTree_: function() {
+    buildTree_: function () {
       var cachedRegions = this.regions_;
       this.regions_ = undefined;
 
@@ -331,50 +277,43 @@ global.tr.exportTo('tr.model', function() {
       for (var i = 0; i < cachedRegions.length; i++) {
         // Note that we don't add the VM region's stats to this node because
         // they have already been added to it.
-        this.addRegionRecursively_(
-            cachedRegions[i], false /* addStatsToThisNode */);
+        this.addRegionRecursively_(cachedRegions[i], false /* addStatsToThisNode */);
       }
     },
 
-    buildChildNodesRecursively_: function() {
+    buildChildNodesRecursively_: function () {
       if (this.children_ !== undefined) {
-        throw new Error(
-            'Internal error: Classification node already has children');
+        throw new Error('Internal error: Classification node already has children');
       }
       if (this.regions_ !== undefined && this.regions_.length !== 0) {
-        throw new Error(
-            'Internal error: Classification node should have no regions');
+        throw new Error('Internal error: Classification node should have no regions');
       }
 
-      if (this.isLeafNode)
-        return;  // Leaf node: Nothing to do.
+      if (this.isLeafNode) return; // Leaf node: Nothing to do.
 
       // Intermediate node: Clear regions and build children recursively.
       this.regions_ = undefined;
-      this.children_ = this.rule_.children.map(function(childRule) {
+      this.children_ = this.rule_.children.map(function (childRule) {
         var child = new VMRegionClassificationNode(childRule);
         child.buildChildNodesRecursively_();
         return child;
       });
     },
 
-    addStatsFromRegion_: function(region) {
+    addStatsFromRegion_: function (region) {
       this.hasRegions = true;
 
       // Aggregate virtual size.
       var regionSizeInBytes = region.sizeInBytes;
-      if (regionSizeInBytes !== undefined)
-        this.sizeInBytes = (this.sizeInBytes || 0) + regionSizeInBytes;
+      if (regionSizeInBytes !== undefined) this.sizeInBytes = (this.sizeInBytes || 0) + regionSizeInBytes;
 
       // Aggregate byte stats.
       var thisByteStats = this.byteStats;
       var regionByteStats = region.byteStats;
       for (var byteStatName in regionByteStats) {
         var regionByteStatValue = regionByteStats[byteStatName];
-        if (regionByteStatValue === undefined)
-          continue;
-        thisByteStats[byteStatName] =
-            (thisByteStats[byteStatName] || 0) + regionByteStatValue;
+        if (regionByteStatValue === undefined) continue;
+        thisByteStats[byteStatName] = (thisByteStats[byteStatName] || 0) + regionByteStatValue;
       }
     }
   };

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -11,7 +12,7 @@ require("./slice.js");
 /**
  * @fileoverview Provides the Thread class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var Slice = tr.model.Slice;
 
   /**
@@ -28,11 +29,8 @@ global.tr.exportTo('tr.model', function() {
    *
    * @constructor
    */
-  function ThreadSlice(cat, title, colorId, start, args, opt_duration,
-                       opt_cpuStart, opt_cpuDuration, opt_argsStripped,
-                       opt_bind_id) {
-    Slice.call(this, cat, title, colorId, start, args, opt_duration,
-               opt_cpuStart, opt_cpuDuration, opt_argsStripped, opt_bind_id);
+  function ThreadSlice(cat, title, colorId, start, args, opt_duration, opt_cpuStart, opt_cpuDuration, opt_argsStripped, opt_bindId) {
+    Slice.call(this, cat, title, colorId, start, args, opt_duration, opt_cpuStart, opt_cpuDuration, opt_argsStripped, opt_bindId);
     // Do not modify this directly.
     // subSlices is configured by SliceGroup.rebuildSubRows_.
     this.subSlices = [];
@@ -43,24 +41,18 @@ global.tr.exportTo('tr.model', function() {
 
     get overlappingSamples() {
       var samples = new tr.model.EventSet();
-      if (!this.parentContainer || !this.parentContainer.samples)
-        return samples;
-      this.parentContainer.samples.forEach(function(sample) {
-        if (this.start <= sample.start && sample.start <= this.end)
-          samples.push(sample);
+      if (!this.parentContainer || !this.parentContainer.samples) return samples;
+      this.parentContainer.samples.forEach(function (sample) {
+        if (this.start <= sample.start && sample.start <= this.end) samples.push(sample);
       }, this);
       return samples;
     }
   };
 
-  tr.model.EventRegistry.register(
-      ThreadSlice,
-      {
-        name: 'slice',
-        pluralName: 'slices',
-        singleViewElementName: 'tr-ui-a-single-thread-slice-sub-view',
-        multiViewElementName: 'tr-ui-a-multi-thread-slice-sub-view'
-      });
+  tr.model.EventRegistry.register(ThreadSlice, {
+    name: 'slice',
+    pluralName: 'slices'
+  });
 
   return {
     ThreadSlice: ThreadSlice

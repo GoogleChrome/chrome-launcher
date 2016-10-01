@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,12 +9,10 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   function max(a, b) {
-    if (a === undefined)
-      return b;
-    if (b === undefined)
-      return a;
+    if (a === undefined) return b;
+    if (b === undefined) return a;
     return Math.max(a, b);
   }
 
@@ -44,12 +43,11 @@ global.tr.exportTo('tr.b', function() {
      *
      * @param {Object} datum The object to insert.
      */
-    insert: function(datum) {
+    insert: function (datum) {
       var startPosition = this.beginPositionCb_(datum);
       var endPosition = this.endPositionCb_(datum);
 
-      var node = new IntervalTreeNode(datum,
-                                      startPosition, endPosition);
+      var node = new IntervalTreeNode(datum, startPosition, endPosition);
       this.size_++;
 
       this.root_ = this.insertNode_(this.root_, node);
@@ -57,33 +55,21 @@ global.tr.exportTo('tr.b', function() {
       return datum;
     },
 
-    insertNode_: function(root, node) {
-      if (root === undefined)
-        return node;
+    insertNode_: function (root, node) {
+      if (root === undefined) return node;
 
-      if (root.leftNode && root.leftNode.isRed &&
-          root.rightNode && root.rightNode.isRed)
-        this.flipNodeColour_(root);
+      if (root.leftNode && root.leftNode.isRed && root.rightNode && root.rightNode.isRed) this.flipNodeColour_(root);
 
-      if (node.key < root.key)
-        root.leftNode = this.insertNode_(root.leftNode, node);
-      else if (node.key === root.key)
-        root.merge(node);
-      else
-        root.rightNode = this.insertNode_(root.rightNode, node);
+      if (node.key < root.key) root.leftNode = this.insertNode_(root.leftNode, node);else if (node.key === root.key) root.merge(node);else root.rightNode = this.insertNode_(root.rightNode, node);
 
-      if (root.rightNode && root.rightNode.isRed &&
-          (root.leftNode === undefined || !root.leftNode.isRed))
-        root = this.rotateLeft_(root);
+      if (root.rightNode && root.rightNode.isRed && (root.leftNode === undefined || !root.leftNode.isRed)) root = this.rotateLeft_(root);
 
-      if (root.leftNode && root.leftNode.isRed &&
-          root.leftNode.leftNode && root.leftNode.leftNode.isRed)
-        root = this.rotateRight_(root);
+      if (root.leftNode && root.leftNode.isRed && root.leftNode.leftNode && root.leftNode.leftNode.isRed) root = this.rotateRight_(root);
 
       return root;
     },
 
-    rotateRight_: function(node) {
+    rotateRight_: function (node) {
       var sibling = node.leftNode;
       node.leftNode = sibling.rightNode;
       sibling.rightNode = node;
@@ -92,7 +78,7 @@ global.tr.exportTo('tr.b', function() {
       return sibling;
     },
 
-    rotateLeft_: function(node) {
+    rotateLeft_: function (node) {
       var sibling = node.rightNode;
       node.rightNode = sibling.leftNode;
       sibling.leftNode = node;
@@ -101,28 +87,27 @@ global.tr.exportTo('tr.b', function() {
       return sibling;
     },
 
-    flipNodeColour_: function(node) {
+    flipNodeColour_: function (node) {
       node.colour = this.flipColour_(node.colour);
       node.leftNode.colour = this.flipColour_(node.leftNode.colour);
       node.rightNode.colour = this.flipColour_(node.rightNode.colour);
     },
 
-    flipColour_: function(colour) {
+    flipColour_: function (colour) {
       return colour === Colour.RED ? Colour.BLACK : Colour.RED;
     },
 
     /* The high values are used to find intersection. It should be called after
      * all of the nodes are inserted. Doing it each insert is _slow_. */
-    updateHighValues: function() {
+    updateHighValues: function () {
       this.updateHighValues_(this.root_);
     },
 
     /* There is probably a smarter way to do this by starting from the inserted
      * node, but need to handle the rotations correctly. Went the easy route
      * for now. */
-    updateHighValues_: function(node) {
-      if (node === undefined)
-        return undefined;
+    updateHighValues_: function (node) {
+      if (node === undefined) return undefined;
 
       node.maxHighLeft = this.updateHighValues_(node.leftNode);
       node.maxHighRight = this.updateHighValues_(node.rightNode);
@@ -130,11 +115,9 @@ global.tr.exportTo('tr.b', function() {
       return max(max(node.maxHighLeft, node.highValue), node.maxHighRight);
     },
 
-    validateFindArguments_: function(queryLow, queryHigh) {
-      if (queryLow === undefined || queryHigh === undefined)
-        throw new Error('queryLow and queryHigh must be defined');
-      if ((typeof queryLow !== 'number') || (typeof queryHigh !== 'number'))
-        throw new Error('queryLow and queryHigh must be numbers');
+    validateFindArguments_: function (queryLow, queryHigh) {
+      if (queryLow === undefined || queryHigh === undefined) throw new Error('queryLow and queryHigh must be defined');
+      if (typeof queryLow !== 'number' || typeof queryHigh !== 'number') throw new Error('queryLow and queryHigh must be numbers');
     },
 
     /**
@@ -144,10 +127,9 @@ global.tr.exportTo('tr.b', function() {
      * @param {number} queryHigh The high value for the intersection interval.
      * @return {Array} All [begin, end] pairs inside intersecting intervals.
      */
-    findIntersection: function(queryLow, queryHigh) {
+    findIntersection: function (queryLow, queryHigh) {
       this.validateFindArguments_(queryLow, queryHigh);
-      if (this.root_ === undefined)
-        return [];
+      if (this.root_ === undefined) return [];
 
       var ret = [];
       this.root_.appendIntersectionsInto_(ret, queryLow, queryHigh);
@@ -172,9 +154,8 @@ global.tr.exportTo('tr.b', function() {
      * Dumps out the [lowValue, highValue] pairs for each node in depth-first
      * order.
      */
-    dump_: function() {
-      if (this.root_ === undefined)
-        return [];
+    dump_: function () {
+      if (this.root_ === undefined) return [];
       return this.root_.dump();
     }
   };
@@ -204,15 +185,13 @@ global.tr.exportTo('tr.b', function() {
   }
 
   IntervalTreeNode.prototype = {
-    appendIntersectionsInto_: function(ret, queryLow, queryHigh) {
+    appendIntersectionsInto_: function (ret, queryLow, queryHigh) {
       /* This node starts has a start point at or further right then queryHigh
        * so we know this node is out and all right children are out. Just need
        * to check left */
       if (this.lowValue_ >= queryHigh) {
-        if (!this.leftNode_)
-          return;
-        return this.leftNode_.appendIntersectionsInto_(
-            ret, queryLow, queryHigh);
+        if (!this.leftNode_) return;
+        return this.leftNode_.appendIntersectionsInto_(ret, queryLow, queryHigh);
       }
 
       /* If we have a maximum left high value that is bigger then queryLow we
@@ -224,11 +203,10 @@ global.tr.exportTo('tr.b', function() {
       /* We know that this node starts before queryHigh, if any of it's data
        * ends after queryLow we need to add those nodes */
       if (this.highValue > queryLow) {
-        for (var i = (this.data.length - 1); i >= 0; --i) {
+        for (var i = this.data.length - 1; i >= 0; --i) {
           /* data nodes are sorted by high value, so as soon as we see one
            * before low value we're done. */
-          if (this.data[i].high < queryLow)
-            break;
+          if (this.data[i].high < queryLow) break;
 
           ret.push(this.data[i].datum);
         }
@@ -320,23 +298,22 @@ global.tr.exportTo('tr.b', function() {
       return this.colour_ === Colour.RED;
     },
 
-    merge: function(node) {
-      for (var i = 0; i < node.data.length; i++)
-        this.data_.push(node.data[i]);
-      this.data_.sort(function(a, b) {
+    merge: function (node) {
+      for (var i = 0; i < node.data.length; i++) this.data_.push(node.data[i]);
+      this.data_.sort(function (a, b) {
         return a.high - b.high;
       });
     },
 
-    dump: function() {
+    dump: function () {
       var ret = {};
-      if (this.leftNode_)
-        ret['left'] = this.leftNode_.dump();
+      if (this.leftNode_) ret['left'] = this.leftNode_.dump();
 
-      ret['data'] = this.data_.map(function(d) { return [d.low, d.high]; });
+      ret['data'] = this.data_.map(function (d) {
+        return [d.low, d.high];
+      });
 
-      if (this.rightNode_)
-        ret['right'] = this.rightNode_.dump();
+      if (this.rightNode_) ret['right'] = this.rightNode_.dump();
 
       return ret;
     }

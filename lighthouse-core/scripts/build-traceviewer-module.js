@@ -26,6 +26,8 @@ const path = require('path');
 const jsdom = require('jsdom');
 const mkdirp = require('mkdirp');
 
+const babel = require('babel-core');
+
 const paths = {};
 const INITIAL_IMPORT = 'scripts/traceviewer-module-index';
 
@@ -45,7 +47,7 @@ function convertImport(src) {
       const imports = window.document.querySelectorAll('link[rel="import"]');
       const scripts = window.document.querySelectorAll('script');
       let scriptsContent = '';
-
+      scriptsContent += addUseStrictDirective();
       scriptsContent += convertLicenseComments(html);
 
       // traverse and rewrite the imports
@@ -65,6 +67,9 @@ function convertImport(src) {
       for (let s = 0; s < scripts.length; s++) {
         scriptsContent += rewriteGlobals(scripts[s]);
       }
+
+      // node4 compat
+      scriptsContent = polyfillNode4Support(dest, scriptsContent);
 
       writeNewFile(dest, scriptsContent);
 
@@ -108,6 +113,24 @@ function convertImport(src) {
         script = script.replace(/this.tr =/, 'global.tr =');
         script = script.replace(/\(function\(global\)\s?\{/, '(function() {');
         return script;
+      }
+
+      // the "use strict" must be found *above* the require() statements
+      function addUseStrictDirective() {
+        return '"use strict";\n';
+      }
+
+      // adjust and transpile for usage in node 4+
+      function polyfillNode4Support(dest, scriptsContent) {
+        let transformed = scriptsContent;
+        if (dest.endsWith('/slice.js')) {
+          // no babel plugin that can transpile `new.target`, so this is done manually
+          transformed = transformed.replace('if (new.target)', 'if (!(this instanceof Slice))');
+        }
+        transformed = babel.transform(transformed, {
+          plugins: ['transform-es2015-destructuring']
+        }).code;
+        return transformed;
       }
 
       function writeNewFile(dest, scriptsContent) {

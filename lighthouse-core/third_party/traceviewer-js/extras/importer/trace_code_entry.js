@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -13,7 +14,7 @@ require("../../model/source_info/js_source_info.js");
  * extracts extra context information for each item. This includes things like
  * the source file, line and if the function is a native method or not.
  */
-global.tr.exportTo('tr.e.importer', function() {
+global.tr.exportTo('tr.e.importer', function () {
   function TraceCodeEntry(address, size, name, scriptId) {
     this.id_ = tr.b.GUID.allocateSimple();
     this.address_ = address;
@@ -44,12 +45,12 @@ global.tr.exportTo('tr.e.importer', function() {
     var rawName;
     var rawUrl;
     if (prefix === 'Script:') {
-        rawName = '';
-        rawUrl = body;
+      rawName = '';
+      rawUrl = body;
     } else {
-        var spacePos = body.lastIndexOf(' ');
-        rawName = spacePos !== -1 ? body.substr(0, spacePos) : body;
-        rawUrl = spacePos !== -1 ? body.substr(spacePos + 1) : '';
+      var spacePos = body.lastIndexOf(' ');
+      rawName = spacePos !== -1 ? body.substr(0, spacePos) : body;
+      rawUrl = spacePos !== -1 ? body.substr(spacePos + 1) : '';
     }
 
     function splitLineAndColumn(url) {
@@ -58,12 +59,12 @@ global.tr.exportTo('tr.e.importer', function() {
       var lineNumber;
       var columnNumber;
 
-      if (typeof(lineColumnMatch[1]) === 'string') {
+      if (typeof lineColumnMatch[1] === 'string') {
         lineNumber = parseInt(lineColumnMatch[1], 10);
         // Immediately convert line and column to 0-based numbers.
         lineNumber = isNaN(lineNumber) ? undefined : lineNumber - 1;
       }
-      if (typeof(lineColumnMatch[2]) === 'string') {
+      if (typeof lineColumnMatch[2] === 'string') {
         columnNumber = parseInt(lineColumnMatch[2], 10);
         columnNumber = isNaN(columnNumber) ? undefined : columnNumber - 1;
       }
@@ -77,16 +78,14 @@ global.tr.exportTo('tr.e.importer', function() {
 
     var nativeSuffix = ' native';
     var isNative = rawName.endsWith(nativeSuffix);
-    this.name_ =
-        isNative ? rawName.slice(0, -nativeSuffix.length) : rawName;
+    this.name_ = isNative ? rawName.slice(0, -nativeSuffix.length) : rawName;
 
     var urlData = splitLineAndColumn(rawUrl);
     var url = urlData.url || '';
     var line = urlData.lineNumber || 0;
     var column = urlData.columnNumber || 0;
 
-    this.sourceInfo_ = new tr.model.source_info.JSSourceInfo(
-        url, line, column, isNative, scriptId, state);
+    this.sourceInfo_ = new tr.model.source_info.JSSourceInfo(url, line, column, isNative, scriptId, state);
   };
 
   TraceCodeEntry.prototype = {

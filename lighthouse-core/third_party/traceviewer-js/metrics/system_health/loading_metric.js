@@ -1,39 +1,56 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../../base/category_util.js");
 require("../../base/statistics.js");
 require("../metric_registry.js");
 require("./utils.js");
 require("../../model/helpers/chrome_model_helper.js");
 require("../../model/timed_event.js");
+require("../../value/histogram.js");
 require("../../value/numeric.js");
-require("../../value/value.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.sh', function() {
+global.tr.exportTo('tr.metrics.sh', function () {
   var RESPONSIVENESS_THRESHOLD = 50;
   var INTERACTIVE_WINDOW_SIZE = 5 * 1000;
-  var timeDurationInMs_smallerIsBetter =
-      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter;
+  var timeDurationInMs_smallerIsBetter = tr.b.Unit.byName.timeDurationInMs_smallerIsBetter;
+  var RelatedEventSet = tr.v.d.RelatedEventSet;
+
+  // TODO(ksakamoto): This should be a method of tr.model.Event or one of its
+  // subclasses.
+  function hasCategoryAndName(event, category, title) {
+    return event.title === title && event.category && tr.b.getCategoryParts(event.category).indexOf(category) !== -1;
+  }
 
   function findTargetRendererHelper(chromeHelper) {
     var largestPid = -1;
     for (var pid in chromeHelper.rendererHelpers) {
       var rendererHelper = chromeHelper.rendererHelpers[pid];
-      if (rendererHelper.isChromeTracingUI)
-        continue;
-      if (pid > largestPid)
-        largestPid = pid;
+      if (rendererHelper.isChromeTracingUI) continue;
+      if (pid > largestPid) largestPid = pid;
     }
 
-    if (largestPid === -1)
-      return undefined;
+    if (largestPid === -1) return undefined;
 
     return chromeHelper.rendererHelpers[largestPid];
+  }
+
+  function createBreakdownDiagnostic(rendererHelper, start, end) {
+    var breakdownDict = rendererHelper.generateTimeBreakdownTree(start, end);
+
+    var breakdownDiagnostic = new tr.v.d.Breakdown();
+    breakdownDiagnostic.colorScheme = tr.v.d.COLOR_SCHEME_CHROME_USER_FRIENDLY_CATEGORY_DRIVER;
+
+    for (var label in breakdownDict) {
+      breakdownDiagnostic.set(label, breakdownDict[label].total);
+    }
+    return breakdownDiagnostic;
   }
 
   /**
@@ -44,31 +61,25 @@ global.tr.exportTo('tr.metrics.sh', function() {
   function NavigationStartFinder(rendererHelper) {
     this.navigationStartsForFrameId_ = {};
     for (var ev of rendererHelper.mainThread.sliceGroup.childEvents()) {
-      if (ev.category !== 'blink.user_timing' ||
-          ev.title !== 'navigationStart')
-        continue;
+      if (!hasCategoryAndName(ev, 'blink.user_timing', 'navigationStart')) continue;
       var frameIdRef = ev.args['frame'];
       var list = this.navigationStartsForFrameId_[frameIdRef];
-      if (list === undefined)
-        this.navigationStartsForFrameId_[frameIdRef] = list = [];
+      if (list === undefined) this.navigationStartsForFrameId_[frameIdRef] = list = [];
       list.unshift(ev);
     }
   }
 
   NavigationStartFinder.prototype = {
-    findNavigationStartEventForFrameBeforeTimestamp: function(frameIdRef, ts) {
+    findNavigationStartEventForFrameBeforeTimestamp: function (frameIdRef, ts) {
       var list = this.navigationStartsForFrameId_[frameIdRef];
       if (list === undefined) {
-        console.warn('No navigationStartEvent found for frame id "' +
-            frameIdRef + '"');
+        console.warn('No navigationStartEvent found for frame id "' + frameIdRef + '"');
         return undefined;
       }
       var eventBeforeTimestamp;
       for (var ev of list) {
-        if (ev.start > ts)
-          continue;
-        if (eventBeforeTimestamp === undefined)
-          eventBeforeTimestamp = ev;
+        if (ev.start > ts) continue;
+        if (eventBeforeTimestamp === undefined) eventBeforeTimestamp = ev;
       }
       if (eventBeforeTimestamp === undefined) {
         console.warn('Failed to find navigationStartEvent.');
@@ -78,47 +89,12 @@ global.tr.exportTo('tr.metrics.sh', function() {
     }
   };
 
-  /**
-   * A utility class for finding Paint event for given frame and timestamp.
-   * @constructor
-   */
-  function PaintFinder(rendererHelper) {
-    this.paintsForFrameId_ = {};
-    for (var ev of rendererHelper.mainThread.sliceGroup.childEvents()) {
-      if (ev.category !== 'devtools.timeline' || ev.title !== 'Paint')
-        continue;
-      var frameIdRef = ev.args['data']['frame'];
-      var list = this.paintsForFrameId_[frameIdRef];
-      if (list === undefined)
-          this.paintsForFrameId_[frameIdRef] = list = [];
-      list.push(ev);
-    }
-  }
+  var FIRST_PAINT_BOUNDARIES = tr.v.HistogramBinBoundaries.createLinear(0, 1e3, 20) // 50ms step to 1s
+  .addLinearBins(3e3, 20) // 100ms step to 3s
+  .addExponentialBins(20e3, 20);
 
-  PaintFinder.prototype = {
-    findPaintEventForFrameAfterTimestamp: function(frameIdRef, ts) {
-      var list = this.paintsForFrameId_[frameIdRef];
-      if (list === undefined)
-        return undefined;
-
-      var eventAfterTimestamp;
-      for (var ev of list) {
-        if (ev.start < ts)
-          continue;
-        if (eventAfterTimestamp === undefined)
-          eventAfterTimestamp = ev;
-      }
-      return eventAfterTimestamp;
-    }
-  };
-
-  var FIRST_PAINT_NUMERIC_BUILDER =
-      new tr.v.NumericBuilder(timeDurationInMs_smallerIsBetter, 0)
-      .addLinearBins(1000, 20) // 50ms step to 1s
-      .addLinearBins(3000, 20) // 100ms step to 3s
-      .addExponentialBins(20000, 20);
-  function createHistogram() {
-    var histogram = FIRST_PAINT_NUMERIC_BUILDER.build();
+  function createHistogram(name) {
+    var histogram = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, FIRST_PAINT_BOUNDARIES);
     histogram.customizeSummaryOptions({
       avg: true,
       count: false,
@@ -126,7 +102,7 @@ global.tr.exportTo('tr.metrics.sh', function() {
       min: true,
       std: true,
       sum: false,
-      percentile: [0.90, 0.95, 0.99],
+      percentile: [0.90, 0.95, 0.99]
     });
     return histogram;
   }
@@ -137,19 +113,15 @@ global.tr.exportTo('tr.metrics.sh', function() {
     var objects = rendererHelper.process.objects;
     var frameLoaderInstances = objects.instancesByTypeName_['FrameLoader'];
     if (frameLoaderInstances === undefined) {
-      console.warn('Failed to find FrameLoader for frameId "' + frameIdRef +
-          '" at ts ' + ts + ', the trace maybe incomplete or from an old' +
-          'Chrome.');
+      console.warn('Failed to find FrameLoader for frameId "' + frameIdRef + '" at ts ' + ts + ', the trace maybe incomplete or from an old' + 'Chrome.');
       return undefined;
     }
 
     var snapshot;
     for (var instance of frameLoaderInstances) {
-      if (!instance.isAliveAt(ts))
-        continue;
+      if (!instance.isAliveAt(ts)) continue;
       var maybeSnapshot = instance.getSnapshotAt(ts);
-      if (frameIdRef !== maybeSnapshot.args['frame']['id_ref'])
-        continue;
+      if (frameIdRef !== maybeSnapshot.args['frame']['id_ref']) continue;
       snapshot = maybeSnapshot;
     }
 
@@ -160,162 +132,99 @@ global.tr.exportTo('tr.metrics.sh', function() {
     var targetEvents = [];
 
     for (var ev of rendererHelper.process.getDescendantEvents()) {
-      if (ev.category !== 'blink.user_timing' || ev.title !== title)
-        continue;
+      if (!hasCategoryAndName(ev, 'blink.user_timing', title)) continue;
       targetEvents.push(ev);
     }
 
     return targetEvents;
   }
 
-  function findAllLayoutEvents(rendererHelper) {
-    var isTelemetryInternalEvent =
-        prepareTelemetryInternalEventPredicate(rendererHelper);
-    var layoutsForFrameId = {};
+  function findFirstMeaningfulPaintCandidates(rendererHelper) {
+    var isTelemetryInternalEvent = prepareTelemetryInternalEventPredicate(rendererHelper);
+    var candidatesForFrameId = {};
     for (var ev of rendererHelper.process.getDescendantEvents()) {
-      if (ev.category !==
-          'blink,benchmark,disabled-by-default-blink.debug.layout' ||
-          ev.title !== 'FrameView::performLayout')
-        continue;
-      if (isTelemetryInternalEvent(ev))
-        continue;
-      if (ev.args.counters === undefined) {
-        console.warn('Ignoring FrameView::performLayout event with no ' +
-            'counters arg (END event is missing).');
-        continue;
-      }
-      var frameIdRef = ev.args.counters['frame'];
-      if (frameIdRef === undefined)
-        continue;
-      var list = layoutsForFrameId[frameIdRef];
-      if (list === undefined)
-        layoutsForFrameId[frameIdRef] = list = [];
+      if (!hasCategoryAndName(ev, 'loading', 'firstMeaningfulPaintCandidate')) continue;
+      if (isTelemetryInternalEvent(ev)) continue;
+      var frameIdRef = ev.args['frame'];
+      if (frameIdRef === undefined) continue;
+      var list = candidatesForFrameId[frameIdRef];
+      if (list === undefined) candidatesForFrameId[frameIdRef] = list = [];
       list.push(ev);
     }
-    return layoutsForFrameId;
+    return candidatesForFrameId;
   }
 
   function prepareTelemetryInternalEventPredicate(rendererHelper) {
     var ignoreRegions = [];
 
     var internalRegionStart;
-    for (var slice of
-        rendererHelper.mainThread.asyncSliceGroup.getDescendantEvents()) {
-          if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.start$/))
-            internalRegionStart = slice.start;
-          if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.end$/)) {
-            var timedEvent = new tr.model.TimedEvent(internalRegionStart);
-            timedEvent.duration = slice.end - internalRegionStart;
-            ignoreRegions.push(timedEvent);
-          }
-        }
+    for (var slice of rendererHelper.mainThread.asyncSliceGroup.getDescendantEvents()) {
+      if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.start$/)) internalRegionStart = slice.start;
+      if (!!slice.title.match(/^telemetry\.internal\.[^.]*\.end$/)) {
+        var timedEvent = new tr.model.TimedEvent(internalRegionStart);
+        timedEvent.duration = slice.end - internalRegionStart;
+        ignoreRegions.push(timedEvent);
+      }
+    }
 
     return function isTelemetryInternalEvent(slice) {
-      for (var region of ignoreRegions)
-        if (region.bounds(slice))
-          return true;
+      for (var region of ignoreRegions) if (region.bounds(slice)) return true;
       return false;
-    }
+    };
   }
 
-  var URL_BLACKLIST = [
-    'about:blank',
-    // Chrome on Android creates main frames with the below URL for plugins.
-    'data:text/html,pluginplaceholderdata'
-  ];
+  var URL_BLACKLIST = ['about:blank',
+  // Chrome on Android creates main frames with the below URL for plugins.
+  'data:text/html,pluginplaceholderdata'];
   function shouldIgnoreURL(url) {
     return URL_BLACKLIST.indexOf(url) >= 0;
   }
 
-  var METRICS = [
-    {
-      valueName: 'firstContentfulPaint',
-      title: 'firstContentfulPaint',
-      description: 'time to first contentful paint'
-    },
-    {
-      valueName: 'timeToOnload',
-      title: 'loadEventStart',
-      description: 'time to onload. ' +
-        'This is temporary metric used for PCv1/v2 sanity checking'
-    }];
+  var METRICS = [{
+    valueName: 'timeToFirstContentfulPaint',
+    title: 'firstContentfulPaint',
+    description: 'time to first contentful paint'
+  }, {
+    valueName: 'timeToOnload',
+    title: 'loadEventStart',
+    description: 'time to onload. ' + 'This is temporary metric used for PCv1/v2 sanity checking'
+  }];
 
-  function firstContentfulPaintMetric(values, model) {
-    var chromeHelper = model.getOrCreateHelper(
-        tr.model.helpers.ChromeModelHelper);
+  function timeToFirstContentfulPaintMetric(values, model) {
+    var chromeHelper = model.getOrCreateHelper(tr.model.helpers.ChromeModelHelper);
     var rendererHelper = findTargetRendererHelper(chromeHelper);
-    var isTelemetryInternalEvent =
-        prepareTelemetryInternalEventPredicate(rendererHelper);
+    var isTelemetryInternalEvent = prepareTelemetryInternalEventPredicate(rendererHelper);
     var navigationStartFinder = new NavigationStartFinder(rendererHelper);
 
     for (var metric of METRICS) {
-      var histogram = createHistogram();
+      var histogram = createHistogram(metric.valueName);
+      histogram.description = metric.description;
       var targetEvents = findAllUserTimingEvents(rendererHelper, metric.title);
-     for (var ev of targetEvents) {
-        if (isTelemetryInternalEvent(ev))
-          continue;
+      for (var ev of targetEvents) {
+        if (isTelemetryInternalEvent(ev)) continue;
         var frameIdRef = ev.args['frame'];
-        var snapshot =
-          findFrameLoaderSnapshotAt(rendererHelper, frameIdRef, ev.start);
-        if (snapshot === undefined || !snapshot.args.isLoadingMainFrame)
-          continue;
+        var snapshot = findFrameLoaderSnapshotAt(rendererHelper, frameIdRef, ev.start);
+        if (snapshot === undefined || !snapshot.args.isLoadingMainFrame) continue;
         var url = snapshot.args.documentLoaderURL;
-        if (shouldIgnoreURL(url))
-          continue;
-        var navigationStartEvent = navigationStartFinder.
-          findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
+        if (shouldIgnoreURL(url)) continue;
+        var navigationStartEvent = navigationStartFinder.findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
         // Ignore layout w/o preceding navigationStart, as they are not
         // attributed to any time-to-X metric.
-        if (navigationStartEvent === undefined)
-          continue;
+        if (navigationStartEvent === undefined) continue;
 
         var timeToEvent = ev.start - navigationStartEvent.start;
-        histogram.add(timeToEvent, new tr.v.d.Generic({url: url}));
+        histogram.addSample(timeToEvent, { url: new tr.v.d.Generic(url) });
       }
-      values.addValue(new tr.v.NumericValue(
-          metric.valueName, histogram,
-          { description: metric.description }));
+      values.addHistogram(histogram);
     }
   }
 
-  /**
-   * Compute significance of given layout event.
-   *
-   * Significance of a layout is the number of layout objects newly added to the
-   * layout tree, weighted by page height (before and after the layout).
-   */
-  function layoutSignificance(event) {
-    var newObjects = event.args.counters['LayoutObjectsThatHadNeverHadLayout'];
-    var visibleHeight = event.args['counters']['visibleHeight'];
-    if (!newObjects || !visibleHeight)
-      return 0;
-
-    var heightBefore = event.args['contentsHeightBeforeLayout'];
-    var heightAfter = event.args['counters']['contentsHeightAfterLayout'];
-    var ratioBefore = Math.max(1, heightBefore / visibleHeight);
-    var ratioAfter = Math.max(1, heightAfter / visibleHeight);
-    return newObjects / ((ratioBefore + ratioAfter) / 2);
-  }
-
-  /**
-   * If there are loading fonts when layout happened, the layout change
-   * accounting is postponed until the font is displayed. However, icon fonts
-   * shouldn't block first meaningful paint. We use a threshold that only web
-   * fonts that laid out more than 200 characters should block first meaningful
-   * paint.
-   */
-  function hasTooManyBlankCharactersToBeMeaningful(event) {
-    var BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN = 200;
-    return event.args['counters']['approximateBlankCharacterCount'] >
-        BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN;
-  }
-
-  function addTimeToInteractiveSampleToHistogram(histogram, rendererHelper,
-    navigationStartTime, firstMeaningfulPaint, url) {
-    if (shouldIgnoreURL(url))
-      return;
+  function addTimeToInteractiveSampleToHistogram(histogram, rendererHelper, navigationStart, firstMeaningfulPaint, url) {
+    if (shouldIgnoreURL(url)) return;
+    var navigationStartTime = navigationStart.start;
     var firstInteractive = Infinity;
     var firstInteractiveCandidate = firstMeaningfulPaint;
+    var lastLongTaskEvent = undefined;
     // Find the first interactive point X after firstMeaningfulPaint so that
     // range [X, X + INTERACTIVE_WINDOW_SIZE] contains no
     // 'TaskQueueManager::ProcessTaskFromWorkQueues' slice which takes more than
@@ -326,36 +235,40 @@ global.tr.exportTo('tr.metrics.sh', function() {
     // TODO(nedn): replace this with just "var ev of rendererHelper..." once
     // canary binary is updated.
     // (https://github.com/catapult-project/catapult/issues/2586)
-    for (var ev of[...rendererHelper.mainThread.sliceGroup.childEvents()]) {
-      if (ev.start < firstInteractiveCandidate)
-        continue;
+    for (var ev of [...rendererHelper.mainThread.sliceGroup.childEvents()]) {
+      if (ev.start < firstInteractiveCandidate) continue;
       var interactiveDurationSoFar = ev.start - firstInteractiveCandidate;
       if (interactiveDurationSoFar >= INTERACTIVE_WINDOW_SIZE) {
         firstInteractive = firstInteractiveCandidate;
         break;
       }
-      if (ev.title === 'TaskQueueManager::ProcessTaskFromWorkQueue' &&
-          ev.duration > RESPONSIVENESS_THRESHOLD) {
+      if (ev.title === 'TaskQueueManager::ProcessTaskFromWorkQueue' && ev.duration > RESPONSIVENESS_THRESHOLD) {
         firstInteractiveCandidate = ev.end - 50;
+        lastLongTaskEvent = ev;
       }
     }
-    var diagnosticDict = rendererHelper.generateTimeBreakdownTree(
-        navigationStartTime, firstInteractive);
-    diagnosticDict.url = url;
+    var breakdownDiagnostic = createBreakdownDiagnostic(rendererHelper, navigationStartTime, firstInteractive);
+
     var timeToFirstInteractive = firstInteractive - navigationStartTime;
-    histogram.add(timeToFirstInteractive, new tr.v.d.Generic(diagnosticDict));
+    histogram.addSample(timeToFirstInteractive, {
+      "Start": new RelatedEventSet(navigationStart),
+      "Last long task": new RelatedEventSet(lastLongTaskEvent),
+      "Navigation infos": new tr.v.d.Generic({ url: url, pid: rendererHelper.pid,
+        start: navigationStartTime, interactive: firstInteractive }),
+      "Breakdown of [navStart, Interactive]": breakdownDiagnostic
+    });
   }
 
   /**
    * Computes Time to first meaningful paint (TTFMP) & time to interactive (TTI)
    * from |model| and add it to |value|.
    *
-   * TTFMP is computed from three types of events: NavigationStart, Layout, and
-   * Paint. Each Layout event has associated "significance" value, indicating
-   * how the layout was visually significant.
-   *
-   * TTFMP is the time between NavigationStart and Paint that follows the Layout
-   * with biggest significance value.
+   * First meaningful paint is the paint following the layout with the highest
+   * "Layout Significance". The Layout Significance is computed inside Blink,
+   * by FirstMeaningfulPaintDetector class. It logs
+   * "firstMeaningfulPaintCandidate" event every time the Layout Significance
+   * marks a record. TTFMP is the time between NavigationStart and the last
+   * firstMeaningfulPaintCandidate event.
    *
    * Design doc: https://goo.gl/vpaxv6
    *
@@ -366,110 +279,77 @@ global.tr.exportTo('tr.metrics.sh', function() {
    *
    * Design doc: https://goo.gl/ISWndc
    */
-  function firstMeaningfulPaintAndTimeToInteractiveMetrics(values, model) {
-    var chromeHelper = model.getOrCreateHelper(
-        tr.model.helpers.ChromeModelHelper);
+  function timeToFirstMeaningfulPaintAndTimeToInteractiveMetrics(values, model) {
+    var chromeHelper = model.getOrCreateHelper(tr.model.helpers.ChromeModelHelper);
     var rendererHelper = findTargetRendererHelper(chromeHelper);
     var navigationStartFinder = new NavigationStartFinder(rendererHelper);
-    var paintFinder = new PaintFinder(rendererHelper);
-    var firstMeaningfulPaintHistogram = createHistogram();
-    var firstInteractiveHistogram = createHistogram();
+    var firstMeaningfulPaintHistogram = createHistogram('timeToFirstMeaningfulPaint');
+    firstMeaningfulPaintHistogram.description = 'time to first meaningful paint';
+    var firstInteractiveHistogram = createHistogram('timeToFirstInteractive');
+    firstInteractiveHistogram.description = 'time to first interactive';
 
-    function addFirstMeaningfulPaintSampleToHistogram(
-        frameIdRef, navigationStart, mostSignificantLayout) {
-      var snapshot = findFrameLoaderSnapshotAt(
-          rendererHelper, frameIdRef, mostSignificantLayout.start);
-      if (snapshot === undefined || !snapshot.args.isLoadingMainFrame)
-        return;
+    function addFirstMeaningfulPaintSampleToHistogram(frameIdRef, navigationStart, fmpMarkerEvent) {
+      var snapshot = findFrameLoaderSnapshotAt(rendererHelper, frameIdRef, fmpMarkerEvent.start);
+      if (snapshot === undefined || !snapshot.args.isLoadingMainFrame) return;
       var url = snapshot.args.documentLoaderURL;
-      if (shouldIgnoreURL(url))
-        return;
-      var paintEvent = paintFinder.findPaintEventForFrameAfterTimestamp(
-          frameIdRef, mostSignificantLayout.start);
-      if (paintEvent === undefined) {
-        console.warn('Failed to find paint event after the most significant ' +
-            'layout for frameId "' + frameIdRef + '".');
-        return;
-      }
-      var timeToFirstMeaningfulPaint = paintEvent.start - navigationStart.start;
-      var diagnosticDict = rendererHelper.generateTimeBreakdownTree(
-          navigationStart.start, paintEvent.start);
-      diagnosticDict.url = url;
-      firstMeaningfulPaintHistogram.add(timeToFirstMeaningfulPaint,
-          new tr.v.d.Generic(diagnosticDict));
-      return {firstMeaningfulPaint: paintEvent.start, url: url};
+      if (shouldIgnoreURL(url)) return;
+
+      var timeToFirstMeaningfulPaint = fmpMarkerEvent.start - navigationStart.start;
+      var extraDiagnostic = {
+        url: url,
+        pid: rendererHelper.pid
+      };
+      var breakdownDiagnostic = createBreakdownDiagnostic(rendererHelper, navigationStart.start, fmpMarkerEvent.start);
+      firstMeaningfulPaintHistogram.addSample(timeToFirstMeaningfulPaint, {
+        "Breakdown of [navStart, FMP]": breakdownDiagnostic,
+        "Start": new RelatedEventSet(navigationStart),
+        "End": new RelatedEventSet(fmpMarkerEvent),
+        "Navigation infos": new tr.v.d.Generic({ url: url, pid: rendererHelper.pid,
+          start: navigationStart.start, fmp: fmpMarkerEvent.start })
+      });
+      return { firstMeaningfulPaint: fmpMarkerEvent.start, url: url };
     }
 
-    var layoutsForFrameId = findAllLayoutEvents(rendererHelper);
+    var candidatesForFrameId = findFirstMeaningfulPaintCandidates(rendererHelper);
 
-    for (var frameIdRef in layoutsForFrameId) {
+    for (var frameIdRef in candidatesForFrameId) {
       var navigationStart;
-      var mostSignificantLayout;
-      var maxSignificanceSoFar = 0;
-      var accumulatedSignificanceWhileHavingBlankText = 0;
+      var lastCandidate;
 
-      // Iterate over the layout events, remembering one with largest
-      // significance.
-      for (var ev of layoutsForFrameId[frameIdRef]) {
-        var navigationStartForThisLayout = navigationStartFinder.
-          findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
-        // Ignore layout w/o preceding navigationStart, as they are not
+      // Iterate over the FMP candidates, remembering the last one.
+      for (var ev of candidatesForFrameId[frameIdRef]) {
+        var navigationStartForThisCandidate = navigationStartFinder.findNavigationStartEventForFrameBeforeTimestamp(frameIdRef, ev.start);
+        // Ignore candidate w/o preceding navigationStart, as they are not
         // attributed to any TTFMP.
-        if (navigationStartForThisLayout === undefined)
-          continue;
+        if (navigationStartForThisCandidate === undefined) continue;
 
-        if (navigationStart !== navigationStartForThisLayout) {
+        if (navigationStart !== navigationStartForThisCandidate) {
           // New navigation is found. Compute TTFMP for current navigation, and
           // reset the state variables.
-          if (navigationStart !== undefined &&
-              mostSignificantLayout !== undefined)
-            addFirstMeaningfulPaintSampleToHistogram(
-                frameIdRef, navigationStart, mostSignificantLayout);
-          navigationStart = navigationStartForThisLayout;
-          mostSignificantLayout = undefined;
-          maxSignificanceSoFar = 0;
-          accumulatedSignificanceWhileHavingBlankText = 0;
-        }
-
-        // Check if |ev| has the largest significance. If the page has many
-        // blank characters, the significance value is accumulated until
-        // the text become visible.
-        var significance = layoutSignificance(ev);
-        if (hasTooManyBlankCharactersToBeMeaningful(ev)) {
-          accumulatedSignificanceWhileHavingBlankText += significance;
-        } else {
-          significance += accumulatedSignificanceWhileHavingBlankText;
-          accumulatedSignificanceWhileHavingBlankText = 0;
-          if (significance > maxSignificanceSoFar) {
-            maxSignificanceSoFar = significance;
-            mostSignificantLayout = ev;
+          if (navigationStart !== undefined && lastCandidate !== undefined) {
+            data = addFirstMeaningfulPaintSampleToHistogram(frameIdRef, navigationStart, lastCandidate);
+            if (data !== undefined) addTimeToInteractiveSampleToHistogram(firstInteractiveHistogram, rendererHelper, navigationStart, data.firstMeaningfulPaint, data.url);
           }
+          navigationStart = navigationStartForThisCandidate;
         }
+        lastCandidate = ev;
       }
 
       // Emit TTFMP for the last navigation.
-      if (mostSignificantLayout !== undefined) {
-        var data = addFirstMeaningfulPaintSampleToHistogram(
-          frameIdRef, navigationStart, mostSignificantLayout);
+      if (lastCandidate !== undefined) {
+        var data = addFirstMeaningfulPaintSampleToHistogram(frameIdRef, navigationStart, lastCandidate);
 
-        if (data !== undefined)
-          addTimeToInteractiveSampleToHistogram(
-              firstInteractiveHistogram, rendererHelper, navigationStart.start,
-              data.firstMeaningfulPaint, data.url);
+        if (data !== undefined) addTimeToInteractiveSampleToHistogram(firstInteractiveHistogram, rendererHelper, navigationStart, data.firstMeaningfulPaint, data.url);
       }
     }
 
-    values.addValue(new tr.v.NumericValue(
-        'firstMeaningfulPaint', firstMeaningfulPaintHistogram,
-        { description: 'time to first meaningful paint' }));
-    values.addValue(new tr.v.NumericValue(
-        'timeToFirstInteractive', firstInteractiveHistogram,
-        { description: 'time to first interactive' }));
+    values.addHistogram(firstMeaningfulPaintHistogram);
+    values.addHistogram(firstInteractiveHistogram);
   }
 
   function loadingMetric(values, model) {
-    firstContentfulPaintMetric(values, model);
-    firstMeaningfulPaintAndTimeToInteractiveMetrics(values, model);
+    timeToFirstContentfulPaintMetric(values, model);
+    timeToFirstMeaningfulPaintAndTimeToInteractiveMetrics(values, model);
   }
 
   tr.metrics.MetricRegistry.register(loadingMetric);

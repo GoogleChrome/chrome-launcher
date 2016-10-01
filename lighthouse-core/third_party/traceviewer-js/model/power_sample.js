@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,23 +10,23 @@ require("./event_registry.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   var Event = tr.model.Event;
   var EventRegistry = tr.model.EventRegistry;
 
   /**
-   * A sample that contains a power measurement (in mW).
+   * A sample that contains a power measurement (in W).
    *
    * @constructor
    * @extends {Event}
    */
-  function PowerSample(series, start, power) {
+  function PowerSample(series, start, powerInW) {
     Event.call(this);
 
     this.series_ = series;
     this.start_ = start;
-    this.power_ = power;
+    this.powerInW_ = powerInW;
   }
 
   PowerSample.prototype = {
@@ -43,27 +44,23 @@ global.tr.exportTo('tr.model', function() {
       this.start_ = value;
     },
 
-    get power() {
-      return this.power_;
+    get powerInW() {
+      return this.powerInW_;
     },
 
-    set power(value) {
-      this.power_ = value;
+    set powerInW(value) {
+      this.powerInW_ = value;
     },
 
-    addBoundsToRange: function(range) {
+    addBoundsToRange: function (range) {
       range.addValue(this.start);
     }
   };
 
-  EventRegistry.register(
-      PowerSample,
-      {
-        name: 'powerSample',
-        pluralName: 'powerSamples',
-        singleViewElementName: 'tr-ui-a-single-power-sample-sub-view',
-        multiViewElementName: 'tr-ui-a-multi-power-sample-sub-view'
-      });
+  EventRegistry.register(PowerSample, {
+    name: 'powerSample',
+    pluralName: 'powerSamples'
+  });
 
   return {
     PowerSample: PowerSample

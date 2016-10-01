@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -12,16 +13,16 @@ require("./iteration_helpers.js");
 /**
  * @fileoverview Provides event merging functionality for grouping/analysis.
  */
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   function convertEventsToRanges(events) {
-    return events.map(function(event) {
+    return events.map(function (event) {
       return tr.b.Range.fromExplicitRange(event.start, event.end);
     });
   }
 
   function mergeRanges(inRanges, mergeThreshold, mergeFunction) {
     var remainingEvents = inRanges.slice();
-    remainingEvents.sort(function(x, y) {
+    remainingEvents.sort(function (x, y) {
       return x.min - y.min;
     });
 
@@ -44,15 +45,13 @@ global.tr.exportTo('tr.b', function() {
     }
 
     function flushCurrentMergeBuffer() {
-      if (currentMergeBuffer.length == 0)
-        return;
+      if (currentMergeBuffer.length == 0) return;
 
       mergedEvents.push(mergeFunction(currentMergeBuffer));
       currentMergeBuffer = [];
 
       // Refill merge buffer if needed.
-      if (remainingEvents.length != 0)
-        beginMerging();
+      if (remainingEvents.length != 0) beginMerging();
     }
 
     beginMerging();
@@ -79,37 +78,31 @@ global.tr.exportTo('tr.b', function() {
   // Pass in |opt_totalRange| in order to find empty ranges before the first of
   // |inRanges| and after the last of |inRanges|.
   function findEmptyRangesBetweenRanges(inRanges, opt_totalRange) {
-    if (opt_totalRange && opt_totalRange.isEmpty)
-      opt_totalRange = undefined;
+    if (opt_totalRange && opt_totalRange.isEmpty) opt_totalRange = undefined;
 
     var emptyRanges = [];
     if (!inRanges.length) {
-      if (opt_totalRange)
-        emptyRanges.push(opt_totalRange);
+      if (opt_totalRange) emptyRanges.push(opt_totalRange);
       return emptyRanges;
     }
 
     inRanges = inRanges.slice();
-    inRanges.sort(function(x, y) {
+    inRanges.sort(function (x, y) {
       return x.min - y.min;
     });
-    if (opt_totalRange &&
-        (opt_totalRange.min < inRanges[0].min)) {
-      emptyRanges.push(tr.b.Range.fromExplicitRange(
-          opt_totalRange.min, inRanges[0].min));
+    if (opt_totalRange && opt_totalRange.min < inRanges[0].min) {
+      emptyRanges.push(tr.b.Range.fromExplicitRange(opt_totalRange.min, inRanges[0].min));
     }
 
-    inRanges.forEach(function(range, index) {
+    inRanges.forEach(function (range, index) {
       for (var otherIndex = 0; otherIndex < inRanges.length; ++otherIndex) {
-        if (index === otherIndex)
-          continue;
+        if (index === otherIndex) continue;
         var other = inRanges[otherIndex];
 
         if (other.min > range.max) {
           // |inRanges| is sorted, so |other| is the first range after |range|,
           // and there is an empty range between them.
-          emptyRanges.push(tr.b.Range.fromExplicitRange(
-              range.max, other.min));
+          emptyRanges.push(tr.b.Range.fromExplicitRange(range.max, other.min));
           return;
         }
         // Otherwise, |other| starts before |range| ends, so |other| might
@@ -121,9 +114,8 @@ global.tr.exportTo('tr.b', function() {
           return;
         }
       }
-      if (opt_totalRange && (range.max < opt_totalRange.max)) {
-        emptyRanges.push(tr.b.Range.fromExplicitRange(
-            range.max, opt_totalRange.max));
+      if (opt_totalRange && range.max < opt_totalRange.max) {
+        emptyRanges.push(tr.b.Range.fromExplicitRange(range.max, opt_totalRange.max));
       }
     });
     return emptyRanges;

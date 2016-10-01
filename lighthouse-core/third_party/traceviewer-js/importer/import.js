@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,10 +10,11 @@ require("../base/timing.js");
 require("./empty_importer.js");
 require("./importer.js");
 require("./user_model_builder.js");
+require("../ui/base/overlay.js");
 
 'use strict';
 
-global.tr.exportTo('tr.importer', function() {
+global.tr.exportTo('tr.importer', function () {
   var Timing = tr.b.Timing;
 
   function ImportOptions() {
@@ -27,14 +29,13 @@ global.tr.exportTo('tr.importer', function() {
     this.customizeModelCallback = undefined;
 
     var auditorTypes = tr.c.Auditor.getAllRegisteredTypeInfos();
-    this.auditorConstructors = auditorTypes.map(function(typeInfo) {
+    this.auditorConstructors = auditorTypes.map(function (typeInfo) {
       return typeInfo.constructor;
     });
   }
 
   function Import(model, opt_options) {
-    if (model === undefined)
-      throw new Error('Must provide model to import into.');
+    if (model === undefined) throw new Error('Must provide model to import into.');
 
     // TODO(dsinclair): Check the model is empty.
 
@@ -62,13 +63,12 @@ global.tr.exportTo('tr.importer', function() {
      * eventData should correspond to a single trace file and will be handled by
      * a separate importer.
      */
-    importTraces: function(traces) {
+    importTraces: function (traces) {
       var progressMeter = {
-        update: function(msg) {}
+        update: function (msg) {}
       };
 
-      tr.b.Task.RunSynchronously(
-          this.createImportTracesTask(progressMeter, traces));
+      tr.b.Task.RunSynchronously(this.createImportTracesTask(progressMeter, traces));
     },
 
     /**
@@ -76,9 +76,8 @@ global.tr.exportTo('tr.importer', function() {
      * does so using idle callbacks, putting up an import dialog
      * during the import process.
      */
-    importTracesWithProgressDialog: function(traces) {
-      if (tr.isHeadless)
-        throw new Error('Cannot use this method in headless mode.');
+    importTracesWithProgressDialog: function (traces) {
+      if (tr.isHeadless) throw new Error('Cannot use this method in headless mode.');
 
       var overlay = tr.ui.b.Overlay();
       overlay.title = 'Importing...';
@@ -86,17 +85,17 @@ global.tr.exportTo('tr.importer', function() {
       overlay.msgEl = document.createElement('div');
       Polymer.dom(overlay).appendChild(overlay.msgEl);
       overlay.msgEl.style.margin = '20px';
-      overlay.update = function(msg) {
+      overlay.update = function (msg) {
         Polymer.dom(this.msgEl).textContent = msg;
       };
       overlay.visible = true;
 
-      var promise =
-          tr.b.Task.RunWhenIdle(this.createImportTracesTask(overlay, traces));
-      promise.then(
-          function() { overlay.visible = false; },
-          function(err) { overlay.visible = false; }
-      );
+      var promise = tr.b.Task.RunWhenIdle(this.createImportTracesTask(overlay, traces));
+      promise.then(function () {
+        overlay.visible = false;
+      }, function (err) {
+        overlay.visible = false;
+      });
       return promise;
     },
 
@@ -105,9 +104,8 @@ global.tr.exportTo('tr.importer', function() {
      * updating the progressMeter as it goes. Parameters are as defined in
      * importTraces.
      */
-    createImportTracesTask: function(progressMeter, traces) {
-      if (this.importing_)
-        throw new Error('Already importing.');
+    createImportTracesTask: function (progressMeter, traces) {
+      if (this.importing_) throw new Error('Already importing.');
       this.importing_ = true;
 
       // Just some simple setup. It is useful to have a no-op first
@@ -125,8 +123,7 @@ global.tr.exportTo('tr.importer', function() {
         traces = traces.slice(0);
         progressMeter.update('Creating importers...');
         // Figure out which importers to use.
-        for (var i = 0; i < traces.length; ++i)
-          importers.push(this.createImporter_(traces[i]));
+        for (var i = 0; i < traces.length; ++i) importers.push(this.createImporter_(traces[i]));
 
         // Some traces have other traces inside them. Before doing the full
         // import, ask the importer if it has any subtraces, and if so, create
@@ -146,14 +143,13 @@ global.tr.exportTo('tr.importer', function() {
         }
 
         if (traces.length && !this.hasEventDataDecoder_(importers)) {
-          throw new Error(
-              'Could not find an importer for the provided eventData.');
+          throw new Error('Could not find an importer for the provided eventData.');
         }
 
         // Sort them on priority. This ensures importing happens in a
         // predictable order, e.g. ftrace_importer before
         // trace_event_importer.
-        importers.sort(function(x, y) {
+        importers.sort(function (x, y) {
           return x.importPriority - y.importPriority;
         });
       }, this);
@@ -161,47 +157,36 @@ global.tr.exportTo('tr.importer', function() {
       // We import clock sync markers before all other events. This is necessary
       // because we need the clock sync markers in order to know by how much we
       // need to shift the timestamps of other events.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function importClockSyncMarkers(task) {
-        importers.forEach(function(importer, index) {
-          task.subTask(Timing.wrapNamedFunction(
-              'TraceImport', importer.importerName,
-              function runImportClockSyncMarkersOnOneImporter() {
-                progressMeter.update(
-                    'Importing clock sync markers ' + (index + 1) + ' of ' +
-                      importers.length);
-                importer.importClockSyncMarkers();
-              }), this);
+      lastTask = lastTask.timedAfter('TraceImport', function importClockSyncMarkers(task) {
+        importers.forEach(function (importer, index) {
+          task.subTask(Timing.wrapNamedFunction('TraceImport', importer.importerName, function runImportClockSyncMarkersOnOneImporter() {
+            progressMeter.update('Importing clock sync markers ' + (index + 1) + ' of ' + importers.length);
+            importer.importClockSyncMarkers();
+          }), this);
         }, this);
       }, this);
 
       // Run the import.
       lastTask = lastTask.timedAfter('TraceImport', function runImport(task) {
-        importers.forEach(function(importer, index) {
-          task.subTask(Timing.wrapNamedFunction(
-              'TraceImport', importer.importerName,
-              function runImportEventsOnOneImporter() {
-                progressMeter.update(
-                    'Importing ' + (index + 1) + ' of ' + importers.length);
-                importer.importEvents();
-              }), this);
+        importers.forEach(function (importer, index) {
+          task.subTask(Timing.wrapNamedFunction('TraceImport', importer.importerName, function runImportEventsOnOneImporter() {
+            progressMeter.update('Importing ' + (index + 1) + ' of ' + importers.length);
+            importer.importEvents();
+          }), this);
         }, this);
       }, this);
 
       // Run the cusomizeModelCallback if needed.
       if (this.importOptions_.customizeModelCallback) {
-        lastTask = lastTask.timedAfter('TraceImport',
-                                       function runCustomizeCallbacks(task) {
+        lastTask = lastTask.timedAfter('TraceImport', function runCustomizeCallbacks(task) {
           this.importOptions_.customizeModelCallback(this.model_);
         }, this);
       }
 
       // Import sample data.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function importSampleData(task) {
-        importers.forEach(function(importer, index) {
-          progressMeter.update(
-              'Importing sample data ' + (index + 1) + '/' + importers.length);
+      lastTask = lastTask.timedAfter('TraceImport', function importSampleData(task) {
+        importers.forEach(function (importer, index) {
+          progressMeter.update('Importing sample data ' + (index + 1) + '/' + importers.length);
           importer.importSampleData();
         }, this);
       }, this);
@@ -214,11 +199,9 @@ global.tr.exportTo('tr.importer', function() {
       }, this);
 
       // Finalize import.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function finalizeImport(task) {
-        importers.forEach(function(importer, index) {
-          progressMeter.update(
-              'Finalizing import ' + (index + 1) + '/' + importers.length);
+      lastTask = lastTask.timedAfter('TraceImport', function finalizeImport(task) {
+        importers.forEach(function (importer, index) {
+          progressMeter.update('Finalizing import ' + (index + 1) + '/' + importers.length);
           importer.finalizeImport();
         }, this);
       }, this);
@@ -231,44 +214,38 @@ global.tr.exportTo('tr.importer', function() {
 
       // Prune empty containers.
       if (this.importOptions_.pruneEmptyContainers) {
-        lastTask = lastTask.timedAfter('TraceImport',
-                                       function runPruneEmptyContainers() {
+        lastTask = lastTask.timedAfter('TraceImport', function runPruneEmptyContainers() {
           progressMeter.update('Pruning empty containers...');
           this.model_.pruneEmptyContainers();
         }, this);
       }
 
       // Merge kernel and userland slices on each thread.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function runMergeKernelWithuserland() {
+      lastTask = lastTask.timedAfter('TraceImport', function runMergeKernelWithuserland() {
         progressMeter.update('Merging kernel with userland...');
         this.model_.mergeKernelWithUserland();
       }, this);
 
       // Create auditors
       var auditors = [];
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function createAuditorsAndRunAnnotate() {
+      lastTask = lastTask.timedAfter('TraceImport', function createAuditorsAndRunAnnotate() {
         progressMeter.update('Adding arbitrary data to model...');
-        auditors = this.importOptions_.auditorConstructors.map(
-          function(auditorConstructor) {
-            return new auditorConstructor(this.model_);
-          }, this);
-        auditors.forEach(function(auditor) {
+        auditors = this.importOptions_.auditorConstructors.map(function (auditorConstructor) {
+          return new auditorConstructor(this.model_);
+        }, this);
+        auditors.forEach(function (auditor) {
           auditor.runAnnotate();
           auditor.installUserFriendlyCategoryDriverIfNeeded();
         });
       }, this);
 
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function computeWorldBounds() {
+      lastTask = lastTask.timedAfter('TraceImport', function computeWorldBounds() {
         progressMeter.update('Computing final world bounds...');
         this.model_.computeWorldBounds(this.importOptions_.shiftWorldToZero);
       }, this);
 
       // Build the flow event interval tree.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function buildFlowEventIntervalTree() {
+      lastTask = lastTask.timedAfter('TraceImport', function buildFlowEventIntervalTree() {
         progressMeter.update('Building flow event map...');
         this.model_.buildFlowEventIntervalTree();
       }, this);
@@ -280,8 +257,7 @@ global.tr.exportTo('tr.importer', function() {
       }, this);
 
       // Delete any undeleted objects.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function cleanupUndeletedObjects() {
+      lastTask = lastTask.timedAfter('TraceImport', function cleanupUndeletedObjects() {
         progressMeter.update('Cleaning up undeleted objects...');
         this.model_.cleanupUndeletedObjects();
       }, this);
@@ -293,22 +269,19 @@ global.tr.exportTo('tr.importer', function() {
       }, this);
 
       // Finalize memory dump graphs.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function finalizeMemoryGraphs() {
+      lastTask = lastTask.timedAfter('TraceImport', function finalizeMemoryGraphs() {
         progressMeter.update('Finalizing memory dump graphs...');
         this.model_.finalizeMemoryGraphs();
       }, this);
 
       // Run initializers.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function initializeObjects() {
+      lastTask = lastTask.timedAfter('TraceImport', function initializeObjects() {
         progressMeter.update('Initializing objects (step 2/2)...');
         this.model_.initializeObjects();
       }, this);
 
       // Build event indices mapping from an event id to all flow events.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function buildEventIndices() {
+      lastTask = lastTask.timedAfter('TraceImport', function buildEventIndices() {
         progressMeter.update('Building event indices...');
         this.model_.buildEventIndices();
       }, this);
@@ -321,8 +294,7 @@ global.tr.exportTo('tr.importer', function() {
       }, this);
 
       // Sort Expectations.
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function sortExpectations() {
+      lastTask = lastTask.timedAfter('TraceImport', function sortExpectations() {
         progressMeter.update('Sorting user expectations...');
         this.model_.userModel.sortExpectations();
       }, this);
@@ -330,7 +302,7 @@ global.tr.exportTo('tr.importer', function() {
       // Run audits.
       lastTask = lastTask.timedAfter('TraceImport', function runAudits() {
         progressMeter.update('Running auditors...');
-        auditors.forEach(function(auditor) {
+        auditors.forEach(function (auditor) {
           auditor.runAudit();
         });
       }, this);
@@ -340,14 +312,12 @@ global.tr.exportTo('tr.importer', function() {
         this.model_.sortAlerts();
       }, this);
 
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function lastUpdateBounds() {
+      lastTask = lastTask.timedAfter('TraceImport', function lastUpdateBounds() {
         progressMeter.update('Update bounds...');
         this.model_.updateBounds();
       }, this);
 
-      lastTask = lastTask.timedAfter('TraceImport',
-                                     function addModelWarnings() {
+      lastTask = lastTask.timedAfter('TraceImport', function addModelWarnings() {
         progressMeter.update('Looking for warnings...');
         // Log an import warning if the clock is low resolution.
         if (!this.model_.isTimeHighResolution) {
@@ -360,25 +330,23 @@ global.tr.exportTo('tr.importer', function() {
       }, this);
 
       // Cleanup.
-      lastTask.after(function() {
+      lastTask.after(function () {
         this.importing_ = false;
       }, this);
       return importTask;
     },
 
-    createImporter_: function(eventData) {
+    createImporter_: function (eventData) {
       var importerConstructor = tr.importer.Importer.findImporterFor(eventData);
       if (!importerConstructor) {
-        throw new Error('Couldn\'t create an importer for the provided ' +
-                        'eventData.');
+        throw new Error('Couldn\'t create an importer for the provided ' + 'eventData.');
       }
       return new importerConstructor(this.model_, eventData);
     },
 
-    hasEventDataDecoder_: function(importers) {
+    hasEventDataDecoder_: function (importers) {
       for (var i = 0; i < importers.length; ++i) {
-        if (!importers[i].isTraceDataContainer())
-          return true;
+        if (!importers[i].isTraceDataContainer()) return true;
       }
 
       return false;

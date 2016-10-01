@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -11,7 +12,7 @@ require("./event_container.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   /**
    * A container holding all series of a given type of measurement.
@@ -54,11 +55,10 @@ global.tr.exportTo('tr.model', function() {
       return this.name_;
     },
 
-    childEvents: function*() {
-    },
+    childEvents: function* () {},
 
-    childEventContainers: function*() {
-      yield * this.series;
+    childEventContainers: function* () {
+      yield* this.series;
     },
 
     set timestamps(arg) {
@@ -77,14 +77,14 @@ global.tr.exportTo('tr.model', function() {
       throw new Error('Bad counter API. No cookie.');
     },
 
-    addSeries: function(series) {
+    addSeries: function (series) {
       series.counter = this;
       series.seriesIndex = this.series_.length;
       this.series_.push(series);
       return series;
     },
 
-    getSeries: function(idx) {
+    getSeries: function (idx) {
       return this.series_[idx];
     },
 
@@ -97,14 +97,12 @@ global.tr.exportTo('tr.model', function() {
     },
 
     get numSamples() {
-      if (this.series_.length === 0)
-        return 0;
+      if (this.series_.length === 0) return 0;
       return this.series_[0].length;
     },
 
     get timestamps() {
-      if (this.series_.length === 0)
-        return [];
+      if (this.series_.length === 0) return [];
       return this.series_[0].timestamps;
     },
 
@@ -120,11 +118,11 @@ global.tr.exportTo('tr.model', function() {
      * @return {Object} An array of statistics. Each element in the array
      * has data for one of the series in the selected counter.
      */
-    getSampleStatistics: function(sampleIndices) {
+    getSampleStatistics: function (sampleIndices) {
       sampleIndices.sort();
 
       var ret = [];
-      this.series_.forEach(function(series) {
+      this.series_.forEach(function (series) {
         ret.push(series.getStatistics(sampleIndices));
       });
       return ret;
@@ -134,21 +132,19 @@ global.tr.exportTo('tr.model', function() {
      * Shifts all the timestamps inside this counter forward by the amount
      * specified.
      */
-    shiftTimestampsForward: function(amount) {
-      for (var i = 0; i < this.series_.length; ++i)
-        this.series_[i].shiftTimestampsForward(amount);
+    shiftTimestampsForward: function (amount) {
+      for (var i = 0; i < this.series_.length; ++i) this.series_[i].shiftTimestampsForward(amount);
     },
 
     /**
      * Updates the bounds for this counter based on the samples it contains.
      */
-    updateBounds: function() {
+    updateBounds: function () {
       this.totals = [];
       this.maxTotal = 0;
       this.bounds.reset();
 
-      if (this.series_.length === 0)
-        return;
+      if (this.series_.length === 0) return;
 
       var firstSeries = this.series_[0];
       var lastSeries = this.series_[this.series_.length - 1];
@@ -163,7 +159,7 @@ global.tr.exportTo('tr.model', function() {
       // Note, this assumes that all series have all timestamps.
       for (var i = 0; i < firstSeries.length; ++i) {
         var total = 0;
-        this.series_.forEach(function(series) {
+        this.series_.forEach(function (series) {
           total += series.getSample(i).value;
           this.totals.push(total);
         }.bind(this));
@@ -176,13 +172,11 @@ global.tr.exportTo('tr.model', function() {
   /**
    * Comparison between counters that orders by parent.compareTo, then name.
    */
-  Counter.compare = function(x, y) {
+  Counter.compare = function (x, y) {
     var tmp = x.parent.compareTo(y);
-    if (tmp != 0)
-      return tmp;
+    if (tmp != 0) return tmp;
     var tmp = x.name.localeCompare(y.name);
-    if (tmp == 0)
-      return x.tid - y.tid;
+    if (tmp == 0) return x.tid - y.tid;
     return tmp;
   };
 

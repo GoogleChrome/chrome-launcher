@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("../../base/base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.ui.b', function() {
+global.tr.exportTo('tr.ui.b', function () {
 
   /**
    * Decorates elements as an instance of a class.
@@ -20,14 +21,10 @@ global.tr.exportTo('tr.ui.b', function() {
    */
   function decorate(source, constr) {
     var elements;
-    if (typeof source == 'string')
-      elements = tr.doc.querySelectorAll(source);
-    else
-      elements = [source];
+    if (typeof source == 'string') elements = Polymer.dom(tr.doc).querySelectorAll(source);else elements = [source];
 
     for (var i = 0, el; el = elements[i]; i++) {
-      if (!(el instanceof constr))
-        constr.decorate(el);
+      if (!(el instanceof constr)) constr.decorate(el);
     }
   }
 
@@ -59,8 +56,7 @@ global.tr.exportTo('tr.ui.b', function() {
    *     subclassing by passing in opt_parentConstructor, this is used for
    *     debugging. If not subclassing, then it is the tag name that will be
    *     created by the component.
-
-   * @param {function=} opt_parentConstructor The parent class for this new
+    * @param {function=} opt_parentConstructor The parent class for this new
    *     element, if subclassing is desired. If provided, the parent class must
    *     be also a function created by tr.ui.b.define.
    *
@@ -73,22 +69,18 @@ global.tr.exportTo('tr.ui.b', function() {
    */
   function define(className, opt_parentConstructor, opt_tagNS) {
     if (typeof className == 'function') {
-      throw new Error('Passing functions as className is deprecated. Please ' +
-                      'use (className, opt_parentConstructor) to subclass');
+      throw new Error('Passing functions as className is deprecated. Please ' + 'use (className, opt_parentConstructor) to subclass');
     }
 
     var className = className.toLowerCase();
-    if (opt_parentConstructor && !opt_parentConstructor.tagName)
-      throw new Error('opt_parentConstructor was not ' +
-                      'created by tr.ui.b.define');
+    if (opt_parentConstructor && !opt_parentConstructor.tagName) throw new Error('opt_parentConstructor was not ' + 'created by tr.ui.b.define');
 
     // Walk up the parent constructors until we can find the type of tag
     // to create.
     var tagName = className;
     var tagNS = undefined;
     if (opt_parentConstructor) {
-      if (opt_tagNS)
-        throw new Error('Must not specify tagNS if parentConstructor is given');
+      if (opt_tagNS) throw new Error('Must not specify tagNS if parentConstructor is given');
       var parent = opt_parentConstructor;
       while (parent && parent.tagName) {
         tagName = parent.tagName;
@@ -107,18 +99,12 @@ global.tr.exportTo('tr.ui.b', function() {
      * @constructor
      */
     function f() {
-      if (opt_parentConstructor &&
-          f.prototype.__proto__ != opt_parentConstructor.prototype) {
-        throw new Error(
-            className + ' prototye\'s __proto__ field is messed up. ' +
-            'It MUST be the prototype of ' + opt_parentConstructor.tagName);
+      if (opt_parentConstructor && f.prototype.__proto__ != opt_parentConstructor.prototype) {
+        throw new Error(className + ' prototye\'s __proto__ field is messed up. ' + 'It MUST be the prototype of ' + opt_parentConstructor.tagName);
       }
 
       var el;
-      if (tagNS === undefined)
-        el = tr.doc.createElement(tagName);
-      else
-        el = tr.doc.createElementNS(tagNS, tagName);
+      if (tagNS === undefined) el = tr.doc.createElement(tagName);else el = tr.doc.createElementNS(tagNS, tagName);
       f.decorate.call(this, el, arguments);
       return el;
     }
@@ -127,7 +113,7 @@ global.tr.exportTo('tr.ui.b', function() {
      * Decorates an element as a UI element class.
      * @param {!Element} el The element to decorate.
      */
-    f.decorate = function(el) {
+    f.decorate = function (el) {
       el.__proto__ = f.prototype;
       el.decorate.apply(el, arguments[1]);
       el.constructor = f;
@@ -136,11 +122,9 @@ global.tr.exportTo('tr.ui.b', function() {
     f.className = className;
     f.tagName = tagName;
     f.tagNS = tagNS;
-    f.parentConstructor = (opt_parentConstructor ? opt_parentConstructor :
-                                                   undefined);
-    f.toString = function() {
-      if (!f.parentConstructor)
-        return f.tagName;
+    f.parentConstructor = opt_parentConstructor ? opt_parentConstructor : undefined;
+    f.toString = function () {
+      if (!f.parentConstructor) return f.tagName;
       return f.parentConstructor.toString() + '::' + f.className;
     };
 
@@ -148,14 +132,12 @@ global.tr.exportTo('tr.ui.b', function() {
   }
 
   function elementIsChildOf(el, potentialParent) {
-    if (el == potentialParent)
-      return false;
+    if (el == potentialParent) return false;
 
     var cur = el;
-    while (cur.parentNode) {
-      if (cur == potentialParent)
-        return true;
-      cur = cur.parentNode;
+    while (Polymer.dom(cur).parentNode) {
+      if (cur == potentialParent) return true;
+      cur = Polymer.dom(cur).parentNode;
     }
     return false;
   };

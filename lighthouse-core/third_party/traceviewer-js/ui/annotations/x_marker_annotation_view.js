@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./annotation_view.js");
 
 'use strict';
 
-global.tr.exportTo('tr.ui.annotations', function() {
+global.tr.exportTo('tr.ui.annotations', function () {
   /**
    * A view that draws a vertical line on the timeline at a specific timestamp.
    * @extends {AnnotationView}
@@ -22,7 +23,7 @@ global.tr.exportTo('tr.ui.annotations', function() {
   XMarkerAnnotationView.prototype = {
     __proto__: tr.ui.annotations.AnnotationView.prototype,
 
-    draw: function(ctx) {
+    draw: function (ctx) {
       var dt = this.viewport_.currentDisplayTransform;
       var viewX = dt.xWorldToView(this.annotation_.timestamp);
 

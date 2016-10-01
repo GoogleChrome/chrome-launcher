@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,7 +10,7 @@ require("./event_container.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var CounterSample = tr.model.CounterSample;
 
   /**
@@ -59,26 +60,26 @@ global.tr.exportTo('tr.model', function() {
       return this.timestamps_;
     },
 
-    getSample: function(idx) {
+    getSample: function (idx) {
       return this.samples_[idx];
     },
 
-    getTimestamp: function(idx) {
+    getTimestamp: function (idx) {
       return this.timestamps_[idx];
     },
 
-    addCounterSample: function(ts, val) {
+    addCounterSample: function (ts, val) {
       var sample = new CounterSample(this, ts, val);
       this.addSample(sample);
       return sample;
     },
 
-    addSample: function(sample) {
+    addSample: function (sample) {
       this.timestamps_.push(sample.timestamp);
       this.samples_.push(sample);
     },
 
-    getStatistics: function(sampleIndices) {
+    getStatistics: function (sampleIndices) {
       var sum = 0;
       var min = Number.MAX_VALUE;
       var max = -Number.MAX_VALUE;
@@ -94,25 +95,24 @@ global.tr.exportTo('tr.model', function() {
       return {
         min: min,
         max: max,
-        avg: (sum / sampleIndices.length),
+        avg: sum / sampleIndices.length,
         start: this.getSample(sampleIndices[0]).value,
         end: this.getSample(sampleIndices.length - 1).value
       };
     },
 
-    shiftTimestampsForward: function(amount) {
+    shiftTimestampsForward: function (amount) {
       for (var i = 0; i < this.timestamps_.length; ++i) {
         this.timestamps_[i] += amount;
         this.samples_[i].timestamp = this.timestamps_[i];
       }
     },
 
-    childEvents: function*() {
-      yield * this.samples_;
+    childEvents: function* () {
+      yield* this.samples_;
     },
 
-    childEventContainers: function*() {
-    }
+    childEventContainers: function* () {}
   };
 
   return {

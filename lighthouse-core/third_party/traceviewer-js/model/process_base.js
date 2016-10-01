@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -16,7 +17,7 @@ require("./thread.js");
 /**
  * @fileoverview Provides the ProcessBase class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
 
   var Thread = tr.model.Thread;
   var Counter = tr.model.Counter;
@@ -29,8 +30,7 @@ global.tr.exportTo('tr.model', function() {
    * @extends {tr.model.EventContainer}
    */
   function ProcessBase(model) {
-    if (!model)
-      throw new Error('Must provide a model');
+    if (!model) throw new Error('Must provide a model');
     tr.model.EventContainer.call(this);
     this.model = model;
     this.threads = {};
@@ -39,7 +39,7 @@ global.tr.exportTo('tr.model', function() {
     this.sortIndex = 0;
   };
 
-  ProcessBase.compare = function(x, y) {
+  ProcessBase.compare = function (x, y) {
     return x.sortIndex - y.sortIndex;
   };
 
@@ -50,16 +50,15 @@ global.tr.exportTo('tr.model', function() {
       throw new Error('Not implemented');
     },
 
-    childEventContainers: function*() {
-      yield * tr.b.dictionaryValues(this.threads);
-      yield * tr.b.dictionaryValues(this.counters);
+    childEventContainers: function* () {
+      yield* tr.b.dictionaryValues(this.threads);
+      yield* tr.b.dictionaryValues(this.counters);
       yield this.objects;
     },
 
-    iterateAllPersistableObjects: function(cb) {
+    iterateAllPersistableObjects: function (cb) {
       cb(this);
-      for (var tid in this.threads)
-        this.threads[tid].iterateAllPersistableObjects(cb);
+      for (var tid in this.threads) this.threads[tid].iterateAllPersistableObjects(cb);
     },
 
     /**
@@ -77,22 +76,21 @@ global.tr.exportTo('tr.model', function() {
      * Shifts all the timestamps inside this process forward by the amount
      * specified.
      */
-    shiftTimestampsForward: function(amount) {
-      for (var child of this.childEventContainers())
-        child.shiftTimestampsForward(amount);
+    shiftTimestampsForward: function (amount) {
+      for (var child of this.childEventContainers()) child.shiftTimestampsForward(amount);
     },
 
     /**
      * Closes any open slices.
      */
-    autoCloseOpenSlices: function() {
+    autoCloseOpenSlices: function () {
       for (var tid in this.threads) {
         var thread = this.threads[tid];
         thread.autoCloseOpenSlices();
       }
     },
 
-    autoDeleteObjects: function(maxTimestamp) {
+    autoDeleteObjects: function (maxTimestamp) {
       this.objects.autoDeleteObjects(maxTimestamp);
     },
 
@@ -100,28 +98,28 @@ global.tr.exportTo('tr.model', function() {
      * Called by the model after finalizing imports,
      * but before joining refs.
      */
-    preInitializeObjects: function() {
+    preInitializeObjects: function () {
       this.objects.preInitializeAllObjects();
     },
 
     /**
      * Called by the model after joining refs.
      */
-    initializeObjects: function() {
+    initializeObjects: function () {
       this.objects.initializeAllObjects();
     },
 
     /**
      * Merge slices from the kernel with those from userland for each thread.
      */
-    mergeKernelWithUserland: function() {
+    mergeKernelWithUserland: function () {
       for (var tid in this.threads) {
         var thread = this.threads[tid];
         thread.mergeKernelWithUserland();
       }
     },
 
-    updateBounds: function() {
+    updateBounds: function () {
       this.bounds.reset();
       for (var tid in this.threads) {
         this.threads[tid].updateBounds();
@@ -135,20 +133,17 @@ global.tr.exportTo('tr.model', function() {
       this.bounds.addRange(this.objects.bounds);
     },
 
-    addCategoriesToDict: function(categoriesDict) {
-      for (var tid in this.threads)
-        this.threads[tid].addCategoriesToDict(categoriesDict);
-      for (var id in this.counters)
-        categoriesDict[this.counters[id].category] = true;
+    addCategoriesToDict: function (categoriesDict) {
+      for (var tid in this.threads) this.threads[tid].addCategoriesToDict(categoriesDict);
+      for (var id in this.counters) categoriesDict[this.counters[id].category] = true;
       this.objects.addCategoriesToDict(categoriesDict);
     },
 
-    findAllThreadsMatching: function(predicate, opt_this) {
+    findAllThreadsMatching: function (predicate, opt_this) {
       var threads = [];
       for (var tid in this.threads) {
         var thread = this.threads[tid];
-        if (predicate.call(opt_this, thread))
-          threads.push(thread);
+        if (predicate.call(opt_this, thread)) threads.push(thread);
       }
       return threads;
     },
@@ -157,33 +152,29 @@ global.tr.exportTo('tr.model', function() {
      * @param {String} The name of the thread to find.
      * @return {Array} An array of all the matched threads.
      */
-    findAllThreadsNamed: function(name) {
-      var threads = this.findAllThreadsMatching(function(thread) {
-        if (!thread.name)
-          return false;
+    findAllThreadsNamed: function (name) {
+      var threads = this.findAllThreadsMatching(function (thread) {
+        if (!thread.name) return false;
         return thread.name === name;
       });
       return threads;
     },
 
-    findAtMostOneThreadNamed: function(name) {
+    findAtMostOneThreadNamed: function (name) {
       var threads = this.findAllThreadsNamed(name);
-      if (threads.length === 0)
-        return undefined;
-      if (threads.length > 1)
-        throw new Error('Expected no more than one ' + name);
+      if (threads.length === 0) return undefined;
+      if (threads.length > 1) throw new Error('Expected no more than one ' + name);
       return threads[0];
     },
 
     /**
      * Removes threads from the process that are fully empty.
      */
-    pruneEmptyContainers: function() {
+    pruneEmptyContainers: function () {
       var threadsToKeep = {};
       for (var tid in this.threads) {
         var thread = this.threads[tid];
-        if (!thread.isEmpty)
-          threadsToKeep[tid] = thread;
+        if (!thread.isEmpty) threadsToKeep[tid] = thread;
       }
       this.threads = threadsToKeep;
     },
@@ -192,7 +183,7 @@ global.tr.exportTo('tr.model', function() {
      * @return {TimelineThread} The thread identified by tid on this process,
      * or undefined if it doesn't exist.
      */
-    getThread: function(tid) {
+    getThread: function (tid) {
       return this.threads[tid];
     },
 
@@ -200,9 +191,8 @@ global.tr.exportTo('tr.model', function() {
      * @return {TimelineThread} The thread identified by tid on this process,
      * creating it if it doesn't exist.
      */
-    getOrCreateThread: function(tid) {
-      if (!this.threads[tid])
-        this.threads[tid] = new Thread(this, tid);
+    getOrCreateThread: function (tid) {
+      if (!this.threads[tid]) this.threads[tid] = new Thread(this, tid);
       return this.threads[tid];
     },
 
@@ -210,20 +200,18 @@ global.tr.exportTo('tr.model', function() {
      * @return {Counter} The counter on this process with the given
      * category/name combination, creating it if it doesn't exist.
      */
-    getOrCreateCounter: function(cat, name) {
+    getOrCreateCounter: function (cat, name) {
       var id = cat + '.' + name;
-      if (!this.counters[id])
-        this.counters[id] = new Counter(this, id, cat, name);
+      if (!this.counters[id]) this.counters[id] = new Counter(this, id, cat, name);
       return this.counters[id];
     },
 
-    getSettingsKey: function() {
+    getSettingsKey: function () {
       throw new Error('Not implemented');
     },
 
-    createSubSlices: function() {
-      for (var tid in this.threads)
-        this.threads[tid].createSubSlices();
+    createSubSlices: function () {
+      for (var tid in this.threads) this.threads[tid].createSubSlices();
     }
   };
 

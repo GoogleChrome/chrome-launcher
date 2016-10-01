@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -12,7 +13,7 @@ require("../base/extension_registry.js");
 /**
  * @fileoverview Base class for auditors.
  */
-global.tr.exportTo('tr.c', function() {
+global.tr.exportTo('tr.c', function () {
   function Auditor(model) {
     this.model_ = model;
   }
@@ -27,21 +28,18 @@ global.tr.exportTo('tr.c', function() {
     /**
      * Called by the Model after baking slices. May modify model.
      */
-    runAnnotate: function() {
-    },
+    runAnnotate: function () {},
 
     /**
      * Called by import to install userFriendlyCategoryDriver.
      */
-    installUserFriendlyCategoryDriverIfNeeded: function() {
-    },
+    installUserFriendlyCategoryDriverIfNeeded: function () {},
 
     /**
      * Called by the Model after importing. Should not modify model, except
      * for adding interaction ranges and audits.
      */
-    runAudit: function() {
-    }
+    runAudit: function () {}
   };
 
   var options = new tr.b.ExtensionRegistryOptions(tr.b.BASIC_REGISTRY_MODE);

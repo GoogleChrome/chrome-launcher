@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2012 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -10,6 +11,8 @@ require("../base/interval_tree.js");
 require("../base/quad.js");
 require("../base/range.js");
 require("../base/task.js");
+require("../base/time_display_modes.js");
+require("../base/unit.js");
 require("../core/auditor.js");
 require("../core/filter.js");
 require("./alert.js");
@@ -30,8 +33,6 @@ require("./sample.js");
 require("./stack_frame.js");
 require("./user_model/user_expectation.js");
 require("./user_model/user_model.js");
-require("../value/time_display_mode.js");
-require("../value/unit.js");
 
 'use strict';
 
@@ -51,7 +52,7 @@ require("../value/unit.js");
  * nesting tasks.
  *
  */
-global.tr.exportTo('tr', function() {
+global.tr.exportTo('tr', function () {
   var Process = tr.model.Process;
   var Device = tr.model.Device;
   var Kernel = tr.model.Kernel;
@@ -88,7 +89,7 @@ global.tr.exportTo('tr', function() {
     this.alerts = [];
     this.userModel = new tr.model.um.UserModel(this);
 
-    this.flowIntervalTree = new tr.b.IntervalTree((f) => f.start, (f) => f.end);
+    this.flowIntervalTree = new tr.b.IntervalTree(f => f.start, f => f.end);
     this.globalMemoryDumps = [];
 
     this.userFriendlyCategoryDrivers_ = [];
@@ -113,7 +114,7 @@ global.tr.exportTo('tr', function() {
   Model.prototype = {
     __proto__: tr.model.EventContainer.prototype,
 
-    getEventByStableId: function(stableId) {
+    getEventByStableId: function (stableId) {
       if (this.eventsByStableId_ === undefined) {
         this.eventsByStableId_ = {};
         for (var event of this.getDescendantEvents()) {
@@ -123,39 +124,34 @@ global.tr.exportTo('tr', function() {
       return this.eventsByStableId_[stableId];
     },
 
-    getOrCreateHelper: function(constructor) {
-      if (!constructor.guid)
-        throw new Error('Helper constructors must have GUIDs');
+    getOrCreateHelper: function (constructor) {
+      if (!constructor.guid) throw new Error('Helper constructors must have GUIDs');
 
       if (this.helpersByConstructorGUID_[constructor.guid] === undefined) {
-        if (this.doesHelperGUIDSupportThisModel_[constructor.guid] ===
-            undefined) {
-          this.doesHelperGUIDSupportThisModel_[constructor.guid] =
-            constructor.supportsModel(this);
+        if (this.doesHelperGUIDSupportThisModel_[constructor.guid] === undefined) {
+          this.doesHelperGUIDSupportThisModel_[constructor.guid] = constructor.supportsModel(this);
         }
 
-        if (!this.doesHelperGUIDSupportThisModel_[constructor.guid])
-          return undefined;
+        if (!this.doesHelperGUIDSupportThisModel_[constructor.guid]) return undefined;
 
-        this.helpersByConstructorGUID_[constructor.guid] = new constructor(
-            this);
+        this.helpersByConstructorGUID_[constructor.guid] = new constructor(this);
       }
       return this.helpersByConstructorGUID_[constructor.guid];
     },
 
-    childEvents: function*() {
-      yield * this.globalMemoryDumps;
-      yield * this.instantEvents;
-      yield * this.flowEvents;
-      yield * this.alerts;
-      yield * this.samples;
+    childEvents: function* () {
+      yield* this.globalMemoryDumps;
+      yield* this.instantEvents;
+      yield* this.flowEvents;
+      yield* this.alerts;
+      yield* this.samples;
     },
 
-    childEventContainers: function*() {
+    childEventContainers: function* () {
       yield this.userModel;
       yield this.device;
       yield this.kernel;
-      yield * tr.b.dictionaryValues(this.processes);
+      yield* tr.b.dictionaryValues(this.processes);
     },
 
     /**
@@ -163,45 +159,38 @@ global.tr.exportTo('tr', function() {
      *
      * This iterates through them.
      */
-    iterateAllPersistableObjects: function(callback) {
+    iterateAllPersistableObjects: function (callback) {
       this.kernel.iterateAllPersistableObjects(callback);
-      for (var pid in this.processes)
-        this.processes[pid].iterateAllPersistableObjects(callback);
+      for (var pid in this.processes) this.processes[pid].iterateAllPersistableObjects(callback);
     },
 
-    updateBounds: function() {
+    updateBounds: function () {
       this.bounds.reset();
       var bounds = this.bounds;
       for (var ec of this.childEventContainers()) {
         ec.updateBounds();
         bounds.addRange(ec.bounds);
       }
-      for (var event of this.childEvents())
-        event.addBoundsToRange(bounds);
+      for (var event of this.childEvents()) event.addBoundsToRange(bounds);
     },
 
-    shiftWorldToZero: function() {
+    shiftWorldToZero: function () {
       var shiftAmount = -this.bounds.min;
       this.timestampShiftToZeroAmount_ = shiftAmount;
-      for (var ec of this.childEventContainers())
-        ec.shiftTimestampsForward(shiftAmount);
+      for (var ec of this.childEventContainers()) ec.shiftTimestampsForward(shiftAmount);
 
-      for (var event of this.childEvents())
-        event.start += shiftAmount;
+      for (var event of this.childEvents()) event.start += shiftAmount;
       this.updateBounds();
     },
 
-    convertTimestampToModelTime: function(sourceClockDomainName, ts) {
-      if (sourceClockDomainName !== 'traceEventClock')
-        throw new Error('Only traceEventClock is supported.');
-      return tr.v.Unit.timestampFromUs(ts) +
-        this.timestampShiftToZeroAmount_;
+    convertTimestampToModelTime: function (sourceClockDomainName, ts) {
+      if (sourceClockDomainName !== 'traceEventClock') throw new Error('Only traceEventClock is supported.');
+      return tr.b.Unit.timestampFromUs(ts) + this.timestampShiftToZeroAmount_;
     },
 
     get numProcesses() {
       var n = 0;
-      for (var p in this.processes)
-        n++;
+      for (var p in this.processes) n++;
       return n;
     },
 
@@ -209,7 +198,7 @@ global.tr.exportTo('tr', function() {
      * @return {Process} Gets a TimelineProcess for a specified pid. Returns
      * undefined if the process doesn't exist.
      */
-    getProcess: function(pid) {
+    getProcess: function (pid) {
       return this.processes[pid];
     },
 
@@ -217,15 +206,13 @@ global.tr.exportTo('tr', function() {
      * @return {Process} Gets a TimelineProcess for a specified pid or
      * creates one if it does not exist.
      */
-    getOrCreateProcess: function(pid) {
-      if (!this.processes[pid])
-        this.processes[pid] = new Process(this, pid);
+    getOrCreateProcess: function (pid) {
+      if (!this.processes[pid]) this.processes[pid] = new Process(this, pid);
       return this.processes[pid];
     },
 
-    addStackFrame: function(stackFrame) {
-      if (this.stackFrames[stackFrame.id])
-        throw new Error('Stack frame already exists');
+    addStackFrame: function (stackFrame) {
+      if (this.stackFrames[stackFrame.id]) throw new Error('Stack frame already exists');
       this.stackFrames[stackFrame.id] = stackFrame;
       return stackFrame;
     },
@@ -233,21 +220,18 @@ global.tr.exportTo('tr', function() {
     /**
      * Generates the set of categories from the slices and counters.
      */
-    updateCategories_: function() {
+    updateCategories_: function () {
       var categoriesDict = {};
       this.userModel.addCategoriesToDict(categoriesDict);
       this.device.addCategoriesToDict(categoriesDict);
       this.kernel.addCategoriesToDict(categoriesDict);
-      for (var pid in this.processes)
-        this.processes[pid].addCategoriesToDict(categoriesDict);
+      for (var pid in this.processes) this.processes[pid].addCategoriesToDict(categoriesDict);
 
       this.categories = [];
-      for (var category in categoriesDict)
-        if (category != '')
-          this.categories.push(category);
+      for (var category in categoriesDict) if (category != '') this.categories.push(category);
     },
 
-    getAllThreads: function() {
+    getAllThreads: function () {
       var threads = [];
       for (var tid in this.kernel.threads) {
         threads.push(process.threads[tid]);
@@ -267,12 +251,11 @@ global.tr.exportTo('tr', function() {
      *     process in the model will be returned.
      * @return {!Array<!tr.model.Process>} An array of processes in the model.
      */
-    getAllProcesses: function(opt_predicate) {
+    getAllProcesses: function (opt_predicate) {
       var processes = [];
       for (var pid in this.processes) {
         var process = this.processes[pid];
-        if (opt_predicate === undefined || opt_predicate(process))
-          processes.push(process);
+        if (opt_predicate === undefined || opt_predicate(process)) processes.push(process);
       }
       return processes;
     },
@@ -280,12 +263,10 @@ global.tr.exportTo('tr', function() {
     /**
      * @return {Array} An array of all the counters in the model.
      */
-    getAllCounters: function() {
+    getAllCounters: function () {
       var counters = [];
-      counters.push.apply(
-          counters, tr.b.dictionaryValues(this.device.counters));
-      counters.push.apply(
-          counters, tr.b.dictionaryValues(this.kernel.counters));
+      counters.push.apply(counters, tr.b.dictionaryValues(this.device.counters));
+      counters.push.apply(counters, tr.b.dictionaryValues(this.kernel.counters));
       for (var pid in this.processes) {
         var process = this.processes[pid];
         for (var tid in process.counters) {
@@ -295,29 +276,28 @@ global.tr.exportTo('tr', function() {
       return counters;
     },
 
-    getAnnotationByGUID: function(guid) {
+    getAnnotationByGUID: function (guid) {
       return this.annotationsByGuid_[guid];
     },
 
-    addAnnotation: function(annotation) {
-      if (!annotation.guid)
-        throw new Error('Annotation with undefined guid given');
+    addAnnotation: function (annotation) {
+      if (!annotation.guid) throw new Error('Annotation with undefined guid given');
 
       this.annotationsByGuid_[annotation.guid] = annotation;
       tr.b.dispatchSimpleEvent(this, 'annotationChange');
     },
 
-    removeAnnotation: function(annotation) {
+    removeAnnotation: function (annotation) {
       this.annotationsByGuid_[annotation.guid].onRemove();
       delete this.annotationsByGuid_[annotation.guid];
       tr.b.dispatchSimpleEvent(this, 'annotationChange');
     },
 
-    getAllAnnotations: function() {
+    getAllAnnotations: function () {
       return tr.b.dictionaryValues(this.annotationsByGuid_);
     },
 
-    addUserFriendlyCategoryDriver: function(ufcd) {
+    addUserFriendlyCategoryDriver: function (ufcd) {
       this.userFriendlyCategoryDrivers_.push(ufcd);
     },
 
@@ -326,11 +306,10 @@ global.tr.exportTo('tr', function() {
      *
      * Returns undefined if none is known.
      */
-    getUserFriendlyCategoryFromEvent: function(event) {
+    getUserFriendlyCategoryFromEvent: function (event) {
       for (var i = 0; i < this.userFriendlyCategoryDrivers_.length; i++) {
         var ufc = this.userFriendlyCategoryDrivers_[i].fromEvent(event);
-        if (ufc !== undefined)
-          return ufc;
+        if (ufc !== undefined) return ufc;
       }
       return undefined;
     },
@@ -339,15 +318,11 @@ global.tr.exportTo('tr', function() {
      * @param {String} The name of the thread to find.
      * @return {Array} An array of all the matched threads.
      */
-    findAllThreadsNamed: function(name) {
+    findAllThreadsNamed: function (name) {
       var namedThreads = [];
-      namedThreads.push.apply(
-          namedThreads,
-          this.kernel.findAllThreadsNamed(name));
+      namedThreads.push.apply(namedThreads, this.kernel.findAllThreadsNamed(name));
       for (var pid in this.processes) {
-        namedThreads.push.apply(
-            namedThreads,
-            this.processes[pid].findAllThreadsNamed(name));
+        namedThreads.push.apply(namedThreads, this.processes[pid].findAllThreadsNamed(name));
       }
       return namedThreads;
     },
@@ -365,16 +340,13 @@ global.tr.exportTo('tr', function() {
      * precision of the timestamp values.
      */
     get intrinsicTimeUnit() {
-      if (this.intrinsicTimeUnit_ === undefined)
-        return tr.v.TimeDisplayModes.ms;
+      if (this.intrinsicTimeUnit_ === undefined) return tr.b.TimeDisplayModes.ms;
       return this.intrinsicTimeUnit_;
     },
 
     set intrinsicTimeUnit(value) {
-      if (this.intrinsicTimeUnit_ === value)
-        return;
-      if (this.intrinsicTimeUnit_ !== undefined)
-        throw new Error('Intrinsic time unit already set');
+      if (this.intrinsicTimeUnit_ === value) return;
+      if (this.intrinsicTimeUnit_ !== undefined) throw new Error('Intrinsic time unit already set');
       this.intrinsicTimeUnit_ = value;
     },
 
@@ -396,10 +368,8 @@ global.tr.exportTo('tr', function() {
     },
 
     set canonicalUrl(value) {
-      if (this.canonicalUrl_ === value)
-        return;
-      if (this.canonicalUrl_ !== undefined)
-        throw new Error('canonicalUrl already set');
+      if (this.canonicalUrl_ === value) return;
+      if (this.canonicalUrl_ !== undefined) throw new Error('canonicalUrl already set');
       this.canonicalUrl_ = value;
     },
 
@@ -414,24 +384,22 @@ global.tr.exportTo('tr', function() {
      *    should output the message, we'll only output one message of each type.
      *    The message is the actual warning content.
      */
-    importWarning: function(data) {
+    importWarning: function (data) {
       data.showToUser = !!data.showToUser;
 
       this.importWarnings_.push(data);
 
       // Only log each warning type once. We may want to add some kind of
       // flag to allow reporting all importer warnings.
-      if (this.reportedImportWarnings_[data.type] === true)
-        return;
+      if (this.reportedImportWarnings_[data.type] === true) return;
 
-      if (this.importOptions_.showImportWarnings)
-        console.warn(data.message);
+      if (this.importOptions_.showImportWarnings) console.warn(data.message);
 
       this.reportedImportWarnings_[data.type] = true;
     },
 
     get hasImportWarnings() {
-      return (this.importWarnings_.length > 0);
+      return this.importWarnings_.length > 0;
     },
 
     get importWarnings() {
@@ -439,59 +407,52 @@ global.tr.exportTo('tr', function() {
     },
 
     get importWarningsThatShouldBeShownToUser() {
-      return this.importWarnings_.filter(function(warning) {
+      return this.importWarnings_.filter(function (warning) {
         return warning.showToUser;
       });
     },
 
-    autoCloseOpenSlices: function() {
+    autoCloseOpenSlices: function () {
       // Sort the samples.
-      this.samples.sort(function(x, y) {
+      this.samples.sort(function (x, y) {
         return x.start - y.start;
       });
 
       this.updateBounds();
       this.kernel.autoCloseOpenSlices();
-      for (var pid in this.processes)
-        this.processes[pid].autoCloseOpenSlices();
+      for (var pid in this.processes) this.processes[pid].autoCloseOpenSlices();
     },
 
-    createSubSlices: function() {
+    createSubSlices: function () {
       this.kernel.createSubSlices();
-      for (var pid in this.processes)
-        this.processes[pid].createSubSlices();
+      for (var pid in this.processes) this.processes[pid].createSubSlices();
     },
 
-    preInitializeObjects: function() {
-      for (var pid in this.processes)
-        this.processes[pid].preInitializeObjects();
+    preInitializeObjects: function () {
+      for (var pid in this.processes) this.processes[pid].preInitializeObjects();
     },
 
-    initializeObjects: function() {
-      for (var pid in this.processes)
-        this.processes[pid].initializeObjects();
+    initializeObjects: function () {
+      for (var pid in this.processes) this.processes[pid].initializeObjects();
     },
 
-    pruneEmptyContainers: function() {
+    pruneEmptyContainers: function () {
       this.kernel.pruneEmptyContainers();
-      for (var pid in this.processes)
-        this.processes[pid].pruneEmptyContainers();
+      for (var pid in this.processes) this.processes[pid].pruneEmptyContainers();
     },
 
-    mergeKernelWithUserland: function() {
-      for (var pid in this.processes)
-        this.processes[pid].mergeKernelWithUserland();
+    mergeKernelWithUserland: function () {
+      for (var pid in this.processes) this.processes[pid].mergeKernelWithUserland();
     },
 
-    computeWorldBounds: function(shiftWorldToZero) {
+    computeWorldBounds: function (shiftWorldToZero) {
       this.updateBounds();
       this.updateCategories_();
 
-      if (shiftWorldToZero)
-        this.shiftWorldToZero();
+      if (shiftWorldToZero) this.shiftWorldToZero();
     },
 
-    buildFlowEventIntervalTree: function() {
+    buildFlowEventIntervalTree: function () {
       for (var i = 0; i < this.flowEvents.length; ++i) {
         var flowEvent = this.flowEvents[i];
         this.flowIntervalTree.insert(flowEvent);
@@ -499,43 +460,40 @@ global.tr.exportTo('tr', function() {
       this.flowIntervalTree.updateHighValues();
     },
 
-    cleanupUndeletedObjects: function() {
-      for (var pid in this.processes)
-        this.processes[pid].autoDeleteObjects(this.bounds.max);
+    cleanupUndeletedObjects: function () {
+      for (var pid in this.processes) this.processes[pid].autoDeleteObjects(this.bounds.max);
     },
 
-    sortMemoryDumps: function() {
-      this.globalMemoryDumps.sort(function(x, y) {
+    sortMemoryDumps: function () {
+      this.globalMemoryDumps.sort(function (x, y) {
         return x.start - y.start;
       });
 
-      for (var pid in this.processes)
-        this.processes[pid].sortMemoryDumps();
+      for (var pid in this.processes) this.processes[pid].sortMemoryDumps();
     },
 
-    finalizeMemoryGraphs: function() {
-      this.globalMemoryDumps.forEach(function(dump) {
+    finalizeMemoryGraphs: function () {
+      this.globalMemoryDumps.forEach(function (dump) {
         dump.finalizeGraph();
       });
     },
 
-    buildEventIndices: function() {
+    buildEventIndices: function () {
       this.modelIndices = new tr.model.ModelIndices(this);
     },
 
-    sortAlerts: function() {
-      this.alerts.sort(function(x, y) {
+    sortAlerts: function () {
+      this.alerts.sort(function (x, y) {
         return x.start - y.start;
       });
     },
 
-    applyObjectRefPatchups: function() {
+    applyObjectRefPatchups: function () {
       // Change all the fields pointing at id_refs to their real values.
       var unresolved = [];
-      this.patchupsToApply_.forEach(function(patchup) {
+      this.patchupsToApply_.forEach(function (patchup) {
         if (patchup.pidRef in this.processes) {
-          var snapshot = this.processes[patchup.pidRef].objects.getSnapshotAt(
-              patchup.scopedId, patchup.ts);
+          var snapshot = this.processes[patchup.pidRef].objects.getSnapshotAt(patchup.scopedId, patchup.ts);
           if (snapshot) {
             patchup.object[patchup.field] = snapshot;
             snapshot.referencedAt(patchup.item, patchup.object, patchup.field);
@@ -547,10 +505,11 @@ global.tr.exportTo('tr', function() {
       this.patchupsToApply_ = unresolved;
     },
 
-    replacePIDRefsInPatchups: function(old_pid_ref, new_pid_ref) {
-      this.patchupsToApply_.forEach(function(patchup) {
-        if (patchup.pidRef === old_pid_ref)
-          patchup.pidRef = new_pid_ref;
+    replacePIDRefsInPatchups: function (oldPidRef, newPidRef) {
+      this.patchupsToApply_.forEach(function (patchup) {
+        if (patchup.pidRef === oldPidRef) {
+          patchup.pidRef = newPidRef;
+        }
       });
     },
 
@@ -558,42 +517,40 @@ global.tr.exportTo('tr', function() {
      * Called by the model to join references between objects, after final model
      * bounds have been computed.
      */
-    joinRefs: function() {
+    joinRefs: function () {
       this.joinObjectRefs_();
       this.applyObjectRefPatchups();
     },
 
-    joinObjectRefs_: function() {
-      tr.b.iterItems(this.processes, function(pid, process) {
+    joinObjectRefs_: function () {
+      tr.b.iterItems(this.processes, function (pid, process) {
         this.joinObjectRefsForProcess_(pid, process);
       }, this);
     },
 
-    joinObjectRefsForProcess_: function(pid, process) {
+    joinObjectRefsForProcess_: function (pid, process) {
       // Iterate the world, looking for id_refs
-      tr.b.iterItems(process.threads, function(tid, thread) {
-        thread.asyncSliceGroup.slices.forEach(function(item) {
+      tr.b.iterItems(process.threads, function (tid, thread) {
+        thread.asyncSliceGroup.slices.forEach(function (item) {
           this.searchItemForIDRefs_(pid, 'start', item);
         }, this);
-        thread.sliceGroup.slices.forEach(function(item) {
+        thread.sliceGroup.slices.forEach(function (item) {
           this.searchItemForIDRefs_(pid, 'start', item);
         }, this);
       }, this);
-      process.objects.iterObjectInstances(function(instance) {
-        instance.snapshots.forEach(function(item) {
+      process.objects.iterObjectInstances(function (instance) {
+        instance.snapshots.forEach(function (item) {
           this.searchItemForIDRefs_(pid, 'ts', item);
         }, this);
       }, this);
     },
 
-    searchItemForIDRefs_: function(pid, itemTimestampField, item) {
-      if (!item.args && !item.contexts)
-        return;
+    searchItemForIDRefs_: function (pid, itemTimestampField, item) {
+      if (!item.args && !item.contexts) return;
       var patchupsToApply = this.patchupsToApply_;
 
       function handleField(object, fieldName, fieldValue) {
-        if (!fieldValue || (!fieldValue.id_ref && !fieldValue.idRef))
-          return;
+        if (!fieldValue || !fieldValue.id_ref && !fieldValue.idRef) return;
 
         var scope = fieldValue.scope || tr.model.OBJECT_DEFAULT_SCOPE;
         var idRef = fieldValue.id_ref || fieldValue.idRef;
@@ -609,16 +566,12 @@ global.tr.exportTo('tr', function() {
           field: fieldName,
           pidRef: pidRef,
           scopedId: scopedId,
-          ts: ts});
+          ts: ts });
       }
       function iterObjectFieldsRecursively(object) {
-        if (!(object instanceof Object))
-          return;
+        if (!(object instanceof Object)) return;
 
-        if ((object instanceof tr.model.ObjectSnapshot) ||
-            (object instanceof Float32Array) ||
-            (object instanceof tr.b.Quad))
-          return;
+        if (object instanceof tr.model.ObjectSnapshot || object instanceof Float32Array || object instanceof tr.b.Quad) return;
 
         if (object instanceof Array) {
           for (var i = 0; i < object.length; i++) {

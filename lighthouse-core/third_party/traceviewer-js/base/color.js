@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,7 +9,7 @@ require("./base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   function clamp01(value) {
     return Math.max(0, Math.min(1, value));
   }
@@ -20,64 +21,44 @@ global.tr.exportTo('tr.b', function() {
     this.a = opt_a;
   }
 
-  Color.fromString = function(str) {
+  Color.fromString = function (str) {
     var tmp;
     var values;
     if (str.substr(0, 4) == 'rgb(') {
       tmp = str.substr(4, str.length - 5);
-      values = tmp.split(',').map(function(v) {
+      values = tmp.split(',').map(function (v) {
         return v.replace(/^\s+/, '', 'g');
       });
-      if (values.length != 3)
-        throw new Error('Malformatted rgb-expression');
-      return new Color(
-          parseInt(values[0]),
-          parseInt(values[1]),
-          parseInt(values[2]));
+      if (values.length != 3) throw new Error('Malformatted rgb-expression');
+      return new Color(parseInt(values[0]), parseInt(values[1]), parseInt(values[2]));
     } else if (str.substr(0, 5) == 'rgba(') {
       tmp = str.substr(5, str.length - 6);
-      values = tmp.split(',').map(function(v) {
+      values = tmp.split(',').map(function (v) {
         return v.replace(/^\s+/, '', 'g');
       });
-      if (values.length != 4)
-        throw new Error('Malformatted rgb-expression');
-      return new Color(
-          parseInt(values[0]),
-          parseInt(values[1]),
-          parseInt(values[2]),
-          parseFloat(values[3]));
+      if (values.length != 4) throw new Error('Malformatted rgb-expression');
+      return new Color(parseInt(values[0]), parseInt(values[1]), parseInt(values[2]), parseFloat(values[3]));
     } else if (str[0] == '#' && str.length == 7) {
-      return new Color(
-          parseInt(str.substr(1, 2), 16),
-          parseInt(str.substr(3, 2), 16),
-          parseInt(str.substr(5, 2), 16));
+      return new Color(parseInt(str.substr(1, 2), 16), parseInt(str.substr(3, 2), 16), parseInt(str.substr(5, 2), 16));
     } else {
       throw new Error('Unrecognized string format.');
     }
   };
 
-  Color.lerp = function(a, b, percent) {
-    if (a.a !== undefined && b.a !== undefined)
-      return Color.lerpRGBA(a, b, percent);
+  Color.lerp = function (a, b, percent) {
+    if (a.a !== undefined && b.a !== undefined) return Color.lerpRGBA(a, b, percent);
     return Color.lerpRGB(a, b, percent);
   };
 
-  Color.lerpRGB = function(a, b, percent) {
-    return new Color(
-        ((b.r - a.r) * percent) + a.r,
-        ((b.g - a.g) * percent) + a.g,
-        ((b.b - a.b) * percent) + a.b);
+  Color.lerpRGB = function (a, b, percent) {
+    return new Color((b.r - a.r) * percent + a.r, (b.g - a.g) * percent + a.g, (b.b - a.b) * percent + a.b);
   };
 
-  Color.lerpRGBA = function(a, b, percent) {
-    return new Color(
-        ((b.r - a.r) * percent) + a.r,
-        ((b.g - a.g) * percent) + a.g,
-        ((b.b - a.b) * percent) + a.b,
-        ((b.a - a.a) * percent) + a.a);
+  Color.lerpRGBA = function (a, b, percent) {
+    return new Color((b.r - a.r) * percent + a.r, (b.g - a.g) * percent + a.g, (b.b - a.b) * percent + a.b, (b.a - a.a) * percent + a.a);
   };
 
-  Color.fromDict = function(dict) {
+  Color.fromDict = function (dict) {
     return new Color(dict.r, dict.g, dict.b, dict.a);
   };
 
@@ -88,7 +69,7 @@ global.tr.exportTo('tr.b', function() {
    * |l| Lightness in [0, 1].
    * |a| Alpha in [0, 1]
    */
-  Color.fromHSLExplicit = function(h, s, l, a) {
+  Color.fromHSLExplicit = function (h, s, l, a) {
     var r, g, b;
     function hue2rgb(p, q, t) {
       if (t < 0) t += 1;
@@ -102,24 +83,22 @@ global.tr.exportTo('tr.b', function() {
     if (s === 0) {
       r = g = b = l;
     } else {
-        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-        var p = 2 * l - q;
-        r = hue2rgb(p, q, h + 1 / 3);
-        g = hue2rgb(p, q, h);
-        b = hue2rgb(p, q, h - 1 / 3);
+      var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      var p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
     }
 
-    return new Color(Math.floor(r * 255),
-                     Math.floor(g * 255),
-                     Math.floor(b * 255), a);
-  }
+    return new Color(Math.floor(r * 255), Math.floor(g * 255), Math.floor(b * 255), a);
+  };
 
-  Color.fromHSL = function(hsl) {
+  Color.fromHSL = function (hsl) {
     return Color.fromHSLExplicit(hsl.h, hsl.s, hsl.l, hsl.a);
-  }
+  };
 
   Color.prototype = {
-    clone: function() {
+    clone: function () {
       var c = new Color();
       c.r = this.r;
       c.g = this.g;
@@ -128,70 +107,50 @@ global.tr.exportTo('tr.b', function() {
       return c;
     },
 
-    blendOver: function(bgColor) {
+    blendOver: function (bgColor) {
       var oneMinusThisAlpha = 1 - this.a;
       var outA = this.a + bgColor.a * oneMinusThisAlpha;
-      var bgBlend = (bgColor.a * oneMinusThisAlpha) / bgColor.a;
-      return new Color(
-          this.r * this.a + bgColor.r * bgBlend,
-          this.g * this.a + bgColor.g * bgBlend,
-          this.b * this.a + bgColor.b * bgBlend,
-          outA);
+      var bgBlend = bgColor.a * oneMinusThisAlpha / bgColor.a;
+      return new Color(this.r * this.a + bgColor.r * bgBlend, this.g * this.a + bgColor.g * bgBlend, this.b * this.a + bgColor.b * bgBlend, outA);
     },
 
-    brighten: function(opt_k) {
+    brighten: function (opt_k) {
       var k;
       k = opt_k || 0.45;
 
-      return new Color(
-          Math.min(255, this.r + Math.floor(this.r * k)),
-          Math.min(255, this.g + Math.floor(this.g * k)),
-          Math.min(255, this.b + Math.floor(this.b * k)),
-          this.a);
+      return new Color(Math.min(255, this.r + Math.floor(this.r * k)), Math.min(255, this.g + Math.floor(this.g * k)), Math.min(255, this.b + Math.floor(this.b * k)), this.a);
     },
 
-    lighten: function(k, opt_max_l) {
-      var max_l = opt_max_l !== undefined ? opt_max_l : 1.0;
+    lighten: function (k, opt_maxL) {
+      var maxL = opt_maxL !== undefined ? opt_maxL : 1.0;
       var hsl = this.toHSL();
       hsl.l = clamp01(hsl.l + k);
       return Color.fromHSL(hsl);
     },
 
-    darken: function(opt_k) {
+    darken: function (opt_k) {
       var k;
-      if (opt_k !== undefined)
-        k = opt_k;
-      else
-        k = 0.45;
+      if (opt_k !== undefined) k = opt_k;else k = 0.45;
 
-      return new Color(
-          Math.min(255, this.r - Math.floor(this.r * k)),
-          Math.min(255, this.g - Math.floor(this.g * k)),
-          Math.min(255, this.b - Math.floor(this.b * k)),
-          this.a);
+      return new Color(Math.min(255, this.r - Math.floor(this.r * k)), Math.min(255, this.g - Math.floor(this.g * k)), Math.min(255, this.b - Math.floor(this.b * k)), this.a);
     },
 
-    desaturate: function(opt_desaturateFactor) {
+    desaturate: function (opt_desaturateFactor) {
       var desaturateFactor;
-      if (opt_desaturateFactor !== undefined)
-        desaturateFactor = opt_desaturateFactor;
-      else
-        desaturateFactor = 1;
+      if (opt_desaturateFactor !== undefined) desaturateFactor = opt_desaturateFactor;else desaturateFactor = 1;
 
       var hsl = this.toHSL();
       hsl.s = clamp01(hsl.s * (1 - desaturateFactor));
       return Color.fromHSL(hsl);
     },
 
-    withAlpha: function(a) {
+    withAlpha: function (a) {
       return new Color(this.r, this.g, this.b, a);
     },
 
-    toString: function() {
+    toString: function () {
       if (this.a !== undefined) {
-        return 'rgba(' +
-            this.r + ',' + this.g + ',' +
-            this.b + ',' + this.a + ')';
+        return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + this.a + ')';
       }
       return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
     },
@@ -203,7 +162,7 @@ global.tr.exportTo('tr.b', function() {
      * |l| Lightness in [0, 1].
      * |a| Alpha in [0, 1]
      */
-    toHSL: function() {
+    toHSL: function () {
       var r = this.r / 255;
       var g = this.g / 255;
       var b = this.b / 255;
@@ -218,30 +177,24 @@ global.tr.exportTo('tr.b', function() {
         s = 0;
       } else {
         var delta = max - min;
-        if (l > 0.5)
-          s = delta / (2 - max - min);
-        else
-          s = delta / (max + min);
+        if (l > 0.5) s = delta / (2 - max - min);else s = delta / (max + min);
 
         if (r === max) {
           h = (g - b) / delta;
-          if (g < b)
-            h += 6;
+          if (g < b) h += 6;
         } else if (g === max) {
-          h = 2 + ((b - r) / delta);
+          h = 2 + (b - r) / delta;
         } else {
-          h = 4 + ((r - g) / delta);
+          h = 4 + (r - g) / delta;
         }
         h /= 6;
       }
 
-      return {h: h, s: s, l: l, a: this.a};
+      return { h: h, s: s, l: l, a: this.a };
     },
 
-    toStringWithAlphaOverride: function(alpha) {
-      return 'rgba(' +
-          this.r + ',' + this.g + ',' +
-          this.b + ',' + alpha + ')';
+    toStringWithAlphaOverride: function (alpha) {
+      return 'rgba(' + this.r + ',' + this.g + ',' + this.b + ',' + alpha + ')';
     }
   };
 

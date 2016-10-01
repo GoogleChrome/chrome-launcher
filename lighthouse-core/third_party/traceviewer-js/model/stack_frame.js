@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,10 +9,9 @@ require("../base/base.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   function StackFrame(parentFrame, id, title, colorId, opt_sourceInfo) {
-    if (id === undefined)
-      throw new Error('id must be given');
+    if (id === undefined) throw new Error('id must be given');
     this.parentFrame_ = parentFrame;
     this.id = id;
     this.title_ = title;
@@ -19,8 +19,7 @@ global.tr.exportTo('tr.model', function() {
     this.children = [];
     this.sourceInfo_ = opt_sourceInfo;
 
-    if (this.parentFrame_)
-      this.parentFrame_.addChild(this);
+    if (this.parentFrame_) this.parentFrame_.addChild(this);
   }
 
   StackFrame.prototype = {
@@ -42,10 +41,8 @@ global.tr.exportTo('tr.model', function() {
      */
     get domain() {
       var result = 'unknown';
-      if (this.sourceInfo_ && this.sourceInfo_.domain)
-        result = this.sourceInfo_.domain;
-      if (result === 'unknown' && this.parentFrame)
-        result = this.parentFrame.domain;
+      if (this.sourceInfo_ && this.sourceInfo_.domain) result = this.sourceInfo_.domain;
+      if (result === 'unknown' && this.parentFrame) result = this.parentFrame.domain;
       return result;
     },
 
@@ -54,27 +51,23 @@ global.tr.exportTo('tr.model', function() {
     },
 
     set parentFrame(parentFrame) {
-      if (this.parentFrame_)
-        Polymer.dom(this.parentFrame_).removeChild(this);
+      if (this.parentFrame_) Polymer.dom(this.parentFrame_).removeChild(this);
       this.parentFrame_ = parentFrame;
-      if (this.parentFrame_)
-        this.parentFrame_.addChild(this);
+      if (this.parentFrame_) this.parentFrame_.addChild(this);
     },
 
-    addChild: function(child) {
+    addChild: function (child) {
       this.children.push(child);
     },
 
-    removeChild: function(child) {
+    removeChild: function (child) {
       var i = this.children.indexOf(child.id);
-      if (i == -1)
-        throw new Error('omg');
+      if (i == -1) throw new Error('omg');
       this.children.splice(i, 1);
     },
 
-    removeAllChildren: function() {
-      for (var i = 0; i < this.children.length; i++)
-        this.children[i].parentFrame_ = undefined;
+    removeAllChildren: function () {
+      for (var i = 0; i < this.children.length; i++) this.children[i].parentFrame_ = undefined;
       this.children.splice(0, this.children.length);
     },
 
@@ -91,8 +84,10 @@ global.tr.exportTo('tr.model', function() {
       return stack;
     },
 
-    getUserFriendlyStackTrace: function() {
-      return this.stackTrace.map(function(x) { return x.title; });
+    getUserFriendlyStackTrace: function () {
+      return this.stackTrace.map(function (x) {
+        return x.title;
+      });
     }
   };
 

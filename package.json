@@ -25,13 +25,15 @@
     "dbw": "npm run start -- --config-path=lighthouse-core/config/dobetterweb.json --mobile=false --output=html --output-path=results.html"
   },
   "devDependencies": {
+    "babel-core": "^6.16.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "coveralls": "^2.11.9",
-    "eslint-config-google": "^0.4.0",
     "eslint": "^2.4.0",
+    "eslint-config-google": "^0.4.0",
     "google-closure-compiler": "^20160517.0.0",
+    "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-util": "^3.0.7",
-    "gulp": "^3.9.1",
     "istanbul": "^0.4.3",
     "jsdom": "^9.0.0",
     "mkdirp": "^0.5.1",

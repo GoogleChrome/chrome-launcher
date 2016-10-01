@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2014 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,7 +10,7 @@ require("./math.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
 
   /**
    * Tracks a 2D bounding box.
@@ -21,24 +22,23 @@ global.tr.exportTo('tr.b', function() {
     this.width = 0;
     this.height = 0;
   };
-  Rect.fromXYWH = function(x, y, w, h) {
+  Rect.fromXYWH = function (x, y, w, h) {
     var rect = new Rect();
     rect.x = x;
     rect.y = y;
     rect.width = w;
     rect.height = h;
     return rect;
-  }
-  Rect.fromArray = function(ary) {
-    if (ary.length != 4)
-      throw new Error('ary.length must be 4');
+  };
+  Rect.fromArray = function (ary) {
+    if (ary.length != 4) throw new Error('ary.length must be 4');
     var rect = new Rect();
     rect.x = ary[0];
     rect.y = ary[1];
     rect.width = ary[2];
     rect.height = ary[3];
     return rect;
-  }
+  };
 
   Rect.prototype = {
     __proto__: Object.prototype,
@@ -59,16 +59,15 @@ global.tr.exportTo('tr.b', function() {
       return this.y + this.height;
     },
 
-    toString: function() {
-      return 'Rect(' + this.x + ', ' + this.y + ', ' +
-          this.width + ', ' + this.height + ')';
+    toString: function () {
+      return 'Rect(' + this.x + ', ' + this.y + ', ' + this.width + ', ' + this.height + ')';
     },
 
-    toArray: function() {
+    toArray: function () {
       return [this.x, this.y, this.width, this.height];
     },
 
-    clone: function() {
+    clone: function () {
       var rect = new Rect();
       rect.x = this.x;
       rect.y = this.y;
@@ -77,13 +76,13 @@ global.tr.exportTo('tr.b', function() {
       return rect;
     },
 
-    enlarge: function(pad) {
+    enlarge: function (pad) {
       var rect = new Rect();
       this.enlargeFast(rect, pad);
       return rect;
     },
 
-    enlargeFast: function(out, pad) {
+    enlargeFast: function (out, pad) {
       out.x = this.x - pad;
       out.y = this.y - pad;
       out.width = this.width + 2 * pad;
@@ -91,21 +90,21 @@ global.tr.exportTo('tr.b', function() {
       return out;
     },
 
-    size: function() {
-      return {width: this.width, height: this.height};
+    size: function () {
+      return { width: this.width, height: this.height };
     },
 
-    scale: function(s) {
+    scale: function (s) {
       var rect = new Rect();
       this.scaleFast(rect, s);
       return rect;
     },
 
-    scaleSize: function(s) {
+    scaleSize: function (s) {
       return Rect.fromXYWH(this.x, this.y, this.width * s, this.height * s);
     },
 
-    scaleFast: function(out, s) {
+    scaleFast: function (out, s) {
       out.x = this.x * s;
       out.y = this.y * s;
       out.width = this.width * s;
@@ -113,13 +112,13 @@ global.tr.exportTo('tr.b', function() {
       return out;
     },
 
-    translate: function(v) {
+    translate: function (v) {
       var rect = new Rect();
       this.translateFast(rect, v);
       return rect;
     },
 
-    translateFast: function(out, v) {
+    translateFast: function (out, v) {
       out.x = this.x + v[0];
       out.y = this.x + v[1];
       out.width = this.width;
@@ -127,7 +126,7 @@ global.tr.exportTo('tr.b', function() {
       return out;
     },
 
-    asUVRectInside: function(containingRect) {
+    asUVRectInside: function (containingRect) {
       var rect = new Rect();
       rect.x = (this.x - containingRect.x) / containingRect.width;
       rect.y = (this.y - containingRect.y) / containingRect.height;
@@ -136,7 +135,7 @@ global.tr.exportTo('tr.b', function() {
       return rect;
     },
 
-    intersects: function(that) {
+    intersects: function (that) {
       var ok = true;
       ok &= this.x < that.right;
       ok &= this.right > that.x;
@@ -145,17 +144,12 @@ global.tr.exportTo('tr.b', function() {
       return ok;
     },
 
-    equalTo: function(rect) {
-      return rect &&
-             (this.x === rect.x) &&
-             (this.y === rect.y) &&
-             (this.width === rect.width) &&
-             (this.height === rect.height);
+    equalTo: function (rect) {
+      return rect && this.x === rect.x && this.y === rect.y && this.width === rect.width && this.height === rect.height;
     }
   };
 
   return {
     Rect: Rect
   };
-
 });

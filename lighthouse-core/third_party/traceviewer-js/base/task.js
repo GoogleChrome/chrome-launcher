@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,7 +10,7 @@ require("./timing.js");
 
 'use strict';
 
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
   var Timing = tr.b.Timing;
   /**
    * A task is a combination of a run callback, a set of subtasks, and an after
@@ -38,8 +39,7 @@ global.tr.exportTo('tr.b', function() {
    * @constructor
    */
   function Task(runCb, thisArg) {
-    if (runCb !== undefined && thisArg === undefined)
-      throw new Error('Almost certainly, you meant to pass a thisArg.');
+    if (runCb !== undefined && thisArg === undefined) throw new Error('Almost certainly, you meant to pass a thisArg.');
     this.runCb_ = runCb;
     this.thisArg_ = thisArg;
     this.afterTask_ = undefined;
@@ -54,33 +54,27 @@ global.tr.exportTo('tr.b', function() {
     /*
      * See constructor documentation on semantics of subtasks.
      */
-    subTask: function(cb, thisArg) {
-      if (cb instanceof Task)
-        this.subTasks_.push(cb);
-      else
-        this.subTasks_.push(new Task(cb, thisArg));
+    subTask: function (cb, thisArg) {
+      if (cb instanceof Task) this.subTasks_.push(cb);else this.subTasks_.push(new Task(cb, thisArg));
       return this.subTasks_[this.subTasks_.length - 1];
     },
 
     /**
      * Runs the current task and returns the task that should be executed next.
      */
-    run: function() {
-      if (this.runCb_ !== undefined)
-        this.runCb_.call(this.thisArg_, this);
+    run: function () {
+      if (this.runCb_ !== undefined) this.runCb_.call(this.thisArg_, this);
       var subTasks = this.subTasks_;
       this.subTasks_ = undefined; // Prevent more subTasks from being posted.
 
-      if (!subTasks.length)
-        return this.afterTask_;
+      if (!subTasks.length) return this.afterTask_;
 
       // If there are subtasks, then we want to execute all the subtasks and
       // then this task's afterTask. To make this happen, we update the
       // afterTask of all the subtasks so the point upward to each other, e.g.
       // subTask[0].afterTask to subTask[1] and so on. Then, the last subTask's
       // afterTask points at this task's afterTask.
-      for (var i = 1; i < subTasks.length; i++)
-        subTasks[i - 1].afterTask_ = subTasks[i];
+      for (var i = 1; i < subTasks.length; i++) subTasks[i - 1].afterTask_ = subTasks[i];
       subTasks[subTasks.length - 1].afterTask_ = this.afterTask_;
       return subTasks[0];
     },
@@ -88,13 +82,9 @@ global.tr.exportTo('tr.b', function() {
     /*
      * See constructor documentation on semantics of after tasks.
      */
-    after: function(cb, thisArg) {
-      if (this.afterTask_)
-        throw new Error('Has an after task already');
-      if (cb instanceof Task)
-        this.afterTask_ = cb;
-      else
-        this.afterTask_ = new Task(cb, thisArg);
+    after: function (cb, thisArg) {
+      if (this.afterTask_) throw new Error('Has an after task already');
+      if (cb instanceof Task) this.afterTask_ = cb;else this.afterTask_ = new Task(cb, thisArg);
       return this.afterTask_;
     },
 
@@ -104,9 +94,8 @@ global.tr.exportTo('tr.b', function() {
      * This is because task system doesn't support catching currently.
      * At the time of writing, this is considered to be an acceptable tradeoff.
      */
-    timedAfter: function(groupName, cb, thisArg, opt_args) {
-      if (cb.name === '')
-        throw new Error('Anonymous Task is not allowed');
+    timedAfter: function (groupName, cb, thisArg, opt_args) {
+      if (cb.name === '') throw new Error('Anonymous Task is not allowed');
       return this.namedTimedAfter(groupName, cb.name, cb, thisArg, opt_args);
     },
 
@@ -116,18 +105,14 @@ global.tr.exportTo('tr.b', function() {
      * This is because task system doesn't support catching currently.
      * At the time of writing, this is considered to be an acceptable tradeoff.
      */
-    namedTimedAfter: function(groupName, name, cb, thisArg, opt_args) {
-      if (this.afterTask_)
-        throw new Error('Has an after task already');
+    namedTimedAfter: function (groupName, name, cb, thisArg, opt_args) {
+      if (this.afterTask_) throw new Error('Has an after task already');
       var realTask;
-      if (cb instanceof Task)
-        realTask = cb;
-      else
-        realTask = new Task(cb, thisArg);
-      this.afterTask_ = new Task(function(task) {
+      if (cb instanceof Task) realTask = cb;else realTask = new Task(cb, thisArg);
+      this.afterTask_ = new Task(function (task) {
         var markedTask = Timing.mark(groupName, name, opt_args);
         task.subTask(realTask, thisArg);
-        task.subTask(function() {
+        task.subTask(function () {
           markedTask.end();
         }, thisArg);
       }, thisArg);
@@ -137,26 +122,24 @@ global.tr.exportTo('tr.b', function() {
     /*
      * Adds a task after the chain of tasks.
      */
-    enqueue: function(cb, thisArg) {
+    enqueue: function (cb, thisArg) {
       var lastTask = this;
-      while (lastTask.afterTask_)
-        lastTask = lastTask.afterTask_;
+      while (lastTask.afterTask_) lastTask = lastTask.afterTask_;
       return lastTask.after(cb, thisArg);
     }
   };
 
-  Task.RunSynchronously = function(task) {
+  Task.RunSynchronously = function (task) {
     var curTask = task;
-    while (curTask)
-      curTask = curTask.run();
-  }
+    while (curTask) curTask = curTask.run();
+  };
 
   /**
    * Runs a task using raf.requestIdleCallback, returning
    * a promise for its completion.
    */
-  Task.RunWhenIdle = function(task) {
-    return new Promise(function(resolve, reject) {
+  Task.RunWhenIdle = function (task) {
+    return new Promise(function (resolve, reject) {
       var curTask = task;
       function runAnother() {
         try {
@@ -176,7 +159,7 @@ global.tr.exportTo('tr.b', function() {
       }
       tr.b.requestIdleCallback(runAnother);
     });
-  }
+  };
 
   return {
     Task: Task

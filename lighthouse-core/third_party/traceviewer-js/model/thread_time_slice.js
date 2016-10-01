@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2013 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -9,9 +10,8 @@ require("./slice.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var Slice = tr.model.Slice;
-
 
   var SCHEDULING_STATE = {
     DEBUG: 'Debug',
@@ -47,11 +47,8 @@ global.tr.exportTo('tr.model', function() {
    *
    * @constructor
    */
-  function ThreadTimeSlice(thread, schedulingState, cat,
-                           start, args, opt_duration) {
-    Slice.call(this, cat, schedulingState,
-               this.getColorForState_(schedulingState),
-        start, args, opt_duration);
+  function ThreadTimeSlice(thread, schedulingState, cat, start, args, opt_duration) {
+    Slice.call(this, cat, schedulingState, this.getColorForState_(schedulingState), start, args, opt_duration);
     this.thread = thread;
     this.schedulingState = schedulingState;
     this.cpuOnWhichThreadWasRunning = undefined;
@@ -60,9 +57,8 @@ global.tr.exportTo('tr.model', function() {
   ThreadTimeSlice.prototype = {
     __proto__: Slice.prototype,
 
-    getColorForState_: function(state) {
-      var getColorIdForReservedName =
-          tr.b.ColorScheme.getColorIdForReservedName;
+    getColorForState_: function (state) {
+      var getColorIdForReservedName = tr.b.ColorScheme.getColorIdForReservedName;
 
       switch (state) {
         case SCHEDULING_STATE.RUNNABLE:
@@ -96,24 +92,20 @@ global.tr.exportTo('tr.model', function() {
       return 'tr.ui.analysis.ThreadTimeSlice';
     },
 
-    getAssociatedCpuSlice: function() {
-      if (!this.cpuOnWhichThreadWasRunning)
-        return undefined;
+    getAssociatedCpuSlice: function () {
+      if (!this.cpuOnWhichThreadWasRunning) return undefined;
       var cpuSlices = this.cpuOnWhichThreadWasRunning.slices;
       for (var i = 0; i < cpuSlices.length; i++) {
         var cpuSlice = cpuSlices[i];
-        if (cpuSlice.start !== this.start)
-          continue;
-        if (cpuSlice.duration !== this.duration)
-          continue;
+        if (cpuSlice.start !== this.start) continue;
+        if (cpuSlice.duration !== this.duration) continue;
         return cpuSlice;
       }
       return undefined;
     },
 
-    getCpuSliceThatTookCpu: function() {
-      if (this.cpuOnWhichThreadWasRunning)
-        return undefined;
+    getCpuSliceThatTookCpu: function () {
+      if (this.cpuOnWhichThreadWasRunning) return undefined;
       var curIndex = this.thread.indexOfTimeSlice(this);
       var cpuSliceWhenLastRunning;
       while (curIndex >= 0) {
@@ -125,31 +117,21 @@ global.tr.exportTo('tr.model', function() {
         cpuSliceWhenLastRunning = curSlice.getAssociatedCpuSlice();
         break;
       }
-      if (!cpuSliceWhenLastRunning)
-        return undefined;
+      if (!cpuSliceWhenLastRunning) return undefined;
 
       var cpu = cpuSliceWhenLastRunning.cpu;
-      var indexOfSliceOnCpuWhenLastRunning =
-          cpu.indexOf(cpuSliceWhenLastRunning);
+      var indexOfSliceOnCpuWhenLastRunning = cpu.indexOf(cpuSliceWhenLastRunning);
       var nextRunningSlice = cpu.slices[indexOfSliceOnCpuWhenLastRunning + 1];
-      if (!nextRunningSlice)
-        return undefined;
-      if (Math.abs(nextRunningSlice.start - cpuSliceWhenLastRunning.end) <
-          0.00001)
-        return nextRunningSlice;
+      if (!nextRunningSlice) return undefined;
+      if (Math.abs(nextRunningSlice.start - cpuSliceWhenLastRunning.end) < 0.00001) return nextRunningSlice;
       return undefined;
     }
   };
 
-  tr.model.EventRegistry.register(
-      ThreadTimeSlice,
-      {
-        name: 'threadTimeSlice',
-        pluralName: 'threadTimeSlices',
-        singleViewElementName: 'tr-ui-a-single-thread-time-slice-sub-view',
-        multiViewElementName: 'tr-ui-a-multi-thread-time-slice-sub-view'
-      });
-
+  tr.model.EventRegistry.register(ThreadTimeSlice, {
+    name: 'threadTimeSlice',
+    pluralName: 'threadTimeSlices'
+  });
 
   return {
     ThreadTimeSlice: ThreadTimeSlice,

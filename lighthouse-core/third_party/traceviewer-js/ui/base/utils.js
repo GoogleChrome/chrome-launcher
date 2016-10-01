@@ -1,20 +1,22 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
 found in the LICENSE file.
 **/
 
+require("../../base/base.js");
 require("../../base/rect.js");
 
 'use strict';
 
-global.tr.exportTo('tr.ui.b', function() {
+global.tr.exportTo('tr.ui.b', function () {
   function instantiateTemplate(selector, doc) {
     doc = doc || document;
-    var el = doc.querySelector(selector);
-    if (!el)
-      throw new Error('Element not found');
-    return el.createInstance();
+    var el = Polymer.dom(doc).querySelector(selector);
+    if (!el) throw new Error('Element not found');
+    return doc.importNode(el.content, true);
+    //    return el.createInstance();
   }
 
   function windowRectForElement(element) {
@@ -51,11 +53,22 @@ global.tr.exportTo('tr.ui.b', function() {
   }
 
   function toThreeDigitLocaleString(value) {
-    return value.toLocaleString(
-        undefined, {minimumFractionDigits: 3, maximumFractionDigits: 3});
+    return value.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+  }
+
+  /**
+   * Returns true if |name| is the name of an unknown HTML element.  Registered
+   * polymer elements are known, so this returns false.  Typos of registered
+   * polymer element names are unknown, so this returns true for typos.
+   *
+   * @return {boolean}
+   */
+  function isUnknownElementName(name) {
+    return document.createElement(name) instanceof HTMLUnknownElement;
   }
 
   return {
+    isUnknownElementName: isUnknownElementName,
     toThreeDigitLocaleString: toThreeDigitLocaleString,
     instantiateTemplate: instantiateTemplate,
     windowRectForElement: windowRectForElement,

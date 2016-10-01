@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -5,15 +6,14 @@ found in the LICENSE file.
 **/
 
 require("../../base/range.js");
+require("../../base/unit.js");
 require("../metric_registry.js");
 require("../v8/utils.js");
-require("../../value/numeric.js");
-require("../../value/unit.js");
-require("../../value/value.js");
+require("../../value/histogram.js");
 
 'use strict';
 
-global.tr.exportTo('tr.metrics.blink', function() {
+global.tr.exportTo('tr.metrics.blink', function () {
   // Maps the Blink GC events in timeline to telemetry friendly names.
   var BLINK_GC_EVENTS = {
     'BlinkGCMarking': 'blink-gc-marking',
@@ -38,48 +38,44 @@ global.tr.exportTo('tr.metrics.blink', function() {
 
   tr.metrics.MetricRegistry.register(blinkGcMetric);
 
-  var timeDurationInMs_smallerIsBetter =
-      tr.v.Unit.byName.timeDurationInMs_smallerIsBetter;
-  var percentage_biggerIsBetter =
-      tr.v.Unit.byName.normalizedPercentage_biggerIsBetter;
+  var timeDurationInMs_smallerIsBetter = tr.b.Unit.byName.timeDurationInMs_smallerIsBetter;
+  var percentage_biggerIsBetter = tr.b.Unit.byName.normalizedPercentage_biggerIsBetter;
 
-  var numericBuilder = new tr.v.NumericBuilder(
-      timeDurationInMs_smallerIsBetter, 0);
   // 0.1 steps from 0 to 20 since it is the most common range.
-  numericBuilder.addLinearBins(20, 200);
   // Exponentially increasing steps from 20 to 200.
-  numericBuilder.addExponentialBins(200, 100);
+  var CUSTOM_BOUNDARIES = tr.v.HistogramBinBoundaries.createLinear(0, 20, 200).addExponentialBins(200, 100);
 
-  function createNumericForTopEventTime() {
-    var n = numericBuilder.build();
+  function createNumericForTopEventTime(name) {
+    var n = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
     n.customizeSummaryOptions({
-        avg: true,
-        count: true,
-        max: true,
-        min: false,
-        std: true,
-        sum: true,
-        percentile: [0.90]});
+      avg: true,
+      count: true,
+      max: true,
+      min: false,
+      std: true,
+      sum: true,
+      percentile: [0.90] });
     return n;
   }
 
-  function createNumericForIdleTime() {
-    var n = numericBuilder.build();
+  function createNumericForIdleTime(name) {
+    var n = new tr.v.Histogram(name, timeDurationInMs_smallerIsBetter, CUSTOM_BOUNDARIES);
     n.customizeSummaryOptions({
-        avg: true,
-        count: false,
-        max: true,
-        min: false,
-        std: false,
-        sum: true,
-        percentile: []
+      avg: true,
+      count: false,
+      max: true,
+      min: false,
+      std: false,
+      sum: true,
+      percentile: []
     });
     return n;
   }
 
-  function createPercentage(numerator, denominator) {
-    var percentage = denominator === 0 ? 0 : numerator / denominator * 100;
-    return new tr.v.ScalarNumeric(percentage_biggerIsBetter, percentage);
+  function createPercentage(name, numerator, denominator) {
+    var histogram = new tr.v.Histogram(name, percentage_biggerIsBetter);
+    if (denominator === 0) histogram.addSample(0);else histogram.addSample(numerator / denominator);
+    return histogram;
   }
 
   /**
@@ -87,17 +83,13 @@ global.tr.exportTo('tr.metrics.blink', function() {
    * - blink-gc-marking.
    */
   function addDurationOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isBlinkGarbageCollectionEvent,
-      blinkGarbageCollectionEventName,
-      function(name, events) {
-        var cpuDuration = createNumericForTopEventTime();
-        events.forEach(function(event) {
-          cpuDuration.add(event.cpuDuration);
-        });
-        values.addValue(new tr.v.NumericValue(name, cpuDuration));
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isBlinkGarbageCollectionEvent, blinkGarbageCollectionEventName, function (name, events) {
+      var cpuDuration = createNumericForTopEventTime(name);
+      events.forEach(function (event) {
+        cpuDuration.addSample(event.cpuDuration);
+      });
+      values.addHistogram(cpuDuration);
+    });
   }
 
   /**
@@ -105,17 +97,13 @@ global.tr.exportTo('tr.metrics.blink', function() {
    * - blink-gc-total
    */
   function addTotalDurationOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isBlinkGarbageCollectionEvent,
-      event => 'blink-gc-total',
-      function(name, events) {
-        var cpuDuration = createNumericForTopEventTime();
-        events.forEach(function(event) {
-          cpuDuration.add(event.cpuDuration);
-        });
-        values.addValue(new tr.v.NumericValue(name, cpuDuration));
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isBlinkGarbageCollectionEvent, event => 'blink-gc-total', function (name, events) {
+      var cpuDuration = createNumericForTopEventTime(name);
+      events.forEach(function (event) {
+        cpuDuration.addSample(event.cpuDuration);
+      });
+      values.addHistogram(cpuDuration);
+    });
   }
 
   /**
@@ -125,13 +113,9 @@ global.tr.exportTo('tr.metrics.blink', function() {
    * - blink-gc-marking_percentage_idle.
    */
   function addIdleTimesOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isBlinkGarbageCollectionEvent,
-      blinkGarbageCollectionEventName,
-      function(name, events) {
-        addIdleTimes(values, model, name, events);
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isBlinkGarbageCollectionEvent, blinkGarbageCollectionEventName, function (name, events) {
+      addIdleTimes(values, model, name, events);
+    });
   }
 
   /**
@@ -141,23 +125,18 @@ global.tr.exportTo('tr.metrics.blink', function() {
    * - blink-gc-total_percentage_idle.
    */
   function addTotalIdleTimesOfTopEvents(values, model) {
-    tr.metrics.v8.utils.groupAndProcessEvents(model,
-      isBlinkGarbageCollectionEvent,
-      event => 'blink-gc-total',
-      function(name, events) {
-        addIdleTimes(values, model, name, events);
-      }
-    );
+    tr.metrics.v8.utils.groupAndProcessEvents(model, isBlinkGarbageCollectionEvent, event => 'blink-gc-total', function (name, events) {
+      addIdleTimes(values, model, name, events);
+    });
   }
 
   function addIdleTimes(values, model, name, events) {
-    var cpuDuration = createNumericForIdleTime();
-    var insideIdle = createNumericForIdleTime();
-    var outsideIdle = createNumericForIdleTime();
-    var idleDeadlineOverrun = createNumericForIdleTime();
-    events.forEach(function(event) {
-      var idleTask = tr.metrics.v8.utils.findParent(
-          event, tr.metrics.v8.utils.isIdleTask);
+    var cpuDuration = createNumericForIdleTime(name + '_cpu');
+    var insideIdle = createNumericForIdleTime(name + '_inside_idle');
+    var outsideIdle = createNumericForIdleTime(name + '_outside_idle');
+    var idleDeadlineOverrun = createNumericForIdleTime(name + '_idle_deadline_overrun');
+    events.forEach(function (event) {
+      var idleTask = tr.metrics.v8.utils.findParent(event, tr.metrics.v8.utils.isIdleTask);
       var inside = 0;
       var overrun = 0;
       if (idleTask) {
@@ -174,20 +153,15 @@ global.tr.exportTo('tr.metrics.blink', function() {
           inside = event.cpuDuration;
         }
       }
-      cpuDuration.add(event.cpuDuration);
-      insideIdle.add(inside);
-      outsideIdle.add(event.cpuDuration - inside);
-      idleDeadlineOverrun.add(overrun);
+      cpuDuration.addSample(event.cpuDuration);
+      insideIdle.addSample(inside);
+      outsideIdle.addSample(event.cpuDuration - inside);
+      idleDeadlineOverrun.addSample(overrun);
     });
-    values.addValue(new tr.v.NumericValue(
-        name + '_idle_deadline_overrun',
-        idleDeadlineOverrun));
-    values.addValue(new tr.v.NumericValue(
-        name + '_outside_idle', outsideIdle));
-    var percentage = createPercentage(insideIdle.sum,
-                                      cpuDuration.sum);
-    values.addValue(new tr.v.NumericValue(
-        name + '_percentage_idle', percentage));
+    values.addHistogram(idleDeadlineOverrun);
+    values.addHistogram(outsideIdle);
+    var percentage = createPercentage(name + '_percentage_idle', insideIdle.sum, cpuDuration.sum);
+    values.addHistogram(percentage);
   }
 
   return {

@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright 2016 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -63,7 +64,7 @@ require("./base.js");
  * Furthermore, the underlying single-dimension paths (Run() -> Exec() -> Call()
  * and Obj -> View) can be arbitrarily interleaved in the breakdown.
  */
-global.tr.exportTo('tr.b', function() {
+global.tr.exportTo('tr.b', function () {
 
   /**
    * Node of a multi-dimensional view.
@@ -142,16 +143,14 @@ global.tr.exportTo('tr.b', function() {
     // Map from child name to child node for each dimension.
     var dimensions = title.length;
     this.children = new Array(dimensions);
-    for (var i = 0; i < dimensions; i++)
-      this.children[i] = new Map();
+    for (var i = 0; i < dimensions; i++) this.children[i] = new Map();
 
     // For each value index (from 0 to |valueCount| - 1), we store the self and
     // total values together with a Boolean flag whether the value is only a
     // lower bound (i.e. aggregated from children rather than provided
     // directly).
     this.values = new Array(valueCount);
-    for (var v = 0; v < valueCount; v++)
-      this.values[v] = { self: 0, total: 0, totalState: NOT_PROVIDED };
+    for (var v = 0; v < valueCount; v++) this.values[v] = { self: 0, total: 0, totalState: NOT_PROVIDED };
   }
 
   /**
@@ -277,12 +276,10 @@ global.tr.exportTo('tr.b', function() {
    * @{constructor}
    */
   function MultiDimensionalViewBuilder(dimensions, valueCount) {
-    if (typeof(dimensions) !== 'number' || dimensions < 0)
-      throw new Error('Dimensions must be a non-negative number');
+    if (typeof dimensions !== 'number' || dimensions < 0) throw new Error('Dimensions must be a non-negative number');
     this.dimensions_ = dimensions;
 
-    if (typeof(valueCount) !== 'number' || valueCount < 0)
-      throw new Error('Number of values must be a non-negative number');
+    if (typeof valueCount !== 'number' || valueCount < 0) throw new Error('Number of values must be a non-negative number');
     this.valueCount_ = valueCount;
 
     this.buildRoot_ = this.createRootNode_();
@@ -291,8 +288,7 @@ global.tr.exportTo('tr.b', function() {
     this.bottomUpHeavyViewNode_ = undefined;
 
     this.maxDimensionDepths_ = new Array(dimensions);
-    for (var d = 0; d < dimensions; d++)
-      this.maxDimensionDepths_[d] = 0;
+    for (var d = 0; d < dimensions; d++) this.maxDimensionDepths_[d] = 0;
   }
 
   /** @{enum} */
@@ -351,15 +347,12 @@ global.tr.exportTo('tr.b', function() {
      * Important: No paths can be added to a builder once either view has been
      * built!
      */
-    addPath: function(path, values, valueKind) {
+    addPath: function (path, values, valueKind) {
       if (this.buildRoot_ === undefined) {
-        throw new Error(
-            'Paths cannot be added after either view has been built');
+        throw new Error('Paths cannot be added after either view has been built');
       }
-      if (path.length !== this.dimensions_)
-        throw new Error('Path must be ' + this.dimensions_ + '-dimensional');
-      if (values.length !== this.valueCount_)
-        throw new Error('Must provide ' + this.valueCount_ + ' values');
+      if (path.length !== this.dimensions_) throw new Error('Path must be ' + this.dimensions_ + '-dimensional');
+      if (values.length !== this.valueCount_) throw new Error('Must provide ' + this.valueCount_ + ' values');
 
       var isTotal;
       switch (valueKind) {
@@ -377,16 +370,13 @@ global.tr.exportTo('tr.b', function() {
       for (var d = 0; d < path.length; d++) {
         var singleDimensionPath = path[d];
         var singleDimensionPathLength = singleDimensionPath.length;
-        this.maxDimensionDepths_[d] =
-            Math.max(this.maxDimensionDepths_[d], singleDimensionPathLength);
-        for (var i = 0; i < singleDimensionPathLength; i++)
-          node = this.getOrCreateChildNode_(node, d, singleDimensionPath[i]);
+        this.maxDimensionDepths_[d] = Math.max(this.maxDimensionDepths_[d], singleDimensionPathLength);
+        for (var i = 0; i < singleDimensionPathLength; i++) node = this.getOrCreateChildNode_(node, d, singleDimensionPath[i]);
       }
 
       for (var v = 0; v < this.valueCount_; v++) {
         var addedValue = values[v];
-        if (addedValue === undefined)
-          continue;
+        if (addedValue === undefined) continue;
         var nodeValue = node.values[v];
         if (isTotal) {
           nodeValue.total += addedValue;
@@ -398,7 +388,7 @@ global.tr.exportTo('tr.b', function() {
       }
     },
 
-    buildView: function(viewType) {
+    buildView: function (viewType) {
       switch (viewType) {
         case MultiDimensionalViewBuilder.ViewType.TOP_DOWN_TREE_VIEW:
           return this.buildTopDownTreeView();
@@ -417,16 +407,14 @@ global.tr.exportTo('tr.b', function() {
      * Note that no more paths can be added to the builder once either view has
      * been built.
      */
-    buildTopDownTreeView: function() {
+    buildTopDownTreeView: function () {
       if (this.topDownTreeViewRoot_ === undefined) {
         var treeViewRoot = this.buildRoot_;
         this.buildRoot_ = undefined;
 
-        this.setUpMissingChildRelationships_(treeViewRoot,
-            0 /* firstDimensionToSetUp */);
-        this.finalizeTotalValues_(treeViewRoot,
-            0 /* firstDimensionToFinalize */,
-            new WeakMap() /* dimensionalSelfSumsMap */);
+        this.setUpMissingChildRelationships_(treeViewRoot, 0 /* firstDimensionToSetUp */);
+        this.finalizeTotalValues_(treeViewRoot, 0 /* firstDimensionToFinalize */
+        , new WeakMap() /* dimensionalSelfSumsMap */);
 
         this.topDownTreeViewRoot_ = treeViewRoot;
       }
@@ -440,10 +428,9 @@ global.tr.exportTo('tr.b', function() {
      * Note that no more paths can be added to the builder once either view has
      * been built.
      */
-    buildTopDownHeavyView: function() {
+    buildTopDownHeavyView: function () {
       if (this.topDownHeavyViewRoot_ === undefined) {
-        this.topDownHeavyViewRoot_ = this.buildGenericHeavyView_(
-            this.addDimensionToTopDownHeavyViewNode_.bind(this));
+        this.topDownHeavyViewRoot_ = this.buildGenericHeavyView_(this.addDimensionToTopDownHeavyViewNode_.bind(this));
       }
       return this.topDownHeavyViewRoot_;
     },
@@ -454,29 +441,24 @@ global.tr.exportTo('tr.b', function() {
      * Note that no more paths can be added to the builder once either view has
      * been built.
      */
-    buildBottomUpHeavyView: function() {
+    buildBottomUpHeavyView: function () {
       if (this.bottomUpHeavyViewNode_ === undefined) {
-        this.bottomUpHeavyViewNode_ = this.buildGenericHeavyView_(
-            this.addDimensionToBottomUpHeavyViewNode_.bind(this));
+        this.bottomUpHeavyViewNode_ = this.buildGenericHeavyView_(this.addDimensionToBottomUpHeavyViewNode_.bind(this));
       }
       return this.bottomUpHeavyViewNode_;
     },
 
-    createRootNode_: function() {
-      return new MultiDimensionalViewNode(
-          new Array(this.dimensions_) /* title */, this.valueCount_);
+    createRootNode_: function () {
+      return new MultiDimensionalViewNode(new Array(this.dimensions_) /* title */, this.valueCount_);
     },
 
-    getOrCreateChildNode_: function(
-        parentNode, dimension, childDimensionTitle) {
-      if (dimension < 0 || dimension >= this.dimensions_)
-        throw new Error('Invalid dimension');
+    getOrCreateChildNode_: function (parentNode, dimension, childDimensionTitle) {
+      if (dimension < 0 || dimension >= this.dimensions_) throw new Error('Invalid dimension');
 
       var dimensionChildren = parentNode.children[dimension];
 
       var childNode = dimensionChildren.get(childDimensionTitle);
-      if (childNode !== undefined)
-        return childNode;
+      if (childNode !== undefined) return childNode;
 
       var childTitle = parentNode.title.slice();
       childTitle[dimension] = childDimensionTitle;
@@ -529,7 +511,7 @@ global.tr.exportTo('tr.b', function() {
      *                         .         |B,2|         .         |B,2|
      *                         .         +---+         .         +---+
      */
-    setUpMissingChildRelationships_: function(node, firstDimensionToSetUp) {
+    setUpMissingChildRelationships_: function (node, firstDimensionToSetUp) {
       // Missing child relationships of this node wrt dimensions 0, ...,
       // (firstDimensionToSetUp - 1) and all descendants of the associated
       // children have already been set up. Now we do the same for dimensions
@@ -539,8 +521,7 @@ global.tr.exportTo('tr.b', function() {
         var currentDimensionChildTitles = new Set(node.children[d].keys());
         for (var i = 0; i < d; i++) {
           for (var previousDimensionChildNode of node.children[i].values()) {
-            for (var previousDimensionGrandChildTitle of
-                 previousDimensionChildNode.children[d].keys()) {
+            for (var previousDimensionGrandChildTitle of previousDimensionChildNode.children[d].keys()) {
               currentDimensionChildTitles.add(previousDimensionGrandChildTitle);
             }
           }
@@ -550,20 +531,15 @@ global.tr.exportTo('tr.b', function() {
         // recursively set up its missing child relationships.
         for (var currentDimensionChildTitle of currentDimensionChildTitles) {
           // Add a missing child (if it doesn't exist).
-          var currentDimensionChildNode =
-              this.getOrCreateChildNode_(node, d, currentDimensionChildTitle);
+          var currentDimensionChildNode = this.getOrCreateChildNode_(node, d, currentDimensionChildTitle);
 
           // Set-up child relationships (of the child node) wrt dimensions 0,
           // ..., d - 1.
           for (var i = 0; i < d; i++) {
             for (var previousDimensionChildNode of node.children[i].values()) {
-              var previousDimensionGrandChildNode =
-                  previousDimensionChildNode.children[d].get(
-                      currentDimensionChildTitle);
+              var previousDimensionGrandChildNode = previousDimensionChildNode.children[d].get(currentDimensionChildTitle);
               if (previousDimensionGrandChildNode !== undefined) {
-                currentDimensionChildNode.children[i].set(
-                    previousDimensionChildNode.title[i],
-                    previousDimensionGrandChildNode);
+                currentDimensionChildNode.children[i].set(previousDimensionChildNode.title[i], previousDimensionGrandChildNode);
               }
             }
           }
@@ -697,69 +673,59 @@ global.tr.exportTo('tr.b', function() {
      * on total(N, V) (unless N contains the EXACT value of total(N, V), in
      * which case its relevant totalState won't be modified).
      */
-    finalizeTotalValues_: function(
-        node, firstDimensionToFinalize, dimensionalSelfSumsMap) {
+    finalizeTotalValues_: function (node, firstDimensionToFinalize, dimensionalSelfSumsMap) {
       // Dimension D -> Value index V -> dimensionalSelfSum(|node|, V)[D].
       var dimensionalSelfSums = new Array(this.dimensions_);
 
       // Value index V -> minResidual(|node|, V).
       var minResidual = new Array(this.valueCount_);
-      for (var v = 0; v < this.valueCount_; v++)
-        minResidual[v] = 0;
+      for (var v = 0; v < this.valueCount_; v++) minResidual[v] = 0;
 
       // Value index V -> |node| value V.
       var nodeValues = node.values;
 
       // Value index V -> dimensionalSelfSum(|node|, V)[|d|].
       var nodeSelfSums = new Array(this.valueCount_);
-      for (var v = 0; v < this.valueCount_; v++)
-        nodeSelfSums[v] = nodeValues[v].self;
+      for (var v = 0; v < this.valueCount_; v++) nodeSelfSums[v] = nodeValues[v].self;
 
       for (var d = 0; d < this.dimensions_; d++) {
         // Value index V -> sum over children C of |node| at dimension |d| {
         // residual(C, V) }.
         var childResidualSums = new Array(this.valueCount_);
-        for (var v = 0; v < this.valueCount_; v++)
-          childResidualSums[v] = 0;
+        for (var v = 0; v < this.valueCount_; v++) childResidualSums[v] = 0;
 
         for (var childNode of node.children[d].values()) {
-          if (d >= firstDimensionToFinalize)
-            this.finalizeTotalValues_(childNode, d, dimensionalSelfSumsMap);
+          if (d >= firstDimensionToFinalize) this.finalizeTotalValues_(childNode, d, dimensionalSelfSumsMap);
           // Dimension D -> Value index V ->
           // dimensionalSelfSum(|childNode|, V)[D].
           var childNodeSelfSums = dimensionalSelfSumsMap.get(childNode);
           var childNodeValues = childNode.values;
           for (var v = 0; v < this.valueCount_; v++) {
             nodeSelfSums[v] += childNodeSelfSums[d][v];
-            var residual = childNodeValues[v].total -
-                childNodeSelfSums[this.dimensions_ - 1][v];
+            var residual = childNodeValues[v].total - childNodeSelfSums[this.dimensions_ - 1][v];
             childResidualSums[v] += residual;
             if (childNodeValues[v].totalState > NOT_PROVIDED) {
-              nodeValues[v].totalState = Math.max(
-                  nodeValues[v].totalState, LOWER_BOUND);
+              nodeValues[v].totalState = Math.max(nodeValues[v].totalState, LOWER_BOUND);
             }
           }
         }
 
         dimensionalSelfSums[d] = nodeSelfSums.slice();
-        for (var v = 0; v < this.valueCount_; v++)
-          minResidual[v] = Math.max(minResidual[v], childResidualSums[v]);
+        for (var v = 0; v < this.valueCount_; v++) minResidual[v] = Math.max(minResidual[v], childResidualSums[v]);
       }
 
       for (var v = 0; v < this.valueCount_; v++) {
-        nodeValues[v].total = Math.max(
-            nodeValues[v].total, nodeSelfSums[v] + minResidual[v]);
+        nodeValues[v].total = Math.max(nodeValues[v].total, nodeSelfSums[v] + minResidual[v]);
       }
 
-      if (dimensionalSelfSumsMap.has(node))
-        throw new Error('Internal error: Node finalized more than once');
+      if (dimensionalSelfSumsMap.has(node)) throw new Error('Internal error: Node finalized more than once');
       dimensionalSelfSumsMap.set(node, dimensionalSelfSums);
     },
 
     /**
      * Build a generic heavy view of the multi-dimensional view.
      */
-    buildGenericHeavyView_: function(treeViewNodeHandler) {
+    buildGenericHeavyView_: function (treeViewNodeHandler) {
       // 1. Clone the root node of the top-down tree view node (except
       // children).
       var treeViewRoot = this.buildTopDownTreeView();
@@ -770,20 +736,16 @@ global.tr.exportTo('tr.b', function() {
       // double-counting).
       var recursionDepthTrackers = new Array(this.dimensions_);
       for (var d = 0; d < this.dimensions_; d++) {
-        recursionDepthTrackers[d] =
-            new RecursionDepthTracker(this.maxDimensionDepths_[d], d);
+        recursionDepthTrackers[d] = new RecursionDepthTracker(this.maxDimensionDepths_[d], d);
       }
 
       // 3. Add all paths associated with the single-dimensional descendants of
       // the top-down tree view root node to the heavy view root node
       // (depending on the type of the target heavy view).
-      this.addDimensionsToGenericHeavyViewNode_(treeViewRoot, heavyViewRoot,
-          0 /* startDimension */, recursionDepthTrackers,
-          false /* previousDimensionsRecursive */, treeViewNodeHandler);
+      this.addDimensionsToGenericHeavyViewNode_(treeViewRoot, heavyViewRoot, 0 /* startDimension */, recursionDepthTrackers, false /* previousDimensionsRecursive */, treeViewNodeHandler);
 
       // 4. Set up missing child relationships.
-      this.setUpMissingChildRelationships_(heavyViewRoot,
-          0 /* firstDimensionToSetUp */);
+      this.setUpMissingChildRelationships_(heavyViewRoot, 0 /* firstDimensionToSetUp */);
 
       return heavyViewRoot;
     },
@@ -793,13 +755,9 @@ global.tr.exportTo('tr.b', function() {
      * top-down tree-view node wrt multiple dimensions to a generic heavy-view
      * node (depending on the type of the target heavy view).
      */
-    addDimensionsToGenericHeavyViewNode_: function(treeViewParentNode,
-        heavyViewParentNode, startDimension, recursionDepthTrackers,
-        previousDimensionsRecursive, treeViewNodeHandler) {
+    addDimensionsToGenericHeavyViewNode_: function (treeViewParentNode, heavyViewParentNode, startDimension, recursionDepthTrackers, previousDimensionsRecursive, treeViewNodeHandler) {
       for (var d = startDimension; d < this.dimensions_; d++) {
-        this.addDimensionDescendantsToGenericHeavyViewNode_(treeViewParentNode,
-            heavyViewParentNode, d, recursionDepthTrackers,
-            previousDimensionsRecursive, treeViewNodeHandler);
+        this.addDimensionDescendantsToGenericHeavyViewNode_(treeViewParentNode, heavyViewParentNode, d, recursionDepthTrackers, previousDimensionsRecursive, treeViewNodeHandler);
       }
     },
 
@@ -808,9 +766,7 @@ global.tr.exportTo('tr.b', function() {
      * node wrt a single dimension to a generic heavy-view node (depending on
      * the type of the target heavy view).
      */
-    addDimensionDescendantsToGenericHeavyViewNode_: function(treeViewParentNode,
-        heavyViewParentNode, currentDimension, recursionDepthTrackers,
-        previousDimensionsRecursive, treeViewNodeHandler) {
+    addDimensionDescendantsToGenericHeavyViewNode_: function (treeViewParentNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive, treeViewNodeHandler) {
       var treeViewChildren = treeViewParentNode.children[currentDimension];
       var recursionDepthTracker = recursionDepthTrackers[currentDimension];
       for (var treeViewChildNode of treeViewChildren.values()) {
@@ -818,16 +774,12 @@ global.tr.exportTo('tr.b', function() {
 
         // Add all paths associated with the child node to the heavy view-node
         // parent node.
-        treeViewNodeHandler(
-            treeViewChildNode, heavyViewParentNode, currentDimension,
-            recursionDepthTrackers, previousDimensionsRecursive);
+        treeViewNodeHandler(treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive);
 
         // Recursively add all paths associated with the descendants of the
         // tree view child node wrt the current dimension to the heavy-view
         // parent node.
-        this.addDimensionDescendantsToGenericHeavyViewNode_(treeViewChildNode,
-            heavyViewParentNode, currentDimension, recursionDepthTrackers,
-            previousDimensionsRecursive, treeViewNodeHandler);
+        this.addDimensionDescendantsToGenericHeavyViewNode_(treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive, treeViewNodeHandler);
 
         recursionDepthTracker.pop();
       }
@@ -875,47 +827,30 @@ global.tr.exportTo('tr.b', function() {
      * keep track of the path we traversed along the current dimension (to
      * determine whether total value should be added or not).
      */
-    addDimensionToTopDownHeavyViewNode_: function(
-        treeViewChildNode, heavyViewParentNode, currentDimension,
-        recursionDepthTrackers, previousDimensionsRecursive) {
-      this.addDimensionToTopDownHeavyViewNodeRecursively_(treeViewChildNode,
-          heavyViewParentNode, currentDimension, recursionDepthTrackers,
-          previousDimensionsRecursive, 1 /* subTreeDepth */);
+    addDimensionToTopDownHeavyViewNode_: function (treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive) {
+      this.addDimensionToTopDownHeavyViewNodeRecursively_(treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive, 1 /* subTreeDepth */);
     },
 
-    addDimensionToTopDownHeavyViewNodeRecursively_: function(
-        treeViewChildNode, heavyViewParentNode, currentDimension,
-        recursionDepthTrackers, previousDimensionsRecursive, subTreeDepth) {
+    addDimensionToTopDownHeavyViewNodeRecursively_: function (treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive, subTreeDepth) {
       var recursionDepthTracker = recursionDepthTrackers[currentDimension];
-      var currentDimensionRecursive =
-          subTreeDepth <= recursionDepthTracker.recursionDepth;
-      var currentOrPreviousDimensionsRecursive =
-          currentDimensionRecursive || previousDimensionsRecursive;
+      var currentDimensionRecursive = subTreeDepth <= recursionDepthTracker.recursionDepth;
+      var currentOrPreviousDimensionsRecursive = currentDimensionRecursive || previousDimensionsRecursive;
 
       var dimensionTitle = treeViewChildNode.title[currentDimension];
-      var heavyViewChildNode = this.getOrCreateChildNode_(
-          heavyViewParentNode, currentDimension, dimensionTitle);
+      var heavyViewChildNode = this.getOrCreateChildNode_(heavyViewParentNode, currentDimension, dimensionTitle);
 
-      this.addNodeValues_(treeViewChildNode, heavyViewChildNode,
-          !currentOrPreviousDimensionsRecursive /* addTotal */);
+      this.addNodeValues_(treeViewChildNode, heavyViewChildNode, !currentOrPreviousDimensionsRecursive /* addTotal */);
 
       // Add the descendants of the tree-view child node wrt the next
       // dimensions as children of the heavy-view child node.
-      this.addDimensionsToGenericHeavyViewNode_(treeViewChildNode,
-          heavyViewChildNode, currentDimension + 1, recursionDepthTrackers,
-          currentOrPreviousDimensionsRecursive,
-          this.addDimensionToTopDownHeavyViewNode_.bind(this));
+      this.addDimensionsToGenericHeavyViewNode_(treeViewChildNode, heavyViewChildNode, currentDimension + 1, recursionDepthTrackers, currentOrPreviousDimensionsRecursive, this.addDimensionToTopDownHeavyViewNode_.bind(this));
 
-      for (var treeViewGrandChildNode of
-           treeViewChildNode.children[currentDimension].values()) {
+      for (var treeViewGrandChildNode of treeViewChildNode.children[currentDimension].values()) {
         recursionDepthTracker.push(treeViewGrandChildNode);
 
         // Recursively add the tree-view grandchild node to the heavy-view
         // child node.
-        this.addDimensionToTopDownHeavyViewNodeRecursively_(
-            treeViewGrandChildNode, heavyViewChildNode, currentDimension,
-            recursionDepthTrackers, previousDimensionsRecursive,
-            subTreeDepth + 1);
+        this.addDimensionToTopDownHeavyViewNodeRecursively_(treeViewGrandChildNode, heavyViewChildNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive, subTreeDepth + 1);
 
         recursionDepthTracker.pop();
       }
@@ -969,14 +904,11 @@ global.tr.exportTo('tr.b', function() {
      * (C) (rather than the ancestor's values) are added to the corresponding
      * heavy-view node (B##).
      */
-    addDimensionToBottomUpHeavyViewNode_: function(
-        treeViewChildNode, heavyViewParentNode, currentDimension,
-        recursionDepthTrackers, previousDimensionsRecursive) {
+    addDimensionToBottomUpHeavyViewNode_: function (treeViewChildNode, heavyViewParentNode, currentDimension, recursionDepthTrackers, previousDimensionsRecursive) {
       var recursionDepthTracker = recursionDepthTrackers[currentDimension];
       var bottomIndex = recursionDepthTracker.bottomIndex;
       var topIndex = recursionDepthTracker.topIndex;
-      var firstNonRecursiveIndex =
-          bottomIndex + recursionDepthTracker.recursionDepth;
+      var firstNonRecursiveIndex = bottomIndex + recursionDepthTracker.recursionDepth;
       var viewNodePath = recursionDepthTracker.viewNodePath;
 
       var trackerAncestorNode = recursionDepthTracker.trackerAncestorNode;
@@ -984,28 +916,22 @@ global.tr.exportTo('tr.b', function() {
       for (var i = bottomIndex; i < topIndex; i++) {
         var treeViewAncestorNode = viewNodePath[i];
         var dimensionTitle = treeViewAncestorNode.title[currentDimension];
-        heavyViewDescendantNode = this.getOrCreateChildNode_(
-            heavyViewDescendantNode, currentDimension, dimensionTitle);
+        heavyViewDescendantNode = this.getOrCreateChildNode_(heavyViewDescendantNode, currentDimension, dimensionTitle);
 
         var currentDimensionRecursive = i < firstNonRecursiveIndex;
-        var currentOrPreviousDimensionsRecursive =
-            currentDimensionRecursive || previousDimensionsRecursive;
+        var currentOrPreviousDimensionsRecursive = currentDimensionRecursive || previousDimensionsRecursive;
 
         // The self and total values are taken from the original top-down tree
         // view child node (rather than the ancestor node).
-        this.addNodeValues_(treeViewChildNode, heavyViewDescendantNode,
-            !currentOrPreviousDimensionsRecursive);
+        this.addNodeValues_(treeViewChildNode, heavyViewDescendantNode, !currentOrPreviousDimensionsRecursive);
 
         // Add the descendants of the tree-view child node wrt the next
         // dimensions as children of the heavy-view child node.
-        this.addDimensionsToGenericHeavyViewNode_(treeViewChildNode,
-            heavyViewDescendantNode, currentDimension + 1,
-            recursionDepthTrackers, currentOrPreviousDimensionsRecursive,
-            this.addDimensionToBottomUpHeavyViewNode_.bind(this));
+        this.addDimensionsToGenericHeavyViewNode_(treeViewChildNode, heavyViewDescendantNode, currentDimension + 1, recursionDepthTrackers, currentOrPreviousDimensionsRecursive, this.addDimensionToBottomUpHeavyViewNode_.bind(this));
       }
     },
 
-    addNodeValues_: function(sourceNode, targetNode, addTotal) {
+    addNodeValues_: function (sourceNode, targetNode, addTotal) {
       var targetNodeValues = targetNode.values;
       var sourceNodeValues = sourceNode.values;
       for (var v = 0; v < this.valueCount_; v++) {
@@ -1015,8 +941,7 @@ global.tr.exportTo('tr.b', function() {
         if (addTotal) {
           targetNodeValue.total += sourceNodeValue.total;
           if (sourceNodeValue.totalState > NOT_PROVIDED) {
-            targetNodeValue.totalState = Math.max(
-                targetNodeValue.totalState, LOWER_BOUND);
+            targetNodeValue.totalState = Math.max(targetNodeValue.totalState, LOWER_BOUND);
           }
         }
       }
@@ -1042,14 +967,12 @@ global.tr.exportTo('tr.b', function() {
     this.bottomIndex = this.topIndex = maxDepth;
 
     this.dimension_ = dimension;
-    this.currentTrackerNode_ =
-        this.createNode_(0 /* recursionDepth */, undefined /* parent */);
+    this.currentTrackerNode_ = this.createNode_(0 /* recursionDepth */, undefined /* parent */);
   }
 
   RecursionDepthTracker.prototype = {
-    push: function(viewNode) {
-      if (this.bottomIndex === 0)
-        throw new Error('Cannot push to a full tracker');
+    push: function (viewNode) {
+      if (this.bottomIndex === 0) throw new Error('Cannot push to a full tracker');
       var title = viewNode.title[this.dimension_];
       this.bottomIndex--;
       this.titlePath[this.bottomIndex] = title;
@@ -1066,18 +989,15 @@ global.tr.exportTo('tr.b', function() {
       // depth.
       var maxLengths = zFunction(this.titlePath, this.bottomIndex);
       var recursionDepth = 0;
-      for (var i = 0; i < maxLengths.length; i++)
-        recursionDepth = Math.max(recursionDepth, maxLengths[i]);
+      for (var i = 0; i < maxLengths.length; i++) recursionDepth = Math.max(recursionDepth, maxLengths[i]);
 
-      childTrackerNode =
-          this.createNode_(recursionDepth, this.currentTrackerNode_);
+      childTrackerNode = this.createNode_(recursionDepth, this.currentTrackerNode_);
       this.currentTrackerNode_.children.set(title, childTrackerNode);
       this.currentTrackerNode_ = childTrackerNode;
     },
 
-    pop: function() {
-      if (this.bottomIndex === this.topIndex)
-        throw new Error('Cannot pop from an empty tracker');
+    pop: function () {
+      if (this.bottomIndex === this.topIndex) throw new Error('Cannot pop from an empty tracker');
 
       this.titlePath[this.bottomIndex] = undefined;
       this.viewNodePath[this.bottomIndex] = undefined;
@@ -1090,7 +1010,7 @@ global.tr.exportTo('tr.b', function() {
       return this.currentTrackerNode_.recursionDepth;
     },
 
-    createNode_: function(recursionDepth, parent) {
+    createNode_: function (recursionDepth, parent) {
       return {
         recursionDepth: recursionDepth,
         parent: parent,
@@ -1124,21 +1044,16 @@ global.tr.exportTo('tr.b', function() {
    */
   function zFunction(list, startIndex) {
     var n = list.length - startIndex;
-    if (n === 0)
-      return [];
+    if (n === 0) return [];
 
     var z = new Array(n);
     z[0] = 0;
 
     for (var i = 1, left = 0, right = 0; i < n; ++i) {
       var maxLength;
-      if (i <= right)
-        maxLength = Math.min(right - i + 1, z[i - left]);
-      else
-        maxLength = 0;
+      if (i <= right) maxLength = Math.min(right - i + 1, z[i - left]);else maxLength = 0;
 
-      while (i + maxLength < n && list[startIndex + maxLength] ===
-             list[startIndex + i + maxLength]) {
+      while (i + maxLength < n && list[startIndex + maxLength] === list[startIndex + i + maxLength]) {
         ++maxLength;
       }
 

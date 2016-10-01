@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -8,11 +9,9 @@ require("./user_expectation.js");
 
 'use strict';
 
-global.tr.exportTo('tr.model.um', function() {
-  function ResponseExpectation(
-      parentModel, initiatorTitle, start, duration, opt_isAnimationBegin) {
-    tr.model.um.UserExpectation.call(
-        this, parentModel, initiatorTitle, start, duration);
+global.tr.exportTo('tr.model.um', function () {
+  function ResponseExpectation(parentModel, initiatorTitle, start, duration, opt_isAnimationBegin) {
+    tr.model.um.UserExpectation.call(this, parentModel, initiatorTitle, start, duration);
     this.isAnimationBegin = opt_isAnimationBegin || false;
   }
 
@@ -21,7 +20,7 @@ global.tr.exportTo('tr.model.um', function() {
     constructor: ResponseExpectation
   };
 
-  tr.model.um.UserExpectation.register(ResponseExpectation, {
+  tr.model.um.UserExpectation.subTypes.register(ResponseExpectation, {
     stageTitle: 'Response',
     colorId: tr.b.ColorScheme.getColorIdForReservedName('rail_response')
   });

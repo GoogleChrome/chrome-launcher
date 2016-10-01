@@ -1,3 +1,4 @@
+"use strict";
 /**
 Copyright (c) 2015 The Chromium Authors. All rights reserved.
 Use of this source code is governed by a BSD-style license that can be
@@ -12,7 +13,7 @@ require("../base/color_scheme.js");
 /**
  * @fileoverview Provides the SelectionState class.
  */
-global.tr.exportTo('tr.model', function() {
+global.tr.exportTo('tr.model', function () {
   var ColorScheme = tr.b.ColorScheme;
 
   /**
@@ -44,24 +45,15 @@ global.tr.exportTo('tr.model', function() {
     DIMMED2: ColorScheme.properties.dimmedOffsets[2]
   };
 
-  var brighteningLevels = [
-    SelectionState.NONE,
-    SelectionState.BRIGHTENED0,
-    SelectionState.BRIGHTENED1,
-    SelectionState.BRIGHTENED2
-  ];
-  SelectionState.getFromBrighteningLevel = function(level) {
+  var brighteningLevels = [SelectionState.NONE, SelectionState.BRIGHTENED0, SelectionState.BRIGHTENED1, SelectionState.BRIGHTENED2];
+  SelectionState.getFromBrighteningLevel = function (level) {
     return brighteningLevels[level];
-  }
+  };
 
-  var dimmingLevels = [
-    SelectionState.DIMMED0,
-    SelectionState.DIMMED1,
-    SelectionState.DIMMED2
-  ];
-  SelectionState.getFromDimmingLevel = function(level) {
+  var dimmingLevels = [SelectionState.DIMMED0, SelectionState.DIMMED1, SelectionState.DIMMED2];
+  SelectionState.getFromDimmingLevel = function (level) {
     return dimmingLevels[level];
-  }
+  };
 
   return {
     SelectionState: SelectionState
