@@ -1,8 +1,7 @@
 {
   "passes": [{
-    "network": true,
-    "trace": true,
-    "loadPage": true,
+    "recordNetwork": true,
+    "recordTrace": true,
     "gatherers": []
   }],
 
@@ -24,21 +23,21 @@
     "items": [{
       "name": "Page load performance is fast",
       "description": "",
-      "criteria": {
+      "audits": {
         "first-meaningful-paint": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "speed-index-metric": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "estimated-input-latency": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "time-to-interactive": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         }
       }
@@ -49,13 +48,13 @@
     "scored": false,
     "categorizable": false,
     "items": [{
-      "criteria": {
+      "audits": {
         "critical-request-chains": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         },
         "user-timings": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         }
       }

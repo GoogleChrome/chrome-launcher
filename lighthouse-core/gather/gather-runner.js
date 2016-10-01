@@ -72,7 +72,7 @@ class GatherRunner {
   static loadPage(driver, options) {
     return Promise.resolve()
       // Begin tracing only if requested by config.
-      .then(_ => options.config.trace && driver.beginTrace())
+      .then(_ => options.config.recordTrace && driver.beginTrace())
       // Network is always recorded for internal use, even if not saved as artifact.
       .then(_ => driver.beginNetworkCollect(options))
       // Navigate.
@@ -121,18 +121,14 @@ class GatherRunner {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    let pass = Promise.resolve();
 
-    if (config.loadPage) {
-      pass = pass.then(_ => {
-        const status = 'Loading page & waiting for onload';
-        const gatherernames = gatherers.map(g => g.name).join(', ');
-        log.log('status', status, gatherernames);
-        return GatherRunner.loadPage(driver, options).then(_ => {
-          log.log('statusEnd', status);
-        });
-      });
-    }
+    const gatherernames = gatherers.map(g => g.name).join(', ');
+    const status = 'Loading page & waiting for onload';
+    log.log('status', status, gatherernames);
+
+    const pass = GatherRunner.loadPage(driver, options).then(_ => {
+      log.log('statusEnd', status);
+    });
 
     return gatherers.reduce((chain, gatherer) => {
       return chain.then(_ => gatherer.pass(options));
@@ -154,7 +150,7 @@ class GatherRunner {
 
     let pass = Promise.resolve();
 
-    if (config.trace) {
+    if (config.recordTrace) {
       pass = pass.then(_ => {
         log.log('status', 'Retrieving trace');
         return driver.endTrace();
@@ -174,7 +170,7 @@ class GatherRunner {
       return driver.endNetworkCollect();
     }).then(networkRecords => {
       // Network records only given to gatherers if requested by config.
-      config.network && (passData.networkRecords = networkRecords);
+      config.recordNetwork && (passData.networkRecords = networkRecords);
       log.verbose('statusEnd', status);
     });
 
@@ -237,8 +233,9 @@ class GatherRunner {
               // If requested by config, merge trace and network data for this
               // pass into tracingData.
               const passName = config.passName || Audit.DEFAULT_PASS;
-              config.trace && (tracingData.traces[passName] = passData.trace);
-              config.network && (tracingData.networkRecords[passName] = passData.networkRecords);
+              config.recordTrace && (tracingData.traces[passName] = passData.trace);
+              config.recordNetwork &&
+                  (tracingData.networkRecords[passName] = passData.networkRecords);
 
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;

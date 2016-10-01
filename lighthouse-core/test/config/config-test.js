@@ -43,11 +43,11 @@ describe('Config', () => {
     const unlikelyPassName = 'unlikelyPassName';
     const configJson = {
       passes: [{
-        network: true,
+        recordNetwork: true,
         passName: unlikelyPassName,
         gatherers: []
       }, {
-        network: true,
+        recordNetwork: true,
         passName: unlikelyPassName,
         gatherers: []
       }],
@@ -71,10 +71,10 @@ describe('Config', () => {
   it('warns when traced twice with no passNames specified', () => {
     const configJson = {
       passes: [{
-        network: true,
+        recordNetwork: true,
         gatherers: []
       }, {
-        network: true,
+        recordNetwork: true,
         gatherers: []
       }],
       audits: []

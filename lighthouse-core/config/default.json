@@ -1,8 +1,7 @@
 {
   "passes": [{
-    "network": true,
-    "trace": true,
-    "loadPage": true,
+    "recordNetwork": true,
+    "recordTrace": true,
     "gatherers": [
       "url",
       "https",
@@ -17,15 +16,13 @@
   },
   {
     "passName": "offlinePass",
-    "loadPage": true,
-    "network": true,
+    "recordNetwork": true,
     "gatherers": [
       "service-worker",
       "offline"
     ]
   },
   {
-    "loadPage": true,
     "gatherers": [
       "http-redirect",
       "html-without-javascript"
@@ -76,56 +73,56 @@
     "items": [{
       "name": "App can load on offline/flaky connections",
       "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
-      "criteria": {
+      "audits": {
         "service-worker": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "works-offline": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "cache-start-url": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
     },{
       "name": "Page load performance is fast",
       "description": "Users notice if sites and apps don't perform well. These top-level metrics capture the most important perceived performance concerns.",
-      "criteria": {
+      "audits": {
         "first-meaningful-paint": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "speed-index-metric": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "estimated-input-latency": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "time-to-interactive": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "scrolling-60fps": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Content scrolls at 60fps",
           "category": "UX"
         },
         "touch-150ms": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Touch input gets a response in < 150ms",
           "category": "UX"
         },
         "fmp-no-jank": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "App is interactive without jank after the first meaningful paint",
@@ -135,22 +132,22 @@
     }, {
       "name": "Site is progressively enhanced",
       "description": "Progressive enhancement means that everyone can access the basic content and functionality of a page in any browser, and those without certain browser features may receive a reduced but not unfunctioning experience.",
-      "criteria": {
+      "audits": {
         "without-javascript": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
     }, {
       "name": "Network connection is secure",
       "description": "Security is an important part of the web for both developers and users. Moving forward, Transport Layer Security (TLS) support will be required for many APIs.",
-      "criteria": {
+      "audits": {
         "is-on-https": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "redirects-http": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
@@ -158,25 +155,25 @@
       "name": "User can be prompted to Add to Homescreen",
       "description": "While users can manually add your site to their homescreen in the browser menu, the <a href=\"https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android?hl=en\">prompt (aka app install banner)</a> will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
       "see": "https://github.com/GoogleChrome/lighthouse/issues/23",
-      "criteria": {
+      "audits": {
         "service-worker": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-exists": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-start-url": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-icons-min-144": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-short-name": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
@@ -184,55 +181,55 @@
       "name": "Installed web app will launch with custom splash screen",
       "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable <a href=\"https://developers.google.com/web/updates/2015/10/splashscreen?hl=en\">splash screen</a> the user sees between tapping the home screen icon and your app’s first paint.",
       "see": "https://github.com/GoogleChrome/lighthouse/issues/24",
-      "criteria": {
+      "audits": {
         "manifest-exists": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-name": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-background-color": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-theme-color": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-icons-min-192": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
     }, {
       "name": "Address bar matches brand colors",
       "description": "The browser address bar can be themed to match your site. A theme-color <a href=\"https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android\">meta tag</a> will upgrade the address bar when a user browses the site, and the <a href=\"https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color\">manifest theme-color</a> will apply the same theme site-wide once it's been added to homescreen.",
-      "criteria": {
+      "audits": {
         "manifest-exists": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "theme-color-meta": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-theme-color": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
     }, {
       "name": "Design is mobile-friendly",
       "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
-      "criteria": {
+      "audits": {
         "viewport": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "content-width": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
@@ -243,73 +240,73 @@
     "scored": false,
     "categorizable": false,
     "items": [{
-      "criteria": {
+      "audits": {
         "aria-allowed-attr": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "aria-valid-attr": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "color-contrast": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "image-alt": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "label": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "tabindex": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-short-name-length": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "manifest-display": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "geolocation-on-start": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "serviceworker-push": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Service worker makes use of push notifications, if appropriate",
           "category": "UX"
         },
         "tap-targets": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Tap targets are appropriately sized for touch",
           "category": "UX"
         },
         "payments-autocomplete": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Payment forms marked up with [autocomplete] attributes",
           "category": "UX"
         },
         "login-autocomplete": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Login forms marked up with [autocomplete] attributes",
           "category": "UX"
         },
         "input-type": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
           "description": "Input fields use appropriate [type] attributes for custom keyboards",
@@ -323,13 +320,13 @@
     "scored": false,
     "categorizable": false,
     "items": [{
-      "criteria": {
+      "audits": {
         "critical-request-chains": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         },
         "user-timings": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         }
       }

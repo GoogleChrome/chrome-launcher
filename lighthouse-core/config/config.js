@@ -126,10 +126,10 @@ function validatePasses(passes, audits, rootPath) {
     });
   });
 
-  // Log if multiple passes require trace or network data and could overwrite one another.
+  // Log if multiple passes require trace or network recording and could overwrite one another.
   const usedNames = new Set();
   passes.forEach((pass, index) => {
-    if (!pass.network && !pass.trace) {
+    if (!pass.recordNetwork && !pass.recordTrace) {
       return;
     }
 

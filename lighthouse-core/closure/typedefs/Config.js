@@ -27,16 +27,13 @@
 var PassConfig = function() {};
 
 /** type {boolean} */
-PassConfig.prototype.network;
+PassConfig.prototype.recordNetwork;
 
 /** type {boolean} */
-PassConfig.prototype.trace;
+PassConfig.prototype.recordTrace;
 
 /** type {string} */
 PassConfig.prototype.loadDataName;
-
-/** type {!boolean} */
-PassConfig.prototype.loadPage;
 
 /** type {!Array<!string>} */
 PassConfig.prototype.gatherers;

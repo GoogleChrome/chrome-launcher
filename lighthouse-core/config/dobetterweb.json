@@ -1,7 +1,6 @@
 {
   "passes": [{
-    "network": true,
-    "loadPage": true,
+    "recordNetwork": true,
     "gatherers": [
       "../gather/gatherers/https",
       "../gather/gatherers/url",
@@ -30,40 +29,40 @@
     "categorizable": true,
     "items": [{
       "name": "Using modern offline features",
-      "criteria": {
+      "audits": {
         "appcache-manifest": {
-          "rawValue": false
+          "expectedValue": false
         },
         "no-websql": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }, {
       "name": "Using modern protocols",
-      "criteria": {
+      "audits": {
         "is-on-https": {
-          "rawValue": false
+          "expectedValue": false
         },
         "uses-http2": {
-          "rawValue": false,
+          "expectedValue": false,
           "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
         }
       }
     }, {
       "name": "Using modern JavaScript features",
-      "criteria": {
+      "audits": {
         "no-datenow": {
-          "rawValue": false
+          "expectedValue": false
         },
         "no-console-time": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }, {
       "name": "Avoiding APIs that harm the user experience",
-      "criteria": {
+      "audits": {
         "no-document-write": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }]

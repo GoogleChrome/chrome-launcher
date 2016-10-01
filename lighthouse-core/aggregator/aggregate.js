@@ -74,10 +74,10 @@ class Aggregate {
     let weight = 0;
 
     if (typeof expected === 'undefined' ||
-        typeof expected.rawValue === 'undefined' ||
+        typeof expected.expectedValue === 'undefined' ||
         typeof expected.weight === 'undefined') {
       const msg =
-          `aggregations: ${name} criteria does not contain expected rawValue or weight properties`;
+          `aggregations: ${name} audit does not contain expectedValue or weight properties`;
       throw new Error(msg);
     }
 
@@ -91,22 +91,24 @@ class Aggregate {
       throw new Error(msg);
     }
 
-    if (typeof result.score !== typeof expected.rawValue) {
-      let msg =
-          `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+    if (typeof result.score !== typeof expected.expectedValue) {
+      const expectedType = typeof expected.expectedValue;
+      const resultType = typeof result.rawValue;
+      let msg = `Expected expectedValue of type ${expectedType}, got ${resultType}`;
       if (result.debugString) {
         msg += ': ' + result.debugString;
       }
       throw new Error(msg);
     }
 
-    switch (typeof expected.rawValue) {
+    switch (typeof expected.expectedValue) {
       case 'boolean':
-        weight = this._convertBooleanToWeight(result.score, expected.rawValue, expected.weight);
+        weight = this._convertBooleanToWeight(result.score,
+            expected.expectedValue, expected.weight);
         break;
 
       case 'number':
-        weight = this._convertNumberToWeight(result.score, expected.rawValue, expected.weight);
+        weight = this._convertNumberToWeight(result.score, expected.expectedValue, expected.weight);
         break;
 
       default:
@@ -148,15 +150,15 @@ class Aggregate {
    */
   static compare(results, items, aggregationIsScored) {
     return items.map(item => {
-      const expectedNames = Object.keys(item.criteria);
+      const expectedNames = Object.keys(item.audits);
 
       // Filter down and remap the results to something more comparable to
       // the expected set of results.
       const filteredAndRemappedResults =
           Aggregate._remapResultsByName(
-            Aggregate._filterResultsByAuditNames(results, item.criteria)
+            Aggregate._filterResultsByAuditNames(results, item.audits)
           );
-      const maxScore = Aggregate._getTotalWeight(item.criteria);
+      const maxScore = Aggregate._getTotalWeight(item.audits);
       const subItems = [];
       let overallScore = 0;
 
@@ -165,12 +167,12 @@ class Aggregate {
       expectedNames.forEach(e => {
         /* istanbul ignore if */
         // TODO(paullewis): Remove once coming soon audits have landed.
-        if (item.criteria[e].comingSoon) {
+        if (item.audits[e].comingSoon) {
           subItems.push({
             score: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
             name: 'coming-soon',
-            category: item.criteria[e].category,
-            description: item.criteria[e].description,
+            category: item.audits[e].category,
+            description: item.audits[e].description,
             comingSoon: true
           });
 
@@ -191,7 +193,7 @@ class Aggregate {
 
         overallScore += Aggregate._convertToWeight(
             filteredAndRemappedResults[e],
-            item.criteria[e],
+            item.audits[e],
             e);
       });
 

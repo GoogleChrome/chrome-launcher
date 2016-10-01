@@ -129,7 +129,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      trace: true,
+      recordTrace: true,
       gatherers: [{}]
     };
 
@@ -152,7 +152,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      trace: true,
+      recordTrace: true,
       gatherers: [{
         afterPass() {}
       }]
@@ -177,7 +177,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      network: true,
+      recordNetwork: true,
       gatherers: [{}]
     };
 
@@ -196,7 +196,7 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      network: true,
+      recordNetwork: true,
       gatherers: [{
         afterPass() {}
       }]
@@ -230,15 +230,13 @@ describe('GatherRunner', function() {
     const flags = {};
 
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [
         t1
       ]
     }, {
-      loadPage: true,
       passName: 'secondPass',
       gatherers: [
         t2
@@ -260,16 +258,14 @@ describe('GatherRunner', function() {
 
   it('respects trace names', () => {
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }, {
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'secondPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }];
     const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};
@@ -289,10 +285,9 @@ describe('GatherRunner', function() {
     const flags = {};
 
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [
         t1
       ]
@@ -382,10 +377,9 @@ describe('GatherRunner', function() {
 
   it('will instantiate computed artifacts during a run', () => {
     const passes = [{
-      network: true,
-      trace: true,
+      recordNetwork: true,
+      recordTrace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }];
     const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};

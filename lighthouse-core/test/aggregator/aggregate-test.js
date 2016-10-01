@@ -133,7 +133,7 @@ describe('Aggregate', () => {
 
   it('throws for undefined results', () => {
     const expected = {
-      rawValue: true,
+      expectedValue: true,
       weight: 10
     };
     return assert.throws(_ => Aggregate._convertToWeight(undefined, expected));
@@ -150,7 +150,7 @@ describe('Aggregate', () => {
 
   it('returns the correct weight for a boolean result', () => {
     const expected = {
-      rawValue: true,
+      expectedValue: true,
       weight: 10
     };
 
@@ -165,7 +165,7 @@ describe('Aggregate', () => {
 
   it('returns the correct weight for a numeric result', () => {
     const expected = {
-      rawValue: 100,
+      expectedValue: 100,
       weight: 10
     };
 
@@ -180,7 +180,7 @@ describe('Aggregate', () => {
 
   it('throws if weight is missing from the expected', () => {
     const expected = {
-      rawValue: 100
+      expectedValue: 100
     };
 
     const result = {
@@ -194,7 +194,7 @@ describe('Aggregate', () => {
 
   it('returns a weight of zero for other inputs', () => {
     const expected = {
-      rawValue: [],
+      expectedValue: [],
       weight: 10
     };
 
@@ -209,7 +209,7 @@ describe('Aggregate', () => {
 
   it('throws if types do not match', () => {
     const expected = {
-      rawValue: true,
+      expectedValue: true,
       weight: 10
     };
 
@@ -224,13 +224,13 @@ describe('Aggregate', () => {
 
   it('scores a set correctly (contributesToScore: true)', () => {
     const items = [{
-      criteria: {
+      audits: {
         'test': {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         },
         'alternate-test': {
-          rawValue: 100,
+          expectedValue: 100,
           weight: 3
         }
       }
@@ -262,13 +262,13 @@ describe('Aggregate', () => {
 
   it('scores a set correctly (contributesToScore: false)', () => {
     const items = [{
-      criteria: {
+      audits: {
         'test': {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         },
         'alternate-test': {
-          rawValue: 100,
+          expectedValue: 100,
           weight: 3
         }
       }
@@ -300,9 +300,9 @@ describe('Aggregate', () => {
 
   it('throws when given a result containing no score property', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         }
       }
@@ -318,9 +318,9 @@ describe('Aggregate', () => {
     return assert.throws(_ => Aggregate.compare(results, items, scored));
   });
 
-  it('throws when given a criterion containing no rawValue property', () => {
+  it('throws when given an audit containing no expectedValue property', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           weight: 1
         }
@@ -339,9 +339,9 @@ describe('Aggregate', () => {
 
   it('filters a set correctly', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         }
       }
@@ -367,9 +367,9 @@ describe('Aggregate', () => {
 
   it('outputs a score', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         }
       }
@@ -387,9 +387,9 @@ describe('Aggregate', () => {
 
   it('outputs subitems', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
-          rawValue: true,
+          expectedValue: true,
           weight: 1
         }
       }
@@ -414,9 +414,9 @@ describe('Aggregate', () => {
       scored: true,
       categorizable: true,
       items: [{
-        criteria: {
+        audits: {
           test: {
-            rawValue: true,
+            expectedValue: true,
             weight: 1
           }
         }
