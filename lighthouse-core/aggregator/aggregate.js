@@ -74,10 +74,10 @@ class Aggregate {
     let weight = 0;
 
     if (typeof expected === 'undefined' ||
-        typeof expected.rawValue === 'undefined' ||
+        typeof expected.expectedValue === 'undefined' ||
         typeof expected.weight === 'undefined') {
       const msg =
-          `aggregations: ${name} audit does not contain expected rawValue or weight properties`;
+          `aggregations: ${name} audit does not contain expectedValue or weight properties`;
       throw new Error(msg);
     }
 
@@ -91,22 +91,24 @@ class Aggregate {
       throw new Error(msg);
     }
 
-    if (typeof result.score !== typeof expected.rawValue) {
-      let msg =
-          `Expected rawValue of type ${typeof expected.rawValue}, got ${typeof result.rawValue}`;
+    if (typeof result.score !== typeof expected.expectedValue) {
+      const expectedType = typeof expected.expectedValue;
+      const resultType = typeof result.rawValue;
+      let msg = `Expected expectedValue of type ${expectedType}, got ${resultType}`;
       if (result.debugString) {
         msg += ': ' + result.debugString;
       }
       throw new Error(msg);
     }
 
-    switch (typeof expected.rawValue) {
+    switch (typeof expected.expectedValue) {
       case 'boolean':
-        weight = this._convertBooleanToWeight(result.score, expected.rawValue, expected.weight);
+        weight = this._convertBooleanToWeight(result.score,
+            expected.expectedValue, expected.weight);
         break;
 
       case 'number':
-        weight = this._convertNumberToWeight(result.score, expected.rawValue, expected.weight);
+        weight = this._convertNumberToWeight(result.score, expected.expectedValue, expected.weight);
         break;
 
       default:

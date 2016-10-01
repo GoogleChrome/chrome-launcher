@@ -28,11 +28,11 @@
       "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
       "audits": {
         "service-worker": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         },
         "works-offline": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }
@@ -41,7 +41,7 @@
       "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
       "audits": {
         "viewport": {
-          "rawValue": true,
+          "expectedValue": true,
           "weight": 1
         }
       }

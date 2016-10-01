@@ -25,19 +25,19 @@
       "description": "",
       "audits": {
         "first-meaningful-paint": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "speed-index-metric": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "estimated-input-latency": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         },
         "time-to-interactive": {
-          "rawValue": 100,
+          "expectedValue": 100,
           "weight": 1
         }
       }
@@ -50,11 +50,11 @@
     "items": [{
       "audits": {
         "critical-request-chains": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         },
         "user-timings": {
-          "rawValue": 0,
+          "expectedValue": 0,
           "weight": 1
         }
       }

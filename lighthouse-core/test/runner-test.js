@@ -186,7 +186,7 @@ describe('Runner', () => {
           description: 'description',
           audits: {
             'is-on-https': {
-              rawValue: true,
+              expectedValue: true,
               weight: 1
             }
           }

@@ -31,20 +31,20 @@
       "name": "Using modern offline features",
       "audits": {
         "appcache-manifest": {
-          "rawValue": false
+          "expectedValue": false
         },
         "no-websql": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }, {
       "name": "Using modern protocols",
       "audits": {
         "is-on-https": {
-          "rawValue": false
+          "expectedValue": false
         },
         "uses-http2": {
-          "rawValue": false,
+          "expectedValue": false,
           "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
         }
       }
@@ -52,17 +52,17 @@
       "name": "Using modern JavaScript features",
       "audits": {
         "no-datenow": {
-          "rawValue": false
+          "expectedValue": false
         },
         "no-console-time": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }, {
       "name": "Avoiding APIs that harm the user experience",
       "audits": {
         "no-document-write": {
-          "rawValue": false
+          "expectedValue": false
         }
       }
     }]
