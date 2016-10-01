@@ -53,7 +53,7 @@ var AggregationCriteria;
 function AggregationItem() {}
 
 /** @type {!Object<!AggregationCriterion>} */
-AggregationItem.prototype.criteria;
+AggregationItem.prototype.audits;
 
 /** @type {string} */
 AggregationItem.prototype.name;

@@ -80,7 +80,7 @@ Lighthouse can be used to analyze trace and performance data collected from othe
     "scored": false,
     "categorizable": false,
     "items": [{
-      "criteria": {
+      "audits": {
         "user-timings": { "rawValue": 0, "weight": 1 },
         "critical-request-chains": { "rawValue": 0, "weight": 1}
       }

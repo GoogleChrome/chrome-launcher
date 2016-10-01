@@ -23,7 +23,7 @@
     "items": [{
       "name": "Page load performance is fast",
       "description": "",
-      "criteria": {
+      "audits": {
         "first-meaningful-paint": {
           "rawValue": 100,
           "weight": 1
@@ -48,7 +48,7 @@
     "scored": false,
     "categorizable": false,
     "items": [{
-      "criteria": {
+      "audits": {
         "critical-request-chains": {
           "rawValue": 0,
           "weight": 1

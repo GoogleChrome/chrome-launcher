@@ -81,7 +81,7 @@ window.getDefaultAggregations = function() {
       if (aggregation.items.length === 1) {
         return {
           name: aggregation.name,
-          criteria: aggregation.items[0].criteria,
+          audits: aggregation.items[0].audits,
         };
       }
 
@@ -90,7 +90,7 @@ window.getDefaultAggregations = function() {
   ).map(aggregation => {
     return {
       name: aggregation.name,
-      audits: Object.keys(aggregation.criteria)
+      audits: Object.keys(aggregation.audits)
     };
   });
 };

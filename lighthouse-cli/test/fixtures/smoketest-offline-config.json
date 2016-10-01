@@ -26,7 +26,7 @@
     "items": [{
       "name": "App can load on offline/flaky connections",
       "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
-      "criteria": {
+      "audits": {
         "service-worker": {
           "rawValue": true,
           "weight": 1
@@ -39,7 +39,7 @@
     }, {
       "name": "Design is mobile-friendly",
       "description": "Users increasingly experience your app on mobile devices, so it's important to ensure that the experience can adapt to smaller screens.",
-      "criteria": {
+      "audits": {
         "viewport": {
           "rawValue": true,
           "weight": 1

@@ -224,7 +224,7 @@ describe('Aggregate', () => {
 
   it('scores a set correctly (contributesToScore: true)', () => {
     const items = [{
-      criteria: {
+      audits: {
         'test': {
           rawValue: true,
           weight: 1
@@ -262,7 +262,7 @@ describe('Aggregate', () => {
 
   it('scores a set correctly (contributesToScore: false)', () => {
     const items = [{
-      criteria: {
+      audits: {
         'test': {
           rawValue: true,
           weight: 1
@@ -300,7 +300,7 @@ describe('Aggregate', () => {
 
   it('throws when given a result containing no score property', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           rawValue: true,
           weight: 1
@@ -320,7 +320,7 @@ describe('Aggregate', () => {
 
   it('throws when given a criterion containing no rawValue property', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           weight: 1
         }
@@ -339,7 +339,7 @@ describe('Aggregate', () => {
 
   it('filters a set correctly', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           rawValue: true,
           weight: 1
@@ -367,7 +367,7 @@ describe('Aggregate', () => {
 
   it('outputs a score', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           rawValue: true,
           weight: 1
@@ -387,7 +387,7 @@ describe('Aggregate', () => {
 
   it('outputs subitems', () => {
     const items = [{
-      criteria: {
+      audits: {
         test: {
           rawValue: true,
           weight: 1
@@ -414,7 +414,7 @@ describe('Aggregate', () => {
       scored: true,
       categorizable: true,
       items: [{
-        criteria: {
+        audits: {
           test: {
             rawValue: true,
             weight: 1

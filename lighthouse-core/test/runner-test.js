@@ -153,7 +153,7 @@ describe('Runner', () => {
         items: [{
           name: 'name',
           description: 'description',
-          criteria: {
+          audits: {
             'is-on-https': {
               value: true,
               weight: 1
@@ -184,7 +184,7 @@ describe('Runner', () => {
         items: [{
           name: 'name',
           description: 'description',
-          criteria: {
+          audits: {
             'is-on-https': {
               rawValue: true,
               weight: 1

@@ -29,7 +29,7 @@
     "categorizable": true,
     "items": [{
       "name": "Using modern offline features",
-      "criteria": {
+      "audits": {
         "appcache-manifest": {
           "rawValue": false
         },
@@ -39,7 +39,7 @@
       }
     }, {
       "name": "Using modern protocols",
-      "criteria": {
+      "audits": {
         "is-on-https": {
           "rawValue": false
         },
@@ -50,7 +50,7 @@
       }
     }, {
       "name": "Using modern JavaScript features",
-      "criteria": {
+      "audits": {
         "no-datenow": {
           "rawValue": false
         },
@@ -60,7 +60,7 @@
       }
     }, {
       "name": "Avoiding APIs that harm the user experience",
-      "criteria": {
+      "audits": {
         "no-document-write": {
           "rawValue": false
         }
