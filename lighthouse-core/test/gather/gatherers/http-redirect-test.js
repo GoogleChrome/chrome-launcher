@@ -77,30 +77,41 @@ describe('HTTP Redirect gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(httpRedirectGather.artifact.value, false);
-      assert.ok(typeof httpRedirectGather.artifact.debugString === 'string');
+      assert.ok(httpRedirectGather.artifact.debugString);
     });
   });
 
   it('handles driver timeout', () => {
+    const fastTimeout = 50;
+    const slowResolve = 200;
+    let artifact;
+
     return httpRedirectGather.afterPass({
       driver: {
         getSecurityState() {
           return new Promise((resolve, reject) => {
-            // Resolve after a second, which should be after the timeout for waiting on
-            // the security state has fired.
-            setTimeout(resolve, 1000);
+            // Resolve slowly, after the timeout for waiting on the security
+            // state has fired.
+            setTimeout(_ => resolve({
+              schemeIsCryptographic: true
+            }), slowResolve);
           });
         }
       },
 
-      timeout: 250
+      _testTimeout: fastTimeout
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.equal(httpRedirectGather.artifact.value, false);
+      artifact = httpRedirectGather.artifact;
+      assert.equal(artifact.value, false);
+      assert.ok(artifact.debugString);
+
+      // Wait until after slow resolve to ensure artifact value didn't change.
+      return new Promise((resolve, reject) => {
+        setTimeout(resolve, slowResolve);
+      });
+    }).then(_ => {
+      assert.deepStrictEqual(httpRedirectGather.artifact, artifact);
     });
   });
 });

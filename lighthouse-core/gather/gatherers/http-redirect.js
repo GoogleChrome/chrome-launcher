@@ -27,7 +27,6 @@ class HTTPRedirect extends Gatherer {
 
   constructor() {
     super();
-    this._noSecurityChangesTimeout = undefined;
     this._preRedirectURL = undefined;
   }
 
@@ -37,45 +36,43 @@ class HTTPRedirect extends Gatherer {
   }
 
   afterPass(options) {
-    const driver = options.driver;
-    const timeout = options.timeout || 10000;
-
     // Reset the options.
     options.url = this._preRedirectURL;
 
-    return new Promise((resolve, reject) => {
+    // Allow override for faster testing.
+    const timeout = options._testTimeout || 10000;
+
+    const securityPromise = options.driver.getSecurityState()
+      .then(state => {
+        return {
+          value: state.schemeIsCryptographic
+        };
+      }, _ => {
+        return {
+          value: false,
+          debugString: 'Error requesting security state'
+        };
+      });
+
+    let noSecurityChangesTimeout;
+    const timeoutPromise = new Promise((resolve, reject) => {
       // Set up a timeout for ten seconds in case we don't get any
       // security events at all. If that happens, bail.
-      this._noSecurityChangesTimeout = setTimeout(_ => {
-        this.artifact = {
+      noSecurityChangesTimeout = setTimeout(_ => {
+        resolve({
           value: false,
           debugString: 'Timed out waiting for HTTP redirection.'
-        };
-
-        resolve();
-      }, timeout);
-
-      driver.getSecurityState()
-        .then(state => {
-          // We've received a security event, so this needs
-          // to be canceled, otherwise we resolve the promise with an error.
-          if (this._noSecurityChangesTimeout !== undefined) {
-            clearTimeout(this._noSecurityChangesTimeout);
-          }
-
-          this.artifact = {
-            value: state.schemeIsCryptographic
-          };
-
-          resolve();
-        }, _ => {
-          this.artifact = {
-            value: false,
-            debugString: 'Error requesting security state'
-          };
-
-          reject();
         });
+      }, timeout);
+    });
+
+    return Promise.race([
+      securityPromise,
+      timeoutPromise
+    ]).then(result => {
+      // Clear timeout. No effect if it won, no need to wait if it lost.
+      clearTimeout(noSecurityChangesTimeout);
+      this.artifact = result;
     });
   }
 }
