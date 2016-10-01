@@ -35,9 +35,6 @@ PassConfig.prototype.trace;
 /** type {string} */
 PassConfig.prototype.loadDataName;
 
-/** type {!boolean} */
-PassConfig.prototype.loadPage;
-
 /** type {!Array<!string>} */
 PassConfig.prototype.gatherers;
 

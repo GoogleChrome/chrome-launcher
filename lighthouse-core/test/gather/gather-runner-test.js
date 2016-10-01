@@ -233,12 +233,10 @@ describe('GatherRunner', function() {
       network: true,
       trace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [
         t1
       ]
     }, {
-      loadPage: true,
       passName: 'secondPass',
       gatherers: [
         t2
@@ -263,13 +261,11 @@ describe('GatherRunner', function() {
       network: true,
       trace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }, {
       network: true,
       trace: true,
       passName: 'secondPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }];
     const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};
@@ -292,7 +288,6 @@ describe('GatherRunner', function() {
       network: true,
       trace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [
         t1
       ]
@@ -385,7 +380,6 @@ describe('GatherRunner', function() {
       network: true,
       trace: true,
       passName: 'firstPass',
-      loadPage: true,
       gatherers: [new TestGatherer()]
     }];
     const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};

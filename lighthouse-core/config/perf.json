@@ -2,7 +2,6 @@
   "passes": [{
     "network": true,
     "trace": true,
-    "loadPage": true,
     "gatherers": []
   }],
 

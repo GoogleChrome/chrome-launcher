@@ -121,18 +121,14 @@ class GatherRunner {
     const driver = options.driver;
     const config = options.config;
     const gatherers = config.gatherers;
-    let pass = Promise.resolve();
 
-    if (config.loadPage) {
-      pass = pass.then(_ => {
-        const status = 'Loading page & waiting for onload';
-        const gatherernames = gatherers.map(g => g.name).join(', ');
-        log.log('status', status, gatherernames);
-        return GatherRunner.loadPage(driver, options).then(_ => {
-          log.log('statusEnd', status);
-        });
-      });
-    }
+    const gatherernames = gatherers.map(g => g.name).join(', ');
+    const status = 'Loading page & waiting for onload';
+    log.log('status', status, gatherernames);
+
+    const pass = GatherRunner.loadPage(driver, options).then(_ => {
+      log.log('statusEnd', status);
+    });
 
     return gatherers.reduce((chain, gatherer) => {
       return chain.then(_ => gatherer.pass(options));

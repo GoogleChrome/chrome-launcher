@@ -2,7 +2,6 @@
   "passes": [{
     "network": true,
     "trace": true,
-    "loadPage": true,
     "gatherers": [
       "url",
       "https",
@@ -17,7 +16,6 @@
   },
   {
     "passName": "offlinePass",
-    "loadPage": true,
     "network": true,
     "gatherers": [
       "service-worker",
@@ -25,7 +23,6 @@
     ]
   },
   {
-    "loadPage": true,
     "gatherers": [
       "http-redirect",
       "html-without-javascript"
