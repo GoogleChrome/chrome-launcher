@@ -144,12 +144,14 @@ module.exports = (function() {
   require('chrome-devtools-frontend/front_end/common/UIString.js');
   require('chrome-devtools-frontend/front_end/platform/utilities.js');
   require('chrome-devtools-frontend/front_end/sdk/Target.js');
+  require('chrome-devtools-frontend/front_end/sdk/TargetManager.js');
   require('chrome-devtools-frontend/front_end/sdk/NetworkManager.js');
   require('chrome-devtools-frontend/front_end/sdk/NetworkRequest.js');
 
   // Dependencies for timeline-model
   WebInspector.targetManager = {
-    observeTargets() {}
+    observeTargets() { },
+    addEventListener() { }
   };
   WebInspector.settings = {
     createSetting() {
@@ -209,7 +211,7 @@ module.exports = (function() {
   WebInspector.NetworkLog = function(target) {
     this._requests = new Map();
     target.networkManager.addEventListener(
-      WebInspector.NetworkManager.EventTypes.RequestStarted, this._onRequestStarted, this);
+      WebInspector.NetworkManager.Events.RequestStarted, this._onRequestStarted, this);
   };
 
   WebInspector.NetworkLog.prototype = {
@@ -250,11 +252,16 @@ module.exports = (function() {
       networkAgent() {
         return fakeNetworkAgent;
       },
-      registerNetworkDispatcher() {}
+      registerNetworkDispatcher() { },
+      model() { }
     };
 
     fakeTarget.networkManager = new WebInspector.NetworkManager(fakeTarget);
     fakeTarget.networkLog = new WebInspector.NetworkLog(fakeTarget);
+
+    WebInspector.NetworkLog.fromTarget = () => {
+      return fakeTarget.networkLog;
+    };
 
     return fakeTarget.networkManager;
   };

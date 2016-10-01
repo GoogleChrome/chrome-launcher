@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "axe-core": "^1.1.1",
-    "chrome-devtools-frontend": "1.0.401423",
+    "chrome-devtools-frontend": "1.0.422034",
     "chrome-remote-interface": "^0.11.0",
     "debug": "^2.2.0",
     "devtools-timeline-model": "1.1.6",
