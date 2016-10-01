@@ -18,7 +18,6 @@
 
 const ComputedArtifact = require('./computed-artifact');
 const speedline = require('speedline');
-const ConsoleQuieter = require('../../lib/console-quieter');
 
 class Speedline extends ComputedArtifact {
 
@@ -33,10 +32,8 @@ class Speedline extends ComputedArtifact {
     // speedline() may throw without a promise, so we resolve immediately
     // to get in a promise chain.
     return Promise.resolve().then(_ => {
-      ConsoleQuieter.mute({prefix: 'speedline'});
       return speedline(trace.traceEvents);
     }).then(speedlineResults => {
-      ConsoleQuieter.unmuteAndFlush();
       return speedlineResults;
     });
   }

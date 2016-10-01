@@ -34,11 +34,11 @@ describe('Speedline gatherer', () => {
   });
 
   // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
-  it('measures the pwa.rocks example with speed index of 831', () => {
+  it('measures the pwa.rocks example with speed index of 577', () => {
     const speedlineGather = new SpeedlineGather();
 
     return speedlineGather.request({traceEvents: pwaTrace}).then(speedline => {
-      return assert.equal(Math.round(speedline.speedIndex), 831);
+      return assert.equal(Math.round(speedline.speedIndex), 577);
     });
   });
 
@@ -61,7 +61,7 @@ describe('Speedline gatherer', () => {
         assert.ok(speedlineGather.cache.has(trace), 'Cache reports a match');
         assert.equal(speedlineGather.cache.get(trace), speedline, 'Cache match matches');
 
-        return assert.equal(Math.round(speedline.speedIndex), 831);
+        return assert.equal(Math.round(speedline.speedIndex), 577);
       });
   });
 });

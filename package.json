@@ -54,7 +54,7 @@
     "mkdirp": "^0.5.1",
     "rimraf": "^2.2.8",
     "semver": ">=4.3.3",
-    "speedline": "1.0.0",
+    "speedline": "pmdartus/speedline#fptovc",
     "yargs": "3.30.0"
   },
   "repository": "googlechrome/lighthouse",
