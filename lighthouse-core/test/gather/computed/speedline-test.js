@@ -20,6 +20,7 @@
 const SpeedlineGather = require('../../../gather/computed/speedline.js');
 const assert = require('assert');
 const pwaTrace = require('../../fixtures/traces/progressive-app.json');
+const threeFrameTrace = require('../../fixtures/traces/threeframes-blank_content_more.json');
 
 describe('Speedline gatherer', () => {
   it('returns an error debugString on faulty trace data', () => {
@@ -33,17 +34,24 @@ describe('Speedline gatherer', () => {
     });
   });
 
-  // TODO(samthor): speedIndex requires trace data with frame data. Include multiple short samples.
-  it('measures the pwa.rocks example with speed index of 831', () => {
+  it('measures the pwa.rocks example with speed index of 577', () => {
     const speedlineGather = new SpeedlineGather();
 
     return speedlineGather.request({traceEvents: pwaTrace}).then(speedline => {
-      return assert.equal(Math.round(speedline.speedIndex), 831);
+      return assert.equal(Math.floor(speedline.speedIndex), 577);
+    });
+  });
+
+  it('measures SI of 3 frame trace (blank @1s, content @2s, more content @3s)', () => {
+    const speedlineGather = new SpeedlineGather();
+
+    return speedlineGather.request({traceEvents: threeFrameTrace}).then(speedline => {
+      assert.equal(Math.floor(speedline.speedIndex), 2040);
+      return assert.equal(Math.floor(speedline.perceptualSpeedIndex), 2066);
     });
   });
 
   it('uses a cache', () => {
-    // TODO these gather instances could be shared across tests for speed
     const speedlineGather = new SpeedlineGather();
     let start;
     const trace = {traceEvents: pwaTrace};
@@ -61,7 +69,7 @@ describe('Speedline gatherer', () => {
         assert.ok(speedlineGather.cache.has(trace), 'Cache reports a match');
         assert.equal(speedlineGather.cache.get(trace), speedline, 'Cache match matches');
 
-        return assert.equal(Math.round(speedline.speedIndex), 831);
+        return assert.equal(Math.floor(speedline.speedIndex), 577);
       });
   });
 });
