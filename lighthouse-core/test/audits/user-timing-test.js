@@ -24,7 +24,8 @@ const traceEvents = require('../fixtures/traces/trace-user-timings.json');
 describe('Performance: user-timings audit', () => {
   it('fails gracefully', () => {
     return Audit.audit({}).then(response => {
-      return assert.equal(response.score, -1);
+      assert.equal(response.score, -1);
+      assert.ok(response.debugString.length);
     });
   });
 
@@ -32,12 +33,16 @@ describe('Performance: user-timings audit', () => {
     return Audit.audit({traces: {[Audit.DEFAULT_PASS]: {traceEvents}}})
       .then(response => {
         assert.equal(response.score, 2);
-        assert.ok(!Number.isNaN(response.extendedInfo.value[0].startTime));
-        assert.ok(typeof response.extendedInfo.value[0].endTime === 'undefined');
-        assert.ok(typeof response.extendedInfo.value[0].duration === 'undefined');
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].startTime));
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].endTime));
-        assert.ok(!Number.isNaN(response.extendedInfo.value[1].duration));
+
+        assert.equal(response.extendedInfo.value[0].isMark, true);
+        assert.equal(Math.floor(response.extendedInfo.value[0].startTime), 1000);
+        assert.equal(typeof response.extendedInfo.value[0].endTime, 'undefined');
+        assert.equal(typeof response.extendedInfo.value[0].duration, 'undefined');
+
+        assert.equal(response.extendedInfo.value[1].isMark, false);
+        assert.equal(Math.floor(response.extendedInfo.value[1].startTime), 0);
+        assert.equal(Math.floor(response.extendedInfo.value[1].endTime), 1000);
+        assert.equal(Math.floor(response.extendedInfo.value[1].duration), 1000);
       });
   });
 });
