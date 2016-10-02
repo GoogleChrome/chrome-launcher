@@ -42,16 +42,34 @@ class ReportLoader {
 
   write(results) {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(results);
-
-    this.stopSpinner();
-    document.documentElement.innerHTML = html;
+    try {
+      const html = reportGenerator.generateHTML(results);
+      this.stopSpinner();
+      document.documentElement.innerHTML = html;
+    } catch (err) {
+      this.stopSpinner();
+      this.displayException(err, results);
+    }
 
     // Find and replace all the scripts that have been injected so that they get evaluated.
     const scripts = document.querySelectorAll('script');
     scripts.forEach(this.replaceScript);
   }
 
+  displayException(err, results) {
+    const html = `
+      <div class="report-error">
+        <h1 class="error-message">⚠️ Error: <span></span></h1>
+        <p class="error-stack"><span></span></p>
+        <big>➡ <a target="_blank" href="https://github.com/GoogleChrome/lighthouse/issues">Please report this bug</a></big>
+        <div class="error-results"><pre><span></span></pre></div>
+      </div>
+    `;
+    document.body.innerHTML = html;
+    document.querySelector('.error-message span').textContent = err.message;
+    document.querySelector('.error-stack span').textContent = err.stack;
+    document.querySelector('.error-results span').textContent = JSON.stringify(results, null, 2);
+  }
   /**
    * Replaces the script injected by innerHTML so that it actually gets evaluated and executed.
    */

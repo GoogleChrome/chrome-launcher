@@ -55,3 +55,18 @@ a {
   background-size: 34px 34px;
   will-change: transform;
 }
+
+.report-error {
+  font-family: consolas, monospace;
+}
+
+.error-stack {
+  white-space: pre-wrap;
+}
+
+.error-results {
+  background: #dedede;
+  max-height: 600px;
+  overflow: auto;
+  border-radius: 2px;
+}

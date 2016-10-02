@@ -64,6 +64,8 @@ window.runLighthouse = function(options, requestedAudits) {
 
       // Run Lighthouse.
       return Runner.run(driver, runOptions);
+    }).then(results => {
+      window.createPageAndPopulate(results);
     }).catch(e => {
       console.error(e);
       throw e;

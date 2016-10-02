@@ -129,9 +129,6 @@ document.addEventListener('DOMContentLoaded', _ => {
         }
       }, selectedAudits);
     })
-    .then(results => {
-      background.createPageAndPopulate(results);
-    })
     .catch(err => {
       let {message} = err;
       if (err.message.toLowerCase().startsWith('another debugger')) {
