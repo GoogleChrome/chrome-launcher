@@ -61,7 +61,7 @@ class ReportLoader {
       <div class="report-error">
         <h1 class="error-message">⚠️ Error: <span></span></h1>
         <p class="error-stack"><span></span></p>
-        <big>➡ <a target="_blank" href="httbigs://github.com/GoogleChrome/lighthouse/issues">Please report this bug</a></big>
+        <big>➡ <a target="_blank" href="https://github.com/GoogleChrome/lighthouse/issues">Please report this bug</a></big>
         <div class="error-results"><pre><span></span></pre></div>
       </div>
     `;
