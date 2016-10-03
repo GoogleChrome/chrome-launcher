@@ -271,43 +271,51 @@ class GatherRunner {
       });
   }
 
-  static getGathererClass(gatherer, configPath) {
+  static getGathererClass(nameOrGathererClass, configPath) {
     const Runner = require('../runner');
     const coreList = Runner.getGathererList();
 
-    // First, see if the gatherer is a Lighthouse core gatherer.
-    const coreGatherer = coreList.find(a => a === `${gatherer}.js`);
-    let requirePath = `./gatherers/${gatherer}`;
-    if (!coreGatherer) {
-      // Otherwise, attempt to find it elsewhere. This throws if not found.
-      requirePath = Runner.resolvePlugin(gatherer, configPath, 'gatherer');
+    let GathererClass;
+    if (typeof nameOrGathererClass === 'string') {
+      const name = nameOrGathererClass;
+
+      // See if the gatherer is a Lighthouse core gatherer.
+      const coreGatherer = coreList.find(a => a === `${name}.js`);
+      let requirePath = `./gatherers/${name}`;
+      if (!coreGatherer) {
+        // Otherwise, attempt to find it elsewhere. This throws if not found.
+        requirePath = Runner.resolvePlugin(name, configPath, 'gatherer');
+      }
+
+      GathererClass = require(requirePath);
+
+      this.assertValidGatherer(GathererClass, name);
+    } else {
+      GathererClass = nameOrGathererClass;
+      this.assertValidGatherer(GathererClass);
     }
-
-    const GathererClass = require(requirePath);
-
-    // Confirm that the gatherer appears valid.
-    this.assertValidGatherer(gatherer, GathererClass);
 
     return GathererClass;
   }
 
-  static assertValidGatherer(gatherer, GathererDefinition) {
+  static assertValidGatherer(GathererDefinition, gathererName) {
     const gathererInstance = new GathererDefinition();
+    gathererName = gathererName || gathererInstance.name || 'gatherer';
 
     if (typeof gathererInstance.beforePass !== 'function') {
-      throw new Error(`${gatherer} has no beforePass() method.`);
+      throw new Error(`${gathererName} has no beforePass() method.`);
     }
 
     if (typeof gathererInstance.pass !== 'function') {
-      throw new Error(`${gatherer} has no pass() method.`);
+      throw new Error(`${gathererName} has no pass() method.`);
     }
 
     if (typeof gathererInstance.afterPass !== 'function') {
-      throw new Error(`${gatherer} has no afterPass() method.`);
+      throw new Error(`${gathererName} has no afterPass() method.`);
     }
 
     if (typeof gathererInstance.artifact !== 'object') {
-      throw new Error(`${gatherer} has no artifact property.`);
+      throw new Error(`${gathererName} has no artifact property.`);
     }
   }
 

@@ -308,6 +308,10 @@ describe('GatherRunner', function() {
     return assert.doesNotThrow(_ => GatherRunner.getGathererClass('valid-custom-gatherer', root));
   });
 
+  it('returns gatherer when gatherer class, not package-name string, is provided', () => {
+    assert.equal(GatherRunner.getGathererClass(TestGatherer, '.'), TestGatherer);
+  });
+
   it('throws when a gatherer is not found', () => {
     return assert.throws(_ => GatherRunner.getGathererClass(
         '/fake-path/non-existent-gatherer'), /locate gatherer/);
