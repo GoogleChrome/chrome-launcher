@@ -44,15 +44,15 @@ class HTMLWithoutJavaScript extends Gatherer {
 
     this.artifact = {};
     return driver.evaluateAsync(`(${getBodyText.toString()}())`)
-    .then(result => {
-      this.artifact = result;
-    })
-    .catch(_ => {
-      this.artifact = {
-        value: -1,
-        debugString: 'Unable to get document body innerText'
-      };
-    });
+      .then(result => {
+        this.artifact = result;
+      })
+      .catch(_ => {
+        this.artifact = {
+          value: -1,
+          debugString: 'Unable to get document body innerText'
+        };
+      });
   }
 }
 

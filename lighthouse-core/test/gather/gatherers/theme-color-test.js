@@ -51,8 +51,6 @@ describe('Theme Color gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(themeColorGather.artifact, -1);
     });
   });

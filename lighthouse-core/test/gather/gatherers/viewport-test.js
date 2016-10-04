@@ -50,8 +50,6 @@ describe('Viewport gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(viewportGather.artifact, -1);
     });
   });

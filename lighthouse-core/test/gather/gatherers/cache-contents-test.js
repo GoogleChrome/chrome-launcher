@@ -21,10 +21,6 @@ const CacheContentGather = require('../../../gather/gatherers/cache-contents');
 const assert = require('assert');
 let cacheContentGather;
 
-const isExpectedOutput = artifact => {
-  return 'raw' in artifact && 'value' in artifact;
-};
-
 describe('Cache Contents gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
@@ -51,9 +47,7 @@ describe('Cache Contents gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.ok(isExpectedOutput(cacheContentGather.artifact));
+      assert.ok(cacheContentGather.artifact.debugString);
     });
   });
 

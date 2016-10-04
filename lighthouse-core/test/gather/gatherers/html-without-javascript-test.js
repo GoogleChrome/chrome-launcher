@@ -71,10 +71,8 @@ describe('HTML without JavaScript gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.ok('value' in htmlWithoutJavaScriptGather.artifact);
-      assert.ok('debugString' in htmlWithoutJavaScriptGather.artifact);
+      assert.equal(htmlWithoutJavaScriptGather.artifact.value, -1);
+      assert.ok(htmlWithoutJavaScriptGather.artifact.debugString);
     });
   });
 });
