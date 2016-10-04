@@ -18,6 +18,11 @@
 
 const Gatherer = require('./gatherer');
 
+/**
+ * @fileoverview Determines the security level of the page.
+ * @see https://chromedevtools.github.io/debugger-protocol-viewer/tot/Security/#type-SecurityState
+ */
+
 class HTTPS extends Gatherer {
 
   constructor() {
@@ -26,41 +31,40 @@ class HTTPS extends Gatherer {
   }
 
   afterPass(options) {
-    const driver = options.driver;
-    const timeout = options.timeout || 10000;
+    // Allow override for faster testing.
+    const timeout = options._testTimeout || 10000;
 
-    return new Promise((resolve, reject) => {
+    const securityPromise = options.driver.getSecurityState()
+      .then(state => {
+        return {
+          value: state.schemeIsCryptographic
+        };
+      }, _ => {
+        return {
+          value: false,
+          debugString: 'Error requesting page security state.'
+        };
+      });
+
+    let noSecurityChangesTimeout;
+    const timeoutPromise = new Promise((resolve, reject) => {
       // Set up a timeout for ten seconds in case we don't get any
       // security events at all. If that happens, bail.
-      this._noSecurityChangesTimeout = setTimeout(_ => {
-        this.artifact = {
+      noSecurityChangesTimeout = setTimeout(_ => {
+        resolve({
           value: false,
-          debugString: 'Timed out waiting for security event.'
-        };
-
-        resolve();
-      }, timeout);
-
-      driver.getSecurityState()
-        .then(state => {
-          // We've received a security event, so this needs
-          // to be canceled, otherwise we resolve the promise with an error.
-          if (this._noSecurityChangesTimeout !== undefined) {
-            clearTimeout(this._noSecurityChangesTimeout);
-          }
-
-          this.artifact = {
-            value: state.schemeIsCryptographic
-          };
-
-          resolve();
-        }, _ => {
-          this.artifact = {
-            value: false,
-            debugString: 'Error getting security state'
-          };
-          resolve();
+          debugString: 'Timed out waiting for page security state.'
         });
+      }, timeout);
+    });
+
+    return Promise.race([
+      securityPromise,
+      timeoutPromise
+    ]).then(result => {
+      // Clear timeout. No effect if it won, no need to wait if it lost.
+      clearTimeout(noSecurityChangesTimeout);
+      this.artifact = result;
     });
   }
 }

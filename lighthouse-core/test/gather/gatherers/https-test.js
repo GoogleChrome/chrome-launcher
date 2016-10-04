@@ -55,20 +55,35 @@ describe('HTTPS gatherer', () => {
   });
 
   it('handles driver timeout', () => {
+    const fastTimeout = 50;
+    const slowResolve = 200;
+    let artifact;
+
     return httpsGather.afterPass({
       driver: {
         getSecurityState() {
           return new Promise((resolve, reject) => {
-            // Resolve the Promise after the timeout should have fired.
-            setTimeout(resolve, 500);
+            // Resolve slowly, after the timeout for waiting on the security
+            // state has fired.
+            setTimeout(_ => resolve({
+              schemeIsCryptographic: true
+            }), slowResolve);
           });
         }
       },
 
-      timeout: 250
+      _testTimeout: fastTimeout
     }).then(_ => {
-      assert.equal(httpsGather.artifact.value, false);
-      assert.ok(httpsGather.artifact.debugString);
+      artifact = httpsGather.artifact;
+      assert.equal(artifact.value, false);
+      assert.ok(artifact.debugString);
+
+      // Wait until after slow resolve to ensure artifact value didn't change.
+      return new Promise((resolve, reject) => {
+        setTimeout(resolve, slowResolve);
+      });
+    }).then(_ => {
+      assert.deepStrictEqual(httpsGather.artifact, artifact);
     });
   });
 });
