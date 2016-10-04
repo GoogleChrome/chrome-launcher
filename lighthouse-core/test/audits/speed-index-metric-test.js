@@ -63,14 +63,6 @@ describe('Performance: speed-index-metric audit', () => {
     });
   });
 
-  it('gives error string if too few frames to determine speed index', () => {
-    const artifacts = mockArtifactsWithSpeedlineResult({frames: [frame()]});
-    return Audit.audit(artifacts).then(response => {
-      assert.equal(response.rawValue, -1);
-      assert(response.debugString);
-    });
-  });
-
   it('gives error string if speed index of 0', () => {
     const SpeedlineResult = {
       frames: [frame(), frame(), frame()],

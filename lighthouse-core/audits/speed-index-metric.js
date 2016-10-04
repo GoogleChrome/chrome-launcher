@@ -64,13 +64,6 @@ class SpeedIndexMetric extends Audit {
         });
       }
 
-      if (speedline.frames.length < 3) {
-        return SpeedIndexMetric.generateAuditResult({
-          rawValue: -1,
-          debugString: 'Trace unable to find sufficient frames to evaluate Speed Index.'
-        });
-      }
-
       if (speedline.speedIndex === 0) {
         return SpeedIndexMetric.generateAuditResult({
           rawValue: -1,
