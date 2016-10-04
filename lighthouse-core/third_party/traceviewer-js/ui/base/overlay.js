@@ -24,7 +24,7 @@ require("./utils.js");
 global.tr.exportTo('tr.ui.b', function () {
   if (tr.isHeadless) return {};
 
-  var THIS_DOC = document.currentScript.ownerDocument;
+  return;
 
   /**
    * Creates a new overlay element. It will not be visible until shown.

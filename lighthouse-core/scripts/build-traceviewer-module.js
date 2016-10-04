@@ -70,6 +70,8 @@ function convertImport(src) {
 
       // node4 compat
       scriptsContent = polyfillNode4Support(dest, scriptsContent);
+      // browser compat
+      scriptsContent = adjustForBrowserCompat(scriptsContent);
 
       writeNewFile(dest, scriptsContent);
 
@@ -131,6 +133,12 @@ function convertImport(src) {
           plugins: ['transform-es2015-destructuring']
         }).code;
         return transformed;
+      }
+
+      function adjustForBrowserCompat(scriptsContent) {
+        return scriptsContent
+            // early exit in tracing/base.ui and avoid currentScript from breaking us.
+            .replace('var THIS_DOC = document.currentScript.ownerDocument;', 'return;');
       }
 
       function writeNewFile(dest, scriptsContent) {
