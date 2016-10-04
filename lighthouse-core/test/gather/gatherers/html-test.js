@@ -70,10 +70,8 @@ describe('HTML gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.ok('value' in htmlGather.artifact);
-      assert.ok('debugString' in htmlGather.artifact);
+      assert.equal(htmlGather.artifact.value, -1);
+      assert.ok(htmlGather.artifact.debugString);
     });
   });
 });

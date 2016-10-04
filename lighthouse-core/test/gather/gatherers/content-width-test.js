@@ -21,7 +21,7 @@ const ContentWidthGatherer = require('../../../gather/gatherers/content-width');
 const assert = require('assert');
 let contentWidthGatherer;
 
-describe('Viewport gatherer', () => {
+describe('Content Width gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
     contentWidthGatherer = new ContentWidthGatherer();
@@ -51,8 +51,6 @@ describe('Viewport gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(contentWidthGatherer.artifact.scrollWidth, -1);
     });
   });

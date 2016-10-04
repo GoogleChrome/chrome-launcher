@@ -24,10 +24,6 @@ let manifestGather;
 const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 
-const isExpectedOutput = artifact => {
-  return 'raw' in artifact && 'value' in artifact;
-};
-
 describe('Manifest gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
@@ -59,9 +55,7 @@ describe('Manifest gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.ok(isExpectedOutput(manifestGather.artifact));
+      assert.ok(manifestGather.artifact.debugString);
     });
   });
 

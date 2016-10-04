@@ -21,10 +21,6 @@ const AccessibilityGather = require('../../../gather/gatherers/accessibility');
 const assert = require('assert');
 let accessibilityGather;
 
-const isExpectedOutput = artifact => {
-  return 'raw' in artifact && 'value' in artifact;
-};
-
 describe('Accessibility gatherer', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
@@ -51,9 +47,7 @@ describe('Accessibility gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
-      assert.ok(isExpectedOutput(accessibilityGather.artifact));
+      assert.ok(accessibilityGather.artifact.debugString);
     });
   });
 

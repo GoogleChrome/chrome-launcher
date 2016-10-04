@@ -41,8 +41,7 @@ describe('Geolocation gatherer', () => {
         }
       }
     })).then(_ => {
-      assert.ok(typeof geolocationGatherer.artifact === 'boolean');
-      assert.equal(geolocationGatherer.artifact, true);
+      assert.strictEqual(geolocationGatherer.artifact, true);
     });
   });
 
@@ -60,8 +59,6 @@ describe('Geolocation gatherer', () => {
         }
       }
     })).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(geolocationGatherer.artifact, -1);
     });
   });

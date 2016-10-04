@@ -49,9 +49,8 @@ describe('HTTPS gatherer', () => {
         }
       }
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(httpsGather.artifact.value, false);
+      assert.ok(httpsGather.artifact.debugString);
     });
   });
 
@@ -68,10 +67,8 @@ describe('HTTPS gatherer', () => {
 
       timeout: 250
     }).then(_ => {
-      assert(false);
-    }).catch(_ => {
       assert.equal(httpsGather.artifact.value, false);
-      assert.ok(typeof httpsGather.artifact.debugString === 'string');
+      assert.ok(httpsGather.artifact.debugString);
     });
   });
 });
