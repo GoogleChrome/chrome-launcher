@@ -294,6 +294,10 @@ class Config {
 
     this._passes = configJSON.passes || null;
     this._auditResults = configJSON.auditResults || null;
+    if (this._auditResults && !Array.isArray(this._auditResults)) {
+      throw new Error('config.auditResults must be an array');
+    }
+
     this._aggregations = configJSON.aggregations || null;
 
     this._audits = requireAudits(configJSON.audits, this._configDir);
