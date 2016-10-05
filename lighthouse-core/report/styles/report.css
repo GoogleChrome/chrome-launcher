@@ -181,25 +181,18 @@ a {
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 22px;
   font-weight: 400;
-  color: #FFFFFF;
+  color: #fff;
   margin: 0;
   padding: 0;
   line-height: 1.5;
 }
 
-.menu__header-url {
-  opacity: 0.74;
+.menu__header-version {
+  opacity: 0.4;
+  color: #fff;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 14px;
-  color: #FFFFFF;
-  margin: 0;
-  padding: 0;
   line-height: 1.5;
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 92%;
 }
 
 .menu__nav {
@@ -265,9 +258,22 @@ a {
   color: #FFF;
 }
 
+.report-body__url {
+  font-family: 'Roboto', Arial, sans-serif;
+  white-space: nowrap;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 400;
+  color: #aaa;
+  padding: 20px 0 10px;
+}
+
+.report-body__url a {
+  color: currentColor;
+}
+
 .report-body__breakdown {
   flex: 1;
-  padding-top: 20px;
   max-width: 100%;
 }
 

@@ -1,4 +1,7 @@
 {
+  "meta": {
+    "lighthouseVersion": "1.1.4"
+  },
   "audits": {
     "is-on-https": {
       "score": true,

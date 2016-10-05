@@ -113,7 +113,8 @@ function createOutput(results, outputMode) {
   // Pretty printed.
   const bold = '\x1b[1m';
   const reset = '\x1B[0m';
-  let output = `\n\n${bold}Lighthouse results:${reset} ${results.url}\n\n`;
+  const version = results.meta.lighthouseVersion;
+  let output = `\n\n${bold}Lighthouse (${version}) results:${reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
     output += `▫ ${bold}${aggregation.name}${reset}\n\n`;
