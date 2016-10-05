@@ -130,9 +130,7 @@ class Runner {
         }
 
         return {
-          meta: {
-            lighthouseVersion: require('../package').version
-          },
+          lighthouseVersion: require('../package').version,
           initialUrl: opts.initialUrl,
           url: opts.url,
           audits: formattedAudits,

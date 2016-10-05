@@ -205,7 +205,7 @@ class ReportGenerator {
     const template = Handlebars.compile(this.getReportHTML());
     return template({
       url: results.url,
-      lighthouseVersion: results.meta.lighthouseVersion,
+      lighthouseVersion: results.lighthouseVersion,
       css: this.getReportCSS(inline),
       script: this.getReportJS(inline),
       aggregations: results.aggregations,
