@@ -1,7 +1,5 @@
 {
-  "meta": {
-    "lighthouseVersion": "x.x.x"
-  },
+  "lighthouseVersion": "x.x.x",
   "audits": {
     "is-on-https": {
       "score": true,
