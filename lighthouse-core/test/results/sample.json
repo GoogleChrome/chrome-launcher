@@ -1,4 +1,5 @@
 {
+  "lighthouseVersion": "x.x.x",
   "audits": {
     "is-on-https": {
       "score": true,

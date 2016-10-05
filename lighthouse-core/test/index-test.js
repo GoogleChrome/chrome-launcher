@@ -113,6 +113,7 @@ describe('Module Tests', function() {
         description: 'HTML has a viewport <meta>'
       }]
     }).then(results => {
+      assert.ok(results.lighthouseVersion);
       assert.equal(results.url, exampleUrl);
       assert.equal(results.initialUrl, exampleUrl);
       assert.ok(Array.isArray(results.aggregations));

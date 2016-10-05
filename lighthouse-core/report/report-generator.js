@@ -22,7 +22,6 @@ const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
-const pkg = require('../../package.json');
 
 class ReportGenerator {
 
@@ -51,9 +50,6 @@ class ReportGenerator {
       const formatter = new Intl.DateTimeFormat('en-US', options);
       return formatter.format(new Date());
     });
-
-    // Lighthouse version at the bottom of the HTML report.
-    Handlebars.registerHelper('version', _ => pkg.version);
 
     // Helper for either show an "✘" or "✔" booleans, or simply returning the
     // value if it's of any other type.
@@ -209,6 +205,7 @@ class ReportGenerator {
     const template = Handlebars.compile(this.getReportHTML());
     return template({
       url: results.url,
+      lighthouseVersion: results.lighthouseVersion,
       css: this.getReportCSS(inline),
       script: this.getReportJS(inline),
       aggregations: results.aggregations,
