@@ -1,18 +1,13 @@
-# lighthouse
-> Stops you crashing into the rocks; lights the way
+# lighthouse  [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse) [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
 
-![image](https://cloud.githubusercontent.com/assets/39191/15410166/30c658e2-1dcd-11e6-99da-8996be5429b6.png)
+> Lighthouse analyzes web apps and web pages, collecting modern performance metrics and insights on developer best practices.
 
-![image](https://cloud.githubusercontent.com/assets/39191/15410190/502b2d52-1dcd-11e6-9d82-5de8742180bd.png)
+![image](https://cloud.githubusercontent.com/assets/39191/19172855/ed871100-8bd8-11e6-9ea6-8aeece7760d4.png)
+
+![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
 
 
-
-[![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse)
-[![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
-
-_status: ready for use! please report any issues or questions you have_
-
-**Lighthouse requires Chrome 52 or later**
+Lighthouse requires Chrome 52 or later.
 
 ## Install Chrome extension
 
@@ -254,5 +249,6 @@ node scripts/build-traceviewer-module.js
 
 
 <p align="center">
-<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px">
+<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px"><br>
+Lighthouse stops you crashing into the rocks; lights the way.
 </p>
