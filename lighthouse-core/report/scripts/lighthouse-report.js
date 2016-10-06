@@ -25,8 +25,10 @@ function LighthouseReport() {
   this.checkboxToggleView = document.querySelector('.js-toggle-view');
   this.viewUserFeature = document.querySelector('.js-report-by-user-feature');
   this.viewTechnology = document.querySelector('.js-report-by-technology');
+  this.reportItems = document.querySelectorAll('.report-section__item');
 
   this.updateView = this.updateView.bind(this);
+  this.toggleHelpText = this.toggleHelpText.bind(this);
 
   this.addEventListeners();
 }
@@ -47,9 +49,21 @@ LighthouseReport.prototype = {
     }
   },
 
+  toggleHelpText: function(e) {
+    if (e.target.classList.contains('report-section__item-help-toggle')) {
+      const el = e.currentTarget.querySelector('.report-section__item-helptext');
+      if (el) {
+        el.hidden = !el.hidden;
+      }
+    }
+  },
+
   addEventListeners: function() {
     this.printButton.addEventListener('click', this.onPrint);
     this.checkboxToggleView.addEventListener('change', this.updateView);
+    [...this.reportItems].forEach(node => {
+      node.addEventListener('click', this.toggleHelpText);
+    });
   }
 };
 

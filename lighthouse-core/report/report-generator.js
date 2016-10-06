@@ -23,6 +23,12 @@ const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
 
+const RATINGS = {
+  GOOD: {label: 'good', minValue: 0.66, minScore: 75},
+  AVERAGE: {label: 'average', minValue: 0.33},
+  POOR: {label: 'poor', minScore: 45}
+};
+
 class ReportGenerator {
 
   constructor() {
@@ -32,6 +38,22 @@ class ReportGenerator {
       }, 0) / aggregation.score.length;
 
       return Math.round(totalScore * 100);
+    };
+
+    const getItemRating = value => {
+      if (typeof value === 'boolean') {
+        return value ? RATINGS.GOOD.label : RATINGS.POOR.label;
+      }
+
+      // Limit the rating to average if this is a rating for Best Practices.
+      let rating = RATINGS.POOR.label;
+      if (value > RATINGS.GOOD.minValue) {
+        rating = RATINGS.GOOD.label;
+      } else if (value > RATINGS.AVERAGE.minValue) {
+        rating = RATINGS.AVERAGE.label;
+      }
+
+      return rating;
     };
 
     // Converts a name to a link.
@@ -68,33 +90,23 @@ class ReportGenerator {
     Handlebars.registerHelper('getTotalScoreRating', aggregation => {
       const totalScore = getTotalScore(aggregation);
 
-      let rating = 'poor';
-      if (totalScore > 45) {
-        rating = 'average';
+      let rating = RATINGS.POOR.label;
+      if (totalScore > RATINGS.POOR.minScore) {
+        rating = RATINGS.AVERAGE.label;
       }
-      if (totalScore > 75) {
-        rating = 'good';
+      if (totalScore > RATINGS.GOOD.minScore) {
+        rating = RATINGS.GOOD.label;
       }
 
       return rating;
     });
 
-    // Converts a value to a rating string, which can be used inside the report for color styling.
-    Handlebars.registerHelper('getItemRating', (value, aggregatorScored) => {
-      if (typeof value === 'boolean') {
-        return value ? 'good' : 'poor';
-      }
+    // Converts a value to a rating string, which can be used inside the report
+    // for color styling.
+    Handlebars.registerHelper('getItemRating', getItemRating);
 
-      // Limit the rating to average if this is a rating for Best Practices.
-      let rating = aggregatorScored ? 'average' : 'poor';
-      if (value > 0.33) {
-        rating = 'average';
-      }
-      if (value > 0.66) {
-        rating = 'good';
-      }
-
-      return rating;
+    Handlebars.registerHelper('showHelpText', value => {
+      return getItemRating(value) === RATINGS.GOOD.label ? 'hidden' : '';
     });
 
     // Convert numbers to fixed point decimals

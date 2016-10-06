@@ -112,7 +112,12 @@ limitations under the License.
                       {{#if subItem.comingSoon}}
                       (Coming soon)
                       {{/if}}
+
+                      {{#if subItem.helpText }}
+                        <span class="report-section__item-help-toggle">?</span>
+                      {{/if}}
                     </span>
+
                     {{#if subItem.displayValue }}
                     <span class="report-section__item-raw-value">({{ subItem.displayValue }})&nbsp;</span>
                     {{/if }}
@@ -120,7 +125,7 @@ limitations under the License.
                   </div>
 
                   {{#if subItem.helpText }}
-                    <div class="report-section__item-helptext">
+                    <div class="report-section__item-helptext" {{showHelpText subItem.score}}>
                       {{{ subItem.helpText }}}
                     </div>
                   {{/if}}
