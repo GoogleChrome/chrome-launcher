@@ -114,6 +114,7 @@ describe('Module Tests', function() {
       }]
     }).then(results => {
       assert.ok(results.lighthouseVersion);
+      assert.ok(results.generatedTime);
       assert.equal(results.url, exampleUrl);
       assert.equal(results.initialUrl, exampleUrl);
       assert.ok(Array.isArray(results.aggregations));

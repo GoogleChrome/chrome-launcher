@@ -1,5 +1,6 @@
 {
   "lighthouseVersion": "x.x.x",
+  "generatedTime": "2016-10-06T18:25:16.681Z",
   "audits": {
     "is-on-https": {
       "score": true,

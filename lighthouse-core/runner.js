@@ -131,6 +131,7 @@ class Runner {
 
         return {
           lighthouseVersion: require('../package').version,
+          generatedTime: (new Date()).toJSON(),
           initialUrl: opts.initialUrl,
           url: opts.url,
           audits: formattedAudits,

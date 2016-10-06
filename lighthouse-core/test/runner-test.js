@@ -217,6 +217,7 @@ describe('Runner', () => {
 
     return Runner.run(fakeDriver, {url, config}).then(results => {
       assert.ok(results.lighthouseVersion);
+      assert.ok(results.generatedTime);
       assert.equal(results.initialUrl, url);
       assert.equal(results.audits['is-on-https'].name, 'is-on-https');
       assert.equal(results.aggregations[0].score[0].overall, 1);

@@ -34,6 +34,12 @@ describe('Report', () => {
     return assert.ok(/<script>/gim.test(html));
   });
 
+  it('should format generated Time', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+    return assert.ok(/on 10\/\d\/2016\, /gim.test(html));
+  });
+
   it('generates extension HTML', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: false});
