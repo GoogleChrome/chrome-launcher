@@ -76,9 +76,7 @@ limitations under the License.
           </span>
           {{/if}}
         </h1>
-        <p class="report-section__description">
-          {{ this.description }}
-        </p>
+        <p class="report-section__description">{{ this.description }}</p>
 
         <div class="js-report-by-user-feature">
           {{#each this.score as |aggregation|}}
@@ -131,9 +129,7 @@ limitations under the License.
                   {{/if}}
 
                   {{#if subItem.extendedInfo.value}}
-                    <div class="report-section__item-extended-info">
-                    {{> (lookup . 'name') subItem.extendedInfo.value }}
-                    </div>
+                    <div class="report-section__item-extended-info">{{> (lookup . 'name') subItem.extendedInfo.value }}</div>
                   {{/if}}
                 </li>
               {{/each}}
@@ -168,9 +164,7 @@ limitations under the License.
                     </div>
 
                     {{#if subItem.extendedInfo.value}}
-                      <div class="report-section__item-extended-info">
-                      {{> (lookup . 'name') subItem.extendedInfo.value }}
-                      </div>
+                      <div class="report-section__item-extended-info">{{> (lookup . 'name') subItem.extendedInfo.value }}</div>
                     {{/if}}
                   </li>
                 {{/each}}

@@ -303,7 +303,7 @@ a {
   font-weight: 500;
   color: #49525F;
   display: flex;
-  margin: 1em 0 0.3em 0;
+  margin: 0.4em 0 0.3em 0;
 }
 
 .report-section__title-main {
@@ -333,9 +333,12 @@ a {
 .report-section__description {
   color: #5F6875;
   font-size: 16px;
-  margin: 0 0 2em 0;
+  margin: 0 0 1em 0;
   line-height: 1.4;
   max-width: 750px;
+}
+.report-section__description:empty {
+  margin: 0;
 }
 
 .report-section__aggregation-description {
@@ -375,9 +378,14 @@ a {
   font-size: 15px;
   color: #555;
   font-style: italic;
-  padding: 8px 0px 16px 24px;
+  margin: 0px 0px 16px 24px;
   max-width: 90%;
 }
+
+.report-section__item-extended-info:empty {
+  margin: 0;
+}
+
 .report-section__item-helptext {
   font-size: 14px;
   color: #999;
