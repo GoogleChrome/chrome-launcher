@@ -11,16 +11,16 @@ Lighthouse requires Chrome 52 or later.
 
 ## Install Chrome extension
 
-[chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
+Install from the Chrome Web Store: [chrome.google.com/webstore/detail/lighthouse/…](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
 Quick-start guide on using the Lighthouse extension: http://bit.ly/lighthouse-quickstart
 
-## Install CLI
+## Install CLI [![NPM lighthouse package](https://img.shields.io/npm/v/lighthouse.svg)](https://npmjs.org/package/lighthouse)
 
 Requires Node v5+ or Node v4 w/ `--harmony`
 
 ```sh
-npm install -g GoogleChrome/lighthouse
+npm install -g lighthouse
 ```
 
 ## Run
@@ -122,7 +122,7 @@ Options:
 
 ## Lighthouse w/ mobile devices
 
-Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse. 
+Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse.
 
 ```sh
 $ adb kill-server
