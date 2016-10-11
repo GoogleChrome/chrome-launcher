@@ -26,9 +26,33 @@
 enum OutputMode { pretty, json, html };
 type Mode = 'pretty' | 'json' | 'html';
 
+interface SubScore {
+  displayValue: string;
+  debugString: string;
+  comingSoon?: boolean;
+  score: number;
+  description: string;
+  extendedInfo?: {
+    value: string;
+    formatter: string;
+  };
+}
+
+interface Score {
+  overall: number;
+  name: string;
+  scored: boolean;
+  subItems: Array<SubScore>;
+}
+
+interface Aggregation {
+  name: string;
+  score:  Array<Score>;
+}
+
 interface Results {
   url: string;
-  aggregations: any[];
+  aggregations: Array<Aggregation>;
   audits: Object;
   lighthouseVersion: string;
 };
@@ -50,7 +74,7 @@ function checkOutputPath(path: string): string {
   return path;
 }
 
-function formatScore(score, suffix?: string) {
+function formatScore(score: boolean | number | string, suffix?: string) {
   // Until we only support node 6 we can not use default args.
   suffix = suffix || '';
 
@@ -114,7 +138,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
       item.subItems.forEach(subitem => {
         // Get audit object from inside of results.audits under name subitem.
         // Coming soon events are not located inside of results.audits.
-        subitem = results.audits[subitem] || subitem;
+        subitem = results.audits[subitem as any] || subitem;
 
         if (subitem.comingSoon) {
           return;
