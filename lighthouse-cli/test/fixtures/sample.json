@@ -60,6 +60,24 @@
       "category": "JavaScript",
       "description": "Page contains some content when its scripts are not available"
     },
+    "appcache-manifest": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "name": "appcache-manifest",
+      "category": "Offline",
+      "description": "Site is not using Application Cache",
+      "helpText": "Application Cache has been <a href=\"https://html.spec.whatwg.org/multipage/browsers.html#offline\" target=\"_blank\">deprecated</a> by <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers\" target=\"_blank\">Service Workers</a>. Consider implementing an offline solution using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Cache\" target=\"_blank\">Cache Storage API</a>."
+    },
+    "no-websql": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "name": "no-websql",
+      "category": "Offline",
+      "description": "Site is not using WebSQL DB.",
+      "helpText": "Web SQL Database is <a href=\"https://dev.w3.org/html5/webdatabase/\" target=\"_blank\">deprecated</a>. Consider implementing an offline solution using <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB\" target=\"_blank\">IndexedDB</a>."
+    },
     "first-meaningful-paint": {
       "score": 100,
       "displayValue": "615.8ms",
@@ -607,6 +625,22 @@
           "subItems": [
             "critical-request-chains",
             "user-timings"
+          ]
+        }
+      ]
+    },
+     {
+      "name": "Do Better Web",
+      "description": "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls.",
+      "scored": false,
+      "categorizable": true,
+      "score": [
+        {
+          "overall": null,
+          "name": "Using modern offline features",
+          "subItems": [
+            "appcache-manifest",
+            "no-websql"
           ]
         }
       ]

@@ -57,6 +57,11 @@ describe('Printer', () => {
     // Just check there's no HTML / JSON there.
     assert.throws(_ => JSON.parse(prettyOutput));
     assert.equal(/<!doctype/gim.test(prettyOutput), false);
+
+    const hasScoreOnNonScoredItem = /Using modern offline features.*?(0%|NaN)/.test(prettyOutput);
+    const hasAggregationPresent = prettyOutput.includes('Using modern offline features');
+    assert.equal(hasScoreOnNonScoredItem, false, 'non-scored item was scored');
+    assert.equal(hasAggregationPresent, true, 'non-scored aggregation item is not there');
   });
 
   it('creates HTML for results', () => {

@@ -80,6 +80,7 @@ function formatScore(score, suffix) {
   if (typeof score !== 'number') {
     return `${purple}${score}${reset}`;
   }
+
   let colorChoice = red;
   if (score > 45) {
     colorChoice = yellow;
@@ -123,7 +124,7 @@ function createOutput(results, outputMode) {
       let score = (item.overall * 100).toFixed(0);
 
       if (item.name) {
-        output += `${bold}${item.name}${reset}: ${formatScore(Number(score), '%')}\n`;
+        output += `${bold}${item.name}${reset}: ${item.scored ? formatScore(score, '%') : ''}\n`;
       }
 
       item.subItems.forEach(subitem => {
