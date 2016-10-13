@@ -6,7 +6,7 @@
     margin-right: 8px;
   }
   .http-resource__protocol,
-  .http-resource__misc {
+  .http-resource__code {
     color: #999;
   }
 </style>
@@ -17,11 +17,11 @@
     {{#each this}}
       <div class="http-resource">
         <span class="http-resource__url">{{this.url}}</span>
-        {{#if this.protocol}}
-          <span class="http-resource__protocol">({{this.protocol}})</span>
+        {{#if this.label}}
+          <span class="http-resource__protocol">({{this.label}})</span>
         {{/if}}
-        {{#if this.misc}}
-          <span class="http-resource__misc">{{this.misc}}</span>
+        {{#if this.code}}
+          <pre class="http-resource__code">{{this.code}}</pre>
         {{/if}}
       </div>
     {{/each}}

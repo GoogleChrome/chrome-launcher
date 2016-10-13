@@ -59,7 +59,7 @@ class NoConsoleTimeAudit extends Audit {
       return url.parse(err.url).host === pageHost;
     }).map(err => {
       return Object.assign({
-        misc: `(line: ${err.line}, col: ${err.col})`
+        label: `line: ${err.line}, col: ${err.col}`
       }, err);
     });
 

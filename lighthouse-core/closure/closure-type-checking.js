@@ -29,6 +29,7 @@ gulp.task('js-compile', function() {
     'closure/third_party/*.js',
     'audits/**/*.js',
     'lib/icons.js',
+    'lib/styles-helpers.js',
     'aggregator/**/*.js'
   ])
     // TODO: hack to remove `require`s that Closure currently can't resolve.

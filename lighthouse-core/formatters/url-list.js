@@ -33,7 +33,11 @@ class UrlList extends Formatter {
 
           let output = '';
           resources.forEach(resource => {
-            output += `      ${resource.url} (${resource.protocol})\n`;
+            output += `      ${resource.url}`;
+            if (resource.label) {
+              output += ` (${resource.label})`;
+            }
+            output += '\n';
           });
           return output;
         };
