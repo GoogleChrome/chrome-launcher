@@ -70,8 +70,12 @@ class UsesHTTP2Audit extends Audit {
       }, record);
     });
 
-    const displayValue = (resources.length ?
-        `${resources.length} resources were not served over h2` : '');
+    let displayValue = '';
+    if (resources.length > 1) {
+      displayValue = `${resources.length} resources were not served over h2`;
+    } else if (resources.length === 1) {
+      displayValue = `${resources.length} resource was not served over h2`;
+    }
 
     return UsesHTTP2Audit.generateAuditResult({
       rawValue: resources.length === 0,

@@ -41,6 +41,15 @@ describe('Resources are fetched over http/2', () => {
     assert.equal(auditResult.extendedInfo.value.length, 4);
   });
 
+  it('displayValue is correct when only one resource fails', () => {
+    const entryWithHTTP1 = networkRecords.slice(1, 2);
+    const auditResult = UsesHTTP2Audit.audit({
+      URL: {finalUrl: URL},
+      networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: entryWithHTTP1}
+    });
+    assert.ok(auditResult.displayValue.match('1 resource was not'));
+  });
+
   it('passes when all resources were requested via http/2', () => {
     const auditResult = UsesHTTP2Audit.audit({
       URL: {finalUrl: URL},
