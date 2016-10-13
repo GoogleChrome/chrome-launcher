@@ -25,6 +25,7 @@ const net = require('net');
 const rimraf = require('rimraf');
 const ask = require('./ask');
 const chromeFinder = require('./chrome-finder');
+const log = require('../lighthouse-core/lib/log');
 
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
@@ -77,7 +78,7 @@ module.exports = class Launcher {
     // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.TMP_PROFILE_DIR}/chrome.pid`;
 
-    console.log(`created ${this.TMP_PROFILE_DIR}`);
+    log.log('ChromeLauncher', `created ${this.TMP_PROFILE_DIR}`);
 
     this.prepared = true;
   }
@@ -116,7 +117,7 @@ module.exports = class Launcher {
 
       fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
-      console.log('Chrome running with pid =', chrome.pid);
+      log.log('ChromeLauncher', 'Chrome running with pid =', chrome.pid);
       resolve(chrome.pid);
     })
     .then(pid => Promise.all([pid, this.waitUntilReady()]));
@@ -153,24 +154,17 @@ module.exports = class Launcher {
     return new Promise((resolve, reject) => {
       let retries = 0;
       (function poll() {
-        const green = '\x1B[32m';
-        const reset = '\x1B[0m';
-
         if (retries === 0) {
-          process.stdout.write('Waiting for browser.');
+          log.log('ChromeLauncher', 'Waiting for browser...');
         }
         retries++;
-        process.stdout.write('..');
+        log.verbose('ChromeLauncher', 'Waiting for browser...');
 
         launcher
           .isDebuggerReady()
-          .then(() => {
-            process.stdout.write(`${green}✓${reset}\n`);
-            resolve();
-          })
+          .then(resolve)
           .catch(err => {
             if (retries > 10) {
-              process.stdout.write('\n');
               return reject(err);
             }
             delay(launcher.pollInterval).then(poll);
@@ -187,7 +181,7 @@ module.exports = class Launcher {
           resolve();
         });
 
-        console.log('Killing all Chrome Instances');
+        log.log('ChromeLauncher', 'Killing all Chrome Instances');
         this.chrome.kill();
 
         if (process.platform === 'win32') {
@@ -202,7 +196,7 @@ module.exports = class Launcher {
 
   destroyTmp() {
     if (this.TMP_PROFILE_DIR) {
-      console.log(`Removing ${this.TMP_PROFILE_DIR}`);
+      log.log('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
       rimraf.sync(this.TMP_PROFILE_DIR);
     }
   }
