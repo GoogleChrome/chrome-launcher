@@ -179,8 +179,9 @@ _Some incomplete notes_
 * **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
 
 ##### Internal module graph
-![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/16702446/cd59989e-451a-11e6-97e9-6c72c301017d.png)
-<small><code>npm install -g js-vd; vd --exclude "node_modules|third_party" lighthouse-core/ > graph.html</code></small>
+![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/19367685/04d4336a-9151-11e6-9ebb-3b87bdb09a4c.png)
+
+<small><code>npm install -g js-vd; vd --exclude "node_modules|third_party|fs|path|url|log" lighthouse-core/ > graph.html</code></small>
 
 
 ### Protocol
