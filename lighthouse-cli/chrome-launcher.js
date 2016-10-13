@@ -153,16 +153,24 @@ module.exports = class Launcher {
 
     return new Promise((resolve, reject) => {
       let retries = 0;
+      let waitStatus = 'Waiting for browser.';
       (function poll() {
+        const green = '\x1B[32m';
+        const reset = '\x1B[0m';
+
         if (retries === 0) {
-          log.log('ChromeLauncher', 'Waiting for browser...');
+          log.log('ChromeLauncher', waitStatus);
         }
         retries++;
-        log.verbose('ChromeLauncher', 'Waiting for browser...');
+        waitStatus += '..';
+        log.verbose('ChromeLauncher', waitStatus);
 
         launcher
           .isDebuggerReady()
-          .then(resolve)
+          .then(() => {
+            log.verbose('ChromeLauncher', waitStatus + `${green}✓${reset}`);
+            resolve();
+          })
           .catch(err => {
             if (retries > 10) {
               return reject(err);
