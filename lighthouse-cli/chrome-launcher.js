@@ -78,7 +78,7 @@ module.exports = class Launcher {
     // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.TMP_PROFILE_DIR}/chrome.pid`;
 
-    log.log('ChromeLauncher', `created ${this.TMP_PROFILE_DIR}`);
+    log.verbose('ChromeLauncher', `created ${this.TMP_PROFILE_DIR}`);
 
     this.prepared = true;
   }
@@ -117,7 +117,7 @@ module.exports = class Launcher {
 
       fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
-      log.log('ChromeLauncher', 'Chrome running with pid =', chrome.pid);
+      log.verbose('ChromeLauncher', 'Chrome running with pid =', chrome.pid);
       resolve(chrome.pid);
     })
     .then(pid => Promise.all([pid, this.waitUntilReady()]));
@@ -163,12 +163,12 @@ module.exports = class Launcher {
         }
         retries++;
         waitStatus += '..';
-        log.verbose('ChromeLauncher', waitStatus);
+        log.log('ChromeLauncher', waitStatus);
 
         launcher
           .isDebuggerReady()
           .then(() => {
-            log.verbose('ChromeLauncher', waitStatus + `${green}✓${reset}`);
+            log.log('ChromeLauncher', waitStatus + `${green}✓${reset}`);
             resolve();
           })
           .catch(err => {
@@ -204,7 +204,7 @@ module.exports = class Launcher {
 
   destroyTmp() {
     if (this.TMP_PROFILE_DIR) {
-      log.log('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
+      log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
       rimraf.sync(this.TMP_PROFILE_DIR);
     }
   }
