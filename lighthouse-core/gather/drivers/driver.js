@@ -596,13 +596,19 @@ function captureJSCallUsage(funcRef, set) {
   const originalPrepareStackTrace = Error.prepareStackTrace;
 
   return function() {
+    const args = Object.values(arguments); // callee's arguments.
+
     // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
     Error.prepareStackTrace = function(error, structStackTrace) {
-      const lastCallFrame = structStackTrace[structStackTrace.length - 1];
-      const file = lastCallFrame.getFileName();
-      const line = lastCallFrame.getLineNumber();
-      const col = lastCallFrame.getColumnNumber();
-      return {url: file, line, col}; // return value is e.stack
+      // First frame is the function we injected (the one that just threw).
+      // Second, is the actual callsite of the funcRef we're after.
+      const callFrame = structStackTrace[1];
+      const file = callFrame.getFileName();
+      const line = callFrame.getLineNumber();
+      const col = callFrame.getColumnNumber();
+      const stackTrace = structStackTrace.slice(1).map(
+          callsite => callsite.toString());
+      return {url: file, args, line, col, stackTrace}; // return value is e.stack
     };
     const e = new Error(`__called ${funcRef.name}__`);
     set.add(JSON.stringify(e.stack));
