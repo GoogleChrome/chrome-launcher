@@ -23,7 +23,10 @@ const execSync = require('child_process').execSync;
 
 module.exports = {
   darwin() {
-    const suffix = '/Contents/MacOS/Google Chrome Canary';
+    const suffixes = [
+      '/Contents/MacOS/Google Chrome Canary',
+      '/Contents/MacOS/Google Chrome'
+    ];
 
     const LSREGISTER =
       '/System/Library/Frameworks/CoreServices.framework' +
@@ -34,21 +37,26 @@ module.exports = {
 
     execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome canary.app$\'' +
+      ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
       ' | awk \'{$1=""; print $0}\''
     ).toString()
       .split(/\r?\n/)
       .forEach(inst => {
-        const execPath = path.join(inst.trim(), suffix);
-        if (canAccess(execPath)) {
-          installations.push(execPath);
-        }
+        suffixes.forEach(suffix => {
+          const execPath = path.join(inst.trim(), suffix);
+          if (canAccess(execPath)) {
+            installations.push(execPath);
+          }
+        });
       });
 
     const priorities = new Map([
-      [/^\/Volumes\//, -1],
-      [/^\/Applications\//, 100],
-      [new RegExp(`^${process.env.HOME}/Applications/`), 50]
+      [/^\/Volumes\/.*Chrome Canary.app/, -1],
+      [/^\/Volumes\/.*Chrome.app/, -2],
+      [/^\/Applications\/.*Chrome Canary.app/, 101],
+      [/^\/Applications\/.*Chrome.app/, 100],
+      [new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`), 51],
+      [new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`), 50]
     ]);
 
     return sort(installations, priorities);
