@@ -596,7 +596,9 @@ function captureJSCallUsage(funcRef, set) {
   const originalPrepareStackTrace = Error.prepareStackTrace;
 
   return function() {
-    const args = Object.values(arguments); // callee's arguments.
+    // Note: this function runs in the context of the page that is being audited.
+
+    const args = [...arguments]; // callee's arguments.
 
     // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
     Error.prepareStackTrace = function(error, structStackTrace) {
