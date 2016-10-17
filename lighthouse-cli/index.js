@@ -192,7 +192,8 @@ function lighthouseRun(addresses) {
   return lighthouse(address, flags, config)
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
-      if (outputMode !== 'html') {
+      // If pretty printing to the command line, also output the html report.
+      if (outputMode === Printer.OUTPUT_MODE.pretty) {
         const filename = './' + assetSaver.getFilenamePrefix({url: address}) + '.html';
         Printer.write(results, 'html', filename);
       }
