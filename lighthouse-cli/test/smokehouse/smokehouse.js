@@ -73,7 +73,10 @@ function resolveLocalOrCwd(payloadPath) {
  * @return {!LighthouseResults}
  */
 function runLighthouse(url, configPath) {
-  const command = `node lighthouse-cli/index.js ${url}`;
+  // Assume if currently running in Node v4 that child process will as well, so
+  // run Lighthouse with --harmony flag.
+  const harmony = /v4/.test(process.version) ? '--harmony' : '';
+  const command = `node ${harmony} lighthouse-cli/index.js ${url}`;
   const options = [
     `--config-path=${configPath}`,
     '--output=json',
