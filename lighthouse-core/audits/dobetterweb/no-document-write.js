@@ -54,7 +54,7 @@ class NoDocWriteAudit extends Audit {
 
     const results = artifacts.DocWriteUse.usage.map(err => {
       return Object.assign({
-        misc: `(line: ${err.line}, col: ${err.col})`
+        label: `line: ${err.line}, col: ${err.col}`
       }, err);
     });
 

@@ -63,10 +63,19 @@ class UsesHTTP2Audit extends Audit {
       const sameHost = requestHost === finalHost;
       const notH2 = /HTTP\/[01][\.\d]?/i.test(record.protocol);
       return sameHost && notH2;
+    }).map(record => {
+      return Object.assign({
+        label: record.protocol,
+        url: record.url // .url is a getter and not copied over for the assign.
+      }, record);
     });
 
-    const displayValue = (resources.length ?
-        `${resources.length} resources were not served over h2` : '');
+    let displayValue = '';
+    if (resources.length > 1) {
+      displayValue = `${resources.length} resources were not served over h2`;
+    } else if (resources.length === 1) {
+      displayValue = `${resources.length} resource was not served over h2`;
+    }
 
     return UsesHTTP2Audit.generateAuditResult({
       rawValue: resources.length === 0,

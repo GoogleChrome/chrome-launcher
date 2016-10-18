@@ -37,12 +37,8 @@ class Aggregate {
    */
   static _getTotalWeight(expected) {
     const expectedNames = Object.keys(expected);
-    let weight = expectedNames.reduce((last, e) => last + expected[e].weight, 0);
-    if (weight === 0) {
-      weight = 1;
-    }
-
-    return weight;
+    let totalWeight = expectedNames.reduce((last, e) => last + (expected[e].weight || 0), 0);
+    return totalWeight;
   }
 
   /**
@@ -158,9 +154,10 @@ class Aggregate {
           Aggregate._remapResultsByName(
             Aggregate._filterResultsByAuditNames(results, item.audits)
           );
-      const maxScore = Aggregate._getTotalWeight(item.audits);
+
       const subItems = [];
       let overallScore = 0;
+      let maxScore = 1;
 
       // Step through each item in the expected results, and add them
       // to the overall score and add each to the subItems list.
@@ -196,6 +193,10 @@ class Aggregate {
             item.audits[e],
             e);
       });
+
+      if (aggregationIsScored) {
+        maxScore = Aggregate._getTotalWeight(item.audits);
+      }
 
       return {
         overall: (overallScore / maxScore),

@@ -131,10 +131,6 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.min(100, score);
     score = Math.max(0, score);
 
-    if (!data.navStart) {
-      throw new Error(FAILURE_MESSAGE);
-    }
-
     timings.navStart = data.navStart.ts / 1000;
 
     return {
@@ -159,12 +155,14 @@ class FirstMeaningfulPaint extends Audit {
     // const events = model.timelineModel().mainThreadEvents();
     const events = traceData;
 
-    // Parse the trace for our key events
+    // Parse the trace for our key events and sort them by timestamp.
     events.filter(e => {
       return e.cat.includes('blink.user_timing') ||
         e.name === 'FrameView::performLayout' ||
         e.name === 'Paint' ||
         e.name === 'TracingStartedInPage';
+    }).sort((event0, event1) => {
+      return event0.ts - event1.ts;
     }).forEach(event => {
       // Grab the page's ID from the first TracingStartedInPage in the trace
       if (event.name === 'TracingStartedInPage' && !mainFrameID) {
@@ -179,20 +177,29 @@ class FirstMeaningfulPaint extends Audit {
       // firstContentfulPaint == the first time that text or image content was
       // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
       // COMPAT: firstContentfulPaint trace event first introduced in Chrome 49 (r370921)
-      if (event.name === 'firstContentfulPaint' && event.args.frame === mainFrameID) {
+      if (event.name === 'firstContentfulPaint' && event.args.frame === mainFrameID &&
+          !!navigationStart && event.ts >= navigationStart.ts) {
         firstContentfulPaint = event;
       }
       // COMPAT: frame property requires Chrome 52 (r390306)
       // https://codereview.chromium.org/1922823003
-      if (event.name === 'FrameView::performLayout' && event.args.counters &&
-          event.args.counters.frame === mainFrameID) {
+      if (event.name === 'FrameView::performLayout' &&
+          event.args.counters && event.args.counters.frame === mainFrameID &&
+          !!navigationStart && event.ts >= navigationStart.ts) {
         layouts.set(event, event.args.counters);
       }
 
-      if (event.name === 'Paint' && event.args.data.frame === mainFrameID) {
+      if (event.name === 'Paint' && event.args.data.frame === mainFrameID &&
+        !!navigationStart && event.ts >= navigationStart.ts) {
         paints.push(event);
       }
     });
+
+    // navigationStart is currently essential to FMP calculation.
+    // see: https://github.com/GoogleChrome/lighthouse/issues/753
+    if (!navigationStart) {
+      throw new Error('No `navigationStart` event found after `TracingStartedInPage` in trace');
+    }
 
     return {
       navigationStart,

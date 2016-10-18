@@ -266,5 +266,32 @@ module.exports = (function() {
     return fakeTarget.networkManager;
   };
 
+  // Dependencies for CSS parsing.
+  require('chrome-devtools-frontend/front_end/common/TextRange.js');
+  const gonzales = require('chrome-devtools-frontend/front_end/gonzales/gonzales-scss.js');
+  require('chrome-devtools-frontend/front_end/gonzales/SCSSParser.js');
+
+  // Mostly taken from from chrome-devtools-frontend/front_end/gonzales/SCSSParser.js.
+  WebInspector.SCSSParser.prototype.parse = function(content) {
+    var ast = null;
+    try {
+      ast = gonzales.parse(content, {syntax: 'css'});
+    } catch (e) {
+      return [];
+    }
+
+    /** @type {!{properties: !Array<!Gonzales.Node>, node: !Gonzales.Node}} */
+    var rootBlock = {
+      properties: [],
+      node: ast
+    };
+    /** @type {!Array<!{properties: !Array<!Gonzales.Node>, node: !Gonzales.Node}>} */
+    var blocks = [rootBlock];
+    ast.selectors = [];
+    WebInspector.SCSSParser.extractNodes(ast, blocks, rootBlock);
+
+    return ast;
+  };
+
   return WebInspector;
 })();

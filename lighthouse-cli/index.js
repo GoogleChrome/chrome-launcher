@@ -30,6 +30,7 @@ const Printer = require('./printer');
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const ChromeLauncher = require('./chrome-launcher');
+const log = require('../lighthouse-core/lib/log');
 
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 
@@ -152,6 +153,7 @@ if (cli.verbose) {
 } else if (cli.quiet) {
   flags.logLevel = 'error';
 }
+log.setLevel(flags.logLevel);
 
 const cleanup = {
   fns: [],
@@ -173,7 +175,7 @@ function launchChromeAndRun(addresses) {
   return launcher
     .isDebuggerReady()
     .catch(() => {
-      console.log('Launching Chrome...');
+      log.log('Lighthouse CLI', 'Launching Chrome...');
       return launcher.run();
     })
     .then(() => lighthouseRun(addresses))
@@ -190,7 +192,8 @@ function lighthouseRun(addresses) {
   return lighthouse(address, flags, config)
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
-      if (outputMode !== 'html') {
+      // If pretty printing to the command line, also output the html report.
+      if (outputMode === Printer.OUTPUT_MODE.pretty) {
         const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`;
         Printer.write(results, 'html', filename);
       }

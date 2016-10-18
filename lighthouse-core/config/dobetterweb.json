@@ -3,6 +3,7 @@
     "recordNetwork": true,
     "gatherers": [
       "../gather/gatherers/https",
+      "../gather/gatherers/styles",
       "../gather/gatherers/url",
       "../gather/gatherers/dobetterweb/appcache",
       "../gather/gatherers/dobetterweb/console-time-usage",
@@ -17,6 +18,7 @@
     "../audits/dobetterweb/no-console-time",
     "../audits/dobetterweb/no-datenow",
     "../audits/dobetterweb/no-document-write",
+    "../audits/dobetterweb/no-old-flexbox",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
     "../audits/is-on-https"
@@ -46,6 +48,13 @@
         "uses-http2": {
           "expectedValue": false,
           "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
+        }
+      }
+    }, {
+      "name": "Using modern CSS features",
+      "audits": {
+        "no-old-flexbox": {
+          "expectedValue": false
         }
       }
     }, {

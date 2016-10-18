@@ -34,7 +34,7 @@ class SpeedIndexMetric extends Audit {
     return {
       category: 'Performance',
       name: 'speed-index-metric',
-      description: 'Speed Index',
+      description: 'Perceptual Speed Index',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
       requiredArtifacts: ['traceContents']
     };
@@ -79,7 +79,7 @@ class SpeedIndexMetric extends Audit {
       //  95th Percentile = 17,400
       const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
-      let score = 100 * distribution.computeComplementaryPercentile(speedline.speedIndex);
+      let score = 100 * distribution.computeComplementaryPercentile(speedline.perceptualSpeedIndex);
 
       // Clamp the score to 0 <= x <= 100.
       score = Math.min(100, score);
@@ -92,14 +92,14 @@ class SpeedIndexMetric extends Audit {
         frames: speedline.frames.map(frame => {
           return {
             timestamp: frame.getTimeStamp(),
-            progress: frame.getProgress()
+            progress: frame.getPerceptualProgress()
           };
         })
       };
 
       return SpeedIndexMetric.generateAuditResult({
         score: Math.round(score),
-        rawValue: Math.round(speedline.speedIndex),
+        rawValue: Math.round(speedline.perceptualSpeedIndex),
         optimalValue: this.meta.optimalValue,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.SPEEDLINE,

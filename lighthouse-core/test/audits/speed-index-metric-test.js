@@ -42,7 +42,8 @@ describe('Performance: speed-index-metric audit', () => {
 
     return {
       getTimeStamp: () => timestamp,
-      getProgress: () => progress
+      getProgress: () => progress,
+      getPerceptualProgress: () => progress
     };
   }
 
@@ -79,13 +80,14 @@ describe('Performance: speed-index-metric audit', () => {
   it('scores speed index of 831 as 100', () => {
     const SpeedlineResult = {
       frames: [frame(), frame(), frame()],
-      speedIndex: 831
+      speedIndex: 831,
+      perceptualSpeedIndex: 845
     };
     const artifacts = mockArtifactsWithSpeedlineResult(SpeedlineResult);
 
     return Audit.audit(artifacts).then(response => {
-      assert.equal(response.displayValue, '831');
-      assert.equal(response.rawValue, 831);
+      assert.equal(response.displayValue, '845');
+      assert.equal(response.rawValue, 845);
       assert.equal(response.score, 100);
     });
   });

@@ -54,18 +54,7 @@ describe('Aggregate', () => {
     const a = {};
 
     const weight = Aggregate._getTotalWeight(a);
-    return assert.equal(weight, 1);
-  });
-
-  it('returns a weight of at least 1', () => {
-    const a = {
-      x: {
-        weight: 0
-      }
-    };
-
-    const weight = Aggregate._getTotalWeight(a);
-    return assert.equal(weight, 1);
+    return assert.equal(weight, 0);
   });
 
   it('generates the correct total weight', () => {

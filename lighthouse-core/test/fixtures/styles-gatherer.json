@@ -1,0 +1,243 @@
+[
+  {
+    "header": {
+      "styleSheetId": "71513.1",
+      "frameId": "71513.1",
+      "sourceURL": "http:\/\/localhost:8080\/do_better_web_tests.html",
+      "origin": "regular",
+      "title": "",
+      "ownerNode": 4,
+      "disabled": false,
+      "isInline": true,
+      "startLine": 6,
+      "startColumn": 7
+    },
+    "content": "\n  body {\n    color: red;\n  }\n  p, div {\n    background: red, green;\n    border-radius: 3px;\n    transform: translateZ(0);\n    display: box;\n    transition: opacity 300ms ease-in-out;\n  }\n  .span {\n    transform: translate3d(0,0,0);\n    display: box; \/* old flexbox *\/\n  }\n",
+    "parsedContent": [
+      {
+        "property": {
+          "name": "color",
+          "val": "red"
+        },
+        "declarationRange": {
+          "startLine": 2,
+          "startColumn": 4,
+          "endLine": 2,
+          "endColumn": 15
+        },
+        "selector": "body"
+      },
+      {
+        "property": {
+          "name": "background",
+          "val": "red, green"
+        },
+        "declarationRange": {
+          "startLine": 5,
+          "startColumn": 4,
+          "endLine": 5,
+          "endColumn": 27
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "border-radius",
+          "val": "3px"
+        },
+        "declarationRange": {
+          "startLine": 6,
+          "startColumn": 4,
+          "endLine": 6,
+          "endColumn": 23
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transform",
+          "val": "translateZ(0)"
+        },
+        "declarationRange": {
+          "startLine": 7,
+          "startColumn": 4,
+          "endLine": 7,
+          "endColumn": 29
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "display",
+          "val": "box"
+        },
+        "declarationRange": {
+          "startLine": 8,
+          "startColumn": 4,
+          "endLine": 8,
+          "endColumn": 17
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transition",
+          "val": "opacity 300ms ease-in-out"
+        },
+        "declarationRange": {
+          "startLine": 9,
+          "startColumn": 4,
+          "endLine": 9,
+          "endColumn": 42
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transform",
+          "val": "translate3d(0,0,0)"
+        },
+        "declarationRange": {
+          "startLine": 12,
+          "startColumn": 4,
+          "endLine": 12,
+          "endColumn": 34
+        },
+        "selector": ".span"
+      },
+      {
+        "property": {
+          "name": "display",
+          "val": "box"
+        },
+        "declarationRange": {
+          "startLine": 13,
+          "startColumn": 4,
+          "endLine": 13,
+          "endColumn": 17
+        },
+        "selector": ".span"
+      }
+    ]
+  }, {
+    "header": {
+      "styleSheetId": "71513.2",
+      "frameId": "71513.2",
+      "sourceURL": "http:\/\/localhost:8080\/do_better_web_tests.html",
+      "origin": "regular",
+      "title": "",
+      "ownerNode": 4,
+      "disabled": false,
+      "isInline": true,
+      "startLine": 6,
+      "startColumn": 7
+    },
+    "content": "\n  body {\n    color: red;\n  }\n  p, div {\n    background: red, green;\n    border-radius: 3px;\n    transform: translateZ(0);\n    display: flex;\n    transition: opacity 300ms ease-in-out;\n  }\n  .span {\n    transform: translate3d(0,0,0);\n    display: flex;\n  }\n",
+    "parsedContent": [
+      {
+        "property": {
+          "name": "color",
+          "val": "red"
+        },
+        "declarationRange": {
+          "startLine": 2,
+          "startColumn": 4,
+          "endLine": 2,
+          "endColumn": 15
+        },
+        "selector": "body"
+      },
+      {
+        "property": {
+          "name": "background",
+          "val": "red, green"
+        },
+        "declarationRange": {
+          "startLine": 5,
+          "startColumn": 4,
+          "endLine": 5,
+          "endColumn": 27
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "border-radius",
+          "val": "3px"
+        },
+        "declarationRange": {
+          "startLine": 6,
+          "startColumn": 4,
+          "endLine": 6,
+          "endColumn": 23
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transform",
+          "val": "translateZ(0)"
+        },
+        "declarationRange": {
+          "startLine": 7,
+          "startColumn": 4,
+          "endLine": 7,
+          "endColumn": 29
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "display",
+          "val": "flex"
+        },
+        "declarationRange": {
+          "startLine": 8,
+          "startColumn": 4,
+          "endLine": 8,
+          "endColumn": 17
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transition",
+          "val": "opacity 300ms ease-in-out"
+        },
+        "declarationRange": {
+          "startLine": 9,
+          "startColumn": 4,
+          "endLine": 9,
+          "endColumn": 42
+        },
+        "selector": "p,div"
+      },
+      {
+        "property": {
+          "name": "transform",
+          "val": "translate3d(0,0,0)"
+        },
+        "declarationRange": {
+          "startLine": 12,
+          "startColumn": 4,
+          "endLine": 12,
+          "endColumn": 34
+        },
+        "selector": ".span"
+      },
+      {
+        "property": {
+          "name": "display",
+          "val": "flex"
+        },
+        "declarationRange": {
+          "startLine": 13,
+          "startColumn": 4,
+          "endLine": 13,
+          "endColumn": 17
+        },
+        "selector": ".span"
+      }
+    ]
+  }
+]

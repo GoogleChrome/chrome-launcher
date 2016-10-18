@@ -15,34 +15,59 @@
  */
 'use strict';
 
-const Audit = require('../../audits/first-meaningful-paint.js');
+const FMPAudit = require('../../audits/first-meaningful-paint.js');
+const Audit = require('../../audits/audit.js');
 const assert = require('assert');
 const traceEvents = require('../fixtures/traces/progressive-app.json');
+const badNavStartTrace = require('../fixtures/traces/bad-nav-start-ts.json');
 
 /* eslint-env mocha */
 describe('Performance: first-meaningful-paint audit', () => {
   it('scores a -1 when no trace data is present', () => {
-    return Audit.audit({}).then(response => {
-      return assert.equal(response.score, -1);
+    return FMPAudit.audit({}).then(result => {
+      assert.equal(result.score, -1);
+      assert.ok(result.debugString);
     });
   });
 
   it('scores a -1 when faulty trace data is present', () => {
-    return Audit.audit({boo: 'ya'}).then(response => {
-      return assert.equal(response.score, -1);
+    const artifacts = {
+      traces: {
+        [Audit.DEFAULT_PASS]: {boo: 'ya'}
+      }
+    };
+    return FMPAudit.audit(artifacts).then(result => {
+      assert.equal(result.rawValue, -1);
+      assert.ok(result.debugString);
+    });
+  });
+
+  it('scores a -1 and returns an error when navigation start is before trace start', () => {
+    const artifacts = {
+      traces: {
+        [Audit.DEFAULT_PASS]: badNavStartTrace
+      }
+    };
+    return FMPAudit.audit(artifacts).then(result => {
+      assert.equal(result.rawValue, -1);
+      assert.ok(/navigationStart/.test(result.debugString));
     });
   });
 
   describe('measures the pwa.rocks example correctly', () => {
     let fmpResult;
 
-    it('processes a valid trace file', done => {
-      assert.doesNotThrow(_ => {
-        Audit.audit({traces: {[Audit.DEFAULT_PASS]: {traceEvents}}})
-          .then(response => {
-            fmpResult = response;
-            done();
-          });
+    it('processes a valid trace file', () => {
+      const artifacts = {
+        traces: {
+          [Audit.DEFAULT_PASS]: {traceEvents}
+        }
+      };
+
+      return FMPAudit.audit(artifacts).then(result => {
+        fmpResult = result;
+      }).catch(_ => {
+        assert.ok(false);
       });
     });
 

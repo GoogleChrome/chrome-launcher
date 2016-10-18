@@ -61,7 +61,6 @@
     "label",
     "tabindex",
     "content-width",
-    "cache-start-url",
     "geolocation-on-start"
   ],
 
@@ -131,7 +130,7 @@
       }
     }, {
       "name": "Site is progressively enhanced",
-      "description": "Progressive enhancement means that everyone can access the basic content and functionality of a page in any browser, and those without certain browser features may receive a reduced but not unfunctioning experience.",
+      "description": "Progressive enhancement means that everyone can access the basic content and functionality of a page in any browser, and those without certain browser features may receive a reduced but still functional experience.",
       "audits": {
         "without-javascript": {
           "expectedValue": true,
