@@ -4,7 +4,7 @@ node lighthouse-cli/test/fixtures/static-server.js &
 
 sleep 0.5s
 
-config="lighthouse-cli/test/smokehouse/offline-local/offline-config.json"
+config="lighthouse-core/config/default.json"
 expectations="lighthouse-cli/test/smokehouse/offline-local/offline-expectations.js"
 
 # run smoketest, expecting results found in offline-expectations

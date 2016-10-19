@@ -17,18 +17,42 @@
 'use strict';
 
 /**
- * Expected Lighthouse audit values for local test pages, one of which works
- * offline with a service worker and one of which does not. Tests against audits
- * defined in 'offline-config.json'.
+ * Expected Lighthouse results from testing the defaut audits on local test
+ * pages, one of which works offline with a service worker and one of which does
+ * not.
  */
 module.exports = [
   {
     initialUrl: 'http://localhost:10200/online-only.html',
     url: 'http://localhost:10200/online-only.html',
     audits: {
+      'is-on-https': false,
+      'redirects-http': false,
       'service-worker': false,
       'works-offline': false,
-      'viewport': true
+      'viewport': true,
+      'manifest-display': false,
+      'without-javascript': true,
+      'user-timings': 0,
+      'critical-request-chains': 1,
+      'manifest-exists': false,
+      'manifest-background-color': false,
+      'manifest-theme-color': false,
+      'manifest-icons-min-192': false,
+      'manifest-icons-min-144': false,
+      'manifest-name': false,
+      'manifest-short-name': false,
+      'manifest-short-name-length': false,
+      'manifest-start-url': false,
+      'theme-color-meta': false,
+      'aria-valid-attr': true,
+      'aria-allowed-attr': true,
+      'color-contrast': true,
+      'image-alt': true,
+      'label': true,
+      'tab-index': true,
+      'content-width': true,
+      'geolocation': true
     }
   },
 
@@ -36,9 +60,33 @@ module.exports = [
     initialUrl: 'http://localhost:10503/offline-ready.html',
     url: 'http://localhost:10503/offline-ready.html',
     audits: {
+      'is-on-https': false,
+      'redirects-http': false,
       'service-worker': true,
       'works-offline': true,
-      'viewport': true
+      'viewport': true,
+      'manifest-display': false,
+      'without-javascript': true,
+      'user-timings': 0,
+      'critical-request-chains': 1,
+      'manifest-exists': false,
+      'manifest-background-color': false,
+      'manifest-theme-color': false,
+      'manifest-icons-min-192': false,
+      'manifest-icons-min-144': false,
+      'manifest-name': false,
+      'manifest-short-name': false,
+      'manifest-short-name-length': false,
+      'manifest-start-url': false,
+      'theme-color-meta': false,
+      'aria-valid-attr': true,
+      'aria-allowed-attr': true,
+      'color-contrast': true,
+      'image-alt': false,
+      'label': true,
+      'tab-index': true,
+      'content-width': true,
+      'geolocation': true
     }
   }
 ];
