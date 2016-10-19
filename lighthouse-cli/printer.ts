@@ -26,7 +26,7 @@
 enum OutputMode { pretty, json, html };
 type Mode = 'pretty' | 'json' | 'html';
 
-interface SubScore {
+interface AuditResult {
   displayValue: string;
   debugString: string;
   comingSoon?: boolean;
@@ -38,16 +38,16 @@ interface SubScore {
   };
 }
 
-interface Score {
+interface AggregationResultItem {
   overall: number;
   name: string;
   scored: boolean;
-  subItems: Array<SubScore>;
+  subItems: Array<AuditResult | string>;
 }
 
 interface Aggregation {
   name: string;
-  score:  Array<Score>;
+  score:  Array<AggregationResultItem>;
 }
 
 interface Results {
@@ -74,7 +74,7 @@ function checkOutputPath(path: string): string {
   return path;
 }
 
-function formatScore(score: boolean | number | string, suffix?: string) {
+function formatAggregationResultItem(score: boolean | number | string, suffix?: string) {
   // Until we only support node 6 we can not use default args.
   suffix = suffix || '';
 
@@ -132,31 +132,34 @@ function createOutput(results: Results, outputMode: OutputMode): string {
       const score = (item.overall * 100).toFixed(0);
 
       if (item.name) {
-        output += `${bold}${item.name}${reset}: ${item.scored ? formatScore(score, '%') : ''}\n`;
+        output += `${bold}${item.name}${reset}: ${item.scored ? formatAggregationResultItem(score, '%') : ''}\n`;
       }
 
       item.subItems.forEach(subitem => {
-        // Get audit object from inside of results.audits under name subitem.
-        // Coming soon events are not located inside of results.audits.
-        subitem = results.audits[subitem as any] || subitem;
+        let auditResult: AuditResult;
 
-        if (subitem.comingSoon) {
-          return;
+        if (typeof subitem === 'string') {
+          auditResult = results.audits[subitem as string];
+        } else {
+          auditResult = subitem as AuditResult;
         }
 
-        let lineItem = ` ── ${formatScore(subitem.score)} ${subitem.description}`;
-        if (subitem.displayValue) {
-          lineItem += ` (${bold}${subitem.displayValue}${reset})`;
+        if (auditResult.comingSoon === true)
+          return;
+
+        let lineItem = ` ── ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
+        if (auditResult.displayValue) {
+          lineItem += ` (${bold}${auditResult.displayValue}${reset})`;
         }
         output += `${lineItem}\n`;
-        if (subitem.debugString) {
-          output += `    ${subitem.debugString}\n`;
+        if (auditResult.debugString) {
+          output += `    ${auditResult.debugString}\n`;
         }
 
-        if (subitem.extendedInfo && subitem.extendedInfo.value) {
+        if (auditResult.extendedInfo && auditResult.extendedInfo.value) {
           const formatter =
-              Formatter.getByName(subitem.extendedInfo.formatter).getFormatter('pretty');
-          output += `${formatter(subitem.extendedInfo.value)}`;
+              Formatter.getByName(auditResult.extendedInfo.formatter).getFormatter('pretty');
+          output += `${formatter(auditResult.extendedInfo.value)}`;
         }
       });
 
