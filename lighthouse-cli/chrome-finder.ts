@@ -21,80 +21,89 @@ const fs = require('fs');
 const path = require('path');
 const execSync = require('child_process').execSync;
 
-module.exports = {
-  darwin() {
-    const suffixes = [
-      '/Contents/MacOS/Google Chrome Canary',
-      '/Contents/MacOS/Google Chrome'
-    ];
+export function darwin() {
+  const suffixes = [
+    '/Contents/MacOS/Google Chrome Canary',
+    '/Contents/MacOS/Google Chrome'
+  ];
 
-    const LSREGISTER =
-      '/System/Library/Frameworks/CoreServices.framework' +
-      '/Versions/A/Frameworks/LaunchServices.framework' +
-      '/Versions/A/Support/lsregister';
+  const LSREGISTER =
+    '/System/Library/Frameworks/CoreServices.framework' +
+    '/Versions/A/Frameworks/LaunchServices.framework' +
+    '/Versions/A/Support/lsregister';
 
-    const installations = [];
+  const installations = [];
 
-    execSync(
-      `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
-      ' | awk \'{$1=""; print $0}\''
-    ).toString()
-      .split(/\r?\n/)
-      .forEach(inst => {
-        suffixes.forEach(suffix => {
-          const execPath = path.join(inst.trim(), suffix);
-          if (canAccess(execPath)) {
-            installations.push(execPath);
-          }
-        });
-      });
-
-    const priorities = new Map([
-      [/^\/Volumes\/.*Chrome Canary.app/, -1],
-      [/^\/Volumes\/.*Chrome.app/, -2],
-      [/^\/Applications\/.*Chrome Canary.app/, 101],
-      [/^\/Applications\/.*Chrome.app/, 100],
-      [new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`), 51],
-      [new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`), 50]
-    ]);
-
-    return sort(installations, priorities);
-  },
-
-  linux() {
-    const execPath = process.env.LIGHTHOUSE_CHROMIUM_PATH;
-    if (execPath && canAccess(execPath)) {
-      return [execPath];
-    }
-    throw new Error(
-      'The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to ' +
-      'executable of a build of Chromium version 52.0 or later.'
-    );
-  },
-
-  win32() {
-    const installations = [];
-    const suffixes = [
-      '\\Google\\Chrome SxS\\Application\\chrome.exe',
-      '\\Google\\Chrome\\Application\\chrome.exe'
-    ];
-    const prefixes = [
-      process.env.LOCALAPPDATA,
-      process.env.PROGRAMFILES,
-      process.env['PROGRAMFILES(X86)']
-    ];
-    prefixes.forEach(prefix =>
+  execSync(
+    `${LSREGISTER} -dump` +
+    ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
+    ' | awk \'{$1=""; print $0}\''
+  ).toString()
+    .split(/\r?\n/)
+    .forEach(inst => {
       suffixes.forEach(suffix => {
-        const chromePath = path.join(prefix, suffix);
-        if (canAccess(chromePath)) {
-          installations.push(chromePath);
+        const execPath = path.join(inst.trim(), suffix);
+        if (canAccess(execPath)) {
+          installations.push(execPath);
         }
-      })
-    );
-    return installations;
+      });
+    });
+
+  const priorities: {regex: RegExp, weight: number}[] = [{
+    regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`),
+    weight: 50
+  }, {
+    regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`),
+    weight: 51
+  }, {
+    regex: /^\/Applications\/.*Chrome.app/,
+    weight: 100
+  }, {
+    regex: /^\/Applications\/.*Chrome Canary.app/,
+    weight: 101
+  }, {
+    regex: /^\/Volumes\/.*Chrome.app/,
+    weight: -2
+  }, {
+    regex: /^\/Volumes\/.*Chrome Canary.app/,
+    weight: -1
+  }];
+
+  return sort(installations, priorities);
+}
+
+export function linux() {
+  const execPath = process.env.LIGHTHOUSE_CHROMIUM_PATH;
+  if (execPath && canAccess(execPath)) {
+    return [execPath];
   }
-};
+  throw new Error(
+    'The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to ' +
+    'executable of a build of Chromium version 52.0 or later.'
+  );
+}
+
+export function win32() {
+  const installations = [];
+  const suffixes = [
+    '\\Google\\Chrome SxS\\Application\\chrome.exe',
+    '\\Google\\Chrome\\Application\\chrome.exe'
+  ];
+  const prefixes = [
+    process.env.LOCALAPPDATA,
+    process.env.PROGRAMFILES,
+    process.env['PROGRAMFILES(X86)']
+  ];
+  prefixes.forEach(prefix =>
+    suffixes.forEach(suffix => {
+      const chromePath = path.join(prefix, suffix);
+      if (canAccess(chromePath)) {
+        installations.push(chromePath);
+      }
+    })
+  );
+  return installations;
+}
 
 function sort(installations, priorities) {
   const defaultPriority = 10;
@@ -102,11 +111,8 @@ function sort(installations, priorities) {
     // assign priorities
     .map(inst => {
       for (const pair of priorities) {
-        const regex = pair[0];
-        const priority = pair[1];
-
-        if (regex.test(inst)) {
-          return [inst, priority];
+        if (pair.regex.test(inst)) {
+          return [inst, pair.weight];
         }
       }
       return [inst, defaultPriority];
@@ -117,7 +123,7 @@ function sort(installations, priorities) {
     .map(pair => pair[0]);
 }
 
-function canAccess(file) {
+function canAccess(file: string): Boolean {
   try {
     fs.accessSync(file);
     return true;
