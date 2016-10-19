@@ -144,50 +144,29 @@ class Driver {
     });
   }
 
+  /**
+   * Evaluate an expression in the context of the current page. Expression must
+   * evaluate to a Promise. Returns a promise that resolves on asyncExpression's
+   * resolved value.
+   * @param {string} asyncExpression
+   * @return {!Promise<*>}
+   */
   evaluateAsync(asyncExpression) {
     return new Promise((resolve, reject) => {
-      let asyncTimeout;
-
-      // Inject the call to capture inspection.
-      const expression = `(function() {
-        const __inspect = inspect;
-        const __returnResults = function(results) {
-          __inspect(JSON.stringify(results));
-        };
-        ${asyncExpression}
-      })()`;
-
-      const inspectHandler = value => {
-        if (asyncTimeout !== undefined) {
-          clearTimeout(asyncTimeout);
-        }
-
-        // If the returned object doesn't meet the expected pattern, bail with an undefined.
-        if (value === undefined ||
-            value.object === undefined ||
-            value.object.value === undefined) {
-          return resolve();
-        }
-
-        return resolve(JSON.parse(value.object.value));
-      };
-
-      // COMPAT: Chrome 52 is when Runtime.inspectRequested became available
-      //   https://codereview.chromium.org/1866213002
-      // Previously, a similar-looking Inspector.inspect event was available, but unfortunately
-      // it will not fire in this scenario.
-      this.once('Runtime.inspectRequested', inspectHandler);
-
-      this.sendCommand('Runtime.evaluate', {
-        expression,
-        includeCommandLineAPI: true
-      }).catch(reject);
-
       // If this gets to 60s and it hasn't been resolved, reject the Promise.
-      asyncTimeout = setTimeout(
+      const asyncTimeout = setTimeout(
         (_ => reject(new Error('The asynchronous expression exceeded the allotted time of 60s'))),
         60000
       );
+      this.sendCommand('Runtime.evaluate', {
+        expression: asyncExpression,
+        includeCommandLineAPI: true,
+        awaitPromise: true,
+        returnByValue: true
+      }).then(result => {
+        clearTimeout(asyncTimeout);
+        resolve(result.result.value);
+      }).catch(reject);
     });
   }
 

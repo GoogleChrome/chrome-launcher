@@ -20,14 +20,13 @@
 
 const Gatherer = require('./gatherer');
 
-/* global document, __returnResults */
+/* global document */
 
 /* istanbul ignore next */
 function getBodyText() {
   // note: we use innerText, not textContent, because textContent includes the content of <script> elements!
   const body = document.querySelector('body');
-  // __returnResults is magically inserted by driver.evaluateAsync
-  __returnResults(body ? body.innerText : '');
+  return Promise.resolve(body ? body.innerText : '');
 }
 
 class HTMLWithoutJavaScript extends Gatherer {
