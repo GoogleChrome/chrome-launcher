@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * @license
  * Copyright 2016 Google Inc. All rights reserved.
@@ -18,19 +17,24 @@
 
 'use strict';
 
+const _SIGINT = 'SIGINT';
+const _ERROR_EXIT_CODE = 130;
+const _RUNTIME_ERROR_CODE = 1;
+
 const environment = require('../lighthouse-core/lib/environment.js');
 if (!environment.checkNodeCompatibility()) {
   console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
-  process.exit(1);
+  process.exit(_RUNTIME_ERROR_CODE);
 }
 
-const path = require('path');
+import * as path from 'path';
 const yargs = require('yargs');
-const Printer = require('./printer');
+import * as Printer from './printer';
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
-const ChromeLauncher = require('./chrome-launcher');
 const log = require('../lighthouse-core/lib/log');
+import {ChromeLauncher} from './chrome-launcher';
+import * as Commands from './commands/commands';
 
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 
@@ -96,12 +100,11 @@ Example: --output-path=./lighthouse-results.html`
     'quiet',
     'help'
   ])
-
-  .choices('output', Object.keys(Printer.OUTPUT_MODE))
+  .choices('output', Printer.GetValidOutputOptions())
 
   // default values
   .default('mobile', true)
-  .default('output', Printer.OUTPUT_MODE.pretty)
+  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.pretty])
   .default('output-path', 'stdout')
   .check(argv => {
     // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
@@ -114,22 +117,14 @@ Example: --output-path=./lighthouse-results.html`
   })
   .argv;
 
+// Process terminating command
 if (cli.listAllAudits) {
-  const audits = lighthouse
-      .getAuditList()
-      .map(i => {
-        return i.replace(/\.js$/, '');
-      });
-
-  process.stdout.write(JSON.stringify({audits}));
-  process.exit(0);
+  Commands.ListAudits();
 }
 
+// Process terminating command
 if (cli.listTraceCategories) {
-  const traceCategories = lighthouse.traceCategories;
-
-  process.stdout.write(JSON.stringify({traceCategories}));
-  process.exit(0);
+  Commands.ListTraceCategories();
 }
 
 const urls = cli._;
@@ -153,6 +148,7 @@ if (cli.verbose) {
 } else if (cli.quiet) {
   flags.logLevel = 'error';
 }
+
 log.setLevel(flags.logLevel);
 
 const cleanup = {
@@ -192,9 +188,8 @@ function lighthouseRun(addresses) {
   return lighthouse(address, flags, config)
     .then(results => Printer.write(results, outputMode, outputPath))
     .then(results => {
-      // If pretty printing to the command line, also output the html report.
-      if (outputMode === Printer.OUTPUT_MODE.pretty) {
-        const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`;
+      if (outputMode === Printer.OutputMode.pretty) {
+        const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`
         Printer.write(results, 'html', filename);
       }
 
@@ -208,13 +203,13 @@ function showConnectionError() {
     'If you\'re using lighthouse with --skip-autolaunch, ' +
     'make sure you\'re running some other Chrome with a debugger.'
   );
-  process.exit(1);
+  process.exit(_RUNTIME_ERROR_CODE);
 }
 
 function showRuntimeError(err) {
   console.error('Runtime error encountered:', err);
   console.error(err.stack);
-  process.exit(1);
+  process.exit(_RUNTIME_ERROR_CODE);
 }
 
 function handleError(err) {
@@ -230,23 +225,20 @@ function run() {
     lighthouseRun(urls).catch(handleError);
   } else {
     // because you can't cancel a promise yet
-    const SIGINT = Symbol('SIGINT');
     const isSigint = new Promise((resolve, reject) => {
-      process.on('SIGINT', () => reject(SIGINT));
+      process.on(_SIGINT, () => reject(_SIGINT));
     });
 
     Promise
       .race([launchChromeAndRun(urls), isSigint])
       .catch(maybeSigint => {
-        if (maybeSigint === SIGINT) {
+        if (maybeSigint === _SIGINT) {
           return cleanup
             .doCleanup()
-            .then(() => process.exit(130))
             .catch(err => {
               console.error(err);
               console.error(err.stack);
-              process.exit(130);
-            });
+            }).then(() => process.exit(_ERROR_EXIT_CODE));
         }
         return handleError(maybeSigint);
       });
