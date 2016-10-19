@@ -17,45 +17,31 @@
 
 'use strict';
 
+/**
+ * An enumeration of acceptable output modes:
+ *   'pretty': Pretty print the results
+ *   'json': JSON formatted results
+ *   'html': An HTML report
+ */
+enum OutputMode { pretty, json, html };
+type Mode = 'pretty' | 'json' | 'html';
+
+interface Results {
+  url: string;
+  aggregations: any[];
+  audits: Object;
+  lighthouseVersion: string;
+};
+
 const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
 const Formatter = require('../lighthouse-core/formatters/formatter');
 const log = require('../lighthouse-core/lib/log');
 
 /**
- * An enumeration of acceptable output modes:
- * <ul>
- *   <li>'pretty': Pretty print the results</li>
- *   <li>'json': JSON formatted results</li>
- *   <li>'html': An HTML report</li>
- * </ul>
- * @enum {string}
- */
-const OUTPUT_MODE = {
-  pretty: 'pretty',
-  json: 'json',
-  html: 'html'
-};
-
-/**
- * Verify output mode.
- * @param {string} mode
- * @return {OUTPUT_MODE}
- */
-function checkOutputMode(mode) {
-  if (!OUTPUT_MODE.hasOwnProperty(mode)) {
-    log.warn('Printer', `Unknown output mode ${mode}; using pretty`);
-    return OUTPUT_MODE.pretty;
-  }
-
-  return OUTPUT_MODE[mode];
-}
-
-/**
  * Verify output path to use, either stdout or a file path.
- * @param {string} path
  */
-function checkOutputPath(path) {
+function checkOutputPath(path: string): string {
   if (!path) {
     log.warn('Printer', 'No output path set; using stdout');
     return 'stdout';
@@ -64,8 +50,10 @@ function checkOutputPath(path) {
   return path;
 }
 
-function formatScore(score, suffix) {
+function formatScore(score, suffix?: string) {
+  // Until we only support node 6 we can not use default args.
   suffix = suffix || '';
+
   const green = '\x1B[32m';
   const red = '\x1B[31m';
   const yellow = '\x1b[33m';
@@ -93,21 +81,17 @@ function formatScore(score, suffix) {
 
 /**
  * Creates the results output in a format based on the `mode`.
- *
- * @param {{url: string, aggregations: !Array<*>}} results
- * @param {OUTPUT_MODE} outputMode
- * @return {string}
  */
-function createOutput(results, outputMode) {
+function createOutput(results: Results, outputMode: OutputMode): string {
   const reportGenerator = new ReportGenerator();
 
   // HTML report.
-  if (outputMode === 'html') {
+  if (outputMode === OutputMode.html) {
     return reportGenerator.generateHTML(results, {inline: true});
   }
 
   // JSON report.
-  if (outputMode === 'json') {
+  if (outputMode === OutputMode.json) {
     return JSON.stringify(results, null, 2);
   }
 
@@ -162,11 +146,8 @@ function createOutput(results, outputMode) {
 /* istanbul ignore next */
 /**
  * Writes the output to stdout.
- *
- * @param {string} output
- * @return {!Promise}
  */
-function writeToStdout(output) {
+function writeToStdout(output: string): Promise<undefined> {
   return new Promise((resolve, reject) => {
     // small delay to avoid race with debug() logs
     setTimeout(_ => {
@@ -178,20 +159,15 @@ function writeToStdout(output) {
 
 /**
  * Writes the output to a file.
- *
- * @param {string} filePath The destination path
- * @param {string} output The output to write
- * @param {string} outputMode Output mode; either 'pretty', 'json', or 'html'.
- * @return {Promise}
  */
-function writeFile(filePath, output, outputMode) {
+function writeFile(filePath: string, output: string, outputMode: OutputMode): Promise<undefined> {
   return new Promise((resolve, reject) => {
     // TODO: make this mkdir to the filePath.
     fs.writeFile(filePath, output, 'utf8', err => {
       if (err) {
         return reject(err);
       }
-      log.log('Printer', `${outputMode} output written to ${filePath}`);
+      log.log('Printer', `${OutputMode[outputMode]} output written to ${filePath}`);
       resolve();
     });
   });
@@ -199,18 +175,12 @@ function writeFile(filePath, output, outputMode) {
 
 /**
  * Writes the results.
- *
- * @param {{url: string, aggregations: !Array<*>}} results
- * @param {string} mode Output mode; either 'pretty', 'json', or 'html'.
- * @param {string} path The output path to use, either stdout or a file path.
- * @return {!Promise}
  */
-function write(results, mode, path) {
+function write(results: Results, mode: Mode, path: string): Promise<Results> {
   return new Promise((resolve, reject) => {
-    const outputMode = checkOutputMode(mode);
     const outputPath = checkOutputPath(path);
 
-    const output = createOutput(results, outputMode);
+    const output = createOutput(results, OutputMode[mode]);
 
     // Testing stdout is out of scope, and doesn't really achieve much besides testing Node,
     // so we will skip this chunk of the code.
@@ -219,16 +189,22 @@ function write(results, mode, path) {
       return writeToStdout(output).then(_ => resolve(results));
     }
 
-    return writeFile(outputPath, output, outputMode).then(_ => {
+    return writeFile(outputPath, output, OutputMode[mode]).then(_ => {
       resolve(results);
     }).catch(err => reject(err));
   });
 }
 
-module.exports = {
-  checkOutputMode,
+function GetValidOutputOptions():Array<Mode> {
+  return [OutputMode[OutputMode.pretty] as Mode,
+          OutputMode[OutputMode.json] as Mode,
+          OutputMode[OutputMode.html] as Mode];
+}
+
+export {
   checkOutputPath,
   createOutput,
   write,
-  OUTPUT_MODE
-};
+  OutputMode,
+  GetValidOutputOptions,
+}
