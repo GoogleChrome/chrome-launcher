@@ -26,7 +26,11 @@ module.exports = (function() {
   }
 
   // Global pollution.
-  global.self = global;
+  // Check below is to make it worker-friendly where global is worker's self.
+  if (global.self !== global) {
+    global.self = global;
+  }
+
   if (typeof global.window === 'undefined') {
     global.window = global;
   }
