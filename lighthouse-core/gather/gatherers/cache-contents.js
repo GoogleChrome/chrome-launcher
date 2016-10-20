@@ -16,7 +16,7 @@
  */
 'use strict';
 
-/* global __returnResults, caches */
+/* global caches */
 
 const Gatherer = require('./gatherer');
 
@@ -24,7 +24,7 @@ const Gatherer = require('./gatherer');
 /* istanbul ignore next */
 function getCacheContents() {
   // Get every cache by name.
-  caches.keys()
+  return caches.keys()
 
       // Open each one.
       .then(cacheNames => Promise.all(cacheNames.map(cacheName => caches.open(cacheName))))
@@ -39,11 +39,8 @@ function getCacheContents() {
                 requests.push(...reqs.map(r => r.url));
               });
         })).then(_ => {
-          // __returnResults is magically inserted by driver.evaluateAsync
-          __returnResults(requests);
+          return requests;
         });
-      }).catch(_ => {
-        __returnResults(undefined);
       });
 }
 

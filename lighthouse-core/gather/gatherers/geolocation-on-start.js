@@ -26,7 +26,7 @@ const Gatherer = require('./gatherer');
  * @author Paul Lewis
  */
 
-/* global navigator, window, __returnResults */
+/* global navigator, window */
 
 /* istanbul ignore next */
 function overrideGeo() {
@@ -39,7 +39,7 @@ function overrideGeo() {
 }
 
 function collectGeoState() {
-  __returnResults(window.__didNotCallGeo);
+  return Promise.resolve(window.__didNotCallGeo);
 }
 
 class GeolocationOnStart extends Gatherer {
