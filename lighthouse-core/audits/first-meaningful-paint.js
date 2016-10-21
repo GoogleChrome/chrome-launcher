@@ -108,8 +108,8 @@ class FirstMeaningfulPaint extends Audit {
     // * fMP full: considering both page height + webfont heuristics
 
     // Calculate the difference from navigation and save all candidates
-    let timings = {};
-    let timingsArr = [];
+    const timings = {};
+    const timingsArr = [];
     Object.keys(data.fmpCandidates).forEach(name => {
       const evt = data.fmpCandidates[name];
       timings[name] = evt && ((evt.ts - data.navStart.ts) / 1000);
@@ -148,8 +148,8 @@ class FirstMeaningfulPaint extends Audit {
     let mainFrameID;
     let navigationStart;
     let firstContentfulPaint;
-    let layouts = new Map();
-    let paints = [];
+    const layouts = new Map();
+    const paints = [];
 
     // const model = new DevtoolsTimelineModel(traceData);
     // const events = model.timelineModel().mainThreadEvents();

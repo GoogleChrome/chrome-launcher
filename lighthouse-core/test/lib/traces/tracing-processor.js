@@ -110,7 +110,7 @@ describe('TracingProcessor lib', () => {
     it('correctly calculates percentiles of single task over multiple windows', () => {
       // Starts 3 seconds into the first window. Mean Queueing Time = 7600ms.
       const TASK_LENGTH = 20000;
-      let results1 = TracingProcessor._riskPercentiles([TASK_LENGTH], 5000,
+      const results1 = TracingProcessor._riskPercentiles([TASK_LENGTH], 5000,
           defaultPercentiles, TASK_LENGTH - 2000);
       const expected1 = createRiskPercentiles(defaultPercentiles,
           [16, 16, 16, 18766, 19516, 19966, 20016]);

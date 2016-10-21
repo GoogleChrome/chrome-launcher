@@ -141,7 +141,7 @@ class TraceProcessor {
     }
 
     // Find percentiles of interest, in order.
-    for (let percentile of percentiles) {
+    for (const percentile of percentiles) {
       // Loop over durations, calculating a CDF value for each until it is above
       // the target percentile.
       const percentileTime = percentile * totalTime;

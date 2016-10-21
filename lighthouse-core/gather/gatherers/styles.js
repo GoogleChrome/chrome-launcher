@@ -31,7 +31,7 @@ const Gatherer = require('./gatherer');
  * @return {!Array}
  */
 function getCSSPropsInStyleSheet(parseTree) {
-  let results = [];
+  const results = [];
 
   parseTree.traverseByType('declaration', function(node, index, parent) {
     const keyVal = node.toString().split(':').map(item => item.trim());

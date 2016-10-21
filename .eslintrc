@@ -28,6 +28,7 @@
     "require-jsdoc": 0,
     "valid-jsdoc": 0,
     "comma-dangle": 0,
+    "prefer-const": 2,
     "strict": [2, "global"]
   },
   "parserOptions": {

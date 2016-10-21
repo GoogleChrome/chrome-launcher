@@ -36,12 +36,12 @@ function noUrlManifestParser(manifestSrc) {
 
 describe('Manifest Parser', function() {
   it('should not parse empty string input', function() {
-    let parsedManifest = noUrlManifestParser('');
+    const parsedManifest = noUrlManifestParser('');
     assert.ok(parsedManifest.debugString);
   });
 
   it('accepts empty dictionary', function() {
-    let parsedManifest = noUrlManifestParser('{}');
+    const parsedManifest = noUrlManifestParser('{}');
     assert(!parsedManifest.debugString);
     assert.equal(parsedManifest.value.name.value, undefined);
     assert.equal(parsedManifest.value.short_name.value, undefined);
@@ -60,7 +60,7 @@ describe('Manifest Parser', function() {
   describe('icon parsing', function() {
     // 9.7
     it('gives an empty array and an error for erroneous icons entry', () => {
-      let parsedManifest = manifestParser('{"icons": {"16": "img/icons/icon16.png"}}',
+      const parsedManifest = manifestParser('{"icons": {"16": "img/icons/icon16.png"}}',
           EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.ok(!parsedManifest.debugString);
       const icons = parsedManifest.value.icons;
@@ -70,7 +70,7 @@ describe('Manifest Parser', function() {
     });
 
     it('gives an empty array and no error for missing icons entry', () => {
-      let parsedManifest = manifestParser('{}',
+      const parsedManifest = manifestParser('{}',
           EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert.ok(!parsedManifest.debugString);
       const icons = parsedManifest.value.icons;
@@ -80,29 +80,29 @@ describe('Manifest Parser', function() {
     });
 
     it('parses basic string', function() {
-      let parsedManifest = manifestParser('{"icons": [{"src": "192.png", "sizes": "192x192"}]}',
+      const parsedManifest = manifestParser('{"icons": [{"src": "192.png", "sizes": "192x192"}]}',
           EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
       assert(!parsedManifest.debugString);
-      let icons = parsedManifest.value.icons;
+      const icons = parsedManifest.value.icons;
       assert(!icons.debugString);
-      let icon192 = icons.value[0];
+      const icon192 = icons.value[0];
       assert(!icon192.value.sizes.debugString);
       assert.equal(icons.value.length, 1);
     });
 
     it('finds three icons in the stub manifest', function() {
-      let parsedManifest = manifestParser(JSON.stringify(manifestStub), EXAMPLE_MANIFEST_URL,
+      const parsedManifest = manifestParser(JSON.stringify(manifestStub), EXAMPLE_MANIFEST_URL,
           EXAMPLE_DOC_URL);
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.icons.value.length, 3);
     });
 
     it('parses icons with extra whitespace', function() {
-      let manifest = '{"icons": [{"src": "192.png", "sizes": " 192x192   256x256"}]}';
-      let parsedManifest = manifestParser(manifest, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-      let icons = parsedManifest.value.icons;
-      let icon192 = icons.value[0];
-      let icon192Sizes = icon192.value.sizes.value;
+      const manifest = '{"icons": [{"src": "192.png", "sizes": " 192x192   256x256"}]}';
+      const parsedManifest = manifestParser(manifest, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
+      const icons = parsedManifest.value.icons;
+      const icon192 = icons.value[0];
+      const icon192Sizes = icon192.value.sizes.value;
       assert.equal(icon192Sizes[0], '192x192');
       assert.equal(icon192Sizes[1], '256x256');
     });
@@ -148,13 +148,13 @@ describe('Manifest Parser', function() {
 
   describe('name parsing', function() {
     it('parses basic string', function() {
-      let parsedManifest = noUrlManifestParser('{"name":"foo"}');
+      const parsedManifest = noUrlManifestParser('{"name":"foo"}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, 'foo');
     });
 
     it('trims whitespaces', function() {
-      let parsedManifest = noUrlManifestParser('{"name":" foo "}');
+      const parsedManifest = noUrlManifestParser('{"name":" foo "}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.name.value, 'foo');
     });
@@ -172,13 +172,13 @@ describe('Manifest Parser', function() {
 
   describe('short_name parsing', function() {
     it('parses basic string', function() {
-      let parsedManifest = noUrlManifestParser('{"short_name":"foo"}');
+      const parsedManifest = noUrlManifestParser('{"short_name":"foo"}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, 'foo');
     });
 
     it('trims whitespaces', function() {
-      let parsedManifest = noUrlManifestParser('{"short_name":" foo "}');
+      const parsedManifest = noUrlManifestParser('{"short_name":" foo "}');
       assert(!parsedManifest.debugString);
       assert.equal(parsedManifest.value.short_name.value, 'foo');
     });

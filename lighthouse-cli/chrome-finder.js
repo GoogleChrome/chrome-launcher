@@ -79,7 +79,7 @@ module.exports = {
       '\\Google\\Chrome SxS\\Application\\chrome.exe',
       '\\Google\\Chrome\\Application\\chrome.exe'
     ];
-    let prefixes = [
+    const prefixes = [
       process.env.LOCALAPPDATA,
       process.env.PROGRAMFILES,
       process.env['PROGRAMFILES(X86)']
@@ -101,7 +101,7 @@ function sort(installations, priorities) {
   return installations
     // assign priorities
     .map(inst => {
-      for (let pair of priorities) {
+      for (const pair of priorities) {
         const regex = pair[0];
         const priority = pair[1];
 

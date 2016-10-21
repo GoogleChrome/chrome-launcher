@@ -320,7 +320,7 @@ class GatherRunner {
   }
 
   static instantiateComputedArtifacts() {
-    let computedArtifacts = {};
+    const computedArtifacts = {};
     require('fs').readdirSync(path.join(__dirname, 'computed')).forEach(function(file) {
       // Drop `.js` suffix to keep browserify import happy.
       file = file.replace(/\.js$/, '');

@@ -104,7 +104,7 @@ class TTIMetric extends Audit {
       let currentLatency = Infinity;
       const percentiles = [0.9]; // [0.75, 0.9, 0.99, 1];
       const threshold = 50;
-      let foundLatencies = [];
+      const foundLatencies = [];
 
       // When we've found a latency that's good enough, we're good.
       while (currentLatency > threshold) {

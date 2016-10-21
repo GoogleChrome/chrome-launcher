@@ -1,6 +1,6 @@
 'use strict';
 
-let assert = global.assert = require('assert');
+const assert = global.assert = require('assert');
 
 /**
  * We don't want any mocha tests to run without evaluating any assertions

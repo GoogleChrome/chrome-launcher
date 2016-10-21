@@ -94,7 +94,7 @@ class Runner {
       }
 
       // Now run the audits.
-      let auditResults = [];
+      const auditResults = [];
       run = run.then(artifacts => config.audits.reduce((chain, audit) => {
         const status = `Evaluating: ${audit.meta.description}`;
         // Run each audit sequentially, the auditResults array has all our fine work

@@ -21,7 +21,7 @@ const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
 
-let computedArtifacts = GatherRunner.instantiateComputedArtifacts();
+const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
   return Object.assign(computedArtifacts, {
