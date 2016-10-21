@@ -19,7 +19,7 @@ let TracingProcessor;
 const assert = require('assert');
 
 /* eslint-env mocha */
-
+const pwaTrace = require('../../fixtures/traces/progressive-app.json');
 const defaultPercentiles = [0, 0.25, 0.5, 0.75, 0.9, 0.99, 1];
 
 /**
@@ -158,7 +158,9 @@ describe('TracingProcessor lib', () => {
       const expected = createRiskPercentiles([1], [16 + duration2]);
       assert.deepEqual(results, expected);
     });
+  });
 
+  describe('log normal distribution', () => {
     it('creates a log normal distribution', () => {
       // This curve plotted with the below percentile assertions
       // https://www.desmos.com/calculator/vjk2rwd17y
@@ -181,6 +183,38 @@ describe('TracingProcessor lib', () => {
       assert.equal(getPct(distribution, 8000), '0.03', 'pct for 8000 does not match');
       assert.equal(getPct(distribution, 9000), '0.01', 'pct for 9000 does not match');
       assert.equal(getPct(distribution, 10000), '0.00', 'pct for 10000 does not match');
+    });
+  });
+
+  describe('risk to responsiveness', () => {
+    let oldFn;
+    // monkeypatch _riskPercentiles to deal with gRtR solo
+    beforeEach(() => {
+      oldFn = TracingProcessor._riskPercentiles;
+      TracingProcessor._riskPercentiles = (durations, totalTime, percentiles, clippedLength) => {
+        return {
+          durations, totalTime, percentiles, clippedLength
+        };
+      };
+    });
+    afterEach(() => {
+      TracingProcessor._riskPercentiles = oldFn;
+    });
+
+    it('gets durations of top-level tasks', () => {
+      const tracingProcessor = new TracingProcessor();
+      const model = tracingProcessor.init(pwaTrace);
+      const ret = TracingProcessor.getRiskToResponsiveness(model, {traceEvents: pwaTrace});
+      const durations = ret.durations;
+
+      assert.equal(durations.filter(dur => isNaN(dur)).length, 0, 'NaN found');
+      assert.equal(durations.length, 309);
+      assert.equal(durations[50], 0.012);
+      assert.equal(durations[100], 0.053);
+      assert.equal(durations[200], 0.558);
+      assert.equal(durations[durations.length - 3].toFixed(2), '26.32');
+      assert.equal(durations[durations.length - 2].toFixed(2), '37.61');
+      assert.equal(durations[durations.length - 1].toFixed(2), '40.10');
     });
   });
 });
