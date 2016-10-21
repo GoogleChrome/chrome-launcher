@@ -42,9 +42,15 @@ npm install
 ```
 
 #### Run
+
 ```sh
 node lighthouse-cli http://example.com
 ```
+
+Geting started tip: `node --inspect --debug-brk lighthouse-cli http://example.com` to open up Chrome DevTools and step
+through the entire app. See [Debugging Node.js with Chrome
+DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27#.59rma3ukm)
+for more info.
 
 ## Custom run configuration
 
