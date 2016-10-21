@@ -539,7 +539,7 @@ class Driver {
     const globalVarToPopulate = `window['__${funcName}StackTraces']`;
     const collectUsage = () => {
       return this.evaluateAsync(
-          `__returnResults(Array.from(${globalVarToPopulate}).map(item => JSON.parse(item)))`);
+          `Promise.resolve(Array.from(${globalVarToPopulate}).map(item => JSON.parse(item)))`);
     };
 
     const funcBody = captureJSCallUsage.toString();
