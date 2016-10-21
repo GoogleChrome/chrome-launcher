@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', _ => {
     background.loadSelectedAggregations()
     .then(getAuditsFromSelected)
     .then(selectedAudits => {
-      return background.runLighthouse({
+      return background.runLighthouseInExtension({
         flags: {
           mobile: true
         }
