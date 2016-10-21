@@ -22,7 +22,7 @@ const Element = require('../../../lib/element.js');
 const NetworkRecorder = require('../../../lib/network-recorder');
 const assert = require('assert');
 
-let driverStub = new Driver();
+const driverStub = new Driver();
 
 driverStub.sendCommand = function(command, params) {
   switch (command) {
@@ -67,7 +67,7 @@ describe('Browser Driver', () => {
 
   it('will update the options.url through redirects', () => {
     const networkRecorder = driverStub._networkRecorder = new NetworkRecorder([]);
-    let opts = {url: req1.url};
+    const opts = {url: req1.url};
     driverStub.enableUrlUpdateIfRedirected(opts);
 
     // Fake some reqFinished events

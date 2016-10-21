@@ -53,7 +53,7 @@ class CriticalRequestChains extends ComputedArtifact {
   compute_(networkRecords) {
     // Build a map of requestID -> Node.
     const requestIdToRequests = new Map();
-    for (let request of networkRecords) {
+    for (const request of networkRecords) {
       requestIdToRequests.set(request.requestId, request);
     }
 
@@ -73,7 +73,7 @@ class CriticalRequestChains extends ComputedArtifact {
 
     // Create a tree of critical requests.
     const criticalRequestChains = {};
-    for (let request of criticalRequests) {
+    for (const request of criticalRequests) {
       // Work back from this request up to the root. If by some weird quirk we are giving request D
       // here, which has ancestors C, B and A (where A is the root), we will build array [C, B, A]
       // during this phase.

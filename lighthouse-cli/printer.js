@@ -121,7 +121,7 @@ function createOutput(results, outputMode) {
     output += `▫ ${bold}${aggregation.name}${reset}\n\n`;
 
     aggregation.score.forEach(item => {
-      let score = (item.overall * 100).toFixed(0);
+      const score = (item.overall * 100).toFixed(0);
 
       if (item.name) {
         output += `${bold}${item.name}${reset}: ${item.scored ? formatScore(score, '%') : ''}\n`;

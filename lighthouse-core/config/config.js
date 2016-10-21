@@ -96,7 +96,7 @@ function cleanTrace(trace) {
 
   // account for offset after removing items
   let i = 0;
-  for (let dup of traceStartEvents) {
+  for (const dup of traceStartEvents) {
     traceEvents.splice(dup - i, 1);
     i++;
   }
@@ -277,7 +277,7 @@ class Config {
     }
 
     // We don't want to mutate the original config object
-    let inputConfig = configJSON;
+    const inputConfig = configJSON;
     configJSON = JSON.parse(JSON.stringify(inputConfig));
     // Copy arrays that could contain plugins to allow for programmatic
     // injection of plugins.

@@ -21,7 +21,7 @@ const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
 
-let mockArtifacts = GatherRunner.instantiateComputedArtifacts();
+const mockArtifacts = GatherRunner.instantiateComputedArtifacts();
 mockArtifacts.traces = {
   defaultPass: {traceEvents: pwaTrace}
 };

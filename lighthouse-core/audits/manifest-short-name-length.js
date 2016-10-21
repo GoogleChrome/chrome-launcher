@@ -47,7 +47,7 @@ class ManifestShortNameLength extends Audit {
       // Historically, Chrome recommended 12 chars as the maximum length to prevent truncation.
       // See #69 for more discussion.
       // https://developer.chrome.com/apps/manifest/name#short_name
-      let manifestValue = manifest.short_name.value || manifest.name.value || '';
+      const manifestValue = manifest.short_name.value || manifest.name.value || '';
       isShortNameShortEnough = manifestValue && manifestValue.length <= suggestedLength;
 
       if (!isShortNameShortEnough) {

@@ -154,7 +154,7 @@ function parseStartUrl(jsonInput, manifestUrl, documentUrl) {
 }
 
 function parseDisplay(jsonInput) {
-  let display = parseString(jsonInput.display, true);
+  const display = parseString(jsonInput.display, true);
 
   if (!display.value) {
     display.value = DEFAULT_DISPLAY_MODE;
@@ -172,7 +172,7 @@ function parseDisplay(jsonInput) {
 }
 
 function parseOrientation(jsonInput) {
-  let orientation = parseString(jsonInput.orientation, true);
+  const orientation = parseString(jsonInput.orientation, true);
 
   if (orientation.value &&
       ALLOWED_ORIENTATION_VALUES.indexOf(orientation.value.toLowerCase()) === -1) {
@@ -197,9 +197,9 @@ function parseIcon(raw, manifestUrl) {
     src.value = url.resolve(manifestUrl, src.value);
   }
 
-  let type = parseString(raw.type, true);
+  const type = parseString(raw.type, true);
 
-  let density = {
+  const density = {
     raw: raw.density,
     value: 1,
     debugString: undefined
@@ -212,9 +212,9 @@ function parseIcon(raw, manifestUrl) {
     }
   }
 
-  let sizes = parseString(raw.sizes);
+  const sizes = parseString(raw.sizes);
   if (sizes.value !== undefined) {
-    let set = new Set();
+    const set = new Set();
     sizes.value.trim().split(/\s+/).forEach(size => set.add(size.toLowerCase()));
     sizes.value = set.size > 0 ? Array.from(set) : undefined;
   }
@@ -268,8 +268,8 @@ function parseIcons(jsonInput, manifestUrl) {
 }
 
 function parseApplication(raw) {
-  let platform = parseString(raw.platform, true);
-  let id = parseString(raw.id, true);
+  const platform = parseString(raw.platform, true);
+  const id = parseString(raw.id, true);
 
   // 10.2.(2) and 10.2.(3)
   const appUrl = parseString(raw.url, true);
@@ -298,12 +298,11 @@ function parseApplication(raw) {
 
 function parseRelatedApplications(jsonInput) {
   const raw = jsonInput.related_applications;
-  let value;
 
   if (raw === undefined) {
     return {
       raw,
-      value,
+      value: undefined,
       debugString: undefined
     };
   }
@@ -311,14 +310,14 @@ function parseRelatedApplications(jsonInput) {
   if (!Array.isArray(raw)) {
     return {
       raw,
-      value,
+      value: undefined,
       debugString: 'ERROR: \'related_applications\' expected to be an array but is not.'
     };
   }
 
   // TODO(bckenny): spec says to skip apps missing `platform`, so debug messages
   // on individual apps are lost. Warn instead?
-  value = raw
+  const value = raw
     .filter(application => !!application.platform)
     .map(parseApplication)
     .filter(parsedApp => !!parsedApp.value.id.value || !!parsedApp.value.url.value);
@@ -384,7 +383,7 @@ function parse(string, manifestUrl, documentUrl) {
   }
 
   /* eslint-disable camelcase */
-  let manifest = {
+  const manifest = {
     name: parseName(jsonInput),
     short_name: parseShortName(jsonInput),
     start_url: parseStartUrl(jsonInput, manifestUrl, documentUrl),

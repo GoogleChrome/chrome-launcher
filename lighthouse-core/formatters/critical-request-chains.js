@@ -139,7 +139,7 @@ class CriticalRequestChains extends Formatter {
       const depth = opts.depth;
       const treeMarkers = opts.treeMarkers;
       let startTime = opts.startTime;
-      let transferSize = opts.transferSize;
+      const transferSize = opts.transferSize;
 
       return Object.keys(node).reduce((output, id, currentIndex, arr) => {
         // Test if this node has children, and if it's the last child.

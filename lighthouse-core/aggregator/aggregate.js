@@ -37,7 +37,7 @@ class Aggregate {
    */
   static _getTotalWeight(expected) {
     const expectedNames = Object.keys(expected);
-    let totalWeight = expectedNames.reduce((last, e) => last + (expected[e].weight || 0), 0);
+    const totalWeight = expectedNames.reduce((last, e) => last + (expected[e].weight || 0), 0);
     return totalWeight;
   }
 

@@ -21,7 +21,7 @@ const ScreenshotsGather = require('../../../gather/computed/screenshots');
 const assert = require('assert');
 const pwaTrace = require('../../fixtures/traces/progressive-app.json');
 
-let screenshotsGather = new ScreenshotsGather();
+const screenshotsGather = new ScreenshotsGather();
 
 describe('Screenshot gatherer', () => {
   it('returns an artifact for a real trace', () => {

@@ -58,7 +58,7 @@ class EstimatedInputLatency extends Audit {
     //  95th Percentile ≈ 199ms
     const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
-    let score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
+    const score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
 
     return EstimatedInputLatency.generateAuditResult({
       score: Math.round(score),
