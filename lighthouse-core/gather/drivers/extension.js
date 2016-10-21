@@ -16,19 +16,17 @@
  */
 'use strict';
 
-const Driver = require('./driver.js');
+const Connection = require('./connection.js');
 const log = require('../../lib/log.js');
-const EventEmitter = require('events').EventEmitter;
 
 /* globals chrome */
 
-class ExtensionDriver extends Driver {
+class ExtensionConnection extends Connection {
 
   constructor() {
     super();
     this._tabId = null;
 
-    this._eventEmitter = new EventEmitter();
     this._onEvent = this._onEvent.bind(this);
     this._onUnexpectedDetach = this._onUnexpectedDetach.bind(this);
   }
@@ -36,8 +34,7 @@ class ExtensionDriver extends Driver {
   _onEvent(source, method, params) {
     // log events received
     log.log('<=', method, params);
-
-    this._eventEmitter.emit(method, params);
+    this.emitNotification(method, params);
   }
 
   _onUnexpectedDetach(debuggee, detachReason) {
@@ -49,16 +46,19 @@ class ExtensionDriver extends Driver {
     this._tabId = null;
     chrome.debugger.onEvent.removeListener(this._onEvent);
     chrome.debugger.onDetach.removeListener(this._onUnexpectedDetach);
-    this._eventEmitter.removeAllListeners();
-    this._eventEmitter = null;
+    this.dispose();
   }
 
+  /**
+   * @override
+   * @return {!Promise}
+   */
   connect() {
     if (this._tabId !== null) {
       return Promise.resolve();
     }
 
-    return this.queryCurrentTab_()
+    return this._queryCurrentTab()
       .then(tab => {
         const tabId = this._tabId = tab.id;
         chrome.debugger.onEvent.addListener(this._onEvent);
@@ -72,9 +72,13 @@ class ExtensionDriver extends Driver {
             resolve(tabId);
           });
         });
-      }).then(_ => this.enableRuntimeEvents());
+      });
   }
 
+  /**
+   * @override
+   * @return {!Promise}
+   */
   disconnect() {
     if (this._tabId === null) {
       return Promise.resolve();
@@ -101,35 +105,35 @@ class ExtensionDriver extends Driver {
   }
 
   /**
-   * Call protocol methods
-   * @param {!string} command
+   * @override
+   * @param {!string} method
    * @param {!Object} params
    * @return {!Promise}
    */
   sendCommand(command, params) {
     return new Promise((resolve, reject) => {
-      this.formattedLog('method => browser', {method: command, params: params}, 'verbose');
+      log.formatProtocol('method => browser', {method: command, params: params}, 'verbose');
       if (!this._tabId) {
         log.error('No tabId set for sendCommand');
       }
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
-          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
+          log.formatProtocol('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(chrome.runtime.lastError);
         }
 
         if (result.wasThrown) {
-          this.formattedLog('method <= browser ERR', {method: command, params: result}, 'error');
+          log.formatProtocol('method <= browser ERR', {method: command, params: result}, 'error');
           return reject(result.exceptionDetails);
         }
 
-        this.formattedLog('method <= browser OK', {method: command, params: result}, 'verbose');
+        log.formatProtocol('method <= browser OK', {method: command, params: result}, 'verbose');
         resolve(result);
       });
     });
   }
 
-  queryCurrentTab_() {
+  _queryCurrentTab() {
     return new Promise((resolve, reject) => {
       const queryOpts = {
         active: true,
@@ -154,8 +158,8 @@ class ExtensionDriver extends Driver {
    * Used by lighthouse-background to kick off the run on the current page
    */
   getCurrentTabURL() {
-    return this.queryCurrentTab_().then(tab => tab.url);
+    return this._queryCurrentTab().then(tab => tab.url);
   }
 }
 
-module.exports = ExtensionDriver;
+module.exports = ExtensionConnection;

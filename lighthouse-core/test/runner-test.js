@@ -16,7 +16,7 @@
 'use strict';
 
 const Runner = require('../runner');
-const fakeDriver = require('./gather/fake-driver');
+const driverMock = require('./gather/fake-driver');
 const Config = require('../config/config');
 const Audit = require('../audits/audit');
 const assert = require('assert');
@@ -36,7 +36,7 @@ describe('Runner', () => {
       ]
     });
 
-    return Runner.run(fakeDriver, {url, config}).then(_ => {
+    return Runner.run(null, {url, config, driverMock}).then(_ => {
       assert.ok(typeof config.passes[0].gatherers[0] === 'object');
     });
   });
@@ -49,7 +49,7 @@ describe('Runner', () => {
       ]
     });
 
-    return Runner.run(fakeDriver, {url, config})
+    return Runner.run(null, {url, config, driverMock})
       .then(_ => {
         assert.ok(false);
       }, err => {
@@ -144,7 +144,7 @@ describe('Runner', () => {
       }]
     });
 
-    return Runner.run(fakeDriver, {url, config})
+    return Runner.run(null, {url, config, driverMock})
       .then(_ => {
         assert.ok(false);
       }, err => {
@@ -180,7 +180,7 @@ describe('Runner', () => {
       }]
     });
 
-    return Runner.run(fakeDriver, {url, config}).then(results => {
+    return Runner.run(null, {url, config, driverMock}).then(results => {
       // Mostly checking that this did not throw, but check representative values.
       assert.equal(results.initialUrl, url);
       assert.strictEqual(results.audits['is-on-https'].rawValue, true);
@@ -215,7 +215,7 @@ describe('Runner', () => {
       }]
     });
 
-    return Runner.run(fakeDriver, {url, config}).then(results => {
+    return Runner.run(null, {url, config, driverMock}).then(results => {
       assert.ok(results.lighthouseVersion);
       assert.ok(results.generatedTime);
       assert.equal(results.initialUrl, url);

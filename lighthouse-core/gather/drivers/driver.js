@@ -19,6 +19,7 @@
 const NetworkRecorder = require('../../lib/network-recorder');
 const emulation = require('../../lib/emulation');
 const Element = require('../../lib/element');
+const EventEmitter = require('events').EventEmitter;
 const parseURL = require('url').parse;
 
 const log = require('../../lib/log.js');
@@ -28,10 +29,15 @@ const PAUSE_AFTER_LOAD = 500;
 
 class Driver {
 
-  constructor() {
+  /**
+   * @param {!Connection} connection
+   */
+  constructor(connection) {
     this._traceEvents = [];
     this._traceCategories = Driver.traceCategories;
-    this._eventEmitter = null;
+    this._eventEmitter = new EventEmitter();
+    this._connection = connection;
+    connection.on('notification', event => this._eventEmitter.emit(event.method, event.params));
   }
 
   static get traceCategories() {
@@ -53,38 +59,15 @@ class Driver {
     ];
   }
 
-  enableRuntimeEvents() {
-    return this.sendCommand('Runtime.enable');
-  }
-
-  enableSecurityEvents() {
-    return this.sendCommand('Security.enable');
-  }
-
-  /**
-   * A simple formatting utility for event logging.
-   * @param {string} prefix
-   * @param {!Object} data A JSON-serializable object of event data to log.
-   * @param {string=} level Optional logging level. Defaults to 'log'.
-   */
-  formattedLog(prefix, data, level) {
-    const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
-    const maxLength = columns - data.method.length - prefix.length - 18;
-    // IO.read blacklisted here to avoid logging megabytes of trace data
-    const snippet = (data.params && data.method !== 'IO.read') ?
-        JSON.stringify(data.params).substr(0, maxLength) : '';
-    log[level ? level : 'log'](prefix, data.method, snippet);
-  }
-
   /**
    * @return {!Promise<null>}
    */
   connect() {
-    return Promise.reject(new Error('Not implemented'));
+    return this._connection.connect();
   }
 
   disconnect() {
-    return Promise.reject(new Error('Not implemented'));
+    return this._connection.disconnect();
   }
 
   /**
@@ -98,7 +81,7 @@ class Driver {
     }
 
     // log event listeners being bound
-    this.formattedLog('listen for event =>', {method: eventName}, 'verbose');
+    log.formatProtocol('listen for event =>', {method: eventName}, 'verbose');
     this._eventEmitter.on(eventName, cb);
   }
 
@@ -113,7 +96,7 @@ class Driver {
       throw new Error('connect() must be called before attempting to listen to events.');
     }
     // log event listeners being bound
-    this.formattedLog('listen once for event =>', {method: eventName}, 'verbose');
+    log.formatProtocol('listen once for event =>', {method: eventName}, 'verbose');
     this._eventEmitter.once(eventName, cb);
   }
 
@@ -132,10 +115,12 @@ class Driver {
 
   /**
    * Call protocol methods
+   * @param {!string} method
+   * @param {!Object} params
    * @return {!Promise}
    */
-  sendCommand() {
-    return Promise.reject(new Error('Not implemented'));
+  sendCommand(method, params) {
+    return this._connection.sendCommand(method, params);
   }
 
   evaluateScriptOnLoad(scriptSource) {
@@ -466,6 +451,10 @@ class Driver {
       this._networkRecorder = null;
       this._networkRecords = [];
     });
+  }
+
+  enableRuntimeEvents() {
+    return this.sendCommand('Runtime.enable');
   }
 
   beginEmulation() {

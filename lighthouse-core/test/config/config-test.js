@@ -209,7 +209,7 @@ describe('Config', () => {
   it('loads an audit from node_modules/', () => {
     return assert.throws(_ => new Config({
       // Use a lighthouse dep as a stand in for a module.
-      audits: ['chrome-remote-interface']
+      audits: ['mocha']
     }), function(err) {
       // Should throw an audit validation error, but *not* an audit not found error.
       return !/locate audit/.test(err) && /audit\(\) method/.test(err);

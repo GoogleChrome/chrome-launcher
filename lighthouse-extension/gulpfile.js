@@ -120,7 +120,6 @@ gulp.task('browserify', () => {
           global: true
         })
         .ignore('../lighthouse-core/lib/asset-saver.js') // relative from gulpfile location
-        .ignore('chrome-remote-interface')
         .ignore('source-map');
 
         // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.

@@ -58,10 +58,10 @@ module.exports = function(url, flags, configJSON) {
     // Use ConfigParser to generate a valid config file
     const config = new Config(configJSON, flags.configPath);
 
-    const driver = new ChromeProtocol();
+    const connection = new ChromeProtocol();
 
     // kick off a lighthouse run
-    resolve(Runner.run(driver, {url, flags, config}));
+    resolve(Runner.run(connection, {url, flags, config}));
   });
 };
 

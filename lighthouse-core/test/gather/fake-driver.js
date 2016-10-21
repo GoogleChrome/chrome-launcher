@@ -26,11 +26,12 @@ module.exports = {
   gotoURL() {
     return Promise.resolve();
   },
-
   beginEmulation() {
     return Promise.resolve();
   },
-
+  enableRuntimeEvents() {
+    return Promise.resolve();
+  },
   cleanAndDisableBrowserCaches() {},
   clearDataForOrigin() {},
   reloadForCleanStateIfNeeded() {

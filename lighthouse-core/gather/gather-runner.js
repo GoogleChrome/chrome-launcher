@@ -87,12 +87,9 @@ class GatherRunner {
     log.log('status', 'Initializing…');
     // Enable emulation if required.
     return Promise.resolve(options.flags.mobile && driver.beginEmulation())
-      .then(_ => {
-        return driver.cleanAndDisableBrowserCaches();
-      }).then(_ => {
-        // Clears storage for origin.
-        return driver.clearDataForOrigin(options.url);
-      });
+      .then(_ => driver.enableRuntimeEvents())
+      .then(_ => driver.cleanAndDisableBrowserCaches())
+      .then(_ => driver.clearDataForOrigin(options.url));
   }
 
   /**

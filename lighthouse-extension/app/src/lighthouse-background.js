@@ -47,9 +47,9 @@ window.createPageAndPopulate = function(results) {
 window.runLighthouse = function(options, requestedAudits) {
   // Default to 'info' logging level.
   log.setLevel('info');
-  const driver = new ExtensionProtocol();
+  const connection = new ExtensionProtocol();
 
-  return driver.getCurrentTabURL()
+  return connection.getCurrentTabURL()
     .then(url => {
       // Always start with a freshly parsed default config.
       const runConfig = JSON.parse(JSON.stringify(defaultConfig));
@@ -63,7 +63,7 @@ window.runLighthouse = function(options, requestedAudits) {
       const runOptions = Object.assign({}, options, {url, config});
 
       // Run Lighthouse.
-      return Runner.run(driver, runOptions);
+      return Runner.run(connection, runOptions);
     }).then(results => {
       window.createPageAndPopulate(results);
     }).catch(e => {

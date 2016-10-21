@@ -16,6 +16,7 @@
  */
 'use strict';
 
+const Driver = require('./gather/drivers/driver.js');
 const GatherRunner = require('./gather/gather-runner');
 const Aggregate = require('./aggregator/aggregate');
 const assetSaver = require('./lib/asset-saver');
@@ -25,7 +26,7 @@ const path = require('path');
 const url = require('url');
 
 class Runner {
-  static run(driver, opts) {
+  static run(connection, opts) {
     // Clean opts input.
     opts.flags = opts.flags || {};
 
@@ -69,7 +70,7 @@ class Runner {
     // to check that there are artifacts specified in the config, and throw if not.
     if (validPassesAndAudits || validArtifactsAndAudits) {
       if (validPassesAndAudits) {
-        opts.driver = driver;
+        opts.driver = opts.driverMock || new Driver(connection);
         // Finally set up the driver to gather.
         run = run.then(_ => GatherRunner.run(config.passes, opts));
       } else if (validArtifactsAndAudits) {
