@@ -34,9 +34,6 @@ module.exports = {
   },
   cleanAndDisableBrowserCaches() {},
   clearDataForOrigin() {},
-  reloadForCleanStateIfNeeded() {
-    return Promise.resolve();
-  },
   beginTrace() {
     return Promise.resolve();
   },

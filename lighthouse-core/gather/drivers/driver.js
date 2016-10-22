@@ -341,22 +341,6 @@ class Driver {
   }
 
   /**
-   * @param {!Object} options
-   * @return {!Promise}
-   */
-  reloadForCleanStateIfNeeded(options) {
-    if (!options.restoreCleanState) {
-      return Promise.resolve();
-    }
-
-    const status = 'Reloading page to reset state';
-    log.log('status', status);
-    return this.gotoURL(options.url).then(_ => {
-      log.log('statusEnd', status);
-    });
-  }
-
-  /**
    * @param {string} selector Selector to find in the DOM
    * @return {!Promise<Element>} The found element, or null, resolved in a promise
    */

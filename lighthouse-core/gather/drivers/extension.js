@@ -90,6 +90,8 @@ class ExtensionConnection extends Connection {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
+        // Reload the target page to restore its state.
+        chrome.tabs.reload(tabId);
         resolve();
       });
     }).then(_ => this._detachCleanup());

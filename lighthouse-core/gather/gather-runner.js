@@ -45,9 +45,8 @@ const path = require('path');
  *     ii. all gatherer's afterPass()
  *
  * 3. Teardown
- *   A. reloadForCleanStateIfNeeded
- *   B. driver.disconnect()
- *   C. collect all artifacts and return them
+ *   A. driver.disconnect()
+ *   B. collect all artifacts and return them
  */
 class GatherRunner {
   /**
@@ -243,14 +242,9 @@ class GatherRunner {
         });
       })
       .then(_ => {
-        // We dont need to hold up the reporting for the reload/disconnect,
-        // so we will not return a promise in here.
-        driver.reloadForCleanStateIfNeeded(options).then(_ => {
-          log.log('status', 'Disconnecting from browser...');
-          driver.disconnect();
-        });
-      })
-      .then(_ => {
+        log.log('status', 'Disconnecting from browser...');
+        return driver.disconnect();
+      }).then(_ => {
         // Collate all the gatherer results.
         const computedArtifacts = this.instantiateComputedArtifacts();
         const artifacts = Object.assign({}, computedArtifacts, tracingData);
