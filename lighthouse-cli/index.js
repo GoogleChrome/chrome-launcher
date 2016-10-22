@@ -2,4 +2,4 @@
 
 'use strict'
 
-require('./bin.js');
+require('./bin.js').run();

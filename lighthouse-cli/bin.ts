@@ -161,9 +161,14 @@ const cleanup = {
   }
 };
 
-function launchChromeAndRun(addresses) {
+function launchChromeAndRun(addresses: Array<string>,
+                            config: Object,
+                            opts?: {selectChrome: boolean}) {
+
+  opts = opts || cli;
+
   const launcher = new ChromeLauncher({
-    autoSelectChrome: !cli.selectChrome,
+    autoSelectChrome: !opts.selectChrome,
   });
 
   cleanup.register(() => launcher.kill());
@@ -174,11 +179,11 @@ function launchChromeAndRun(addresses) {
       log.log('Lighthouse CLI', 'Launching Chrome...');
       return launcher.run();
     })
-    .then(() => lighthouseRun(addresses))
+    .then(() => lighthouseRun(addresses, config))
     .then(() => launcher.kill());
 }
 
-function lighthouseRun(addresses) {
+function lighthouseRun(addresses, config: Object) {
   // Process URLs once at a time
   const address = addresses.shift();
   if (!address) {
@@ -193,7 +198,7 @@ function lighthouseRun(addresses) {
         Printer.write(results, 'html', filename);
       }
 
-      return lighthouseRun(addresses);
+      return lighthouseRun(addresses, config);
     });
 }
 
@@ -222,7 +227,7 @@ function handleError(err) {
 
 function run() {
   if (cli.skipAutolaunch) {
-    lighthouseRun(urls).catch(handleError);
+    lighthouseRun(urls, config).catch(handleError);
   } else {
     // because you can't cancel a promise yet
     const isSigint = new Promise((resolve, reject) => {
@@ -230,7 +235,7 @@ function run() {
     });
 
     Promise
-      .race([launchChromeAndRun(urls), isSigint])
+      .race([launchChromeAndRun(urls, config), isSigint])
       .catch(maybeSigint => {
         if (maybeSigint === _SIGINT) {
           return cleanup
@@ -245,5 +250,7 @@ function run() {
   }
 }
 
-// kick off a lighthouse run
-run();
+export {
+  run,
+  launchChromeAndRun
+}
