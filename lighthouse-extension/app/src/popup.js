@@ -126,7 +126,8 @@ document.addEventListener('DOMContentLoaded', _ => {
       return background.runLighthouseInExtension({
         flags: {
           mobile: true
-        }
+        },
+        restoreCleanState: true
       }, selectedAudits);
     })
     .catch(err => {

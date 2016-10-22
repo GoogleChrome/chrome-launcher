@@ -340,8 +340,20 @@ class Driver {
       .then(_ => waitForLoad && this._waitForFullyLoaded(pauseAfterLoadMs));
   }
 
-  reloadForCleanStateIfNeeded() {
-    return Promise.resolve();
+  /**
+   * @param {!Object} options
+   * @return {!Promise}
+   */
+  reloadForCleanStateIfNeeded(options) {
+    if (!options.restoreCleanState) {
+      return Promise.resolve();
+    }
+
+    const status = 'Reloading page to reset state';
+    log.log('status', status);
+    return this.gotoURL(options.url).then(_ => {
+      log.log('statusEnd', status);
+    });
   }
 
   /**
