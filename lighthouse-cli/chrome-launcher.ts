@@ -17,28 +17,36 @@
 
 'use strict';
 
-const childProcess = require('child_process');
-const fs = require('fs');
-const path = require('path');
+import * as childProcess from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as chromeFinder from './chrome-finder';
+import {ask} from './ask';
+
 const mkdirp = require('mkdirp');
 const net = require('net');
 const rimraf = require('rimraf');
-const ask = require('./ask');
-const chromeFinder = require('./chrome-finder');
 const log = require('../lighthouse-core/lib/log');
-
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const spawnSync = childProcess.spawnSync;
 
-module.exports = class Launcher {
-  constructor(opts) {
+class ChromeLauncher {
+  prepared: Boolean = false
+  pollInterval: number = 500
+  autoSelectChrome: Boolean
+  TMP_PROFILE_DIR: string
+  outFile: number
+  errFile: number
+  pidFile: string
+  chrome: childProcess.ChildProcess
+
+  // We can not use default args here due to support node pre 6.
+  constructor(opts?: {autoSelectChrome?: Boolean}) {
     opts = opts || {};
+
     // choose the first one (default)
     this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
-    this.pollInterval = 500;
-    this.chrome = null;
-    this.prepared = false;
   }
 
   flags() {
@@ -104,7 +112,7 @@ module.exports = class Launcher {
       .then(execPath => this.spawn(execPath));
   }
 
-  spawn(execPath) {
+  spawn(execPath: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const chrome = spawn(
         execPath,
@@ -134,7 +142,7 @@ module.exports = class Launcher {
   }
 
   // resolves if ready, rejects otherwise
-  isDebuggerReady() {
+  isDebuggerReady(): Promise<undefined> {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(9222);
       client.once('error', err => {
@@ -149,7 +157,7 @@ module.exports = class Launcher {
   }
 
   // resolves when debugger is ready, rejects after 10 polls
-  waitUntilReady() {
+  waitUntilReady(): Promise<undefined> {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
@@ -182,7 +190,7 @@ module.exports = class Launcher {
     });
   }
 
-  kill() {
+  kill(): Promise<undefined> {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
@@ -233,3 +241,5 @@ function win32TmpDir() {
   mkdirp.sync(tmpdir);
   return tmpdir;
 }
+
+export {ChromeLauncher};

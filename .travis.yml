@@ -12,11 +12,13 @@ cache:
      - chrome-linux
      - lighthouse-extension/node_modules
 before_script:
+  - npm i -g typescript@2.0
   - npm --prefix ./lighthouse-extension install ./lighthouse-extension
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./lighthouse-core/scripts/download-chrome.sh
+  - cd lighthouse-cli && tsc && cd ..
 script:
   - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
   - npm run lint

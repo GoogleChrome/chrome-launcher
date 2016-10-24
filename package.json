@@ -26,6 +26,7 @@
     "smokehouse": "node $__node_harmony lighthouse-cli/test/smokehouse/smokehouse.js"
   },
   "devDependencies": {
+    "@types/node": "^6.0.45",
     "babel-core": "^6.16.0",
     "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "coveralls": "^2.11.9",
