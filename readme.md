@@ -39,7 +39,16 @@ lighthouse --help
 git clone https://github.com/GoogleChrome/lighthouse
 cd lighthouse
 npm install
+
+cd lighthouse-cli/
+npm install
 ```
+
+#### Working on the CLI.
+
+The CLI's implementation is now in TypeScript; and currently being evaluated for improved ergonomics. You must run a filewatcher with compile step during development.
+
+`cd lighthouse-cli && npm run dev`
 
 #### Run
 
