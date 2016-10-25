@@ -26,36 +26,7 @@
 enum OutputMode { pretty, json, html };
 type Mode = 'pretty' | 'json' | 'html';
 
-interface AuditResult {
-  displayValue: string;
-  debugString: string;
-  comingSoon?: boolean;
-  score: number;
-  description: string;
-  extendedInfo?: {
-    value: string;
-    formatter: string;
-  };
-}
-
-interface AggregationResultItem {
-  overall: number;
-  name: string;
-  scored: boolean;
-  subItems: Array<AuditResult | string>;
-}
-
-interface Aggregation {
-  name: string;
-  score:  Array<AggregationResultItem>;
-}
-
-interface Results {
-  url: string;
-  aggregations: Array<Aggregation>;
-  audits: Object;
-  lighthouseVersion: string;
-};
+import {Results, AuditResult} from './types/types';
 
 const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
@@ -139,7 +110,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
         let auditResult: AuditResult;
 
         if (typeof subitem === 'string') {
-          auditResult = results.audits[subitem as string];
+          auditResult = (<any>results).audits[subitem];
         } else {
           auditResult = subitem as AuditResult;
         }
@@ -190,7 +161,7 @@ function writeToStdout(output: string): Promise<undefined> {
 function writeFile(filePath: string, output: string, outputMode: OutputMode): Promise<undefined> {
   return new Promise((resolve, reject) => {
     // TODO: make this mkdir to the filePath.
-    fs.writeFile(filePath, output, 'utf8', err => {
+    fs.writeFile(filePath, output, 'utf8', (err: Error) => {
       if (err) {
         return reject(err);
       }
@@ -207,7 +178,7 @@ function write(results: Results, mode: Mode, path: string): Promise<Results> {
   return new Promise((resolve, reject) => {
     const outputPath = checkOutputPath(path);
 
-    const output = createOutput(results, OutputMode[mode]);
+    const output = createOutput(results, (<any>OutputMode)[mode]);
 
     // Testing stdout is out of scope, and doesn't really achieve much besides testing Node,
     // so we will skip this chunk of the code.
@@ -216,7 +187,7 @@ function write(results: Results, mode: Mode, path: string): Promise<Results> {
       return writeToStdout(output).then(_ => resolve(results));
     }
 
-    return writeFile(outputPath, output, OutputMode[mode]).then(_ => {
+    return writeFile(outputPath, output, (<any>OutputMode)[mode]).then(_ => {
       resolve(results);
     }).catch(err => reject(err));
   });

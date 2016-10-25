@@ -25,3 +25,7 @@ lighthouse-cli/*.js
 
 lighthouse-cli/commands/*.map
 lighthouse-cli/commands/*.js
+
+lighthouse-cli/types/*.js
+lighthouse-cli/types/*.map
+
