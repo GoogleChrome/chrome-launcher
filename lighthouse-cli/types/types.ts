@@ -19,7 +19,7 @@ interface AggregationResultItem {
 
 interface Aggregation {
   name: string;
-  score:  Array<AggregationResultItem>;
+  score: Array<AggregationResultItem>;
 }
 
 interface Results {
