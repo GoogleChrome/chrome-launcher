@@ -25,6 +25,7 @@ script:
   - npm run unit
   - npm run closure
   - npm run smoke
+  - npm run smokehouse
   - cd lighthouse-extension
   - gulp build
   - cd ..
