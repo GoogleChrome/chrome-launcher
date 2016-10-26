@@ -32,7 +32,7 @@ gulp.task('js-compile', function() {
     'lib/styles-helpers.js',
     'aggregator/**/*.js'
   ])
-    // TODO: hack to remove `require`s that Closure currently can't resolve.
+    // Hack to remove `require`s that Closure currently can't resolve.
     .pipe(replace('require(\'../lib/web-inspector\').Color.parse;',
         'WebInspector.Color.parse;'))
     .pipe(replace('require(\'../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))

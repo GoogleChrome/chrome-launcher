@@ -15,6 +15,8 @@
  */
 'use strict';
 
+/* eslint max-nested-callbacks: ["error", 5] */
+
 const assert = require('assert');
 const walk = require('walk');
 const path = require('path');

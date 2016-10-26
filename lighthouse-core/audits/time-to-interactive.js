@@ -79,9 +79,6 @@ class TTIMetric extends Audit {
       const endOfTraceTime = model.bounds.max;
 
       // TODO: Wait for DOMContentLoadedEndEvent
-      // TODO: Wait for UA loading indicator to be done
-
-      // TODO CHECK these units are the same
       const fMPts = timings.fMPfull + timings.navStart;
 
       // look at speedline results for 85% starting at FMP
@@ -93,7 +90,6 @@ class TTIMetric extends Audit {
         });
 
         if (eightyFivePctVC) {
-          // TODO CHECK these units are the same
           visuallyReadyTiming = eightyFivePctVC.getTimeStamp() - timings.navStart;
         }
       }
