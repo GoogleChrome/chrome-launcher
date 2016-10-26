@@ -47,6 +47,39 @@ class TestGathererNoArtifact {
 
 const fakeDriver = require('./fake-driver');
 
+function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
+  const Driver = require('../../gather/driver');
+  const Connection = require('../../gather/connections/connection');
+  const EmulationDriver = class extends Driver {
+    enableRuntimeEvents() {
+      return Promise.resolve();
+    }
+    cleanAndDisableBrowserCaches() {}
+    clearDataForOrigin() {}
+  };
+  const EmulationMock = class extends Connection {
+    sendCommand(command) {
+      let fn = null;
+      switch (command) {
+        case 'Network.emulateNetworkConditions':
+          fn = netThrottleFn;
+          break;
+        case 'Emulation.setCPUThrottlingRate':
+          fn = cpuThrottleFn;
+          break;
+        case 'Emulation.setDeviceMetricsOverride':
+          fn = emulationFn;
+          break;
+        default:
+          fn = null;
+          break;
+      }
+      return Promise.resolve(fn && fn());
+    }
+  };
+  return new EmulationDriver(new EmulationMock());
+}
+
 describe('GatherRunner', function() {
   it('loads a page', () => {
     const driver = {
@@ -77,55 +110,113 @@ describe('GatherRunner', function() {
     });
   });
 
-  it('sets up the driver to begin emulation when mobile == true', () => {
-    let calledEmulation = false;
-    const driver = {
-      beginEmulation() {
-        calledEmulation = true;
-        return Promise.resolve();
-      },
-      enableRuntimeEvents() {
-        return Promise.resolve();
-      },
-      cleanAndDisableBrowserCaches() {
-        return Promise.resolve();
-      },
-      clearDataForOrigin() {
-        return Promise.resolve();
-      }
+  it('sets up the driver to begin emulation when all emulation flags are undefined', () => {
+    const tests = {
+      calledDeviceEmulation: false,
+      calledNetworkEmulation: false,
+      calledCpuEmulation: false,
     };
+    const createEmulationCheck = variable => () => {
+      tests[variable] = true;
 
-    return GatherRunner.setupDriver(driver, {
-      flags: {
-        mobile: true
-      }
-    }).then(_ => {
-      assert.equal(calledEmulation, true);
-    });
-  });
-
-  it('does not set up the driver to begin emulation when mobile == false', () => {
-    let calledEmulation = false;
-    const driver = {
-      beginEmulation() {
-        calledEmulation = true;
-        return Promise.resolve();
-      },
-      enableRuntimeEvents() {
-        return Promise.resolve();
-      },
-      cleanAndDisableBrowserCaches() {
-        return Promise.resolve();
-      },
-      clearDataForOrigin() {
-        return Promise.resolve();
-      }
+      return true;
     };
+    const driver = getMockedEmulationDriver(
+      createEmulationCheck('calledDeviceEmulation'),
+      createEmulationCheck('calledNetworkEmulation'),
+      createEmulationCheck('calledCpuEmulation')
+    );
 
     return GatherRunner.setupDriver(driver, {
       flags: {}
     }).then(_ => {
-      assert.equal(calledEmulation, false);
+      assert.equal(tests.calledDeviceEmulation, true);
+      assert.equal(tests.calledNetworkEmulation, true);
+      assert.equal(tests.calledCpuEmulation, true);
+    });
+  });
+
+  it(`sets up the driver to stop device emulation when
+  disableDeviceEmulation flag is true`, () => {
+    const tests = {
+      calledDeviceEmulation: false,
+      calledNetworkEmulation: false,
+      calledCpuEmulation: false,
+    };
+    const createEmulationCheck = variable => () => {
+      tests[variable] = true;
+      return true;
+    };
+    const driver = getMockedEmulationDriver(
+      createEmulationCheck('calledDeviceEmulation', false),
+      createEmulationCheck('calledNetworkEmulation', true),
+      createEmulationCheck('calledCpuEmulation', true)
+    );
+
+    return GatherRunner.setupDriver(driver, {
+      flags: {
+        disableDeviceEmulation: true,
+      }
+    }).then(_ => {
+      assert.equal(tests.calledDeviceEmulation, false);
+      assert.equal(tests.calledNetworkEmulation, true);
+      assert.equal(tests.calledCpuEmulation, true);
+    });
+  });
+
+  it(`sets up the driver to stop network throttling when
+  disableNetworkThrottling flag is true`, () => {
+    const tests = {
+      calledDeviceEmulation: false,
+      calledNetworkEmulation: false,
+      calledCpuEmulation: false,
+    };
+    const createEmulationCheck = variable => () => {
+      tests[variable] = true;
+      return true;
+    };
+    const driver = getMockedEmulationDriver(
+      createEmulationCheck('calledDeviceEmulation'),
+      createEmulationCheck('calledNetworkEmulation'),
+      createEmulationCheck('calledCpuEmulation')
+    );
+
+    return GatherRunner.setupDriver(driver, {
+      flags: {
+        disableNetworkThrottling: true,
+      }
+    }).then(_ => {
+      assert.equal(tests.calledDeviceEmulation, true);
+      assert.equal(tests.calledNetworkEmulation, false);
+      assert.equal(tests.calledCpuEmulation, true);
+    });
+  });
+
+  it(`sets up the driver to stop cpu throttling when
+  disableCpuThrottling flag is true`, () => {
+    const tests = {
+      calledDeviceEmulation: false,
+      calledNetworkEmulation: false,
+      calledCpuEmulation: false,
+    };
+    const createEmulationCheck = variable => () => {
+      tests[variable] = true;
+      return true;
+    };
+    const driver = getMockedEmulationDriver(
+      createEmulationCheck('calledDeviceEmulation'),
+      createEmulationCheck('calledNetworkEmulation'),
+      createEmulationCheck('calledCpuEmulation')
+    );
+
+    return GatherRunner.setupDriver(driver, {
+      flags: {
+        disableCpuThrottling: true,
+      }
+    }).then(_ => {
+      assert.equal(tests.calledDeviceEmulation, true);
+      assert.equal(tests.calledNetworkEmulation, true);
+      assert.equal(tests.calledCpuEmulation, false);
     });
   });
 

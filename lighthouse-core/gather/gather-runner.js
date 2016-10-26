@@ -84,8 +84,8 @@ class GatherRunner {
 
   static setupDriver(driver, options) {
     log.log('status', 'Initializing…');
-    // Enable emulation if required.
-    return Promise.resolve(options.flags.mobile && driver.beginEmulation())
+    // Enable emulation based on flags
+    return driver.beginEmulation(options.flags)
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cleanAndDisableBrowserCaches())
       .then(_ => driver.clearDataForOrigin(options.url));
@@ -204,10 +204,9 @@ class GatherRunner {
       return Promise.reject(new Error('You must provide a config'));
     }
 
-    // Default mobile emulation and page loading to true.
-    // The extension will switch these off initially.
-    if (typeof options.flags.mobile === 'undefined') {
-      options.flags.mobile = true;
+    // CPU throttling is temporarily off by default
+    if (typeof options.flags.disableCpuThrottling === 'undefined') {
+      options.flags.disableCpuThrottling = true;
     }
 
     passes = this.instantiateGatherers(passes, options.config.configDir);

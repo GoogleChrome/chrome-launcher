@@ -453,11 +453,22 @@ class Driver {
     return this.sendCommand('Runtime.enable');
   }
 
-  beginEmulation() {
-    return Promise.all([
-      emulation.enableNexus5X(this),
-      emulation.enableNetworkThrottling(this)
-    ]);
+  beginEmulation(flags) {
+    const emulations = [];
+
+    if (!flags.disableDeviceEmulation) {
+      emulations.push(emulation.enableNexus5X(this));
+    }
+
+    if (!flags.disableNetworkThrottling) {
+      emulations.push(emulation.enableNetworkThrottling(this));
+    }
+
+    if (!flags.disableCpuThrottling) {
+      emulations.push(emulation.enableCPUThrottling(this));
+    }
+
+    return Promise.all(emulations);
   }
 
   /**
@@ -470,13 +481,13 @@ class Driver {
 
   /**
    * Enable internet connection, using emulated mobile settings if
-   * `options.flags.mobile` is true.
+   * `options.flags.disableNetworkThrottling` is false.
    * @param {!Object} options
    * @return {!Promise}
    */
   goOnline(options) {
     return this.sendCommand('Network.enable').then(_ => {
-      if (options.flags.mobile) {
+      if (!options.flags.disableNetworkThrottling) {
         return emulation.enableNetworkThrottling(this);
       }
 

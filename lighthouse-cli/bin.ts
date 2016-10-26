@@ -65,7 +65,9 @@ const cli = yargs
     'perf'
   ], 'Configuration:')
   .describe({
-    'mobile': 'Emulates a Nexus 5X',
+    'disable-device-emulation': 'Disable Nexus 5X emulation',
+    'disable-cpu-throttling': 'Disable CPU throttling',
+    'disable-network-throttling': 'Disable network throttling',
     'save-assets': 'Save the trace contents & screenshots to disk',
     'save-artifacts': 'Save all gathered artifacts to disk',
     'list-all-audits': 'Prints a list of all available audits and exits',
@@ -88,11 +90,13 @@ Example: --output-path=./lighthouse-results.html`
 
   // boolean values
   .boolean([
+    'disable-device-emulation',
+    'disable-cpu-throttling',
+    'disable-network-throttling',
     'save-assets',
     'save-artifacts',
     'list-all-audits',
     'list-trace-categories',
-    'mobile',
     'perf',
     'skip-autolaunch',
     'select-chrome',
@@ -103,7 +107,7 @@ Example: --output-path=./lighthouse-results.html`
   .choices('output', Printer.GetValidOutputOptions())
 
   // default values
-  .default('mobile', true)
+  .default('disable-cpu-throttling', true)
   .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.pretty])
   .default('output-path', 'stdout')
   .check(argv => {

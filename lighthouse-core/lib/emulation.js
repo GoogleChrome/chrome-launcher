@@ -63,6 +63,13 @@ const NO_THROTTLING_METRICS = {
   offline: false
 };
 
+const NO_CPU_THROTTLE_METRICS = {
+  rate: 1
+};
+const CPU_THROTTLE_METRICS = {
+  rate: 5
+};
+
 function enableNexus5X(driver) {
   /**
    * Finalizes touch emulation by enabling `"ontouchstart" in window` feature detect
@@ -113,9 +120,19 @@ function goOffline(driver) {
   return driver.sendCommand('Network.emulateNetworkConditions', OFFLINE_METRICS);
 }
 
+function enableCPUThrottling(driver) {
+  return driver.sendCommand('Emulation.setCPUThrottlingRate', CPU_THROTTLE_METRICS);
+}
+
+function disableCPUThrottling(driver) {
+  return driver.sendCommand('Emulation.setCPUThrottlingRate', NO_CPU_THROTTLE_METRICS);
+}
+
 module.exports = {
   enableNexus5X,
   enableNetworkThrottling,
   disableNetworkThrottling,
+  enableCPUThrottling,
+  disableCPUThrottling,
   goOffline
 };

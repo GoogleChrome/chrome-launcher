@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', _ => {
     .then(selectedAudits => {
       return background.runLighthouseInExtension({
         flags: {
-          mobile: true
+          disableCpuThrottling: true
         },
         restoreCleanState: true
       }, selectedAudits);
