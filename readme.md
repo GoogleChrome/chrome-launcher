@@ -138,7 +138,8 @@ Options:
   --help             Show help                                                        [boolean]
   --version          Show version number                                              [boolean]
   --skip-autolaunch  Skip autolaunch of Chrome when accessing port 9222 fails         [boolean]
-  --select-chrome    Choose Chrome location when multiple installations are found     [boolean]
+  --select-chrome    Interactively choose version of Chrome to use when multiple
+                     installations are found                                          [boolean]
 ```
 
 ## Lighthouse w/ mobile devices

@@ -72,8 +72,8 @@ const cli = yargs
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
     'config-path': 'The path to the config JSON.',
     'perf': 'Use a performance-test-only configuration',
-    'skip-autolaunch': 'Skip autolaunch of chrome when accessing port 9222 fails',
-    'select-chrome': 'Choose chrome location to use when multiple installations are found',
+    'skip-autolaunch': 'Skip autolaunch of Chrome when accessing port 9222 fails',
+    'select-chrome': 'Interactively choose version of Chrome to use when multiple installations are found',
   })
 
   .group([
