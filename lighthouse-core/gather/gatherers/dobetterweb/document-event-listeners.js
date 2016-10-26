@@ -48,7 +48,7 @@ class PageLevelEventListeners extends Gatherer {
   _listEventListeners(expression) {
     return this.driver.sendCommand('Runtime.evaluate', {
       expression,
-      objectGroup: 'page-listeners-gatherer'
+      objectGroup: 'page-listeners-gatherer' // needed to populate .handler
     }).then(result => {
       return this.driver.sendCommand('DOMDebugger.getEventListeners', {
         objectId: result.result.objectId
@@ -79,12 +79,13 @@ class PageLevelEventListeners extends Gatherer {
           // Debugger.scriptParsed event so we get .url and other
           // needed properties.
           const combo = Object.assign(listener, this._parsedScripts[idx]);
+          combo.objectId = location;
 
           // Note: line/col numbers are zero-index. Add one to each so we have
           // actual file line/col numbers.
           combo.line = combo.lineNumber + 1;
           combo.col = combo.columnNumber + 1;
-          combo.objectId = location;
+
           matchedListeners.push(combo);
         }
       });
