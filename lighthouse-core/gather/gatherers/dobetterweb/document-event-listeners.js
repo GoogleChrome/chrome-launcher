@@ -67,10 +67,10 @@ class PageLevelEventListeners extends Gatherer {
   getEventListeners(location) {
     const matchedListeners = [];
 
-    return this._listEventListeners(location).then(listeners => {
+    return this._listEventListeners(location).then(results => {
       const parsedScriptIds = this._parsedScripts.map(script => script.scriptId);
 
-      listeners.listeners.forEach(listener => {
+      results.listeners.forEach(listener => {
         // Slim down the list of parsed scripts to match the found event
         // listeners that have the same script id.
         const idx = parsedScriptIds.indexOf(listener.scriptId);
@@ -84,6 +84,7 @@ class PageLevelEventListeners extends Gatherer {
           // actual file line/col numbers.
           combo.line = combo.lineNumber + 1;
           combo.col = combo.columnNumber + 1;
+          combo.objectId = location;
           matchedListeners.push(combo);
         }
       });
@@ -118,11 +119,11 @@ class PageLevelEventListeners extends Gatherer {
     return this.unlistenForScriptParsedEvents(options.driver)
       .then(_ => this.collectListeners(LISTENER_LOCATIONS))
       .then(listeners => {
-        this.artifact.listeners = listeners;
+        this.artifact = listeners;
       }).catch(_ => {
         this.artifact = {
           usage: -1,
-          debugString: 'Unable to gather passive events listeners usage'
+          debugString: 'Unable to gather passive events listeners usage.'
         };
       });
   }

@@ -56,20 +56,27 @@ class PassiveEventsAudit extends Audit {
         rawValue: -1,
         debugString: 'PageLevelEventListeners gatherer did not run'
       });
+    } else if (artifacts.PageLevelEventListeners.rawValue === -1) {
+      return PassiveEventsAudit.generateAuditResult(artifacts.PageLevelEventListeners);
     }
 
-    const listeners = artifacts.PageLevelEventListeners.listeners;
+    const listeners = artifacts.PageLevelEventListeners;
     const pageHost = url.parse(artifacts.URL.finalUrl).host;
 
-    const results = listeners.filter(l => {
-      const isScrollBlocking = SCROLL_BLOCKING_EVENTS.indexOf(l.type) !== -1;
-      const callsPreventDefault = l.handler.description.match(/\.preventDefault\(\s*\)/g);
-      const sameHost = url.parse(l.url).host === pageHost;
-      return sameHost && isScrollBlocking && !l.passive && !callsPreventDefault;
-    }).map(err => {
+    // Filter out non-passive window/document/document.body listeners that do
+    // not call preventDefault() are scroll blocking events.
+    const results = listeners.filter(loc => {
+      const isScrollBlocking = SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
+      const callsPreventDefault = loc.handler.description.match(
+            /\.preventDefault\(\s*\)/g);
+      const sameHost = url.parse(loc.url).host === pageHost;
+      return sameHost && isScrollBlocking && !loc.passive &&
+             !callsPreventDefault;
+    }).map(loc => {
       return Object.assign({
-        label: `line: ${err.line}, col: ${err.col}`
-      }, err);
+        label: `line: ${loc.line}, col: ${loc.col}`,
+        code: `${loc.objectId}.addEventListener('${loc.type}', ${loc.handler.description})`
+      }, loc);
     });
 
     return PassiveEventsAudit.generateAuditResult({
