@@ -21,6 +21,8 @@ const fs = require('fs');
 const path = require('path');
 const execSync = require('child_process').execSync;
 
+type Priorities = Array<{regex: RegExp, weight: number}>;
+
 export function darwin() {
   const suffixes = [
     '/Contents/MacOS/Google Chrome Canary',
@@ -32,7 +34,7 @@ export function darwin() {
     '/Versions/A/Frameworks/LaunchServices.framework' +
     '/Versions/A/Support/lsregister';
 
-  const installations = [];
+  const installations: Array<string> = [];
 
   execSync(
     `${LSREGISTER} -dump` +
@@ -40,7 +42,7 @@ export function darwin() {
     ' | awk \'{$1=""; print $0}\''
   ).toString()
     .split(/\r?\n/)
-    .forEach(inst => {
+    .forEach((inst: string) => {
       suffixes.forEach(suffix => {
         const execPath = path.join(inst.trim(), suffix);
         if (canAccess(execPath)) {
@@ -49,7 +51,7 @@ export function darwin() {
       });
     });
 
-  const priorities: {regex: RegExp, weight: number}[] = [{
+  const priorities: Priorities = [{
     regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`),
     weight: 50
   }, {
@@ -84,7 +86,7 @@ export function linux() {
 }
 
 export function win32() {
-  const installations = [];
+  const installations: Array<string> = [];
   const suffixes = [
     '\\Google\\Chrome SxS\\Application\\chrome.exe',
     '\\Google\\Chrome\\Application\\chrome.exe'
@@ -105,11 +107,11 @@ export function win32() {
   return installations;
 }
 
-function sort(installations, priorities) {
+function sort(installations: Array<string>, priorities: Priorities) {
   const defaultPriority = 10;
   return installations
     // assign priorities
-    .map(inst => {
+    .map((inst: string) => {
       for (const pair of priorities) {
         if (pair.regex.test(inst)) {
           return [inst, pair.weight];
@@ -118,7 +120,7 @@ function sort(installations, priorities) {
       return [inst, defaultPriority];
     })
     // sort based on priorities
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => (<any>b)[1] - (<any>a)[1])
     // remove priority flag
     .map(pair => pair[0]);
 }

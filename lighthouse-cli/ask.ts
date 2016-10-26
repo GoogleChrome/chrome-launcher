@@ -27,7 +27,7 @@ function ask(question: string, options: string[]): Promise<string> {
     iface.setPrompt(question + '\r\n' + optionsStr + '\r\nChoice: ');
     iface.prompt();
 
-    iface.on('line', _answer => {
+    iface.on('line', (_answer: string) => {
       const answer = toInt(_answer);
       if (answer > 0 && answer <= options.length) {
         iface.close();

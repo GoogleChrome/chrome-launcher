@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "build": "tsc",
     "dev": "tsc -w"
   },
   "devDependencies": {

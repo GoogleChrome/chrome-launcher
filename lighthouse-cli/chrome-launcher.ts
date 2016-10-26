@@ -24,7 +24,7 @@ import * as chromeFinder from './chrome-finder';
 import {ask} from './ask';
 
 const mkdirp = require('mkdirp');
-const net = require('net');
+import * as net from 'net';
 const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
@@ -99,7 +99,7 @@ class ChromeLauncher {
 
     return Promise.resolve()
       .then(() => {
-        const installations = chromeFinder[process.platform]();
+        const installations = (<any>chromeFinder)[process.platform]();
 
         if (installations.length < 1) {
           return Promise.reject(new Error('No Chrome Installations Found'));
@@ -132,7 +132,7 @@ class ChromeLauncher {
     .then(pid => Promise.all([pid, this.waitUntilReady()]));
   }
 
-  cleanup(client) {
+  cleanup(client?: net.Socket) {
     if (client) {
       client.removeAllListeners();
       client.end();
@@ -219,11 +219,11 @@ class ChromeLauncher {
   }
 };
 
-function defaults(val, def) {
+function defaults(val: any, def: any) {
   return typeof val === 'undefined' ? def : val;
 }
 
-function delay(time) {
+function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 

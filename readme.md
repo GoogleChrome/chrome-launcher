@@ -42,6 +42,7 @@ npm install
 
 cd lighthouse-cli/
 npm install
+npm run build
 ```
 
 #### Working on the CLI.
