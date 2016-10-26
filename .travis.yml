@@ -2,8 +2,9 @@ language: node_js
 matrix:
   include:
     - node_js: "4.3.2"
-    - node_js: "5.0"
-    - node_js: "node"
+    - node_js: "5"
+    - node_js: "6"
+    - node_js: "7"
 sudo: required
 dist: trusty
 cache:
