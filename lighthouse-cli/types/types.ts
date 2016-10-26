@@ -4,6 +4,10 @@ interface AuditResult {
   comingSoon?: boolean;
   score: number;
   description: string;
+  name: string;
+  category: string;
+  helpText?: string;
+  requiredArtifacts?: Array<string>;
   extendedInfo?: {
     value: string;
     formatter: string;
