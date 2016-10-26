@@ -17,6 +17,7 @@
 'use strict';
 
 /* eslint-env worker, serviceworker */
+/* eslint max-nested-callbacks: ["error", 5] */
 
 // This service-worker courtesy of googlechrome.github.io/samples/service-worker/basic/index.html
 

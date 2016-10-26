@@ -163,10 +163,10 @@ class Aggregate {
       // to the overall score and add each to the subItems list.
       expectedNames.forEach(e => {
         /* istanbul ignore if */
-        // TODO(paullewis): Remove once coming soon audits have landed.
+        // TODO(paullewis): Remove once coming soon audits have landed
         if (item.audits[e].comingSoon) {
           subItems.push({
-            score: '¯\\_(ツ)_/¯', // TODO(samthor): Patch going to Closure, String.raw is badly typed
+            score: '¯\\_(ツ)_/¯',
             name: 'coming-soon',
             category: item.audits[e].category,
             description: item.audits[e].description,
