@@ -170,51 +170,43 @@ describe('TracingProcessor lib', () => {
       const distribution = TracingProcessor.getLogNormalDistribution(median, pODM);
 
       function getPct(distribution, value) {
-        return distribution.computeComplementaryPercentile(value).toFixed(2);
+        return Number(distribution.computeComplementaryPercentile(value).toFixed(2));
       }
       assert.equal(typeof distribution.computeComplementaryPercentile, 'function');
-      assert.equal(getPct(distribution, 2000), '1.00', 'pct for 2000 does not match');
-      assert.equal(getPct(distribution, 3000), '0.98', 'pct for 3000 does not match');
-      assert.equal(getPct(distribution, 3500), '0.92', 'pct for 3500 does not match');
-      assert.equal(getPct(distribution, 4000), '0.81', 'pct for 4000 does not match');
-      assert.equal(getPct(distribution, 5000), '0.50', 'pct for 5000 does not match');
-      assert.equal(getPct(distribution, 6000), '0.24', 'pct for 6000 does not match');
-      assert.equal(getPct(distribution, 7000), '0.09', 'pct for 7000 does not match');
-      assert.equal(getPct(distribution, 8000), '0.03', 'pct for 8000 does not match');
-      assert.equal(getPct(distribution, 9000), '0.01', 'pct for 9000 does not match');
-      assert.equal(getPct(distribution, 10000), '0.00', 'pct for 10000 does not match');
+      assert.equal(getPct(distribution, 2000), 1.00, 'pct for 2000 does not match');
+      assert.equal(getPct(distribution, 3000), 0.98, 'pct for 3000 does not match');
+      assert.equal(getPct(distribution, 3500), 0.92, 'pct for 3500 does not match');
+      assert.equal(getPct(distribution, 4000), 0.81, 'pct for 4000 does not match');
+      assert.equal(getPct(distribution, 5000), 0.50, 'pct for 5000 does not match');
+      assert.equal(getPct(distribution, 6000), 0.24, 'pct for 6000 does not match');
+      assert.equal(getPct(distribution, 7000), 0.09, 'pct for 7000 does not match');
+      assert.equal(getPct(distribution, 8000), 0.03, 'pct for 8000 does not match');
+      assert.equal(getPct(distribution, 9000), 0.01, 'pct for 9000 does not match');
+      assert.equal(getPct(distribution, 10000), 0.00, 'pct for 10000 does not match');
     });
   });
 
   describe('risk to responsiveness', () => {
-    let oldFn;
-    // monkeypatch _riskPercentiles to deal with gRtR solo
-    beforeEach(() => {
-      oldFn = TracingProcessor._riskPercentiles;
-      TracingProcessor._riskPercentiles = (durations, totalTime, percentiles, clippedLength) => {
-        return {
-          durations, totalTime, percentiles, clippedLength
-        };
-      };
-    });
-    afterEach(() => {
-      TracingProcessor._riskPercentiles = oldFn;
-    });
-
     it('gets durations of top-level tasks', () => {
       const tracingProcessor = new TracingProcessor();
       const model = tracingProcessor.init(pwaTrace);
-      const ret = TracingProcessor.getRiskToResponsiveness(model, {traceEvents: pwaTrace});
+      const trace = {traceEvents: pwaTrace};
+      const ret = TracingProcessor.getMainThreadTopLevelEventDurations(model, trace);
       const durations = ret.durations;
+
+      function getDurationFromIndex(index) {
+        return Number(durations[index].toFixed(2));
+      }
 
       assert.equal(durations.filter(dur => isNaN(dur)).length, 0, 'NaN found');
       assert.equal(durations.length, 309);
-      assert.equal(durations[50], 0.012);
-      assert.equal(durations[100], 0.053);
-      assert.equal(durations[200], 0.558);
-      assert.equal(durations[durations.length - 3].toFixed(2), '26.32');
-      assert.equal(durations[durations.length - 2].toFixed(2), '37.61');
-      assert.equal(durations[durations.length - 1].toFixed(2), '40.10');
+
+      assert.equal(getDurationFromIndex(50), 0.01);
+      assert.equal(getDurationFromIndex(100), 0.05);
+      assert.equal(getDurationFromIndex(200), 0.56);
+      assert.equal(getDurationFromIndex(durations.length - 3), 26.32);
+      assert.equal(getDurationFromIndex(durations.length - 2), 37.61);
+      assert.equal(getDurationFromIndex(durations.length - 1), 40.10);
     });
   });
 });
