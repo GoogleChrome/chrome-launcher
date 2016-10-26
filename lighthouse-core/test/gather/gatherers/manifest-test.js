@@ -47,30 +47,32 @@ describe('Manifest gatherer', () => {
     });
   });
 
-  it('handles driver failure', () => {
-    return manifestGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(_ => {
-      assert.ok(manifestGather.artifact.debugString);
-    });
-  });
-
-  it('propagates error retrieving the manifest', () => {
+  it('propagates error from driver failure', () => {
     const error = 'There was an error.';
     return manifestGather.afterPass({
       driver: {
         sendCommand() {
+          return Promise.reject(error);
+        }
+      }
+    }).then(_ => {
+      assert.ok(manifestGather.artifact.debugString);
+      assert.notStrictEqual(manifestGather.artifact.debugString.indexOf(error), -1);
+    });
+  });
+
+  it('emits an error when unable to retrieve the manifest', () => {
+    return manifestGather.afterPass({
+      driver: {
+        sendCommand() {
           return Promise.resolve({
-            errors: [error]
+            errors: [],
+            url: EXAMPLE_MANIFEST_URL
           });
         }
       }
     }).then(_ => {
-      assert.notStrictEqual(manifestGather.artifact.debugString.indexOf(error), -1);
+      assert.ok(manifestGather.artifact.debugString);
     });
   });
 

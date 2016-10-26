@@ -19,6 +19,12 @@
 const Gatherer = require('./gatherer');
 const manifestParser = require('../../lib/manifest-parser');
 
+/**
+ * Uses the debugger protocol to fetch the manifest from within the context of
+ * the target page, reusing any credentials, emulation, etc, already established
+ * there. The artifact produced is the fetched string, if any, passed through
+ * the manifest parser.
+ */
 class Manifest extends Gatherer {
 
   static _errorManifest(errorString) {
@@ -30,34 +36,28 @@ class Manifest extends Gatherer {
   }
 
   afterPass(options) {
-    const driver = options.driver;
-    /**
-     * This re-fetches the manifest separately, which could
-     * potentially lead to a different asset. Using the original manifest
-     * resource is tracked in issue #83
-     */
-    return driver.sendCommand('Page.getAppManifest')
+    return options.driver.sendCommand('Page.getAppManifest')
       .then(response => {
-        if (response.errors.length) {
+        // We're not reading `response.errors` however it may contain critical and noncritical
+        // errors from Blink's manifest parser: 
+        //   https://chromedevtools.github.io/debugger-protocol-viewer/tot/Page/#type-AppManifestError
+        if (!response.data) {
           let errorString;
           if (response.url) {
-            errorString = `Unable to retrieve manifest at ${response.url}: `;
+            errorString = `Unable to retrieve manifest at ${response.url}`;
+          } else {
+            // The driver will return an empty string for url and the data if
+            // the page has no manifest.
+            errorString = 'No manifest found.';
           }
-          this.artifact = Manifest._errorManifest(errorString + response.errors.join(', '));
-          return;
-        }
 
-        // The driver will return an empty string for url and the data if the
-        // page has no manifest.
-        if (!response.data.length && !response.data.url) {
-          this.artifact = Manifest._errorManifest('No manifest found.');
+          this.artifact = Manifest._errorManifest(errorString);
           return;
         }
 
         this.artifact = manifestParser(response.data, response.url, options.url);
-      }, _ => {
-        this.artifact = Manifest._errorManifest('Unable to retrieve manifest');
-        return;
+      }, err => {
+        this.artifact = Manifest._errorManifest('Unable to retrieve manifest: ' + err);
       });
   }
 }
