@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Driver = require('./gather/drivers/driver.js');
+const Driver = require('./gather/driver.js');
 const GatherRunner = require('./gather/gather-runner');
 const Aggregate = require('./aggregator/aggregate');
 const assetSaver = require('./lib/asset-saver');

@@ -16,13 +16,13 @@
  */
 'use strict';
 
-const NetworkRecorder = require('../../lib/network-recorder');
-const emulation = require('../../lib/emulation');
-const Element = require('../../lib/element');
+const NetworkRecorder = require('../lib/network-recorder');
+const emulation = require('../lib/emulation');
+const Element = require('../lib/element');
 const EventEmitter = require('events').EventEmitter;
 const parseURL = require('url').parse;
 
-const log = require('../../lib/log.js');
+const log = require('../lib/log.js');
 
 const MAX_WAIT_FOR_FULLY_LOADED = 25 * 1000;
 const PAUSE_AFTER_LOAD = 500;

@@ -17,8 +17,8 @@
 
 'use strict';
 
-const Driver = require('../../../gather/drivers/driver.js');
-const Connection = require('../../../gather/drivers/connection.js');
+const Driver = require('../../../gather/driver.js');
+const Connection = require('../../../gather/connections/connection.js');
 const Element = require('../../../lib/element.js');
 const NetworkRecorder = require('../../../lib/network-recorder');
 const assert = require('assert');
