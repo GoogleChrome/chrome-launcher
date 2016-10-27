@@ -19,23 +19,27 @@
 const debug = require('debug');
 const EventEmitter = require('events').EventEmitter;
 
+const loggersByTitle = {};
+const loggingBufferColumns = 25;
+
 function setLevel(level) {
-  if (level === 'verbose') {
-    debug.enable('*');
-  } else if (level === 'error') {
-    debug.enable('*:error');
-  } else {
-    debug.enable('*, -*:verbose');
+  switch (level) {
+    case 'verbose':
+      debug.enable('*');
+      break;
+    case 'error':
+      debug.enable('*:error');
+      break;
+    default:
+      debug.enable('*, -*:verbose');
   }
 }
 
-const loggers = {};
-function _log(title, logargs) {
-  const args = [...logargs].slice(1);
-  if (!loggers[title]) {
-    loggers[title] = debug(title);
+function _log(title, ...logargs) {
+  if (!loggersByTitle[title]) {
+    loggersByTitle[title] = debug(title);
   }
-  return loggers[title](...args);
+  return loggersByTitle[title](...logargs);
 }
 
 class Emitter extends EventEmitter {
@@ -66,34 +70,34 @@ class Emitter extends EventEmitter {
  */
 function formatProtocol(prefix, data, level) {
   const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
-  const maxLength = columns - data.method.length - prefix.length - 18;
+  const maxLength = columns - data.method.length - prefix.length - loggingBufferColumns;
   // IO.read blacklisted here to avoid logging megabytes of trace data
   const snippet = (data.params && data.method !== 'IO.read') ?
       JSON.stringify(data.params).substr(0, maxLength) : '';
   level = level || 'log';
-  _log(`${prefix}:${level}`, prefix, data.method, snippet);
+  _log(`${prefix}:${level}`, data.method, snippet);
 }
 
 module.exports = {
   setLevel,
   formatProtocol,
   events: new Emitter(),
-  log(title) {
-    this.events.issueStatus(title, arguments);
-    return _log(title, arguments);
+  log(title, ...args) {
+    this.events.issueStatus(title, ...args);
+    return _log(title, ...args);
   },
 
-  warn(title) {
-    this.events.issueWarning(arguments);
-    return _log(`${title}:warn`, arguments);
+  warn(title, ...args) {
+    this.events.issueWarning(title, ...args);
+    return _log(`${title}:warn`, ...args);
   },
 
-  error(title) {
-    return _log(`${title}:error`, arguments);
+  error(title, ...args) {
+    return _log(`${title}:error`, ...args);
   },
 
-  verbose(title) {
-    this.events.issueStatus(title, arguments);
-    return _log(`${title}:verbose`, arguments);
+  verbose(title, ...args) {
+    this.events.issueStatus(title, ...args);
+    return _log(`${title}:verbose`, ...args);
   }
 };
