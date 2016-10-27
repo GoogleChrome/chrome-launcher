@@ -43,8 +43,8 @@ const NEXUS5X_USERAGENT = {
 
 const TYPICAL_MOBILE_THROTTLING_METRICS = {
   latency: 150, // 150ms
-  downloadThroughput: 1.6 * 1024 * 1024 / 8, // 1.6Mbps
-  uploadThroughput: 750 * 1024 / 8, // 750Kbps
+  downloadThroughput: Math.floor(1.6 * 1024 * 1024 / 8), // 1.6Mbps
+  uploadThroughput: Math.floor(750 * 1024 / 8), // 750Kbps
   offline: false
 };
 
