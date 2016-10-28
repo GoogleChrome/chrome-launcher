@@ -86,7 +86,7 @@ class Log {
   }
 
   static warn(title) {
-    Log.events.issueWarning(title);
+    Log.events.issueWarning(arguments);
     return Log._logToStdErr(`${title}:warn`, Array.from(arguments).slice(1));
   }
 
