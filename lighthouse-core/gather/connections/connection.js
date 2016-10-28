@@ -105,8 +105,8 @@ class Connection {
       callback.resolve(object.result);
       return;
     }
-    log.formatProtocol('method <= browser EVENT',
-        {method: object.method, params: object.result}, 'verbose');
+    log.formatProtocol('<= event',
+        {method: object.method, params: object.params}, 'verbose');
     this.emitNotification(object.method, object.params);
   }
 

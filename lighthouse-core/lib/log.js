@@ -19,29 +19,6 @@
 const debug = require('debug');
 const EventEmitter = require('events').EventEmitter;
 
-const loggersByTitle = {};
-const loggingBufferColumns = 25;
-
-function setLevel(level) {
-  switch (level) {
-    case 'verbose':
-      debug.enable('*');
-      break;
-    case 'error':
-      debug.enable('*:error');
-      break;
-    default:
-      debug.enable('*, -*:verbose');
-  }
-}
-
-function _log(title, ...logargs) {
-  if (!loggersByTitle[title]) {
-    loggersByTitle[title] = debug(title);
-  }
-  return loggersByTitle[title](...logargs);
-}
-
 class Emitter extends EventEmitter {
   /**
    * Fires off all status updates. Listen with
@@ -62,42 +39,66 @@ class Emitter extends EventEmitter {
   }
 }
 
-/**
- * A simple formatting utility for event logging.
- * @param {string} prefix
- * @param {!Object} data A JSON-serializable object of event data to log.
- * @param {string=} level Optional logging level. Defaults to 'log'.
- */
-function formatProtocol(prefix, data, level) {
-  const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
-  const maxLength = columns - data.method.length - prefix.length - loggingBufferColumns;
-  // IO.read blacklisted here to avoid logging megabytes of trace data
-  const snippet = (data.params && data.method !== 'IO.read') ?
-      JSON.stringify(data.params).substr(0, maxLength) : '';
-  level = level || 'log';
-  _log(`${prefix}:${level}`, data.method, snippet);
-}
+const loggersByTitle = {};
+const loggingBufferColumns = 25;
 
-module.exports = {
-  setLevel,
-  formatProtocol,
-  events: new Emitter(),
-  log(title, ...args) {
-    this.events.issueStatus(title, ...args);
-    return _log(title, ...args);
-  },
+class Log {
 
-  warn(title, ...args) {
-    this.events.issueWarning(title, ...args);
-    return _log(`${title}:warn`, ...args);
-  },
-
-  error(title, ...args) {
-    return _log(`${title}:error`, ...args);
-  },
-
-  verbose(title, ...args) {
-    this.events.issueStatus(title, ...args);
-    return _log(`${title}:verbose`, ...args);
+  static _logToStdErr(title, argsArray) {
+    const args = [...argsArray];
+    if (!loggersByTitle[title]) {
+      loggersByTitle[title] = debug(title);
+    }
+    return loggersByTitle[title](...args);
   }
-};
+
+  static setLevel(level) {
+    switch (level) {
+      case 'verbose':
+        debug.enable('*');
+        break;
+      case 'error':
+        debug.enable('*:error');
+        break;
+      default:
+        debug.enable('*, -*:verbose');
+    }
+  }
+
+  /**
+   * A simple formatting utility for event logging.
+   * @param {string} prefix
+   * @param {!Object} data A JSON-serializable object of event data to log.
+   * @param {string=} level Optional logging level. Defaults to 'log'.
+   */
+  static formatProtocol(prefix, data, level) {
+    const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
+    const maxLength = columns - data.method.length - prefix.length - loggingBufferColumns;
+    // IO.read blacklisted here to avoid logging megabytes of trace data
+    const snippet = (data.params && data.method !== 'IO.read') ?
+      JSON.stringify(data.params).substr(0, maxLength) : '';
+    Log._logToStdErr(`${prefix}:${level || ''}`, [data.method, snippet]);
+  }
+
+  static log(title) {
+    Log.events.issueStatus(title);
+    return Log._logToStdErr(title, Array.from(arguments).slice(1));
+  }
+
+  static warn(title) {
+    Log.events.issueWarning(title);
+    return Log._logToStdErr(`${title}:warn`, Array.from(arguments).slice(1));
+  }
+
+  static error(title) {
+    return Log._logToStdErr(`${title}:error`, Array.from(arguments).slice(1));
+  }
+
+  static verbose(title) {
+    Log.events.issueStatus(title);
+    return Log._logToStdErr(`${title}:verbose`, Array.from(arguments).slice(1));
+  }
+}
+Log.events = new Emitter();
+
+module.exports = Log;
