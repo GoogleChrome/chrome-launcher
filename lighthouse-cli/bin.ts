@@ -201,8 +201,8 @@ function lighthouseRun(addresses: Array<string>, config: Object) {
   return lighthouse(address, flags, config)
     .then((results: Results) => Printer.write(results, outputMode, outputPath))
     .then((results: Results) => {
-      if (outputMode === Printer.OutputMode.pretty) {
-        const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`
+      if (outputMode === Printer.OutputMode[Printer.OutputMode.pretty]) {
+        const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`;
         Printer.write(results, 'html', filename);
       }
 
