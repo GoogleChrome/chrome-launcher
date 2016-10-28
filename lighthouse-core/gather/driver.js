@@ -123,6 +123,14 @@ class Driver {
     return this._connection.sendCommand(method, params);
   }
 
+  /**
+   * Get current tab id
+   * @return {!Promise<string>}
+   */
+  getCurrentTabId() {
+    return this._connection.getCurrentTabId();
+  }
+
   evaluateScriptOnLoad(scriptSource) {
     return this.sendCommand('Page.addScriptToEvaluateOnLoad', {
       scriptSource
@@ -174,6 +182,72 @@ class Driver {
       });
 
       this.sendCommand('ServiceWorker.enable').catch(reject);
+    });
+  }
+
+  getServiceWorkerRegistrations() {
+    return new Promise((resolve, reject) => {
+      this.once('ServiceWorker.workerRegistrationUpdated', data => {
+        this.sendCommand('ServiceWorker.disable')
+          .then(_ => resolve(data), reject);
+      });
+
+      this.sendCommand('ServiceWorker.enable').catch(reject);
+    });
+  }
+
+  /**
+   * Rejects if any open tabs would share a service worker with the target URL.
+   * @param {!string} pageUrl
+   * @return {!Promise}
+   */
+  checkForMultipleTabsAttached(pageUrl) {
+    // Get necessary information of serviceWorkers
+    const getRegistrations = this.getServiceWorkerRegistrations();
+    const getVersions = this.getServiceWorkerVersions();
+    const getActiveTabId = this.getCurrentTabId();
+
+    return Promise.all([getRegistrations, getVersions, getActiveTabId]).then(res => {
+      const registrations = res[0].registrations;
+      const versions = res[1].versions;
+      const activeTabId = res[2];
+      const parsedURL = parseURL(pageUrl);
+      const origin = `${parsedURL.protocol}//${parsedURL.hostname}` +
+      (parsedURL.port ? `:${parsedURL.port}` : '');
+
+      let swHasMoreThanOneClient = false;
+      registrations
+        .filter(reg => {
+          const parsedURL = parseURL(reg.scopeURL);
+          const swOrigin = `${parsedURL.protocol}//${parsedURL.hostname}` +
+            (parsedURL.port ? `:${parsedURL.port}` : '');
+
+          return origin === swOrigin;
+        })
+        .forEach(reg => {
+          swHasMoreThanOneClient = !!versions.find(ver => {
+            // Check if any of the service workers are the same (registration id)
+            if (ver.registrationId !== reg.registrationId) {
+              return false;
+            }
+
+            // Check if the controlledClients are bigger than 1 and it's not the active tab
+            if (!ver.controlledClients || ver.controlledClients.length === 0) {
+              return false;
+            }
+
+            const multipleTabsAttached = ver.controlledClients.length > 1;
+            const oneInactiveTabIsAttached = ver.controlledClients[0] !== activeTabId;
+
+            return multipleTabsAttached || oneInactiveTabIsAttached;
+          });
+        });
+
+      if (swHasMoreThanOneClient) {
+        throw new Error(
+          'You probably have multiple tabs open to the same origin.'
+        );
+      }
     });
   }
 

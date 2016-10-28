@@ -27,9 +27,10 @@ const path = require('path');
  * 1. Setup
  *   A. driver.connect()
  *   B. GatherRunner.setupDriver()
- *     i. beginEmulation
- *     ii. cleanAndDisableBrowserCaches
- *     iii. clearDataForOrigin
+ *     i. checkForMultipleTabsAttached
+ *     ii. beginEmulation
+ *     iii. cleanAndDisableBrowserCaches
+ *     iiii. clearDataForOrigin
  *
  * 2. For each pass in the config:
  *   A. GatherRunner.beforePass()
@@ -85,10 +86,18 @@ class GatherRunner {
   static setupDriver(driver, options) {
     log.log('status', 'Initializing…');
     // Enable emulation based on flags
-    return driver.beginEmulation(options.flags)
+    return driver.checkForMultipleTabsAttached(options.url)
+      .then(_ => driver.beginEmulation(options.flags))
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cleanAndDisableBrowserCaches())
       .then(_ => driver.clearDataForOrigin(options.url));
+  }
+
+  static disposeDriver(driver) {
+    // We dont need to hold up the reporting for the reload/disconnect,
+    // so we will not return a promise in here.
+    log.log('status', 'Disconnecting from browser...');
+    driver.disconnect();
   }
 
   /**
@@ -240,10 +249,8 @@ class GatherRunner {
           options.url = urlAfterRedirects;
         });
       })
+      .then(_ => GatherRunner.disposeDriver(driver))
       .then(_ => {
-        log.log('status', 'Disconnecting from browser...');
-        return driver.disconnect();
-      }).then(_ => {
         // Collate all the gatherer results.
         const computedArtifacts = this.instantiateComputedArtifacts();
         const artifacts = Object.assign({}, computedArtifacts, tracingData);
@@ -258,6 +265,12 @@ class GatherRunner {
           });
         });
         return artifacts;
+      })
+      // cleanup on error
+      .catch(err => {
+        GatherRunner.disposeDriver(driver);
+
+        throw err;
       });
   }
 

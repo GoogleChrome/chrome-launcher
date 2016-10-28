@@ -54,6 +54,9 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
     enableRuntimeEvents() {
       return Promise.resolve();
     }
+    checkForMultipleTabsAttached() {
+      return Promise.resolve();
+    }
     cleanAndDisableBrowserCaches() {}
     clearDataForOrigin() {}
   };

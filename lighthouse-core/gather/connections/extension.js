@@ -153,6 +153,22 @@ class ExtensionConnection extends Connection {
   getCurrentTabURL() {
     return this._queryCurrentTab().then(tab => tab.url);
   }
+
+  getCurrentTabId() {
+    return this.queryCurrentTab_().then(currentTab => {
+      return new Promise((resolve, reject) => {
+        chrome.debugger.getTargets(targets => {
+          const target = targets.find(target => target.tabId === currentTab.id);
+
+          if (!target) {
+            reject(new Error('We can\'t find a target id.'));
+          }
+
+          resolve(target.id);
+        });
+      });
+    });
+  }
 }
 
 module.exports = ExtensionConnection;

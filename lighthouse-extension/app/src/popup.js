@@ -131,11 +131,16 @@ document.addEventListener('DOMContentLoaded', _ => {
       }, selectedAudits);
     })
     .catch(err => {
-      let {message} = err;
-      if (err.message.toLowerCase().startsWith('another debugger')) {
+      let message = err.message;
+      if (message.toLowerCase().startsWith('another debugger')) {
         message = 'You probably have DevTools open.' +
           ' Close DevTools to use lighthouse';
       }
+      if (message.toLowerCase().includes('multiple tabs')) {
+        message = 'You probably have multiple tabs open to the same origin.' +
+          ' Close the other tabs to use lighthouse.';
+      }
+
       feedbackEl.textContent = message;
       stopSpinner();
       background.console.error(err);

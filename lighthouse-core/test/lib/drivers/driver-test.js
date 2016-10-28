@@ -26,6 +26,32 @@ const assert = require('assert');
 const connection = new Connection();
 const driverStub = new Driver(connection);
 
+function createOnceStub(events) {
+  return (eventName, cb) => {
+    if (events[eventName]) {
+      return cb(events[eventName]);
+    }
+
+    throw Error(`Stub not implemented: ${eventName}`);
+  };
+}
+
+function createSWRegistration(id, url, isDeleted) {
+  return {
+    isDeleted: !!isDeleted,
+    registrationId: id,
+    scopeURL: url,
+  };
+}
+
+function createActiveWorker(id, url, controlledClients) {
+  return {
+    registrationId: id,
+    scriptURL: url,
+    controlledClients,
+  };
+}
+
 connection.sendCommand = function(command, params) {
   switch (command) {
     case 'DOM.getDocument':
@@ -34,6 +60,9 @@ connection.sendCommand = function(command, params) {
       return Promise.resolve({
         nodeId: params.selector === 'invalid' ? 0 : 231
       });
+    case 'ServiceWorker.enable':
+    case 'ServiceWorker.disable':
+      return Promise.resolve();
     default:
       throw Error(`Stub not implemented: ${command}`);
   }
@@ -81,5 +110,75 @@ describe('Browser Driver', () => {
     // The above event is handled synchronously by enableUrlUpdateIfRedirected and will be all set
     assert.notEqual(opts.url, req1.url, 'opts.url changed after the redirects');
     assert.equal(opts.url, req3.url, 'opts.url matches the last redirect');
+  });
+});
+
+describe('Multiple tab check', () => {
+  it('will fail when multiple tabs are found with the same active serviceworker', () => {
+    const pageUrl = 'https://example.com/';
+    const swUrl = `${pageUrl}sw.js`;
+    const registrations = [
+      createSWRegistration(1, pageUrl),
+    ];
+    const versions = [
+      createActiveWorker(1, swUrl, ['unique'])
+    ];
+
+    driverStub.getCurrentTabId = () => Promise.resolve('unique2');
+    driverStub.once = createOnceStub({
+      'ServiceWorker.workerRegistrationUpdated': {
+        registrations
+      },
+      'ServiceWorker.workerVersionUpdated': {
+        versions
+      }
+    });
+
+    return driverStub.checkForMultipleTabsAttached(pageUrl)
+      .then(_ => assert.ok(false), _ => assert.ok(true));
+  });
+
+  it('will succeed when service worker is already registered on current tab', () => {
+    const pageUrl = 'https://example.com/';
+    const swUrl = `${pageUrl}sw.js`;
+    const registrations = [
+      createSWRegistration(1, pageUrl),
+    ];
+    const versions = [
+      createActiveWorker(1, swUrl, ['unique'])
+    ];
+
+    driverStub.getCurrentTabId = () => Promise.resolve('unique');
+    driverStub.once = createOnceStub({
+      'ServiceWorker.workerRegistrationUpdated': {
+        registrations
+      },
+      'ServiceWorker.workerVersionUpdated': {
+        versions
+      }
+    });
+
+    return driverStub.checkForMultipleTabsAttached(pageUrl)
+      .then(_ => assert.ok(true), _ => assert.ok(false));
+  });
+
+  it('will succeed when only one service worker loaded', () => {
+    const pageUrl = 'https://example.com/';
+    const swUrl = `${pageUrl}sw.js`;
+    const registrations = [createSWRegistration(1, pageUrl)];
+    const versions = [createActiveWorker(1, swUrl, [])];
+
+    driverStub.getCurrentTabId = () => Promise.resolve('unique');
+    driverStub.once = createOnceStub({
+      'ServiceWorker.workerRegistrationUpdated': {
+        registrations
+      },
+      'ServiceWorker.workerVersionUpdated': {
+        versions
+      }
+    });
+
+    return driverStub.checkForMultipleTabsAttached(pageUrl)
+      .then(_ => assert.ok(true), _ => assert.ok(false));
   });
 });
