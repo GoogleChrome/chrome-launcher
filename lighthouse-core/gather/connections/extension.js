@@ -155,7 +155,7 @@ class ExtensionConnection extends Connection {
   }
 
   getCurrentTabId() {
-    return this.queryCurrentTab_().then(currentTab => {
+    return this._queryCurrentTab().then(currentTab => {
       return new Promise((resolve, reject) => {
         chrome.debugger.getTargets(targets => {
           const target = targets.find(target => target.tabId === currentTab.id);
