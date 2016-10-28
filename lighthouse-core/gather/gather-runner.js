@@ -25,8 +25,9 @@ const path = require('path');
  * Execution sequence when GatherRunner.run() is called:
  *
  * 1. Setup
- *   A. driver.connect()
- *   B. GatherRunner.setupDriver()
+ *   A. navigate to about:blank
+ *   B. driver.connect()
+ *   C. GatherRunner.setupDriver()
  *     i. checkForMultipleTabsAttached
  *     ii. beginEmulation
  *     iii. cleanAndDisableBrowserCaches
@@ -46,7 +47,7 @@ const path = require('path');
  *     ii. all gatherer's afterPass()
  *
  * 3. Teardown
- *   A. driver.disconnect()
+ *   A. GatherRunner.disposeDriver()
  *   B. collect all artifacts and return them
  */
 class GatherRunner {
@@ -221,6 +222,7 @@ class GatherRunner {
     passes = this.instantiateGatherers(passes, options.config.configDir);
 
     return driver.connect()
+      .then(_ => GatherRunner.loadBlank(driver))
       .then(_ => GatherRunner.setupDriver(driver, options))
 
       // Run each pass
