@@ -32,14 +32,8 @@ class EstimatedInputLatencyFormatter extends Formatter {
 
           const ninetieth = percentiles.find(result => result.percentile === 0.9);
           const time = ninetieth.time.toFixed(1);
-          const allResults = percentiles.map(result => {
-            const percentile = Math.round(result.percentile * 100);
-            const time = result.time.toFixed(1);
-            return `${percentile}%: ${time}ms`;
-          }).join(', ');
 
-          const output = `    - 90% probability of input latency at ${time}ms or shorter.\n` +
-              `      (${allResults})\n`;
+          const output = `    - 90% probability of input latency at ${time}ms or shorter.`;
 
           return output;
         };
