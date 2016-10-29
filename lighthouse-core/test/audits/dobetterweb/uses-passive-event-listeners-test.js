@@ -24,10 +24,6 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page uses passive events listeners where applicable', () => {
-  const SCROLL_BLOCKING_EVENTS = [
-    'wheel', 'mousewheel', 'touchstart', 'touchmove'
-  ];
-
   it('it returns error value when no input present', () => {
     const auditResult = PassiveEventsAudit.audit({});
     assert.equal(auditResult.rawValue, -1);
@@ -57,7 +53,7 @@ describe('Page uses passive events listeners where applicable', () => {
     for (let i = 0; i < auditResult.extendedInfo.value.length; ++i) {
       const val = auditResult.extendedInfo.value[i];
       assert.ok(!val.passive, 'results should all be non-passive listeners');
-      assert.notEqual(SCROLL_BLOCKING_EVENTS.indexOf(val.type), -1,
+      assert.notEqual(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.indexOf(val.type), -1,
           'results should not contain other types of events');
     }
     assert.equal(auditResult.extendedInfo.value.length, 5);

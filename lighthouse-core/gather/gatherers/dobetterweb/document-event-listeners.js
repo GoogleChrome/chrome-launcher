@@ -79,7 +79,7 @@ class PageLevelEventListeners extends Gatherer {
           // Debugger.scriptParsed event so we get .url and other
           // needed properties.
           const combo = Object.assign(listener, this._parsedScripts[idx]);
-          combo.objectId = location;
+          combo.objectId = location; // One of LISTENER_LOCATIONS.
 
           // Note: line/col numbers are zero-index. Add one to each so we have
           // actual file line/col numbers.

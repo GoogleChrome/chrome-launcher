@@ -26,11 +26,12 @@ const url = require('url');
 const Audit = require('../audit');
 const Formatter = require('../../formatters/formatter');
 
-const SCROLL_BLOCKING_EVENTS = [
-  'wheel', 'mousewheel', 'touchstart', 'touchmove'
-];
-
 class PassiveEventsAudit extends Audit {
+
+  static get SCROLL_BLOCKING_EVENTS() {
+    // See https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+    return ['wheel', 'mousewheel', 'touchstart', 'touchmove'];
+  }
 
   /**
    * @return {!AuditMeta}
@@ -39,8 +40,9 @@ class PassiveEventsAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'uses-passive-event-listeners',
-      description: 'Site uses passive event listeners to improve scrolling performance',
-      helpText: `<a href="https://www.chromestatus.com/features/5745543795965952" target="_blank">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>${SCROLL_BLOCKING_EVENTS.toString()}</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>.`,
+      description: 'Using passive listeners for page-level event listeners ' +
+                   'improve scrolling performance',
+      helpText: `<a href="https://www.chromestatus.com/features/5745543795965952" target="_blank">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>${this.SCROLL_BLOCKING_EVENTS.toString()}</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>.`,
       requiredArtifacts: ['URL', 'PageLevelEventListeners']
     };
   }
@@ -66,16 +68,17 @@ class PassiveEventsAudit extends Audit {
     // Filter out non-passive window/document/document.body listeners that do
     // not call preventDefault() are scroll blocking events.
     const results = listeners.filter(loc => {
-      const isScrollBlocking = SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
-      const callsPreventDefault = loc.handler.description.match(
+      const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
+      const mentionsPreventDefault = loc.handler.description.match(
             /\.preventDefault\(\s*\)/g);
       const sameHost = url.parse(loc.url).host === pageHost;
       return sameHost && isScrollBlocking && !loc.passive &&
-             !callsPreventDefault;
+             !mentionsPreventDefault;
     }).map(loc => {
+      const handler = loc.handler ? loc.handler.description : '...';
       return Object.assign({
         label: `line: ${loc.line}, col: ${loc.col}`,
-        code: `${loc.objectId}.addEventListener('${loc.type}', ${loc.handler.description})`
+        code: `${loc.objectId}.addEventListener('${loc.type}', ${handler})`
       }, loc);
     });
 
