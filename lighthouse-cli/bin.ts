@@ -221,7 +221,9 @@ function showConnectionError() {
 
 function showRuntimeError(err: LightHouseError) {
   console.error('Runtime error encountered:', err);
-  console.error(err.stack);
+  if (err.stack) {
+    console.error(err.stack);
+  }
   process.exit(_RUNTIME_ERROR_CODE);
 }
 
