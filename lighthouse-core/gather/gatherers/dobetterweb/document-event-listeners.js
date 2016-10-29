@@ -30,7 +30,7 @@ class PageLevelEventListeners extends Gatherer {
   listenForScriptParsedEvents() {
     return this.driver.sendCommand('Debugger.enable').then(_ => {
       this.driver.on('Debugger.scriptParsed', script => {
-        this._parsedScripts.push(script);
+        this._parsedScripts.set(script.scriptId, script);
       });
     });
   }
@@ -68,17 +68,15 @@ class PageLevelEventListeners extends Gatherer {
     const matchedListeners = [];
 
     return this._listEventListeners(location).then(results => {
-      const parsedScriptIds = this._parsedScripts.map(script => script.scriptId);
-
       results.listeners.forEach(listener => {
         // Slim down the list of parsed scripts to match the found event
         // listeners that have the same script id.
-        const idx = parsedScriptIds.indexOf(listener.scriptId);
-        if (idx !== -1) {
+        const script = this._parsedScripts.get(listener.scriptId);
+        if (script) {
           // Combine the EventListener object and the result of the
           // Debugger.scriptParsed event so we get .url and other
           // needed properties.
-          const combo = Object.assign(listener, this._parsedScripts[idx]);
+          const combo = Object.assign(listener, script);
           combo.objectId = location; // One of LISTENER_LOCATIONS.
 
           // Note: line/col numbers are zero-index. Add one to each so we have
@@ -112,7 +110,7 @@ class PageLevelEventListeners extends Gatherer {
 
   beforePass(options) {
     this.driver = options.driver;
-    this._parsedScripts = [];
+    this._parsedScripts = new Map();
     return this.listenForScriptParsedEvents();
   }
 
