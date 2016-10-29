@@ -8,6 +8,7 @@
       "../gather/gatherers/dobetterweb/appcache",
       "../gather/gatherers/dobetterweb/console-time-usage",
       "../gather/gatherers/dobetterweb/datenow",
+      "../gather/gatherers/dobetterweb/document-event-listeners",
       "../gather/gatherers/dobetterweb/document-write",
       "../gather/gatherers/dobetterweb/websql"
     ]
@@ -21,6 +22,7 @@
     "../audits/dobetterweb/no-old-flexbox",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
+    "../audits/dobetterweb/uses-passive-event-listeners",
     "../audits/is-on-https"
   ],
 
@@ -65,6 +67,9 @@
         },
         "no-console-time": {
           "expectedValue": false
+        },
+        "uses-passive-event-listeners": {
+          "expectedValue": true
         }
       }
     }, {

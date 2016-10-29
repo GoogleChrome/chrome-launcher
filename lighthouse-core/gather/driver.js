@@ -440,7 +440,10 @@ class Driver {
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
     };
 
-    return this.sendCommand('Page.enable')
+    return this.sendCommand('Debugger.disable')
+      .then(_ => this.sendCommand('DOM.disable'))
+      .then(_ => this.sendCommand('CSS.disable'))
+      .then(_ => this.sendCommand('Page.enable'))
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
 
