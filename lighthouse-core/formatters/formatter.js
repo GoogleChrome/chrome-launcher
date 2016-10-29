@@ -41,7 +41,6 @@ class Formatter {
     this._formatters = {
       accessibility: require('./accessibility'),
       criticalRequestChains: require('./critical-request-chains'),
-      estimatedInputLatency: require('./estimated-input-latency'),
       urllist: require('./url-list'),
       null: require('./null-formatter'),
       speedline: require('./speedline-formatter'),

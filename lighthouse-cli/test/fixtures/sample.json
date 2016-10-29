@@ -163,7 +163,7 @@
             "time": 18.540999999999997
           }
         ],
-        "formatter": "estimatedInputLatency"
+        "formatter": "null"
       },
       "name": "estimated-input-latency",
       "category": "Performance",
