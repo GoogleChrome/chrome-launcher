@@ -20,7 +20,7 @@ Quick-start guide on using the Lighthouse extension: http://bit.ly/lighthouse-qu
 Requires Node v5+ or Node v4 w/ `--harmony`
 
 ```sh
-npm install -g lighthouse
+npm install -g GoogleChrome/lighthouse
 ```
 
 ## Run
