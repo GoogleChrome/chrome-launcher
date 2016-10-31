@@ -111,7 +111,7 @@ class Connection {
   _handleRawError(object, callback) {
     log.formatProtocol('method <= browser ERR',
         {method: callback.method}, 'error');
-    callback.reject(object.error);
+    callback.reject(new Error(`Raw Protocol (${callback.method}) ${object.error.message}`));
   }
 
   /**

@@ -77,7 +77,7 @@ Better docs coming soon, but in the meantime look at [PR #593](https://github.co
 Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
 ##### `config.json`
-```js
+```json
 {
   "audits": [
     "user-timings",
@@ -168,7 +168,7 @@ $ lighthouse --disable-device-emulation --disable-cpu-throttling https://mysite.
 
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
 
-```js
+```sh
 # lint and test all files
 npm test
 
@@ -242,7 +242,7 @@ Promise.resolve({
   rawValue: {},
   // debugString: Some *specific* error string for helping the user figure out why they failed here.
   //   The reporter can handle *general* feedback on how to fix, e.g. links to the docs
-  debugString: 'Your manifest 404ed'
+  debugString: 'Your manifest 404ed',
   // fault:  Optional argument when the audit doesn't cover whatever it is you're doing,
   //   e.g. we can't parse your particular corner case out of a trace yet.
   //   Whatever is in `rawValue` and `score` would be N/A in these cases
