@@ -29,7 +29,7 @@ module.exports = {
   beginEmulation() {
     return Promise.resolve();
   },
-  checkForMultipleTabsAttached() {
+  assertNoSameOriginServiceWorkerClients() {
     return Promise.resolve();
   },
   reloadForCleanStateIfNeeded() {

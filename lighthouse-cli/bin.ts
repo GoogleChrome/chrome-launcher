@@ -230,8 +230,6 @@ function showRuntimeError(err: LightHouseError) {
 function handleError(err: LightHouseError) {
   if (err.code === 'ECONNREFUSED') {
     showConnectionError();
-  } else if (err.message.toLowerCase().includes('multiple tabs')) {
-    console.error(err.message);
   } else {
     showRuntimeError(err);
   }

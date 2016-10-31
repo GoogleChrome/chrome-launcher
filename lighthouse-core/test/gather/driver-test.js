@@ -17,10 +17,10 @@
 
 'use strict';
 
-const Driver = require('../../../gather/driver.js');
-const Connection = require('../../../gather/connections/connection.js');
-const Element = require('../../../lib/element.js');
-const NetworkRecorder = require('../../../lib/network-recorder');
+const Driver = require('../../gather/driver.js');
+const Connection = require('../../gather/connections/connection.js');
+const Element = require('../../lib/element.js');
+const NetworkRecorder = require('../../lib/network-recorder');
 const assert = require('assert');
 
 const connection = new Connection();
@@ -114,17 +114,32 @@ describe('Browser Driver', () => {
 });
 
 describe('Multiple tab check', () => {
-  it('will fail when multiple tabs are found with the same active serviceworker', () => {
+  it('will pass if there are no current service workers', () => {
     const pageUrl = 'https://example.com/';
-    const swUrl = `${pageUrl}sw.js`;
+    driverStub.once = createOnceStub({
+      'ServiceWorker.workerRegistrationUpdated': {
+        registrations: []
+      },
+      'ServiceWorker.workerVersionUpdated': {
+        versions: []
+      }
+    });
+
+    return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
+  });
+
+  it('will pass if there is an active service worker for a different origin', () => {
+    const pageUrl = 'https://example.com/';
+    const secondUrl = 'https://example.edu';
+    const swUrl = `${secondUrl}sw.js`;
+
     const registrations = [
-      createSWRegistration(1, pageUrl),
+      createSWRegistration(1, secondUrl),
     ];
     const versions = [
-      createActiveWorker(1, swUrl, ['unique'])
+      createActiveWorker(1, swUrl, ['uniqueId'])
     ];
 
-    driverStub.getCurrentTabId = () => Promise.resolve('unique2');
     driverStub.once = createOnceStub({
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
@@ -134,21 +149,19 @@ describe('Multiple tab check', () => {
       }
     });
 
-    return driverStub.checkForMultipleTabsAttached(pageUrl)
-      .then(_ => assert.ok(false), _ => assert.ok(true));
+    return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
   });
 
-  it('will succeed when service worker is already registered on current tab', () => {
+  it('will fail if a service worker with a matching origin has a controlled client', () => {
     const pageUrl = 'https://example.com/';
     const swUrl = `${pageUrl}sw.js`;
     const registrations = [
       createSWRegistration(1, pageUrl),
     ];
     const versions = [
-      createActiveWorker(1, swUrl, ['unique'])
+      createActiveWorker(1, swUrl, ['uniqueId'])
     ];
 
-    driverStub.getCurrentTabId = () => Promise.resolve('unique');
     driverStub.once = createOnceStub({
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
@@ -158,17 +171,19 @@ describe('Multiple tab check', () => {
       }
     });
 
-    return driverStub.checkForMultipleTabsAttached(pageUrl)
-      .then(_ => assert.ok(true), _ => assert.ok(false));
+    return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl)
+      .then(_ => assert.ok(false),
+          err => {
+            assert.ok(err.message.toLowerCase().includes('multiple tabs'));
+          });
   });
 
-  it('will succeed when only one service worker loaded', () => {
+  it('will succeed if a service worker with a matching origin has no controlled clients', () => {
     const pageUrl = 'https://example.com/';
     const swUrl = `${pageUrl}sw.js`;
     const registrations = [createSWRegistration(1, pageUrl)];
     const versions = [createActiveWorker(1, swUrl, [])];
 
-    driverStub.getCurrentTabId = () => Promise.resolve('unique');
     driverStub.once = createOnceStub({
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
@@ -178,7 +193,6 @@ describe('Multiple tab check', () => {
       }
     });
 
-    return driverStub.checkForMultipleTabsAttached(pageUrl)
-      .then(_ => assert.ok(true), _ => assert.ok(false));
+    return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
   });
 });

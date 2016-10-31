@@ -123,14 +123,6 @@ class Driver {
     return this._connection.sendCommand(method, params);
   }
 
-  /**
-   * Get current tab id
-   * @return {!Promise<string>}
-   */
-  getCurrentTabId() {
-    return this._connection.getCurrentTabId();
-  }
-
   evaluateScriptOnLoad(scriptSource) {
     return this.sendCommand('Page.addScriptToEvaluateOnLoad', {
       scriptSource
@@ -198,56 +190,44 @@ class Driver {
 
   /**
    * Rejects if any open tabs would share a service worker with the target URL.
+   * This includes the target tab, so navigation to something like about:blank
+   * should be done before calling.
    * @param {!string} pageUrl
    * @return {!Promise}
    */
-  checkForMultipleTabsAttached(pageUrl) {
-    // Get necessary information of serviceWorkers
-    const getRegistrations = this.getServiceWorkerRegistrations();
-    const getVersions = this.getServiceWorkerVersions();
-    const getActiveTabId = this.getCurrentTabId();
-
-    return Promise.all([getRegistrations, getVersions, getActiveTabId]).then(res => {
-      const registrations = res[0].registrations;
-      const versions = res[1].versions;
-      const activeTabId = res[2];
+  assertNoSameOriginServiceWorkerClients(pageUrl) {
+    let registrations;
+    let versions;
+    return this.getServiceWorkerRegistrations().then(data => {
+      registrations = data.registrations;
+    }).then(_ => this.getServiceWorkerVersions()).then(data => {
+      versions = data.versions;
+    }).then(_ => {
       const parsedURL = parseURL(pageUrl);
       const origin = `${parsedURL.protocol}//${parsedURL.hostname}` +
-      (parsedURL.port ? `:${parsedURL.port}` : '');
+          (parsedURL.port ? `:${parsedURL.port}` : '');
 
-      let swHasMoreThanOneClient = false;
       registrations
         .filter(reg => {
           const parsedURL = parseURL(reg.scopeURL);
           const swOrigin = `${parsedURL.protocol}//${parsedURL.hostname}` +
-            (parsedURL.port ? `:${parsedURL.port}` : '');
+              (parsedURL.port ? `:${parsedURL.port}` : '');
 
           return origin === swOrigin;
         })
         .forEach(reg => {
-          swHasMoreThanOneClient = !!versions.find(ver => {
-            // Check if any of the service workers are the same (registration id)
+          versions.forEach(ver => {
+            // Ignore workers unaffiliated with this registration
             if (ver.registrationId !== reg.registrationId) {
-              return false;
+              return;
             }
 
-            // Check if the controlledClients are bigger than 1 and it's not the active tab
-            if (!ver.controlledClients || ver.controlledClients.length === 0) {
-              return false;
+            // Throw if service worker for this origin has active controlledClients.
+            if (ver.controlledClients && ver.controlledClients.length > 0) {
+              throw new Error('You probably have multiple tabs open to the same origin.');
             }
-
-            const multipleTabsAttached = ver.controlledClients.length > 1;
-            const oneInactiveTabIsAttached = ver.controlledClients[0] !== activeTabId;
-
-            return multipleTabsAttached || oneInactiveTabIsAttached;
           });
         });
-
-      if (swHasMoreThanOneClient) {
-        throw new Error(
-          'You probably have multiple tabs open to the same origin.'
-        );
-      }
     });
   }
 

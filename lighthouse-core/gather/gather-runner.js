@@ -28,7 +28,7 @@ const path = require('path');
  *   A. navigate to about:blank
  *   B. driver.connect()
  *   C. GatherRunner.setupDriver()
- *     i. checkForMultipleTabsAttached
+ *     i. assertNoSameOriginServiceWorkerClients
  *     ii. beginEmulation
  *     iii. cleanAndDisableBrowserCaches
  *     iiii. clearDataForOrigin
@@ -87,7 +87,7 @@ class GatherRunner {
   static setupDriver(driver, options) {
     log.log('status', 'Initializing…');
     // Enable emulation based on flags
-    return driver.checkForMultipleTabsAttached(options.url)
+    return driver.assertNoSameOriginServiceWorkerClients(options.url)
       .then(_ => driver.beginEmulation(options.flags))
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cleanAndDisableBrowserCaches())
