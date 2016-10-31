@@ -17,7 +17,10 @@
 'use strict';
 
 const debug = require('debug');
+const debugNode = require('debug/node');
 const EventEmitter = require('events').EventEmitter;
+
+debugNode.colors = [6, 2, 4, 5];
 
 class Emitter extends EventEmitter {
   /**
@@ -46,10 +49,19 @@ class Log {
 
   static _logToStdErr(title, argsArray) {
     const args = [...argsArray];
-    if (!loggersByTitle[title]) {
-      loggersByTitle[title] = debug(title);
+    const log = Log.loggerfn(title);
+    return log(...args);
+  }
+
+  static loggerfn(title) {
+    let log = loggersByTitle[title];
+    if (!log) {
+      log = loggersByTitle[title] = debug(title);
+      // errors with red, warnings with yellow.
+      // eslint-disable-next-line no-nested-ternary
+      log.color = title.includes('error') ? 1 : title.includes('warn') ? 3 : undefined;
     }
-    return loggersByTitle[title](...args);
+    return log;
   }
 
   static setLevel(level) {
