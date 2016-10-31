@@ -37,19 +37,18 @@ lighthouse --help
 #### Setup
 ```sh
 git clone https://github.com/GoogleChrome/lighthouse
+
 cd lighthouse
 npm install
 
-cd lighthouse-cli/
+# The CLI is authored in TypeScript and requires compilation:
+cd lighthouse-cli
 npm install
 npm run build
+
+# To run the TS compiler in watch mode:
+# cd lighthouse-cli && npm run dev
 ```
-
-#### Working on the CLI.
-
-The CLI's implementation is now in TypeScript; and currently being evaluated for improved ergonomics. You must run a filewatcher with compile step during development.
-
-`cd lighthouse-cli && npm run dev`
 
 #### Run
 
