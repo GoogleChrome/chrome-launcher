@@ -440,9 +440,11 @@ class Driver {
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
     };
 
+    // Disable any domains that could interfere or add overhead to the trace
     return this.sendCommand('Debugger.disable')
       .then(_ => this.sendCommand('DOM.disable'))
       .then(_ => this.sendCommand('CSS.disable'))
+      // Enable Page domain to wait for Page.loadEventFired
       .then(_ => this.sendCommand('Page.enable'))
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
