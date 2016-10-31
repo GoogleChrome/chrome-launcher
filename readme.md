@@ -2,10 +2,13 @@
 
 > Lighthouse analyzes web apps and web pages, collecting modern performance metrics and insights on developer best practices.
 
+HTML report:
+
 ![image](https://cloud.githubusercontent.com/assets/39191/19172855/ed871100-8bd8-11e6-9ea6-8aeece7760d4.png)
 
-![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
+Default CLI output:
 
+![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
 
 Lighthouse requires Chrome 52 or later.
 
@@ -71,6 +74,22 @@ You can supply your own run configuration to customize what audits you want deta
 The audits and gatherers checked into the lighthouse repo are available to any configuration. If you're interested in writing your own audits or gatherers, you can use them with Lighthouse without neccessarily contributing upstream.
 
 Better docs coming soon, but in the meantime look at [PR #593](https://github.com/GoogleChrome/lighthouse/pull/593), and the tests [valid-custom-audit.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-audit.js) and [valid-custom-gatherer.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-gatherer.js). If you have questions, please file an issue and we'll help out!
+
+## Do Better Web
+
+**Do Better Web** is an initiative within Lighthouse to help web developers modernize their existing web applications. By running a set of tests, developers can discover new web platform APIs, become aware of performance pitfalls, and learn (newer) best practices. In other words, do better on the web!
+
+DBW is implemented as a set of standalone [gatherers](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/gather/gatherers/dobetterweb), [audits](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/audits/dobetterweb), and [custom run configuration](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/dobetterweb.json) that can be run alongside the core Lighthouse tests.
+
+To run DBW:
+
+    npm run dbw http://example.com
+
+which is a shorthand for:
+
+    npm run start -- --config-path=lighthouse-core/config/dobetterweb.json --disable-device-emulation --disable-cpu-throttling --disable-network-throttling --output=html --output-path=results.html`
+
+If you'd like to contribute, check the [list of issues](https://github.com/GoogleChrome/lighthouse/issues?q=is%3Aissue+is%3Aopen+label%3ADoBetterWeb) or proposal a new audit by filing an issue.
 
 ## Lighthouse as trace processor
 
