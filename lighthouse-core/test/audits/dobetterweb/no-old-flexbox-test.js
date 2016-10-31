@@ -40,6 +40,14 @@ describe('Page does not use old CSS flexbox', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
+  it('passes when no stylesheets were collected on the page', () => {
+    const auditResult = NoOldFlexboxAudit.audit({
+      Styles: []
+    });
+    assert.equal(auditResult.rawValue, true);
+    assert.equal(auditResult.extendedInfo.value.length, 0);
+  });
+
   it('fails when display: box is used', () => {
     const auditResult = NoOldFlexboxAudit.audit({
       Styles: stylesData
