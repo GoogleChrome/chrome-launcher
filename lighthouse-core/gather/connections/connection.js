@@ -96,8 +96,8 @@ class Connection {
       this._callbacks.delete(object.id);
       if (object.error) {
         log.formatProtocol('method <= browser ERR',
-            {method: callback.method, params: object.result}, 'error');
-        callback.reject(object.result);
+            {method: callback.method}, 'error');
+        callback.reject(object.error);
         return;
       }
       log.formatProtocol('method <= browser OK',
