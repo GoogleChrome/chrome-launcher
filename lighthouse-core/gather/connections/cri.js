@@ -64,7 +64,7 @@ class CriConnection extends Connection {
             resolve(JSON.parse(data));
             return;
           }
-          reject('Unable to fetch webSocketDebuggerUrl, status: ' + response.statusCode);
+          reject(new Error(`Unable to fetch webSocketDebuggerUrl, status: ${response.statusCode}`));
         });
       });
     });
@@ -75,7 +75,7 @@ class CriConnection extends Connection {
    */
   disconnect() {
     if (!this._ws) {
-      return Promise.reject('connect() must be called before attempting to disconnect.');
+      return Promise.reject(new Error('connect() must be called before attempting to disconnect.'));
     }
     this._ws.removeAllListeners();
     this._ws.close();
