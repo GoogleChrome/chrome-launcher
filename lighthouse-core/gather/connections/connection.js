@@ -94,11 +94,9 @@ class Connection {
     if (object.id) {
       const callback = this._callbacks.get(object.id);
       this._callbacks.delete(object.id);
+
       if (object.error) {
-        log.formatProtocol('method <= browser ERR',
-            {method: callback.method}, 'error');
-        callback.reject(object.error);
-        return;
+        return this._handleRawError(object, callback);
       }
       log.formatProtocol('method <= browser OK',
           {method: callback.method, params: object.result}, 'verbose');
@@ -108,6 +106,12 @@ class Connection {
     log.formatProtocol('<= event',
         {method: object.method, params: object.params}, 'verbose');
     this.emitNotification(object.method, object.params);
+  }
+
+  _handleRawError(object, callback) {
+    log.formatProtocol('method <= browser ERR',
+        {method: callback.method}, 'error');
+    callback.reject(object.error);
   }
 
   /**
