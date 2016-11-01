@@ -58,7 +58,7 @@ const cli = yargs
   ], 'Logging:')
   .describe({
     verbose: 'Displays verbose logging',
-    quiet: 'Displays no progress or debug logs'
+    quiet: 'Displays no progress, debug logs or errors'
   })
 
   .group([
@@ -156,7 +156,7 @@ flags.logLevel = 'info';
 if (cli.verbose) {
   flags.logLevel = 'verbose';
 } else if (cli.quiet) {
-  flags.logLevel = 'error';
+  flags.logLevel = 'silent';
 }
 
 log.setLevel(flags.logLevel);

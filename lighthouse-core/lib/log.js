@@ -54,6 +54,9 @@ class Log {
 
   static setLevel(level) {
     switch (level) {
+      case 'silent':
+        debug.disable();
+        break;
       case 'verbose':
         debug.enable('*');
         break;
