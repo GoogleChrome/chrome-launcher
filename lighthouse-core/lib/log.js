@@ -60,7 +60,7 @@ class Log {
   static _logToStdErr(title, argsArray) {
     const args = [...argsArray];
     const log = Log.loggerfn(title);
-    return log(...args);
+    log(...args);
   }
 
   static loggerfn(title) {
