@@ -20,7 +20,17 @@ const debug = require('debug');
 const debugNode = require('debug/node');
 const EventEmitter = require('events').EventEmitter;
 
-debugNode.colors = [6, 2, 4, 5];
+const colors = {
+  red: 1,
+  yellow: 3,
+  cyan: 6,
+  green: 2,
+  blue: 4,
+  magenta: 5
+};
+
+// whitelist non-red/yellow colors for debug()
+debugNode.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
 
 class Emitter extends EventEmitter {
   /**
@@ -56,10 +66,12 @@ class Log {
   static loggerfn(title) {
     let log = loggersByTitle[title];
     if (!log) {
-      log = loggersByTitle[title] = debug(title);
+      log = debug(title);
+      loggersByTitle[title] = log;
       // errors with red, warnings with yellow.
       // eslint-disable-next-line no-nested-ternary
-      log.color = title.includes('error') ? 1 : title.includes('warn') ? 3 : undefined;
+      log.color = title.endsWith('error') ? colors.red :
+          title.endsWith('warn') ? colors.yellow : undefined;
     }
     return log;
   }
