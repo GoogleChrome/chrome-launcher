@@ -35,6 +35,9 @@ class EstimatedInputLatency extends Audit {
       name: 'estimated-input-latency',
       description: 'Estimated Input Latency',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
+      helpText: 'Primarily a measure of the main thread\'s activity. ' +
+      'There is a 90% probabililty a user would encounter input latency of this amount or less. ' +
+      '10% of touches can expect additional latency.',
       requiredArtifacts: ['traceContents']
     };
   }
@@ -67,7 +70,7 @@ class EstimatedInputLatency extends Audit {
       displayValue: `${rawValue}ms`,
       extendedInfo: {
         value: latencyPercentiles,
-        formatter: Formatter.SUPPORTED_FORMATS.ESTIMATED_INPUT_LATENCY
+        formatter: Formatter.SUPPORTED_FORMATS.NULL
       }
     });
   }
