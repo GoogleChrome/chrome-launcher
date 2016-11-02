@@ -109,6 +109,11 @@ class Connection {
   }
 
   _handleRawError(object, callback) {
+    // We proactively disable a few domains. Ignore any errors
+    if (object.error.message && object.error.message.includes('DOM agent hasn\'t been enabled')) {
+      callback.resolve();
+      return;
+    }
     log.formatProtocol('method <= browser ERR',
         {method: callback.method}, 'error');
     callback.reject(new Error(`Raw Protocol (${callback.method}) ${object.error.message}`));
