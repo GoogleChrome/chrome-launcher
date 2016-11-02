@@ -1,0 +1,201 @@
+<!doctype html>
+<!--
+ * Copyright 2016 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<!-- FAIL - appcache manifest -->
+<html manifest="clock.appcache">
+<head>
+<title>DoBetterWeb Mega Tester...Of Death</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+<script src="./dbw_tester.js"></script>
+
+<style>
+  body {
+    color: red;
+  }
+  p, div {
+    background: red, green;
+    border-radius: 3px;
+    transform: translateZ(0);
+    display: box;
+    transition: opacity 300ms ease-in-out;
+  }
+  .span {
+    transform: translate3d(0,0,0);
+    display: box; /* FAIL: old flexbox usage */
+  }
+  .span2,
+  .span3 {
+          display: box;  /* FAIL: old flexbox usage */
+    color:     red;
+  }
+  .span4,
+  .span5 { display:     box; /* FAIL - old flexbox, weird formatting */
+    box-shadow: 3px 3px 3px purple,
+                3px 3px 3px blue;
+  }
+  .span6 {
+    box-shadow: 3px 3px 3px purple,
+                3px 3px
+                3px green;
+  }
+</style>
+</head>
+<body>
+
+Hi there!
+
+<script>
+function dateNowTest() {
+  function helloDate() {
+    // FAIL - Date.now() usage in a function.
+    return Date.now();
+  }
+  helloDate();
+}
+
+function consoleTimeTest() {
+  // FAIL
+  console.time('arg1');
+  for (let i = 0; i < 2; i++) {
+    // FAIL
+    console.time('arg2');
+  }
+  console.timeEnd('arg1');
+  console.timeEnd('arg2');
+}
+
+function documentWriteTest() {
+  document.write('Hi'); // FAIL
+  document.write('There'); // FAIL
+  document.write('2.0!'); // FAIL
+}
+
+function websqlTest() {
+  const db = openDatabase('mydb', '1.0', 'my first database', 1024);
+}
+
+function mutationEvenTest() {
+  // FAIL
+  document.addEventListener('DOMNodeInserted', function(e) {
+    console.log('DOMNodeInserted');
+  });
+
+  // FAIL
+  document.addEventListener('DOMNodeRemoved', function(e) {
+    console.log('DOMNodeRemoved');
+  });
+
+  // FAIL
+  document.body.addEventListener('DOMNodeInserted', function(e) {
+    console.log('DOMNodeInserted');
+  });
+
+  // FAIL
+  window.addEventListener('DOMNodeInserted', function(e) {
+    console.log('DOMNodeInserted');
+  });
+
+  // PASS - not MutationEvents
+  window.addEventListener('DOMContentLoaded', function(e) {
+    console.log('DOMContentLoaded');
+  });
+}
+
+function passiveEventsListenerTest() {
+  // FAIL
+  window.addEventListener('wheel', function(e) {
+    console.log('wheel');
+  });
+
+  // FAIL
+  window.addEventListener('touchstart', function(e) {
+    console.log('touchstart');
+  });
+
+  // FAIL
+  window.addEventListener('mousewheel', function(e) {
+    console.log('mousewheel');
+  }, {passive: false});
+
+  // FAIL
+  document.addEventListener('touchstart', function(e) {
+    console.log('touchstart document');
+  });
+
+  // FAIL
+  document.body.addEventListener('touchmove', function(e) {
+    console.log('touchmove');
+  });
+
+  // PASS - calls preventDefault() but isnt passive;
+  document.addEventListener('touchstart', function(e) {
+
+    e.preventDefault(); // intentionally surrounded by whitespace.
+
+    console.log('touchstart - preventDefault called');
+  });
+
+  // PASS
+  document.body.addEventListener('touchstart', function(e) {
+    console.log('touchstart');
+  }, {passive: true});
+
+  // PASS
+  window.addEventListener('touchstart', function(e) {
+    console.log('touchstart passive');
+  }, {passive: true});
+
+  // PASS - another event on window that isn't wheel/touch
+  window.addEventListener('scroll', function(e) {
+    console.log('scroll');
+  });
+}
+
+// Figure out which tests to fun.
+const params = new URLSearchParams(location.search);
+if (location.search === '') {
+  documentWriteTest();
+  dateNowTest();
+  consoleTimeTest();
+  websqlTest();
+  mutationEvenTest();
+  passiveEventsListenerTest();
+} else {
+  if (params.has('documentWrite')) {
+    documentWriteTest();
+  }
+  if (params.has('dateNow')) {
+    dateNowTest();
+  }
+  if (params.has('consoleTime')) {
+    consoleTimeTest();
+  }
+  if (params.has('websql')) {
+    websqlTest();
+  }
+  if (params.has('mutationEvents')) {
+    mutationEvenTest();
+  }
+  if (params.has('passiveEvents')) {
+    passiveEventsListenerTest();
+  }
+}
+</script>
+
+</body>
+</html>
