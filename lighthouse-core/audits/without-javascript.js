@@ -37,16 +37,23 @@ class WithoutJavaScript extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    let bodyHasContent = true;
-    let debugString;
-    if (artifacts.HTMLWithoutJavaScript.trim() === '') {
-      bodyHasContent = false;
-      debugString = 'The page body should render some content if its scripts are not available.';
+    const artifact = artifacts.HTMLWithoutJavaScript;
+    if (artifact.value === -1) {
+      return WithoutJavaScript.generateAuditResult({
+        rawValue: -1,
+        debugString: artifact.debugString
+      });
+    }
+
+    if (artifact.value.trim() === '') {
+      return WithoutJavaScript.generateAuditResult({
+        rawValue: false,
+        debugString: 'The page body should render some content if its scripts are not available.'
+      });
     }
 
     return WithoutJavaScript.generateAuditResult({
-      rawValue: bodyHasContent,
-      debugString
+      rawValue: true
     });
   }
 }

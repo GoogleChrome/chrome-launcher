@@ -15,21 +15,57 @@
  */
 'use strict';
 
-const Audit = require('../../audits/without-javascript.js');
+/* eslint-env mocha */
+
+const withoutJsAudit = require('../../audits/without-javascript.js');
 const assert = require('assert');
 
-/* global describe, it*/
+describe.only('Progressive Enhancement: without javascript audit', () => {
+  it('passes on the error when there was a driver error', () => {
+    const debugString = 'Unusual error string';
+    const artifacts = {
+      HTMLWithoutJavaScript: {
+        value: -1,
+        debugString
+      }
+    };
 
-/* eslint-disable no-script-url */
-describe('JavaScript: scripting audit', () => {
+    const result = withoutJsAudit.audit(artifacts);
+    assert.equal(result.score, -1);
+    assert.equal(result.debugString, debugString);
+  });
+
   it('fails when the js-less body is empty', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: ''}).score, false);
+    const artifacts = {
+      HTMLWithoutJavaScript: {
+        value: ''
+      }
+    };
+
+    const result = withoutJsAudit.audit(artifacts);
+    assert.equal(result.score, false);
+    assert.ok(result.debugString);
   });
+
   it('fails when the js-less body is whitespace', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: '        '}).score, false);
+    const artifacts = {
+      HTMLWithoutJavaScript: {
+        value: '        '
+      }
+    };
+
+    const result = withoutJsAudit.audit(artifacts);
+    assert.equal(result.score, false);
+    assert.ok(result.debugString);
   });
+
   it('succeeds when the js-less body contains some content', () => {
-    return assert.equal(Audit.audit({HTMLWithoutJavaScript: 'test'}).score, true);
+    const artifacts = {
+      HTMLWithoutJavaScript: {
+        value: 'test'
+      }
+    };
+
+    assert.equal(withoutJsAudit.audit(artifacts).score, true);
   });
 });
-/* eslint-enable */

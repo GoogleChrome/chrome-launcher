@@ -58,8 +58,8 @@ describe('HTML without JavaScript gatherer', () => {
         }
       }
     }).then(_ => {
-      assert.ok(typeof htmlWithoutJavaScriptGather.artifact === 'string');
-      assert.ok(/Hello/gim.test(htmlWithoutJavaScriptGather.artifact));
+      assert.ok(typeof htmlWithoutJavaScriptGather.artifact.value === 'string');
+      assert.ok(/Hello/gim.test(htmlWithoutJavaScriptGather.artifact.value));
     });
   });
 
@@ -67,12 +67,12 @@ describe('HTML without JavaScript gatherer', () => {
     return htmlWithoutJavaScriptGather.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.reject('such a fail');
+          return Promise.reject(new Error('such a fail'));
         }
       }
     }).then(_ => {
       assert.equal(htmlWithoutJavaScriptGather.artifact.value, -1);
-      assert.ok(htmlWithoutJavaScriptGather.artifact.debugString);
+      assert.ok(/such a fail/i.test(htmlWithoutJavaScriptGather.artifact.debugString));
     });
   });
 });

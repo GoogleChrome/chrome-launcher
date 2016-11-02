@@ -16,9 +16,12 @@
  */
 'use strict';
 
-/* Note that this returns the innerText of the <body> element, not the HTML. */
-
 const Gatherer = require('./gatherer');
+
+/**
+ * @fileoverview Returns the innerText of the <body> element while JavaScript is
+ * disabled.
+ */
 
 /* global document */
 
@@ -30,7 +33,6 @@ function getBodyText() {
 }
 
 class HTMLWithoutJavaScript extends Gatherer {
-
   beforePass(options) {
     options.disableJavaScript = true;
   }
@@ -39,17 +41,16 @@ class HTMLWithoutJavaScript extends Gatherer {
     // Reset the JS disable.
     options.disableJavaScript = false;
 
-    const driver = options.driver;
-
-    this.artifact = {};
-    return driver.evaluateAsync(`(${getBodyText.toString()}())`)
+    return options.driver.evaluateAsync(`(${getBodyText.toString()}())`)
       .then(result => {
-        this.artifact = result;
+        this.artifact = {
+          value: result
+        };
       })
-      .catch(_ => {
+      .catch(err => {
         this.artifact = {
           value: -1,
-          debugString: 'Unable to get document body innerText'
+          debugString: `Unable to get document body innerText: ${err.message}`
         };
       });
   }

@@ -108,6 +108,11 @@ class Connection {
     this.emitNotification(object.method, object.params);
   }
 
+  /**
+   * @param {{error: {message: string}}} object
+   * @param {{reject: function(*), method: string}} callback
+   * @private
+   */
   _handleRawError(object, callback) {
     // We proactively disable a few domains. Ignore any errors
     if (object.error.message && object.error.message.includes('DOM agent hasn\'t been enabled')) {
