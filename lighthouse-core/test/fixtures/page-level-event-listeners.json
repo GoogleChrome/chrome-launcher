@@ -1,21 +1,21 @@
 [
   {
-    "type":"wheel",
+    "type":"DOMNodeInserted",
     "useCapture":false,
     "passive":false,
-    "scriptId":"35",
-    "lineNumber":121,
-    "columnNumber":43,
+    "scriptId":"36",
+    "lineNumber":111,
+    "columnNumber":53,
     "handler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('wheel');\n  }",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":2}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('wheel');\n  }",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":3}"
     },
     "removeFunction":{
@@ -27,38 +27,38 @@
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":122,
-    "col":44,
-    "objectId":"window"
+    "objectId":"window",
+    "line":112,
+    "col":54
   },
   {
-    "type":"touchstart",
+    "type":"DOMContentLoaded",
     "useCapture":false,
     "passive":false,
-    "scriptId":"35",
-    "lineNumber":126,
-    "columnNumber":48,
+    "scriptId":"36",
+    "lineNumber":116,
+    "columnNumber":54,
     "handler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart');\n  }",
+      "description":"function (e) {\n    console.log('DOMContentLoaded');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":5}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart');\n  }",
+      "description":"function (e) {\n    console.log('DOMContentLoaded');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":6}"
     },
     "removeFunction":{
@@ -70,38 +70,38 @@
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":127,
-    "col":49,
-    "objectId":"window"
+    "objectId":"window",
+    "line":117,
+    "col":55
   },
   {
-    "type":"touchstart",
+    "type":"wheel",
     "useCapture":false,
-    "passive":true,
-    "scriptId":"35",
-    "lineNumber":159,
-    "columnNumber":48,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":126,
+    "columnNumber":43,
     "handler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart passive');\n  }",
+      "description":"function (e) {\n    console.log('wheel');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":8}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart passive');\n  }",
+      "description":"function (e) {\n    console.log('wheel');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":9}"
     },
     "removeFunction":{
@@ -113,38 +113,38 @@
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":160,
-    "col":49,
-    "objectId":"window"
+    "objectId":"window",
+    "line":127,
+    "col":44
   },
   {
-    "type":"mousewheel",
+    "type":"touchstart",
     "useCapture":false,
     "passive":false,
-    "scriptId":"35",
+    "scriptId":"36",
     "lineNumber":131,
     "columnNumber":48,
     "handler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('mousewheel');\n  }",
+      "description":"function (e) {\n    console.log('touchstart');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":11}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('mousewheel');\n  }",
+      "description":"function (e) {\n    console.log('touchstart');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":12}"
     },
     "removeFunction":{
@@ -156,38 +156,38 @@
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
+    "objectId":"window",
     "line":132,
-    "col":49,
-    "objectId":"window"
+    "col":49
   },
   {
-    "type":"scroll",
+    "type":"touchstart",
     "useCapture":false,
-    "passive":false,
-    "scriptId":"35",
+    "passive":true,
+    "scriptId":"36",
     "lineNumber":164,
-    "columnNumber":44,
+    "columnNumber":48,
     "handler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('scroll');\n  }",
+      "description":"function (e) {\n    console.log('touchstart passive');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":14}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n    console.log('scroll');\n  }",
+      "description":"function (e) {\n    console.log('touchstart passive');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":15}"
     },
     "removeFunction":{
@@ -199,124 +199,124 @@
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
+    "objectId":"window",
     "line":165,
-    "col":45,
-    "objectId":"window"
+    "col":49
+  },
+  {
+    "type":"mousewheel",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":136,
+    "columnNumber":48,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('mousewheel');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":17}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('mousewheel');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":18}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":19}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"window",
+    "line":137,
+    "col":49
+  },
+  {
+    "type":"scroll",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":169,
+    "columnNumber":44,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('scroll');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":20}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('scroll');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":21}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":22}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"window",
+    "line":170,
+    "col":45
   },
   {
     "type":"wheel",
     "useCapture":false,
     "passive":false,
-    "scriptId":"34",
+    "scriptId":"35",
     "lineNumber":10,
     "columnNumber":35,
     "handler":{
       "type":"function",
       "className":"Function",
       "description":"e => {\n  console.log('whee: arrow function');\n}",
-      "objectId":"{\"injectedScriptId\":3,\"id\":18}"
-    },
-    "originalHandler":{
-      "type":"function",
-      "className":"Function",
-      "description":"e => {\n  console.log('whee: arrow function');\n}",
-      "objectId":"{\"injectedScriptId\":3,\"id\":19}"
-    },
-    "removeFunction":{
-      "type":"function",
-      "className":"Function",
-      "description":"function remove() { [Command Line API] }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":20}"
-    },
-    "url":"https://example2.com/dbw_test.js",
-    "startLine":0,
-    "startColumn":0,
-    "endLine":14,
-    "endColumn":0,
-    "executionContextId":3,
-    "hash":"75040170776E28D2960EBCB31B0A3540D4BCED71",
-    "executionContextAuxData":{
-      "isDefault":true,
-      "frameId":"11250.1"
-    },
-    "isLiveEdit":false,
-    "sourceMapURL":"",
-    "hasSourceURL":false,
-    "line":11,
-    "col":36,
-    "objectId":"document"
-  },
-  {
-    "type":"touchstart",
-    "useCapture":false,
-    "passive":false,
-    "scriptId":"35",
-    "lineNumber":136,
-    "columnNumber":50,
-    "handler":{
-      "type":"function",
-      "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart document');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":21}"
-    },
-    "originalHandler":{
-      "type":"function",
-      "className":"Function",
-      "description":"function (e) {\n    console.log('touchstart document');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":22}"
-    },
-    "removeFunction":{
-      "type":"function",
-      "className":"Function",
-      "description":"function remove() { [Command Line API] }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":23}"
-    },
-    "url":"https://example.com",
-    "startLine":44,
-    "startColumn":8,
-    "endLine":189,
-    "endColumn":0,
-    "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
-    "executionContextAuxData":{
-      "isDefault":true,
-      "frameId":"11250.1"
-    },
-    "isLiveEdit":false,
-    "sourceMapURL":"",
-    "hasSourceURL":false,
-    "line":137,
-    "col":51,
-    "objectId":"document"
-  },
-  {
-    "type":"touchstart",
-    "useCapture":false,
-    "passive":false,
-    "scriptId":"35",
-    "lineNumber":146,
-    "columnNumber":50,
-    "handler":{
-      "type":"function",
-      "className":"Function",
-      "description":"function (e) {\n\n    e.preventDefault();\n\n    console.log('touchstart - preventDefault called');\n  }",
       "objectId":"{\"injectedScriptId\":3,\"id\":24}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
-      "description":"function (e) {\n\n    e.preventDefault();\n\n    console.log('touchstart - preventDefault called');\n  }",
+      "description":"e => {\n  console.log('whee: arrow function');\n}",
       "objectId":"{\"injectedScriptId\":3,\"id\":25}"
     },
     "removeFunction":{
@@ -325,108 +325,323 @@
       "description":"function remove() { [Command Line API] }",
       "objectId":"{\"injectedScriptId\":3,\"id\":26}"
     },
-    "url":"https://example.com",
-    "startLine":44,
-    "startColumn":8,
-    "endLine":189,
+    "url":"https://anotherdomain./dbw_test.js",
+    "startLine":0,
+    "startColumn":0,
+    "endLine":14,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"75040170776E28D2960EBCB31B0A3540D4BCED71",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":147,
-    "col":51,
-    "objectId":"document"
+    "objectId":"document",
+    "line":11,
+    "col":36
+  },
+  {
+    "type":"DOMNodeInserted",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":96,
+    "columnNumber":55,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":27}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":28}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":29}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"document",
+    "line":97,
+    "col":56
+  },
+  {
+    "type":"DOMNodeRemoved",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":101,
+    "columnNumber":54,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeRemoved');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":30}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeRemoved');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":31}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":32}"
+    },
+    "url":"https://anotherdomain.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"document",
+    "line":102,
+    "col":55
+  },
+  {
+    "type":"touchstart",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":141,
+    "columnNumber":50,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('touchstart document');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":33}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('touchstart document');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":34}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":35}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"document",
+    "line":142,
+    "col":51
+  },
+  {
+    "type":"touchstart",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":151,
+    "columnNumber":50,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n\n    e.preventDefault();\n\n    console.log('touchstart - preventDefault called');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":36}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n\n    e.preventDefault();\n\n    console.log('touchstart - preventDefault called');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":37}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":38}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"document",
+    "line":152,
+    "col":51
+  },
+  {
+    "type":"DOMNodeInserted",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"36",
+    "lineNumber":106,
+    "columnNumber":60,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":40}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted');\n  }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":41}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":3,\"id\":42}"
+    },
+    "url":"https://example.com",
+    "startLine":44,
+    "startColumn":8,
+    "endLine":194,
+    "endColumn":0,
+    "executionContextId":3,
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"10211.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"document.body",
+    "line":107,
+    "col":61
   },
   {
     "type":"touchmove",
     "useCapture":false,
     "passive":false,
-    "scriptId":"35",
-    "lineNumber":141,
+    "scriptId":"36",
+    "lineNumber":146,
     "columnNumber":54,
     "handler":{
       "type":"function",
       "className":"Function",
       "description":"function (e) {\n    console.log('touchmove');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":28}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":43}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
       "description":"function (e) {\n    console.log('touchmove');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":29}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":44}"
     },
     "removeFunction":{
       "type":"function",
       "className":"Function",
       "description":"function remove() { [Command Line API] }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":30}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":45}"
     },
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":142,
-    "col":55,
-    "objectId":"document.body"
+    "objectId":"document.body",
+    "line":147,
+    "col":55
   },
   {
     "type":"touchstart",
     "useCapture":false,
     "passive":true,
-    "scriptId":"35",
-    "lineNumber":154,
+    "scriptId":"36",
+    "lineNumber":159,
     "columnNumber":55,
     "handler":{
       "type":"function",
       "className":"Function",
       "description":"function (e) {\n    console.log('touchstart');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":31}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":46}"
     },
     "originalHandler":{
       "type":"function",
       "className":"Function",
       "description":"function (e) {\n    console.log('touchstart');\n  }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":32}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":47}"
     },
     "removeFunction":{
       "type":"function",
       "className":"Function",
       "description":"function remove() { [Command Line API] }",
-      "objectId":"{\"injectedScriptId\":3,\"id\":33}"
+      "objectId":"{\"injectedScriptId\":3,\"id\":48}"
     },
     "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
-    "endLine":189,
+    "endLine":194,
     "endColumn":0,
     "executionContextId":3,
-    "hash":"24605D32CC656CC2A639C2F765A227CCA42B8E64",
+    "hash":"6E2F66A00F5A3C51777D3785BCD4662087953234",
     "executionContextAuxData":{
       "isDefault":true,
-      "frameId":"11250.1"
+      "frameId":"10211.1"
     },
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "line":155,
-    "col":56,
-    "objectId":"document.body"
+    "objectId":"document.body",
+    "line":160,
+    "col":56
   }
 ]

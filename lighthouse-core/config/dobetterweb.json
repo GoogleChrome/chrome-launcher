@@ -19,6 +19,7 @@
     "../audits/dobetterweb/no-console-time",
     "../audits/dobetterweb/no-datenow",
     "../audits/dobetterweb/no-document-write",
+    "../audits/dobetterweb/no-mutation-events",
     "../audits/dobetterweb/no-old-flexbox",
     "../audits/dobetterweb/no-websql",
     "../audits/dobetterweb/uses-http2",
@@ -70,6 +71,9 @@
         },
         "uses-passive-event-listeners": {
           "expectedValue": true
+        },
+        "no-mutation-events": {
+          "expectedValue": false
         }
       }
     }, {
