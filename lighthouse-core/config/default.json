@@ -25,6 +25,21 @@
       "http-redirect",
       "html-without-javascript"
     ]
+  }, {
+    "recordNetwork": true,
+    "passName": "dbw",
+    "gatherers": [
+      "styles",
+      "dobetterweb/anchors-with-no-rel-noopener",
+      "dobetterweb/appcache",
+      "dobetterweb/console-time-usage",
+      "dobetterweb/datenow",
+      "dobetterweb/document-event-listeners",
+      "dobetterweb/document-write",
+      "dobetterweb/geolocation-on-start",
+      "dobetterweb/links-blocking-first-paint",
+      "dobetterweb/websql"
+    ]
   }],
 
   "audits": [
@@ -58,7 +73,19 @@
     "image-alt",
     "label",
     "tabindex",
-    "content-width"
+    "content-width",
+    "dobetterweb/external-anchors-use-rel-noopener",
+    "dobetterweb/appcache-manifest",
+    "dobetterweb/geolocation-on-start",
+    "dobetterweb/link-blocking-first-paint",
+    "dobetterweb/no-console-time",
+    "dobetterweb/no-datenow",
+    "dobetterweb/no-document-write",
+    "dobetterweb/no-mutation-events",
+    "dobetterweb/no-old-flexbox",
+    "dobetterweb/no-websql",
+    "dobetterweb/uses-http2",
+    "dobetterweb/uses-passive-event-listeners"
   ],
 
   "aggregations": [{
@@ -226,12 +253,73 @@
         }
       }
     }]
-  },{
+  }, {
     "name": "Best Practices",
-    "description": "These audits do not affect your score but are worth a look.",
+    "description": "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls. These audits do not affect your score but are worth a look.",
     "scored": false,
-    "categorizable": false,
+    "categorizable": true,
     "items": [{
+      "name": "Using modern offline features",
+      "audits": {
+        "appcache-manifest": {
+          "expectedValue": false
+        },
+        "no-websql": {
+          "expectedValue": false
+        }
+      }
+    }, {
+      "name": "Using modern protocols",
+      "audits": {
+        "is-on-https": {
+          "expectedValue": false
+        },
+        "uses-http2": {
+          "expectedValue": false,
+          "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
+        }
+      }
+    }, {
+      "name": "Using modern CSS features",
+      "audits": {
+        "no-old-flexbox": {
+          "expectedValue": false
+        }
+      }
+    }, {
+      "name": "Using modern JavaScript features",
+      "audits": {
+        "no-datenow": {
+          "expectedValue": false
+        },
+        "no-console-time": {
+          "expectedValue": false
+        },
+        "uses-passive-event-listeners": {
+          "expectedValue": true
+        },
+        "no-mutation-events": {
+          "expectedValue": false
+        }
+      }
+    }, {
+      "name": "Avoiding APIs that harm the user experience",
+      "audits": {
+        "no-document-write": {
+          "expectedValue": false
+        },
+        "link-blocking-first-paint": {
+          "expectedValue": false
+        },
+        "external-anchors-use-rel-noopener": {
+          "expectedValue": true
+        },
+        "geolocation-on-start": {
+          "expectedValue": false
+        }
+      }
+    }, {
+      "name": "Accessiblity",
       "audits": {
         "aria-allowed-attr": {
           "expectedValue": true,
@@ -256,7 +344,11 @@
         "tabindex": {
           "expectedValue": true,
           "weight": 1
-        },
+        }
+      }
+    }, {
+      "name": "Other",
+      "audits": {
         "manifest-short-name-length": {
           "expectedValue": true,
           "weight": 1
@@ -302,7 +394,7 @@
         }
       }
     }]
-  },{
+  }, {
     "name": "Performance Metrics",
     "description": "These encapsulate your app's performance.",
     "scored": false,

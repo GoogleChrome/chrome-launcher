@@ -4,7 +4,7 @@ node lighthouse-cli/test/fixtures/static-server.js &
 
 sleep 0.5s
 
-config="lighthouse-core/config/dobetterweb.json"
+config="lighthouse-core/config/default.json"
 expectations="lighthouse-cli/test/smokehouse/dobetterweb/dbw-expectations.js"
 
 # run smoketest on DBW test page.

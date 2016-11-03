@@ -142,9 +142,11 @@ class Runner {
    * @return {!Array<string>}
    */
   static getAuditList() {
-    return fs
-        .readdirSync(path.join(__dirname, './audits'))
-        .filter(f => /\.js$/.test(f) && f !== 'audit.js');
+    const fileList = [
+      ...fs.readdirSync(path.join(__dirname, './audits')),
+      ...fs.readdirSync(path.join(__dirname, './audits/dobetterweb')).map(f => `dobetterweb/${f}`)
+    ];
+    return fileList.filter(f => /\.js$/.test(f) && f !== 'audit.js').sort();
   }
 
   /**
@@ -152,9 +154,12 @@ class Runner {
    * @return {!Array<string>}
    */
   static getGathererList() {
-    return fs
-        .readdirSync(path.join(__dirname, './gather/gatherers'))
-        .filter(f => /\.js$/.test(f) && f !== 'gatherer.js');
+    const fileList = [
+      ...fs.readdirSync(path.join(__dirname, './gather/gatherers')),
+      ...fs.readdirSync(path.join(__dirname, './gather/gatherers/dobetterweb'))
+          .map(f => `dobetterweb/${f}`)
+    ];
+    return fileList.filter(f => /\.js$/.test(f) && f !== 'gatherer.js').sort();
   }
 
   /**
