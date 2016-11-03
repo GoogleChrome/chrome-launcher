@@ -20,7 +20,7 @@
 const withoutJsAudit = require('../../audits/without-javascript.js');
 const assert = require('assert');
 
-describe.only('Progressive Enhancement: without javascript audit', () => {
+describe('Progressive Enhancement: without javascript audit', () => {
   it('passes on the error when there was a driver error', () => {
     const debugString = 'Unusual error string';
     const artifacts = {

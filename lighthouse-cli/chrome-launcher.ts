@@ -53,6 +53,7 @@ class ChromeLauncher {
     const flags = [
       '--remote-debugging-port=9222',
       '--disable-extensions',
+      '--disable-translate',
       '--no-first-run',
       `--user-data-dir=${this.TMP_PROFILE_DIR}`
     ];

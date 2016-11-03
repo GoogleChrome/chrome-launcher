@@ -12,7 +12,7 @@ CHROME_ARGS=$@
 
 INITIAL_URL="about:blank"
 TMP_PROFILE_DIR=$(mktemp -d -t lighthouse.XXXXXXXXXX)
-CHROME_FLAGS="--remote-debugging-port=9222 --disable-extensions --user-data-dir=$TMP_PROFILE_DIR --no-first-run $CHROME_ARGS"
+CHROME_FLAGS="--remote-debugging-port=9222 --disable-extensions --disable-translate --user-data-dir=$TMP_PROFILE_DIR --no-first-run $CHROME_ARGS"
 CHROME_PATH=""
 
 log_warning() {
