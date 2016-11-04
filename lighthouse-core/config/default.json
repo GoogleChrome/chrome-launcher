@@ -10,7 +10,6 @@
       "manifest",
       "accessibility",
       "content-width",
-      "cache-contents",
       "geolocation-on-start"
     ]
   },
