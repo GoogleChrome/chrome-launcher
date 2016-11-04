@@ -71,7 +71,7 @@ class PassiveEventsAudit extends Audit {
       const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
       const mentionsPreventDefault = loc.handler.description.match(
             /\.preventDefault\(\s*\)/g);
-      const sameHost = url.parse(loc.url).host === pageHost;
+      const sameHost = loc.url ? url.parse(loc.url).host === pageHost : true;
       return sameHost && isScrollBlocking && !loc.passive &&
              !mentionsPreventDefault;
     }).map(loc => {

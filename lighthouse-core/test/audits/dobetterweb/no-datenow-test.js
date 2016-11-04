@@ -66,4 +66,20 @@ describe('Page does not use Date.now()', () => {
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 2);
   });
+
+  it('only passes when has url property', () => {
+    const auditResult = DateNowUseAudit.audit({
+      DateNowUse: {
+        usage: [
+          {line: 1, col: 1},
+          {url: 'http://example.com/two', line: 10, col: 1},
+          {url: 'http://example2.com/two', line: 2, col: 22}
+        ]
+      },
+      URL: {finalUrl: URL},
+    });
+
+    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.extendedInfo.value.length, 1);
+  });
 });

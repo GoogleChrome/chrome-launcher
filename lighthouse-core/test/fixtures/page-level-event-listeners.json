@@ -153,7 +153,6 @@
       "description":"function remove() { [Command Line API] }",
       "objectId":"{\"injectedScriptId\":3,\"id\":13}"
     },
-    "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
     "endLine":194,
@@ -368,7 +367,6 @@
       "description":"function remove() { [Command Line API] }",
       "objectId":"{\"injectedScriptId\":3,\"id\":29}"
     },
-    "url":"https://example.com",
     "startLine":44,
     "startColumn":8,
     "endLine":194,
