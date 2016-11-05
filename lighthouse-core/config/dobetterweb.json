@@ -10,12 +10,14 @@
       "../gather/gatherers/dobetterweb/datenow",
       "../gather/gatherers/dobetterweb/document-event-listeners",
       "../gather/gatherers/dobetterweb/document-write",
+      "../gather/gatherers/dobetterweb/links-blocking-first-paint",
       "../gather/gatherers/dobetterweb/websql"
     ]
   }],
 
   "audits": [
     "../audits/dobetterweb/appcache-manifest",
+    "../audits/dobetterweb/link-blocking-first-paint",
     "../audits/dobetterweb/no-console-time",
     "../audits/dobetterweb/no-datenow",
     "../audits/dobetterweb/no-document-write",
@@ -77,9 +79,12 @@
         }
       }
     }, {
-      "name": "Avoiding APIs that harm the user experience",
+      "name": "Avoiding practices that harm the user experience",
       "audits": {
         "no-document-write": {
+          "expectedValue": false
+        },
+        "link-blocking-first-paint": {
           "expectedValue": false
         }
       }

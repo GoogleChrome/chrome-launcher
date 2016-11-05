@@ -44,8 +44,12 @@ function requestHandler(request, response) {
   }
 
   function sendResponse(statusCode, data) {
-    const headers = filePath.endsWith('.js') ?
-      {'Content-Type': 'text/javascript'} : undefined;
+    let headers;
+    if (filePath.endsWith('.js')) {
+      headers = {'Content-Type': 'text/javascript'};
+    } else if (filePath.endsWith('.css')) {
+      headers = {'Content-Type': 'text/css'};
+    }
     response.writeHead(statusCode, headers);
 
     if (queryString && queryString.includes('delay')) {
