@@ -33,8 +33,8 @@ class LinkBlockingFirstPaintAudit extends Audit {
     return {
       category: 'Performance',
       name: 'link-blocking-first-paint',
-      description: 'Site does not use <link> that block first paint',
-      helpText: '&lt;link elements are <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp" target="_blank">blocking the first paint</a> of your page. Consider inline critical CSS/HTML Imports or using the <code>disabled</code> or <code>media</code> attributes to <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css"  target="_blank">make the resource(s) non-render blocking.</a>',
+      description: 'Site does not use <link> that delay first paint',
+      helpText: '&lt;link> elements are <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp" target="_blank">delaying the first paint</a> of your page! For stylesheets, consider inlining or using the <code>disabled</code> and <code>media</code> attributes. For HTML Imports, use the <code>async</code> attribute. These techniques will <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css" target="_blank">make the resource(s) non-render blocking</a>.',
       requiredArtifacts: ['LinksBlockingFirstPaint']
     };
   }
@@ -55,14 +55,16 @@ class LinkBlockingFirstPaintAudit extends Audit {
     const results = artifacts.LinksBlockingFirstPaint.items.map(link => {
       return {
         url: link.url,
-        label: `blocked first paint by ${link.spendTime}ms`
+        label: `delayed first paint by ${link.spendTime}ms`
       };
     });
 
     let displayValue = '';
     const totalSpendTime = artifacts.LinksBlockingFirstPaint.total.spendTime;
-    if (results.length > 0) {
-      displayValue = `${results.length} resources blocked first paint by ${totalSpendTime}ms`;
+    if (results.length > 1) {
+      displayValue = `${results.length} resources delayed first paint by ${totalSpendTime}ms`;
+    } else if (results.length === 1) {
+      displayValue = `${results.length} resource delayed first paint by ${totalSpendTime}ms`;
     }
 
     return LinkBlockingFirstPaintAudit.generateAuditResult({

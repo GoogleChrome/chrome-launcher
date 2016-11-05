@@ -21,26 +21,25 @@ const Gatherer = require('../gatherer');
 /* global document,window */
 
 /* istanbul ignore next */
-function getBlockFirstPaintLinks(filterLinks) {
+function collectLinksThatBlockFirstPaint() {
   return new Promise((resolve, reject) => {
     try {
       const linkList = [...document.querySelectorAll('link')]
-        .filter(filterLinks)
+        .filter(link => {
+          // Filter stylesheet/HTML imports that block rendering.
+          // https://www.igvita.com/2012/06/14/debunking-responsive-css-performance-myths/
+          // https://www.w3.org/TR/html-imports/#dfn-import-async-attribute
+          const blockingStylesheet = (link.rel === 'stylesheet' &&
+              window.matchMedia(link.media).matches && !link.disabled);
+          const blockingImport = link.rel === 'import' && link.hasAttribute('async');
+          return blockingStylesheet || blockingImport;
+        })
         .map(link => link.href);
       resolve(linkList);
     } catch (e) {
       reject('Unable to get Stylesheets/HTML Imports on page');
     }
   });
-}
-
-// filtered match stylesheet/import
-// ref)
-// https://www.igvita.com/2012/06/14/debunking-responsive-css-performance-myths/
-// https://www.w3.org/TR/html-imports/#dfn-import-async-attribute
-function filterLinks(link) {
-  return (link.rel === 'stylesheet' && window.matchMedia(link.media).matches) ||
-         (link.rel === 'import' && link.hasAttribute('async'));
 }
 
 class LinksBlockingFirstPaint extends Gatherer {
@@ -67,7 +66,7 @@ class LinksBlockingFirstPaint extends Gatherer {
   afterPass(options, tracingData) {
     const linkInfo = this._filteredLink(tracingData);
     const driver = options.driver;
-    const scriptStr = `(${getBlockFirstPaintLinks.toString()}(${filterLinks.toString()}))`;
+    const scriptStr = `(${collectLinksThatBlockFirstPaint.toString()}())`;
     return driver.evaluateAsync(scriptStr)
       .then(results => {
         let totalTransferSize = 0;
