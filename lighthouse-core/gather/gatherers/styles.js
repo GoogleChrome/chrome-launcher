@@ -98,8 +98,9 @@ class Styles extends Gatherer {
         }).then(content => {
           const styleHeader = this._activeStyleHeaders[sheetId];
           styleHeader.content = content.text;
-          styleHeader.parsedContent = getCSSPropsInStyleSheet(
-              parser.parse(styleHeader.content));
+          const parsedContent = parser.parse(styleHeader.content);
+          styleHeader.parsedContent = parsedContent.error ?
+              [] : getCSSPropsInStyleSheet(parsedContent);
           return styleHeader;
         });
       });

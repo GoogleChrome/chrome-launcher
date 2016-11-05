@@ -281,7 +281,7 @@ module.exports = (function() {
     try {
       ast = gonzales.parse(content, {syntax: 'css'});
     } catch (e) {
-      return [];
+      return {error: e};
     }
 
     /** @type {!{properties: !Array<!Gonzales.Node>, node: !Gonzales.Node}} */
