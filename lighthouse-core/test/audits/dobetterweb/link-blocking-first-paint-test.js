@@ -39,10 +39,16 @@ describe('Block First Paint audit', () => {
   });
 
   it('fails when there are links found which block first paint', () => {
+    const linkDetails = {
+      href: 'http://google.com/css/style.css',
+      disabled: false,
+      media: '',
+      rel: 'stylesheet'
+    };
     const auditResult = LinkBlockingFirstPaintAudit.audit({
       LinksBlockingFirstPaint: {
         items: [{
-          url: 'http://google.com/style.css',
+          link: linkDetails,
           transferSize: 100,
           spendTime: 100
         }],
@@ -53,7 +59,9 @@ describe('Block First Paint audit', () => {
       }
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.extendedInfo.value.length > 0);
+    assert.ok(auditResult.extendedInfo.value.length, 1);
+    assert.ok(auditResult.extendedInfo.value[0].url.match(linkDetails.href));
+    assert.ok(auditResult.extendedInfo.value[0].label.match('delayed first paint'));
   });
 
   it('passes when there are no links found which block first paint', () => {

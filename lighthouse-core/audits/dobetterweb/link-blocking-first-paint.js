@@ -52,10 +52,10 @@ class LinkBlockingFirstPaintAudit extends Audit {
       });
     }
 
-    const results = artifacts.LinksBlockingFirstPaint.items.map(link => {
+    const results = artifacts.LinksBlockingFirstPaint.items.map(item => {
       return {
-        url: link.url,
-        label: `delayed first paint by ${link.spendTime}ms`
+        url: item.link.href,
+        label: `delayed first paint by ${item.spendTime}ms`
       };
     });
 

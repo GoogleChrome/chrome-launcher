@@ -34,7 +34,14 @@ function collectLinksThatBlockFirstPaint() {
           const blockingImport = link.rel === 'import' && link.hasAttribute('async');
           return blockingStylesheet || blockingImport;
         })
-        .map(link => link.href);
+        .map(link => {
+          return {
+            href: link.href,
+            rel: link.rel,
+            media: link.media,
+            disabled: link.disabled
+          };
+        });
       resolve(linkList);
     } catch (e) {
       reject('Unable to get Stylesheets/HTML Imports on page');
@@ -70,12 +77,12 @@ class LinksBlockingFirstPaint extends Gatherer {
       let totalTransferSize = 0;
       let totalSpendTime = 0;
 
-      const blockingLinks = links.reduce((prev, url) => {
-        if (linkInfo[url]) {
+      const blockingLinks = links.reduce((prev, link) => {
+        if (linkInfo[link.href]) {
           const data = {
-            url,
-            transferSize: linkInfo[url].transferSize,
-            spendTime: this._formatMS(linkInfo[url])
+            link,
+            transferSize: linkInfo[link.href].transferSize,
+            spendTime: this._formatMS(linkInfo[link.href])
           };
           totalTransferSize += data.transferSize;
           totalSpendTime += data.spendTime;
