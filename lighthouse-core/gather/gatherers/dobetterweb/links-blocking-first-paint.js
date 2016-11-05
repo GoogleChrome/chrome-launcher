@@ -46,8 +46,7 @@ class LinksBlockingFirstPaint extends Gatherer {
 
   _filteredLink(tracingData) {
     return tracingData.networkRecords.reduce((prev, record) => {
-      // stylesheet of mimeType is text/css.
-      // import of mimeType is text/html.
+      // Filter stylesheet and html import mimetypes.
       if (/(css|html)/.test(record._mimeType)) {
         prev[record._url] = {
           transferSize: record._transferSize,
@@ -64,40 +63,41 @@ class LinksBlockingFirstPaint extends Gatherer {
   }
 
   afterPass(options, tracingData) {
-    const linkInfo = this._filteredLink(tracingData);
-    const driver = options.driver;
-    const scriptStr = `(${collectLinksThatBlockFirstPaint.toString()}())`;
-    return driver.evaluateAsync(scriptStr)
-      .then(results => {
-        let totalTransferSize = 0;
-        let totalSpendTime = 0;
-        const filteredData = results.reduce((prev, url) => {
-          if (linkInfo[url]) {
-            const data = {
-              url,
-              transferSize: linkInfo[url].transferSize,
-              spendTime: this._formatMS(linkInfo[url])
-            };
-            totalTransferSize += data.transferSize;
-            totalSpendTime += data.spendTime;
-            prev.push(data);
-          }
-          return prev;
-        }, []);
-        this.artifact = {
-          items: filteredData,
-          total: {
-            transferSize: totalTransferSize,
-            spendTime: Math.round(totalSpendTime * 100) / 100
-          }
-        };
-      })
-      .catch(debugString => {
-        this.artifact = {
-          value: -1,
-          debugString
-        };
-      });
+    const scriptSrc = `(${collectLinksThatBlockFirstPaint.toString()}())`;
+    return options.driver.evaluateAsync(scriptSrc).then(links => {
+      const linkInfo = this._filteredLink(tracingData);
+
+      let totalTransferSize = 0;
+      let totalSpendTime = 0;
+
+      const blockingLinks = links.reduce((prev, url) => {
+        if (linkInfo[url]) {
+          const data = {
+            url,
+            transferSize: linkInfo[url].transferSize,
+            spendTime: this._formatMS(linkInfo[url])
+          };
+          totalTransferSize += data.transferSize;
+          totalSpendTime += data.spendTime;
+          prev.push(data);
+        }
+        return prev;
+      }, []);
+
+      this.artifact = {
+        items: blockingLinks,
+        total: {
+          transferSize: totalTransferSize,
+          spendTime: Math.round(totalSpendTime * 100) / 100
+        }
+      };
+    })
+    .catch(debugString => {
+      this.artifact = {
+        value: -1,
+        debugString
+      };
+    });
   }
 }
 
