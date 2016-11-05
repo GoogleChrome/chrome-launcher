@@ -30,8 +30,10 @@ module.exports = [
       'no-console-time': false,
       'no-datenow': false,
       'no-document-write': false,
+      'no-mutation-events': false,
       'no-old-flexbox': false,
-      'no-websql': false
+      'no-websql': false,
+      'uses-passive-event-listeners': false
     }
   }, {
     initialUrl: 'http://localhost:10200/online-only.html',
@@ -43,8 +45,10 @@ module.exports = [
       'no-console-time': true,
       'no-datenow': true,
       'no-document-write': true,
+      'no-mutation-events': true,
       'no-old-flexbox': true,
-      'no-websql': true
+      'no-websql': true,
+      'uses-passive-event-listeners': true
     }
   }
 ];

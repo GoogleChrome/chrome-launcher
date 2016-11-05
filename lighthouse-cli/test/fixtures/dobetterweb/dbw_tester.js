@@ -17,15 +17,27 @@
 
 /*eslint-disable*/
 
-// FAIL - Date.now() usage in another file.
-const d = Date.now();
+(function() {
 
-// FAIL - MutationEvent usage in another file.
-document.addEventListener('DOMNodeInserted', function(e) {
-  console.log('DOMNodeInserted');
-});
+const params = new URLSearchParams(location.search);
 
-// FAIL - non-passive listener usage in another file.
-document.addEventListener('wheel', e => {
-  console.log('whee: arrow function');
-});
+if (params.has('dateNow')) {
+  // FAIL - Date.now() usage in another file.
+  const d = Date.now();
+}
+
+if (params.has('mutationEvents')) {
+  // FAIL - MutationEvent usage in another file.
+  document.addEventListener('DOMNodeInserted', function(e) {
+    console.log('DOMNodeInserted');
+  });
+}
+
+if (params.has('passiveEvents')) {
+  // FAIL - non-passive listener usage in another file.
+  document.addEventListener('wheel', e => {
+    console.log('whee: arrow function');
+  });
+}
+
+})();
