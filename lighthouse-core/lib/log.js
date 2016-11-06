@@ -17,20 +17,28 @@
 'use strict';
 
 const debug = require('debug');
-const debugNode = require('debug/node');
 const EventEmitter = require('events').EventEmitter;
 
+// process.browser is set when browserify'd via the `process` npm module
+const isBrowser = process.browser;
+
 const colors = {
-  red: 1,
-  yellow: 3,
-  cyan: 6,
-  green: 2,
-  blue: 4,
-  magenta: 5
+  red: isBrowser ? 'crimson' : 1,
+  yellow: isBrowser ? 'gold' : 3,
+  cyan: isBrowser ? 'darkturquoise' : 6,
+  green: isBrowser ? 'forestgreen' : 2,
+  blue: isBrowser ? 'steelblue' : 4,
+  magenta: isBrowser ? 'palevioletred' : 5
 };
 
 // whitelist non-red/yellow colors for debug()
-debugNode.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
+if (isBrowser) {
+  const debugBrowser = require('debug/browser');
+  debugBrowser.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
+} else {
+  const debugNode = require('debug/node');
+  debugNode.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
+}
 
 class Emitter extends EventEmitter {
   /**
