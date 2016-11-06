@@ -59,6 +59,7 @@ describe('Block First Paint audit', () => {
       }
     });
     assert.equal(auditResult.rawValue, false);
+    assert.ok(auditResult.displayValue.match('1 resource delayed first paint by 100ms'));
     assert.ok(auditResult.extendedInfo.value.length, 1);
     assert.ok(auditResult.extendedInfo.value[0].url.match(linkDetails.href));
     assert.ok(auditResult.extendedInfo.value[0].label.match('delayed first paint'));
