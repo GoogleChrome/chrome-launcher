@@ -39,14 +39,22 @@ class ChromeLauncher {
   outFile: number
   errFile: number
   pidFile: string
+  startingUrl: string
+  additionalFlags: Array<string>
   chrome: childProcess.ChildProcess
 
   // We can not use default args here due to support node pre 6.
-  constructor(opts?: {autoSelectChrome?: Boolean}) {
-    opts = opts || {};
+  constructor(opts?: {
+      startingUrl?: string,
+      additionalFlags?: Array<string>,
+      autoSelectChrome?: Boolean}) {
 
-    // choose the first one (default)
-    this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
+        opts = opts || {};
+
+        // choose the first one (default)
+        this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
+        this.startingUrl = defaults(opts.startingUrl, 'about:blank');
+        this.additionalFlags = defaults(opts.additionalFlags, []);
   }
 
   flags() {
@@ -61,8 +69,10 @@ class ChromeLauncher {
     if (process.platform === 'linux') {
       flags.push('--disable-setuid-sandbox');
     }
-    // open about:blank as starting page rather than NTP
-    flags.push('about:blank');
+
+    flags.push(...this.additionalFlags);
+    flags.push(this.startingUrl);
+
     return flags;
   }
 

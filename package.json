@@ -5,7 +5,7 @@
   "main": "./lighthouse-core/index.js",
   "bin": {
     "lighthouse": "./lighthouse-cli/index.js",
-    "chrome-debug": "lighthouse-core/scripts/launch-chrome.sh"
+    "chrome-debug": "./lighthouse-cli/manual-chrome-launcher.js"
   },
   "engines": {
     "node": ">=5"
