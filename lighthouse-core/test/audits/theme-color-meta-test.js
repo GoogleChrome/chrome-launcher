@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/meta-theme-color.js');
+const Audit = require('../../audits/theme-color-meta.js');
 const assert = require('assert');
 
 /* global describe, it*/

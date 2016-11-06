@@ -144,7 +144,7 @@ class Runner {
   static getAuditList() {
     return fs
         .readdirSync(path.join(__dirname, './audits'))
-        .filter(f => /\.js$/.test(f));
+        .filter(f => /\.js$/.test(f) && f !== 'audit.js');
   }
 
   /**
@@ -154,7 +154,7 @@ class Runner {
   static getGathererList() {
     return fs
         .readdirSync(path.join(__dirname, './gather/gatherers'))
-        .filter(f => /\.js$/.test(f));
+        .filter(f => /\.js$/.test(f) && f !== 'gatherer.js');
   }
 
   /**

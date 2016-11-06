@@ -326,10 +326,10 @@ describe('Aggregate', () => {
     return assert.throws(_ => Aggregate.compare(results, items, scored));
   });
 
-  it('filters a set correctly', () => {
+  it('throws when attempting to aggregate an audit name not in audit results', () => {
     const items = [{
       audits: {
-        test: {
+        'my-audit-test-name': {
           expectedValue: true,
           weight: 1
         }
@@ -345,12 +345,43 @@ describe('Aggregate', () => {
     }];
 
     const scored = true;
+    assert.throws(_ => Aggregate.compare(results, items, scored)[0],
+      /my-audit-test-name/);
+  });
+
+  it('filters out non-aggregated audit results correctly', () => {
+    const items = [{
+      audits: {
+        test: {
+          expectedValue: true,
+          weight: 1
+        }
+      }
+    }];
+
+    const results = [{
+      name: 'test',
+      rawValue: true,
+      score: true,
+      displayValue: 'true',
+      contributesToScore: true
+    }, {
+      name: 'alternate-test',
+      rawValue: 50,
+      score: 50,
+      displayValue: '50',
+      contributesToScore: true
+    }];
+
+    const scored = true;
     const aggregation = Aggregate.compare(results, items, scored)[0];
-    return assert.deepEqual(aggregation, {
-      overall: 0,
+    assert.deepEqual(aggregation, {
+      overall: 1,
       name: undefined,
       description: undefined,
-      subItems: []
+      subItems: [
+        'test'
+      ]
     });
   });
 

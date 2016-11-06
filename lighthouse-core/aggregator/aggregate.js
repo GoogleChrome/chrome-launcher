@@ -177,7 +177,7 @@ class Aggregate {
         }
 
         if (!filteredAndRemappedResults[e]) {
-          return;
+          throw new Error(`aggregations: expected audit results not found under audit name ${e}`);
         }
 
         subItems.push(filteredAndRemappedResults[e].name);

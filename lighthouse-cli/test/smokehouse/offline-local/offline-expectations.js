@@ -50,7 +50,7 @@ module.exports = [
       'color-contrast': true,
       'image-alt': true,
       'label': true,
-      'tab-index': true,
+      'tabindex': true,
       'content-width': true
     }
   },
@@ -83,7 +83,7 @@ module.exports = [
       'color-contrast': true,
       'image-alt': false,
       'label': true,
-      'tab-index': true,
+      'tabindex': true,
       'content-width': true
     }
   }
