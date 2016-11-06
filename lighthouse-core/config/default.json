@@ -51,7 +51,7 @@
     "manifest-short-name",
     "manifest-short-name-length",
     "manifest-start-url",
-    "meta-theme-color",
+    "theme-color-meta",
     "aria-valid-attr",
     "aria-allowed-attr",
     "color-contrast",
