@@ -166,6 +166,16 @@ function passiveEventsListenerTest() {
   });
 }
 
+function geolocationOnStartTest() {
+  navigator.geolocation.getCurrentPosition(function(position) {
+    // noop
+  });
+
+  const watchID = navigator.geolocation.watchPosition(function(position) {
+    navigator.geolocation.clearWatch(watchID);
+  });
+}
+
 // Figure out which tests to fun.
 const params = new URLSearchParams(location.search);
 if (location.search === '') {
@@ -175,6 +185,7 @@ if (location.search === '') {
   websqlTest();
   mutationEvenTest();
   passiveEventsListenerTest();
+  geolocationOnStartTest();
 } else {
   if (params.has('documentWrite')) {
     documentWriteTest();
@@ -193,6 +204,9 @@ if (location.search === '') {
   }
   if (params.has('passiveEvents')) {
     passiveEventsListenerTest();
+  }
+  if (params.has('geolocation')) {
+    geolocationOnStartTest();
   }
 }
 </script>

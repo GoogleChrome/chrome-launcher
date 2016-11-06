@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
+/**
+ * @fileoverview Audits a page to see if it is requesting the geolocation API on
+ * page load. This is often a sign of poor user experience because it lacks context.
+ */
+
 'use strict';
 
-const Audit = require('./audit');
+const Audit = require('../audit');
+const Formatter = require('../../formatters/formatter');
 
 class GeolocationOnStart extends Audit {
   /**
@@ -26,8 +32,10 @@ class GeolocationOnStart extends Audit {
   static get meta() {
     return {
       category: 'UX',
-      name: 'geolocation',
-      description: 'Page does not automatically request geolocation',
+      name: 'geolocation-on-start',
+      description: 'Page does not automatically request geolocation on page load',
+      helpText: 'Using the geolocation without context is a poor user experience. Always tie API ' +
+                'permissions to user interactions.',
       requiredArtifacts: ['GeolocationOnStart']
     };
   }
@@ -40,15 +48,26 @@ class GeolocationOnStart extends Audit {
     if (typeof artifacts.GeolocationOnStart === 'undefined' ||
         artifacts.GeolocationOnStart === -1) {
       return GeolocationOnStart.generateAuditResult({
-        rawValue: false,
-        debugString: 'Unable to get geolocation values.'
+        rawValue: -1,
+        debugString: 'GeolocationOnStart gatherer did not run'
       });
     }
 
+    const results = artifacts.GeolocationOnStart.usage.map(err => {
+      return Object.assign({
+        label: `line: ${err.line}, col: ${err.col}`
+      }, err);
+    });
+
     return GeolocationOnStart.generateAuditResult({
-      rawValue: artifacts.GeolocationOnStart
+      rawValue: results.length === 0,
+      extendedInfo: {
+        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
+        value: results
+      }
     });
   }
+
 }
 
 module.exports = GeolocationOnStart;

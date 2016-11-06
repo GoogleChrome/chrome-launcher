@@ -51,8 +51,7 @@ module.exports = [
       'image-alt': true,
       'label': true,
       'tab-index': true,
-      'content-width': true,
-      'geolocation': true
+      'content-width': true
     }
   },
 
@@ -85,8 +84,7 @@ module.exports = [
       'image-alt': false,
       'label': true,
       'tab-index': true,
-      'content-width': true,
-      'geolocation': true
+      'content-width': true
     }
   }
 ];

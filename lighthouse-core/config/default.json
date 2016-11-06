@@ -9,8 +9,7 @@
       "theme-color",
       "manifest",
       "accessibility",
-      "content-width",
-      "geolocation-on-start"
+      "content-width"
     ]
   },
   {
@@ -59,8 +58,7 @@
     "image-alt",
     "label",
     "tabindex",
-    "content-width",
-    "geolocation-on-start"
+    "content-width"
   ],
 
   "aggregations": [{
@@ -268,10 +266,6 @@
           "weight": 1
         },
         "manifest-display": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "geolocation-on-start": {
           "expectedValue": true,
           "weight": 1
         },
