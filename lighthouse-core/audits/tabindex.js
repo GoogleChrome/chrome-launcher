@@ -27,7 +27,7 @@ class TabIndex extends Audit {
   static get meta() {
     return {
       category: 'Accessibility',
-      name: 'tab-index',
+      name: 'tabindex',
       description: 'No element has a tabindex attribute greater than 0',
       requiredArtifacts: ['Accessibility']
     };
