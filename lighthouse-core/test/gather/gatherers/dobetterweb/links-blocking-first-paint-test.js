@@ -47,7 +47,7 @@ const traceData = {
   ]
 };
 
-describe('Link in head', () => {
+describe('First paint blocking links', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
     linksBlockingFirstPaint = new LinksBlockingFirstPaint();
@@ -76,16 +76,23 @@ describe('Link in head', () => {
   });
 
   it('returns an artifact', () => {
+    const linkDetails = {
+      href: 'http://google.com/css/style.css',
+      disabled: false,
+      media: '',
+      rel: 'stylesheet'
+    };
+
     return linksBlockingFirstPaint.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.resolve(['http://google.com/css/style.css']);
+          return Promise.resolve([linkDetails]);
         }
       }
     }, traceData).then(_ => {
       const expected = {
         items: [{
-          url: 'http://google.com/css/style.css',
+          link: linkDetails,
           transferSize: 10,
           spendTime: 0
         }],

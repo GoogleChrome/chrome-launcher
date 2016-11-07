@@ -21,12 +21,27 @@ const Gatherer = require('../gatherer');
 /* global document,window */
 
 /* istanbul ignore next */
-function getBlockFirstPaintLinks(filterLinks) {
+function collectLinksThatBlockFirstPaint() {
   return new Promise((resolve, reject) => {
     try {
       const linkList = [...document.querySelectorAll('link')]
-        .filter(filterLinks)
-        .map(link => link.href);
+        .filter(link => {
+          // Filter stylesheet/HTML imports that block rendering.
+          // https://www.igvita.com/2012/06/14/debunking-responsive-css-performance-myths/
+          // https://www.w3.org/TR/html-imports/#dfn-import-async-attribute
+          const blockingStylesheet = (link.rel === 'stylesheet' &&
+              window.matchMedia(link.media).matches && !link.disabled);
+          const blockingImport = link.rel === 'import' && link.hasAttribute('async');
+          return blockingStylesheet || blockingImport;
+        })
+        .map(link => {
+          return {
+            href: link.href,
+            rel: link.rel,
+            media: link.media,
+            disabled: link.disabled
+          };
+        });
       resolve(linkList);
     } catch (e) {
       reject('Unable to get Stylesheets/HTML Imports on page');
@@ -34,21 +49,11 @@ function getBlockFirstPaintLinks(filterLinks) {
   });
 }
 
-// filtered match stylesheet/import
-// ref)
-// https://www.igvita.com/2012/06/14/debunking-responsive-css-performance-myths/
-// https://www.w3.org/TR/html-imports/#dfn-import-async-attribute
-function filterLinks(link) {
-  return (link.rel === 'stylesheet' && window.matchMedia(link.media).matches) ||
-         (link.rel === 'import' && link.hasAttribute('async'));
-}
-
 class LinksBlockingFirstPaint extends Gatherer {
 
   _filteredLink(tracingData) {
     return tracingData.networkRecords.reduce((prev, record) => {
-      // stylesheet of mimeType is text/css.
-      // import of mimeType is text/html.
+      // Filter stylesheet and html import mimetypes.
       if (/(css|html)/.test(record._mimeType)) {
         prev[record._url] = {
           transferSize: record._transferSize,
@@ -65,40 +70,41 @@ class LinksBlockingFirstPaint extends Gatherer {
   }
 
   afterPass(options, tracingData) {
-    const linkInfo = this._filteredLink(tracingData);
-    const driver = options.driver;
-    const scriptStr = `(${getBlockFirstPaintLinks.toString()}(${filterLinks.toString()}))`;
-    return driver.evaluateAsync(scriptStr)
-      .then(results => {
-        let totalTransferSize = 0;
-        let totalSpendTime = 0;
-        const filteredData = results.reduce((prev, url) => {
-          if (linkInfo[url]) {
-            const data = {
-              url,
-              transferSize: linkInfo[url].transferSize,
-              spendTime: this._formatMS(linkInfo[url])
-            };
-            totalTransferSize += data.transferSize;
-            totalSpendTime += data.spendTime;
-            prev.push(data);
-          }
-          return prev;
-        }, []);
-        this.artifact = {
-          items: filteredData,
-          total: {
-            transferSize: totalTransferSize,
-            spendTime: Math.round(totalSpendTime * 100) / 100
-          }
-        };
-      })
-      .catch(debugString => {
-        this.artifact = {
-          value: -1,
-          debugString
-        };
-      });
+    const scriptSrc = `(${collectLinksThatBlockFirstPaint.toString()}())`;
+    return options.driver.evaluateAsync(scriptSrc).then(links => {
+      const linkInfo = this._filteredLink(tracingData);
+
+      let totalTransferSize = 0;
+      let totalSpendTime = 0;
+
+      const blockingLinks = links.reduce((prev, link) => {
+        if (linkInfo[link.href]) {
+          const data = {
+            link,
+            transferSize: linkInfo[link.href].transferSize,
+            spendTime: this._formatMS(linkInfo[link.href])
+          };
+          totalTransferSize += data.transferSize;
+          totalSpendTime += data.spendTime;
+          prev.push(data);
+        }
+        return prev;
+      }, []);
+
+      this.artifact = {
+        items: blockingLinks,
+        total: {
+          transferSize: totalTransferSize,
+          spendTime: Math.round(totalSpendTime * 100) / 100
+        }
+      };
+    })
+    .catch(debugString => {
+      this.artifact = {
+        value: -1,
+        debugString
+      };
+    });
   }
 }
 
