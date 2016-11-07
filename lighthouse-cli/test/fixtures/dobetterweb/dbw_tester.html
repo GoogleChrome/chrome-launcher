@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 -->
-<!-- FAIL - appcache manifest -->
+
+<!-- FAIL - appcache manifest. Note: Appcache cannot be toggled at runtime. -->
 <html manifest="clock.appcache">
 <head>
 <title>DoBetterWeb Mega Tester...Of Death</title>
@@ -22,12 +23,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
 <script src="./dbw_tester.js"></script>
-<link rel="stylesheet" href="./dbw_tester.css">
-<link rel="stylesheet" href="./dbw_disabled.css" disabled>
+
+<template id="links-blocking-first-paint-tmpl">
+  <link rel="stylesheet" href="./dbw_tester.css">
+  <link rel="stylesheet" href="./dbw_disabled.css" disabled>
+</template>
+
 <style>
   body {
-    color: white;
+    color: black;
   }
+</style>
+
+<template id="old-flexbox-tmpl">
+<style>
   p, div {
     background: red, green;
     border-radius: 3px;
@@ -55,12 +64,28 @@
                 3px green;
   }
 </style>
+</template>
+
 </head>
 <body>
 
 Hi there!
 
+<template id="noopener-links-tmpl">
+  <!-- FAIL - does not use rel="noopener" to open external link -->
+  <a href="https://www.google.com/" target="_blank">external link</a>
+  <!-- PASS -->
+  <a href="https://www.google.com/" target="_blank" rel="noopener">external link that uses  rel="noopener"</a>
+  <!-- PASS -->
+  <a href="./doesnotexist" target="_blank">internal link is ok</a>
+</template>
+
 <script>
+function stampTemplate(id, location) {
+  const template = document.querySelector('#' + id);
+  location.appendChild(template.content.cloneNode(true));
+}
+
 function dateNowTest() {
   function helloDate() {
     // FAIL - Date.now() usage in a function.
@@ -177,6 +202,18 @@ function geolocationOnStartTest() {
   });
 }
 
+function oldCSSFlexboxTest() {
+  stampTemplate('old-flexbox-tmpl', document.body);
+}
+
+function linksBlockingFirstPaintTest() {
+  stampTemplate('links-blocking-first-paint-tmpl', document.head);
+}
+
+function noRelOpenLinksTest() {
+  stampTemplate('noopener-links-tmpl', document.head);
+}
+
 // Figure out which tests to fun.
 const params = new URLSearchParams(location.search);
 if (location.search === '') {
@@ -187,6 +224,9 @@ if (location.search === '') {
   mutationEvenTest();
   passiveEventsListenerTest();
   geolocationOnStartTest();
+  linksBlockingFirstPaintTest();
+  noRelOpenLinksTest();
+  oldCSSFlexboxTest();
 } else {
   if (params.has('documentWrite')) {
     documentWriteTest();
@@ -208,6 +248,15 @@ if (location.search === '') {
   }
   if (params.has('geolocation')) {
     geolocationOnStartTest();
+  }
+  if (params.has('linksblockfp')) {
+    linksBlockingFirstPaintTest();
+  }
+  if (params.has('relnoopener')) {
+    noRelOpenLinksTest();
+  }
+  if (params.has('oldcssflexbox')) {
+    oldCSSFlexboxTest();
   }
 }
 </script>
