@@ -62,6 +62,7 @@ class ChromeLauncher {
       '--remote-debugging-port=9222',
       '--disable-extensions',
       '--disable-translate',
+      '--disable-default-apps',
       '--no-first-run',
       `--user-data-dir=${this.TMP_PROFILE_DIR}`
     ];
