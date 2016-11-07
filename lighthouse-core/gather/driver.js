@@ -395,6 +395,32 @@ class Driver {
   }
 
   /**
+  * @param {string} objectId Object ID for the resolved DOM node
+  * @param {string} propName Name of the property
+  * @return {!Promise<String>} The property value, or null, if property not found
+  */
+  getObjectProperty(objectId, propName) {
+    return new Promise((resolve, reject) => {
+      this.sendCommand('Runtime.getProperties', {
+        objectId,
+        accessorPropertiesOnly: true,
+        generatePreview: false,
+        ownProperties: false,
+      })
+      .then(properties => {
+        const propertyForName = properties.result
+          .find(property => property.name === propName);
+
+        if (propertyForName) {
+          resolve(propertyForName.value.value);
+        } else {
+          reject(null);
+        }
+      });
+    });
+  }
+
+  /**
    * @param {string} selector Selector to find in the DOM
    * @return {!Promise<Element>} The found element, or null, resolved in a promise
    */
@@ -410,6 +436,28 @@ class Driver {
           return null;
         }
         return new Element(element, this);
+      });
+  }
+
+  /**
+   * @param {string} selector Selector to find in the DOM
+   * @return {!Promise<Element[]>} The found elements, or [], resolved in a promise
+   */
+  querySelectorAll(selector) {
+    return this.sendCommand('DOM.getDocument')
+      .then(result => result.root.nodeId)
+      .then(nodeId => this.sendCommand('DOM.querySelectorAll', {
+        nodeId,
+        selector
+      }))
+      .then(nodeList => {
+        const elementList = [];
+        nodeList.nodeIds.forEach(nodeId => {
+          if (nodeId !== 0) {
+            elementList.push(new Element({nodeId}, this));
+          }
+        });
+        return elementList;
       });
   }
 

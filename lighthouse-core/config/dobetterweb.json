@@ -5,6 +5,7 @@
       "../gather/gatherers/https",
       "../gather/gatherers/styles",
       "../gather/gatherers/url",
+      "../gather/gatherers/dobetterweb/anchors-with-no-rel-noopener",
       "../gather/gatherers/dobetterweb/appcache",
       "../gather/gatherers/dobetterweb/console-time-usage",
       "../gather/gatherers/dobetterweb/datenow",
@@ -19,6 +20,7 @@
   "audits": [
     "../audits/is-on-https",
     "../audits/dobetterweb/appcache-manifest",
+    "../audits/dobetterweb/external-anchors-use-rel-noopener",
     "../audits/dobetterweb/geolocation-on-start",
     "../audits/dobetterweb/link-blocking-first-paint",
     "../audits/dobetterweb/no-console-time",
@@ -88,6 +90,9 @@
         },
         "link-blocking-first-paint": {
           "expectedValue": false
+        },
+        "external-anchors-use-rel-noopener": {
+          "expectedValue": true
         },
         "geolocation-on-start": {
           "expectedValue": false

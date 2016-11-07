@@ -21,8 +21,21 @@ const Element = require('../../lib/element');
 const assert = require('assert');
 
 class DriverStub {
-  sendCommand() {
-    return Promise.resolve({attributes: ['rel', 'manifest']});
+  sendCommand(command) {
+    switch (command) {
+      case 'DOM.getAttributes':
+        return Promise.resolve({attributes: ['rel', 'manifest']});
+
+      case 'DOM.resolveNode':
+        return Promise.resolve({object: {objectId: 'test'}});
+
+      default:
+        throw Error(`Stub not implemented: ${command}`);
+    }
+  }
+
+  getObjectProperty() {
+    return Promise.resolve('123');
   }
 }
 
@@ -62,6 +75,13 @@ describe('Element', () => {
     var element = new Element(this.stubbedElement, this.stubbedDriver);
     return element.getAttribute('rel').then(value => {
       assert.equal(value, 'manifest');
+    });
+  });
+
+  it('returns property value from getProperty', () => {
+    var element = new Element(this.stubbedElement, this.stubbedDriver);
+    return element.getProperty('test').then(value => {
+      assert.equal(value, '123');
     });
   });
 });

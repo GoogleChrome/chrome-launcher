@@ -46,6 +46,20 @@ class Element {
         return resp.attributes[attrIndex + 1];
       });
   }
+
+  /**
+   * @param {!string} propName Property name
+   * @return {!Promise<?string>} The property value
+   */
+  getProperty(propName) {
+    return this.driver
+      .sendCommand('DOM.resolveNode', {
+        nodeId: this.element.nodeId
+      })
+      .then(resp => {
+        return this.driver.getObjectProperty(resp.object.objectId, propName);
+      });
+  }
 }
 
 module.exports = Element;
