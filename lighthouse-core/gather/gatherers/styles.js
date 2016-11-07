@@ -25,6 +25,7 @@
 
 const WebInspector = require('../../lib/web-inspector');
 const Gatherer = require('./gatherer');
+const log = require('../../lib/log.js');
 
 /**
  * @param {!gonzales.AST} parseTree
@@ -98,8 +99,15 @@ class Styles extends Gatherer {
         }).then(content => {
           const styleHeader = this._activeStyleHeaders[sheetId];
           styleHeader.content = content.text;
-          styleHeader.parsedContent = getCSSPropsInStyleSheet(
-              parser.parse(styleHeader.content));
+
+          const parsedContent = parser.parse(styleHeader.content);
+          if (parsedContent.error) {
+            log.warn('Styles Gatherer', `Could not parse content: ${parsedContent.error}`);
+            styleHeader.parsedContent = [];
+          } else {
+            styleHeader.parsedContent = getCSSPropsInStyleSheet(parsedContent);
+          }
+
           return styleHeader;
         });
       });
