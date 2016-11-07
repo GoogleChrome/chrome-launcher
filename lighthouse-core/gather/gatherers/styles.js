@@ -102,7 +102,7 @@ class Styles extends Gatherer {
 
           const parsedContent = parser.parse(styleHeader.content);
           if (parsedContent.error) {
-            log.warn('Styles Gatherer', '....${parsedContent.error}');
+            log.warn('Styles Gatherer', `Could not parse content: ${parsedContent.error}`);
             styleHeader.parsedContent = [];
           } else {
             styleHeader.parsedContent = getCSSPropsInStyleSheet(parsedContent);
