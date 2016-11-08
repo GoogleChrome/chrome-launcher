@@ -110,7 +110,7 @@ class TraceProcessor {
    * within the window should be given as `clippedLength`. For instance, if a
    * 50ms duration occurs 10ms before the end of the window, `50` should be in
    * the `durations` array, and `clippedLength` should be set to 40.
-   * @see https://docs.google.com/document/d/18gvP-CBA2BiBpi3Rz1I1ISciKGhniTSZ9TY0XCnXS7E/preview
+   * @see https://docs.google.com/document/d/1b9slyaB9yho91YTOkAQfpCdULFkZM9LqsipcX3t7He8/preview
    * @param {!Array<number>} durations Array of durations, sorted in ascending order.
    * @param {number} totalTime Total time (in ms) of interval containing durations.
    * @param {!Array<number>} percentiles Array of percentiles of interest, in ascending order.
@@ -174,7 +174,7 @@ class TraceProcessor {
   /**
    * Calculates the maximum queueing time (in ms) of high priority tasks for
    * selected percentiles within a window of the main thread.
-   * @see https://docs.google.com/document/d/18gvP-CBA2BiBpi3Rz1I1ISciKGhniTSZ9TY0XCnXS7E/preview
+   * @see https://docs.google.com/document/d/1b9slyaB9yho91YTOkAQfpCdULFkZM9LqsipcX3t7He8/preview
    * @param {!traceviewer.Model} model
    * @param {{traceEvents: !Array<!Object>}} trace
    * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
