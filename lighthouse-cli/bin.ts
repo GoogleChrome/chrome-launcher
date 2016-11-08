@@ -20,6 +20,7 @@
 const _SIGINT = 'SIGINT';
 const _ERROR_EXIT_CODE = 130;
 const _RUNTIME_ERROR_CODE = 1;
+const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 
 interface LightHouseError extends Error {
   code?: string
@@ -254,9 +255,16 @@ function showRuntimeError(err: LightHouseError) {
   process.exit(_RUNTIME_ERROR_CODE);
 }
 
+function showProtocolTimeoutError() {
+  console.error('Debugger protocol timed out while connecting to Chrome.');
+  process.exit(_PROTOCOL_TIMEOUT_EXIT_CODE);
+}
+
 function handleError(err: LightHouseError) {
   if (err.code === 'ECONNREFUSED') {
     showConnectionError();
+  } else if (err.code === 'CRI_TIMEOUT') {
+    showProtocolTimeoutError();
   } else {
     showRuntimeError(err);
   }
