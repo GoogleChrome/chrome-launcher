@@ -34,6 +34,7 @@ if (!environment.checkNodeCompatibility()) {
 
 import {Results} from './types/types';
 import * as path from 'path';
+import * as http from 'http';
 const yargs = require('yargs');
 import * as Printer from './printer';
 const lighthouse = require('../lighthouse-core');
@@ -44,7 +45,7 @@ import * as Commands from './commands/commands';
 
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 
-const cli = yargs
+const cliFlags = yargs
   .help('help')
   .version(() => require('../package').version)
   .showHelpOnFail(false, 'Specify --help for available options')
@@ -68,7 +69,8 @@ const cli = yargs
     'list-all-audits',
     'list-trace-categories',
     'config-path',
-    'perf'
+    'perf',
+    'port'
   ], 'Configuration:')
   .describe({
     'disable-device-emulation': 'Disable Nexus 5X emulation',
@@ -80,7 +82,8 @@ const cli = yargs
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
     'config-path': 'The path to the config JSON.',
     'perf': 'Use a performance-test-only configuration',
-    'skip-autolaunch': 'Skip autolaunch of Chrome when accessing port 9222 fails',
+    'port': 'The port to use for the debugging protocol. Use 0 for a random port',
+    'skip-autolaunch': 'Skip autolaunch of Chrome when already running instance is not found',
     'select-chrome': 'Interactively choose version of Chrome to use when multiple installations are found',
   })
 
@@ -116,6 +119,7 @@ Example: --output-path=./lighthouse-results.html`
   .default('disable-cpu-throttling', true)
   .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.pretty])
   .default('output-path', 'stdout')
+  .default('port', 9222)
   .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
     // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
     // or --list-trace-categories. If not, stop the program and ask for a url
@@ -128,38 +132,37 @@ Example: --output-path=./lighthouse-results.html`
   .argv;
 
 // Process terminating command
-if (cli.listAllAudits) {
+if (cliFlags.listAllAudits) {
   Commands.ListAudits();
 }
 
 // Process terminating command
-if (cli.listTraceCategories) {
+if (cliFlags.listTraceCategories) {
   Commands.ListTraceCategories();
 }
 
-const urls = cli._;
-const outputMode = cli.output;
-const outputPath = cli['output-path'];
-const flags = cli;
+const urls = cliFlags._;
+const outputMode = cliFlags.output;
+const outputPath = cliFlags['output-path'];
 
 let config: Object | null = null;
-if (cli.configPath) {
+if (cliFlags.configPath) {
   // Resolve the config file path relative to where cli was called.
-  cli.configPath = path.resolve(process.cwd(), cli.configPath);
-  config = require(cli.configPath);
-} else if (cli.perf) {
+  cliFlags.configPath = path.resolve(process.cwd(), cliFlags.configPath);
+  config = require(cliFlags.configPath);
+} else if (cliFlags.perf) {
   config = perfOnlyConfig;
 }
 
 // set logging preferences
-flags.logLevel = 'info';
-if (cli.verbose) {
-  flags.logLevel = 'verbose';
-} else if (cli.quiet) {
-  flags.logLevel = 'silent';
+cliFlags.logLevel = 'info';
+if (cliFlags.verbose) {
+  cliFlags.logLevel = 'verbose';
+} else if (cliFlags.quiet) {
+  cliFlags.logLevel = 'silent';
 }
 
-log.setLevel(flags.logLevel);
+log.setLevel(cliFlags.logLevel);
 
 const cleanup: {fns: Array<Function>,
   register: Function,
@@ -169,29 +172,53 @@ const cleanup: {fns: Array<Function>,
   doCleanup() { return Promise.all(this.fns.map((c: Function) => c())); }
 };
 
-function launchChromeAndRun(addresses: Array<string>,
-                            config: Object,
-                            opts?: {selectChrome: boolean}) {
+/**
+ * If the requested port is 0, set it to a random, unused port.
+ */
+function initPort(flags: {port: number}): Promise<undefined> {
+  return new Promise((resolve, reject) => {
+    if (flags.port !== 0) {
+      log.verbose('Lighthouse CLI', `Using supplied port ${flags.port}`);
+      return resolve();
+    }
 
-  opts = opts || cli;
+    log.verbose('Lighthouse CLI', 'Generating random port.');
+    const server  = http.createServer();
+    server.listen(0);
+    server.on('listening', () => {
+      flags.port = server.address().port;
+      server.close();
 
-  const launcher = new ChromeLauncher({
-    autoSelectChrome: !opts.selectChrome,
-  });
-
-  cleanup.register(() => launcher.kill());
-
-  return launcher
-    .isDebuggerReady()
-    .catch(() => {
-      log.log('Lighthouse CLI', 'Launching Chrome...');
-      return launcher.run();
+      log.verbose('Lighthouse CLI', `Using generated port ${flags.port}.`);
+      resolve();
     })
-    .then(() => lighthouseRun(addresses, config))
-    .then(() => launcher.kill());
+  })
 }
 
-function lighthouseRun(addresses: Array<string>, config: Object) {
+function launchChromeAndRun(addresses: Array<string>,
+                            config: Object,
+                            flags: {port: number, selectChrome: boolean}) {
+
+  return initPort(flags).then(() => {
+    const launcher = new ChromeLauncher({
+      port: flags.port,
+      autoSelectChrome: !flags.selectChrome,
+    });
+
+    cleanup.register(() => launcher.kill());
+
+    return launcher
+      .isDebuggerReady()
+      .catch(() => {
+        log.log('Lighthouse CLI', 'Launching Chrome...');
+        return launcher.run();
+      })
+      .then(() => lighthouseRun(addresses, config, flags))
+      .then(() => launcher.kill());
+  })
+}
+
+function lighthouseRun(addresses: Array<string>, config: Object, flags: Object) {
   // Process URLs once at a time
   const address = addresses.shift();
   if (!address) {
@@ -206,7 +233,7 @@ function lighthouseRun(addresses: Array<string>, config: Object) {
         Printer.write(results, 'html', filename);
       }
 
-      return lighthouseRun(addresses, config);
+      return lighthouseRun(addresses, config, flags);
     });
 }
 
@@ -236,28 +263,30 @@ function handleError(err: LightHouseError) {
 }
 
 function run() {
-  if (cli.skipAutolaunch) {
-    lighthouseRun(urls, config).catch(handleError);
-  } else {
-    // because you can't cancel a promise yet
-    const isSigint = new Promise((resolve, reject) => {
-      process.on(_SIGINT, () => reject(_SIGINT));
-    });
-
-    Promise
-      .race([launchChromeAndRun(urls, config), isSigint])
-      .catch(maybeSigint => {
-        if (maybeSigint === _SIGINT) {
-          return cleanup
-            .doCleanup()
-            .catch(err => {
-              console.error(err);
-              console.error(err.stack);
-            }).then(() => process.exit(_ERROR_EXIT_CODE));
-        }
-        return handleError(maybeSigint);
+  return initPort(cliFlags).then(() => {
+    if (cliFlags.skipAutolaunch) {
+      return lighthouseRun(urls, config, cliFlags).catch(handleError);
+    } else {
+      // because you can't cancel a promise yet
+      const isSigint = new Promise((resolve, reject) => {
+        process.on(_SIGINT, () => reject(_SIGINT));
       });
-  }
+
+      return Promise
+        .race([launchChromeAndRun(urls, config, cliFlags), isSigint])
+        .catch(maybeSigint => {
+          if (maybeSigint === _SIGINT) {
+            return cleanup
+              .doCleanup()
+              .catch(err => {
+                console.error(err);
+                console.error(err.stack);
+              }).then(() => process.exit(_ERROR_EXIT_CODE));
+          }
+          return handleError(maybeSigint);
+        });
+    }
+  })
 }
 
 export {

@@ -20,9 +20,18 @@ const Connection = require('./connection.js');
 const WebSocket = require('ws');
 const http = require('http');
 const hostname = 'localhost';
-const port = process.env.PORT || 9222;
 
 class CriConnection extends Connection {
+  /**
+   * @param {number=} port Optional port number. Defaults to 9222;
+   * @constructor
+   */
+  constructor(port) {
+    super();
+
+    this.port = port;
+  }
+
   /**
    * @override
    * @return {!Promise}
@@ -51,7 +60,7 @@ class CriConnection extends Connection {
     return new Promise((resolve, reject) => {
       http.get({
         hostname: hostname,
-        port: port,
+        port: this.port,
         path: '/json/' + command
       }, response => {
         var data = '';
