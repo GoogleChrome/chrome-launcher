@@ -42,12 +42,14 @@ class ChromeLauncher {
   startingUrl: string
   additionalFlags: Array<string>
   chrome: childProcess.ChildProcess
+  port: number
 
   // We can not use default args here due to support node pre 6.
   constructor(opts?: {
       startingUrl?: string,
       additionalFlags?: Array<string>,
-      autoSelectChrome?: Boolean}) {
+      autoSelectChrome?: Boolean,
+      port?: number}) {
 
         opts = opts || {};
 
@@ -55,11 +57,12 @@ class ChromeLauncher {
         this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
         this.startingUrl = defaults(opts.startingUrl, 'about:blank');
         this.additionalFlags = defaults(opts.additionalFlags, []);
+        this.port = defaults(opts.port, 9222);
   }
 
   flags() {
     const flags = [
-      '--remote-debugging-port=9222',
+      `--remote-debugging-port=${this.port}`,
       '--disable-extensions',
       '--disable-translate',
       '--disable-default-apps',
@@ -138,7 +141,7 @@ class ChromeLauncher {
 
       fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
-      log.verbose('ChromeLauncher', 'Chrome running with pid =', chrome.pid);
+      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
       resolve(chrome.pid);
     })
     .then(pid => Promise.all([pid, this.waitUntilReady()]));
@@ -156,7 +159,7 @@ class ChromeLauncher {
   // resolves if ready, rejects otherwise
   isDebuggerReady(): Promise<undefined> {
     return new Promise((resolve, reject) => {
-      const client = net.createConnection(9222);
+      const client = net.createConnection(this.port);
       client.once('error', err => {
         this.cleanup(client);
         reject(err);

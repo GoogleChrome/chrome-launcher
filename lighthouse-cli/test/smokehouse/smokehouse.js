@@ -18,11 +18,14 @@
 'use strict';
 
 const path = require('path');
-const execSync = require('child_process').execSync;
+const spawnSync = require('child_process').spawnSync;
 const yargs = require('yargs');
 
 const DEFAULT_CONFIG_PATH = 'pwa-config';
 const DEFAULT_EXPECTATIONS_PATH = 'pwa-expectations';
+
+const PROTOCOL_TIMEOUT_EXIT_CODE = 67;
+const RETRIES = 3;
 
 const GREEN = '\x1B[32m';
 const RED = '\x1B[31m';
@@ -73,18 +76,46 @@ function resolveLocalOrCwd(payloadPath) {
  * @return {!LighthouseResults}
  */
 function runLighthouse(url, configPath) {
-  // Assume if currently running in Node v4 that child process will as well, so
-  // run Lighthouse with --harmony flag.
-  const harmony = /v4/.test(process.version) ? '--harmony' : '';
-  const command = `node ${harmony} lighthouse-cli/index.js ${url}`;
-  const options = [
+  const command = 'node';
+  const args = [
+    'lighthouse-cli/index.js',
+    url,
     `--config-path=${configPath}`,
     '--output=json',
-    '--quiet'
-  ].join(' ');
+    '--quiet',
+    '--port=0'
+  ];
 
-  const rawResults = execSync(command + ' ' + options, {encoding: 'utf8'});
-  return JSON.parse(rawResults);
+  // Assume if currently running in Node v4 that child process will as well, so
+  // run Lighthouse with --harmony flag.
+  if (/v4/.test(process.version)) {
+    args.unshift('--harmony');
+  }
+
+  // Lighthouse sometimes times out waiting to for a connection to Chrome in CI.
+  // Watch for this error and retry relaunching Chrome and running Lighthouse up
+  // to RETRIES times. See https://github.com/GoogleChrome/lighthouse/issues/833
+  let runResults;
+  let runCount = 0;
+  do {
+    if (runCount > 0) {
+      console.log('  Lighthouse error: timed out waiting for debugger connection. Retrying...');
+    }
+
+    runCount++;
+    runResults = spawnSync(command, args, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'inherit']});
+  } while (runResults.status === PROTOCOL_TIMEOUT_EXIT_CODE && runCount <= RETRIES);
+
+  if (runResults.status === PROTOCOL_TIMEOUT_EXIT_CODE) {
+    console.error(`Lighthouse debugger connection timed out ${RETRIES} times. Giving up.`);
+    process.exit(1);
+  } else if (runResults.status !== 0) {
+    console.error(`Lighthouse run failed with exit code ${runResults.status}. stderr to follow:`);
+    console.error(runResults.stderr);
+    process.exit(runResults.status);
+  }
+
+  return JSON.parse(runResults.stdout);
 }
 
 /**
