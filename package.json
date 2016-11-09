@@ -22,7 +22,7 @@
     "closure": "cd lighthouse-core && closure/closure-type-checking.js",
     "watch": "lighthouse-core/scripts/run-mocha.sh --watch",
     "chrome": "lighthouse-core/scripts/launch-chrome.sh",
-    "dbw": "npm run start -- --config-path=lighthouse-core/config/dobetterweb.json --disable-device-emulation --disable-cpu-throttling --disable-network-throttling --output=html --output-path=results.html",
+    "fast": "npm run start -- --disable-device-emulation --disable-cpu-throttling --disable-network-throttling",
     "smokehouse": "node $__node_harmony lighthouse-cli/test/smokehouse/smokehouse.js"
   },
   "devDependencies": {

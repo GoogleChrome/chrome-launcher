@@ -30,7 +30,7 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       category: 'Performance',
       name: 'external-anchors-use-rel-noopener',
       description: 'Site opens external anchors using rel="noopener".',
-      helpText: 'links that open in a new tab should use <code>target="_blank"</code> and <code>rel="noopener"</code> so the <a href="https://jakearchibald.com/2016/performance-benefits-of-rel-noopener">opening page\'s performance does not suffer.</a>',
+      helpText: 'Anchors that open in a new tab should use <code>target="_blank"</code> and <code>rel="noopener"</code> so the <a href="https://jakearchibald.com/2016/performance-benefits-of-rel-noopener" target="_blank">opening page\'s performance does not suffer.</a>',
       requiredArtifacts: ['URL', 'AnchorsWithNoRelNoopener']
     };
   }
@@ -57,7 +57,7 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
           url: `<a
             href="${anchor.href}"
             ${anchor.target ? ` target="${anchor.target}"` : ''}
-            ${anchor.rel ? ` rel="${anchor.rel}"` : ''}>
+            ${anchor.rel ? ` rel="${anchor.rel}"` : ''}>...
           </a>`
         };
       });

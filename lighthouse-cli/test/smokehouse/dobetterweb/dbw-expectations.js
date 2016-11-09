@@ -26,6 +26,7 @@ module.exports = [
     audits: {
       'is-on-https': false,
       'uses-http2': false,
+      'external-anchors-use-rel-noopener': false,
       'appcache-manifest': false,
       'geolocation-on-start': false,
       'link-blocking-first-paint': false,
@@ -43,6 +44,7 @@ module.exports = [
     audits: {
       'is-on-https': false,
       'uses-http2': false,
+      'external-anchors-use-rel-noopener': true,
       'appcache-manifest': true,
       'geolocation-on-start': true,
       'link-blocking-first-paint': true,
