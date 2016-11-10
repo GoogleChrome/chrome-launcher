@@ -50,6 +50,14 @@ class Accessibilty extends Formatter {
         throw new Error('Unknown formatter type');
     }
   }
+
+  static getHelpers() {
+    return {
+      gt(a, b) {
+        return a > b;
+      }
+    };
+  }
 }
 
 module.exports = Accessibilty;

@@ -106,9 +106,6 @@ class ReportGenerator {
     // value is boolean?
     Handlebars.registerHelper('is-bool', value => (typeof value === 'boolean'));
 
-    // a > b
-    Handlebars.registerHelper('gt', (a, b) => (a > b));
-
     // !value
     Handlebars.registerHelper('not', value => !value);
 
