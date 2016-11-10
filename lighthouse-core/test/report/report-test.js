@@ -44,6 +44,10 @@ describe('Report', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: false});
 
-    return assert.ok(/<script src/gim.test(html));
+    assert.ok(html.includes('self.lhresults = {'), 'results object was not added');
+    assert.ok(html.includes('<footer'), 'no footer tag found');
+    assert.ok(html.includes('function LighthouseReport'), 'lighthouse-report.js was not inlined');
+    assert.ok(html.includes('.report-body {'), 'report.css was not inlined');
+    assert.ok(!html.includes('&quot;lighthouseVersion'), 'lhresults were not escaped');
   });
 });

@@ -14,20 +14,18 @@ const eslint = require('gulp-eslint');
 const livereload = require('gulp-livereload');
 const tap = require('gulp-tap');
 const zip = require('gulp-zip');
-const rename = require('gulp-rename');
+const LighthouseRunner = require('../lighthouse-core/runner');
 
-const audits = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/audits/'))
-    .filter(f => /\.js$/.test(f))
-    .map(f => `../lighthouse-core/audits/${f.replace(/\.js$/, '')}`);
+const audits = LighthouseRunner.getAuditList()
+    .map(f => '../lighthouse-core/audits/' + f.replace(/\.js$/, ''));
 
-const gatherers = fs.readdirSync(path.join(__dirname, '../', 'lighthouse-core/gather/gatherers/'))
-    .filter(f => /\.js$/.test(f))
-    .map(f => `../lighthouse-core/gather/gatherers/${f.replace(/\.js$/, '')}`);
+const gatherers = LighthouseRunner.getGathererList()
+    .map(f => '../lighthouse-core/gather/gatherers/' + f.replace(/\.js$/, ''));
 
 const computedArtifacts = fs.readdirSync(
     path.join(__dirname, '../lighthouse-core/gather/computed/'))
     .filter(f => /\.js$/.test(f))
-    .map(f => `../lighthouse-core/gather/computed/${f.replace(/\.js$/, '')}`);
+    .map(f => '../lighthouse-core/gather/computed/' + f.replace(/\.js$/, ''));
 
 gulp.task('extras', () => {
   return gulp.src([
@@ -43,15 +41,6 @@ gulp.task('extras', () => {
     dot: true
   })
   .pipe(debug({title: 'copying to dist:'}))
-  .pipe(gulp.dest('dist'));
-});
-
-gulp.task('copyReportScripts', () => {
-  return gulp.src([
-    '../lighthouse-core/report/scripts/lighthouse-report.js'
-  ])
-  .pipe(rename('pages/scripts/lighthouse-report.js'))
-  .pipe(gulp.dest('app'))
   .pipe(gulp.dest('dist'));
 });
 
@@ -94,52 +83,73 @@ gulp.task('chromeManifest', () => {
   .pipe(gulp.dest('dist'));
 });
 
-gulp.task('browserify', () => {
+function applyBrowserifyTransforms(bundle) {
+  // Fix an issue with imported speedline code that doesn't brfs well.
+  return bundle.transform('./fs-transform', {
+    global: true
+  })
+  // Transform the fs.readFile etc, but do so in all the modules.
+  .transform('brfs', {
+    global: true
+  });
+}
+
+gulp.task('browserify-lighthouse', () => {
   return gulp.src([
-    'app/src/popup.js',
-    'app/src/chromereload.js',
-    'app/src/lighthouse-background.js',
-    'app/src/report-loader.js'
+    'app/src/lighthouse-background.js'
   ], {read: false})
     .pipe(tap(file => {
-      let bundle = browserify(file.path) // , {debug: true})
-      // Fix an issue with Babelified code that doesn't brfs well.
-      .transform('./fs-transform', {
+      let bundle = browserify(file.path); // , {debug: true})
+      bundle = applyBrowserifyTransforms(bundle);
+
+      // lighthouse-background will need some additional transforms, ignores and requires…
+
+      // Do the additional transform to convert references of devtools-timeline-model
+      // to the modified version internal to Lighthouse.
+      bundle.transform('./dtm-transform.js', {
         global: true
       })
-      // Transform the fs.readFile etc, but do so in all the modules.
-      .transform('brfs', {
-        global: true
+      .ignore('../lighthouse-core/lib/asset-saver.js') // relative from gulpfile location
+      .ignore('source-map')
+      .ignore('debug/node');
+
+      // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.
+      const corePath = '../lighthouse-core/';
+      const driverPath = `${corePath}gather/`;
+      audits.forEach(audit => {
+        bundle = bundle.require(audit, {expose: audit.replace(corePath, '../')});
+      });
+      gatherers.forEach(gatherer => {
+        bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
+      });
+      computedArtifacts.forEach(artifact => {
+        bundle = bundle.require(artifact, {expose: artifact.replace(driverPath, './')});
       });
 
-      // In the case of our lighthouse-core script, we've got extra work to do
-      if (file.path.includes('app/src/lighthouse-background.js')) {
-        // Do the additional transform to convert references to devtools-timeline-model
-        // to the modified version internal to Lighthouse.
-        bundle.transform('./dtm-transform.js', {
-          global: true
-        })
-        .ignore('../lighthouse-core/lib/asset-saver.js') // relative from gulpfile location
-        .ignore('source-map');
-
-        // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.
-        const corePath = '../lighthouse-core/';
-        const driverPath = `${corePath}gather/`;
-        audits.forEach(audit => {
-          bundle = bundle.require(audit, {expose: audit.replace(corePath, '../')});
-        });
-        gatherers.forEach(gatherer => {
-          bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
-        });
-        computedArtifacts.forEach(artifact => {
-          bundle = bundle.require(artifact, {expose: artifact.replace(driverPath, './')});
-        });
-      }
       // Inject the new browserified contents back into our gulp pipeline
       file.contents = bundle.bundle();
     }))
     .pipe(gulp.dest('app/scripts'))
     .pipe(gulp.dest('dist/scripts'));
+});
+
+gulp.task('browserify-other', () => {
+  return gulp.src([
+    'app/src/popup.js',
+    'app/src/chromereload.js',
+  ], {read: false})
+    .pipe(tap(file => {
+      let bundle = browserify(file.path); // , {debug: true})
+      bundle = applyBrowserifyTransforms(bundle);
+      // Inject the new browserified contents back into our gulp pipeline
+      file.contents = bundle.bundle();
+    }))
+    .pipe(gulp.dest('app/scripts'))
+    .pipe(gulp.dest('dist/scripts'));
+});
+
+gulp.task('browserify', cb => {
+  runSequence('browserify-lighthouse', 'browserify-other', cb);
 });
 
 gulp.task('clean', () => {
@@ -148,7 +158,7 @@ gulp.task('clean', () => {
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'html', 'copyReportScripts'], () => {
+gulp.task('watch', ['lint', 'browserify', 'html'], () => {
   livereload.listen();
 
   gulp.watch([
@@ -177,7 +187,7 @@ gulp.task('package', function() {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'browserify', 'chromeManifest',
-    ['html', 'images', 'css', 'extras', 'copyReportScripts'], cb);
+    ['html', 'images', 'css', 'extras'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {

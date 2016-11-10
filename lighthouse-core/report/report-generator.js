@@ -67,7 +67,6 @@ class ReportGenerator {
       if (typeof value === 'boolean') {
         return value ? '&#10004;' : '&#10008;';
       }
-
       return value;
     });
 
@@ -141,11 +140,19 @@ class ReportGenerator {
   }
 
   /**
-   * Gets the HTML for the report.
+   * Gets the template for the report.
    * @return {string}
    */
-  getReportHTML() {
-    return fs.readFileSync(path.join(__dirname, './templates/report.html'), 'utf8');
+  getReportTemplate() {
+    return fs.readFileSync(path.join(__dirname, './templates/report-template.html'), 'utf8');
+  }
+
+  /**
+   * Gets the template for any exceptions.
+   * @return {string}
+   */
+  getExceptionTemplate() {
+    return fs.readFileSync(path.join(__dirname, './templates/exception.html'), 'utf8');
   }
 
   /**
@@ -157,19 +164,11 @@ class ReportGenerator {
   }
 
   /**
-   * Gets the JavaScript for the report.
-   * @param  {boolean} inline Whether or not to give the JS back as an inline script vs external.
+   * Gets the script for the report UI
    * @return {string}
    */
-  getReportJS(inline) {
-    // If this is for the extension we won't be able to run JS inline to the page so we will
-    // return a path to a JS file that will be copied in from ./scripts/report.js by gulp.
-    if (inline) {
-      const reportScript =
-          fs.readFileSync(path.join(__dirname, './scripts/lighthouse-report.js'), 'utf8');
-      return `<script>${reportScript}</script>`;
-    }
-    return '<script src="/pages/scripts/lighthouse-report.js"></script>';
+  getReportJS() {
+    return fs.readFileSync(path.join(__dirname, './scripts/lighthouse-report.js'), 'utf8');
   }
 
   /**
@@ -204,9 +203,28 @@ class ReportGenerator {
     return items;
   }
 
-  generateHTML(results, options) {
-    const inline = (options && options.inline) || false;
+  /**
+   * Creates the page describing any error generated while running generateHTML()
+   * @param {!Error} err Exception thrown from generateHTML.
+   * @param {!Object} results Lighthouse results.
+   * @returns {string} HTML of the exception page.
+   */
+  renderException(err, results) {
+    const template = Handlebars.compile(this.getExceptionTemplate());
+    return template({
+      errMessage: err.message,
+      errStack: err.stack,
+      css: this.getReportCSS(),
+      results: JSON.stringify(results, null, 2)
+    });
+  }
 
+  /**
+   * Generates the Lighthouse report HTML.
+   * @param {!Object} results Lighthouse results.
+   * @returns {string} HTML of the report page.
+   */
+  generateHTML(results) {
     // Ensure the formatter for each extendedInfo is registered.
     Object.keys(results.audits).forEach(audit => {
       // Use value rather than key for audit.
@@ -236,14 +254,15 @@ class ReportGenerator {
       });
     });
 
-    const template = Handlebars.compile(this.getReportHTML());
+    const template = Handlebars.compile(this.getReportTemplate());
     return template({
       url: results.url,
       lighthouseVersion: results.lighthouseVersion,
       generatedTime: this._formatTime(results.generatedTime),
-      css: this.getReportCSS(inline),
+      lhresults: JSON.stringify(results, null, 2),
+      css: this.getReportCSS(),
       reportContext: 'extension', // devtools, extension, cli
-      script: this.getReportJS(inline),
+      script: this.getReportJS(),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations)
     });

@@ -28,7 +28,7 @@ script:
   - npm run smoke
   - npm run smokehouse
   - cd lighthouse-extension
-  - gulp build
+  - gulp build -- $__node_harmony
   - cd ..
 after_success:
   - npm run coveralls

@@ -16,18 +16,23 @@ limitations under the License.
 
 -->
 <!doctype html>
+
 <html data-report-context="{{reportContext}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <title>Lighthouse report: {{ url }}</title>
-  <style>
-  {{{ css }}}
-  </style>
+  <style>{{{ css }}}</style>
+  <script>{{{ script }}}</script>
 </head>
 <body>
-<div class="js-report report">
 
+<script>
+  // expose the original results
+  self.lhresults = {{{ lhresults }}};
+</script>
+
+<div class="js-report report">
   <section class="report-body">
     <div class="report-body__header">
       <div class="report-body__metadata">
@@ -163,6 +168,3 @@ limitations under the License.
     </footer>
   </section>
 </div>
-{{{ script }}}
-</body>
-</html>
