@@ -33,7 +33,7 @@ describe('Page does not use mutation events', () => {
 
   it('passes when mutation events are not used', () => {
     const auditResult = NoMutationEventsAudit.audit({
-      PageLevelEventListeners: [],
+      EventListeners: [],
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, true);
@@ -42,20 +42,20 @@ describe('Page does not use mutation events', () => {
 
   it('fails when mutation events are used on the origin', () => {
     const auditResult = NoMutationEventsAudit.audit({
-      PageLevelEventListeners: fixtureData,
+      EventListeners: fixtureData,
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.equal(auditResult.extendedInfo.value.length, 4);
   });
 
   it('fails when listener is missing a url property', () => {
     const auditResult = NoMutationEventsAudit.audit({
-      PageLevelEventListeners: fixtureData,
+      EventListeners: fixtureData,
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
     assert.ok(auditResult.extendedInfo.value[1].url === undefined);
-    assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.equal(auditResult.extendedInfo.value.length, 4);
   });
 });

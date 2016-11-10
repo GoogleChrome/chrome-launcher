@@ -23,7 +23,7 @@
 
 const Gatherer = require('../gatherer');
 
-class PageLevelEventListeners extends Gatherer {
+class EventListeners extends Gatherer {
 
   listenForScriptParsedEvents() {
     return this.driver.sendCommand('Debugger.enable').then(_ => {
@@ -146,4 +146,4 @@ class PageLevelEventListeners extends Gatherer {
   }
 }
 
-module.exports = PageLevelEventListeners;
+module.exports = EventListeners;

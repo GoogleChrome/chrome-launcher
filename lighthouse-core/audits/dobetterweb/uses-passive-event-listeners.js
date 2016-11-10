@@ -43,7 +43,7 @@ class PassiveEventsAudit extends Audit {
       description: 'Site is using passive listeners (at the page level) ' +
                    'to improve scrolling performance',
       helpText: `<a href="https://www.chromestatus.com/features/5745543795965952" target="_blank">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>${this.SCROLL_BLOCKING_EVENTS.toString()}</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>.`,
-      requiredArtifacts: ['URL', 'PageLevelEventListeners']
+      requiredArtifacts: ['URL', 'EventListeners']
     };
   }
 
@@ -52,17 +52,17 @@ class PassiveEventsAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.PageLevelEventListeners === 'undefined' ||
-        artifacts.PageLevelEventListeners === -1) {
+    if (typeof artifacts.EventListeners === 'undefined' ||
+        artifacts.EventListeners === -1) {
       return PassiveEventsAudit.generateAuditResult({
         rawValue: -1,
-        debugString: 'PageLevelEventListeners gatherer did not run'
+        debugString: 'EventListeners gatherer did not run'
       });
-    } else if (artifacts.PageLevelEventListeners.rawValue === -1) {
-      return PassiveEventsAudit.generateAuditResult(artifacts.PageLevelEventListeners);
+    } else if (artifacts.EventListeners.rawValue === -1) {
+      return PassiveEventsAudit.generateAuditResult(artifacts.EventListeners);
     }
 
-    const listeners = artifacts.PageLevelEventListeners;
+    const listeners = artifacts.EventListeners;
     const pageHost = url.parse(artifacts.URL.finalUrl).host;
 
     // Filter out non-passive window/document/document.body listeners that do
