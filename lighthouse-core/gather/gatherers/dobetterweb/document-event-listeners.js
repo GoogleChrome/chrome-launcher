@@ -49,12 +49,12 @@ class PageLevelEventListeners extends Gatherer {
     if (typeof nodeId === 'string') {
       promise = this.driver.sendCommand('Runtime.evaluate', {
         expression: nodeId,
-        objectGroup: 'event-listeners-gatherer' // needed to populate event handler info.
+        objectGroup: 'event-listeners-gatherer' // populates event handler info.
       });
     } else {
       promise = this.driver.sendCommand('DOM.resolveNode', {
         nodeId: nodeId,
-        objectGroup: 'event-listeners-gatherer' // needed to populate event handler info.
+        objectGroup: 'event-listeners-gatherer' // populates event handler info.
       });
     }
 

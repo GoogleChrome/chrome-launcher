@@ -31,7 +31,7 @@ describe('Page uses passive events listeners where applicable', () => {
   });
 
   it('debugString is present if gatherer fails', () => {
-    const debugString = 'Unable to gather passive events listeners usage.';
+    const debugString = 'Unable to gather passive event listeners usage.';
     const auditResult = PassiveEventsAudit.audit({
       PageLevelEventListeners: {
         rawValue: -1,
@@ -43,7 +43,7 @@ describe('Page uses passive events listeners where applicable', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
-  it('fails when page-level scroll blocking listeners should be passive', () => {
+  it('fails when scroll blocking listeners should be passive', () => {
     const auditResult = PassiveEventsAudit.audit({
       PageLevelEventListeners: fixtureData,
       URL: {finalUrl: URL}
@@ -56,12 +56,12 @@ describe('Page uses passive events listeners where applicable', () => {
       assert.notEqual(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.indexOf(val.type), -1,
           'results should not contain other types of events');
     }
-    assert.equal(auditResult.extendedInfo.value.length, 5);
+    assert.equal(auditResult.extendedInfo.value.length, 6);
     assert.equal(auditResult.extendedInfo.value[0].url, fixtureData[0].url);
     assert.ok(auditResult.extendedInfo.value[0].code.match(/addEventListener/));
   });
 
-  it('passes page-level scroll blocking listeners should be passive', () => {
+  it('passes scroll blocking listeners should be passive', () => {
     const auditResult = PassiveEventsAudit.audit({
       PageLevelEventListeners: [],
       URL: {finalUrl: URL}
@@ -77,6 +77,6 @@ describe('Page uses passive events listeners where applicable', () => {
     });
     assert.equal(auditResult.rawValue, false);
     assert.ok(auditResult.extendedInfo.value[1].url === undefined);
-    assert.equal(auditResult.extendedInfo.value.length, 5);
+    assert.equal(auditResult.extendedInfo.value.length, 6);
   });
 });
