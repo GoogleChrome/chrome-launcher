@@ -59,7 +59,7 @@ class PageLevelEventListeners extends Gatherer {
     }
 
     return promise.then(result => {
-      let obj = result.object || result.result;
+      const obj = result.object || result.result;
       return this.driver.sendCommand('DOMDebugger.getEventListeners', {
         objectId: obj.objectId
       }).then(listeners => {
@@ -137,7 +137,7 @@ class PageLevelEventListeners extends Gatherer {
         })
         .then(listeners => {
           this.artifact = listeners;
-        }).catch(e => {
+        }).catch(_ => {
           this.artifact = {
             usage: -1,
             debugString: 'Unable to collect passive events listener usage.'
