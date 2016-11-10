@@ -23,8 +23,6 @@
 
 const Gatherer = require('../gatherer');
 
-const LISTENER_LOCATIONS = ['window', 'document', 'document.body'];
-
 class PageLevelEventListeners extends Gatherer {
 
   listenForScriptParsedEvents() {
@@ -41,17 +39,31 @@ class PageLevelEventListeners extends Gatherer {
   }
 
   /**
-   * @param {string} expression An expression to evaluate in the page.
+   * @param {number|string} node The node id of the element, 'document', or 'window'.
    * @return {!Promise<!Array.<EventListener>>}
    * @private
    */
-  _listEventListeners(expression) {
-    return this.driver.sendCommand('Runtime.evaluate', {
-      expression,
-      objectGroup: 'page-listeners-gatherer' // needed to populate .handler
-    }).then(result => {
+  _listEventListeners(nodeId) {
+    let promise;
+
+    if (typeof nodeId === 'string') {
+      promise = this.driver.sendCommand('Runtime.evaluate', {
+        expression: nodeId,
+        objectGroup: 'event-listeners-gatherer' // needed to populate event handler info.
+      });
+    } else {
+      promise = this.driver.sendCommand('DOM.resolveNode', {
+        nodeId: nodeId,
+        objectGroup: 'event-listeners-gatherer' // needed to populate event handler info.
+      });
+    }
+
+    return promise.then(result => {
+      let obj = result.object || result.result;
       return this.driver.sendCommand('DOMDebugger.getEventListeners', {
-        objectId: result.result.objectId
+        objectId: obj.objectId
+      }).then(listeners => {
+        return {listeners: listeners.listeners, tagName: obj.description};
       });
     });
   }
@@ -60,14 +72,14 @@ class PageLevelEventListeners extends Gatherer {
    * Collects the event listeners attached to an object and formats the results.
    * listenForScriptParsedEvents should be called before this method to ensure
    * the page's parsed scripts are collected at page load.
-   * @param {string} location An object to look for attached event listeners.
+   * @param {string} nodeId The node to look for attached event listeners.
    * @return {!Promise<!Array.<Object>>} List of event listeners attached to
-   *     location.
+   *     the node.
    */
-  getEventListeners(location) {
+  getEventListeners(nodeId) {
     const matchedListeners = [];
 
-    return this._listEventListeners(location).then(results => {
+    return this._listEventListeners(nodeId).then(results => {
       results.listeners.forEach(listener => {
         // Slim down the list of parsed scripts to match the found event
         // listeners that have the same script id.
@@ -77,7 +89,7 @@ class PageLevelEventListeners extends Gatherer {
           // Debugger.scriptParsed event so we get .url and other
           // needed properties.
           const combo = Object.assign(listener, script);
-          combo.objectId = location; // One of LISTENER_LOCATIONS.
+          combo.objectId = results.tagName;
 
           // Note: line/col numbers are zero-index. Add one to each so we have
           // actual file line/col numbers.
@@ -93,17 +105,16 @@ class PageLevelEventListeners extends Gatherer {
   }
 
   /**
-   * Aggregates the event listeners used on each object into a single list.
-   * @param {Array.<string>} locations Objects to look for attached event listeners.
+   * Aggregates the event listeners used on each element into a single list.
+   * @param {Array.<Element>} nodes List of elements to fetch event listeners for.
    * @return {!Promise<!Array.<Object>>} Resolves to a list of all the event
-   *     listeners found on each object.
+   *     listeners found across the elements.
    */
-  collectListeners(locations) {
-    return locations.reduce((chain, location) => {
+  collectListeners(nodes) {
+    return nodes.reduce((chain, node) => {
       return chain.then(prevArr => {
-        return this.getEventListeners(location).then(results => {
-          return prevArr.concat(results);
-        });
+        return this.getEventListeners(node.element ? node.element.nodeId : node)
+            .then(result => prevArr.concat(result));
       });
     }, Promise.resolve([]));
   }
@@ -115,16 +126,23 @@ class PageLevelEventListeners extends Gatherer {
   }
 
   afterPass(options) {
+    const driver = options.driver;
+
     return this.unlistenForScriptParsedEvents(options.driver)
-      .then(_ => this.collectListeners(LISTENER_LOCATIONS))
-      .then(listeners => {
-        this.artifact = listeners;
-      }).catch(_ => {
-        this.artifact = {
-          usage: -1,
-          debugString: 'Unable to gather passive events listeners usage.'
-        };
-      });
+        .then(_ => driver.sendCommand('DOM.enable'))
+        .then(_ => driver.querySelectorAll('body, body *'))
+        .then(nodes => {
+          nodes.push('document', 'window');
+          return this.collectListeners(nodes);
+        })
+        .then(listeners => {
+          this.artifact = listeners;
+        }).catch(e => {
+          this.artifact = {
+            usage: -1,
+            debugString: 'Unable to collect passive events listener usage.'
+          };
+        });
   }
 }
 

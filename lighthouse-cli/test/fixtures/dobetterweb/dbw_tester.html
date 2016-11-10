@@ -69,7 +69,12 @@
 </head>
 <body>
 
-Hi there!
+<div>
+  <h2>Do better web tester page</h2>
+  <span>Hi there!</span>
+</div>
+
+<section id="touchmove-section">touchmove section</section>
 
 <template id="noopener-links-tmpl">
   <!-- FAIL - does not use rel="noopener" to open external link -->
@@ -132,6 +137,12 @@ function mutationEvenTest() {
   });
 
   // FAIL
+  const el = document.querySelector('#touchmove-section');
+  el.addEventListener('DOMNodeInserted', function(e) {
+    console.log('DOMNodeInserted on element');
+  });
+
+  // FAIL
   window.addEventListener('DOMNodeInserted', function(e) {
     console.log('DOMNodeInserted');
   });
@@ -165,6 +176,12 @@ function passiveEventsListenerTest() {
 
   // FAIL
   document.body.addEventListener('touchmove', function(e) {
+    console.log('touchmove');
+  });
+
+  // FAIL
+  const el = document.querySelector('#touchmove-section');
+  el.addEventListener('touchmove', function(e) {
     console.log('touchmove');
   });
 
