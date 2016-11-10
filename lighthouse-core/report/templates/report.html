@@ -16,7 +16,7 @@ limitations under the License.
 
 -->
 <!doctype html>
-<html>
+<html data-report-context="{{reportContext}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
@@ -30,18 +30,10 @@ limitations under the License.
 
   <section class="report-body">
     <div class="report-body__header">
-      <div class="toggle">
-        <h1 class="toggle__title">View:</h1>
-
-        <label class="toggle__label" for="user-feature" aria-label="User feature">
-          <input name="view-toggle" class="js-toggle-view toggle-view" id="user-feature" type="checkbox" value="toggle">
-          <div role="presentation" class="toggle__display" data-on="Technology" data-off="User feature">
-            <div aria-hidden class="toggle__slider"></div>
-          </div>
-          <div role="presentation" class="toggle__focus-ring"></div>
-        </label>
+      <div class="report-body__metadata">
+        <div class="report-body__url">Results for: <a href="{{ url }}" target="_blank">{{ url }}</a></div>
+        <div class="report-body__url">Generated on: {{generatedTime}}</div>
       </div>
-
       <button class="print js-print"></button>
     </div>
     <div class="report-body__content">
@@ -63,73 +55,97 @@ limitations under the License.
         </div>
       </div>
 
-      <div class="report-body__url">Results for <a href="{{ url }}" target="_blank">{{ url }}</a></div>
-
+      <div>
       {{#each aggregations}}
-      <div class="js-breakdown report-body__breakdown">
-        <h1 class="report-section__title" id="{{nameToLink this.name}}">
-          <span class="report-section__title-main">{{ this.name }}</span>
-          {{#if this.scored}}
-          <span class="report-section__title-score">
-            <span class="report-section__title-score-total report-section__title-score-total--{{ getTotalScoreRating this }}">{{ getTotalScore this }}</span>
-            <span class="report-section__title-score-max"> / 100</span>
+      <section class="js-breakdown aggregations">
+        <header class="aggregations__header" id="{{nameToLink this.name}}">
+          <h1>{{ this.name }}</h1>
+        </header>
+        <p class="aggregations__desc">{{ this.description }}</p>
+        {{#if this.scored}}
+        <div class="section-result">
+          <span class="section-result__score --{{ getTotalScoreRating this }}">
+            <span class="section-result__points">{{ getTotalScore this }}</span>
+            <span class="section-result__divider">/</span>
+            <span class="section-result__total">100</span>
           </span>
-          {{/if}}
-        </h1>
-        <p class="report-section__description">{{ this.description }}</p>
+        </div>
+        {{/if}}
 
         <div class="js-report-by-user-feature">
           {{#each this.score as |aggregation|}}
-            <section class="report-body__breakdown-item">
+            <section class="aggregation">
 
             {{#if aggregation.name }}
-            <h1 class="report-section__subtitle">{{ aggregation.name }}</h1>
+            <header class="aggregation__header">
+              <h2>{{ aggregation.name }}</h2>
+            </header>
             {{/if}}
 
             {{#if aggregation.description }}
-            <p class="report-section__aggregation-description">{{{ aggregation.description }}}</p>
+            <p class="aggregation__desc">{{{ aggregation.description }}}</p>
             {{/if}}
 
-            <ul class="report-section__individual-results">
+            <ul class="subitems">
               {{#each aggregation.subItems as |subItem| }}
-                <li class="report-section__item {{#if subItem.comingSoon}}coming-soon{{/if}}">
-                  <div class="report-section__item-details">
-                    <span class="report-section__item-description">
-                      {{#unless ../../scored }}
-                        <span class="report-section__item-category">
-                          {{ subItem.category }}:
-                        </span>
-                      {{/unless}}
+                <li class="subitem {{#if subItem.comingSoon}}--coming-soon{{/if}} {{#if (shouldShowHelpText subItem.score)}}--show-help{{/if}}">
 
-                      {{ subItem.description }}
-                      {{#if subItem.optimalValue }}
-                        <small>
-                          (target: {{ subItem.optimalValue }})
-                        </small>
-                      {{/if}}
-                      {{#if subItem.comingSoon}}
-                      (Coming soon)
-                      {{/if}}
+                  <p class="subitem__desc">
+                    {{#unless ../../scored }}
+                      <strong class="subitem__category">{{ subItem.category }}:</strong>
+                    {{/unless}}
+                    
+                    {{ subItem.description }}
 
-                      {{#if subItem.helpText }}
-                        <span class="report-section__item-help-toggle">?</span>
-                      {{/if}}
-                    </span>
+                    {{~#if (and subItem.displayValue (not (is-bool subItem.displayValue))) ~}}
+                      <strong class="subitem__raw-value">: {{ subItem.displayValue }}</strong>
+                    {{/if}}
 
-                    {{#if subItem.displayValue }}
-                    <span class="report-section__item-raw-value">({{ subItem.displayValue }})&nbsp;</span>
-                    {{/if }}
-                    <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.score }}">{{{ getItemValue subItem.score }}}</span>
-                  </div>
+                    {{#if subItem.optimalValue }}
+                      <small>(target: {{ subItem.optimalValue }})</small>
+                    {{/if}}
+
+                    {{#if subItem.comingSoon}}
+                      <small class="subitem__tease">(Coming soon)</small>
+                    {{/if}}
+
+                    {{#if subItem.helpText }}
+                      <input type="checkbox" class="subitem__help-toggle" title="Toggle help text"  {{#if (shouldShowHelpText subItem.score)}}checked{{/if}}>
+                    {{/if}}
+                  </p>
 
                   {{#if subItem.helpText }}
-                    <div class="report-section__item-helptext" {{showHelpText subItem.score}}>
+                    <div class="subitem__help">
                       {{{ subItem.helpText }}}
                     </div>
                   {{/if}}
 
+                  {{#if subItem.debugString }}
+                    <div class="subitem__debug">
+                      {{{ subItem.debugString }}}
+                    </div>
+                  {{/if}}
+
+                  <div class="subitem-result">
+                    {{#if subItem.comingSoon}}
+                          <span class="subitem-result__unknown">N/A</span>
+                    {{else}}
+                      {{#if (is-bool subItem.score)}}
+                        {{#if subItem.score}}
+                          <span class="subitem-result__good">Pass</span>
+                        {{else}}
+                          <span class="subitem-result__poor">Fail</span>
+                        {{/if}}
+                      {{else}}
+                        <span class="subitem-result__points --{{ getItemRating subItem.score }}">
+                          {{{ getItemValue subItem.score }}}
+                        </span>
+                      {{/if}}
+                    {{/if}}
+                  </div>
+
                   {{#if subItem.extendedInfo.value}}
-                    <div class="report-section__item-extended-info">{{> (lookup . 'name') subItem.extendedInfo.value }}</div>
+                    {{> (lookup . 'name') subItem.extendedInfo.value }}
                   {{/if}}
                 </li>
               {{/each}}
@@ -137,44 +153,9 @@ limitations under the License.
           </section>
           {{/each}}
         </div>
-
-        {{#if this.categorizable}}
-        <div class="js-report-by-technology" hidden="hidden">
-           {{#each ../auditsByCategory }}
-            <section class="report-body__breakdown-item">
-              <h1 class="report-section__subtitle">{{ @key }}</h1>
-
-              <ul class="report-section__individual-results">
-                {{#each this as |subItem| }}
-                  <li class="report-section__item {{#if subItem.comingSoon}}coming-soon{{/if}}">
-                    <div class="report-section__item-details">
-                      <span class="report-section__item-description">
-                        {{ subItem.description }}
-                        {{#if subItem.optimalValue }}
-                          (target: {{ subItem.optimalValue }})
-                        {{/if}}
-                        {{#if subItem.comingSoon}}
-                        (Coming soon)
-                        {{/if}}
-                      </span>
-                      {{#if subItem.rawValue }}
-                      <span class="report-section__item-raw-value">({{ subItem.rawValue }})&nbsp;</span>
-                      {{/if }}
-                      <span class="report-section__item-value report-section__item-value--{{ getItemRating subItem.value }}">{{{ getItemValue subItem.value }}}</span>
-                    </div>
-
-                    {{#if subItem.extendedInfo.value}}
-                      <div class="report-section__item-extended-info">{{> (lookup . 'name') subItem.extendedInfo.value }}</div>
-                    {{/if}}
-                  </li>
-                {{/each}}
-              </ul>
-            </section>
-          {{/each}}
-        </div>
-        {{/if}}
-      </div>
+      </section>
       {{/each}}
+      </div>
     </div>
 
     <footer class="footer">

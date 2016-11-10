@@ -1,23 +1,17 @@
 <style>
-  .ut-measures {
-    font-size: 14px
-  }
-
   .ut-measure_listing-duration {
     font-weight: bold
   }
 </style>
 
-<div>
-  <div class="ut-measures">
-    {{#each this}}
-      <div>
-        {{#if this.isMark}}
-          <span class="ut-measure_listing-duration">Mark: {{ decimal this.startTime }}ms</span> - {{ this.name }}
-        {{else}}
-          <span class="ut-measure_listing-duration">Measure {{ decimal this.duration }}ms</span> - {{ this.name }}
-        {{/if}}
-      </div>
-    {{/each}}
-  </div>
-</div>
+<ul class="subitem__details">
+  {{#each this}}
+    <li class="subitem__detail">
+      {{#if this.isMark}}
+        <strong class="ut-measure_listing-duration">Mark: {{ decimal this.startTime }}ms</strong> - {{ this.name }}
+      {{else}}
+        <strong class="ut-measure_listing-duration">Measure {{ decimal this.duration }}ms</strong> - {{ this.name }}
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>

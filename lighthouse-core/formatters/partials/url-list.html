@@ -1,13 +1,7 @@
 <style>
-  .http-resources {
-    font-size: 14px;
-  }
-  .http-resource__url {
-    margin-right: 8px;
-  }
   .http-resource__protocol,
   .http-resource__code {
-    color: #999;
+    color: var(--secondary-text-color);
   }
   .http-resource__code {
     text-overflow: ellipsis;
@@ -15,19 +9,19 @@
   }
 </style>
 
-<div>
-  <details class="http-resources">
-    <summary>URLs</summary>
-    {{#each this}}
-      <div class="http-resource">
-        <span class="http-resource__url">{{this.url}}</span>
-        {{#if this.label}}
-          <span class="http-resource__protocol">({{this.label}})</span>
-        {{/if}}
-        {{#if this.code}}
-          <pre class="http-resource__code">{{this.code}}</pre>
-        {{/if}}
-      </div>
-    {{/each}}
-  </details>
-</div>
+<details class="subitem__details">
+  <summary class="subitem__detail">URLs</summary>
+  <ul class="subitem__details">
+  {{#each this}}
+    <li class="subitem__detail http-resource">
+      <span class="http-resource__url">{{this.url}}</span>
+      {{#if this.label}}
+        <span class="http-resource__protocol">({{this.label}})</span>
+      {{/if}}
+      {{#if this.code}}
+        <pre class="http-resource__code">{{this.code}}</pre>
+      {{/if}}
+    </li>
+  {{/each}}
+  </ul>
+</details>

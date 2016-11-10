@@ -102,11 +102,11 @@
   {{/each}}
 {{/inline}}
 
-<div class="cnc-tree">
-  <div>Longest request chain (shorter is better): <strong>{{longestChain this}}</strong></div>
-  <div>Longest chain duration (shorter is better): <strong>{{formatTime (longestDuration this)}}ms</strong></div>
-  <div>Longest chain transfer size (smaller is better): <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></div>
-  <div>
+<ul class="subitem__details">
+  <li class="subitem__detail">Longest request chain (shorter is better): <strong>{{longestChain this}}</strong></li>
+  <li class="subitem__detail">Longest chain duration (shorter is better): <strong>{{formatTime (longestDuration this)}}ms</strong></li>
+  <li class="subitem__detail">Longest chain transfer size (smaller is better): <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></li>
+  <li class="subitem__detail">
     <div>Initial navigation</div>
     {{#createTreeRenderContext this}}
       {{#each this.tree }}
@@ -115,5 +115,5 @@
         {{/createContextFor}}
       {{/each}}
     {{/createTreeRenderContext}}
-  </div>
-</div>
+  </li>
+</ul>

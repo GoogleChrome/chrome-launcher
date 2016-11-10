@@ -93,9 +93,8 @@ class ReportGenerator {
     // for color styling.
     Handlebars.registerHelper('getItemRating', getItemRating);
 
-    Handlebars.registerHelper('showHelpText', value => {
-      return getItemRating(value) === RATINGS.GOOD.label ? 'hidden' : '';
-    });
+    Handlebars.registerHelper('shouldShowHelpText',
+      value => (getItemRating(value) !== RATINGS.GOOD.label));
 
     // Convert numbers to fixed point decimals
     Handlebars.registerHelper('decimal', number => {
@@ -103,6 +102,27 @@ class ReportGenerator {
         return number.toFixed(2);
       }
       return number;
+    });
+
+    // value is boolean?
+    Handlebars.registerHelper('is-bool', value => (typeof value === 'boolean'));
+
+    // a > b
+    Handlebars.registerHelper('gt', (a, b) => (a > b));
+
+    // !value
+    Handlebars.registerHelper('not', value => !value);
+
+    // arg1 && arg2 && ... && argn
+    Handlebars.registerHelper('and', () => {
+      let arg = false;
+      for (let i = 0, n = arguments.length - 1; i < n; i++) {
+        arg = arguments[i];
+        if (!arg) {
+          break;
+        }
+      }
+      return arg;
     });
   }
 
@@ -222,6 +242,7 @@ class ReportGenerator {
       lighthouseVersion: results.lighthouseVersion,
       generatedTime: this._formatTime(results.generatedTime),
       css: this.getReportCSS(inline),
+      reportContext: 'extension', // devtools, extension, cli
       script: this.getReportJS(inline),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations)
