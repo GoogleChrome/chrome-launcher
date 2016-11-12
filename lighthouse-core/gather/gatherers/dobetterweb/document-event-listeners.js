@@ -39,21 +39,22 @@ class EventListeners extends Gatherer {
   }
 
   /**
-   * @param {number|string} node The node id of the element, 'document', or 'window'.
+   * @param {number|string} nodeIdOrObject The node id of the element or the
+   *     string of and object ('document', 'window').
    * @return {!Promise<!Array.<EventListener>>}
    * @private
    */
-  _listEventListeners(nodeId) {
+  _listEventListeners(nodeIdOrObject) {
     let promise;
 
-    if (typeof nodeId === 'string') {
+    if (typeof nodeIdOrObject === 'string') {
       promise = this.driver.sendCommand('Runtime.evaluate', {
-        expression: nodeId,
+        expression: nodeIdOrObject,
         objectGroup: 'event-listeners-gatherer' // populates event handler info.
       });
     } else {
       promise = this.driver.sendCommand('DOM.resolveNode', {
-        nodeId: nodeId,
+        nodeId: nodeIdOrObject,
         objectGroup: 'event-listeners-gatherer' // populates event handler info.
       });
     }
