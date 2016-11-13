@@ -30,11 +30,11 @@
     "passName": "dbw",
     "gatherers": [
       "styles",
+      "dobetterweb/all-event-listeners",
       "dobetterweb/anchors-with-no-rel-noopener",
       "dobetterweb/appcache",
       "dobetterweb/console-time-usage",
       "dobetterweb/datenow",
-      "dobetterweb/document-event-listeners",
       "dobetterweb/document-write",
       "dobetterweb/geolocation-on-start",
       "dobetterweb/links-blocking-first-paint",

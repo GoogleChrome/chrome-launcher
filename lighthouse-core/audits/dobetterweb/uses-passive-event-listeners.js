@@ -78,7 +78,7 @@ class PassiveEventsAudit extends Audit {
       const handler = loc.handler ? loc.handler.description : '...';
       return Object.assign({
         label: `line: ${loc.line}, col: ${loc.col}`,
-        code: `${loc.objectId}.addEventListener('${loc.type}', ${handler})`
+        code: `${loc.objectName}.addEventListener('${loc.type}', ${handler})`
       }, loc);
     });
 

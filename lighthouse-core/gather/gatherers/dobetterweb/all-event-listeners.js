@@ -63,8 +63,8 @@ class EventListeners extends Gatherer {
       const obj = result.object || result.result;
       return this.driver.sendCommand('DOMDebugger.getEventListeners', {
         objectId: obj.objectId
-      }).then(listeners => {
-        return {listeners: listeners.listeners, tagName: obj.description};
+      }).then(results => {
+        return {listeners: results.listeners, tagName: obj.description};
       });
     });
   }
@@ -90,7 +90,7 @@ class EventListeners extends Gatherer {
           // Debugger.scriptParsed event so we get .url and other
           // needed properties.
           const combo = Object.assign(listener, script);
-          combo.objectId = results.tagName;
+          combo.objectName = results.tagName;
 
           // Note: line/col numbers are zero-index. Add one to each so we have
           // actual file line/col numbers.
@@ -114,6 +114,7 @@ class EventListeners extends Gatherer {
   collectListeners(nodes) {
     return nodes.reduce((chain, node) => {
       return chain.then(prevArr => {
+        // Call getEventListeners once for each node in the list.
         return this.getEventListeners(node.element ? node.element.nodeId : node)
             .then(result => prevArr.concat(result));
       });
@@ -137,7 +138,9 @@ class EventListeners extends Gatherer {
           return this.collectListeners(nodes);
         })
         .then(listeners => {
-          this.artifact = listeners;
+          return driver.sendCommand('DOM.disable').then(_ => {
+            this.artifact = listeners;
+          });
         }).catch(_ => {
           this.artifact = {
             usage: -1,
