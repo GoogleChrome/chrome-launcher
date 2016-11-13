@@ -23,6 +23,15 @@
 
 const Gatherer = require('../gatherer');
 
+/* global navigator */
+
+/* istanbul ignore next */
+function queryGeolocationPermission() {
+  return navigator.permissions.query({name: 'geolocation'}).then(result => {
+    return result.state;
+  });
+}
+
 class GeolocationOnStart extends Gatherer {
 
   beforePass(options) {
@@ -32,16 +41,27 @@ class GeolocationOnStart extends Gatherer {
         'navigator.geolocation.watchPosition');
   }
 
-  afterPass() {
-    const promises = this.collectCurrentPosUsage().then(results => {
-      return this.collectWatchPosUsage().then(results2 => results.concat(results2));
-    });
+  afterPass(options) {
+    return options.driver.evaluateAsync(`(${queryGeolocationPermission.toString()}())`)
+        .then(state => {
+          if (state === 'granted') {
+            this.artifact = {
+              value: -1,
+              debugString: 'Unable to determine if this permission was requested ' +
+                           'on page load because it had already been granted. ' +
+                           'Try resetting the permission and run Lighthouse again.'
+            };
+            return;
+          }
 
-    return promises.then(results => {
-      this.artifact.usage = results;
-    }, _ => {
-      this.artifact = -1;
-    });
+          return this.collectCurrentPosUsage().then(results => {
+            return this.collectWatchPosUsage().then(results2 => results.concat(results2));
+          }).then(results => {
+            this.artifact.usage = results;
+          }, _ => {
+            this.artifact = -1;
+          });
+        });
   }
 }
 
