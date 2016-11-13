@@ -219,9 +219,10 @@ class ReportGenerator {
   /**
    * Generates the Lighthouse report HTML.
    * @param {!Object} results Lighthouse results.
+   * @param {!string} reportContext Where the report is going
    * @returns {string} HTML of the report page.
    */
-  generateHTML(results) {
+  generateHTML(results, reportContext) {
     // Ensure the formatter for each extendedInfo is registered.
     Object.keys(results.audits).forEach(audit => {
       // Use value rather than key for audit.
@@ -258,7 +259,7 @@ class ReportGenerator {
       generatedTime: this._formatTime(results.generatedTime),
       lhresults: JSON.stringify(results, null, 2),
       css: this.getReportCSS(),
-      reportContext: 'extension', // devtools, extension, cli
+      reportContext: reportContext || 'extension', // devtools, extension, cli
       script: this.getReportJS(),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations)
