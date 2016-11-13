@@ -131,16 +131,13 @@ class EventListeners extends Gatherer {
     const driver = options.driver;
 
     return this.unlistenForScriptParsedEvents(options.driver)
-        .then(_ => driver.sendCommand('DOM.enable'))
         .then(_ => driver.querySelectorAll('body, body /deep/ *')) // drills into shadow trees
         .then(nodes => {
           nodes.push('document', 'window');
           return this.collectListeners(nodes);
         })
         .then(listeners => {
-          return driver.sendCommand('DOM.disable').then(_ => {
-            this.artifact = listeners;
-          });
+          this.artifact = listeners;
         }).catch(_ => {
           this.artifact = {
             usage: -1,
