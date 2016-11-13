@@ -641,5 +641,91 @@
     "objectId":"document.body",
     "line":160,
     "col":56
+  },
+  {
+    "type":"DOMNodeInserted",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"74",
+    "lineNumber":140,
+    "columnNumber":49,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted on element');\n  }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":50}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('DOMNodeInserted on element');\n  }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":51}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":52}"
+    },
+    "url":"http://example.com/dbw_tester.html",
+    "startLine":87,
+    "startColumn":8,
+    "endLine":279,
+    "endColumn":0,
+    "executionContextId":9,
+    "hash":"D30491F357534D373A3E60171730B9C871495595",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"36427.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"section#touchmove-section",
+    "line":141,
+    "col":50
+  },
+  {
+    "type":"touchmove",
+    "useCapture":false,
+    "passive":false,
+    "scriptId":"74",
+    "lineNumber":183,
+    "columnNumber":43,
+    "handler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('touchmove');\n  }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":53}"
+    },
+    "originalHandler":{
+      "type":"function",
+      "className":"Function",
+      "description":"function (e) {\n    console.log('touchmove');\n  }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":54}"
+    },
+    "removeFunction":{
+      "type":"function",
+      "className":"Function",
+      "description":"function remove() { [Command Line API] }",
+      "objectId":"{\"injectedScriptId\":9,\"id\":55}"
+    },
+    "url":"http://example.com/dbw_tester.html",
+    "startLine":87,
+    "startColumn":8,
+    "endLine":279,
+    "endColumn":0,
+    "executionContextId":9,
+    "hash":"D30491F357534D373A3E60171730B9C871495595",
+    "executionContextAuxData":{
+      "isDefault":true,
+      "frameId":"36427.1"
+    },
+    "isLiveEdit":false,
+    "sourceMapURL":"",
+    "hasSourceURL":false,
+    "objectId":"section#touchmove-section",
+    "line":184,
+    "col":44
   }
 ]

@@ -21,22 +21,22 @@
 
 const params = new URLSearchParams(location.search);
 
-if (params.has('dateNow')) {
+if (location.search === '' || params.has('dateNow')) {
   // FAIL - Date.now() usage in another file.
   const d = Date.now();
 }
 
-if (params.has('mutationEvents')) {
+if (location.search === '' || params.has('mutationEvents')) {
   // FAIL - MutationEvent usage in another file.
   document.addEventListener('DOMNodeInserted', function(e) {
     console.log('DOMNodeInserted');
   });
 }
 
-if (params.has('passiveEvents')) {
+if (location.search === '' || params.has('passiveEvents')) {
   // FAIL - non-passive listener usage in another file.
   document.addEventListener('wheel', e => {
-    console.log('whee: arrow function');
+    console.log('wheel: arrow function');
   });
 }
 

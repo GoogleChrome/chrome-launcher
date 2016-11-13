@@ -49,9 +49,9 @@ class NoMutationEventsAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'no-mutation-events',
-      description: 'Site does not use Mutation Events (at the page level) in its own scripts',
+      description: 'Site does not use Mutation Events in its own scripts',
       helpText: 'Using <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Mutation_events" target="_blank">Mutation events</a> degrades application performance. They are deprecated in the DOM events spec, replaced by <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver" target="_blank">MutationObservers</a>.',
-      requiredArtifacts: ['URL', 'PageLevelEventListeners']
+      requiredArtifacts: ['URL', 'EventListeners']
     };
   }
 
@@ -60,17 +60,17 @@ class NoMutationEventsAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.PageLevelEventListeners === 'undefined' ||
-        artifacts.PageLevelEventListeners === -1) {
+    if (typeof artifacts.EventListeners === 'undefined' ||
+        artifacts.EventListeners === -1) {
       return NoMutationEventsAudit.generateAuditResult({
         rawValue: -1,
-        debugString: 'PageLevelEventListeners gatherer did not run'
+        debugString: 'EventListeners gatherer did not run'
       });
-    } else if (artifacts.PageLevelEventListeners.rawValue === -1) {
-      return NoMutationEventsAudit.generateAuditResult(artifacts.PageLevelEventListeners);
+    } else if (artifacts.EventListeners.rawValue === -1) {
+      return NoMutationEventsAudit.generateAuditResult(artifacts.EventListeners);
     }
 
-    const listeners = artifacts.PageLevelEventListeners;
+    const listeners = artifacts.EventListeners;
 
     const pageHost = url.parse(artifacts.URL.finalUrl).host;
 
