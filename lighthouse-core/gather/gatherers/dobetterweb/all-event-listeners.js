@@ -128,10 +128,8 @@ class EventListeners extends Gatherer {
   }
 
   afterPass(options) {
-    const driver = options.driver;
-
-    return this.unlistenForScriptParsedEvents(options.driver)
-        .then(_ => driver.querySelectorAll('body, body /deep/ *')) // drills into shadow trees
+    return this.unlistenForScriptParsedEvents()
+        .then(_ => options.driver.querySelectorAll('body, body /deep/ *')) // drill into shadow trees
         .then(nodes => {
           nodes.push('document', 'window');
           return this.collectListeners(nodes);
