@@ -24,6 +24,8 @@ Requires Node v5+ or Node v4 w/ `--harmony`
 
 ```sh
 npm install -g lighthouse
+# or if you use yarn:
+# yarn global add lighthouse
 ```
 
 ## Run
