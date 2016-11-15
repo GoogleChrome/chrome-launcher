@@ -38,8 +38,8 @@ class ColorContrast extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const rule =
-        artifacts.Accessibility.violations.find(result => result.id === 'color-contrast');
+    const violations = artifacts.Accessibility.violations || [];
+    const rule = violations.find(result => result.id === 'color-contrast');
 
     return ColorContrast.generateAuditResult({
       rawValue: typeof rule === 'undefined',

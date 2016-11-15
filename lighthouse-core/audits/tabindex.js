@@ -38,8 +38,8 @@ class TabIndex extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const rule =
-        artifacts.Accessibility.violations.find(result => result.id === 'tabindex');
+    const violations = artifacts.Accessibility.violations || [];
+    const rule = violations.find(result => result.id === 'tabindex');
 
     return TabIndex.generateAuditResult({
       rawValue: typeof rule === 'undefined',
