@@ -38,7 +38,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":112,
     "col":54
   },
@@ -81,7 +81,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":117,
     "col":55
   },
@@ -124,7 +124,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":127,
     "col":44
   },
@@ -166,7 +166,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":132,
     "col":49
   },
@@ -209,7 +209,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":165,
     "col":49
   },
@@ -252,7 +252,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":137,
     "col":49
   },
@@ -295,7 +295,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"window",
+    "objectName":"Window",
     "line":170,
     "col":45
   },
@@ -338,7 +338,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document",
+    "objectName":"#document",
     "line":11,
     "col":36
   },
@@ -380,7 +380,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document",
+    "objectName":"#document",
     "line":97,
     "col":56
   },
@@ -423,7 +423,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document",
+    "objectName":"#document",
     "line":102,
     "col":55
   },
@@ -466,7 +466,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document",
+    "objectName":"#document",
     "line":142,
     "col":51
   },
@@ -509,7 +509,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document",
+    "objectName":"#document",
     "line":152,
     "col":51
   },
@@ -552,7 +552,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document.body",
+    "objectName":"document.body",
     "line":107,
     "col":61
   },
@@ -595,7 +595,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document.body",
+    "objectName":"body",
     "line":147,
     "col":55
   },
@@ -638,7 +638,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"document.body",
+    "objectName":"body",
     "line":160,
     "col":56
   },
@@ -681,7 +681,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"section#touchmove-section",
+    "objectName":"section#touchmove-section",
     "line":141,
     "col":50
   },
@@ -724,7 +724,7 @@
     "isLiveEdit":false,
     "sourceMapURL":"",
     "hasSourceURL":false,
-    "objectId":"section#touchmove-section",
+    "objectName":"section#touchmove-section",
     "line":184,
     "col":44
   }
