@@ -24,6 +24,7 @@
 
 const url = require('url');
 const Audit = require('../audit');
+const EventHelpers = require('../../lib/event-helpers');
 const Formatter = require('../../formatters/formatter');
 
 class PassiveEventsAudit extends Audit {
@@ -74,13 +75,7 @@ class PassiveEventsAudit extends Audit {
       const sameHost = loc.url ? url.parse(loc.url).host === pageHost : true;
       return sameHost && isScrollBlocking && !loc.passive &&
              !mentionsPreventDefault;
-    }).map(loc => {
-      const handler = loc.handler ? loc.handler.description : '...';
-      return Object.assign({
-        label: `line: ${loc.line}, col: ${loc.col}`,
-        code: `${loc.objectName}.addEventListener('${loc.type}', ${handler})`
-      }, loc);
-    });
+    }).map(loc => EventHelpers.addFormattedCodeSnippet(loc));
 
     return PassiveEventsAudit.generateAuditResult({
       rawValue: results.length === 0,

@@ -24,6 +24,7 @@
 
 const url = require('url');
 const Audit = require('../audit');
+const EventHelpers = require('../../lib/event-helpers');
 const Formatter = require('../../formatters/formatter');
 
 class NoMutationEventsAudit extends Audit {
@@ -78,13 +79,7 @@ class NoMutationEventsAudit extends Audit {
       const isMutationEvent = this.MUTATION_EVENTS.indexOf(loc.type) !== -1;
       const sameHost = loc.url ? url.parse(loc.url).host === pageHost : true;
       return sameHost && isMutationEvent;
-    }).map(loc => {
-      const handler = loc.handler ? loc.handler.description : '...';
-      return Object.assign({
-        label: `line: ${loc.line}, col: ${loc.col}`,
-        code: `${loc.objectId}.addEventListener('${loc.type}', ${handler})`
-      }, loc);
-    });
+    }).map(loc => EventHelpers.addFormattedCodeSnippet(loc));
 
     return NoMutationEventsAudit.generateAuditResult({
       rawValue: results.length === 0,
