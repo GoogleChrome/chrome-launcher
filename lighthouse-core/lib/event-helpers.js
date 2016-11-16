@@ -20,8 +20,8 @@
  * Adds line/col information to an event listener object along with a formatted
  * code snippet of violation.
  *
- * @param {!EventListener} listener A modified EventListener object as returned
- *     by the events gatherer.
+ * @param {!Object} listener A modified EventListener object as returned
+ *     by the driver in the all events gatherer.
  * @return {!Object} A copy of the original listener object with the added
  *     properties.
  */

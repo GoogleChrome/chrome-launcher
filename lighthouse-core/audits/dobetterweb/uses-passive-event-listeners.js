@@ -75,7 +75,7 @@ class PassiveEventsAudit extends Audit {
       const sameHost = loc.url ? url.parse(loc.url).host === pageHost : true;
       return sameHost && isScrollBlocking && !loc.passive &&
              !mentionsPreventDefault;
-    }).map(loc => EventHelpers.addFormattedCodeSnippet(loc));
+    }).map(EventHelpers.addFormattedCodeSnippet);
 
     return PassiveEventsAudit.generateAuditResult({
       rawValue: results.length === 0,
