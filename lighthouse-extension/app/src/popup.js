@@ -37,6 +37,33 @@ document.addEventListener('DOMContentLoaded', _ => {
   const optionsList = document.body.querySelector('.options__list');
   const okButton = document.getElementById('ok');
 
+  function getLighthouseVersion() {
+    return chrome.runtime.getManifest().version;
+  }
+
+  function getChromeVersion() {
+    return /Chrome\/([0-9.]+)/.exec(navigator.userAgent)[1];
+  }
+
+  function buildReportErrorLink(err) {
+    const reportErrorEl = document.createElement('a');
+    reportErrorEl.className = 'button button--report-error';
+
+    let qsBody = '**Lighthouse Version**: ' + getLighthouseVersion() + '\n';
+    qsBody += '**Chrome Version**: ' + getChromeVersion() + '\n';
+    qsBody += '**Error Message**: ' + err.message + '\n';
+    qsBody += '**Stack Trace**:\n ```' + err.stack + '```';
+
+    const base = 'https://github.com/googlechrome/lighthouse/issues/new?';
+    const title = encodeURI('title=Lighthouse Extension Error');
+    const body = '&body=' + encodeURI(qsBody);
+
+    reportErrorEl.href = base + title + body;
+    reportErrorEl.textContent = 'Report Error';
+    reportErrorEl.target = '_blank';
+    return reportErrorEl;
+  }
+
   let spinnerAnimation;
 
   function startSpinner() {
@@ -132,16 +159,26 @@ document.addEventListener('DOMContentLoaded', _ => {
     })
     .catch(err => {
       let message = err.message;
-      if (message.toLowerCase().startsWith('another debugger')) {
+
+      const debuggerExists = message.toLowerCase().startsWith('another debugger');
+      const multipleTabs = message.toLowerCase().includes('multiple tabs');
+
+      if (debuggerExists) {
         message = 'You probably have DevTools open.' +
           ' Close DevTools to use lighthouse';
       }
-      if (message.toLowerCase().includes('multiple tabs')) {
+      if (multipleTabs) {
         message = 'You probably have multiple tabs open to the same origin.' +
           ' Close the other tabs to use lighthouse.';
       }
 
       feedbackEl.textContent = message;
+
+      if (!multipleTabs && !debuggerExists) {
+        feedbackEl.className = 'feedback-error';
+        feedbackEl.appendChild(buildReportErrorLink(err));
+      }
+
       stopSpinner();
       background.console.error(err);
     });

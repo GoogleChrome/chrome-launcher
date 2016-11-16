@@ -143,6 +143,16 @@ body {
   margin: 0 auto;
 }
 
+.button--report-error {
+  background: rgba(239, 83, 80, 0.81);
+  text-decoration: none;
+  padding: 3px 5px;
+  font-size: .8em;
+  text-align: center;
+  display: inline;
+  margin-left: 5px;
+}
+
 .subpage {
   position: fixed;
   top: 0;
@@ -190,6 +200,16 @@ body {
   left: 16px;
   width: 180px;
   line-height: 1.45;
+}
+
+.feedback-error {
+  background: #49525F;
+  position: absolute;
+  bottom: 10px;
+  left: 16px;
+  width: 180px;
+  line-height: 1.45;
+  font-size: .9em;
 }
 
 /* 1. scrollbar when extension is too small */
