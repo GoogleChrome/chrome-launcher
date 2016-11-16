@@ -17,6 +17,8 @@ const Formatter = require('../formatters/formatter');
 //   https://www.desmos.com/calculator/jlrx14q4w8
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 1700;
 const SCORING_MEDIAN = 5000;
+// This aligns with the external TTI targets in https://goo.gl/yXqxpL
+const SCORING_TARGET = 5000;
 
 class TTIMetric extends Audit {
   /**
@@ -27,7 +29,7 @@ class TTIMetric extends Audit {
       category: 'Performance',
       name: 'time-to-interactive',
       description: 'Time To Interactive (alpha)',
-      optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
+      optimalValue: SCORING_TARGET.toLocaleString() + 'ms',
       requiredArtifacts: ['traceContents']
     };
   }
