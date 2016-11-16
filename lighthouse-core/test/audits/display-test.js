@@ -35,9 +35,9 @@ describe('Mobile-friendly: display audit', () => {
   });
 
   it('fails when no manifest artifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+    const output = Audit.audit({Manifest: {value: undefined}});
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString && output.debugString.length > 0, true);
   });
 
   it('falls back to the successful default when there is no manifest display property', () => {
@@ -49,6 +49,7 @@ describe('Mobile-friendly: display audit', () => {
     assert.equal(output.score, true);
     assert.equal(output.displayValue, 'browser');
     assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
   it('succeeds when a manifest has a display property', () => {
@@ -61,6 +62,7 @@ describe('Mobile-friendly: display audit', () => {
     assert.equal(output.score, true);
     assert.equal(output.displayValue, 'standalone');
     assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
   it('succeeds when a complete manifest contains a display property', () => {
