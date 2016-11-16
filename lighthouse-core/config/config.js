@@ -24,6 +24,7 @@ const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
 const path = require('path');
 const Audit = require('../audits/audit');
+const Runner = require('../runner');
 
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
@@ -155,37 +156,9 @@ function getGatherersNeededByAudits(audits) {
   }, new Set());
 }
 
-function requireAudits(audits, configPath) {
-  if (!audits) {
-    return null;
-  }
-  const Runner = require('../runner');
-  const coreList = Runner.getAuditList();
+function assertValidAudit(auditDefinition, auditPath) {
+  const auditName = auditPath || auditDefinition.meta.name;
 
-  return audits.map(nameOrAuditClass => {
-    let AuditClass;
-    if (typeof nameOrAuditClass === 'string') {
-      const name = nameOrAuditClass;
-      // See if the audit is a Lighthouse core audit.
-      const coreAudit = coreList.find(a => a === `${name}.js`);
-      let requirePath = `../audits/${name}`;
-      if (!coreAudit) {
-        // Otherwise, attempt to find it elsewhere. This throws if not found.
-        requirePath = Runner.resolvePlugin(name, configPath, 'audit');
-      }
-      AuditClass = require(requirePath);
-      assertValidAudit(AuditClass, name);
-    } else {
-      AuditClass = nameOrAuditClass;
-      assertValidAudit(AuditClass);
-    }
-
-    return AuditClass;
-  });
-}
-
-function assertValidAudit(auditDefinition, auditName) {
-  auditName = auditName || (auditDefinition.meta && auditDefinition.meta.name) || 'audit';
   if (typeof auditDefinition.audit !== 'function') {
     throw new Error(`${auditName} has no audit() method.`);
   }
@@ -300,11 +273,47 @@ class Config {
 
     this._aggregations = configJSON.aggregations || null;
 
-    this._audits = requireAudits(configJSON.audits, this._configDir);
+    this._audits = Config.requireAudits(configJSON.audits, this._configDir);
     this._artifacts = expandArtifacts(configJSON.artifacts);
 
     // validatePasses must follow after audits are required
     validatePasses(configJSON.passes, this._audits, this._configDir);
+  }
+
+  /**
+   * Take an array of audits and audit paths and require any paths (possibly
+   * relative to the optional `configPath`) using `Runner.resolvePlugin`,
+   * leaving only an array of Audits.
+   * @param {?Array<(string|!Audit)>} audits
+   * @param {string=} configPath
+   * @return {?Array<!Audit>}
+   */
+  static requireAudits(audits, configPath) {
+    if (!audits) {
+      return null;
+    }
+
+    const coreList = Runner.getAuditList();
+    return audits.map(pathOrAuditClass => {
+      let AuditClass;
+      if (typeof pathOrAuditClass === 'string') {
+        const path = pathOrAuditClass;
+        // See if the audit is a Lighthouse core audit.
+        const coreAudit = coreList.find(a => a === `${path}.js`);
+        let requirePath = `../audits/${path}`;
+        if (!coreAudit) {
+          // Otherwise, attempt to find it elsewhere. This throws if not found.
+          requirePath = Runner.resolvePlugin(path, configPath, 'audit');
+        }
+        AuditClass = require(requirePath);
+        assertValidAudit(AuditClass, path);
+      } else {
+        AuditClass = pathOrAuditClass;
+        assertValidAudit(AuditClass);
+      }
+
+      return AuditClass;
+    });
   }
 
   /** @type {string} */

@@ -32,16 +32,27 @@ const _flatten = arr => [].concat.apply([], arr);
  * @param {!Connection} connection
  * @param {string} url
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAudits Names of audits to run.
+ * @param {!Array<string>} requestedAuditNames Names of audits to run.
  * @return {!Promise}
  */
-window.runLighthouseForConnection = function(connection, url, options, requestedAudits) {
+window.runLighthouseForConnection = function(connection, url, options, requestedAuditNames) {
   // Always start with a freshly parsed default config.
   const runConfig = JSON.parse(JSON.stringify(defaultConfig));
 
-  // Filter out audits not requested.
-  requestedAudits = new Set(requestedAudits);
-  runConfig.audits = runConfig.audits.filter(audit => requestedAudits.has(audit));
+  // The config file has a list of paths of audits to run. `requestedAuditNames`
+  // is a list of audit names to run. Map audit paths to audit names, then
+  // filter out any paths of audits with names that weren't requested.
+  requestedAuditNames = new Set(requestedAuditNames);
+  const auditPathToName = new Map(Config.requireAudits(runConfig.audits)
+    .map((AuditClass, index) => {
+      const auditPath = runConfig.audits[index];
+      const auditName = AuditClass.meta.name;
+      return [auditPath, auditName];
+    }));
+  runConfig.audits = runConfig.audits.filter(auditPath => {
+    const auditName = auditPathToName.get(auditPath);
+    return requestedAuditNames.has(auditName);
+  });
   const config = new Config(runConfig);
 
   // Add url and config to fresh options object.
@@ -53,15 +64,15 @@ window.runLighthouseForConnection = function(connection, url, options, requested
 
 /**
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAudits Names of audits to run.
+ * @param {!Array<string>} requestedAuditNames Names of audits to run.
  * @return {!Promise}
  */
-window.runLighthouseInExtension = function(options, requestedAudits) {
+window.runLighthouseInExtension = function(options, requestedAuditNames) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new ExtensionProtocol();
   return connection.getCurrentTabURL()
-    .then(url => window.runLighthouseForConnection(connection, url, options, requestedAudits))
+    .then(url => window.runLighthouseForConnection(connection, url, options, requestedAuditNames))
     .then(results => {
       const blobURL = window.createReportPageAsBlob(results, 'extension');
       chrome.tabs.create({url: blobURL});
@@ -72,14 +83,14 @@ window.runLighthouseInExtension = function(options, requestedAudits) {
  * @param {!RawProtocol.Port} port
  * @param {string} url
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAudits Names of audits to run.
+ * @param {!Array<string>} requestedAuditNames Names of audits to run.
  * @return {!Promise}
  */
-window.runLighthouseInWorker = function(port, url, options, requestedAudits) {
+window.runLighthouseInWorker = function(port, url, options, requestedAuditNames) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new RawProtocol(port);
-  return window.runLighthouseForConnection(connection, url, options, requestedAudits);
+  return window.runLighthouseForConnection(connection, url, options, requestedAuditNames);
 };
 
 /**
