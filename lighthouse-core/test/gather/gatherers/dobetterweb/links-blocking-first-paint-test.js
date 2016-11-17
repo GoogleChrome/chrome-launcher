@@ -57,7 +57,7 @@ describe('First paint blocking links', () => {
     return assert.equal(linksBlockingFirstPaint._formatMS({
       startTime: 0.888,
       endTime: 0.999
-    }), 0.11);
+    }), 111);
   });
 
   it('return filtered link', () => {

@@ -31,7 +31,7 @@ function collectLinksThatBlockFirstPaint() {
           // https://www.w3.org/TR/html-imports/#dfn-import-async-attribute
           const blockingStylesheet = (link.rel === 'stylesheet' &&
               window.matchMedia(link.media).matches && !link.disabled);
-          const blockingImport = link.rel === 'import' && link.hasAttribute('async');
+          const blockingImport = link.rel === 'import' && !link.hasAttribute('async');
           return blockingStylesheet || blockingImport;
         })
         .map(link => {
@@ -66,7 +66,7 @@ class LinksBlockingFirstPaint extends Gatherer {
   }
 
   _formatMS(info) {
-    return Math.round((info.endTime - info.startTime) * 100) / 100;
+    return Math.round((info.endTime - info.startTime) * 1000);
   }
 
   afterPass(options, tracingData) {
