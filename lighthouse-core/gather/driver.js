@@ -694,9 +694,10 @@ function captureJSCallUsage(funcRef, set) {
       const file = callFrame.getFileName();
       const line = callFrame.getLineNumber();
       const col = callFrame.getColumnNumber();
-      const stackTrace = structStackTrace.slice(1).map(
-          callsite => callsite.toString());
-      return {url: file, args, line, col, stackTrace}; // return value is e.stack
+      // TODO: add back when we want stack traces. See https://github.com/GoogleChrome/lighthouse/issues/957
+      // const stackTrace = structStackTrace.slice(1).map(
+      //    callsite => callsite.toString());
+      return {url: file, args, line, col}; // return value is e.stack
     };
     const e = new Error(`__called ${funcRef.name}__`);
     set.add(JSON.stringify(e.stack));
