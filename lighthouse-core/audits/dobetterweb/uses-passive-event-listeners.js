@@ -76,11 +76,13 @@ class PassiveEventsAudit extends Audit {
              !mentionsPreventDefault;
     }).map(EventHelpers.addFormattedCodeSnippet);
 
+    const groupedResults = EventHelpers.groupCodeSnippetsByLocation(results);
+
     return PassiveEventsAudit.generateAuditResult({
-      rawValue: results.length === 0,
+      rawValue: groupedResults.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: results
+        value: groupedResults
       }
     });
   }

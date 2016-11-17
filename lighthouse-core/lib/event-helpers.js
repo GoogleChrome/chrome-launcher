@@ -34,6 +34,51 @@ function addFormattedCodeSnippet(listener) {
   }, listener);
 }
 
+/**
+ * Groups event listeners under url/line/col "violation buckets".
+ *
+ * The listener gatherer returns a list of (url/line/col) src locations where
+ * event handlers were attached to DOM nodes. This location is where
+ * addEventListener was invoked, but it's not guaranteed to be where
+ * the user's event handler was defined. An example is libraries, where the
+ * user provides a callback and the library calls addEventListener (another
+ * part of the codebase). Instead we map url/line/col/type to array of event
+ * handlers so the user doesn't see a redundant list of url/line/col from the
+ * same location.
+ *
+ * @param {!Array<!Object>} listeners Results from the event listener gatherer.
+ * @return {!Array<{line: number, col: number, url: string, type: string, code: string, label: string}>}
+ *     A list of slimmed down listener objects.
+ */
+function groupCodeSnippetsByLocation(listeners) {
+  const locToListenersMap = new Map();
+  listeners.forEach(loc => {
+    const key = JSON.stringify({line: loc.line, col: loc.col, url: loc.url, type: loc.type});
+    if (locToListenersMap.has(key)) {
+      locToListenersMap.get(key).push(loc);
+    } else {
+      locToListenersMap.set(key, [loc]);
+    }
+  });
+
+  const results = [];
+  locToListenersMap.forEach((listenersForLocation, key) => {
+    const lineColUrlObj = JSON.parse(key);
+    // Aggregate the code snippets.
+    const codeSnippets = listenersForLocation.reduce((prev, loc) => {
+      return prev + loc.code.trim() + '\n\n';
+    }, '');
+    lineColUrlObj.code = codeSnippets;
+    // All listeners under this bucket have the same line/col. We use the first's
+    // label as the label for all of them.
+    lineColUrlObj.label = listenersForLocation[0].label;
+    results.push(lineColUrlObj);
+  });
+
+  return results;
+}
+
 module.exports = {
-  addFormattedCodeSnippet
+  addFormattedCodeSnippet,
+  groupCodeSnippetsByLocation
 };

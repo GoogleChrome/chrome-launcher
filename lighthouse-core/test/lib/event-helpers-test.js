@@ -47,4 +47,20 @@ describe('event helpers', () => {
       });
     });
   });
+
+  describe('groupCodeSnippetsByLocation()', function() {
+    it('has no duplicate line/col violations', () => {
+      const formattedListeners = eventListeners.map(EventHelpers.addFormattedCodeSnippet);
+      // Create a duplicate entry from the first item.
+      const firstEntry = formattedListeners[0];
+      formattedListeners.push(Object.assign({}, firstEntry));
+      const groupedListeners = EventHelpers.groupCodeSnippetsByLocation(formattedListeners);
+
+      const set = new Set();
+      groupedListeners.forEach(l => {
+        assert.ok(!set.has(l.label), 'all line/col are unique');
+        set.add(l.label);
+      });
+    });
+  });
 });
