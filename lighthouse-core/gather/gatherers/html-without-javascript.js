@@ -43,6 +43,10 @@ class HTMLWithoutJavaScript extends Gatherer {
 
     return options.driver.evaluateAsync(`(${getBodyText.toString()}())`)
       .then(result => {
+        if (typeof result !== 'string') {
+          throw new Error('result was not a string');
+        }
+
         this.artifact = {
           value: result
         };

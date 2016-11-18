@@ -38,10 +38,11 @@ class WithoutJavaScript extends Audit {
    */
   static audit(artifacts) {
     const artifact = artifacts.HTMLWithoutJavaScript;
-    if (artifact.value === -1) {
+    if (!artifact || typeof artifact.value !== 'string') {
       return WithoutJavaScript.generateAuditResult({
         rawValue: -1,
-        debugString: artifact.debugString
+        debugString: (artifact && artifact.debugString) ||
+          'HTMLWithoutJavaScript gatherer did not complete successfully'
       });
     }
 

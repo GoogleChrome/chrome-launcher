@@ -63,6 +63,19 @@ describe('HTML without JavaScript gatherer', () => {
     });
   });
 
+  it('handles driver returning non-string', () => {
+    return htmlWithoutJavaScriptGather.afterPass({
+      driver: {
+        evaluateAsync() {
+          return Promise.resolve(null);
+        }
+      }
+    }).then(_ => {
+      assert.equal(htmlWithoutJavaScriptGather.artifact.value, -1);
+      assert.ok(htmlWithoutJavaScriptGather.artifact.debugString);
+    });
+  });
+
   it('handles driver failure', () => {
     return htmlWithoutJavaScriptGather.afterPass({
       driver: {

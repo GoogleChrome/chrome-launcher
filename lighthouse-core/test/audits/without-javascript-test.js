@@ -35,6 +35,18 @@ describe('Progressive Enhancement: without javascript audit', () => {
     assert.equal(result.debugString, debugString);
   });
 
+  it('does not error on non-string input', () => {
+    const artifacts = {
+      HTMLWithoutJavaScript: {
+        value: {}
+      }
+    };
+
+    const result = withoutJsAudit.audit(artifacts);
+    assert.equal(result.score, -1);
+    assert.ok(result.debugString);
+  });
+
   it('fails when the js-less body is empty', () => {
     const artifacts = {
       HTMLWithoutJavaScript: {
