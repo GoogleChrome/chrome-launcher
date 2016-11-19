@@ -29,30 +29,59 @@ const STORAGE_KEY = 'lighthouse_audits';
 const _flatten = arr => [].concat.apply([], arr);
 
 /**
- * @param {!Connection} connection
- * @param {string} url
- * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAuditNames Names of audits to run.
- * @return {!Promise}
+ * Filter out any unrequested aggregations from the config. If any audits are
+ * no longer needed by any remaining aggregations, filter out those as well.
+ * @param {!Object} config Lighthouse config object.
+ * @param {!Object<boolean>} requestedAggregations
  */
-window.runLighthouseForConnection = function(connection, url, options, requestedAuditNames) {
-  // Always start with a freshly parsed default config.
-  const runConfig = JSON.parse(JSON.stringify(defaultConfig));
+function filterConfig(config, requestedAggregations) {
+  config.aggregations = config.aggregations.filter(aggregation => {
+    // First filter out single `item` aggregations, which use top level name.
+    if (aggregation.items.length === 1) {
+      return requestedAggregations[aggregation.name];
+    }
 
-  // The config file has a list of paths of audits to run. `requestedAuditNames`
-  // is a list of audit names to run. Map audit paths to audit names, then
+    // Next, filter the `items` array of aggregations with multiple sub-aggregations.
+    aggregation.items = aggregation.items.filter(item => {
+      return requestedAggregations[item.name];
+    });
+
+    // Finally, filter out any aggregations with no sub-aggregations remaining.
+    return aggregation.items.length > 0;
+  });
+
+  // Find audits required for remaining aggregations.
+  const requestedItems = _flatten(config.aggregations.map(aggregation => aggregation.items));
+  const auditsArray = _flatten(requestedItems.map(item => Object.keys(item.audits)));
+  const requestedAuditNames = new Set(auditsArray);
+
+  // The `audits` property in the config is a list of paths of audits to run.
+  // `requestedAuditNames` is a list of audit *names*. Map paths to names, then
   // filter out any paths of audits with names that weren't requested.
-  requestedAuditNames = new Set(requestedAuditNames);
-  const auditPathToName = new Map(Config.requireAudits(runConfig.audits)
+  const auditPathToName = new Map(Config.requireAudits(config.audits)
     .map((AuditClass, index) => {
-      const auditPath = runConfig.audits[index];
+      const auditPath = config.audits[index];
       const auditName = AuditClass.meta.name;
       return [auditPath, auditName];
     }));
-  runConfig.audits = runConfig.audits.filter(auditPath => {
+  config.audits = config.audits.filter(auditPath => {
     const auditName = auditPathToName.get(auditPath);
     return requestedAuditNames.has(auditName);
   });
+}
+
+/**
+ * @param {!Connection} connection
+ * @param {string} url
+ * @param {!Object} options Lighthouse options.
+ * @param {!Object<boolean>} requestedAggregations Names of aggregations to include.
+ * @return {!Promise}
+ */
+window.runLighthouseForConnection = function(connection, url, options, requestedAggregations) {
+  // Always start with a freshly parsed default config.
+  const runConfig = JSON.parse(JSON.stringify(defaultConfig));
+
+  filterConfig(runConfig, requestedAggregations);
   const config = new Config(runConfig);
 
   // Add url and config to fresh options object.
@@ -64,15 +93,15 @@ window.runLighthouseForConnection = function(connection, url, options, requested
 
 /**
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAuditNames Names of audits to run.
+ * @param {!Object<boolean>} requestedAggregations Names of aggregations to include.
  * @return {!Promise}
  */
-window.runLighthouseInExtension = function(options, requestedAuditNames) {
+window.runLighthouseInExtension = function(options, requestedAggregations) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new ExtensionProtocol();
   return connection.getCurrentTabURL()
-    .then(url => window.runLighthouseForConnection(connection, url, options, requestedAuditNames))
+    .then(url => window.runLighthouseForConnection(connection, url, options, requestedAggregations))
     .then(results => {
       const blobURL = window.createReportPageAsBlob(results, 'extension');
       chrome.tabs.create({url: blobURL});
@@ -83,14 +112,14 @@ window.runLighthouseInExtension = function(options, requestedAuditNames) {
  * @param {!RawProtocol.Port} port
  * @param {string} url
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} requestedAuditNames Names of audits to run.
+ * @param {!Object<boolean>} requestedAggregations Names of aggregations to include.
  * @return {!Promise}
  */
-window.runLighthouseInWorker = function(port, url, options, requestedAuditNames) {
+window.runLighthouseInWorker = function(port, url, options, requestedAggregations) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new RawProtocol(port);
-  return window.runLighthouseForConnection(connection, url, options, requestedAuditNames);
+  return window.runLighthouseForConnection(connection, url, options, requestedAggregations);
 };
 
 /**

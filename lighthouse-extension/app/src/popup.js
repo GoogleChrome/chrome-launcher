@@ -16,8 +16,6 @@
  */
 'use strict';
 
-const _flatten = arr => [].concat.apply([], arr);
-
 document.addEventListener('DOMContentLoaded', _ => {
   const background = chrome.extension.getBackgroundPage();
   const defaultAggregations = background.getDefaultAggregations();
@@ -121,22 +119,6 @@ document.addEventListener('DOMContentLoaded', _ => {
     return frag;
   }
 
-  /**
-   * Returns an array of names of audits from the selected aggregation
-   * categories.
-   * @param {!Object<boolean>} selectedAggregations
-   * @return {!Array<string>}
-   */
-  function getAuditsFromSelected(selectedAggregations) {
-    const auditLists = defaultAggregations.filter(aggregation => {
-      return selectedAggregations[aggregation.name];
-    }).map(selectedAggregation => {
-      return selectedAggregation.audits;
-    });
-
-    return _flatten(auditLists);
-  }
-
   background.listenForStatus(logstatus);
   background.loadSelectedAggregations().then(aggregations => {
     const frag = generateOptionsList(optionsList, aggregations);
@@ -148,14 +130,13 @@ document.addEventListener('DOMContentLoaded', _ => {
     feedbackEl.textContent = '';
 
     background.loadSelectedAggregations()
-    .then(getAuditsFromSelected)
-    .then(selectedAudits => {
+    .then(selectedAggregations => {
       return background.runLighthouseInExtension({
         flags: {
           disableCpuThrottling: true
         },
         restoreCleanState: true
-      }, selectedAudits);
+      }, selectedAggregations);
     })
     .catch(err => {
       let message = err.message;
