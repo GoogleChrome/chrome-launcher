@@ -164,7 +164,7 @@ class ChromeLauncher {
         this.cleanup(client);
         reject(err);
       });
-      client.once('connect', _ => {
+      client.once('connect', () => {
         this.cleanup(client);
         resolve();
       });
