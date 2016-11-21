@@ -58,9 +58,9 @@ class GeolocationOnStart extends Gatherer {
             return this.collectWatchPosUsage().then(results2 => results.concat(results2));
           }).then(results => {
             this.artifact.usage = results;
-          }, _ => {
-            this.artifact = -1;
           });
+        }).catch(_ => {
+          this.artifact = -1;
         });
   }
 }
