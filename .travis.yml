@@ -12,6 +12,8 @@ cache:
      - node_modules
      - chrome-linux
      - lighthouse-extension/node_modules
+install:
+  - npm install
 before_script:
   - npm i -g typescript@2.0
   - npm --prefix ./lighthouse-extension install ./lighthouse-extension
