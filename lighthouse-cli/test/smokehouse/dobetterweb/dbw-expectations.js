@@ -36,6 +36,7 @@ module.exports = [
       'no-mutation-events': false,
       'no-old-flexbox': false,
       'no-websql': false,
+      'script-blocking-first-paint': false,
       'uses-passive-event-listeners': false
     }
   }, {
@@ -54,8 +55,8 @@ module.exports = [
       'no-mutation-events': true,
       'no-old-flexbox': true,
       'no-websql': true,
+      'script-blocking-first-paint': true,
       'uses-passive-event-listeners': true
     }
   }
 ];
-

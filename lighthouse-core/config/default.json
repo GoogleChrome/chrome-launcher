@@ -37,7 +37,7 @@
       "dobetterweb/datenow",
       "dobetterweb/document-write",
       "dobetterweb/geolocation-on-start",
-      "dobetterweb/links-blocking-first-paint",
+      "dobetterweb/tags-blocking-first-paint",
       "dobetterweb/websql"
     ]
   }],
@@ -84,6 +84,7 @@
     "dobetterweb/no-mutation-events",
     "dobetterweb/no-old-flexbox",
     "dobetterweb/no-websql",
+    "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
     "dobetterweb/uses-passive-event-listeners"
   ],
@@ -309,6 +310,9 @@
           "expectedValue": false
         },
         "link-blocking-first-paint": {
+          "expectedValue": false
+        },
+        "script-blocking-first-paint": {
           "expectedValue": false
         },
         "external-anchors-use-rel-noopener": {

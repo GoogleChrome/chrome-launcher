@@ -150,7 +150,11 @@ class Driver {
         returnByValue: true
       }).then(result => {
         clearTimeout(asyncTimeout);
-        resolve(result.result.value);
+        if (result.exceptionDetails) {
+          reject(result.exceptionDetails.exception.value);
+        } else {
+          resolve(result.result.value);
+        }
       }).catch(reject);
     });
   }

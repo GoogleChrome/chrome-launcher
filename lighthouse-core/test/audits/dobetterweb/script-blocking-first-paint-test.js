@@ -15,21 +15,21 @@
  */
 'use strict';
 
-const LinkBlockingFirstPaintAudit =
-    require('../../../audits/dobetterweb/link-blocking-first-paint.js');
+const ScriptBlockingFirstPaintAudit =
+    require('../../../audits/dobetterweb/script-blocking-first-paint.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Link Block First Paint audit', () => {
+describe('Script Block First Paint audit', () => {
   it('fails when no input present', () => {
-    const auditResult = LinkBlockingFirstPaintAudit.audit({});
+    const auditResult = ScriptBlockingFirstPaintAudit.audit({});
     assert.equal(auditResult.rawValue, -1);
     assert.ok(auditResult.debugString);
   });
 
   it('fails when error input present', () => {
-    const auditResult = LinkBlockingFirstPaintAudit.audit({
+    const auditResult = ScriptBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: {
         value: -1
       }
@@ -38,44 +38,46 @@ describe('Link Block First Paint audit', () => {
     assert.ok(auditResult.debugString);
   });
 
-  it('fails when there are links found which block first paint', () => {
-    const linkDetails = {
-      tagName: 'LINK',
-      href: 'http://google.com/css/style.css',
-      url: 'http://google.com/css/style.css',
-      disabled: false,
-      media: '',
-      rel: 'stylesheet'
+  it('fails when there are scripts found which block first paint', () => {
+    const scriptDetails = {
+      tagName: 'SCRIPT',
+      src: 'http://google.com/js/app.js',
+      url: 'http://google.com/js/app.js',
     };
-    const auditResult = LinkBlockingFirstPaintAudit.audit({
+    const auditResult = ScriptBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: {
         items: [
           {
-            tag: linkDetails,
+            tag: scriptDetails,
             transferSize: 100,
             spendTime: 100
           },
           {
-            tag: {tagName: 'SCRIPT'},
-            transferSize: 20,
-            spendTime: 20,
+            tag: scriptDetails,
+            transferSize: 50,
+            spendTime: 50
+          },
+          {
+            tag: {tagName: 'LINK'},
+            transferSize: 110,
+            spendTime: 110
           }
         ],
         total: {
-          transferSize: 120,
-          spendTime: 120
+          transferSize: 260,
+          spendTime: 260
         }
       }
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.displayValue.match('1 resource delayed first paint by 100ms'));
-    assert.ok(auditResult.extendedInfo.value.length, 1);
-    assert.ok(auditResult.extendedInfo.value[0].url.match(linkDetails.href));
+    assert.ok(auditResult.displayValue.match('2 resources delayed first paint by 150ms'));
+    assert.ok(auditResult.extendedInfo.value.length, 2);
+    assert.ok(auditResult.extendedInfo.value[0].url.match(scriptDetails.src));
     assert.ok(auditResult.extendedInfo.value[0].label.match('delayed first paint'));
   });
 
-  it('passes when there are no links found which block first paint', () => {
-    const auditResult = LinkBlockingFirstPaintAudit.audit({
+  it('passes when there are no scripts found which block first paint', () => {
+    const auditResult = ScriptBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: {
         items: [],
         total: {
