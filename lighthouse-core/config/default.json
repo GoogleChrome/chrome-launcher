@@ -323,7 +323,7 @@
         }
       }
     }, {
-      "name": "Accessiblity",
+      "name": "Accessibility",
       "audits": {
         "aria-allowed-attr": {
           "expectedValue": true,

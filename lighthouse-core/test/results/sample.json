@@ -998,7 +998,7 @@
         },
         {
           "overall": 0,
-          "name": "Accessiblity",
+          "name": "Accessibility",
           "subItems": [
             "aria-allowed-attr",
             "aria-valid-attr",
