@@ -19,25 +19,28 @@ const ReportGenerator = require('../../report/report-generator.js');
 const sampleResults = require('../results/sample.json');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
-/*
-Most of the functionality is tested via the Printer class, but in this
-particular case, we need to test the functionality that would be branched for the
-extension, which is relatively minor stuff.
-*/
+// Most of the functionality is tested via the Printer class, but in this
+// particular case, we need to test the functionality that would be branched for
+// the extension, which is relatively minor stuff.
 describe('Report', () => {
   it('generates CLI HTML', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: true});
-
-    return assert.ok(/<script>/gim.test(html));
+    assert.ok(/<script>/gim.test(html));
   });
 
   it('should format generated Time', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults, {inline: true});
-    return assert.ok(/on 10\/\d\/2016\, /gim.test(html));
+    assert.ok(/on 11\/\d{1,2}\/2016\, /gim.test(html));
+  });
+
+  it('should escape closing </script> tags', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+    assert.ok(/<\/script>/gim.test(html));
   });
 
   it('generates extension HTML', () => {
@@ -49,5 +52,6 @@ describe('Report', () => {
     assert.ok(html.includes('function LighthouseReport'), 'lighthouse-report.js was not inlined');
     assert.ok(html.includes('.report-body {'), 'report.css was not inlined');
     assert.ok(!html.includes('&quot;lighthouseVersion'), 'lhresults were not escaped');
+    assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
   });
 });
