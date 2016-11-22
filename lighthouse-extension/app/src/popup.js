@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', _ => {
   const optionsList = document.body.querySelector('.options__list');
   const okButton = document.getElementById('ok');
 
+  const MAX_ISSUE_ERROR_LENGTH = 60;
+
   function getLighthouseVersion() {
     return chrome.runtime.getManifest().version;
   }
@@ -53,7 +55,11 @@ document.addEventListener('DOMContentLoaded', _ => {
     qsBody += '**Stack Trace**:\n ```' + err.stack + '```';
 
     const base = 'https://github.com/googlechrome/lighthouse/issues/new?';
-    const title = encodeURI('title=Lighthouse Extension Error');
+    let titleError = err.message;
+    if (titleError.length > MAX_ISSUE_ERROR_LENGTH) {
+      titleError = `${titleError.substring(0, MAX_ISSUE_ERROR_LENGTH - 3)}...`;
+    }
+    const title = encodeURI('title=Extension Error: ' + titleError);
     const body = '&body=' + encodeURI(qsBody);
 
     reportErrorEl.href = base + title + body;
