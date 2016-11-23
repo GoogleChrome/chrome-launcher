@@ -59,8 +59,11 @@ class GeolocationOnStart extends Gatherer {
           }).then(results => {
             this.artifact.usage = results;
           });
-        }).catch(_ => {
-          this.artifact = -1;
+        }).catch(e => {
+          this.artifact = {
+            value: -1,
+            debugString: e.message
+          };
         });
   }
 }

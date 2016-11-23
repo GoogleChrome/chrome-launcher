@@ -660,7 +660,15 @@ class Driver {
     const globalVarToPopulate = `window['__${funcName}StackTraces']`;
     const collectUsage = () => {
       return this.evaluateAsync(
-          `Promise.resolve(Array.from(${globalVarToPopulate}).map(item => JSON.parse(item)))`);
+          `Promise.resolve(Array.from(${globalVarToPopulate}).map(item => JSON.parse(item)))`)
+        .then(result => {
+          if (!Array.isArray(result)) {
+            throw new Error(
+                'Driver failure: Expected evaluateAsync results to be an array ' +
+                `but got "${JSON.stringify(result)}" instead.`);
+          }
+          return result;
+        });
     };
 
     const funcBody = captureJSCallUsage.toString();

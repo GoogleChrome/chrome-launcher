@@ -46,16 +46,17 @@ class GeolocationOnStart extends Audit {
    */
   static audit(artifacts) {
     if (typeof artifacts.GeolocationOnStart === 'undefined' ||
-        artifacts.GeolocationOnStart === -1) {
+        artifacts.GeolocationOnStart.value === -1) {
+      let debugString = 'Unknown error with the GeolocationOnStart gatherer';
+      if (typeof artifacts.GeolocationOnStart === 'undefined') {
+        debugString = 'GeolocationOnStart gatherer did not run';
+      } else if (artifacts.GeolocationOnStart.debugString) {
+        debugString = artifacts.GeolocationOnStart.debugString;
+      }
+
       return GeolocationOnStart.generateAuditResult({
         rawValue: -1,
-        debugString: 'GeolocationOnStart gatherer did not run'
-      });
-    } else if (artifacts.GeolocationOnStart.value === -1 &&
-               artifacts.GeolocationOnStart.debugString) {
-      return GeolocationOnStart.generateAuditResult({
-        rawValue: artifacts.GeolocationOnStart.value,
-        debugString: artifacts.GeolocationOnStart.debugString
+        debugString
       });
     }
 

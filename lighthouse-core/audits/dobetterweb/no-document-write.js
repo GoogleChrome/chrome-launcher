@@ -45,10 +45,17 @@ class NoDocWriteAudit extends Audit {
    */
   static audit(artifacts) {
     if (typeof artifacts.DocWriteUse === 'undefined' ||
-        artifacts.DocWriteUse === -1) {
+        artifacts.DocWriteUse.value === -1) {
+      let debugString = 'Unknown error with the DocWriteUse gatherer';
+      if (typeof artifacts.DocWriteUse === 'undefined') {
+        debugString = 'DocWriteUse gatherer did not run';
+      } else if (artifacts.DocWriteUse.debugString) {
+        debugString = artifacts.DocWriteUse.debugString;
+      }
+
       return NoDocWriteAudit.generateAuditResult({
         rawValue: -1,
-        debugString: 'DocWriteUse gatherer did not run'
+        debugString
       });
     }
 

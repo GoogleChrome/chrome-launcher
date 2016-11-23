@@ -23,6 +23,15 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page does not use console.time()', () => {
+  it('fails when gatherer returns error', () => {
+    const debugString = 'interesting debug string';
+    const auditResult = NoConsoleTimeAudit.audit({
+      ConsoleTimeUsage: {value: -1, debugString}
+    });
+    assert.equal(auditResult.rawValue, -1);
+    assert.equal(auditResult.debugString, debugString);
+  });
+
   it('fails when no input present', () => {
     const auditResult = NoConsoleTimeAudit.audit({});
     assert.equal(auditResult.rawValue, -1);

@@ -23,6 +23,15 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page does not use Date.now()', () => {
+  it('fails when gatherer returns error', () => {
+    const debugString = 'interesting debug string';
+    const auditResult = DateNowUseAudit.audit({
+      DateNowUse: {value: -1, debugString}
+    });
+    assert.equal(auditResult.rawValue, -1);
+    assert.equal(auditResult.debugString, debugString);
+  });
+
   it('fails when no input present', () => {
     const auditResult = DateNowUseAudit.audit({});
     assert.equal(auditResult.rawValue, -1);
