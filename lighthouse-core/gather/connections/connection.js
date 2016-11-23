@@ -95,13 +95,16 @@ class Connection {
       const callback = this._callbacks.get(object.id);
       this._callbacks.delete(object.id);
 
-      if (object.error) {
-        return this._handleRawError(object, callback);
-      }
-      log.formatProtocol('method <= browser OK',
+      // handleRawError returns or throws synchronously; wrap to put into promise chain.
+      return callback.resolve(Promise.resolve().then(_ => {
+        if (object.error) {
+          return this.handleRawError(object.error, callback.method);
+        }
+
+        log.formatProtocol('method <= browser OK',
           {method: callback.method, params: object.result}, 'verbose');
-      callback.resolve(object.result);
-      return;
+        return object.result;
+      }));
     }
     log.formatProtocol('<= event',
         {method: object.method, params: object.params}, 'verbose');
@@ -109,19 +112,24 @@ class Connection {
   }
 
   /**
-   * @param {{error: {message: string}}} object
-   * @param {{reject: function(*), method: string}} callback
-   * @private
+   * Handles error responses from the protocol, absorbing errors we don't care
+   * about and throwing on the rest.
+   *
+   * Currently the only error ignored is from defensive calls of `DOM.disable`
+   * when already disabled.
+   * @param {{message: string}} error
+   * @param {string} method Protocol method that received the error response.
+   * @throws {Error}
+   * @protected
    */
-  _handleRawError(object, callback) {
-    // We proactively disable a few domains. Ignore any errors
-    if (object.error.message && object.error.message.includes('DOM agent hasn\'t been enabled')) {
-      callback.resolve();
+  handleRawError(error, method) {
+    // We proactively disable the DOM domain. Ignore any errors.
+    if (error.message && error.message.includes('DOM agent hasn\'t been enabled')) {
       return;
     }
-    log.formatProtocol('method <= browser ERR',
-        {method: callback.method}, 'error');
-    callback.reject(new Error(`Raw Protocol (${callback.method}) ${object.error.message}`));
+
+    log.formatProtocol('method <= browser ERR', {method}, 'error');
+    throw new Error(`Protocol error (${method}): ${error.message}`);
   }
 
   /**

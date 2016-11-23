@@ -99,7 +99,7 @@ class ExtensionConnection extends Connection {
 
   /**
    * @override
-   * @param {!string} method
+   * @param {!string} command
    * @param {!Object} params
    * @return {!Promise}
    */
@@ -107,17 +107,26 @@ class ExtensionConnection extends Connection {
     return new Promise((resolve, reject) => {
       log.formatProtocol('method => browser', {method: command, params: params}, 'verbose');
       if (!this._tabId) {
-        log.error('No tabId set for sendCommand');
+        log.error('ExtensionConnection', 'No tabId set for sendCommand');
       }
+
       chrome.debugger.sendCommand({tabId: this._tabId}, command, params, result => {
         if (chrome.runtime.lastError) {
-          log.formatProtocol('method <= browser ERR', {method: command, params: result}, 'error');
-          return reject(chrome.runtime.lastError);
-        }
+          // The error from the extension has a `message` property that is the
+          // stringified version of the actual protocol error object.
+          const message = chrome.runtime.lastError.message;
+          let error;
+          try {
+            error = JSON.parse(message);
+          } catch (e) {}
+          error = error || {message: 'Unknown debugger protocol error.'};
 
-        if (result.wasThrown) {
-          log.formatProtocol('method <= browser ERR', {method: command, params: result}, 'error');
-          return reject(result.exceptionDetails);
+          // handleRawError returns or throws synchronously, so try/catch awkwardly.
+          try {
+            return resolve(this.handleRawError(error, command));
+          } catch (err) {
+            return reject(err);
+          }
         }
 
         log.formatProtocol('method <= browser OK', {method: command, params: result}, 'verbose');

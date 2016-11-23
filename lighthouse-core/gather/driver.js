@@ -155,7 +155,10 @@ class Driver {
         } else {
           resolve(result.result.value);
         }
-      }).catch(reject);
+      }).catch(err => {
+        clearTimeout(asyncTimeout);
+        reject(err);
+      });
     });
   }
 
@@ -475,11 +478,7 @@ class Driver {
     // Disable any domains that could interfere or add overhead to the trace
     return this.sendCommand('Debugger.disable')
       .then(_ => this.sendCommand('CSS.disable'))
-      .then(_ => {
-        return this.sendCommand('DOM.disable')
-          // If it wasn't already enabled, it will throw; ignore these. See #861
-          .catch(_ => {});
-      })
+      .then(_ => this.sendCommand('DOM.disable'))
       // Enable Page domain to wait for Page.loadEventFired
       .then(_ => this.sendCommand('Page.enable'))
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
