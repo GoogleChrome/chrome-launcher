@@ -37,6 +37,20 @@ document.addEventListener('DOMContentLoaded', _ => {
 
   const MAX_ISSUE_ERROR_LENGTH = 60;
 
+  /**
+   * Error strings that indicate a problem in how Lighthouse was run, not in
+   * Lighthouse itself, mapped to more useful strings to report to the user.
+   */
+  const NON_BUG_ERROR_MESSAGES = {
+    'Another debugger': 'You probably have DevTools open. Close DevTools to use Lighthouse',
+    'multiple tabs': 'You probably have multiple tabs open to the same origin. ' +
+        'Close the other tabs to use Lighthouse.',
+    // The extension debugger API is forbidden from attaching to the web store.
+    // @see https://chromium.googlesource.com/chromium/src/+/5d1f214db0f7996f3c17cd87093d439ce4c7f8f1/chrome/common/extensions/chrome_extensions_client.cc#232
+    'The extensions gallery cannot be scripted': 'The Lighthouse extension cannot audit the ' +
+        'Chrome Web Store. If necessary, use the Lighthouse CLI to do so.'
+  };
+
   function getLighthouseVersion() {
     return chrome.runtime.getManifest().version;
   }
@@ -146,22 +160,21 @@ document.addEventListener('DOMContentLoaded', _ => {
     })
     .catch(err => {
       let message = err.message;
+      let includeReportLink = true;
 
-      const debuggerExists = message.toLowerCase().startsWith('another debugger');
-      const multipleTabs = message.toLowerCase().includes('multiple tabs');
-
-      if (debuggerExists) {
-        message = 'You probably have DevTools open.' +
-          ' Close DevTools to use lighthouse';
-      }
-      if (multipleTabs) {
-        message = 'You probably have multiple tabs open to the same origin.' +
-          ' Close the other tabs to use lighthouse.';
+      // Check for errors in how the user ran Lighthouse and replace with a more
+      // helpful message (and remove 'Report Error' link).
+      for (const [test, replacement] of Object.entries(NON_BUG_ERROR_MESSAGES)) {
+        if (message.includes(test)) {
+          message = replacement;
+          includeReportLink = false;
+          break;
+        }
       }
 
       feedbackEl.textContent = message;
 
-      if (!multipleTabs && !debuggerExists) {
+      if (includeReportLink) {
         feedbackEl.className = 'feedback-error';
         feedbackEl.appendChild(buildReportErrorLink(err));
       }

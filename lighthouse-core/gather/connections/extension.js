@@ -67,7 +67,7 @@ class ExtensionConnection extends Connection {
         return new Promise((resolve, reject) => {
           chrome.debugger.attach({tabId}, '1.1', _ => {
             if (chrome.runtime.lastError) {
-              return reject(chrome.runtime.lastError);
+              return reject(new Error(chrome.runtime.lastError.message));
             }
             resolve(tabId);
           });
@@ -88,7 +88,7 @@ class ExtensionConnection extends Connection {
     return new Promise((resolve, reject) => {
       chrome.debugger.detach({tabId}, _ => {
         if (chrome.runtime.lastError) {
-          return reject(chrome.runtime.lastError);
+          return reject(new Error(chrome.runtime.lastError.message));
         }
         // Reload the target page to restore its state.
         chrome.tabs.reload(tabId);
