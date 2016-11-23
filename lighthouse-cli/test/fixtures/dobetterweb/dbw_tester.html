@@ -82,7 +82,7 @@
   <!-- FAIL - does not use rel="noopener" to open external link -->
   <a href="https://www.google.com/" target="_blank">external link</a>
   <!-- PASS -->
-  <a href="https://www.google.com/" target="_blank" rel="noopener">external link that uses  rel="noopener"</a>
+  <a href="https://www.google.com/" target="_blank" rel="noopener nofollow">external link that uses rel noopener and another unrelated rel attribute</a>
   <!-- PASS -->
   <a href="./doesnotexist" target="_blank">internal link is ok</a>
 </template>

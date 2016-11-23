@@ -22,7 +22,7 @@ class AnchorsWithNoRelNoopener extends Gatherer {
 
   afterPass(options) {
     const driver = options.driver;
-    return driver.querySelectorAll('a[target="_blank"]:not([rel="noopener"])')
+    return driver.querySelectorAll('a[target="_blank"]:not([rel~="noopener"])')
       .then(failingNodeList => {
         const failingNodes = failingNodeList.map(node => {
           return Promise.all([
