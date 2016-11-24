@@ -25,7 +25,7 @@ const exampleManifest = JSON.stringify(require('../fixtures/manifest.json'));
 const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Manifest: icons audits', () => {
   describe('icons exist check', () => {
@@ -43,8 +43,14 @@ describe('Manifest: icons audits', () => {
         icons: []
       });
       const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-      assert.equal(Audit144.audit({Manifest}).rawValue, false);
-      assert.equal(Audit192.audit({Manifest}).rawValue, false);
+
+      const audit144 = Audit144.audit({Manifest});
+      const audit192 = Audit192.audit({Manifest});
+
+      assert.equal(audit144.rawValue, false);
+      assert.ok(audit144.debugString.match(/^WARNING/));
+      assert.equal(audit192.rawValue, false);
+      assert.ok(audit192.debugString.match(/^WARNING/));
     });
   });
 
@@ -57,8 +63,13 @@ describe('Manifest: icons audits', () => {
       });
       const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-      assert.equal(Audit144.audit({Manifest}).rawValue, false);
-      assert.equal(Audit192.audit({Manifest}).rawValue, false);
+      const audit144 = Audit144.audit({Manifest});
+      const audit192 = Audit192.audit({Manifest});
+
+      assert.equal(audit144.rawValue, false);
+      assert.ok(audit144.debugString.match(/are at least 144px/));
+      assert.equal(audit192.rawValue, false);
+      assert.ok(audit192.debugString.match(/are at least 192px/));
     });
 
     it('succeeds when a manifest contains icons that are large enough', () => {
@@ -77,8 +88,13 @@ describe('Manifest: icons audits', () => {
       });
       const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-      assert.equal(Audit144.audit({Manifest}).rawValue, true);
-      assert.equal(Audit192.audit({Manifest}).rawValue, true);
+      const audit144 = Audit144.audit({Manifest});
+      const audit192 = Audit192.audit({Manifest});
+
+      assert.equal(audit144.rawValue, true);
+      assert.ok(audit144.displayValue);
+      assert.equal(audit192.rawValue, true);
+      assert.ok(audit192.displayValue);
     });
 
     it('succeeds when there\'s two icons, one without sizes; the other with a valid size', () => {
