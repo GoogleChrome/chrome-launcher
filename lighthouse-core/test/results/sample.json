@@ -484,7 +484,7 @@
       "rawValue": false,
       "name": "appcache-manifest",
       "category": "Offline",
-      "description": "Site is not using Application Cache",
+      "description": "Site does not use Application Cache",
       "helpText": "Application Cache has been <a href=\"https://html.spec.whatwg.org/multipage/browsers.html#offline\" target=\"_blank\">deprecated</a> by <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers\" target=\"_blank\">Service Workers</a>. Consider implementing an offline solution using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Cache\" target=\"_blank\">Cache Storage API</a>."
     },
     "geolocation-on-start": {
@@ -753,7 +753,7 @@
       "rawValue": false,
       "name": "no-websql",
       "category": "Offline",
-      "description": "Site is not using WebSQL DB.",
+      "description": "Site does not use WebSQL DB.",
       "helpText": "Web SQL Database is <a href=\"https://dev.w3.org/html5/webdatabase/\" target=\"_blank\">deprecated</a>. Consider implementing an offline solution using <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB\" target=\"_blank\">IndexedDB</a>."
     },
     "uses-http2": {
@@ -833,7 +833,7 @@
       },
       "name": "uses-passive-event-listeners",
       "category": "JavaScript",
-      "description": "Site is using passive listeners to improve scrolling performance",
+      "description": "Site uses passive listeners to improve scrolling performance",
       "helpText": "<a href=\"https://www.chromestatus.com/features/5745543795965952\" target=\"_blank\">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>wheel,mousewheel,touchstart,touchmove</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>."
     }
   },

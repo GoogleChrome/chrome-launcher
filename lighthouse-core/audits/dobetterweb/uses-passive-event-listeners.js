@@ -41,7 +41,7 @@ class PassiveEventsAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'uses-passive-event-listeners',
-      description: 'Site is using passive listeners to improve scrolling performance',
+      description: 'Site uses passive listeners to improve scrolling performance',
       helpText: `<a href="https://www.chromestatus.com/features/5745543795965952" target="_blank">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>${this.SCROLL_BLOCKING_EVENTS.toString()}</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>.`,
       requiredArtifacts: ['URL', 'EventListeners']
     };
