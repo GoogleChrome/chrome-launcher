@@ -132,7 +132,14 @@ class ReportGenerator {
       hour: 'numeric', minute: 'numeric', second: 'numeric',
       timeZoneName: 'short'
     };
-    const formatter = new Intl.DateTimeFormat('en-US', options);
+    let formatter = new Intl.DateTimeFormat('en-US', options);
+
+    // Force UTC if runtime timezone could not be detected.
+    // See https://github.com/GoogleChrome/lighthouse/issues/1056
+    if (formatter.resolvedOptions().timeZone.toLowerCase() === 'etc/unknown') {
+      options.timeZone = 'UTC';
+      formatter = new Intl.DateTimeFormat('en-US', options);
+    }
     return formatter.format(new Date(date));
   }
 
