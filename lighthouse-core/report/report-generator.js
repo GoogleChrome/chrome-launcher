@@ -24,10 +24,20 @@ const fs = require('fs');
 const path = require('path');
 
 const RATINGS = {
-  GOOD: {label: 'good', minValue: 0.66, minScore: 75},
-  AVERAGE: {label: 'average', minValue: 0.33},
-  POOR: {label: 'poor', minScore: 45}
+  GOOD: {label: 'good', minScore: 75},
+  AVERAGE: {label: 'average', minScore: 45},
+  POOR: {label: 'poor'}
 };
+
+function calculateRating(value) {
+  let rating = RATINGS.POOR.label;
+  if (value >= RATINGS.GOOD.minScore) {
+    rating = RATINGS.GOOD.label;
+  } else if (value >= RATINGS.AVERAGE.minScore) {
+    rating = RATINGS.AVERAGE.label;
+  }
+  return rating;
+}
 
 class ReportGenerator {
 
@@ -44,16 +54,7 @@ class ReportGenerator {
       if (typeof value === 'boolean') {
         return value ? RATINGS.GOOD.label : RATINGS.POOR.label;
       }
-
-      // Limit the rating to average if this is a rating for Best Practices.
-      let rating = RATINGS.POOR.label;
-      if (value > RATINGS.GOOD.minValue) {
-        rating = RATINGS.GOOD.label;
-      } else if (value > RATINGS.AVERAGE.minValue) {
-        rating = RATINGS.AVERAGE.label;
-      }
-
-      return rating;
+      return calculateRating(value);
     };
 
     // Converts a name to a link.
@@ -76,16 +77,7 @@ class ReportGenerator {
     // Converts the total score to a rating that can be used for styling.
     Handlebars.registerHelper('getTotalScoreRating', aggregation => {
       const totalScore = getTotalScore(aggregation);
-
-      let rating = RATINGS.POOR.label;
-      if (totalScore > RATINGS.POOR.minScore) {
-        rating = RATINGS.AVERAGE.label;
-      }
-      if (totalScore > RATINGS.GOOD.minScore) {
-        rating = RATINGS.GOOD.label;
-      }
-
-      return rating;
+      return calculateRating(totalScore);
     });
 
     // Converts a value to a rating string, which can be used inside the report
