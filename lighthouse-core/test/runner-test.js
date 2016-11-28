@@ -95,7 +95,8 @@ describe('Runner', () => {
 
     return Runner.run({}, {url, config}).then(results => {
       const audits = results.audits;
-      assert.equal(audits['user-timings'].rawValue, 2);
+      assert.equal(audits['user-timings'].displayValue, 2);
+      assert.equal(audits['user-timings'].rawValue, true);
     });
   });
 
@@ -132,7 +133,8 @@ describe('Runner', () => {
 
     return Runner.run({}, {url, config}).then(results => {
       const audits = results.audits;
-      assert.equal(audits['critical-request-chains'].rawValue, 9);
+      assert.equal(audits['critical-request-chains'].displayValue, 9);
+      assert.equal(audits['critical-request-chains'].rawValue, false);
     });
   });
 

@@ -21,8 +21,6 @@ const Audit = require('./audit');
 const Formatter = require('../formatters/formatter');
 const TimelineModel = require('../lib/traces/devtools-timeline-model');
 
-const FAILURE_MESSAGE = 'Trace data not found.';
-
 /**
  * @param {!Array<!Object>} traceData
  * @return {!Array<!UserTimingsExtendedInfo>}
@@ -128,27 +126,24 @@ class UserTimings extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return new Promise((resolve, reject) => {
-      const traceContents =
-        artifacts.traces[this.DEFAULT_PASS] &&
-        artifacts.traces[this.DEFAULT_PASS].traceEvents;
-      if (!traceContents || !Array.isArray(traceContents)) {
-        throw new Error(FAILURE_MESSAGE);
-      }
-
-      const userTimings = filterTrace(traceContents);
-      resolve(UserTimings.generateAuditResult({
-        rawValue: userTimings.length,
-        extendedInfo: {
-          formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
-          value: userTimings
-        }
-      }));
-    }).catch(err => {
+    if (!artifacts.traces || !artifacts.traces[Audit.DEFAULT_PASS] ||
+        !Array.isArray(artifacts.traces[Audit.DEFAULT_PASS].traceEvents)) {
       return UserTimings.generateAuditResult({
         rawValue: -1,
-        debugString: err.message
+        debugString: 'Trace data not found.'
       });
+    }
+
+    const traceContents = artifacts.traces[Audit.DEFAULT_PASS].traceEvents;
+    const userTimings = filterTrace(traceContents);
+
+    return UserTimings.generateAuditResult({
+      rawValue: true,
+      displayValue: userTimings.length,
+      extendedInfo: {
+        formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
+        value: userTimings
+      }
     });
   }
 }
