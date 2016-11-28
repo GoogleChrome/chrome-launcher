@@ -118,6 +118,7 @@ class UserTimings extends Audit {
       category: 'Performance',
       name: 'user-timings',
       description: 'User Timing marks and measures',
+      helpText: 'Consider instrumenting your app with the User Timing API to create custom, real-world measurements of key user experiences. <a href="https://developers.google.com/web/tools/lighthouse/audits/user-timing" target="_blank" rel="noreferrer noopener">Learn more</a>.',
       requiredArtifacts: ['traceContents']
     };
   }

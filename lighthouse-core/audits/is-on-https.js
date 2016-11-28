@@ -27,6 +27,7 @@ class HTTPS extends Audit {
       category: 'Security',
       name: 'is-on-https',
       description: 'Site is on HTTPS',
+      helpText: 'All sites should be protected with HTTPS, even ones that don\'t handle sensitive data. HTTPS prevents intruders from tampering with or passively listening in on the communications between your app and your users, and is a prerequisite for HTTP/2 and many new web platform APIs. <a href="https://developers.google.com/web/tools/lighthouse/audits/https" target="_blank" rel="noreferrer noopener">Learn more</a>.',
       requiredArtifacts: ['HTTPS']
     };
   }

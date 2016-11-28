@@ -27,6 +27,7 @@ class WorksOffline extends Audit {
       category: 'Offline',
       name: 'works-offline',
       description: 'URL responds with a 200 when offline',
+      helpText: 'If you\'re building a Progressive Web App, consider using a service worker so that your app can work offline. <a href="https://developers.google.com/web/tools/lighthouse/audits/http-200-when-offline" target="_blank" rel="noopener noreferrer">Learn more</a>.',
       requiredArtifacts: ['Offline']
     };
   }

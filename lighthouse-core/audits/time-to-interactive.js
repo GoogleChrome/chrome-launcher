@@ -29,6 +29,7 @@ class TTIMetric extends Audit {
       category: 'Performance',
       name: 'time-to-interactive',
       description: 'Time To Interactive (alpha)',
+      helpText: 'Time to Interactive identifies the time at which your app appears to be ready enough to interact with. <a href="https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive" target="_blank" rel="noopener noreferrer">Learn more</a>.',
       optimalValue: SCORING_TARGET.toLocaleString() + 'ms',
       requiredArtifacts: ['traceContents']
     };

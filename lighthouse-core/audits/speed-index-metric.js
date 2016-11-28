@@ -35,6 +35,7 @@ class SpeedIndexMetric extends Audit {
       category: 'Performance',
       name: 'speed-index-metric',
       description: 'Perceptual Speed Index',
+      helpText: 'Speed Index shows how quickly the contents of a page are visibly populated. <a href="https://developers.google.com/web/tools/lighthouse/audits/speed-index" target="_blank" rel="noreferrer noopener">Learn more</a>.',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
       requiredArtifacts: ['traceContents']
     };
