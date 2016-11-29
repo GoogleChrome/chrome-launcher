@@ -99,6 +99,7 @@ function dateNowTest() {
     return Date.now();
   }
   helloDate();
+  eval('Date.now()'); // FAIL
 }
 
 function consoleTimeTest() {
@@ -110,6 +111,8 @@ function consoleTimeTest() {
   }
   console.timeEnd('arg1');
   console.timeEnd('arg2');
+
+  eval("console.time('arg3')"); // FAIL
 }
 
 function documentWriteTest() {

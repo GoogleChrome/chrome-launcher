@@ -702,13 +702,24 @@ function captureJSCallUsage(funcRef, set) {
       // First frame is the function we injected (the one that just threw).
       // Second, is the actual callsite of the funcRef we're after.
       const callFrame = structStackTrace[1];
-      const file = callFrame.getFileName();
+      let url = callFrame.getFileName();
       const line = callFrame.getLineNumber();
       const col = callFrame.getColumnNumber();
-      // TODO: add back when we want stack traces. See https://github.com/GoogleChrome/lighthouse/issues/957
-      // const stackTrace = structStackTrace.slice(1).map(
-      //    callsite => callsite.toString());
-      return {url: file, args, line, col}; // return value is e.stack
+      const isEval = callFrame.isEval();
+      const stackTrace = structStackTrace.slice(1).map(callsite => callsite.toString());
+
+      // If we don't have an URL, (e.g. eval'd code), use the last entry in the
+      // stack trace to give some context: eval(<context>):<line>:<col>
+      // See https://crbug.com/646849.
+      if (!url) {
+        url = stackTrace[0];
+      }
+
+      // TODO: add back when we want stack traces.
+      // Stack traces were removed from the return object in
+      // https://github.com/GoogleChrome/lighthouse/issues/957 so callsites
+      // would be unique.
+      return {url, args, line, col, isEval}; // return value is e.stack
     };
     const e = new Error(`__called ${funcRef.name}__`);
     set.add(JSON.stringify(e.stack));
