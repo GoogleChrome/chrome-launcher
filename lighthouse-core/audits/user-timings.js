@@ -48,7 +48,9 @@ function filterTrace(traceData) {
     if (ut.hasCategory('blink.user_timing')) {
       // reject these "userTiming" events that aren't really UserTiming, by nuking ones with frame data (or requestStart)
       // https://cs.chromium.org/search/?q=trace_event.*?user_timing&sq=package:chromium&type=cs
-      return !(ut.name === 'requestStart' || ut.args.frame !== undefined);
+      return ut.name !== 'requestStart' &&
+          ut.name !== 'paintNonDefaultBackgroundColor' &&
+          ut.args.frame === undefined;
     }
 
     return false;
