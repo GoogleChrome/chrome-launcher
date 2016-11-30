@@ -12,7 +12,7 @@
   },
   "scripts": {
     "lint": "[ \"$CI\" = true ] && eslint --quiet . || eslint .",
-    "smoke": "lighthouse-cli/test/smokehouse/offline-local/run-tests.sh; lighthouse-cli/test/smokehouse/dobetterweb/run-tests.sh",
+    "smoke": "lighthouse-cli/test/smokehouse/offline-local/run-tests.sh && lighthouse-cli/test/smokehouse/dobetterweb/run-tests.sh",
     "coverage": "node $__node_harmony $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*-test.js') --timeout 10000 --reporter progress",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
     "start": "node ./lighthouse-cli/index.js",
