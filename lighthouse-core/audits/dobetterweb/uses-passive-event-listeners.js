@@ -52,13 +52,7 @@ class PassiveEventsAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.EventListeners === 'undefined' ||
-        artifacts.EventListeners === -1) {
-      return PassiveEventsAudit.generateAuditResult({
-        rawValue: -1,
-        debugString: 'EventListeners gatherer did not run'
-      });
-    } else if (artifacts.EventListeners.rawValue === -1) {
+    if (artifacts.EventListeners.rawValue === -1) {
       return PassiveEventsAudit.generateAuditResult(artifacts.EventListeners);
     }
 

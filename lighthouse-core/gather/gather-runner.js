@@ -260,7 +260,7 @@ class GatherRunner {
         passes.forEach(pass => {
           pass.gatherers.forEach(gatherer => {
             if (typeof gatherer.artifact === 'undefined') {
-              throw new Error(`${gatherer.constructor.name} failed to provide an artifact.`);
+              throw new Error(`${gatherer.name} failed to provide an artifact.`);
             }
 
             artifacts[gatherer.name] = gatherer.artifact;
@@ -317,10 +317,6 @@ class GatherRunner {
 
     if (typeof gathererInstance.afterPass !== 'function') {
       throw new Error(`${gathererName} has no afterPass() method.`);
-    }
-
-    if (typeof gathererInstance.artifact !== 'object') {
-      throw new Error(`${gathererName} has no artifact property.`);
     }
   }
 

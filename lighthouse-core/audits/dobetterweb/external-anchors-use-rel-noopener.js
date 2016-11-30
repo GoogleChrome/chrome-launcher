@@ -40,11 +40,10 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.AnchorsWithNoRelNoopener === 'undefined' ||
-        artifacts.AnchorsWithNoRelNoopener === -1) {
+    if (artifacts.AnchorsWithNoRelNoopener === -1) {
       return ExternalAnchorsUseRelNoopenerAudit.generateAuditResult({
         rawValue: -1,
-        debugString: 'AnchorsWithNoRelNoopener gatherer did not run'
+        debugString: 'Unknown error with the AnchorsWithNoRelNoopener gatherer.'
       });
     }
 

@@ -22,18 +22,6 @@ const traceEvents = require('../fixtures/traces/trace-user-timings.json');
 /* eslint-env mocha */
 
 describe('Performance: user-timings audit', () => {
-  it('fails when there is no trace data', () => {
-    const auditResult = Audit.audit({});
-    assert.equal(auditResult.score, -1);
-    assert.ok(auditResult.debugString.length);
-  });
-
-  it('fails when trace data is not an array', () => {
-    const auditResult = Audit.audit({traces: 'not-an-array'});
-    assert.equal(auditResult.score, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('evaluates valid input correctly', () => {
     const auditResult = Audit.audit({
       traces: {[Audit.DEFAULT_PASS]: {traceEvents}}

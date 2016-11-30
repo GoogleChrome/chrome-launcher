@@ -100,22 +100,21 @@ describe('Runner', () => {
     });
   });
 
-  it('fails gracefully with empty artifacts object', () => {
+  it('outputs an error audit result when missing a required artifact', () => {
     const url = 'https://example.com';
 
     const config = new Config({
       audits: [
-        'user-timings'
+        // requires the HTTPS artifact
+        'is-on-https'
       ],
 
-      artifacts: {
-      }
+      artifacts: {}
     });
 
     return Runner.run({}, {url, config}).then(results => {
-      const audits = results.audits;
-      assert.equal(audits['user-timings'].rawValue, -1);
-      assert(audits['user-timings'].debugString);
+      assert.equal(results.audits['is-on-https'].rawValue, -1);
+      assert.ok(results.audits['is-on-https'].debugString);
     });
   });
 

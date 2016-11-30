@@ -34,13 +34,15 @@ class AnchorsWithNoRelNoopener extends Gatherer {
         return Promise.all(failingNodes);
       })
       .then(failingNodes => {
-        this.artifact.usages = failingNodes.map(node => {
-          return {
-            href: node[0],
-            rel: node[1],
-            target: node[2]
-          };
-        });
+        this.artifact = {
+          usages: failingNodes.map(node => {
+            return {
+              href: node[0],
+              rel: node[1],
+              target: node[2]
+            };
+          })
+        };
       })
       .catch(_ => {
         this.artifact = -1;

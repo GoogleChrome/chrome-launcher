@@ -29,7 +29,7 @@ class Screenshots extends Audit {
       category: 'Performance',
       name: 'screenshots',
       description: 'Screenshots of all captured frames',
-      requiredArtifacts: ['traceContents']
+      requiredArtifacts: ['traces']
     };
   }
 
@@ -39,12 +39,6 @@ class Screenshots extends Audit {
    */
   static audit(artifacts) {
     const trace = artifacts.traces[this.DEFAULT_PASS];
-    if (typeof trace === 'undefined') {
-      return Promise.resolve(Screenshots.generateAuditResult({
-        rawValue: -1,
-        debugString: 'No trace found to generate screenshots'
-      }));
-    }
 
     return artifacts.requestScreenshots(trace).then(screenshots => {
       if (typeof screenshots === 'undefined') {

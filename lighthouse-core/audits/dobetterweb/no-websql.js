@@ -44,12 +44,10 @@ class NoWebSQLAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.WebSQL === 'undefined' ||
-        artifacts.WebSQL.database === -1) {
+    if (artifacts.WebSQL.database === -1) {
       return NoWebSQLAudit.generateAuditResult({
         rawValue: -1,
-        debugString: (artifacts.WebSQL ?
-            artifacts.WebSQL.debugString : 'WebSQL gatherer did not run')
+        debugString: artifacts.WebSQL.debugString
       });
     }
 

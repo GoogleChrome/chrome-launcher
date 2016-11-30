@@ -20,11 +20,6 @@
  * Base class for all gatherers; defines pass lifecycle methods.
  */
 class Gatherer {
-
-  constructor() {
-    this.artifact = {};
-  }
-
   /**
    * @return {string}
    */

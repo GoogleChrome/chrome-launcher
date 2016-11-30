@@ -45,12 +45,9 @@ class GeolocationOnStart extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.GeolocationOnStart === 'undefined' ||
-        artifacts.GeolocationOnStart.value === -1) {
+    if (artifacts.GeolocationOnStart.value === -1) {
       let debugString = 'Unknown error with the GeolocationOnStart gatherer';
-      if (typeof artifacts.GeolocationOnStart === 'undefined') {
-        debugString = 'GeolocationOnStart gatherer did not run';
-      } else if (artifacts.GeolocationOnStart.debugString) {
+      if (artifacts.GeolocationOnStart.debugString) {
         debugString = artifacts.GeolocationOnStart.debugString;
       }
 

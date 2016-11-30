@@ -24,8 +24,10 @@ const URL = 'https://google.com/test';
 /* eslint-env mocha */
 
 describe('External anchors use rel="noopener"', () => {
-  it('fails when no input present', () => {
-    const auditResult = ExternalAnchorsAudit.audit({});
+  it('fails when gatherer failed', () => {
+    const auditResult = ExternalAnchorsAudit.audit({
+      AnchorsWithNoRelNoopener: -1
+    });
     assert.equal(auditResult.rawValue, -1);
     assert.ok(auditResult.debugString);
   });

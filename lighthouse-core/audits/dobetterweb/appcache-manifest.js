@@ -43,8 +43,7 @@ class AppCacheManifestAttr extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.AppCacheManifest === 'undefined' ||
-        artifacts.AppCacheManifest === -1) {
+    if (artifacts.AppCacheManifest === -1) {
       return AppCacheManifestAttr.generateAuditResult({
         rawValue: false,
         debugString: 'Unable to determine if you\'re using AppCache.'

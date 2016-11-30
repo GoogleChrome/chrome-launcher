@@ -30,29 +30,6 @@ describe('UX: geolocation audit', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
-  it('fails when gatherer returns -1', () => {
-    const auditResult = GeolocationOnStartAudit.audit(-1);
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString.match('did not run'));
-  });
-
-  it('fails when no input present', () => {
-    const auditResult = GeolocationOnStartAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
-  it('prints debugString info if present in artifact', () => {
-    const auditResult = GeolocationOnStartAudit.audit({
-      GeolocationOnStart: {
-        value: -1,
-        debugString: 'Unable to determine'
-      }
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString.match('Unable to determine'));
-  });
-
   it('fails when geolocation has been automatically requested', () => {
     const auditResult = GeolocationOnStartAudit.audit({
       GeolocationOnStart: {

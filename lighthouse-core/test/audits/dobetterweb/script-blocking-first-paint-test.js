@@ -22,20 +22,16 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Script Block First Paint audit', () => {
-  it('fails when no input present', () => {
-    const auditResult = ScriptBlockingFirstPaintAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('fails when error input present', () => {
+    const debugString = 'first paint debug string';
     const auditResult = ScriptBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: {
-        value: -1
+        value: -1,
+        debugString
       }
     });
     assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
+    assert.strictEqual(auditResult.debugString, debugString);
   });
 
   it('fails when there are scripts found which block first paint', () => {

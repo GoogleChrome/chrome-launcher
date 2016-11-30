@@ -37,13 +37,6 @@ class RedirectsHTTP extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (!artifacts.HTTPRedirect ||
-        !artifacts.HTTPRedirect.value) {
-      return RedirectsHTTP.generateAuditResult({
-        rawValue: false
-      });
-    }
-
     return RedirectsHTTP.generateAuditResult({
       rawValue: artifacts.HTTPRedirect.value,
       debugString: artifacts.HTTPRedirect.debugString

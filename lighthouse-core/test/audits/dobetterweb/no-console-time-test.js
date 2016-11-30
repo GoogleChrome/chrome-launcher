@@ -32,12 +32,6 @@ describe('Page does not use console.time()', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
-  it('fails when no input present', () => {
-    const auditResult = NoConsoleTimeAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('passes when console.time() is not used', () => {
     const auditResult = NoConsoleTimeAudit.audit({
       ConsoleTimeUsage: {usage: []},

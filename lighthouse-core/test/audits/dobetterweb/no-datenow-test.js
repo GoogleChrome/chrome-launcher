@@ -32,12 +32,6 @@ describe('Page does not use Date.now()', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
-  it('fails when no input present', () => {
-    const auditResult = DateNowUseAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('passes when Date.now() is not used', () => {
     const auditResult = DateNowUseAudit.audit({
       DateNowUse: {usage: []},

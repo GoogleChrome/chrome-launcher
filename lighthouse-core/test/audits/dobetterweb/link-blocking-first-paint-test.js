@@ -22,20 +22,16 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Link Block First Paint audit', () => {
-  it('fails when no input present', () => {
-    const auditResult = LinkBlockingFirstPaintAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('fails when error input present', () => {
+    const debugString = 'the uniquest debug string';
     const auditResult = LinkBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: {
-        value: -1
+        value: -1,
+        debugString
       }
     });
     assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
+    assert.strictEqual(auditResult.debugString, debugString);
   });
 
   it('fails when there are links found which block first paint', () => {

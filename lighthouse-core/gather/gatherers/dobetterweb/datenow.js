@@ -31,7 +31,9 @@ class DateNowUse extends Gatherer {
 
   afterPass() {
     return this.collectUsage().then(dateNowUses => {
-      this.artifact.usage = dateNowUses;
+      this.artifact = {
+        usage: dateNowUses
+      };
     }, e => {
       this.artifact = {
         value: -1,

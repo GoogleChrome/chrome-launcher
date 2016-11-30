@@ -46,12 +46,9 @@ class NoDateNowAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.DateNowUse === 'undefined' ||
-        artifacts.DateNowUse.value === -1) {
+    if (artifacts.DateNowUse.value === -1) {
       let debugString = 'Unknown error with the DateNowUse gatherer';
-      if (typeof artifacts.DateNowUse === 'undefined') {
-        debugString = 'DateNowUse gatherer did not run';
-      } else if (artifacts.DateNowUse.debugString) {
+      if (artifacts.DateNowUse.debugString) {
         debugString = artifacts.DateNowUse.debugString;
       }
 

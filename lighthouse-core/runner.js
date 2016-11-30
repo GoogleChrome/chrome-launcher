@@ -25,6 +25,32 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+function runAudit(audit, artifacts) {
+  const status = `Evaluating: ${audit.meta.description}`;
+
+  return Promise.resolve().then(_ => {
+    log.log('status', status);
+
+    // Return an early error if an artifact required for the audit is missing.
+    for (const artifactName of audit.meta.requiredArtifacts) {
+      // TODO: need pass-specific check of networkRecords and traces
+      if (typeof artifacts[artifactName] === 'undefined') {
+        log.warn('Runner',
+            `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
+        return audit.generateAuditResult({
+          rawValue: -1,
+          debugString: `Required ${artifactName} gatherer did not run.`
+        });
+      }
+    }
+
+    return audit.audit(artifacts);
+  }).then(result => {
+    log.verbose('statusEnd', status);
+    return result;
+  });
+}
+
 class Runner {
   static run(connection, opts) {
     // Clean opts input.
@@ -88,18 +114,13 @@ class Runner {
         });
       }
 
-      // Now run the audits.
+      // Run each audit sequentially, the auditResults array has all our fine work
       const auditResults = [];
       run = run.then(artifacts => config.audits.reduce((chain, audit) => {
-        const status = `Evaluating: ${audit.meta.description}`;
-        // Run each audit sequentially, the auditResults array has all our fine work
+        // TODO: need to check that traces are arrays
         return chain.then(_ => {
-          log.log('status', status);
-          return audit.audit(artifacts);
-        }).then(ret => {
-          log.verbose('statusEnd', status);
-          auditResults.push(ret);
-        });
+          return runAudit(audit, artifacts);
+        }).then(ret => auditResults.push(ret));
       }, Promise.resolve()).then(_ => auditResults));
     } else if (config.auditResults) {
       // If there are existing audit results, surface those here.

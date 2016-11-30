@@ -24,13 +24,7 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page uses passive events listeners where applicable', () => {
-  it('it returns error value when no input present', () => {
-    const auditResult = PassiveEventsAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
-  it('debugString is present if gatherer fails', () => {
+  it('fails when gatherer returns error', () => {
     const debugString = 'Unable to gather passive event listeners usage.';
     const auditResult = PassiveEventsAudit.audit({
       EventListeners: {

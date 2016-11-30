@@ -21,10 +21,6 @@ const assert = require('assert');
 /* global describe, it*/
 
 describe('Security: HTTP->HTTPS audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).rawValue, false);
-  });
-
   it('fails when no redirect detected', () => {
     return assert.equal(Audit.audit({
       HTTPRedirect: {

@@ -25,12 +25,6 @@ const h2Records = require('../../fixtures/networkRecords-h2push.json');
 /* eslint-env mocha */
 
 describe('Resources are fetched over http/2', () => {
-  it('fails when no input present', () => {
-    const auditResult = UsesHTTP2Audit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('fails when some resources were requested via http/1.x', () => {
     const auditResult = UsesHTTP2Audit.audit({
       URL: {finalUrl: URL},

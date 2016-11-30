@@ -21,8 +21,6 @@ const Audit = require('./audit');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const Formatter = require('../formatters/formatter');
 
-const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
-
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
 // https://www.desmos.com/calculator/joz3pqttdq
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 1600;
@@ -41,7 +39,7 @@ class FirstMeaningfulPaint extends Audit {
       description: 'First meaningful paint',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
       helpText: 'First meaningful paint measures when the primary content of a page is visible. <a href="https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint" target="_blank" rel="noreferrer noopener">Learn more</a>.',
-      requiredArtifacts: ['traceContents']
+      requiredArtifacts: ['traces']
     };
   }
 
@@ -55,9 +53,6 @@ class FirstMeaningfulPaint extends Audit {
   static audit(artifacts) {
     return new Promise((resolve, reject) => {
       const traceContents = artifacts.traces[this.DEFAULT_PASS].traceEvents;
-      if (!traceContents || !Array.isArray(traceContents)) {
-        throw new Error(FAILURE_MESSAGE);
-      }
       const evts = this.collectEvents(traceContents);
 
       const navStart = evts.navigationStart;

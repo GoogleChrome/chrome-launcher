@@ -44,7 +44,9 @@ class NotificationOnStart extends Gatherer {
           }
 
           return this.collectNotificationUsage().then(results => {
-            this.artifact.usage = results;
+            this.artifact = {
+              usage: results
+            };
           });
         }).catch(e => {
           this.artifact = {

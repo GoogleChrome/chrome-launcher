@@ -21,10 +21,16 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('No websql audit', () => {
-  it('fails gracefully when gatherer does not run', () => {
-    const auditResult = NoWebSQLAudit.audit({});
+  it('fails when gatherer returns error', () => {
+    const debugString = 'websql is the best';
+    const auditResult = NoWebSQLAudit.audit({
+      WebSQL: {
+        database: -1,
+        debugString
+      }
+    });
     assert.equal(auditResult.rawValue, -1);
-    assert.equal(auditResult.debugString, 'WebSQL gatherer did not run');
+    assert.equal(auditResult.debugString, debugString);
   });
 
   it('passes when no database is created', () => {

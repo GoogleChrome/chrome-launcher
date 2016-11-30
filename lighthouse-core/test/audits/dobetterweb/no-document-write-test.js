@@ -32,12 +32,6 @@ describe('Page does not use document.write()', () => {
     assert.equal(auditResult.debugString, debugString);
   });
 
-  it('fails when no input present', () => {
-    const auditResult = DocWriteUseAudit.audit({});
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('passes when document.write() is not used', () => {
     const auditResult = DocWriteUseAudit.audit({
       DocWriteUse: {usage: []},
