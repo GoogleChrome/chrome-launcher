@@ -128,7 +128,8 @@ class ReportGenerator {
 
     // Force UTC if runtime timezone could not be detected.
     // See https://github.com/GoogleChrome/lighthouse/issues/1056
-    if (formatter.resolvedOptions().timeZone.toLowerCase() === 'etc/unknown') {
+    const tz = formatter.resolvedOptions().timeZone;
+    if (!tz || tz.toLowerCase() === 'etc/unknown') {
       options.timeZone = 'UTC';
       formatter = new Intl.DateTimeFormat('en-US', options);
     }
