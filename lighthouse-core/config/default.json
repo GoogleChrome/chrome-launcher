@@ -290,12 +290,6 @@
     }, {
       "name": "Using modern JavaScript features",
       "audits": {
-        "no-datenow": {
-          "expectedValue": false
-        },
-        "no-console-time": {
-          "expectedValue": false
-        },
         "uses-passive-event-listeners": {
           "expectedValue": true
         },
@@ -412,6 +406,22 @@
         "user-timings": {
           "expectedValue": 0,
           "weight": 1
+        }
+      }
+    }]
+  }, {
+    "name": "Fancier stuff",
+    "description": "A list of newer features that you could be using in your app. These audits do not affect your score and are just suggestions.",
+    "scored": false,
+    "categorizable": true,
+    "items": [{
+      "name": "New JavaScript features",
+      "audits": {
+        "no-datenow": {
+          "expectedValue": false
+        },
+        "no-console-time": {
+          "expectedValue": false
         }
       }
     }]
