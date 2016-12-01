@@ -38,6 +38,11 @@ class ContentWidth extends Gatherer {
     return driver.evaluateAsync(`(${getContentWidth.toString()}())`)
 
     .then(returnedValue => {
+      if (!Number.isFinite(returnedValue.scrollWidth) ||
+          !Number.isFinite(returnedValue.viewportWidth)) {
+        throw new Error(`ContentWidth results were not numeric: ${JSON.stringify(returnedValue)}`);
+      }
+
       this.artifact = returnedValue;
     }, _ => {
       this.artifact = {
