@@ -20,6 +20,9 @@
 const fs = require('fs');
 const path = require('path');
 const execSync = require('child_process').execSync;
+const execFileSync = require('child_process').execFileSync;
+
+const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
@@ -41,7 +44,7 @@ export function darwin() {
     ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
     ' | awk \'{$1=""; print $0}\''
   ).toString()
-    .split(/\r?\n/)
+    .split(newLineRegex)
     .forEach((inst: string) => {
       suffixes.forEach(suffix => {
         const execPath = path.join(inst.trim(), suffix);
@@ -74,15 +77,64 @@ export function darwin() {
   return sort(installations, priorities);
 }
 
+/**
+ * Look for linux executables in 3 ways
+ * 1. Look into LIGHTHOUSE_CHROMIUM_PATH env variable
+ * 2. Look into the directories where .desktop are saved on gnome based distro's
+ * 3. Look for google-chrome-stable & google-chrome executables by using the which command
+ */
 export function linux() {
-  const execPath = process.env.LIGHTHOUSE_CHROMIUM_PATH;
-  if (execPath && canAccess(execPath)) {
-    return [execPath];
+  let installations: Array<string> = [];
+
+  // 1. Look into LIGHTHOUSE_CHROMIUM_PATH env variable
+  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
+    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH);
   }
-  throw new Error(
-    'The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to ' +
-    'executable of a build of Chromium version 52.0 or later.'
-  );
+
+  // 2. Look into the directories where .desktop are saved on gnome based distro's
+  const desktopInstallationFolders = [
+    path.join(require('os').homedir(), '.local/share/applications/'),
+    '/usr/share/applications/',
+  ];
+  desktopInstallationFolders.forEach(folder => {
+    installations = installations.concat(findChromeExecutables(folder));
+  });
+
+  // Look for google-chrome-stable & google-chrome executables by using the which command
+  const executables = [
+    'google-chrome-stable',
+    'google-chrome',
+  ];
+  executables.forEach((executable: string) => {
+    const chromePath = execFileSync('which', [executable])
+      .toString()
+      .split(newLineRegex)[0];
+
+    if (canAccess(chromePath)) {
+      installations.push(chromePath);
+    }
+  });
+
+  if (!installations.length) {
+    throw new Error('The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to ' +
+      'executable of a build of Chromium version 54.0 or later.');
+  }
+
+  const priorities: Priorities = [{
+    regex: /chrome-wrapper$/,
+    weight: 51
+  }, {
+    regex: /google-chrome-stable$/,
+    weight: 50
+  }, {
+    regex: /google-chrome$/,
+    weight: 49
+  }, {
+    regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH),
+    weight: 100
+  }];
+
+  return sort(uniq(installations.filter(Boolean)), priorities);
 }
 
 export function win32() {
@@ -126,10 +178,38 @@ function sort(installations: Array<string>, priorities: Priorities) {
 }
 
 function canAccess(file: string): Boolean {
+  if (!file) {
+    return false;
+  }
+
   try {
     fs.accessSync(file);
     return true;
   } catch (e) {
     return false;
   }
+}
+
+function uniq(arr: Array<any>) {
+    return Array.from(new Set(arr));
+}
+
+function findChromeExecutables(folder: string): Array<string> {
+  const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
+  const chromeExecRegex = '^Exec=\/.*\/(google|chrome|chromium)-.*';
+
+  let installations: Array<string> = [];
+  if (canAccess(folder)) {
+    // Output of the grep & print looks like:
+    //    /opt/google/chrome/google-chrome --profile-directory
+    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
+    let execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
+      .toString()
+      .split(newLineRegex)
+      .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
+
+    execPaths.forEach((execPath: string) => canAccess(execPath) && installations.push(execPath));
+  }
+
+  return installations;
 }
