@@ -100,6 +100,32 @@ describe('Runner', () => {
     });
   });
 
+  it('rejects when given an invalid trace artifact', () => {
+    const url = 'https://example.com';
+    const config = new Config({
+      passes: [{
+        recordTrace: true,
+        gatherers: []
+      }],
+    });
+
+    // Arrange for driver to return bad trace.
+    const badTraceDriver = Object.assign({}, driverMock, {
+      endTrace() {
+        return Promise.resolve({
+          traceEvents: 'not an array'
+        });
+      }
+    });
+
+    return Runner.run({}, {url, config, driverMock: badTraceDriver})
+      .then(_ => {
+        assert.ok(false);
+      }, _ => {
+        assert.ok(true);
+      });
+  });
+
   it('outputs an error audit result when missing a required artifact', () => {
     const url = 'https://example.com';
 

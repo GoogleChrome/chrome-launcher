@@ -32,7 +32,7 @@ function mockArtifactsWithSpeedlineResult(result) {
       return Promise.resolve(result);
     }
   };
-  return Object.assign(emptyTraceStub, mockArtifacts);
+  return Object.assign({}, emptyTraceStub, mockArtifacts);
 }
 
 describe('Performance: speed-index-metric audit', () => {

@@ -99,6 +99,18 @@ class Runner {
         });
       }
 
+      // Basic check that the traces (gathered or loaded) are valid.
+      run = run.then(artifacts => {
+        for (const passName of Object.keys(artifacts.traces || {})) {
+          const trace = artifacts.traces[passName];
+          if (!Array.isArray(trace.traceEvents)) {
+            throw new Error(passName + ' trace was invalid. `traceEvents` was not an array.');
+          }
+        }
+
+        return artifacts;
+      });
+
       // Ignoring these two flags for coverage as this functionality is not exposed by the module.
       /* istanbul ignore next */
       if (opts.flags.saveArtifacts) {
@@ -117,7 +129,6 @@ class Runner {
       // Run each audit sequentially, the auditResults array has all our fine work
       const auditResults = [];
       run = run.then(artifacts => config.audits.reduce((chain, audit) => {
-        // TODO: need to check that traces are arrays
         return chain.then(_ => {
           return runAudit(audit, artifacts);
         }).then(ret => auditResults.push(ret));
