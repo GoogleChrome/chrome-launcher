@@ -16,24 +16,22 @@
  */
 
 /**
- * @fileoverview Captures calls to the geolocation API on page load.
+ * @fileoverview Captures calls to the notification API on page load.
  */
 
 'use strict';
 
 const Gatherer = require('../gatherer');
 
-class GeolocationOnStart extends Gatherer {
+class NotificationOnStart extends Gatherer {
 
   beforePass(options) {
-    this.collectCurrentPosUsage = options.driver.captureFunctionCallSites(
-        'navigator.geolocation.getCurrentPosition');
-    this.collectWatchPosUsage = options.driver.captureFunctionCallSites(
-        'navigator.geolocation.watchPosition');
+    this.collectNotificationUsage = options.driver.captureFunctionCallSites(
+        'Notification.requestPermission');
   }
 
   afterPass(options) {
-    return options.driver.queryPermissionState('geolocation')
+    return options.driver.queryPermissionState('notifications')
         .then(state => {
           if (state === 'granted' || state === 'denied') {
             this.artifact = {
@@ -45,9 +43,7 @@ class GeolocationOnStart extends Gatherer {
             return;
           }
 
-          return this.collectCurrentPosUsage().then(results => {
-            return this.collectWatchPosUsage().then(results2 => results.concat(results2));
-          }).then(results => {
+          return this.collectNotificationUsage().then(results => {
             this.artifact.usage = results;
           });
         }).catch(e => {
@@ -59,4 +55,4 @@ class GeolocationOnStart extends Gatherer {
   }
 }
 
-module.exports = GeolocationOnStart;
+module.exports = NotificationOnStart;

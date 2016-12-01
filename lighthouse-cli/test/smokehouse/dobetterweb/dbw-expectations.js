@@ -36,6 +36,7 @@ module.exports = [
       'no-mutation-events': false,
       'no-old-flexbox': false,
       'no-websql': false,
+      'notification-on-start': false,
       'script-blocking-first-paint': false,
       'uses-passive-event-listeners': false
     }

@@ -37,6 +37,7 @@
       "dobetterweb/datenow",
       "dobetterweb/document-write",
       "dobetterweb/geolocation-on-start",
+      "dobetterweb/notification-on-start",
       "dobetterweb/tags-blocking-first-paint",
       "dobetterweb/websql"
     ]
@@ -84,6 +85,7 @@
     "dobetterweb/no-mutation-events",
     "dobetterweb/no-old-flexbox",
     "dobetterweb/no-websql",
+    "dobetterweb/notification-on-start",
     "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
     "dobetterweb/uses-passive-event-listeners"
@@ -319,6 +321,9 @@
           "expectedValue": true
         },
         "geolocation-on-start": {
+          "expectedValue": false
+        },
+        "notification-on-start": {
           "expectedValue": false
         }
       }
