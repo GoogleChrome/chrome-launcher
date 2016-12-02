@@ -130,7 +130,9 @@ function convertImport(src) {
           transformed = transformed.replace('if (new.target)', 'if (!(this instanceof Slice))');
         }
         transformed = babel.transform(transformed, {
-          plugins: ['transform-es2015-destructuring']
+          plugins: ['transform-es2015-destructuring'],
+          comments: false, // Output comments in generated output.
+          compact: true // Do not include superfluous whitespace characters and line terminators.
         }).code;
         return transformed;
       }
