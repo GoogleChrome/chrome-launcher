@@ -26,37 +26,6 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-function runAudit(audit, artifacts) {
-  const status = `Evaluating: ${audit.meta.description}`;
-
-  return Promise.resolve().then(_ => {
-    log.log('status', status);
-
-    // Return an early error if an artifact required for the audit is missing.
-    for (const artifactName of audit.meta.requiredArtifacts) {
-      const noArtifact = typeof artifacts[artifactName] === 'undefined';
-
-      // If trace required, check that DEFAULT_PASS trace exists.
-      // TODO: need pass-specific check of networkRecords and traces.
-      const noTrace = artifactName === 'traces' && !artifacts.traces[Audit.DEFAULT_PASS];
-
-      if (noArtifact || noTrace) {
-        log.warn('Runner',
-            `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
-        return audit.generateAuditResult({
-          rawValue: -1,
-          debugString: `Required ${artifactName} gatherer did not run.`
-        });
-      }
-    }
-
-    return audit.audit(artifacts);
-  }).then(result => {
-    log.verbose('statusEnd', status);
-    return result;
-  });
-}
-
 class Runner {
   static run(connection, opts) {
     // Clean opts input.
@@ -136,7 +105,7 @@ class Runner {
       const auditResults = [];
       run = run.then(artifacts => config.audits.reduce((chain, audit) => {
         return chain.then(_ => {
-          return runAudit(audit, artifacts);
+          return Runner._runAudit(audit, artifacts);
         }).then(ret => auditResults.push(ret));
       }, Promise.resolve()).then(_ => auditResults));
     } else if (config.auditResults) {
@@ -173,6 +142,45 @@ class Runner {
       });
 
     return run;
+  }
+
+  /**
+   * Checks that the audit's required artifacts exist and runs the audit if so.
+   * Otherwise returns error audit result.
+   * @param {!Audit} audit
+   * @param {!Artifacts} artifacts
+   * @return {!Promise<!AuditResult>}
+   * @private
+   */
+  static _runAudit(audit, artifacts) {
+    const status = `Evaluating: ${audit.meta.description}`;
+
+    return Promise.resolve().then(_ => {
+      log.log('status', status);
+
+      // Return an early error if an artifact required for the audit is missing.
+      for (const artifactName of audit.meta.requiredArtifacts) {
+        const noArtifact = typeof artifacts[artifactName] === 'undefined';
+
+        // If trace required, check that DEFAULT_PASS trace exists.
+        // TODO: need pass-specific check of networkRecords and traces.
+        const noTrace = artifactName === 'traces' && !artifacts.traces[Audit.DEFAULT_PASS];
+
+        if (noArtifact || noTrace) {
+          log.warn('Runner',
+              `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
+          return audit.generateAuditResult({
+            rawValue: -1,
+            debugString: `Required ${artifactName} gatherer did not run.`
+          });
+        }
+      }
+
+      return audit.audit(artifacts);
+    }).then(result => {
+      log.verbose('statusEnd', status);
+      return result;
+    });
   }
 
   /**
