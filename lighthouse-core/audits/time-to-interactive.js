@@ -82,7 +82,7 @@ class TTIMetric extends Audit {
       const endOfTraceTime = model.bounds.max;
 
       // TODO: Wait for DOMContentLoadedEndEvent
-      const fMPts = timings.fMPfull + timings.navStart;
+      const fMPts = timings.fMP + timings.navStart;
 
       // look at speedline results for 85% starting at FMP
       let visuallyReadyTiming = 0;

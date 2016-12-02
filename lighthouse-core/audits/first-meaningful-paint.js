@@ -28,8 +28,6 @@ const FAILURE_MESSAGE = 'Navigation and first paint timings not found.';
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 1600;
 const SCORING_MEDIAN = 4000;
 
-const BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN = 200;
-
 class FirstMeaningfulPaint extends Audit {
   /**
    * @return {!AuditMeta}
@@ -61,21 +59,11 @@ class FirstMeaningfulPaint extends Audit {
       const evts = this.collectEvents(traceContents);
 
       const navStart = evts.navigationStart;
-      const fCP = evts.firstContentfulPaint;
-      const fMPbasic = this.findFirstMeaningfulPaint(evts, {});
-      const fMPpageheight = this.findFirstMeaningfulPaint(evts, {pageHeight: true});
-      const fMPwebfont = this.findFirstMeaningfulPaint(evts, {webFont: true});
-      const fMPfull = this.findFirstMeaningfulPaint(evts, {pageHeight: true, webFont: true});
+      const fMP = evts.firstMeaningfulPaint;
 
       var data = {
         navStart,
-        fmpCandidates: {
-          fCP,
-          fMPbasic,
-          fMPpageheight,
-          fMPwebfont,
-          fMPfull
-        }
+        fMP,
       };
 
       const result = this.calculateScore(data);
@@ -101,24 +89,8 @@ class FirstMeaningfulPaint extends Audit {
   }
 
   static calculateScore(data) {
-    // there are a few candidates for fMP:
-    // * firstContentfulPaint: the first time that text or image content was painted.
-    // * fMP basic: paint after most significant layout
-    // * fMP page height: basic + scaling sigificance to page height
-    // * fMP webfont: basic + waiting for in-flight webfonts to paint
-    // * fMP full: considering both page height + webfont heuristics
-
-    // Calculate the difference from navigation and save all candidates
-    const timings = {};
-    const timingsArr = [];
-    Object.keys(data.fmpCandidates).forEach(name => {
-      const evt = data.fmpCandidates[name];
-      timings[name] = evt && ((evt.ts - data.navStart.ts) / 1000);
-      timingsArr.push(timings[name]);
-    });
-
     // First meaningful paint is the last timestamp observed from the candidates
-    const firstMeaningfulPaint = timingsArr.reduce((maxTimestamp, curr) => max(maxTimestamp, curr));
+    const firstMeaningfulPaint = (data.fMP.ts - data.navStart.ts) / 1000;
 
     // Use the CDF of a log-normal distribution for scoring.
     //   < 1100ms: score≈100
@@ -132,13 +104,14 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.min(100, score);
     score = Math.max(0, score);
 
-    timings.navStart = data.navStart.ts / 1000;
+    data.fMP = firstMeaningfulPaint;
+    data.navStart = data.navStart.ts / 1000;
 
     return {
       duration: `${firstMeaningfulPaint.toFixed(1)}`,
       score: Math.round(score),
       rawValue: firstMeaningfulPaint.toFixed(1),
-      extendedInfo: {timings}
+      extendedInfo: {timings: data}
     };
   }
 
@@ -148,21 +121,15 @@ class FirstMeaningfulPaint extends Audit {
   static collectEvents(traceData) {
     let mainFrameID;
     let navigationStart;
-    let firstContentfulPaint;
-    const layouts = new Map();
-    const paints = [];
+    let firstMeaningfulPaint;
 
     // const model = new DevtoolsTimelineModel(traceData);
     // const events = model.timelineModel().mainThreadEvents();
     const events = traceData;
 
     // Parse the trace for our key events and sort them by timestamp.
-    events.filter(e => {
-      return e.cat.includes('blink.user_timing') ||
-        e.name === 'FrameView::performLayout' ||
-        e.name === 'Paint' ||
-        e.name === 'TracingStartedInPage';
-    }).sort((event0, event1) => {
+    events.filter(e => e.cat.includes('blink.user_timing') || e.name === 'TracingStartedInPage')
+    .sort((event0, event1) => {
       return event0.ts - event1.ts;
     }).forEach(event => {
       // Grab the page's ID from the first TracingStartedInPage in the trace
@@ -175,24 +142,9 @@ class FirstMeaningfulPaint extends Audit {
       if (event.name === 'navigationStart' && !!mainFrameID && !navigationStart) {
         navigationStart = event;
       }
-      // firstContentfulPaint == the first time that text or image content was
-      // painted. See src/third_party/WebKit/Source/core/paint/PaintTiming.h
-      // COMPAT: firstContentfulPaint trace event first introduced in Chrome 49 (r370921)
-      if (event.name === 'firstContentfulPaint' && event.args.frame === mainFrameID &&
+      if (event.name === 'firstMeaningfulPaint' && event.args.frame === mainFrameID &&
           !!navigationStart && event.ts >= navigationStart.ts) {
-        firstContentfulPaint = event;
-      }
-      // COMPAT: frame property requires Chrome 52 (r390306)
-      // https://codereview.chromium.org/1922823003
-      if (event.name === 'FrameView::performLayout' &&
-          event.args.counters && event.args.counters.frame === mainFrameID &&
-          !!navigationStart && event.ts >= navigationStart.ts) {
-        layouts.set(event, event.args.counters);
-      }
-
-      if (event.name === 'Paint' && event.args.data.frame === mainFrameID &&
-        !!navigationStart && event.ts >= navigationStart.ts) {
-        paints.push(event);
+        firstMeaningfulPaint = event;
       }
     });
 
@@ -204,72 +156,9 @@ class FirstMeaningfulPaint extends Audit {
 
     return {
       navigationStart,
-      firstContentfulPaint,
-      layouts,
-      paints
+      firstMeaningfulPaint,
     };
-  }
-
-  static findFirstMeaningfulPaint(evts, heuristics) {
-    let mostSignificantLayout;
-    let significance = 0;
-    let maxSignificanceSoFar = 0;
-    let pending = 0;
-
-    evts.layouts.forEach((countersObj, layoutEvent) => {
-      const counter = val => countersObj[val];
-
-      function heightRatio() {
-        const ratioBefore = counter('contentsHeightBeforeLayout') / counter('visibleHeight');
-        const ratioAfter = counter('contentsHeightAfterLayout') / counter('visibleHeight');
-        return (max(1, ratioBefore) + max(1, ratioAfter)) / 2;
-      }
-
-      // If there are loading fonts when layout happened, the layout change accounting is postponed
-      // until the font is displayed. However, icon fonts shouldn't block first meaningful paint.
-      // We use a threshold that only web fonts that laid out more than 200 characters
-      // should block first meaningful paint.
-      //   https://docs.google.com/document/d/1BR94tJdZLsin5poeet0XoTW60M0SjvOJQttKT-JK8HI/edit#heading=h.wjx8tsc9m27r
-      function hasTooManyBlankCharactersToBeMeaningful() {
-        return counter('approximateBlankCharacterCount') >
-            BLOCK_FIRST_MEANINGFUL_PAINT_IF_BLANK_CHARACTERS_MORE_THAN;
-      }
-
-      if (!counter('host') || counter('visibleHeight') === 0) {
-        return;
-      }
-
-      const layoutCount = counter('LayoutObjectsThatHadNeverHadLayout') || 0;
-      // layout significance = number of layout objects added / max(1, page height / screen height)
-      significance = (heuristics.pageHeight) ? (layoutCount / heightRatio()) : layoutCount;
-
-      if (heuristics.webFont && hasTooManyBlankCharactersToBeMeaningful()) {
-        pending += significance;
-      } else {
-        significance += pending;
-        pending = 0;
-        if (significance > maxSignificanceSoFar) {
-          maxSignificanceSoFar = significance;
-          mostSignificantLayout = layoutEvent;
-        }
-      }
-    });
-
-    let paintAfterMSLayout;
-    if (mostSignificantLayout) {
-      paintAfterMSLayout = evts.paints.find(e => e.ts > mostSignificantLayout.ts);
-    }
-    return paintAfterMSLayout;
   }
 }
 
 module.exports = FirstMeaningfulPaint;
-
-/**
- * Math.max, but with NaN values removed
- * @param {...number} _
- */
-function max(_) {
-  const args = [...arguments].filter(val => !isNaN(val));
-  return Math.max.apply(Math, args);
-}

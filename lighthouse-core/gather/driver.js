@@ -49,7 +49,6 @@ class Driver {
       'benchmark',
       'netlog',
       'devtools.timeline',
-      'disabled-by-default-blink.debug.layout',
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',
       'disabled-by-default-devtools.timeline.stack',

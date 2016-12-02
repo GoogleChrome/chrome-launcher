@@ -99,16 +99,7 @@ function FirstMeaningfulPaintTimings() {}
 FirstMeaningfulPaintTimings.prototype.fCP;
 
 /** @type {number} */
-FirstMeaningfulPaintTimings.prototype.fMPbasic;
-
-/** @type {number} */
-FirstMeaningfulPaintTimings.prototype.fMPpageheight;
-
-/** @type {number} */
-FirstMeaningfulPaintTimings.prototype.fMPwebfont;
-
-/** @type {number} */
-FirstMeaningfulPaintTimings.prototype.fMPfull;
+FirstMeaningfulPaintTimings.prototype.fMP;
 
 /** @type {number} */
 FirstMeaningfulPaintTimings.prototype.navStart;

@@ -86,11 +86,7 @@
       "extendedInfo": {
         "value": {
           "timings": {
-            "fCP": 615.821,
-            "fMPbasic": 615.595,
-            "fMPpageheight": 615.595,
-            "fMPwebfont": 615.595,
-            "fMPfull": 615.595,
+            "fMP": 615.595,
             "navStart": 110574423.567
           }
         },
