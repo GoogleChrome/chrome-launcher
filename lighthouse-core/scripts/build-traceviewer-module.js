@@ -140,7 +140,7 @@ function convertImport(src) {
       function adjustForBrowserCompat(scriptsContent) {
         return scriptsContent
             // early exit in tracing/base.ui and avoid currentScript from breaking us.
-            .replace('var THIS_DOC = document.currentScript.ownerDocument;', 'return;');
+            .replace(/var THIS_DOC ?= ?document\.currentScript\.ownerDocument;/g, 'return;');
       }
 
       function writeNewFile(dest, scriptsContent) {
