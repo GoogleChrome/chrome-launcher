@@ -35,16 +35,15 @@ Object.keys(glMatrixModule).forEach(exportName => {
   global[exportName] = glMatrixModule[exportName];
 });
 // from catapult/tracing/tracing/extras/importer/jszip.html
-global.JSZip = require('jszip/dist/jszip.min.js');
+global.JSZip = {};
 global.mannwhitneyu = {};
-
 global.HTMLImportsLoader = {};
 global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
   if (path === '/gl-matrix-min.js') {
     return '../../../lib/empty-stub.js';
   }
   if (path === '/jszip.min.js') {
-    return 'jszip/dist/jszip.min.js';
+    return '../../../lib/empty-stub.js';
   }
   if (path === '/mannwhitneyu.js') {
     return '../../../lib/empty-stub.js';

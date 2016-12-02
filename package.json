@@ -51,7 +51,6 @@
     "gl-matrix": "2.3.2",
     "handlebars": "^4.0.5",
     "json-stringify-safe": "^5.0.1",
-    "jszip": "2.6.0",
     "mkdirp": "^0.5.1",
     "rimraf": "^2.2.8",
     "semver": ">=4.3.3",
