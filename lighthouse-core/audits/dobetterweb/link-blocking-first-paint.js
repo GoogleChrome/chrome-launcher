@@ -46,10 +46,10 @@ class LinkBlockingFirstPaintAudit extends Audit {
    */
   static computeAuditResultForTags(artifacts, tagFilter) {
     const artifact = artifacts.TagsBlockingFirstPaint;
-    if (typeof artifact === 'undefined' || artifact.value === -1) {
+    if (artifact.value === -1) {
       return {
         rawValue: -1,
-        debugString: 'TagsBlockingFirstPaint gatherer did not run'
+        debugString: artifact.debugString
       };
     }
 

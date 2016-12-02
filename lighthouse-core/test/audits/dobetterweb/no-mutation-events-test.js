@@ -25,10 +25,17 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page does not use mutation events', () => {
-  it('it returns error value when no input present', () => {
-    const auditResult = NoMutationEventsAudit.audit({});
+  it('fails when gatherer returns error', () => {
+    const debugString = 'event-y debug string';
+    const auditResult = NoMutationEventsAudit.audit({
+      EventListeners: {
+        rawValue: -1,
+        debugString
+      },
+      URL: {finalUrl: URL}
+    });
     assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
+    assert.strictEqual(auditResult.debugString, debugString);
   });
 
   it('passes when mutation events are not used', () => {

@@ -27,22 +27,17 @@ const exampleManifest = manifestParser(manifestSrc, URL, URL);
 /* global describe, it*/
 
 describe('Cache: start_url audit', () => {
-  it('fails when an empty manifest artifact is present', () => {
-    return assert.equal(Audit.audit({Manifest: {}}).rawValue, false);
-  });
-
   it('fails when no cache contents given', () => {
-    const artifacts = {Manifest: exampleManifest, URL: {finalUrl: URL}};
+    const artifacts = {
+      Manifest: exampleManifest,
+      URL: {finalUrl: URL},
+      CacheContents: {
+        debugString: 'no cache contents'
+      }
+    };
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
-    assert.equal(output.debugString, 'No cache or URL detected');
-  });
-
-  it('fails when no URL given', () => {
-    const artifacts = {Manifest: exampleManifest, CacheContents};
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
-    assert.equal(output.debugString, 'No cache or URL detected');
+    assert.ok(output.debugString);
   });
 
   it('succeeds when given a manifest with a start_url, cache contents, and a URL', () => {

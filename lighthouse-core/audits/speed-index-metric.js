@@ -37,7 +37,7 @@ class SpeedIndexMetric extends Audit {
       description: 'Perceptual Speed Index',
       helpText: 'Speed Index shows how quickly the contents of a page are visibly populated. <a href="https://developers.google.com/web/tools/lighthouse/audits/speed-index" target="_blank" rel="noreferrer noopener">Learn more</a>.',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
-      requiredArtifacts: ['traceContents']
+      requiredArtifacts: ['traces']
     };
   }
 
@@ -49,12 +49,6 @@ class SpeedIndexMetric extends Audit {
    */
   static audit(artifacts) {
     const trace = artifacts.traces[this.DEFAULT_PASS];
-    if (typeof trace === 'undefined') {
-      return SpeedIndexMetric.generateAuditResult({
-        rawValue: -1,
-        debugString: 'No trace found to generate screenshots'
-      });
-    }
 
     // run speedline
     return artifacts.requestSpeedline(trace).then(speedline => {

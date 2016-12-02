@@ -22,7 +22,9 @@ const assert = require('assert');
 
 describe('Mobile-friendly: viewport audit', () => {
   it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).rawValue, false);
+    return assert.equal(Audit.audit({
+      Viewport: -1
+    }).rawValue, false);
   });
 
   it('fails when HTML does not contain a viewport meta tag', () => {

@@ -45,12 +45,9 @@ class NoConsoleTimeAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.ConsoleTimeUsage === 'undefined' ||
-        artifacts.ConsoleTimeUsage.value === -1) {
+    if (artifacts.ConsoleTimeUsage.value === -1) {
       let debugString = 'Unknown error with the ConsoleTimeUsage gatherer';
-      if (typeof artifacts.ConsoleTimeUsage === 'undefined') {
-        debugString = 'ConsoleTimeUsage gatherer did not run';
-      } else if (artifacts.ConsoleTimeUsage.debugString) {
+      if (artifacts.ConsoleTimeUsage.debugString) {
         debugString = artifacts.ConsoleTimeUsage.debugString;
       }
 

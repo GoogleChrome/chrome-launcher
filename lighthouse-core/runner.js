@@ -19,6 +19,7 @@
 const Driver = require('./gather/driver.js');
 const GatherRunner = require('./gather/gather-runner');
 const Aggregate = require('./aggregator/aggregate');
+const Audit = require('./audits/audit');
 const assetSaver = require('./lib/asset-saver');
 const log = require('./lib/log');
 const fs = require('fs');
@@ -73,6 +74,18 @@ class Runner {
         });
       }
 
+      // Basic check that the traces (gathered or loaded) are valid.
+      run = run.then(artifacts => {
+        for (const passName of Object.keys(artifacts.traces || {})) {
+          const trace = artifacts.traces[passName];
+          if (!Array.isArray(trace.traceEvents)) {
+            throw new Error(passName + ' trace was invalid. `traceEvents` was not an array.');
+          }
+        }
+
+        return artifacts;
+      });
+
       // Ignoring these two flags for coverage as this functionality is not exposed by the module.
       /* istanbul ignore next */
       if (opts.flags.saveArtifacts) {
@@ -88,18 +101,12 @@ class Runner {
         });
       }
 
-      // Now run the audits.
+      // Run each audit sequentially, the auditResults array has all our fine work
       const auditResults = [];
       run = run.then(artifacts => config.audits.reduce((chain, audit) => {
-        const status = `Evaluating: ${audit.meta.description}`;
-        // Run each audit sequentially, the auditResults array has all our fine work
         return chain.then(_ => {
-          log.log('status', status);
-          return audit.audit(artifacts);
-        }).then(ret => {
-          log.verbose('statusEnd', status);
-          auditResults.push(ret);
-        });
+          return Runner._runAudit(audit, artifacts);
+        }).then(ret => auditResults.push(ret));
       }, Promise.resolve()).then(_ => auditResults));
     } else if (config.auditResults) {
       // If there are existing audit results, surface those here.
@@ -135,6 +142,45 @@ class Runner {
       });
 
     return run;
+  }
+
+  /**
+   * Checks that the audit's required artifacts exist and runs the audit if so.
+   * Otherwise returns error audit result.
+   * @param {!Audit} audit
+   * @param {!Artifacts} artifacts
+   * @return {!Promise<!AuditResult>}
+   * @private
+   */
+  static _runAudit(audit, artifacts) {
+    const status = `Evaluating: ${audit.meta.description}`;
+
+    return Promise.resolve().then(_ => {
+      log.log('status', status);
+
+      // Return an early error if an artifact required for the audit is missing.
+      for (const artifactName of audit.meta.requiredArtifacts) {
+        const noArtifact = typeof artifacts[artifactName] === 'undefined';
+
+        // If trace required, check that DEFAULT_PASS trace exists.
+        // TODO: need pass-specific check of networkRecords and traces.
+        const noTrace = artifactName === 'traces' && !artifacts.traces[Audit.DEFAULT_PASS];
+
+        if (noArtifact || noTrace) {
+          log.warn('Runner',
+              `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
+          return audit.generateAuditResult({
+            rawValue: -1,
+            debugString: `Required ${artifactName} gatherer did not run.`
+          });
+        }
+      }
+
+      return audit.audit(artifacts);
+    }).then(result => {
+      log.verbose('statusEnd', status);
+      return result;
+    });
   }
 
   /**

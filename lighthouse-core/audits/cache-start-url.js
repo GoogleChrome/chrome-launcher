@@ -38,7 +38,7 @@ class CacheStartUrl extends Audit {
    */
   static audit(artifacts) {
     let cacheHasStartUrl = false;
-    const manifest = artifacts.Manifest && artifacts.Manifest.value;
+    const manifest = artifacts.Manifest.value;
     const cacheContents = artifacts.CacheContents;
 
     if (!(manifest && manifest.start_url && manifest.start_url.value)) {
@@ -48,11 +48,10 @@ class CacheStartUrl extends Audit {
       });
     }
 
-    if (!(Array.isArray(cacheContents) && artifacts.URL &&
-          artifacts.URL.finalUrl)) {
+    if (!Array.isArray(cacheContents)) {
       return CacheStartUrl.generateAuditResult({
         rawValue: false,
-        debugString: 'No cache or URL detected'
+        debugString: cacheContents.debugString || 'No cache detected'
       });
     }
 

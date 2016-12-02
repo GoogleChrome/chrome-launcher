@@ -46,14 +46,6 @@ class UsesHTTP2Audit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.networkRecords === 'undefined' ||
-        artifacts.URL === 'undefined') {
-      return UsesHTTP2Audit.generateAuditResult({
-        rawValue: -1,
-        debugString: 'Network or URL gatherer did not run'
-      });
-    }
-
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
     const finalHost = url.parse(artifacts.URL.finalUrl).host;
 

@@ -29,7 +29,6 @@ class ThemeColor extends Gatherer {
         this.artifact = themeColorMeta;
       })
       .catch(_ => {
-        // The audit should read this as a fail since -1 is not a valid color.
         this.artifact = -1;
       });
   }

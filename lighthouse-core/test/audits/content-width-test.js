@@ -18,20 +18,30 @@
 const Audit = require('../../audits/content-width.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Mobile-friendly: content-width audit', () => {
-  it('fails when no input present', () => {
-    return assert.equal(Audit.audit({}).rawValue, false);
-  });
-
   it('fails when scroll width differs from viewport width', () => {
-    return assert.equal(Audit.audit({
+    const result = Audit.audit({
       ContentWidth: {
         scrollWidth: 100,
         viewportWidth: 300
       }
-    }).rawValue, false);
+    });
+
+    assert.equal(result.rawValue, false);
+    assert.ok(result.debugString);
+  });
+
+  it('fails when gatherer failed', () => {
+    const result = Audit.audit({
+      ContentWidth: {
+        scrollWidth: -1,
+        viewportWidth: -1
+      }
+    });
+    assert.equal(result.rawValue, false);
+    assert.ok(result.debugString);
   });
 
   it('passes when widths match', () => {

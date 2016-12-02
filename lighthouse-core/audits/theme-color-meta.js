@@ -38,7 +38,7 @@ class ThemeColor extends Audit {
    */
   static audit(artifacts) {
     const themeColorMeta = artifacts.ThemeColor;
-    if (!themeColorMeta) {
+    if (themeColorMeta === null || themeColorMeta === -1) {
       return ThemeColor.generateAuditResult({
         rawValue: false,
         debugString: 'No valid theme-color meta tag found.'

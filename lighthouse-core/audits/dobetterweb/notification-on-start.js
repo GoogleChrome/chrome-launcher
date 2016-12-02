@@ -45,12 +45,9 @@ class NotificationOnStart extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.NotificationOnStart === 'undefined' ||
-        artifacts.NotificationOnStart.value === -1) {
+    if (artifacts.NotificationOnStart.value === -1) {
       let debugString = 'Unknown error with the NotificationOnStart gatherer';
-      if (typeof artifacts.NotificationOnStart === 'undefined') {
-        debugString = 'NotificationOnStart gatherer did not run';
-      } else if (artifacts.NotificationOnStart.debugString) {
+      if (artifacts.NotificationOnStart.debugString) {
         debugString = artifacts.NotificationOnStart.debugString;
       }
 

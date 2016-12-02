@@ -30,11 +30,8 @@ class TestGatherer extends Gatherer {
     this.called = false;
   }
 
-  get name() {
-    return 'test';
-  }
-
   pass() {
+    this.artifact = 'MyArtifact';
     this.called = true;
   }
 }
@@ -361,8 +358,6 @@ describe('GatherRunner', function() {
     }).then(_ => {
       assert.ok(t1.called);
       assert.ok(t2.called);
-    }, _ => {
-      assert.ok(false);
     });
   });
 
@@ -476,9 +471,6 @@ describe('GatherRunner', function() {
 
     assert.throws(_ => GatherRunner.getGathererClass('missing-after-pass', root),
       /afterPass\(\) method/);
-
-    return assert.throws(_ => GatherRunner.getGathererClass('missing-artifact', root),
-      /artifact property/);
   });
 
   it('can create computed artifacts', () => {

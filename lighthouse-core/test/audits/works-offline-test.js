@@ -21,12 +21,6 @@ const assert = require('assert');
 /* global describe, it*/
 
 describe('Offline: works-offline audit', () => {
-  it('fails gracefully', () => {
-    const output = Audit.audit({});
-
-    return assert.equal(output.score, false);
-  });
-
   it('correctly audits a 200 code', () => {
     const output = Audit.audit({Offline: 200});
 

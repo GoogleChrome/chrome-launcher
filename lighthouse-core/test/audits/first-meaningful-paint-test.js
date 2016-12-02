@@ -23,25 +23,6 @@ const badNavStartTrace = require('../fixtures/traces/bad-nav-start-ts.json');
 
 /* eslint-env mocha */
 describe('Performance: first-meaningful-paint audit', () => {
-  it('scores a -1 when no trace data is present', () => {
-    return FMPAudit.audit({}).then(result => {
-      assert.equal(result.score, -1);
-      assert.ok(result.debugString);
-    });
-  });
-
-  it('scores a -1 when faulty trace data is present', () => {
-    const artifacts = {
-      traces: {
-        [Audit.DEFAULT_PASS]: {boo: 'ya'}
-      }
-    };
-    return FMPAudit.audit(artifacts).then(result => {
-      assert.equal(result.rawValue, -1);
-      assert.ok(result.debugString);
-    });
-  });
-
   it('scores a -1 and returns an error when navigation start is before trace start', () => {
     const artifacts = {
       traces: {
