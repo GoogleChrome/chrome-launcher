@@ -19,6 +19,7 @@
 const Driver = require('./gather/driver.js');
 const GatherRunner = require('./gather/gather-runner');
 const Aggregate = require('./aggregator/aggregate');
+const Audit = require('./audits/audit');
 const assetSaver = require('./lib/asset-saver');
 const log = require('./lib/log');
 const fs = require('fs');
@@ -33,8 +34,13 @@ function runAudit(audit, artifacts) {
 
     // Return an early error if an artifact required for the audit is missing.
     for (const artifactName of audit.meta.requiredArtifacts) {
-      // TODO: need pass-specific check of networkRecords and traces
-      if (typeof artifacts[artifactName] === 'undefined') {
+      const noArtifact = typeof artifacts[artifactName] === 'undefined';
+
+      // If trace required, check that DEFAULT_PASS trace exists.
+      // TODO: need pass-specific check of networkRecords and traces.
+      const noTrace = artifactName === 'traces' && !artifacts.traces[Audit.DEFAULT_PASS];
+
+      if (noArtifact || noTrace) {
         log.warn('Runner',
             `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
         return audit.generateAuditResult({

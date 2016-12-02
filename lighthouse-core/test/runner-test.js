@@ -144,6 +144,24 @@ describe('Runner', () => {
     });
   });
 
+  it('outputs an error audit result when trace required but not provided', () => {
+    const url = 'https://example.com';
+    const config = new Config({
+      audits: [
+        // requires traces[Audit.DEFAULT_PASS]
+        'user-timings'
+      ],
+      artifacts: {
+        traces: {}
+      }
+    });
+
+    return Runner.run({}, {url, config}).then(results => {
+      assert.equal(results.audits['user-timings'].rawValue, -1);
+      assert.ok(results.audits['user-timings'].debugString);
+    });
+  });
+
   it('accepts performance logs as an artifact', () => {
     const url = 'https://example.com';
     const config = new Config({
