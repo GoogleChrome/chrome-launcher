@@ -61,8 +61,8 @@ const mockArtifacts = {
 /* eslint-env mocha */
 describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain length', () => {
-    Audit.audit(mockArtifacts).then(output => {
-      assert.equal(output.score, 2);
+    return Audit.audit(mockArtifacts).then(output => {
+      assert.equal(output.score, false);
     });
   });
 });
