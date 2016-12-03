@@ -38,6 +38,9 @@ module.exports = {
   enableRuntimeEvents() {
     return Promise.resolve();
   },
+  evaluateScriptOnLoad() {
+    return Promise.resolve();
+  },
   cleanAndDisableBrowserCaches() {},
   clearDataForOrigin() {},
   beginTrace() {

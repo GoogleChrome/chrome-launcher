@@ -24,7 +24,13 @@ const parseURL = require('url').parse;
 function requestHandler(request, response) {
   const filePath = parseURL(request.url).pathname;
   const queryString = parseURL(request.url).search;
-  const absoluteFilePath = path.join(__dirname, filePath);
+  let absoluteFilePath = path.join(__dirname, filePath);
+  if (filePath === '/promise_polyfill.js') {
+    // evaluateAsync previously had a bug that LH would fail if a page polyfilled Promise.
+    // We bring in a third-party Promise polyfill to ensure we don't still fail.
+    const thirdPartyPath = '../../../lighthouse-core/third_party';
+    absoluteFilePath = path.join(__dirname, `${thirdPartyPath}/promise-polyfill/promise.js`);
+  }
 
   fs.exists(absoluteFilePath, fsExistsCallback);
 

@@ -53,7 +53,8 @@ function collectTagsThatBlockFirstPaint() {
         });
       resolve(tagList);
     } catch (e) {
-      reject(`Unable to gather Scripts/Stylesheets/HTML Imports on the page: ${e.message}`);
+      const friendly = 'Unable to gather Scripts/Stylesheets/HTML Imports on the page';
+      reject(new Error(`${friendly}: ${e.message}`));
     }
   });
 }
@@ -117,10 +118,10 @@ class TagsBlockingFirstPaint extends Gatherer {
       .then(artifact => {
         this.artifact = artifact;
       })
-      .catch(debugString => {
+      .catch(err => {
         this.artifact = {
           value: -1,
-          debugString
+          debugString: err.message
         };
       });
   }

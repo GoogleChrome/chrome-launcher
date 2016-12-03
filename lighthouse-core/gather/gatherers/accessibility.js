@@ -43,9 +43,13 @@ class Accessibility extends Gatherer {
 
   afterPass(options) {
     const driver = options.driver;
+    const expression = `(function () {
+      ${axe};
+      return (${runA11yChecks.toString()}());
+    })()`;
 
     return driver
-        .evaluateAsync(`${axe};(${runA11yChecks.toString()}())`)
+        .evaluateAsync(expression)
         .then(returnedValue => {
           if (!returnedValue) {
             this.artifact = Accessibility._errorAccessibility('Unable to parse axe results');

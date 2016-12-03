@@ -131,7 +131,7 @@ describe('First paint blocking tags', () => {
     return tagsBlockingFirstPaint.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.reject('such a fail');
+          return Promise.reject(new Error('such a fail'));
         }
       }
     }, traceData).then(_ => {

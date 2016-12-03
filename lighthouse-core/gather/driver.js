@@ -129,30 +129,44 @@ class Driver {
   }
 
   /**
-   * Evaluate an expression in the context of the current page. Expression must
-   * evaluate to a Promise. Returns a promise that resolves on asyncExpression's
-   * resolved value.
-   * @param {string} asyncExpression
+   * Evaluate an expression in the context of the current page.
+   * Returns a promise that resolves on the expression's value.
+   * @param {string} expression
    * @return {!Promise<*>}
    */
-  evaluateAsync(asyncExpression) {
+  evaluateAsync(expression) {
     return new Promise((resolve, reject) => {
       // If this gets to 60s and it hasn't been resolved, reject the Promise.
       const asyncTimeout = setTimeout(
         (_ => reject(new Error('The asynchronous expression exceeded the allotted time of 60s'))),
         60000
       );
+
       this.sendCommand('Runtime.evaluate', {
-        expression: asyncExpression,
+        // We need to wrap the raw expression for several purposes
+        // 1. Ensure that the expression will be a native Promise and not a polyfill/non-Promise.
+        // 2. Ensure that errors captured in the Promise are converted into plain-old JS Objects
+        //    so that they can be serialized properly b/c JSON.stringify(new Error('foo')) === '{}'
+        expression: `(function wrapInNativePromise() {
+          const __nativePromise = window.__nativePromise || Promise;
+          return __nativePromise.resolve()
+            .then(_ => ${expression})
+            .catch(${wrapRuntimeEvalErrorInBrowser.toString()});
+        }())`,
         includeCommandLineAPI: true,
         awaitPromise: true,
         returnByValue: true
       }).then(result => {
         clearTimeout(asyncTimeout);
+        const value = result.result.value;
+
         if (result.exceptionDetails) {
-          reject(result.exceptionDetails.exception.value);
+          // An error occurred before we could even create a Promise, should be *very* rare
+          reject(new Error('an unexpected driver error occurred'));
+        } if (value && value.__failedInBrowser) {
+          reject(Object.assign(new Error(), value));
         } else {
-          resolve(result.result.value);
+          resolve(value);
         }
       }).catch(err => {
         clearTimeout(asyncTimeout);
@@ -743,6 +757,25 @@ function captureJSCallUsage(funcRef, set) {
     Error.prepareStackTrace = originalPrepareStackTrace;
 
     return originalFunc.apply(this, arguments);
+  };
+}
+
+/**
+ * The `exceptionDetails` provided by the debugger protocol does not contain the useful
+ * information such as name, message, and stack trace of the error when it's wrapped in a
+ * promise. Instead, map to a successful object that contains this information.
+ * @param {string|Error} err The error to convert
+ * istanbul ignore next
+ */
+function wrapRuntimeEvalErrorInBrowser(err) {
+  err = err || new Error();
+  const fallbackMessage = typeof err === 'string' ? err : 'unknown error';
+
+  return {
+    __failedInBrowser: true,
+    name: err.name || 'Error',
+    message: err.message || fallbackMessage,
+    stack: err.stack || (new Error()).stack,
   };
 }
 
