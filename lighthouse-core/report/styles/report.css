@@ -24,7 +24,6 @@ span, div, p, section, header, h1, h2, li, ul {
   line-height: inherit;
 }
 
-
 :root {
   --text-font-family: "Roboto", -apple-system, BlinkMacSystemFont,  "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   --text-color: #212121;
@@ -723,7 +722,7 @@ body {
   margin-left: var(--subitem-indent);
 }
 
-.subitem.--show-help .subitem__help {
+.subitem__help-toggle:checked + .subitem__help {
   display: block;
 }
 

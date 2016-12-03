@@ -116,14 +116,11 @@ limitations under the License.
 
                     {{#if subItem.helpText }}
                       <input type="checkbox" class="subitem__help-toggle" title="Toggle help text"  {{#if (shouldShowHelpText subItem.score)}}checked{{/if}}>
+                      <span class="subitem__help">
+                        {{{ subItem.helpText }}}
+                      </span>
                     {{/if}}
                   </p>
-
-                  {{#if subItem.helpText }}
-                    <div class="subitem__help">
-                      {{{ subItem.helpText }}}
-                    </div>
-                  {{/if}}
 
                   {{#if subItem.debugString }}
                     <div class="subitem__debug">
