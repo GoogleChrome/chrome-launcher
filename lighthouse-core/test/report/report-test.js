@@ -49,7 +49,8 @@ describe('Report', () => {
 
     assert.ok(html.includes('self.lhresults = {'), 'results object was not added');
     assert.ok(html.includes('<footer'), 'no footer tag found');
-    assert.ok(html.includes('printButton = document.querySelector'), 'lighthouse-report.js was not inlined');
+    assert.ok(html.includes('printButton = document.querySelector'),
+              'lighthouse-report.js was not inlined');
     assert.ok(html.includes('.report-body {'), 'report.css was not inlined');
     assert.ok(!html.includes('&quot;lighthouseVersion'), 'lhresults were not escaped');
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
