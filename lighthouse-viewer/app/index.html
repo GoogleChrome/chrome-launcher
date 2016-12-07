@@ -1,0 +1,47 @@
+<!--
+Copyright 2016 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Lighthouse Report Viewer</title>
+  <link rel="shortcut icon" href="images/icon-16.png">
+  <link rel="stylesheet" href="styles/report.css">
+  <link rel="stylesheet" href="styles/viewer.css">
+</head>
+<body>
+
+<div class="drop_zone"></div>
+
+<output></output>
+
+<div class="viewer-placeholder">
+  <div class="viewer-placeholder-inner">
+    <img src="images/icon.svg" class="viewer-placeholder-logo"
+         alt="Lighthouse logo" height="75" width="75">
+    <h1>Drop Lighthouse results here</h1>
+  </div>
+</div>
+
+<div class="log-wrapper">
+  <div id="log"></div>
+</div>
+
+<script src="src/main.js" async></script>
+</body>
+</html>
