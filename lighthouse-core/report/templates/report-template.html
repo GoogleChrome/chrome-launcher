@@ -69,7 +69,7 @@ limitations under the License.
         <p class="aggregations__desc">{{ this.description }}</p>
         {{#if this.scored}}
         <div class="section-result">
-          <span class="section-result__score --{{ getTotalScoreRating this }}">
+          <span class="section-result__score score-{{ getTotalScoreRating this }}-bg">
             <span class="section-result__points">{{ getTotalScore this }}</span>
             <span class="section-result__divider">/</span>
             <span class="section-result__total">100</span>
@@ -130,16 +130,16 @@ limitations under the License.
 
                   <div class="subitem-result">
                     {{#if subItem.comingSoon}}
-                          <span class="subitem-result__unknown">N/A</span>
+                          <span class="subitem-result__unknown score-unknown-bg">N/A</span>
                     {{else}}
                       {{#if (is-bool subItem.score)}}
                         {{#if subItem.score}}
-                          <span class="subitem-result__good">Pass</span>
+                          <span class="subitem-result__good score-good-bg">Pass</span>
                         {{else}}
-                          <span class="subitem-result__poor">Fail</span>
+                          <span class="subitem-result__poor score-poor-bg">Fail</span>
                         {{/if}}
                       {{else}}
-                        <span class="subitem-result__points --{{ getItemRating subItem.score }}">
+                        <span class="subitem-result__points score-{{ getItemRating subItem.score }}-bg">
                           {{{ getItemValue subItem.score }}}
                         </span>
                       {{/if}}

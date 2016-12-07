@@ -263,33 +263,6 @@ body {
   padding-left: 20px;
 }
 
-.menu__link-score--good,
-.report-section__score--good,
-.report-section__item-value--good,
-.report-section__title-score-total--good {
-  color: #76B530;
-}
-
-.menu__link-score--average,
-.report-section__score--average,
-.report-section__item-value--average,
-.report-section__title-score-total--average {
-  color: #F5A623;
-}
-
-.menu__link-score--poor,
-.report-section__score--poor,
-.report-section__item-value--poor,
-.report-section__title-score-total--poor {
-  color: #D0021B;
-}
-
-.menu__link:hover .menu__link-label,
-.menu__link:hover .menu__link-score {
-  color: #FFF;
-}
-
-
 .report-body__metadata {
   flex: 1 1 0;
   margin-right: 40px;
@@ -540,10 +513,6 @@ body {
   margin-top: calc((var(--heading-line-height) - var(--heading-font-size) - 6px) / 2);
 }
 
-.section-result__score.--good { background-color: var(--good-color); }
-.section-result__score.--poor { background-color: var(--poor-color); }
-.section-result__score.--average { background-color: var(--average-color); }
-
 .section-result__points {
   font-size: var(--heading-font-size);
 }
@@ -642,11 +611,8 @@ body {
   background-color: #fff;
 }
 
-.subitem-result__good { background-color: var(--good-color); }
 .subitem-result__good::after { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>good</title><path d="M9.17 2.33L4.5 7 2.83 5.33 1.5 6.66l3 3 6-6z" fill="#FFF" fill-rule="evenodd"/></svg>'); }
-.subitem-result__poor { background-color: var(--poor-color); }
 .subitem-result__poor::after { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>poor</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="#FFF" fill-rule="evenodd"/></svg>'); }
-.subitem-result__unknown { background-color: var(--unknown-color); }
 .subitem-result__unknown::after { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>neutral</title><path d="M2 5h8v2H2z" fill="#FFF" fill-rule="evenodd"/></svg>'); }
 
 .subitem-result__points {
@@ -657,10 +623,6 @@ body {
   color: #fff;
   border-radius: 2px;
 }
-
-.subitem-result__points.--good { background-color: var(--good-color); }
-.subitem-result__points.--poor { background-color: var(--poor-color); }
-.subitem-result__points.--average { background-color: var(--average-color); }
 
 .subitem__details {
   list-style: none;
@@ -732,6 +694,19 @@ body {
   margin-top: calc(var(--body-line-height) / 2);
   margin-left: var(--subitem-indent);
   color: var(--poor-color);
+}
+
+.score-good-bg {
+  background-color: var(--good-color);
+}
+.score-average-bg {
+  background-color: var(--average-color);
+}
+.score-poor-bg {
+  background-color: var(--poor-color);
+}
+.score-unknown-bg {
+  background-color: var(--unknown-color);
 }
 
 @media print {
