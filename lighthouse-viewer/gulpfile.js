@@ -67,6 +67,14 @@ gulp.task('html', () => {
   return gulp.src('app/*.html').pipe(gulp.dest('dist'));
 });
 
+gulp.task('polyfills', () => {
+  return gulp.src([
+    'node_modules/url-search-params/build/url-search-params.js',
+    'node_modules/whatwg-fetch/fetch.js'
+  ])
+  .pipe(gulp.dest('dist/src/polyfills'));
+});
+
 gulp.task('browserify', () => {
   return gulp.src([
     'app/src/main.js'
@@ -107,7 +115,7 @@ gulp.task('clean', () => {
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'html', 'images', 'css'], () => {
+gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'css'], () => {
   gulp.watch([
     'app/styles/**/*.css',
     '../lighthouse-core/report/styles/**/*.css'
@@ -134,7 +142,7 @@ gulp.task('deploy', ['build'], () => {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'compile',
-    ['html', 'images', 'css'], cb);
+    ['html', 'images', 'css', 'polyfills'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {
