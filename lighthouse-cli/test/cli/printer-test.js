@@ -16,6 +16,8 @@
 
 'use strict';
 
+require('../../compiled-check.js')('printer.js');
+
 const Printer = require('../../printer.js');
 const assert = require('assert');
 const fs = require('fs');
