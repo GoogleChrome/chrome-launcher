@@ -46,18 +46,16 @@ class LighthouseViewerReport {
 
   addListeners() {
     const printButton = document.querySelector('.js-print');
-    if (!printButton) {
-      return;
+    if (printButton) {
+      printButton.addEventListener('click', _ => {
+        window.print();
+      });
     }
 
-    printButton.addEventListener('click', _ => {
-      window.print();
-    });
-
-    const button = document.createElement('button');
-    button.classList.add('share');
-    button.addEventListener('click', this.onShare);
-    printButton.parentElement.insertBefore(button, printButton);
+    const shareButton = document.querySelector('.js-share');
+    if (shareButton) {
+      shareButton.addEventListener('click', this.onShare);
+    }
   }
 
   loadFromURL() {
@@ -118,6 +116,9 @@ class LighthouseViewerReport {
     // Use only the results section of the full HTML page.
     const div = document.createElement('div');
     div.innerHTML = html;
+
+    document.title = div.querySelector('title').textContent;
+
     html = div.querySelector('.js-report').outerHTML;
 
     this.json = json;

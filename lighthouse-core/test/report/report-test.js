@@ -27,25 +27,34 @@ const assert = require('assert');
 describe('Report', () => {
   it('generates CLI HTML', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+    const html = reportGenerator.generateHTML(sampleResults);
     assert.ok(/<script>/gim.test(html));
   });
 
   it('should format generated Time', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+    const html = reportGenerator.generateHTML(sampleResults);
     assert.ok(/on 11\/\d{1,2}\/2016\, /gim.test(html));
   });
 
   it('should escape closing </script> tags', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults, {inline: true});
+    const html = reportGenerator.generateHTML(sampleResults);
     assert.ok(/<\/script>/gim.test(html));
   });
 
-  it('generates extension HTML', () => {
+  it('sets report context in HTML', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults, {inline: false});
+    let html = reportGenerator.generateHTML(sampleResults);
+    assert.ok(html.includes('data-report-context="extension"'),
+              'default report context is "extension"');
+    html = reportGenerator.generateHTML(sampleResults, 'viewer');
+    assert.ok(html.includes('<html data-report-context="viewer"'), 'viewer report context');
+  });
+
+  it('generates HTML', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults);
 
     assert.ok(html.includes('self.lhresults = {'), 'results object was not added');
     assert.ok(html.includes('<footer'), 'no footer tag found');
