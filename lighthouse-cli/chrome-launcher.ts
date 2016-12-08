@@ -209,8 +209,8 @@ class ChromeLauncher {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
-          this.destroyTmp();
-          resolve();
+          this.destroyTmp()
+            .then(resolve);
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
@@ -226,20 +226,26 @@ class ChromeLauncher {
     });
   }
 
-  destroyTmp() {
-    if (this.TMP_PROFILE_DIR) {
-      log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
-
-      if (this.outFile) {
-        fs.closeSync(this.outFile);
-      }
-
-      if (this.errFile) {
-        fs.closeSync(this.errFile);
-      }
-
-      rimraf.sync(this.TMP_PROFILE_DIR);
+  destroyTmp(): Promise<undefined> {
+    if (!this.TMP_PROFILE_DIR) {
+      return Promise.resolve();
     }
+
+    log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
+
+    if (this.outFile) {
+      fs.closeSync(this.outFile);
+    }
+
+    if (this.errFile) {
+      fs.closeSync(this.errFile);
+    }
+
+    return new Promise((resolve) => {
+      rimraf(this.TMP_PROFILE_DIR, function() {
+        resolve();
+      });
+    });
   }
 };
 
