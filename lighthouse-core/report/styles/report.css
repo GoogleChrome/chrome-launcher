@@ -189,6 +189,7 @@ body {
 
 .report-body__aggregations-container {
   padding-top: var(--report-header-height);
+  will-change: transform;
 }
 
 .report-body__menu-container {
