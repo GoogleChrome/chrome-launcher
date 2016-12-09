@@ -62,22 +62,22 @@ limitations under the License.
         </div>
       </div>
 
-      <div>
+      <div class="report-body__aggregations-container">
       {{#each aggregations}}
-      <section class="js-breakdown aggregations">
-        <header class="aggregations__header" id="{{nameToLink this.name}}">
+      <section class="js-breakdown aggregations" id="{{nameToLink this.name}}">
+        <header class="aggregations__header">
           <h1>{{ this.name }}</h1>
+          <p class="aggregations__desc">{{ this.description }}</p>
+          {{#if this.scored}}
+          <div class="section-result">
+            <span class="section-result__score score-{{ getTotalScoreRating this }}-bg">
+              <span class="section-result__points">{{ getTotalScore this }}</span>
+              <span class="section-result__divider">/</span>
+              <span class="section-result__total">100</span>
+            </span>
+          </div>
+          {{/if}}
         </header>
-        <p class="aggregations__desc">{{ this.description }}</p>
-        {{#if this.scored}}
-        <div class="section-result">
-          <span class="section-result__score score-{{ getTotalScoreRating this }}-bg">
-            <span class="section-result__points">{{ getTotalScore this }}</span>
-            <span class="section-result__divider">/</span>
-            <span class="section-result__total">100</span>
-          </span>
-        </div>
-        {{/if}}
 
         <div class="js-report-by-user-feature">
           {{#each this.score as |aggregation|}}
@@ -86,11 +86,10 @@ limitations under the License.
             {{#if aggregation.name }}
             <header class="aggregation__header">
               <h2>{{ aggregation.name }}</h2>
+              {{#if aggregation.description }}
+                <p class="aggregation__desc">{{{ aggregation.description }}}</p>
+              {{/if}}
             </header>
-            {{/if}}
-
-            {{#if aggregation.description }}
-            <p class="aggregation__desc">{{{ aggregation.description }}}</p>
             {{/if}}
 
             <ul class="subitems">

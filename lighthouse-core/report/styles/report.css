@@ -46,6 +46,10 @@ span, div, p, section, header, h1, h2, li, ul {
   --heading-line-height: 32px;
   --subitem-indent: 24px;
   --max-line-length: none;
+
+  --report-width: 1280px;
+  --report-menu-width: 280px;
+  --report-header-height: 58px;
 }
 
 :root[data-report-context="devtools"] {
@@ -78,6 +82,11 @@ html, body {
   height: 100%;
 }
 
+/* When deep linking to a section, bump the heading down so it's not covered by the top nav. */
+:target.aggregations {
+  padding-top: calc(var(--report-header-height) + var(--heading-line-height)) !important;
+}
+
 a {
   color: #15c;
 }
@@ -108,7 +117,7 @@ body {
 .report {
   width: 100%;
   margin: 0 auto;
-  max-width: 1280px;
+  max-width: var(--report-width);
   background: #FFF;
   box-shadow: 0 0 6px 0 rgba(0,0,0,0.26);
 }
@@ -174,16 +183,21 @@ body {
 }
 
 .report-body__content {
-  margin-left: 22%;
+  margin-left: var(--report-menu-width);
   position: relative;
+}
+
+.report-body__aggregations-container {
+  padding-top: var(--report-header-height);
 }
 
 .report-body__menu-container {
   height: 100%;
   width: 100%;
   min-width: 230px;
-  max-width: 1280px;
+  max-width: var(--report-width);
   position: fixed;
+  will-change: transform;
   left: 50%;
   transform: translateX(-50%);
   top: 0;
@@ -191,9 +205,8 @@ body {
 }
 
 .menu {
-  width: 22%;
+  width: var(--report-menu-width);
   background: #FFFFFF;
-  min-width: 185px;
   height: 100%;
   top: 0;
   left: 0;
@@ -317,15 +330,20 @@ body {
 }
 
 .report-body__header {
-  height: 58px;
+  height: var(--report-header-height);
   border-bottom: 1px solid #EBEBEB;
   background: #FAFAFA;
-  margin-left: 22%;
+  margin-left: var(--report-menu-width);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
   padding: 0 var(--heading-line-height);
+  position: fixed;
+  will-change: transform;
+  z-index: 1;
+  max-width: calc( var(--report-width) - var(--report-menu-width));
+  width: calc(100vw - var(--report-menu-width));
 }
 
 .report-section__title {
@@ -459,7 +477,7 @@ body {
 
 .footer {
   margin-top: 40px;
-  margin-left: 22%;
+  margin-left: var(--report-menu-width);
   height: 130px;
   line-height: 90px;
   text-align: center;
@@ -484,6 +502,10 @@ body {
   height: 27px;
 }
 
+.aggregations__header {
+  position: relative;
+}
+
 .aggregations__header > h1 {
   font-size: var(--heading-font-size);
   font-weight: normal;
@@ -491,7 +513,6 @@ body {
 }
 
 .aggregations {
-  position: relative;
   padding: var(--heading-line-height);
   padding-left: calc(var(--heading-line-height) + var(--gutter-width) + var(--gutter-gap));
 }
@@ -508,8 +529,8 @@ body {
 
 .section-result {
   position: absolute;
-  top: var(--heading-line-height);
-  left: var(--heading-line-height);
+  top: 0;
+  left: calc((var(--gutter-width) + var(--gutter-gap)) * -1);
   width: var(--gutter-width);
 
   display: flex;
@@ -526,7 +547,6 @@ body {
   text-align: center;
   padding: 4px 8px;
   border-radius: 2px;
-  margin-top: calc((var(--heading-line-height) - var(--heading-font-size) - 6px) / 2);
 }
 
 .section-result__points {
