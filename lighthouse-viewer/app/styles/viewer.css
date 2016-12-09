@@ -31,7 +31,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
   visibility: hidden;
 }
 .drop_zone.dropping {
@@ -78,7 +77,7 @@
   margin-right: 16px;
 }
 .log-wrapper {
-  position: absolute;
+  position: fixed;
   top: 0;
   display: flex;
   align-content: center;
@@ -104,4 +103,14 @@
 .share:disabled {
   opacity: 0.2;
   cursor: default;
+}
+
+
+/* app z-indexes */
+.drop_zone {
+  z-index: 2;
+}
+
+.log-wrapper {
+  z-index: 3;
 }
