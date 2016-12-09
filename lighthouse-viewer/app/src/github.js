@@ -32,6 +32,7 @@ class GithubAPI {
   constructor() {
     // this.CLIENT_ID = '48e4c3145c4978268ecb';
     this.auth = new FirebaseAuth();
+    this._saving = false;
   }
 
   static get LH_JSON_EXT() {
@@ -44,7 +45,12 @@ class GithubAPI {
    * @return {!Promise<string>} id of the created gist.
    */
   createGist(jsonFile) {
+    if (this._saving) {
+      return Promise.reject(new Error('Save already in progress'));
+    }
+
     logger.log('Saving report to Github...', false);
+    this._saving = true;
 
     return this.auth.getAccessToken()
       .then(accessToken => {
@@ -73,7 +79,11 @@ class GithubAPI {
       .then(resp => resp.json())
       .then(json => {
         logger.log('Saved!');
+        this._saving = false;
         return json.id;
+      }).catch(err => {
+        this._saving = false;
+        throw err;
       });
   }
 

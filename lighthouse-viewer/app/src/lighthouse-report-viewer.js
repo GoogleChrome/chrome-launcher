@@ -46,11 +46,13 @@ class LighthouseViewerReport {
     this.fileUploader = new FileUploader(this.onFileUpload);
     this.github = new GithubAPI();
 
-    this.addListeners();
+    this._isNewReport = true;
+
+    this.initUI();
     this.loadFromURL();
   }
 
-  addListeners() {
+  initUI() {
     const printButton = document.querySelector('.js-print');
     if (printButton) {
       printButton.addEventListener('click', _ => {
@@ -58,9 +60,17 @@ class LighthouseViewerReport {
       });
     }
 
-    const shareButton = document.querySelector('.js-share');
-    if (shareButton) {
-      shareButton.addEventListener('click', this.onShare);
+    this.shareButton = document.querySelector('.js-share');
+    if (this.shareButton) {
+      this.shareButton.addEventListener('click', this.onShare);
+
+      // Disable the share button after the user shares the gist or if we're loading
+      // a gist from Github. In both cases, the gist is already shared :)
+      if (this._isNewReport) {
+        this.enableShareButton();
+      } else {
+        this.disableShareButton();
+      }
     }
 
     const copyButton = document.querySelector('.js-copy');
@@ -68,6 +78,16 @@ class LighthouseViewerReport {
       copyButton.addEventListener('click', this.onCopyButtonClick);
       document.addEventListener('copy', this.onCopy);
     }
+  }
+
+  enableShareButton() {
+    this.shareButton.classList.remove('disable');
+    this.shareButton.disabled = false;
+  }
+
+  disableShareButton() {
+    this.shareButton.classList.add('disable');
+    this.shareButton.disabled = true;
   }
 
   loadFromURL() {
@@ -80,6 +100,8 @@ class LighthouseViewerReport {
       this.github.auth.ready.then(_ => {
         this.github.getGistFileContentAsJson(gistId).then(json => {
           logger.hide();
+
+          this._isNewReport = false;
           this.replaceReportHTML(json.content);
 
           // Save fetched json and etag to IDB so we can use it later for 304
@@ -140,7 +162,7 @@ class LighthouseViewerReport {
 
     // Replace the HTML and hook up event listeners to the new DOM.
     document.querySelector('output').innerHTML = html;
-    this.addListeners();
+    this.initUI();
   }
 
   /**
@@ -155,6 +177,8 @@ class LighthouseViewerReport {
       if (!file.type.match('json')) {
         throw new Error('Unsupported report format. Expected JSON.');
       }
+      this._isNewReport = true;
+
       this.replaceReportHTML(JSON.parse(str));
     }).catch(err => logger.error(err.message));
   }
@@ -170,7 +194,9 @@ class LighthouseViewerReport {
     return this.github.createGist(this.json).then(id => {
       ga('send', 'event', 'report', 'created');
 
+      this.disableShareButton();
       history.pushState({}, null, `${APP_URL}?gist=${id}`);
+
       return id;
     }).catch(err => logger.log(err.message));
   }

@@ -101,3 +101,7 @@
 #log.show {
   transform: translateY(0);
 }
+.share:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
