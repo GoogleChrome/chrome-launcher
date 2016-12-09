@@ -57,12 +57,14 @@
   align-items: center;
   justify-content: center;
   color: #555;
+  font-weight: 300;
 }
 .viewer-placeholder-inner {
   display: flex;
   align-items: center;
   border-radius: 5px;
   padding: 40px 32px;
+  max-width: 80vw;
   border: 2px dashed rgba(0,0,0,0.2);
   cursor: pointer;
   background-color: #fff;
@@ -70,11 +72,16 @@
 .viewer-placeholder-inner.dropping {
   border-color: currentColor;
 }
-.viewer-placeholder h1 {
+.viewer-placeholder__heading {
   font-weight: 300;
+  margin: 0;
+}
+.viewer-placeholder__help {
+  margin-top: 12px;
 }
 .viewer-placeholder-logo {
-  margin-right: 16px;
+  width: 100px;
+  height: 100px;
 }
 .log-wrapper {
   position: fixed;
@@ -103,6 +110,26 @@
 .share:disabled {
   opacity: 0.2;
   cursor: default;
+}
+
+@media screen and (max-width: 635px) {
+  .viewer-placeholder-inner {
+    display: block;
+    text-align: center;
+  }
+  .viewer-placeholder-logo {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media screen and (min-width: 636px) {
+  .viewer-placeholder__help::before {
+    content: 'Instructions: ';
+  }
+  .viewer-placeholder-logo {
+    margin-right: 16px;
+  }
 }
 
 
