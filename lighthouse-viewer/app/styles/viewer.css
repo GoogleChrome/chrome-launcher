@@ -19,7 +19,7 @@
 }
 
 :root {
-  --lh-background-color: rgb(32,50,70);
+  --lh-background-color: #304ffe;
 }
 
 .drop_zone {
@@ -57,16 +57,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  background-color: var(--lh-background-color);
+  color: #555;
 }
 .viewer-placeholder-inner {
   display: flex;
   align-items: center;
   border-radius: 5px;
   padding: 40px 32px;
-  border: 2px dashed rgba(255,255,255,0.2);
+  border: 2px dashed rgba(0,0,0,0.2);
   cursor: pointer;
+  background-color: #fff;
 }
 .viewer-placeholder-inner.dropping {
   border-color: currentColor;
