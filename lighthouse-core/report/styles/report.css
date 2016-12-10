@@ -769,6 +769,13 @@ body {
 }
 
 @media screen and (max-width: 767px) {
+  :root {
+    --subitem-indent: 8px;
+    --gutter-width: 16px;
+  }
+  .aggregations {
+    padding-right: 8px;
+  }
   .report-body__menu-container {
     display: none;
   }
