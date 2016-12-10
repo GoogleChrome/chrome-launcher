@@ -20,7 +20,7 @@ limitations under the License.
 <html data-report-context="{{reportContext}}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <title>Lighthouse report: {{ url }}</title>
   <style>{{{ css }}}</style>
   <script>{{{ script }}}</script>
@@ -39,9 +39,11 @@ limitations under the License.
         <div class="report-body__url">Results for: <a href="{{ url }}" target="_blank">{{ url }}</a></div>
         <div class="report-body__url">Generated on: {{generatedTime}}</div>
       </div>
-      <button class="report-body__icon share js-share"></button>
-      <button class="report-body__icon copy js-copy"></button>
-      <button class="report-body__icon print js-print"></button>
+      <div class="report-body__buttons">
+        <button class="report-body__icon share js-share"></button>
+        <button class="report-body__icon copy js-copy"></button>
+        <button class="report-body__icon print js-print"></button>
+      </div>
     </div>
     <div class="report-body__content">
       <div class="report-body__menu-container">

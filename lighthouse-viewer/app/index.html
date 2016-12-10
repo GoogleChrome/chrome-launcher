@@ -18,7 +18,7 @@ limitations under the License.
 <html data-report-context="viewer">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <title>Lighthouse Report Viewer</title>
   <link rel="shortcut icon" href="images/lh_logo_icon_16.png">
   <link rel="stylesheet" href="styles/report.css">
@@ -32,9 +32,13 @@ limitations under the License.
 
 <div class="viewer-placeholder">
   <div class="viewer-placeholder-inner">
-    <img src="images/lh_logo_bg.png" class="viewer-placeholder-logo"
-         alt="Lighthouse logo" height="150" width="150">
-    <h1>Drop Lighthouse results here</h1>
+    <div>
+      <img src="images/lh_logo_bg.png" class="viewer-placeholder-logo" alt="Lighthouse logo">
+    </div>
+    <div>
+      <h1 class="viewer-placeholder__heading">Lighthouse Report Viewer</h1>
+      <div class="viewer-placeholder__help">Click here or drag and drop a json report</div>
+    </div>
   </div>
 </div>
 
