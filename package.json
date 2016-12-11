@@ -21,7 +21,7 @@
     "unit": "lighthouse-core/scripts/run-mocha.sh --default",
     "closure": "cd lighthouse-core && closure/closure-type-checking.js",
     "watch": "lighthouse-core/scripts/run-mocha.sh --watch",
-    "chrome": "lighthouse-core/scripts/launch-chrome.sh",
+    "chrome": "./lighthouse-cli/manual-chrome-launcher.js",
     "fast": "npm run start -- --disable-device-emulation --disable-cpu-throttling --disable-network-throttling",
     "smokehouse": "node $__node_harmony lighthouse-cli/test/smokehouse/smokehouse.js",
     "deploy-viewer": "cd lighthouse-viewer && gulp deploy"

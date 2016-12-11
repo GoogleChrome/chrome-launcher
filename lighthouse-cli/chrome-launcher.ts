@@ -219,6 +219,7 @@ class ChromeLauncher {
         if (process.platform === 'win32') {
           spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
         }
+
         this.chrome = null;
       } else {
         // fail silently as we did not start chrome

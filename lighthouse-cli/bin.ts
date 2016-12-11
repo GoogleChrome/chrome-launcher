@@ -14,17 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 'use strict';
 
 const _SIGINT = 'SIGINT';
-const _ERROR_EXIT_CODE = 130;
+const _SIGINT_EXIT_CODE = 130;
 const _RUNTIME_ERROR_CODE = 1;
 const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
-
-interface LightHouseError extends Error {
-  code?: string
-};
 
 const environment = require('../lighthouse-core/lib/environment.js');
 if (!environment.checkNodeCompatibility()) {
@@ -32,22 +27,24 @@ if (!environment.checkNodeCompatibility()) {
   process.exit(_RUNTIME_ERROR_CODE);
 }
 
-
-import {Results} from './types/types';
-import * as path from 'path';
-import * as http from 'http';
-import * as fs from 'fs';
-const yargs = require('yargs');
-import * as Printer from './printer';
-const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
-const log = require('../lighthouse-core/lib/log');
-const performanceXServer = require('./performance-experiment/server');
-const opn = require('opn');
 import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';
-
+import * as fs from 'fs';
+const lighthouse = require('../lighthouse-core');
+const log = require('../lighthouse-core/lib/log');
+const opn = require('opn');
+import * as path from 'path';
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
+const performanceXServer = require('./performance-experiment/server');
+import * as Printer from './printer';
+import * as randomPort from './random-port';
+import {Results} from './types/types';
+const yargs = require('yargs');
+
+interface LighthouseError extends Error {
+  code?: string
+};
 
 const cliFlags = yargs
   .help('help')
@@ -148,9 +145,13 @@ if (cliFlags.listTraceCategories) {
   Commands.ListTraceCategories();
 }
 
-const urls = cliFlags._;
-const outputMode = cliFlags.output;
-const outputPath = cliFlags['output-path'];
+const url = cliFlags._[0];
+
+// Work around camelCase bug for default value in yargs 3.30.
+// see: https://github.com/yargs/yargs/issues/341
+if (!cliFlags.outputPath && cliFlags['output-path']) {
+  cliFlags.outputPath = cliFlags['output-path'];
+}
 
 let config: Object | null = null;
 if (cliFlags.configPath) {
@@ -168,91 +169,55 @@ if (cliFlags.verbose) {
 } else if (cliFlags.quiet) {
   cliFlags.logLevel = 'silent';
 }
-
 log.setLevel(cliFlags.logLevel);
-
-const cleanup: {fns: Array<Function>,
-  register: Function,
-  doCleanup: () => Promise<undefined>} = {
-    fns: [],
-    register(fn: Function) { this.fns.push(fn); },
-  doCleanup() { return Promise.all(this.fns.map((c: Function) => c())); }
-};
 
 /**
  * If the requested port is 0, set it to a random, unused port.
  */
 function initPort(flags: {port: number}): Promise<undefined> {
-  return new Promise((resolve, reject) => {
+  return Promise.resolve().then(() => {
     if (flags.port !== 0) {
       log.verbose('Lighthouse CLI', `Using supplied port ${flags.port}`);
-      return resolve();
+      return;
     }
 
     log.verbose('Lighthouse CLI', 'Generating random port.');
-    const server  = http.createServer();
-    server.listen(0);
-    server.on('listening', () => {
-      flags.port = server.address().port;
-      server.close();
-
+    return randomPort.getRandomPort().then(portNumber => {
+      flags.port = portNumber;
       log.verbose('Lighthouse CLI', `Using generated port ${flags.port}.`);
-      resolve();
+    });
+  })
+}
+
+/**
+ * Attempts to connect to an instance of Chrome with an open remote-debugging
+ * port. If none is found and the `skipAutolaunch` flag is not true, launches
+ * a debuggable instance.
+ */
+function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, selectChrome: boolean}): Promise<ChromeLauncher> {
+  const chromeLauncher = new ChromeLauncher({
+    port: flags.port,
+    autoSelectChrome: !flags.selectChrome,
+  });
+
+  // Kill spawned Chrome process in case of ctrl-C.
+  process.on(_SIGINT, () => {
+    chromeLauncher.kill().then(() => process.exit(_SIGINT_EXIT_CODE), handleError);
+  });
+
+  return chromeLauncher
+    // Check if there is an existing instance of Chrome ready to talk.
+    .isDebuggerReady()
+    .catch(() => {
+      if (flags.skipAutolaunch) {
+        return;
+      }
+
+      // If not, create one.
+      log.log('Lighthouse CLI', 'Launching Chrome...');
+      return chromeLauncher.run();
     })
-  })
-}
-
-function launchChromeAndRun(addresses: Array<string>,
-                            config: Object,
-                            flags: {port: number, selectChrome: boolean, view: boolean}) {
-
-  return initPort(flags).then(() => {
-    const launcher = new ChromeLauncher({
-      port: flags.port,
-      autoSelectChrome: !flags.selectChrome,
-    });
-
-    cleanup.register(() => launcher.kill());
-
-    return launcher
-      .isDebuggerReady()
-      .catch(() => {
-        log.log('Lighthouse CLI', 'Launching Chrome...');
-        return launcher.run();
-      })
-      .then(() => lighthouseRun(addresses, config, flags))
-      .then(() => launcher.kill());
-  })
-}
-
-function lighthouseRun(addresses: Array<string>, config: Object, flags: {view: boolean}) {
-  // Process URLs once at a time
-  const address = addresses.shift();
-  if (!address) {
-    return;
-  }
-
-  return lighthouse(address, flags, config)
-    .then((results: Results) => Printer.write(results, outputMode, outputPath))
-    .then((results: Results) => {
-      const filename = `${assetSaver.getFilenamePrefix({url: address})}.report.html`;
-
-      if (outputMode === Printer.OutputMode[Printer.OutputMode.pretty]) {
-        Printer.write(results, 'html', filename);
-      }
-
-      // Generate report.html, host it and open it in the default browser
-      if (flags.view) {
-        performanceXServer.startServer(0).then((port: number) => {
-          const filePath = `${performanceXServer.FOLDERS.REPORTS}/${filename}`;
-          Printer.write(results, 'html', filePath).then(_ => {
-            opn(`http://localhost:${port}/reports/${filename}`);
-          });
-        });
-      }
-
-      return lighthouseRun(addresses, config, flags);
-    });
+    .then(() => chromeLauncher);
 }
 
 function showConnectionError() {
@@ -264,7 +229,7 @@ function showConnectionError() {
   process.exit(_RUNTIME_ERROR_CODE);
 }
 
-function showRuntimeError(err: LightHouseError) {
+function showRuntimeError(err: LighthouseError) {
   console.error('Runtime error encountered:', err);
   if (err.stack) {
     console.error(err.stack);
@@ -277,7 +242,7 @@ function showProtocolTimeoutError() {
   process.exit(_PROTOCOL_TIMEOUT_EXIT_CODE);
 }
 
-function handleError(err: LightHouseError) {
+function handleError(err: LighthouseError) {
   if (err.code === 'ECONNREFUSED') {
     showConnectionError();
   } else if (err.code === 'CRI_TIMEOUT') {
@@ -287,34 +252,42 @@ function handleError(err: LightHouseError) {
   }
 }
 
-function run() {
-  return initPort(cliFlags).then(() => {
-    if (cliFlags.skipAutolaunch) {
-      return lighthouseRun(urls, config, cliFlags).catch(handleError);
-    } else {
-      // because you can't cancel a promise yet
-      const isSigint = new Promise((resolve, reject) => {
-        process.on(_SIGINT, () => reject(_SIGINT));
-      });
+function runLighthouse(url: string,
+                       flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any, outputPath: string, view: boolean},
+                       config: Object): Promise<undefined> {
 
-      return Promise
-        .race([launchChromeAndRun(urls, config, cliFlags), isSigint])
-        .catch(maybeSigint => {
-          if (maybeSigint === _SIGINT) {
-            return cleanup
-              .doCleanup()
-              .catch(err => {
-                console.error(err);
-                console.error(err.stack);
-              }).then(() => process.exit(_ERROR_EXIT_CODE));
-          }
-          return handleError(maybeSigint);
+  let chromeLauncher: ChromeLauncher;
+  return initPort(flags)
+    .then(() => getDebuggableChrome(flags))
+    .then(chrome => chromeLauncher = chrome)
+    .then(() => lighthouse(url, flags, config))
+    .then((results: Results) => Printer.write(results, flags.output, flags.outputPath))
+    .then((results: Results) => {
+      const filename = `${assetSaver.getFilenamePrefix({url})}.report.html`;
+
+      if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
+        Printer.write(results, 'html', filename);
+      }
+
+      // If --view, generate report.html, host it, and open it in the default browser
+      if (flags.view) {
+        return performanceXServer.startServer(0).then((port: number) => {
+          const filePath = `${performanceXServer.FOLDERS.REPORTS}/${filename}`;
+          return Printer.write(results, 'html', filePath).then(() => {
+            opn(`http://localhost:${port}/reports/${filename}`);
+          });
         });
-    }
-  })
+      }
+    })
+    .then(() => chromeLauncher.kill())
+    .catch(handleError);
+}
+
+function run() {
+  return runLighthouse(url, cliFlags, config);
 }
 
 export {
-  run,
-  launchChromeAndRun
+  runLighthouse,
+  run
 }
