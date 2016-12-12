@@ -214,10 +214,10 @@ class ChromeLauncher {
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
-        this.chrome.kill();
-
         if (process.platform === 'win32') {
           spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+        } else {
+          process.kill(-this.chrome.pid);
         }
 
         this.chrome = null;
