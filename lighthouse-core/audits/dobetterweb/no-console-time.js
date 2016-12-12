@@ -35,7 +35,7 @@ class NoConsoleTimeAudit extends Audit {
       category: 'JavaScript',
       name: 'no-console-time',
       description: 'Site does not use console.time() in its own scripts',
-      helpText: 'Consider using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API" target="_blank">User Timine API</a> (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark" target="_blank">performance.mark()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/measure" target="_blank">performance.measure()</a>), which is a standard, uses high resolution timestamps, and has the added benefit of integrating with the DevTools timeline.',
+      helpText: 'Consider using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API" target="_blank">User Timing API</a> (<a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark" target="_blank">performance.mark()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/measure" target="_blank">performance.measure()</a>), which is a standard, uses high resolution timestamps, and has the added benefit of integrating with the DevTools timeline.',
       requiredArtifacts: ['URL', 'ConsoleTimeUsage']
     };
   }
