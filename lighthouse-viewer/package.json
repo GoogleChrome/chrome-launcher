@@ -14,7 +14,6 @@
     "del": "^2.2.0",
     "eslint-config-xo": "^0.10.1",
     "gh-pages": "^0.12.0",
-    "google-closure-compiler-js": "^20161024.0.0",
     "gulp": "^3.9.1",
     "gulp-eslint": "^2.0.0",
     "gulp-license": "^1.1.0",
@@ -23,7 +22,9 @@
     "gulp-tap": "^0.1.3",
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.7",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.1.5",
+    "tsify": "^2.0.3",
+    "typescript": "^2.1.4"
   },
   "dependencies": {
     "firebase": "^3.6.2",

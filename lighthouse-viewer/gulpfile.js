@@ -22,7 +22,6 @@ const gulp = require('gulp');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const runSequence = require('run-sequence');
 const browserify = require('browserify');
-const closure = require('google-closure-compiler-js').gulp();
 const ghpages = require('gh-pages');
 
 const $ = gulpLoadPlugins();
@@ -34,13 +33,6 @@ function license() {
     organization: 'Copyright 2016 Google Inc. All rights reserved.',
     tiny: true
   });
-}
-
-function applyBrowserifyTransforms(bundle) {
-  // Fix an issue with imported speedline code that doesn't brfs well.
-  return bundle.transform('../lighthouse-extension/fs-transform', {
-    global: true
-  }).transform('brfs', {global: true}); // Transform the fs.readFile etc. Do so in all the modules.
 }
 
 gulp.task('lint', () => {
@@ -82,32 +74,26 @@ gulp.task('browserify', () => {
     'app/src/main.js'
   ], {read: false})
     .pipe($.tap(file => {
-      let bundle = browserify(file.path);
-      bundle = applyBrowserifyTransforms(bundle);
+      const bundle = browserify(file.path, {debug: false})
+        .plugin('tsify', { // Note: tsify needs to come before transforms.
+          allowJs: true,
+          target: 'es5',
+          diagnostics: true,
+          pretty: true,
+          removeComments: true
+        })
+        .transform('brfs')
+        .bundle();
 
-      // Inject transformed browserified content back into our gulp pipeline.
-      file.contents = bundle.bundle();
+      file.contents = bundle; // Inject transformed content back the gulp pipeline.
     }))
     .pipe(gulp.dest(`${DIST_FOLDER}/src`));
 });
 
 gulp.task('compile', ['browserify'], () => {
-  return gulp.src([
-    `${DIST_FOLDER}/src/main.js`
-  ])
-    // .pipe($.sourcemaps.init())
-    .pipe(closure({
-      compilationLevel: 'SIMPLE',
-      // warningLevel: 'VERBOSE',
-      // outputWrapper: '(function(){\n%output%\n}).call(this)',
-      // languageOut: 'ECMASCRIPT5',
-      // processCommonJsModules: true,
-      jsOutputFile: 'main.js',
-      createSourceMap: true
-    }))
-    .pipe($.uglify()) // Use uglify to strip out duplicated license headers.
+  return gulp.src([`${DIST_FOLDER}/src/main.js`])
+    .pipe($.uglify()) // minify.
     .pipe(license())  // Add license to top.
-    // .pipe($.sourcemaps.write('/'))
     .pipe(gulp.dest(`${DIST_FOLDER}/src`));
 });
 
