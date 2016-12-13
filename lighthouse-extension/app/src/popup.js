@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', _ => {
   const statusEl = document.body.querySelector('.status');
   const statusMessageEl = document.body.querySelector('.status__msg');
   const statusDetailsMessageEl = document.body.querySelector('.status__detailsmsg');
-  const spinnerEl = document.body.querySelector('.status__spinner');
   const feedbackEl = document.body.querySelector('.feedback');
 
   const generateOptionsEl = document.getElementById('configure-options');
@@ -82,21 +81,11 @@ document.addEventListener('DOMContentLoaded', _ => {
     return reportErrorEl;
   }
 
-  let spinnerAnimation;
-
   function startSpinner() {
     statusEl.classList.add(subpageVisibleClass);
-    spinnerAnimation = spinnerEl.animate([
-      {transform: 'rotate(0deg)'},
-      {transform: 'rotate(359deg)'}
-    ], {
-      duration: 1000,
-      iterations: Infinity
-    });
   }
 
   function stopSpinner() {
-    spinnerAnimation.cancel();
     statusEl.classList.remove(subpageVisibleClass);
   }
 

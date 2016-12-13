@@ -216,7 +216,7 @@ body {
 }
 
 .menu__header {
-  background: #2F3441;
+  background: #2238b3;
   padding: 0 20px;
   height: 115px;
   line-height: 54px;
@@ -243,8 +243,7 @@ body {
 
 .menu__header-title {
   font-family: var(--text-font-family);
-  font-size: 22px;
-  font-weight: 400;
+  font-weight: 300;
   color: #fff;
   margin: 0;
   padding: 0;
@@ -279,7 +278,7 @@ body {
 }
 
 .menu__link:hover {
-  background-color: #57A0A8;
+  background-color: #448aff;
   color: #FFF;
 }
 

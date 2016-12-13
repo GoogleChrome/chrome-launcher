@@ -5,8 +5,8 @@
   "manifest_version": 2,
   "description": "__MSG_appDescription__",
   "icons": {
-    "16": "images/icon-16.png",
-    "128": "images/icon-128.png"
+    "16": "images/lh_logo_bg.png",
+    "128": "images/lh_logo_bg.png"
   },
   "default_locale": "en",
   "background": {
@@ -22,7 +22,7 @@
   ],
   "browser_action": {
     "default_icon": {
-      "38": "images/icon-38.png"
+      "38": "images/lh_logo_icon.png"
     },
     "default_title": "Lighthouse",
     "default_popup": "popup.html"

@@ -24,16 +24,17 @@ limitations under the License.
   <meta name="viewport" content="width=device-width">
   <title>Lighthouse Report</title>
   <link rel="stylesheet" href="styles/lighthouse.css">
+  <link rel="stylesheet" href="styles/lighthouse-loading.css">
 </head>
 <body>
 
   <header class="header">
-    <img src="images/icon.svg" class="header__icon" width="75" height="75" alt="Lighthouse Icon">
+    <img src="images/lh_logo_bg.png" class="header__icon" width="100" height="100" alt="Lighthouse Logo">
     <div class="header-titles">
       <h1 class="header-titles__main">Lighthouse</h1>
       <h2 class="header-titles__url">...</h2>
     </div>
-    <a class="alpha" href="https://github.com/googlechrome/lighthouse" target="_blank">Alpha</a>
+    <a class="beta" href="https://github.com/googlechrome/lighthouse" target="_blank">Beta</a>
   </header>
 
   <main class="main" role="main">
@@ -44,7 +45,12 @@ limitations under the License.
   </main>
 
   <aside class="status subpage">
-    <div class="status__spinner"></div>
+    <div class="lighthouse-effects">
+      <img src="images/lh_logo_bg_no-light.png" alt="LH logo">
+      <div class="lighthouse-effects__wrapper">
+        <div class="lighthouse-effects__light"></div>
+      </div>
+    </div>
     <div class="status__msg">Starting...</div>
     <div><small class="status__detailsmsg"></small></div>
   </aside>
