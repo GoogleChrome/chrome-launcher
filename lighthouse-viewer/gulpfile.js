@@ -23,9 +23,11 @@ const gulpLoadPlugins = require('gulp-load-plugins');
 const runSequence = require('run-sequence');
 const browserify = require('browserify');
 const closure = require('google-closure-compiler-js').gulp();
-const ghPages = require('gulp-gh-pages');
+const ghpages = require('gh-pages');
 
 const $ = gulpLoadPlugins();
+
+const DIST_FOLDER = 'dist';
 
 function license() {
   return $.license('Apache', {
@@ -52,7 +54,7 @@ gulp.task('lint', () => {
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-  .pipe(gulp.dest('dist/images'));
+  .pipe(gulp.dest(`${DIST_FOLDER}/images`));
 });
 
 gulp.task('css', () => {
@@ -60,11 +62,11 @@ gulp.task('css', () => {
     'app/styles/**/*.css',
     '../lighthouse-core/report/styles/report.css'
   ])
-  .pipe(gulp.dest('dist/styles'));
+  .pipe(gulp.dest(`${DIST_FOLDER}/styles`));
 });
 
 gulp.task('html', () => {
-  return gulp.src('app/*.html').pipe(gulp.dest('dist'));
+  return gulp.src('app/*.html').pipe(gulp.dest(DIST_FOLDER));
 });
 
 gulp.task('polyfills', () => {
@@ -72,7 +74,7 @@ gulp.task('polyfills', () => {
     'node_modules/url-search-params/build/url-search-params.js',
     'node_modules/whatwg-fetch/fetch.js'
   ])
-  .pipe(gulp.dest('dist/src/polyfills'));
+  .pipe(gulp.dest(`${DIST_FOLDER}/src/polyfills`));
 });
 
 gulp.task('browserify', () => {
@@ -86,12 +88,12 @@ gulp.task('browserify', () => {
       // Inject transformed browserified content back into our gulp pipeline.
       file.contents = bundle.bundle();
     }))
-    .pipe(gulp.dest('dist/src'));
+    .pipe(gulp.dest(`${DIST_FOLDER}/src`));
 });
 
 gulp.task('compile', ['browserify'], () => {
   return gulp.src([
-    'dist/src/main.js'
+    `${DIST_FOLDER}/src/main.js`
   ])
     // .pipe($.sourcemaps.init())
     .pipe(closure({
@@ -106,11 +108,11 @@ gulp.task('compile', ['browserify'], () => {
     .pipe($.uglify()) // Use uglify to strip out duplicated license headers.
     .pipe(license())  // Add license to top.
     // .pipe($.sourcemaps.write('/'))
-    .pipe(gulp.dest('dist/src'));
+    .pipe(gulp.dest(`${DIST_FOLDER}/src`));
 });
 
 gulp.task('clean', () => {
-  return del(['dist']).then(paths =>
+  return del([DIST_FOLDER]).then(paths =>
     paths.forEach(path => $.util.log('deleted:', $.util.colors.blue(path)))
   );
 });
@@ -135,8 +137,24 @@ gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'css'],
   ], ['browserify']);
 });
 
-gulp.task('deploy', ['build'], () => {
-  return gulp.src('dist/**/*').pipe(ghPages());
+gulp.task('create-dir-for-gh-pages', () => {
+  del.sync([`${DIST_FOLDER}/viewer`]);
+
+  return gulp.src([`${DIST_FOLDER}/**/*`])
+    .pipe(gulp.dest(`${DIST_FOLDER}/viewer/viewer`));
+});
+
+gulp.task('deploy', cb => {
+  runSequence('build', 'create-dir-for-gh-pages', function() {
+    ghpages.publish(`${DIST_FOLDER}/viewer`, {
+      logger: $.util.log
+    }, err => {
+      if (err) {
+        $.util.log(err);
+      }
+      cb();
+    });
+  });
 });
 
 gulp.task('build', cb => {
