@@ -57,6 +57,12 @@ gulp.task('css', () => {
   .pipe(gulp.dest(`${DIST_FOLDER}/styles`));
 });
 
+gulp.task('concat-css', ['html', 'css'], () => {
+  return gulp.src([`${DIST_FOLDER}/index.html`])
+    .pipe($.useref())
+    .pipe(gulp.dest(DIST_FOLDER));
+});
+
 gulp.task('html', () => {
   return gulp.src('app/*.html').pipe(gulp.dest(DIST_FOLDER));
 });
@@ -146,7 +152,8 @@ gulp.task('deploy', cb => {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'compile',
-    ['html', 'images', 'css', 'polyfills'], cb);
+    ['html', 'images', 'css', 'polyfills'],
+    'concat-css', cb);
 });
 
 gulp.task('default', ['clean'], cb => {
