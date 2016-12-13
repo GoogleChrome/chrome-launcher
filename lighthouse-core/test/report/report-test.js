@@ -56,7 +56,6 @@ describe('Report', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults);
 
-    assert.ok(html.includes('self.lhresults = {'), 'results object was not added');
     assert.ok(html.includes('<footer'), 'no footer tag found');
     assert.ok(html.includes('printButton = document.querySelector'),
               'lighthouse-report.js was not inlined');

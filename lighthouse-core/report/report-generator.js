@@ -227,10 +227,12 @@ class ReportGenerator {
   /**
    * Generates the Lighthouse report HTML.
    * @param {!Object} results Lighthouse results.
-   * @param {!string} reportContext Where the report is going
+   * @param {!string} reportContext What app is requesting the report (eg. devtools, extension)
    * @returns {string} HTML of the report page.
    */
   generateHTML(results, reportContext) {
+    reportContext = reportContext || 'extension';
+
     // Ensure the formatter for each extendedInfo is registered.
     Object.keys(results.audits).forEach(audit => {
       // Use value rather than key for audit.
@@ -261,14 +263,15 @@ class ReportGenerator {
     });
 
     const template = Handlebars.compile(this.getReportTemplate());
+
     return template({
       url: results.url,
       lighthouseVersion: results.lighthouseVersion,
       generatedTime: this._formatTime(results.generatedTime),
       lhresults: this._escapeScriptTags(JSON.stringify(results, null, 2)),
       css: this.getReportCSS(),
-      reportContext: reportContext || 'extension', // devtools, extension, cli
-      script: this.getReportJS(),
+      reportContext: reportContext,
+      script: reportContext === 'devtools' ? '' : this.getReportJS(),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations)
     });
