@@ -17,18 +17,8 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../lib/url-shim');
 const Audit = require('./audit');
-
-/**
- * @param {string} targetURL
- * @return {string}
- */
-function getOrigin(targetURL) {
-  const parsedURL = url.parse(targetURL);
-  return `${parsedURL.protocol}//${parsedURL.hostname}` +
-      (parsedURL.port ? `:${parsedURL.port}` : '');
-}
 
 /**
  * @param {!Array<!ServiceWorkerVersion>} versions
@@ -36,8 +26,8 @@ function getOrigin(targetURL) {
  * @return {(!ServiceWorkerVersion|undefined)}
  */
 function getActivatedServiceWorker(versions, url) {
-  const origin = getOrigin(url);
-  return versions.find(v => v.status === 'activated' && getOrigin(v.scriptURL) === origin);
+  const origin = new URL(url).origin;
+  return versions.find(v => v.status === 'activated' && new URL(v.scriptURL).origin === origin);
 }
 
 class ServiceWorker extends Audit {

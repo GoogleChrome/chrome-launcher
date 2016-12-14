@@ -25,7 +25,8 @@
 <script src="./dbw_tester.js"></script>
 
 <template id="links-blocking-first-paint-tmpl">
-  <link rel="stylesheet" href="./dbw_tester.css">
+  <!-- we use a relative protocol url to test that `new URL(resource)` in the critical-request-chains.js formatter can handle it -->
+  <link rel="stylesheet" href="//localhost:10200/dobetterweb/dbw_tester.css">
   <link rel="stylesheet" href="./dbw_disabled.css" disabled>
   <link rel="import" href="./dbw_partial_a.html">
   <link rel="import" href="./dbw_partial_b.html" async>
@@ -100,6 +101,7 @@ function dateNowTest() {
   }
   helloDate();
   eval('Date.now()'); // FAIL
+  new Function('Date.now()')() // FAIL
 }
 
 function consoleTimeTest() {

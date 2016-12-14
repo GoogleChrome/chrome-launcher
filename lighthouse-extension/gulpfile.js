@@ -111,6 +111,8 @@ gulp.task('browserify-lighthouse', () => {
       })
       .ignore('../lighthouse-core/lib/asset-saver.js') // relative from gulpfile location
       .ignore('source-map')
+      .ignore('whatwg-url')
+      .ignore('url')
       .ignore('debug/node');
 
       // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.

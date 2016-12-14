@@ -18,12 +18,11 @@
 
 require('../../compiled-check.js')('printer.js');
 
+/* eslint-env mocha */
 const Printer = require('../../printer.js');
 const assert = require('assert');
 const fs = require('fs');
 const sampleResults = require('../fixtures/sample.json');
-
-/* global describe, it */
 
 describe('Printer', () => {
   it('accepts valid output paths', () => {

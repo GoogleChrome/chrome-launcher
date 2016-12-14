@@ -22,7 +22,7 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
 const Formatter = require('../../formatters/formatter');
 
@@ -47,11 +47,11 @@ class UsesHTTP2Audit extends Audit {
    */
   static audit(artifacts) {
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    const finalHost = url.parse(artifacts.URL.finalUrl).host;
+    const finalHost = new URL(artifacts.URL.finalUrl).host;
 
     // Filter requests that are on the same host as the page and not over h2.
     const resources = networkRecords.filter(record => {
-      const requestHost = url.parse(record._url).host;
+      const requestHost = new URL(record._url).host;
       const sameHost = requestHost === finalHost;
       const notH2 = /HTTP\/[01][\.\d]?/i.test(record.protocol);
       return sameHost && notH2;

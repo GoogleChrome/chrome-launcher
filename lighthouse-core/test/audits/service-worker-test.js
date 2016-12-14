@@ -15,10 +15,10 @@
  */
 'use strict';
 
-/* eslint-env mocha */
-
 const Audit = require('../../audits/service-worker.js');
 const assert = require('assert');
+
+/* eslint-env mocha */
 
 describe('Offline: Service Worker audit', () => {
   it('reports driver error when given no Service Worker versions', () => {

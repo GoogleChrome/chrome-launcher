@@ -17,7 +17,7 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
 const Formatter = require('../../formatters/formatter');
 
@@ -47,10 +47,10 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       });
     }
 
-    const pageHost = url.parse(artifacts.URL.finalUrl).host;
+    const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usages to exclude anchors that are same origin
     const failingAnchors = artifacts.AnchorsWithNoRelNoopener.usages
-      .filter(anchor => url.parse(anchor.href).host !== pageHost)
+      .filter(anchor => new URL(anchor.href).host !== pageHost)
       .map(anchor => {
         return {
           url: `<a

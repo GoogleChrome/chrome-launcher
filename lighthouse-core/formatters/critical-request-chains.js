@@ -17,7 +17,7 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../lib/url-shim');
 const path = require('path');
 const fs = require('fs');
 const Formatter = require('./formatter');
@@ -206,12 +206,13 @@ class CriticalRequestChains extends Formatter {
 
   static parseURL(resourceURL, opts) {
     const MAX_FILENAME_LENGTH = 64;
-    const parsedResourceURL = url.parse(resourceURL);
+    const parsedResourceURL = new URL(resourceURL);
     const hostname = parsedResourceURL.hostname;
+
     // Handle 'about:*' URLs specially since they have no path.
     let file = parsedResourceURL.protocol === 'about:' ? parsedResourceURL.href :
         // Otherwise, remove any query strings from the path.
-        parsedResourceURL.path.replace(/\?.*/, '')
+        parsedResourceURL.pathname.replace(/\?.*/, '')
         // And grab the last two parts.
         .split('/').slice(-2).join('/');
 

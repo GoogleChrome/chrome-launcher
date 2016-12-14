@@ -240,7 +240,7 @@
                 "children": {
                   "40777.4": {
                     "request": {
-                      "url": "//example.com/file.js",
+                      "url": "http://example.com/file.js",
                       "startTime": 162729.056987,
                       "endTime": 162729.71555,
                       "responseReceivedTime": 162729.611017,

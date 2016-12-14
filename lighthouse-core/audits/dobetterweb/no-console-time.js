@@ -21,7 +21,7 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
 const Formatter = require('../../formatters/formatter');
 
@@ -57,10 +57,10 @@ class NoConsoleTimeAudit extends Audit {
       });
     }
 
-    const pageHost = url.parse(artifacts.URL.finalUrl).host;
+    const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usage from other hosts and keep eval'd code.
     const results = artifacts.ConsoleTimeUsage.usage.filter(err => {
-      return err.isEval ? err.url : url.parse(err.url).host === pageHost;
+      return err.isEval ? !!err.url : new URL(err.url).host === pageHost;
     }).map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`

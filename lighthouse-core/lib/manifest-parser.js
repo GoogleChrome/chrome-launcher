@@ -16,7 +16,7 @@
  */
 'use strict';
 
-const url = require('url');
+const URL = require('./url-shim');
 const validateColor = require('./web-inspector').Color.parse;
 
 const ALLOWED_DISPLAY_VALUES = [
@@ -95,12 +95,10 @@ function parseShortName(jsonInput) {
  * @return {boolean}
  */
 function checkSameOrigin(url1, url2) {
-  const parsed1 = url.parse(url1);
-  const parsed2 = url.parse(url2);
+  const parsed1 = new URL(url1);
+  const parsed2 = new URL(url2);
 
-  return parsed1.protocol === parsed2.protocol &&
-      parsed1.hostname === parsed2.hostname &&
-      parsed1.port === parsed2.port;
+  return parsed1.origin === parsed2.origin;
 }
 
 /**
@@ -126,9 +124,7 @@ function parseStartUrl(jsonInput, manifestUrl, documentUrl) {
   // 8.10(4) - construct URL with raw as input and manifestUrl as the base.
   let startUrl;
   try {
-    // TODO(bckenny): need better URL constructor to do this properly. See
-    // https://github.com/GoogleChrome/lighthouse/issues/602
-    startUrl = url.resolve(manifestUrl, raw);
+    startUrl = new URL(raw, manifestUrl).href;
   } catch (e) {
     // 8.10(5) - discard invalid URLs.
     return {
@@ -191,10 +187,8 @@ function parseIcon(raw, manifestUrl) {
     src.value = undefined;
   }
   if (src.value) {
-    // TODO(bckenny): need better URL constructor to do this properly. See
-    // https://github.com/GoogleChrome/lighthouse/issues/602
     // 9.4(4) - construct URL with manifest URL as the base
-    src.value = url.resolve(manifestUrl, src.value);
+    src.value = new URL(src.value, manifestUrl).href;
   }
 
   const type = parseString(raw.type, true);
@@ -275,10 +269,8 @@ function parseApplication(raw) {
   const appUrl = parseString(raw.url, true);
   if (appUrl.value) {
     try {
-      // TODO(bckenny): need better URL constructor to do this properly. See
-      // https://github.com/GoogleChrome/lighthouse/issues/602
       // 10.2.(4) - attempt to construct URL.
-      appUrl.value = url.parse(appUrl.value).href;
+      appUrl.value = new URL(appUrl.value).href;
     } catch (e) {
       appUrl.value = undefined;
       appUrl.debugString = 'ERROR: invalid application URL ${raw.url}';

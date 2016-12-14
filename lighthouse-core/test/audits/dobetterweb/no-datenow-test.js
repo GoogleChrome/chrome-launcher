@@ -91,12 +91,12 @@ describe('Page does not use Date.now()', () => {
         usage: [
           {url: 'http://example.com/one', line: 1, col: 1, isEval: false},
           {url: 'module.exports (blah/handler.js:5:18)', line: 5, col: 18, isEval: true},
-          {url: 'module.exports (blah/handler.js:5:18)', line: 5, col: 18, isEval: false}
+          {url: 'module.exports (blah/handler.js:3:18)', line: 3, col: 18, isEval: true}
         ]
       },
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.equal(auditResult.extendedInfo.value.length, 3);
   });
 });

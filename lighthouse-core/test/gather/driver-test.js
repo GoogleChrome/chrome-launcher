@@ -95,7 +95,8 @@ const req3 = {
 };
 const mockRedirects = [req1, req2, req3];
 
-/* global describe, it */
+/* eslint-env mocha */
+
 describe('Browser Driver', () => {
   it('returns null when DOM.querySelector finds no node', () => {
     return driverStub.querySelector('invalid').then(value => {

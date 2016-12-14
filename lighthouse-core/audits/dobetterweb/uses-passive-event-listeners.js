@@ -22,7 +22,7 @@
 
 'use strict';
 
-const url = require('url');
+const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
 const EventHelpers = require('../../lib/event-helpers');
 const Formatter = require('../../formatters/formatter');
@@ -57,7 +57,7 @@ class PassiveEventsAudit extends Audit {
     }
 
     const listeners = artifacts.EventListeners;
-    const pageHost = url.parse(artifacts.URL.finalUrl).host;
+    const pageHost = new URL(artifacts.URL.finalUrl).host;
 
     // Filter out non-passive window/document/document.body listeners that do
     // not call preventDefault() are scroll blocking events.
@@ -65,7 +65,7 @@ class PassiveEventsAudit extends Audit {
       const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
       const mentionsPreventDefault = loc.handler.description.match(
             /\.preventDefault\(\s*\)/g);
-      const sameHost = loc.url ? url.parse(loc.url).host === pageHost : true;
+      const sameHost = loc.url ? new URL(loc.url).host === pageHost : true;
       return sameHost && isScrollBlocking && !loc.passive &&
              !mentionsPreventDefault;
     }).map(EventHelpers.addFormattedCodeSnippet);
