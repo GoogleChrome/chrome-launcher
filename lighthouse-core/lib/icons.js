@@ -40,7 +40,7 @@ function sizeAtLeast(sizeRequirement, manifest) {
   // To handle both, we flatten all found sizes into a single array.
   const iconValues = manifest.icons.value;
   const nestedSizes = iconValues.map(icon => icon.value.sizes.value);
-  const flattenedSizes = [].concat.apply([], nestedSizes);
+  const flattenedSizes = [].concat(...nestedSizes);
 
   return flattenedSizes
       // First, filter out any undefined values, in case an icon was defined without a size

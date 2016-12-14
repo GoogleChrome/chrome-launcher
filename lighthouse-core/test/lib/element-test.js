@@ -41,45 +41,48 @@ class DriverStub {
 
 /* global describe, it, beforeEach */
 describe('Element', () => {
+  let stubbedDriver;
+  let stubbedElement;
+
   beforeEach(() => {
-    this.stubbedDriver = new DriverStub();
-    this.stubbedElement = {nodeId: 642};
+    stubbedDriver = new DriverStub();
+    stubbedElement = {nodeId: 642};
   });
 
   it('throws when no driver or element is passed', () => {
     assert.throws(() => {
-      var _ = new Element();
+      const _ = new Element();
     });
   });
 
   it('throws when no driver is passed', () => {
     assert.throws(() => {
-      var _ = new Element(this.stubbedElement, undefined);
+      const _ = new Element(stubbedElement, undefined);
     });
   });
 
   it('throws when no element is passed', () => {
     assert.throws(() => {
-      var _ = new Element(undefined, this.stubbedDriver);
+      const _ = new Element(undefined, stubbedDriver);
     });
   });
 
   it('returns null from getAttribute when no attribute found', () => {
-    var element = new Element(this.stubbedElement, this.stubbedDriver);
+    const element = new Element(stubbedElement, stubbedDriver);
     return element.getAttribute('notanattribute').then(value => {
       assert.equal(value, null);
     });
   });
 
   it('returns attribute value from getAttribute', () => {
-    var element = new Element(this.stubbedElement, this.stubbedDriver);
+    const element = new Element(stubbedElement, stubbedDriver);
     return element.getAttribute('rel').then(value => {
       assert.equal(value, 'manifest');
     });
   });
 
   it('returns property value from getProperty', () => {
-    var element = new Element(this.stubbedElement, this.stubbedDriver);
+    const element = new Element(stubbedElement, stubbedDriver);
     return element.getProperty('test').then(value => {
       assert.equal(value, '123');
     });

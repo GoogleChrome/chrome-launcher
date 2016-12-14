@@ -80,9 +80,9 @@ function enableNexus5X(driver) {
   /* eslint-disable no-proto */ /* global window, document */ /* istanbul ignore next */
   const injectedTouchEventsFunction = function() {
     const touchEvents = ['ontouchstart', 'ontouchend', 'ontouchmove', 'ontouchcancel'];
-    var recepients = [window.__proto__, document.__proto__];
-    for (var i = 0; i < touchEvents.length; ++i) {
-      for (var j = 0; j < recepients.length; ++j) {
+    const recepients = [window.__proto__, document.__proto__];
+    for (let i = 0; i < touchEvents.length; ++i) {
+      for (let j = 0; j < recepients.length; ++j) {
         if (!(touchEvents[i] in recepients[j])) {
           Object.defineProperty(recepients[j], touchEvents[i], {
             value: null, writable: true, configurable: true, enumerable: true

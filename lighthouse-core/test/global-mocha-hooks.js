@@ -27,6 +27,7 @@ Object.keys(assert)
 
 // store the count of assertions on each test's state object
 beforeEach(function() {
+  // eslint-disable-next-line no-invalid-this
   currTest = this.currentTest;
   currTest._assertions = currTest._assertions || 0;
 });

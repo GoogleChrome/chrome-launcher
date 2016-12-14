@@ -11,7 +11,7 @@
     "node": ">=5"
   },
   "scripts": {
-    "lint": "[ \"$CI\" = true ] && eslint --quiet . || eslint .",
+    "lint": "[ \"$CI\" = true ] && eslint --quiet -f codeframe . || eslint .",
     "smoke": "lighthouse-cli/test/smokehouse/offline-local/run-tests.sh && lighthouse-cli/test/smokehouse/dobetterweb/run-tests.sh",
     "coverage": "node $__node_harmony $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*-test.js') --timeout 10000 --reporter progress",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
@@ -31,9 +31,9 @@
     "babel-core": "^6.16.0",
     "babel-plugin-transform-es2015-destructuring": "^6.9.0",
     "coveralls": "^2.11.9",
-    "eslint": "^2.4.0",
-    "eslint-config-google": "^0.4.0",
-    "google-closure-compiler": "^20160517.0.0",
+    "eslint": "^3.12.0",
+    "eslint-config-google": "^0.7.1",
+    "google-closure-compiler": "^20161201.0.0",
     "gulp": "^3.9.1",
     "gulp-replace": "^0.5.4",
     "gulp-util": "^3.0.7",
@@ -41,7 +41,6 @@
     "jsdom": "^9.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.3",
-    "request": "^2.69.0",
     "walk": "^2.3.9"
   },
   "dependencies": {

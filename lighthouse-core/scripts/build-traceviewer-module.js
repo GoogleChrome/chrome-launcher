@@ -51,7 +51,7 @@ function convertImport(src) {
       scriptsContent += convertLicenseComments(html);
 
       // traverse and rewrite the imports
-      for (var i = 0; i < imports.length; i++) {
+      for (let i = 0; i < imports.length; i++) {
         const importPath = importToPath(imports[i]);
         scriptsContent += importToRequire(importPath, dest);
 

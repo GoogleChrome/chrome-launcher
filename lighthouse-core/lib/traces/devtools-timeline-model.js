@@ -70,17 +70,17 @@ class TimelineModel {
   }
 
   topDown() {
-    var filters = [];
+    const filters = [];
     filters.push(WebInspector.TimelineUIUtils.visibleEventsFilter());
     filters.push(new WebInspector.ExcludeTopLevelFilter());
-    var nonessentialEvents = [
+    const nonessentialEvents = [
       WebInspector.TimelineModel.RecordType.EventDispatch,
       WebInspector.TimelineModel.RecordType.FunctionCall,
       WebInspector.TimelineModel.RecordType.TimerFire
     ];
     filters.push(new WebInspector.ExclusiveNameFilter(nonessentialEvents));
 
-    var topDown = WebInspector.TimelineProfileTree.buildTopDown(
+    const topDown = WebInspector.TimelineProfileTree.buildTopDown(
         this._timelineModel.mainThreadEvents(),
         filters, /* startTime */ 0, /* endTime */ Infinity,
         WebInspector.TimelineAggregator.eventId);
@@ -88,9 +88,9 @@ class TimelineModel {
   }
 
   bottomUp() {
-    var topDown = this.topDown();
-    var noGrouping = WebInspector.TimelineAggregator.GroupBy.None;
-    var noGroupAggregator = this._createAggregator().groupFunction(noGrouping);
+    const topDown = this.topDown();
+    const noGrouping = WebInspector.TimelineAggregator.GroupBy.None;
+    const noGroupAggregator = this._createAggregator().groupFunction(noGrouping);
     return WebInspector.TimelineProfileTree.buildBottomUp(topDown, noGroupAggregator);
   }
 
@@ -99,11 +99,11 @@ class TimelineModel {
   * @return {!WebInspector.TimelineProfileTree.Node} A grouped and sorted tree
   */
   bottomUpGroupBy(grouping) {
-    var topDown = this.topDown();
+    const topDown = this.topDown();
 
-    var groupSetting = WebInspector.TimelineAggregator.GroupBy[grouping];
-    var groupingAggregator = this._createAggregator().groupFunction(groupSetting);
-    var bottomUpGrouped =
+    const groupSetting = WebInspector.TimelineAggregator.GroupBy[grouping];
+    const groupingAggregator = this._createAggregator().groupFunction(groupSetting);
+    const bottomUpGrouped =
         WebInspector.TimelineProfileTree.buildBottomUp(topDown, groupingAggregator);
 
     // sort the grouped tree, in-place
@@ -112,7 +112,7 @@ class TimelineModel {
   }
 
   frameModel() {
-    var frameModel = new WebInspector.TimelineFrameModel(event =>
+    const frameModel = new WebInspector.TimelineFrameModel(event =>
       WebInspector.TimelineUIUtils.eventStyle(event).category.name
     );
     frameModel.addTraceEvents({ /* target */ },
@@ -125,7 +125,7 @@ class TimelineModel {
   }
 
   interactionModel() {
-    var irModel = new WebInspector.TimelineIRModel();
+    const irModel = new WebInspector.TimelineIRModel();
     irModel.populate(this._timelineModel);
     return irModel;
   }

@@ -530,8 +530,8 @@ class Driver {
       // COMPAT: We've found `result` not retaining its value in this scenario when it's
       // declared with `let`. Observed in Chrome 50 and 52. While investigating the V8 bug
       // further, we'll use a plain `var` declaration.
-      var isEOF = false;
-      var result = '';
+      let isEOF = false;
+      let result = '';
 
       const readArguments = {
         handle: streamHandle.stream
@@ -756,6 +756,7 @@ function captureJSCallUsage(funcRef, set) {
     // our custom one.
     Error.prepareStackTrace = originalPrepareStackTrace;
 
+    // eslint-disable-next-line no-invalid-this
     return originalFunc.apply(this, arguments);
   };
 }

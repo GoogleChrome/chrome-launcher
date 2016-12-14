@@ -26,7 +26,7 @@ const log = require('../../../lighthouse-core/lib/log');
 const ReportGenerator = require('../../../lighthouse-core/report/report-generator');
 
 const STORAGE_KEY = 'lighthouse_audits';
-const _flatten = arr => [].concat.apply([], arr);
+const _flatten = arr => [].concat(...arr);
 
 /**
  * Filter out any unrequested aggregations from the config. If any audits are

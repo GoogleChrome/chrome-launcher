@@ -224,7 +224,7 @@ module.exports = (function() {
     },
 
     _onRequestStarted: function(event) {
-      var request = event.data;
+      const request = event.data;
       if (this._requests.has(request.url)) {
         return;
       }
@@ -277,7 +277,7 @@ module.exports = (function() {
 
   // Mostly taken from from chrome-devtools-frontend/front_end/gonzales/SCSSParser.js.
   WebInspector.SCSSParser.prototype.parse = function(content) {
-    var ast = null;
+    let ast = null;
     try {
       ast = gonzales.parse(content, {syntax: 'css'});
     } catch (e) {
@@ -285,12 +285,12 @@ module.exports = (function() {
     }
 
     /** @type {!{properties: !Array<!Gonzales.Node>, node: !Gonzales.Node}} */
-    var rootBlock = {
+    const rootBlock = {
       properties: [],
       node: ast
     };
     /** @type {!Array<!{properties: !Array<!Gonzales.Node>, node: !Gonzales.Node}>} */
-    var blocks = [rootBlock];
+    const blocks = [rootBlock];
     ast.selectors = [];
     WebInspector.SCSSParser.extractNodes(ast, blocks, rootBlock);
 

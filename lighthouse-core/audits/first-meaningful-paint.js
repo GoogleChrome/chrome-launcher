@@ -56,7 +56,7 @@ class FirstMeaningfulPaint extends Audit {
       const navStart = evts.navigationStart;
       const fMP = evts.firstMeaningfulPaint;
 
-      var data = {
+      const data = {
         navStart,
         fMP,
       };

@@ -42,7 +42,7 @@ module.exports = function() {
     if (fsTimelineRegExp.test(fileContentsString)) {
       fileContentsString = fileContentsString.replace(fsTimelineRegExp, 'timeline');
     }
-
+    // eslint-disable-next-line no-invalid-this
     this.push(fileContentsString);
     done();
   });

@@ -40,6 +40,7 @@ module.exports = function() {
       fileContentsString = fileContentsString.replace(dtmRegExp, `require("${newPath}")`);
     }
 
+    // eslint-disable-next-line no-invalid-this
     this.push(fileContentsString);
     done();
   });

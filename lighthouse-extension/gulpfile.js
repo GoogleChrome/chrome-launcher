@@ -69,7 +69,7 @@ gulp.task('html', () => {
 });
 
 gulp.task('chromeManifest', () => {
-  var manifestOpts = {
+  const manifestOpts = {
     buildnumber: false,
     background: {
       target: 'scripts/lighthouse-background.js',
@@ -178,7 +178,7 @@ gulp.task('watch', ['lint', 'browserify', 'html'], () => {
 });
 
 gulp.task('package', function() {
-  var manifest = require('./dist/manifest.json');
+  const manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
   .pipe(zip('lighthouse-' + manifest.version + '.zip'))
   .pipe(gulp.dest('package'));
