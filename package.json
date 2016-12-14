@@ -44,7 +44,7 @@
     "walk": "^2.3.9"
   },
   "dependencies": {
-    "axe-core": "^1.1.1",
+    "axe-core": "2.1.7",
     "chrome-devtools-frontend": "1.0.422034",
     "debug": "^2.2.0",
     "devtools-timeline-model": "1.1.6",

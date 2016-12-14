@@ -155,9 +155,9 @@ aws4@^1.2.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.4.1.tgz#fde7d5292466d230e5ee0f4e038d9dfaab08fc61"
 
-axe-core@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-1.1.1.tgz#ae9da5da8ab4f1041907f1f5d8dfe39c946a92c5"
+axe-core@2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-2.1.7.tgz#4f66f2b3ee3b58ec2d3db4339dd124c5b33b79c3"
 
 babar@0.0.3:
   version "0.0.3"
