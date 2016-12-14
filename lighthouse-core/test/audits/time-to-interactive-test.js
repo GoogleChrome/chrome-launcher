@@ -50,11 +50,11 @@ describe('Performance: time-to-interactive audit', () => {
     };
 
     return Audit.audit(artifacts).then(output => {
-      assert.equal(output.rawValue, '1105.8', output.debugString);
-      assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, '20.72');
-      assert.equal(output.extendedInfo.value.timings.fMP, '1099.5');
-      assert.equal(output.extendedInfo.value.timings.mainThreadAvail, '1105.8');
-      assert.equal(output.extendedInfo.value.timings.visuallyReady, '1105.8');
+      assert.equal(output.rawValue, 1105.8, output.debugString);
+      assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, 20.724);
+      assert.equal(output.extendedInfo.value.timings.fMP, 1099.5);
+      assert.equal(output.extendedInfo.value.timings.timeToInteractive, 1105.798);
+      assert.equal(output.extendedInfo.value.timings.visuallyReady, 1105.798);
     });
   });
 });

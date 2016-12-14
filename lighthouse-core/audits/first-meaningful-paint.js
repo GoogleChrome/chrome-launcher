@@ -52,16 +52,7 @@ class FirstMeaningfulPaint extends Audit {
     return new Promise((resolve, reject) => {
       const traceContents = artifacts.traces[this.DEFAULT_PASS].traceEvents;
       const evts = this.collectEvents(traceContents);
-
-      const navStart = evts.navigationStart;
-      const fMP = evts.firstMeaningfulPaint;
-
-      const data = {
-        navStart,
-        fMP,
-      };
-
-      const result = this.calculateScore(data);
+      const result = this.calculateScore(evts);
 
       resolve(FirstMeaningfulPaint.generateAuditResult({
         score: result.score,
@@ -83,9 +74,23 @@ class FirstMeaningfulPaint extends Audit {
     });
   }
 
-  static calculateScore(data) {
-    // First meaningful paint is the last timestamp observed from the candidates
-    const firstMeaningfulPaint = (data.fMP.ts - data.navStart.ts) / 1000;
+  static calculateScore(evts) {
+    const firstMeaningfulPaint = (evts.firstMeaningfulPaint.ts - evts.navigationStart.ts) / 1000;
+    const firstContentfulPaint = (evts.firstContentfulPaint.ts - evts.navigationStart.ts) / 1000;
+
+    // Expose the raw, unchanged monotonic timestamps from the trace, along with timing durations
+    const extendedInfo = {
+      timestamps: {
+        navStart: evts.navigationStart.ts,
+        fCP: evts.firstContentfulPaint.ts,
+        fMP: evts.firstMeaningfulPaint.ts
+      },
+      timings: {
+        navStart: 0,
+        fCP: parseFloat(firstContentfulPaint.toFixed(3)),
+        fMP: parseFloat(firstMeaningfulPaint.toFixed(3))
+      }
+    };
 
     // Use the CDF of a log-normal distribution for scoring.
     //   < 1100ms: score≈100
@@ -99,14 +104,11 @@ class FirstMeaningfulPaint extends Audit {
     score = Math.min(100, score);
     score = Math.max(0, score);
 
-    data.fMP = firstMeaningfulPaint;
-    data.navStart = data.navStart.ts / 1000;
-
     return {
       duration: `${firstMeaningfulPaint.toFixed(1)}`,
       score: Math.round(score),
-      rawValue: firstMeaningfulPaint.toFixed(1),
-      extendedInfo: {timings: data}
+      rawValue: parseFloat(firstMeaningfulPaint.toFixed(1)),
+      extendedInfo
     };
   }
 
@@ -114,44 +116,36 @@ class FirstMeaningfulPaint extends Audit {
    * @param {!Array<!Object>} traceData
    */
   static collectEvents(traceData) {
-    let mainFrameID;
-    let navigationStart;
-    let firstMeaningfulPaint;
-
-    // const model = new DevtoolsTimelineModel(traceData);
-    // const events = model.timelineModel().mainThreadEvents();
-    const events = traceData;
-
     // Parse the trace for our key events and sort them by timestamp.
-    events.filter(e => e.cat.includes('blink.user_timing') || e.name === 'TracingStartedInPage')
-    .sort((event0, event1) => {
-      return event0.ts - event1.ts;
-    }).forEach(event => {
-      // Grab the page's ID from the first TracingStartedInPage in the trace
-      if (event.name === 'TracingStartedInPage' && !mainFrameID) {
-        mainFrameID = event.args.data.page;
-      }
+    const events = traceData.filter(e => {
+      return e.cat.includes('blink.user_timing') || e.name === 'TracingStartedInPage';
+    }).sort((event0, event1) => event0.ts - event1.ts);
 
-      // Record the navigationStart, but only once TracingStartedInPage has started
-      // which is when mainFrameID exists
-      if (event.name === 'navigationStart' && !!mainFrameID && !navigationStart) {
-        navigationStart = event;
-      }
-      if (event.name === 'firstMeaningfulPaint' && event.args.frame === mainFrameID &&
-          !!navigationStart && event.ts >= navigationStart.ts) {
-        firstMeaningfulPaint = event;
-      }
-    });
+    // The first TracingStartedInPage in the trace is definitely our renderer thread of interest
+    // Beware: the tracingStartedInPage event can appear slightly after a navigationStart
+    const startedInPageEvt = events.find(e => e.name === 'TracingStartedInPage');
+    // Filter to just events matching the frame ID for sanity
+    const frameEvents = events.filter(e => e.args.frame === startedInPageEvt.args.data.page);
+
+    // Find our first FCP
+    const firstFCP = frameEvents.find(e => e.name === 'firstContentfulPaint');
+    // Our navStart will be the latest one before fCP.
+    const navigationStart = frameEvents.filter(e =>
+        e.name === 'navigationStart' && e.ts < firstFCP.ts).pop();
+    // FMP will follow at/after the FCP
+    const firstMeaningfulPaint = frameEvents.find(e =>
+        e.name === 'firstMeaningfulPaint' && e.ts >= firstFCP.ts);
 
     // navigationStart is currently essential to FMP calculation.
     // see: https://github.com/GoogleChrome/lighthouse/issues/753
     if (!navigationStart) {
-      throw new Error('No `navigationStart` event found after `TracingStartedInPage` in trace');
+      throw new Error('No `navigationStart` event found in trace');
     }
 
     return {
       navigationStart,
       firstMeaningfulPaint,
+      firstContentfulPaint: firstFCP
     };
   }
 }

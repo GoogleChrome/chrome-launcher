@@ -71,9 +71,6 @@ class TTIMetric extends Audit {
       if (fmpResult.rawValue === -1) {
         return generateError(fmpResult.debugString);
       }
-      const fmpTiming = parseFloat(fmpResult.rawValue);
-      const timings = fmpResult.extendedInfo && fmpResult.extendedInfo.value &&
-          fmpResult.extendedInfo.value.timings;
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
@@ -81,19 +78,22 @@ class TTIMetric extends Audit {
       const model = tracingProcessor.init(trace);
       const endOfTraceTime = model.bounds.max;
 
-      // TODO: Wait for DOMContentLoadedEndEvent
-      const fMPts = timings.fMP + timings.navStart;
+      const fmpTiming = fmpResult.rawValue;
+      const fmpResultExt = fmpResult.extendedInfo.value;
+
+      // frame monotonic timestamps from speedline are in ms (ts / 1000), so we'll match
+      //   https://github.com/pmdartus/speedline/blob/123f512632a/src/frame.js#L86
+      const fMPtsInMS = fmpResultExt.timestamps.fMP / 1000;
+      const navStartTsInMS = fmpResultExt.timestamps.navStart / 1000;
 
       // look at speedline results for 85% starting at FMP
       let visuallyReadyTiming = 0;
-
       if (speedline.frames) {
         const eightyFivePctVC = speedline.frames.find(frame => {
-          return frame.getTimeStamp() >= fMPts && frame.getProgress() >= 85;
+          return frame.getTimeStamp() >= fMPtsInMS && frame.getProgress() >= 85;
         });
-
         if (eightyFivePctVC) {
-          visuallyReadyTiming = eightyFivePctVC.getTimeStamp() - timings.navStart;
+          visuallyReadyTiming = eightyFivePctVC.getTimeStamp() - navStartTsInMS;
         }
       }
 
@@ -117,7 +117,7 @@ class TTIMetric extends Audit {
         // Get our expected latency for the time window
         const latencies = TracingProcessor.getRiskToResponsiveness(
           model, trace, startTime, endTime, percentiles);
-        const estLatency = latencies[0].time.toFixed(2);
+        const estLatency = latencies[0].time;
         foundLatencies.push({
           estLatency: estLatency,
           startTime: startTime.toFixed(1)
@@ -126,7 +126,8 @@ class TTIMetric extends Audit {
         // Grab this latency and try the threshold again
         currentLatency = estLatency;
       }
-      const timeToInteractive = parseFloat(startTime.toFixed(1));
+      // The start of our window is our TTI
+      const timeToInteractive = startTime;
 
       // Use the CDF of a log-normal distribution for scoring.
       //   < 1200ms: score≈100
@@ -143,17 +144,22 @@ class TTIMetric extends Audit {
 
       const extendedInfo = {
         timings: {
-          fMP: fmpTiming.toFixed(1),
-          visuallyReady: visuallyReadyTiming.toFixed(1),
-          mainThreadAvail: startTime.toFixed(1)
+          fMP: parseFloat(fmpTiming.toFixed(3)),
+          visuallyReady: parseFloat(visuallyReadyTiming.toFixed(3)),
+          timeToInteractive: parseFloat(startTime.toFixed(3))
         },
-        expectedLatencyAtTTI: currentLatency,
+        timestamps: {
+          fMP: fMPtsInMS * 1000,
+          visuallyReady: (visuallyReadyTiming + navStartTsInMS) * 1000,
+          timeToInteractive: (timeToInteractive + navStartTsInMS) * 1000
+        },
+        expectedLatencyAtTTI: parseFloat(currentLatency.toFixed(3)),
         foundLatencies
       };
 
       return TTIMetric.generateAuditResult({
         score,
-        rawValue: timeToInteractive,
+        rawValue: parseFloat(timeToInteractive.toFixed(1)),
         displayValue: `${timeToInteractive}ms`,
         optimalValue: this.meta.optimalValue,
         debugString: speedline.debugString,

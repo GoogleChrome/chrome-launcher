@@ -20,32 +20,23 @@ const Audit = require('../../audits/audit.js');
 const assert = require('assert');
 const traceEvents = require('../fixtures/traces/progressive-app.json');
 const badNavStartTrace = require('../fixtures/traces/bad-nav-start-ts.json');
+const lateTracingStartedTrace = require('../fixtures/traces/tracingstarted-after-navstart.json');
+
+function getArtifacts(trace) {
+  return {
+    traces: {
+      [Audit.DEFAULT_PASS]: {traceEvents: Array.isArray(trace) ? trace : trace.traceEvents}
+    }
+  };
+}
 
 /* eslint-env mocha */
 describe('Performance: first-meaningful-paint audit', () => {
-  it('scores a -1 and returns an error when navigation start is before trace start', () => {
-    const artifacts = {
-      traces: {
-        [Audit.DEFAULT_PASS]: badNavStartTrace
-      }
-    };
-    return FMPAudit.audit(artifacts).then(result => {
-      assert.equal(result.rawValue, -1);
-      assert.ok(/navigationStart/.test(result.debugString));
-    });
-  });
-
   describe('measures the pwa.rocks example correctly', () => {
     let fmpResult;
 
     it('processes a valid trace file', () => {
-      const artifacts = {
-        traces: {
-          [Audit.DEFAULT_PASS]: {traceEvents}
-        }
-      };
-
-      return FMPAudit.audit(artifacts).then(result => {
+      return FMPAudit.audit(getArtifacts(traceEvents)).then(result => {
         fmpResult = result;
       }).catch(_ => {
         assert.ok(false);
@@ -61,8 +52,43 @@ describe('Performance: first-meaningful-paint audit', () => {
       assert.equal(fmpResult.extendedInfo.value.timings.fMP, 1099.523);
     });
 
+    it('exposes the FCP timing', () => {
+      assert.equal(fmpResult.extendedInfo.value.timings.fCP, 461.901);
+    });
+
+    it('exposes the navStart timestamp', () => {
+      assert.equal(fmpResult.extendedInfo.value.timestamps.navStart, 668545382727);
+    });
+
     it('scores the fMP correctly', () => {
       assert.equal(fmpResult.score, 99);
+    });
+  });
+
+  describe('finds correct FMP in various traces', () => {
+    it('finds the fMP if there was a tracingStartedInPage after the frame\'s navStart', () => {
+      return FMPAudit.audit(getArtifacts(lateTracingStartedTrace)).then(result => {
+        assert.equal(result.displayValue, '529.9ms');
+        assert.equal(result.rawValue, 529.9);
+        assert.equal(result.extendedInfo.value.timestamps.navStart, 29343540951);
+        assert.equal(result.extendedInfo.value.timings.fCP, 80.054);
+        assert.ok(!result.debugString);
+      }).catch(_ => {
+        console.error(_);
+        assert.ok(false);
+      });
+    });
+
+    it('finds the fMP if there was a tracingStartedInPage after the frame\'s navStart #2', () => {
+      return FMPAudit.audit(getArtifacts(badNavStartTrace)).then(result => {
+        assert.equal(result.displayValue, '632.4ms');
+        assert.equal(result.rawValue, 632.4);
+        assert.equal(result.extendedInfo.value.timestamps.navStart, 8885424467);
+        assert.equal(result.extendedInfo.value.timings.fCP, 632.419);
+        assert.ok(!result.debugString);
+      }).catch(_ => {
+        assert.ok(false);
+      });
     });
   });
 });
