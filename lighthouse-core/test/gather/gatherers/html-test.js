@@ -55,10 +55,10 @@ describe('HTML gatherer', () => {
           }
         }
       }
-    }).then(_ => {
-      assert.ok(typeof htmlGather.artifact === 'string');
-      assert.ok(/<!doctype/gim.test(htmlGather.artifact));
-      assert.ok(/Hello/gim.test(htmlGather.artifact));
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'string');
+      assert.ok(/<!doctype/gim.test(artifact));
+      assert.ok(/Hello/gim.test(artifact));
     });
   });
 
@@ -69,9 +69,9 @@ describe('HTML gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(htmlGather.artifact.value, -1);
-      assert.ok(htmlGather.artifact.debugString);
+    }).then(artifact => {
+      assert.equal(artifact.value, -1);
+      assert.ok(artifact.debugString);
     });
   });
 });

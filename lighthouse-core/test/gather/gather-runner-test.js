@@ -31,12 +31,12 @@ class TestGatherer extends Gatherer {
   }
 
   pass() {
-    this.artifact = 'MyArtifact';
     this.called = true;
+    return 'MyArtifact';
   }
 }
 
-class TestGathererNoArtifact {
+class TestGathererNoArtifact extends Gatherer {
   beforePass() {}
   pass() {}
   afterPass() {}
@@ -136,8 +136,7 @@ describe('GatherRunner', function() {
     });
   });
 
-  it(`sets up the driver to stop device emulation when
-  disableDeviceEmulation flag is true`, () => {
+  it('stops device emulation when disableDeviceEmulation flag is true', () => {
     const tests = {
       calledDeviceEmulation: false,
       calledNetworkEmulation: false,
@@ -164,8 +163,7 @@ describe('GatherRunner', function() {
     });
   });
 
-  it(`sets up the driver to stop network throttling when
-  disableNetworkThrottling flag is true`, () => {
+  it('stops network throttling when disableNetworkThrottling flag is true', () => {
     const tests = {
       calledDeviceEmulation: false,
       calledNetworkEmulation: false,
@@ -192,8 +190,7 @@ describe('GatherRunner', function() {
     });
   });
 
-  it(`sets up the driver to stop cpu throttling when
-  disableCpuThrottling flag is true`, () => {
+  it('stops cpu throttling when disableCpuThrottling flag is true', () => {
     const tests = {
       calledDeviceEmulation: false,
       calledNetworkEmulation: false,
@@ -260,12 +257,12 @@ describe('GatherRunner', function() {
 
     const config = {
       recordTrace: true,
-      gatherers: [{
-        afterPass() {}
-      }]
+      gatherers: [
+        new TestGatherer()
+      ]
     };
 
-    return GatherRunner.afterPass({driver, config}).then(passData => {
+    return GatherRunner.afterPass({driver, config}, {TestGatherer: []}).then(passData => {
       assert.equal(calledTrace, true);
       assert.equal(passData.trace, fakeTraceData);
     });
@@ -304,12 +301,12 @@ describe('GatherRunner', function() {
 
     const config = {
       recordNetwork: true,
-      gatherers: [{
-        afterPass() {}
-      }]
+      gatherers: [
+        new TestGatherer()
+      ]
     };
 
-    return GatherRunner.afterPass({driver, config}).then(vals => {
+    return GatherRunner.afterPass({driver, config}, {TestGatherer: []}).then(vals => {
       assert.equal(calledNetworkCollect, true);
       assert.deepEqual(vals.networkRecords, {x: 1});
     });
@@ -382,28 +379,6 @@ describe('GatherRunner', function() {
         assert.ok(artifacts.traces.secondPass);
         assert.ok(artifacts.networkRecords.secondPass);
       });
-  });
-
-  it('rejects if an audit does not provide an artifact', () => {
-    const t1 = new TestGathererNoArtifact();
-    const config = new Config({});
-    const flags = {};
-
-    const passes = [{
-      recordNetwork: true,
-      recordTrace: true,
-      passName: 'firstPass',
-      gatherers: [
-        t1
-      ]
-    }];
-
-    return GatherRunner.run(passes, {
-      driver: fakeDriver,
-      url: 'https://example.com',
-      flags,
-      config
-    }).then(_ => assert.ok(false), _ => assert.ok(true));
   });
 
   it('loads gatherers from custom paths', () => {
@@ -501,5 +476,220 @@ describe('GatherRunner', function() {
             assert.ok(chains['93149.1'].children);
           });
         });
+  });
+
+  describe('artifact collection', () => {
+    it('supports sync and async return of artifacts from gatherers', () => {
+      const gatherers = [
+        // sync
+        new class BeforeSync extends Gatherer {
+          beforePass() {
+            return this.name;
+          }
+        }(),
+        new class PassSync extends Gatherer {
+          pass() {
+            return this.name;
+          }
+        }(),
+        new class AfterSync extends Gatherer {
+          afterPass() {
+            return this.name;
+          }
+        }(),
+
+        // async
+        new class BeforePromise extends Gatherer {
+          beforePass() {
+            return Promise.resolve(this.name);
+          }
+        }(),
+        new class PassPromise extends Gatherer {
+          pass() {
+            return Promise.resolve(this.name);
+          }
+        }(),
+        new class AfterPromise extends Gatherer {
+          afterPass() {
+            return Promise.resolve(this.name);
+          }
+        }()
+      ];
+      const gathererNames = gatherers.map(gatherer => gatherer.name);
+      const passes = [{
+        gatherers
+      }];
+
+      return GatherRunner.run(passes, {
+        driver: fakeDriver,
+        url: 'https://example.com',
+        flags: {},
+        config: new Config({})
+      }).then(artifacts => {
+        gathererNames.forEach(gathererName => {
+          assert.strictEqual(artifacts[gathererName], gathererName);
+        });
+      });
+    });
+
+    it('uses the last not-undefined phase result as artifact', () => {
+      const recoverableError = new Error('My recoverable error');
+      recoverableError.recoverable = true;
+
+      const someOtherError = new Error('Bad, bad error.');
+      someOtherError.recoverable = true;
+
+      // Gatherer results are all expected to be arrays of promises
+      const gathererResults = {
+        // 97 wins.
+        AfterGatherer: [
+          Promise.resolve(65),
+          Promise.resolve(72),
+          Promise.resolve(97)
+        ],
+
+        // 284 wins.
+        PassGatherer: [
+          Promise.resolve(220),
+          Promise.resolve(284),
+          Promise.resolve(undefined)
+        ],
+
+        // Error wins.
+        SingleErrorGatherer: [
+          Promise.reject(recoverableError),
+          Promise.resolve(1184),
+          Promise.resolve(1210)
+        ],
+
+        // First error wins.
+        TwoErrorGatherer: [
+          Promise.reject(recoverableError),
+          Promise.reject(someOtherError),
+          Promise.resolve(1729)
+        ]
+      };
+
+      return GatherRunner.collectArtifacts(gathererResults).then(artifacts => {
+        assert.strictEqual(artifacts.AfterGatherer, 97);
+        assert.strictEqual(artifacts.PassGatherer, 284);
+        assert.strictEqual(artifacts.SingleErrorGatherer, recoverableError);
+        assert.strictEqual(artifacts.TwoErrorGatherer, recoverableError);
+      });
+    });
+
+    it('supports sync and async throwing of recoverable errors from gatherers', () => {
+      const gatherers = [
+        // sync
+        new class BeforeSync extends Gatherer {
+          beforePass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            throw err;
+          }
+        }(),
+        new class PassSync extends Gatherer {
+          pass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            throw err;
+          }
+        }(),
+        new class AfterSync extends Gatherer {
+          afterPass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            throw err;
+          }
+        }(),
+
+        // async
+        new class BeforePromise extends Gatherer {
+          beforePass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            return Promise.reject(err);
+          }
+        }(),
+        new class PassPromise extends Gatherer {
+          pass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            return Promise.reject(err);
+          }
+        }(),
+        new class AfterPromise extends Gatherer {
+          afterPass() {
+            const err = new Error(this.name);
+            err.recoverable = true;
+            return Promise.reject(err);
+          }
+        }()
+      ];
+      const gathererNames = gatherers.map(gatherer => gatherer.name);
+      const passes = [{
+        gatherers
+      }];
+
+      return GatherRunner.run(passes, {
+        driver: fakeDriver,
+        url: 'https://example.com',
+        flags: {},
+        config: new Config({})
+      }).then(artifacts => {
+        gathererNames.forEach(gathererName => {
+          const errorArtifact = artifacts[gathererName];
+          assert.ok(errorArtifact instanceof Error);
+          assert.strictEqual(errorArtifact.message, gathererName);
+        });
+      });
+    });
+
+    it('rejects if a gatherer returns an unrecoverable error', () => {
+      const errorMessage = 'Gather Failed in pass()';
+      const gatherers = [
+        // sync
+        new class GathererSuccess extends Gatherer {
+          afterPass() {
+            return 1;
+          }
+        }(),
+        new class GathererFailure extends Gatherer {
+          pass() {
+            return Promise.reject(new Error(errorMessage));
+          }
+        }
+      ];
+      const passes = [{
+        gatherers
+      }];
+
+      return GatherRunner.run(passes, {
+        driver: fakeDriver,
+        url: 'https://example.com',
+        flags: {},
+        config: new Config({})
+      }).then(
+        _ => assert.ok(false),
+        err => assert.strictEqual(err.message, errorMessage));
+    });
+
+    it('rejects if a gatherer does not provide an artifact', () => {
+      const passes = [{
+        recordNetwork: true,
+        recordTrace: true,
+        passName: 'firstPass',
+        gatherers: [
+          new TestGathererNoArtifact()
+        ]
+      }];
+
+      return GatherRunner.run(passes, {
+        driver: fakeDriver,
+        url: 'https://example.com',
+        flags: {},
+        config: new Config({})
+      }).then(_ => assert.ok(false), _ => assert.ok(true));
+    });
   });
 });

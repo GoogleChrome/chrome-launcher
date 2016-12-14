@@ -64,8 +64,8 @@ describe('HTTP Redirect gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(httpRedirectGather.artifact.value);
+    }).then(artifact => {
+      assert.ok(artifact.value);
     });
   });
 
@@ -76,16 +76,15 @@ describe('HTTP Redirect gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(httpRedirectGather.artifact.value, false);
-      assert.ok(httpRedirectGather.artifact.debugString);
+    }).then(artifact => {
+      assert.equal(artifact.value, false);
+      assert.ok(artifact.debugString);
     });
   });
 
   it('handles driver timeout', () => {
     const fastTimeout = 50;
     const slowResolve = 200;
-    let artifact;
 
     return httpRedirectGather.afterPass({
       driver: {
@@ -101,17 +100,9 @@ describe('HTTP Redirect gatherer', () => {
       },
 
       _testTimeout: fastTimeout
-    }).then(_ => {
-      artifact = httpRedirectGather.artifact;
+    }).then(artifact => {
       assert.equal(artifact.value, false);
       assert.ok(artifact.debugString);
-
-      // Wait until after slow resolve to ensure artifact value didn't change.
-      return new Promise((resolve, reject) => {
-        setTimeout(resolve, slowResolve);
-      });
-    }).then(_ => {
-      assert.deepStrictEqual(httpRedirectGather.artifact, artifact);
     });
   });
 });

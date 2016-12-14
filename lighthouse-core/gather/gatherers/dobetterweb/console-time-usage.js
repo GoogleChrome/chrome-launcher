@@ -31,15 +31,14 @@ class ConsoleTimeUsage extends Gatherer {
 
   afterPass() {
     return this.collectUsage().then(consoleTimeUsage => {
-      this.artifact = {
+      return {
         usage: consoleTimeUsage
       };
     }, e => {
-      this.artifact = {
+      return {
         value: -1,
         debugString: e.message
       };
-      return;
     });
   }
 }

@@ -47,12 +47,12 @@ class HTMLWithoutJavaScript extends Gatherer {
           throw new Error('result was not a string');
         }
 
-        this.artifact = {
+        return {
           value: result
         };
       })
       .catch(err => {
-        this.artifact = {
+        return {
           value: -1,
           debugString: `Unable to get document body innerText: ${err.message}`
         };

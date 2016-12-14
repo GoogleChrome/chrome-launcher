@@ -135,9 +135,9 @@ class Styles extends Gatherer {
         // the DevTools protocol). Another example is many instances of a shadow
         // root that share the same <style> tag.
         const map = new Map(stylesheets.map(s => [s.content, s]));
-        this.artifact = Array.from(map.values());
+        return Array.from(map.values());
       }, err => {
-        this.artifact = {
+        return {
           rawValue: -1,
           debugString: err
         };

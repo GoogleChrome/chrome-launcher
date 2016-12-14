@@ -34,8 +34,8 @@ describe('Cache Contents gatherer', () => {
           return Promise.resolve();
         }
       }
-    }).then(_ => {
-      assert.ok(typeof cacheContentGather.artifact === 'object');
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'object');
     });
   });
 
@@ -46,8 +46,8 @@ describe('Cache Contents gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.ok(cacheContentGather.artifact.debugString);
+    }).then(artifact => {
+      assert.ok(artifact.debugString);
     });
   });
 
@@ -59,8 +59,8 @@ describe('Cache Contents gatherer', () => {
           return Promise.reject(error);
         }
       }
-    }).then(_ => {
-      assert.ok(cacheContentGather.artifact.debugString === error);
+    }).then(artifact => {
+      assert.ok(artifact.debugString === error);
     });
   });
 
@@ -71,9 +71,9 @@ describe('Cache Contents gatherer', () => {
           return Promise.resolve(['a', 'b', 'c']);
         }
       }
-    }).then(_ => {
-      assert.ok(Array.isArray(cacheContentGather.artifact));
-      assert.equal(cacheContentGather.artifact[0], 'a');
+    }).then(artifact => {
+      assert.ok(Array.isArray(artifact));
+      assert.equal(artifact[0], 'a');
     });
   });
 });

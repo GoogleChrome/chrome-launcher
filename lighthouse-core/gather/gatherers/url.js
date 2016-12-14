@@ -25,7 +25,7 @@ class URL extends Gatherer {
     // in the manifest is stored in the cache.
     // Instead of the originally inputted URL (options.initialUrl), we want the resolved
     // post-redirect URL (which is here at options.url)
-    this.artifact = {
+    return {
       initialUrl: options.initialUrl,
       finalUrl: options.url
     };

@@ -42,8 +42,8 @@ describe('Manifest gatherer', () => {
         }
       },
       url: EXAMPLE_DOC_URL
-    }).then(_ => {
-      assert.ok(typeof manifestGather.artifact === 'object');
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'object');
     });
   });
 
@@ -55,9 +55,9 @@ describe('Manifest gatherer', () => {
           return Promise.reject(error);
         }
       }
-    }).then(_ => {
-      assert.ok(manifestGather.artifact.debugString);
-      assert.notStrictEqual(manifestGather.artifact.debugString.indexOf(error), -1);
+    }).then(artifact => {
+      assert.ok(artifact.debugString);
+      assert.notStrictEqual(artifact.debugString.indexOf(error), -1);
     });
   });
 
@@ -71,8 +71,8 @@ describe('Manifest gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(manifestGather.artifact.debugString);
+    }).then(artifact => {
+      assert.ok(artifact.debugString);
     });
   });
 
@@ -87,8 +87,8 @@ describe('Manifest gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(manifestGather.artifact.debugString);
+    }).then(artifact => {
+      assert.ok(artifact.debugString);
     });
   });
 
@@ -107,8 +107,8 @@ describe('Manifest gatherer', () => {
         }
       },
       url: EXAMPLE_DOC_URL
-    }).then(_ => {
-      assert.ok(typeof manifestGather.artifact.value === 'object');
+    }).then(artifact => {
+      assert.ok(typeof artifact.value === 'object');
     });
   });
 });

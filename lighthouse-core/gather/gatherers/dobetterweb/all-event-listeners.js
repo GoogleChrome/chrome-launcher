@@ -133,11 +133,8 @@ class EventListeners extends Gatherer {
         .then(nodes => {
           nodes.push('document', 'window');
           return this.collectListeners(nodes);
-        })
-        .then(listeners => {
-          this.artifact = listeners;
         }).catch(_ => {
-          this.artifact = {
+          return {
             rawValue: -1,
             debugString: 'Unable to collect passive events listener usage.'
           };

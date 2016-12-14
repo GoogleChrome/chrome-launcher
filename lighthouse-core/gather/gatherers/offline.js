@@ -28,9 +28,9 @@ class Offline extends Gatherer {
       return record._url === options.url && record._fetchedViaServiceWorker;
     }).pop(); // Take the last record that matches.
 
-    this.artifact = navigationRecord ? navigationRecord.statusCode : -1;
-
-    return options.driver.goOnline(options);
+    return options.driver.goOnline(options).then(_ => {
+      return navigationRecord ? navigationRecord.statusCode : -1;
+    });
   }
 }
 

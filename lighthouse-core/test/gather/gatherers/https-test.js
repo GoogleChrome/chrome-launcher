@@ -36,8 +36,8 @@ describe('HTTPS gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.deepEqual(httpsGather.artifact.value, true);
+    }).then(artifact => {
+      assert.deepEqual(artifact.value, true);
     });
   });
 
@@ -48,16 +48,15 @@ describe('HTTPS gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(httpsGather.artifact.value, false);
-      assert.ok(httpsGather.artifact.debugString);
+    }).then(artifact => {
+      assert.equal(artifact.value, false);
+      assert.ok(artifact.debugString);
     });
   });
 
   it('handles driver timeout', () => {
     const fastTimeout = 50;
     const slowResolve = 200;
-    let artifact;
 
     return httpsGather.afterPass({
       driver: {
@@ -73,17 +72,9 @@ describe('HTTPS gatherer', () => {
       },
 
       _testTimeout: fastTimeout
-    }).then(_ => {
-      artifact = httpsGather.artifact;
+    }).then(artifact => {
       assert.equal(artifact.value, false);
       assert.ok(artifact.debugString);
-
-      // Wait until after slow resolve to ensure artifact value didn't change.
-      return new Promise((resolve, reject) => {
-        setTimeout(resolve, slowResolve);
-      });
-    }).then(_ => {
-      assert.deepStrictEqual(httpsGather.artifact, artifact);
     });
   });
 });

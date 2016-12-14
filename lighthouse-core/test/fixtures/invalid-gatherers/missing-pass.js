@@ -18,10 +18,6 @@
 'use strict';
 
 class MissingPass {
-  constructor() {
-    this.artifact = {};
-  }
-
   beforePass() {}
   afterPass() {}
 }

@@ -60,12 +60,11 @@ class CacheContents extends Gatherer {
         .evaluateAsync(`(${getCacheContents.toString()}())`)
         .then(returnedValue => {
           if (!returnedValue) {
-            this.artifact = CacheContents._error('Unable to retrieve cache contents');
-            return;
+            return CacheContents._error('Unable to retrieve cache contents');
           }
-          this.artifact = returnedValue;
+          return returnedValue;
         }, _ => {
-          this.artifact = CacheContents._error('Unable to retrieve cache contents');
+          return CacheContents._error('Unable to retrieve cache contents');
         });
   }
 }

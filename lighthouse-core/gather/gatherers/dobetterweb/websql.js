@@ -46,14 +46,15 @@ class WebSQL extends Gatherer {
   afterPass(options) {
     return this.listenForDatabaseEvents(options.driver)
       .then(database => {
-        this.artifact = {
+        const artifact = {
           database
         };
         if (!database) {
-          this.artifact.debugString = 'No WebSQL databases were opened';
+          artifact.debugString = 'No WebSQL databases were opened';
         }
+        return artifact;
       }).catch(_ => {
-        this.artifact = {
+        return {
           database: -1,
           debugString: 'Unable to gather WebSQL database state'
         };

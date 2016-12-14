@@ -24,10 +24,10 @@ describe('URL gatherer', () => {
   it('returns the correct URL from options', () => {
     const urlGather = new URLGather();
     const url = 'https://example.com';
-    urlGather.afterPass({
+    const artifact = urlGather.afterPass({
       url: url
     });
 
-    return assert.equal(urlGather.artifact.finalUrl, url);
+    return assert.equal(artifact.finalUrl, url);
   });
 });

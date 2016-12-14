@@ -57,9 +57,9 @@ describe('HTML without JavaScript gatherer', () => {
           return Promise.resolve('Hello!');
         }
       }
-    }).then(_ => {
-      assert.ok(typeof htmlWithoutJavaScriptGather.artifact.value === 'string');
-      assert.ok(/Hello/gim.test(htmlWithoutJavaScriptGather.artifact.value));
+    }).then(artifact => {
+      assert.ok(typeof artifact.value === 'string');
+      assert.ok(/Hello/gim.test(artifact.value));
     });
   });
 
@@ -70,9 +70,9 @@ describe('HTML without JavaScript gatherer', () => {
           return Promise.resolve(null);
         }
       }
-    }).then(_ => {
-      assert.equal(htmlWithoutJavaScriptGather.artifact.value, -1);
-      assert.ok(htmlWithoutJavaScriptGather.artifact.debugString);
+    }).then(artifact => {
+      assert.equal(artifact.value, -1);
+      assert.ok(artifact.debugString);
     });
   });
 
@@ -83,9 +83,9 @@ describe('HTML without JavaScript gatherer', () => {
           return Promise.reject(new Error('such a fail'));
         }
       }
-    }).then(_ => {
-      assert.equal(htmlWithoutJavaScriptGather.artifact.value, -1);
-      assert.ok(/such a fail/i.test(htmlWithoutJavaScriptGather.artifact.debugString));
+    }).then(artifact => {
+      assert.equal(artifact.value, -1);
+      assert.ok(/such a fail/i.test(artifact.debugString));
     });
   });
 });

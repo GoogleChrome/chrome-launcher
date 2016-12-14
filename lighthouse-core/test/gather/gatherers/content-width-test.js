@@ -37,9 +37,9 @@ describe('Content Width gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(typeof contentWidthGatherer.artifact === 'object');
-      assert.ok(contentWidthGatherer.artifact.viewportWidth === 400);
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'object');
+      assert.ok(artifact.viewportWidth === 400);
     });
   });
 
@@ -50,8 +50,8 @@ describe('Content Width gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(contentWidthGatherer.artifact.scrollWidth, -1);
+    }).then(artifact => {
+      assert.equal(artifact.scrollWidth, -1);
     });
   });
 });

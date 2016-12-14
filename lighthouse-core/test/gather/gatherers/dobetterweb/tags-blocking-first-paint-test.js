@@ -104,7 +104,7 @@ describe('First paint blocking tags', () => {
           return Promise.resolve([linkDetails, scriptDetails]);
         }
       }
-    }, traceData).then(_ => {
+    }, traceData).then(artifact => {
       const expected = {
         items: [
           {
@@ -123,7 +123,7 @@ describe('First paint blocking tags', () => {
           spendTime: 10000
         }
       };
-      assert.deepEqual(tagsBlockingFirstPaint.artifact, expected);
+      assert.deepEqual(artifact, expected);
     });
   });
 
@@ -134,9 +134,9 @@ describe('First paint blocking tags', () => {
           return Promise.reject(new Error('such a fail'));
         }
       }
-    }, traceData).then(_ => {
-      assert.equal(tagsBlockingFirstPaint.artifact.value, -1);
-      assert.ok(tagsBlockingFirstPaint.artifact.debugString);
+    }, traceData).then(artifact => {
+      assert.equal(artifact.value, -1);
+      assert.ok(artifact.debugString);
     });
   });
 });

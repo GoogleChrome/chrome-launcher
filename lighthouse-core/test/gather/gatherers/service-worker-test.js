@@ -41,8 +41,8 @@ describe('Service Worker gatherer', () => {
         }
       },
       url
-    }).then(_ => {
-      assert.deepEqual(serviceWorkerGatherer.artifact.versions, versions);
+    }).then(artifact => {
+      assert.deepEqual(artifact.versions, versions);
     });
   });
 
@@ -53,9 +53,9 @@ describe('Service Worker gatherer', () => {
           return Promise.reject('fail');
         }
       }
-    }).then(_ => {
-      assert.ok(!serviceWorkerGatherer.artifact.versions);
-      assert.ok(serviceWorkerGatherer.artifact.debugString);
+    }).then(artifact => {
+      assert.ok(!artifact.versions);
+      assert.ok(artifact.debugString);
     });
   });
 });

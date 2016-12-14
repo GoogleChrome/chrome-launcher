@@ -32,8 +32,6 @@ class ServiceWorker extends Gatherer {
         return {
           debugString: `Error in querying Service Worker status: ${err.message}`
         };
-      }).then(artifact => {
-        this.artifact = artifact;
       });
   }
 }

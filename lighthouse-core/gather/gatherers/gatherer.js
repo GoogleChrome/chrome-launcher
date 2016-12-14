@@ -17,7 +17,15 @@
 'use strict';
 
 /**
- * Base class for all gatherers; defines pass lifecycle methods.
+ * Base class for all gatherers; defines pass lifecycle methods. The artifact
+ * from the gatherer is the last not-undefined value returned by a lifecycle
+ * method. All methods can return the artifact value directly or return a
+ * Promise that resolves to that value.
+ *
+ * If an Error is thrown (or a Promise that rejects on an Error), the
+ * GatherRunner will check for a `recoverable` property on the Error. If set to
+ * `true`, the runner will treat it as an expected error internal to the
+ * gatherer and continue execution of any remaining gatherers.
  */
 class Gatherer {
   /**
@@ -32,6 +40,7 @@ class Gatherer {
   /**
    * Called before navigation to target url.
    * @param {!Object} options
+   * @return {*|!Promise<*>}
    */
   beforePass(options) { }
 
@@ -39,6 +48,7 @@ class Gatherer {
    * Called after target page is loaded. If a trace is enabled for this pass,
    * the trace is still being recorded.
    * @param {!Object} options
+   * @return {*|!Promise<*>}
    */
   pass(options) { }
 
@@ -48,6 +58,7 @@ class Gatherer {
    * and record of network activity are provided in `loadData`.
    * @param {!Object} options
    * @param {{networkRecords: !Array, trace: {traceEvents: !Array}} loadData
+   * @return {*|!Promise<*>}
    */
   afterPass(options, loadData) { }
 

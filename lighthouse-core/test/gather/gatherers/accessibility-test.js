@@ -34,8 +34,8 @@ describe('Accessibility gatherer', () => {
           return Promise.resolve();
         }
       }
-    }).then(_ => {
-      assert.ok(typeof accessibilityGather.artifact === 'object');
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'object');
     });
   });
 
@@ -46,8 +46,8 @@ describe('Accessibility gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.ok(accessibilityGather.artifact.debugString);
+    }).then(artifact => {
+      assert.ok(artifact.debugString);
     });
   });
 
@@ -61,8 +61,8 @@ describe('Accessibility gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(accessibilityGather.artifact.debugString === error);
+    }).then(artifact => {
+      assert.ok(artifact.debugString === error);
     });
   });
 
@@ -75,9 +75,9 @@ describe('Accessibility gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(typeof accessibilityGather.artifact === 'object');
-      assert.equal(accessibilityGather.artifact.name, 'a11y');
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'object');
+      assert.equal(artifact.name, 'a11y');
     });
   });
 });

@@ -51,13 +51,12 @@ class Manifest extends Gatherer {
             errorString = 'No manifest found.';
           }
 
-          this.artifact = Manifest._errorManifest(errorString);
-          return;
+          return Manifest._errorManifest(errorString);
         }
 
-        this.artifact = manifestParser(response.data, response.url, options.url);
+        return manifestParser(response.data, response.url, options.url);
       }, err => {
-        this.artifact = Manifest._errorManifest('Unable to retrieve manifest: ' + err);
+        return Manifest._errorManifest('Unable to retrieve manifest: ' + err);
       });
   }
 }

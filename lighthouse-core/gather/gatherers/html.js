@@ -29,9 +29,9 @@ class HTML extends Gatherer {
           nodeId: nodeId
         }))
         .then(nodeHTML => {
-          this.artifact = nodeHTML.outerHTML;
+          return nodeHTML.outerHTML;
         }).catch(_ => {
-          this.artifact = {
+          return {
             value: -1,
             debugString: 'Unable to get document HTML'
           };

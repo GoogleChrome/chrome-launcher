@@ -72,7 +72,7 @@ class HTTPRedirect extends Gatherer {
     ]).then(result => {
       // Clear timeout. No effect if it won, no need to wait if it lost.
       clearTimeout(noSecurityChangesTimeout);
-      this.artifact = result;
+      return result;
     });
   }
 }

@@ -38,8 +38,8 @@ describe('Theme Color gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.equal(themeColorGather.artifact, '#288A76');
+    }).then(artifact => {
+      assert.equal(artifact, '#288A76');
     });
   });
 
@@ -50,8 +50,8 @@ describe('Theme Color gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(themeColorGather.artifact, -1);
+    }).then(artifact => {
+      assert.equal(artifact, -1);
     });
   });
 });

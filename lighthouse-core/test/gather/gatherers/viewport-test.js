@@ -36,9 +36,9 @@ describe('Viewport gatherer', () => {
           });
         }
       }
-    }).then(_ => {
-      assert.ok(typeof viewportGather.artifact === 'string');
-      assert.ok(/width=/gim.test(viewportGather.artifact));
+    }).then(artifact => {
+      assert.ok(typeof artifact === 'string');
+      assert.ok(/width=/gim.test(artifact));
     });
   });
 
@@ -49,8 +49,8 @@ describe('Viewport gatherer', () => {
           return Promise.reject('such a fail');
         }
       }
-    }).then(_ => {
-      assert.equal(viewportGather.artifact, -1);
+    }).then(artifact => {
+      assert.equal(artifact, -1);
     });
   });
 });

@@ -37,8 +37,8 @@ describe('Offline gatherer', () => {
       url: 'https://do-not-match.com/',
       driver: mockDriver
     };
-    return offlineGather.afterPass(options, tracingData).then(_ => {
-      assert.strictEqual(offlineGather.artifact, -1);
+    return offlineGather.afterPass(options, tracingData).then(artifact => {
+      assert.strictEqual(artifact, -1);
     });
   });
 
@@ -48,8 +48,8 @@ describe('Offline gatherer', () => {
       url: 'https://ifixit-pwa.appspot.com/',
       driver: mockDriver
     };
-    return offlineGather.afterPass(options, tracingData).then(_ => {
-      assert.strictEqual(offlineGather.artifact, 200);
+    return offlineGather.afterPass(options, tracingData).then(artifact => {
+      assert.strictEqual(artifact, 200);
     });
   });
 });

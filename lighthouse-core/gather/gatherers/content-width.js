@@ -43,13 +43,12 @@ class ContentWidth extends Gatherer {
         throw new Error(`ContentWidth results were not numeric: ${JSON.stringify(returnedValue)}`);
       }
 
-      this.artifact = returnedValue;
+      return returnedValue;
     }, _ => {
-      this.artifact = {
+      return {
         scrollWidth: -1,
         viewportWidth: -1
       };
-      return;
     });
   }
 }

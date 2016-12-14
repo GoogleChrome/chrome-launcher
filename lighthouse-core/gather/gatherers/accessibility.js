@@ -52,17 +52,16 @@ class Accessibility extends Gatherer {
         .evaluateAsync(expression)
         .then(returnedValue => {
           if (!returnedValue) {
-            this.artifact = Accessibility._errorAccessibility('Unable to parse axe results');
-            return;
+            return Accessibility._errorAccessibility('Unable to parse axe results');
           }
 
           if (returnedValue.error) {
-            this.artifact = Accessibility._errorAccessibility(returnedValue.error);
-          } else {
-            this.artifact = returnedValue;
+            return Accessibility._errorAccessibility(returnedValue.error);
           }
+
+          return returnedValue;
         }, _ => {
-          this.artifact = Accessibility._errorAccessibility('Axe results timed out');
+          return Accessibility._errorAccessibility('Axe results timed out');
         });
   }
 }
