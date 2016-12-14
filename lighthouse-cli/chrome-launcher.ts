@@ -219,6 +219,7 @@ class ChromeLauncher {
         if (process.platform === 'win32') {
           spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
         }
+        this.chrome = null;
       } else {
         // fail silently as we did not start chrome
         resolve();
@@ -227,24 +228,24 @@ class ChromeLauncher {
   }
 
   destroyTmp(): Promise<undefined> {
-    if (!this.TMP_PROFILE_DIR) {
-      return Promise.resolve();
-    }
+    return new Promise(resolve => {
+      if (!this.TMP_PROFILE_DIR) {
+        return resolve();
+      }
 
-    log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
+      log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
 
-    if (this.outFile) {
-      fs.closeSync(this.outFile);
-    }
+      if (this.outFile) {
+        fs.closeSync(this.outFile);
+        this.outFile = null;
+      }
 
-    if (this.errFile) {
-      fs.closeSync(this.errFile);
-    }
+      if (this.errFile) {
+        fs.closeSync(this.errFile);
+        this.errFile = null;
+      }
 
-    return new Promise((resolve) => {
-      rimraf(this.TMP_PROFILE_DIR, function() {
-        resolve();
-      });
+      rimraf(this.TMP_PROFILE_DIR, () => resolve());
     });
   }
 };
