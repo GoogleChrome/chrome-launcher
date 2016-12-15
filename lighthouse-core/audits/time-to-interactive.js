@@ -160,7 +160,7 @@ class TTIMetric extends Audit {
       return TTIMetric.generateAuditResult({
         score,
         rawValue: parseFloat(timeToInteractive.toFixed(1)),
-        displayValue: `${timeToInteractive}ms`,
+        displayValue: `${parseFloat(timeToInteractive.toFixed(1))}ms`,
         optimalValue: this.meta.optimalValue,
         debugString: speedline.debugString,
         extendedInfo: {
