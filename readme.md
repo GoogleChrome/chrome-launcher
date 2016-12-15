@@ -4,7 +4,7 @@
 
 HTML report:
 
-![image](https://cloud.githubusercontent.com/assets/238208/20411484/851a02ca-acd6-11e6-96f8-f90204801581.png)
+![image](https://cloud.githubusercontent.com/assets/238208/21210165/b3c368c0-c22d-11e6-91fb-aa24959e2637.png)
 
 Default CLI output:
 
@@ -36,6 +36,12 @@ lighthouse https://airhorner.com/
 # see flags and options
 lighthouse --help
 ```
+
+## Lighthouse Viewer
+
+If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to Github. 
+
+Note: shared reports are stashed as a secret Gist in Github, under your account.
 
 ## Develop
 
