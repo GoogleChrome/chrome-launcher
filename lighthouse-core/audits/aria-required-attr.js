@@ -18,22 +18,22 @@
 'use strict';
 
 /**
- * @fileoverview Ensures aria-* attributes are valid and not misspelled or non-existent.
+ * @fileoverview Ensures elements with ARIA roles have all required ARIA attributes.
  */
 
 const Audit = require('./audit');
 const A11yHelpers = require('../lib/a11y-helpers');
 const Formatter = require('../formatters/formatter');
 
-class ARIAValidAttr extends Audit {
+class ARIARequiredAttr extends Audit {
   /**
    * @return {!AuditMeta}
    */
   static get meta() {
     return {
       category: 'Accessibility',
-      name: 'aria-valid-attr',
-      description: 'Element aria-* attributes are valid and not misspelled or non-existent.',
+      name: 'aria-required-attr',
+      description: 'Elements with ARIA roles have the required aria-* attributes',
       requiredArtifacts: ['Accessibility']
     };
   }
@@ -44,9 +44,9 @@ class ARIAValidAttr extends Audit {
    */
   static audit(artifacts) {
     const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'aria-valid-attr');
+    const rule = violations.find(result => result.id === 'aria-required-attr');
 
-    return ARIAValidAttr.generateAuditResult({
+    return ARIARequiredAttr.generateAuditResult({
       rawValue: typeof rule === 'undefined',
       debugString: A11yHelpers.createDebugString(rule),
       extendedInfo: {
@@ -57,4 +57,4 @@ class ARIAValidAttr extends Audit {
   }
 }
 
-module.exports = ARIAValidAttr;
+module.exports = ARIARequiredAttr;

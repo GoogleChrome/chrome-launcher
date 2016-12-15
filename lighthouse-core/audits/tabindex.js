@@ -17,7 +17,12 @@
 
 'use strict';
 
+/**
+ * @fileoverview Ensures tabindex attribute values are not greater than 0.
+ */
+
 const Audit = require('./audit');
+const A11yHelpers = require('../lib/a11y-helpers');
 const Formatter = require('../formatters/formatter');
 
 class TabIndex extends Audit {
@@ -43,21 +48,12 @@ class TabIndex extends Audit {
 
     return TabIndex.generateAuditResult({
       rawValue: typeof rule === 'undefined',
-      debugString: this.createDebugString(rule),
+      debugString: A11yHelpers.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
       }
     });
-  }
-
-  static createDebugString(rule) {
-    if (typeof rule === 'undefined') {
-      return '';
-    }
-
-    const elementsStr = rule.nodes.length === 1 ? 'element' : 'elements';
-    return `${rule.help} (Failed on ${rule.nodes.length} ${elementsStr})`;
   }
 }
 

@@ -69,7 +69,9 @@
     "manifest-start-url",
     "theme-color-meta",
     "aria-valid-attr",
+    "aria-valid-attr-value",
     "aria-allowed-attr",
+    "aria-required-attr",
     "color-contrast",
     "image-alt",
     "label",
@@ -328,7 +330,15 @@
           "expectedValue": true,
           "weight": 1
         },
+        "aria-required-attr": {
+          "expectedValue": true,
+          "weight": 1
+        },
         "aria-valid-attr": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "aria-valid-attr-value": {
           "expectedValue": true,
           "weight": 1
         },

@@ -17,7 +17,12 @@
 
 'use strict';
 
+/**
+ * @fileoverview Ensures <img> elements have alternate text or a role of none or presentation.
+ */
+
 const Audit = require('./audit');
+const A11yHelpers = require('../lib/a11y-helpers');
 const Formatter = require('../formatters/formatter');
 
 class ImageAlt extends Audit {
@@ -43,21 +48,12 @@ class ImageAlt extends Audit {
 
     return ImageAlt.generateAuditResult({
       rawValue: typeof rule === 'undefined',
-      debugString: this.createDebugString(rule),
+      debugString: A11yHelpers.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
       }
     });
-  }
-
-  static createDebugString(rule) {
-    if (typeof rule === 'undefined') {
-      return '';
-    }
-
-    const elementsStr = rule.nodes.length === 1 ? 'element' : 'elements';
-    return `${rule.help} (Failed on ${rule.nodes.length} ${elementsStr})`;
   }
 }
 

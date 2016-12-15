@@ -18,7 +18,7 @@
 'use strict';
 
 /**
- * @fileoverview Ensures aria-* attributes are valid and not misspelled or non-existent.
+ * @fileoverview Ensures all ARIA attributes have valid values.
  */
 
 const Audit = require('./audit');
@@ -32,8 +32,8 @@ class ARIAValidAttr extends Audit {
   static get meta() {
     return {
       category: 'Accessibility',
-      name: 'aria-valid-attr',
-      description: 'Element aria-* attributes are valid and not misspelled or non-existent.',
+      name: 'aria-valid-attr-value',
+      description: 'Element aria-* attributes have valid values',
       requiredArtifacts: ['Accessibility']
     };
   }
@@ -44,7 +44,7 @@ class ARIAValidAttr extends Audit {
    */
   static audit(artifacts) {
     const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'aria-valid-attr');
+    const rule = violations.find(result => result.id === 'aria-valid-attr-value');
 
     return ARIAValidAttr.generateAuditResult({
       rawValue: typeof rule === 'undefined',

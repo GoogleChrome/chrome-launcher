@@ -19,23 +19,9 @@
 const Audit = require('../../audits/aria-valid-attr.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Accessibility: aria-valid-attr audit', () => {
-  it('handles empty rules', () => {
-    const output = Audit.createDebugString();
-    assert.ok(typeof output === 'string');
-  });
-
-  it('creates debug strings', () => {
-    const emptyAudit = Audit.createDebugString({
-      nodes: [],
-      help: 'http://example.com/'
-    });
-
-    assert.equal(emptyAudit, 'http://example.com/ (Failed on 0 elements)');
-  });
-
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
@@ -48,7 +34,8 @@ describe('Accessibility: aria-valid-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.score, false);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.displayValue, '');
     assert.equal(output.debugString, 'http://example.com/ (Failed on 0 elements)');
   });
 
@@ -64,7 +51,8 @@ describe('Accessibility: aria-valid-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.score, false);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.displayValue, '');
     assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
   });
 
@@ -76,6 +64,7 @@ describe('Accessibility: aria-valid-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'Element aria-* attributes are valid ARIA attributes');
+    assert.equal(output.description,
+        'Element aria-* attributes are valid and not misspelled or non-existent.');
   });
 });
