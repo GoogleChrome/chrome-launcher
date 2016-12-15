@@ -36,11 +36,14 @@ if (!environment.checkNodeCompatibility()) {
 import {Results} from './types/types';
 import * as path from 'path';
 import * as http from 'http';
+import * as fs from 'fs';
 const yargs = require('yargs');
 import * as Printer from './printer';
 const lighthouse = require('../lighthouse-core');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const log = require('../lighthouse-core/lib/log');
+const performanceXServer = require('./performance-experiment/server');
+const opn = require('opn');
 import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';
 
@@ -90,12 +93,14 @@ const cliFlags = yargs
 
   .group([
     'output',
-    'output-path'
+    'output-path',
+    'view'
   ], 'Output:')
   .describe({
     'output': 'Reporter for the results',
     'output-path': `The file path to output the results
-Example: --output-path=./lighthouse-results.html`
+Example: --output-path=./lighthouse-results.html`,
+    'view': 'Open report.html in browser'
   })
 
   // boolean values
@@ -112,7 +117,8 @@ Example: --output-path=./lighthouse-results.html`
     'select-chrome',
     'verbose',
     'quiet',
-    'help'
+    'help',
+    'view'
   ])
   .choices('output', Printer.GetValidOutputOptions())
 
@@ -198,7 +204,7 @@ function initPort(flags: {port: number}): Promise<undefined> {
 
 function launchChromeAndRun(addresses: Array<string>,
                             config: Object,
-                            flags: {port: number, selectChrome: boolean}) {
+                            flags: {port: number, selectChrome: boolean, view: boolean}) {
 
   return initPort(flags).then(() => {
     const launcher = new ChromeLauncher({
@@ -219,7 +225,7 @@ function launchChromeAndRun(addresses: Array<string>,
   })
 }
 
-function lighthouseRun(addresses: Array<string>, config: Object, flags: Object) {
+function lighthouseRun(addresses: Array<string>, config: Object, flags: {view: boolean}) {
   // Process URLs once at a time
   const address = addresses.shift();
   if (!address) {
@@ -229,9 +235,20 @@ function lighthouseRun(addresses: Array<string>, config: Object, flags: Object) 
   return lighthouse(address, flags, config)
     .then((results: Results) => Printer.write(results, outputMode, outputPath))
     .then((results: Results) => {
+      const filename = `${assetSaver.getFilenamePrefix({url: address})}.report.html`;
+
       if (outputMode === Printer.OutputMode[Printer.OutputMode.pretty]) {
-        const filename = `./${assetSaver.getFilenamePrefix({url: address})}.report.html`;
         Printer.write(results, 'html', filename);
+      }
+
+      // Generate report.html, host it and open it in the default browser
+      if (flags.view) {
+        performanceXServer.startServer(0).then((port: number) => {
+          const filePath = `${performanceXServer.FOLDERS.REPORTS}/${filename}`;
+          Printer.write(results, 'html', filePath).then(_ => {
+            opn(`http://localhost:${port}/reports/${filename}`);
+          });
+        });
       }
 
       return lighthouseRun(addresses, config, flags);

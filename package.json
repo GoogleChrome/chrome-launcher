@@ -57,7 +57,8 @@
     "speedline": "1.0.3",
     "whatwg-url": "^4.0.0",
     "ws": "^1.1.1",
-    "yargs": "3.30.0"
+    "yargs": "3.30.0",
+    "opn": "^4.0.2"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [
