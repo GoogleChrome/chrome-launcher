@@ -41,7 +41,8 @@ gulp.task('lint', () => {
     'gulpfile.js'
   ])
   .pipe($.eslint())
-  .pipe($.eslint.format());
+  .pipe($.eslint.format())
+  .pipe($.eslint.failAfterError());
 });
 
 gulp.task('images', () => {
@@ -89,6 +90,11 @@ gulp.task('browserify', () => {
           removeComments: true
         })
         .transform('brfs')
+        .ignore('../lighthouse-core/lib/log.js')
+        .ignore('whatwg-url')
+        .ignore('url')
+        .ignore('debug/node')
+        .ignore('source-map')
         .bundle();
 
       file.contents = bundle; // Inject transformed content back the gulp pipeline.

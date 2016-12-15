@@ -12,11 +12,13 @@ cache:
      - node_modules
      - chrome-linux
      - lighthouse-extension/node_modules
+     - lighthouse-viewer/node_modules
 install:
   - npm install
 before_script:
   - npm i -g typescript@2.0
   - npm --prefix ./lighthouse-extension install ./lighthouse-extension
+  - npm --prefix ./lighthouse-viewer install ./lighthouse-viewer
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
@@ -30,6 +32,9 @@ script:
   - npm run smokehouse
   - cd lighthouse-extension
   - gulp build -- $__node_harmony
+  - cd ..
+  - cd lighthouse-viewer
+  - gulp
   - cd ..
 after_success:
   - npm run coveralls
