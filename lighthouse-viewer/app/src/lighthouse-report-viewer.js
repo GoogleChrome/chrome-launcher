@@ -166,6 +166,8 @@ class LighthouseViewerReport {
     // Replace the HTML and hook up event listeners to the new DOM.
     document.querySelector('output').innerHTML = html;
     this.initUI();
+
+    ga('send', 'event', 'report', 'view');
   }
 
   /**
