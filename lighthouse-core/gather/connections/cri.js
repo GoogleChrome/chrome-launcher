@@ -83,9 +83,16 @@ class CriConnection extends Connection {
       request.setTimeout(CONNECT_TIMEOUT, _ => {
         request.abort();
 
+        // After aborting, we expect an ECONNRESET error. Ignore.
+        request.on('error', err => {
+          if (err.code !== 'ECONNRESET') {
+            throw err;
+          }
+        });
+
+        // Reject on error with code specifically indicating timeout in connection setup.
         const err = new Error('Timeout waiting for initial Debugger Protocol connection.');
         err.code = 'CRI_TIMEOUT';
-
         log.error('CriConnection', err.message);
         reject(err);
       });
@@ -97,7 +104,8 @@ class CriConnection extends Connection {
    */
   disconnect() {
     if (!this._ws) {
-      return Promise.reject(new Error('connect() must be called before attempting to disconnect.'));
+      log.warn('CriConnection', 'disconnect() was called without an established connection.');
+      return Promise.resolve();
     }
     this._ws.removeAllListeners();
     this._ws.close();

@@ -81,6 +81,7 @@ class ExtensionConnection extends Connection {
    */
   disconnect() {
     if (this._tabId === null) {
+      log.warn('ExtensionConnection', 'disconnect() was called without an established connection.');
       return Promise.resolve();
     }
 
