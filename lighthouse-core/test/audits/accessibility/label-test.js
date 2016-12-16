@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/aria-allowed-attr.js');
+const Audit = require('../../../audits/accessibility/label.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: aria-allowed-attr audit', () => {
+describe('Accessibility: label audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'aria-allowed-attr',
+          id: 'label',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: aria-allowed-attr audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'aria-allowed-attr',
+          id: 'label',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -64,6 +64,6 @@ describe('Accessibility: aria-allowed-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'Element aria-* roles are valid');
+    assert.equal(output.description, 'Every form element has a label');
   });
 });

@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/tabindex.js');
+const Audit = require('../../../audits/accessibility/aria-required-attr.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: tabindex audit', () => {
+describe('Accessibility: aria-required-attr audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'tabindex',
+          id: 'aria-required-attr',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: tabindex audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'tabindex',
+          id: 'aria-required-attr',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -64,6 +64,7 @@ describe('Accessibility: tabindex audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'No element has a tabindex attribute greater than 0');
+    assert.equal(output.description,
+        'Elements with ARIA roles have the required aria-* attributes');
   });
 });

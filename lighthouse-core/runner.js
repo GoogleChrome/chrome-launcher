@@ -194,9 +194,13 @@ class Runner {
   static getAuditList() {
     const fileList = [
       ...fs.readdirSync(path.join(__dirname, './audits')),
-      ...fs.readdirSync(path.join(__dirname, './audits/dobetterweb')).map(f => `dobetterweb/${f}`)
+      ...fs.readdirSync(path.join(__dirname, './audits/dobetterweb')).map(f => `dobetterweb/${f}`),
+      ...fs.readdirSync(path.join(__dirname, './audits/accessibility'))
+          .map(f => `accessibility/${f}`)
     ];
-    return fileList.filter(f => /\.js$/.test(f) && f !== 'audit.js').sort();
+    return fileList.filter(f => {
+      return /\.js$/.test(f) && f !== 'audit.js' && f !== 'accessibility/axe-audit.js';
+    }).sort();
   }
 
   /**

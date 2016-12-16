@@ -18,43 +18,45 @@
 'use strict';
 
 /**
- * @fileoverview Ensures aria-* attributes are valid and not misspelled or non-existent.
+ * @fileoverview Base class for all aXe audits. Provides a consistent way to
+ * generate audit results using aXe rule names.
  */
 
-const Audit = require('./audit');
-const A11yHelpers = require('../lib/a11y-helpers');
-const Formatter = require('../formatters/formatter');
+const Audit = require('../audit');
+const Formatter = require('../../formatters/formatter');
 
-class ARIAValidAttr extends Audit {
+class AxeAudit extends Audit {
   /**
-   * @return {!AuditMeta}
-   */
-  static get meta() {
-    return {
-      category: 'Accessibility',
-      name: 'aria-valid-attr',
-      description: 'Element aria-* attributes are valid and not misspelled or non-existent.',
-      requiredArtifacts: ['Accessibility']
-    };
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
+   * @param {!Artifacts} artifacts Accessibility gatherer artifacts. Note that AxeAudit
+   * expects the meta name for the class to match the rule id from aXe.
    * @return {!AuditResult}
    */
   static audit(artifacts) {
     const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'aria-valid-attr');
+    const rule = violations.find(result => result.id === this.meta.name);
 
-    return ARIAValidAttr.generateAuditResult({
+    return this.generateAuditResult({
       rawValue: typeof rule === 'undefined',
-      debugString: A11yHelpers.createDebugString(rule),
+      debugString: this.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
       }
     });
   }
+
+  /**
+   * @param {!{nodes: Array, help: string}} rule
+   * @return {!string}
+   */
+  static createDebugString(rule) {
+    if (typeof rule === 'undefined') {
+      return '';
+    }
+
+    const elementsStr = rule.nodes.length === 1 ? 'element' : 'elements';
+    return `${rule.help} (Failed on ${rule.nodes.length} ${elementsStr})`;
+  }
 }
 
-module.exports = ARIAValidAttr;
+module.exports = AxeAudit;

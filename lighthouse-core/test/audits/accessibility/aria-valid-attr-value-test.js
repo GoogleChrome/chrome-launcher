@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/image-alt.js');
+const Audit = require('../../../audits/accessibility/aria-valid-attr-value.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: image-alt audit', () => {
+describe('Accessibility: aria-valid-attr-value audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'image-alt',
+          id: 'aria-valid-attr-value',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: image-alt audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'image-alt',
+          id: 'aria-valid-attr-value',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -64,6 +64,6 @@ describe('Accessibility: image-alt audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'Every image element has an alt attribute');
+    assert.equal(output.description, 'Element aria-* attributes have valid values');
   });
 });

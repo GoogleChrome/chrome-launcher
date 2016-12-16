@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/aria-valid-attr.js');
+const Audit = require('../../../audits/accessibility/color-contrast.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: aria-valid-attr audit', () => {
+describe('Accessibility: color-contrast audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'aria-valid-attr',
+          id: 'color-contrast',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: aria-valid-attr audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'aria-valid-attr',
+          id: 'color-contrast',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -65,6 +65,6 @@ describe('Accessibility: aria-valid-attr audit', () => {
 
     const output = Audit.audit(artifacts);
     assert.equal(output.description,
-        'Element aria-* attributes are valid and not misspelled or non-existent.');
+        'Background and foreground colors have a sufficient contrast ratio');
   });
 });

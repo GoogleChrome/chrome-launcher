@@ -19,13 +19,12 @@
 
 /**
  * @fileoverview Ensures <img> elements have alternate text or a role of none or presentation.
+ * See base class in axe-audit.js for audit() implementation.
  */
 
-const Audit = require('./audit');
-const A11yHelpers = require('../lib/a11y-helpers');
-const Formatter = require('../formatters/formatter');
+const AxeAudit = require('./axe-audit');
 
-class ImageAlt extends Audit {
+class ImageAlt extends AxeAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -36,24 +35,6 @@ class ImageAlt extends Audit {
       description: 'Every image element has an alt attribute',
       requiredArtifacts: ['Accessibility']
     };
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
-   */
-  static audit(artifacts) {
-    const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'image-alt');
-
-    return ImageAlt.generateAuditResult({
-      rawValue: typeof rule === 'undefined',
-      debugString: A11yHelpers.createDebugString(rule),
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
-        value: rule
-      }
-    });
   }
 }
 

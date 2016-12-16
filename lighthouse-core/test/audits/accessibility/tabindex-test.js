@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/label.js');
+const Audit = require('../../../audits/accessibility/tabindex.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: label audit', () => {
+describe('Accessibility: tabindex audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'label',
+          id: 'tabindex',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: label audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'label',
+          id: 'tabindex',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -64,6 +64,6 @@ describe('Accessibility: label audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'Every form element has a label');
+    assert.equal(output.description, 'No element has a tabindex attribute greater than 0');
   });
 });

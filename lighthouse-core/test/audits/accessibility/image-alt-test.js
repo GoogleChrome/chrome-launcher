@@ -16,17 +16,17 @@
  */
 'use strict';
 
-const Audit = require('../../audits/color-contrast.js');
+const Audit = require('../../../audits/accessibility/image-alt.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('Accessibility: color-contrast audit', () => {
+describe('Accessibility: image-alt audit', () => {
   it('generates an audit output', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'color-contrast',
+          id: 'image-alt',
           nodes: [],
           help: 'http://example.com/'
         }]
@@ -43,7 +43,7 @@ describe('Accessibility: color-contrast audit', () => {
     const artifacts = {
       Accessibility: {
         violations: [{
-          id: 'color-contrast',
+          id: 'image-alt',
           nodes: [{}],
           help: 'http://example.com/'
         }]
@@ -64,7 +64,6 @@ describe('Accessibility: color-contrast audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description,
-        'Background and foreground colors have a sufficient contrast ratio');
+    assert.equal(output.description, 'Every image element has an alt attribute');
   });
 });

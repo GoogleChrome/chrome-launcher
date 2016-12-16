@@ -19,13 +19,12 @@
 
 /**
  * @fileoverview Ensures all ARIA attributes have valid values.
+ * See base class in axe-audit.js for audit() implementation.
  */
 
-const Audit = require('./audit');
-const A11yHelpers = require('../lib/a11y-helpers');
-const Formatter = require('../formatters/formatter');
+const AxeAudit = require('./axe-audit');
 
-class ARIAValidAttr extends Audit {
+class ARIAValidAttr extends AxeAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -36,24 +35,6 @@ class ARIAValidAttr extends Audit {
       description: 'Element aria-* attributes have valid values',
       requiredArtifacts: ['Accessibility']
     };
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
-   */
-  static audit(artifacts) {
-    const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'aria-valid-attr-value');
-
-    return ARIAValidAttr.generateAuditResult({
-      rawValue: typeof rule === 'undefined',
-      debugString: A11yHelpers.createDebugString(rule),
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
-        value: rule
-      }
-    });
   }
 }
 

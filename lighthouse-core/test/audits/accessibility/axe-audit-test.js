@@ -17,20 +17,49 @@
 
 'use strict';
 
-const A11yHelpers = require('../../lib/a11y-helpers');
+const AxeAudit = require('../../../audits/accessibility/axe-audit');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('a11y helpers', () => {
+describe('Accessibility: axe-audit', () => {
+  describe('audit()', () => {
+    it('generates audit output using subclass meta', () => {
+      class FakeA11yAudit extends AxeAudit {
+        static get meta() {
+          return {
+            category: 'Accessibility',
+            name: 'fake-aria-fail',
+            description: 'You have an aria-* issue.',
+            requiredArtifacts: ['Accessibility']
+          };
+        }
+      }
+      const artifacts = {
+        Accessibility: {
+          violations: [{
+            id: 'fake-aria-fail',
+            nodes: [{}],
+            help: 'http://example.com/'
+          }]
+        }
+      };
+
+      const output = FakeA11yAudit.audit(artifacts);
+      assert.equal(output.rawValue, false);
+      assert.equal(output.displayValue, '');
+      assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
+    });
+  });
+
   describe('createDebugString()', () => {
     it('handles empty rules', () => {
-      const output = A11yHelpers.createDebugString();
+      const output = AxeAudit.createDebugString();
       assert.ok(typeof output === 'string');
     });
 
     it('creates debug strings', () => {
-      const emptyDebugString = A11yHelpers.createDebugString({
+      const emptyDebugString = AxeAudit.createDebugString({
         nodes: [],
         help: 'http://example.com/'
       });
@@ -39,8 +68,8 @@ describe('a11y helpers', () => {
     });
 
     it('refers to a single element if one failure', () => {
-      const debugString = A11yHelpers.createDebugString({
-        nodes: ['foo'],
+      const debugString = AxeAudit.createDebugString({
+        nodes: [{}],
         help: 'http://example.com/'
       });
 
@@ -48,8 +77,8 @@ describe('a11y helpers', () => {
     });
 
     it('refers to multiple elements if multiple failures', () => {
-      const debugString = A11yHelpers.createDebugString({
-        nodes: ['foo', 'bar'],
+      const debugString = AxeAudit.createDebugString({
+        nodes: [{}, {}],
         help: 'http://example.com/'
       });
 

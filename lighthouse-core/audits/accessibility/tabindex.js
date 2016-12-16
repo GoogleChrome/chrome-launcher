@@ -19,13 +19,12 @@
 
 /**
  * @fileoverview Ensures tabindex attribute values are not greater than 0.
+ * See base class in axe-audit.js for audit() implementation.
  */
 
-const Audit = require('./audit');
-const A11yHelpers = require('../lib/a11y-helpers');
-const Formatter = require('../formatters/formatter');
+const AxeAudit = require('./axe-audit');
 
-class TabIndex extends Audit {
+class TabIndex extends AxeAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -36,24 +35,6 @@ class TabIndex extends Audit {
       description: 'No element has a tabindex attribute greater than 0',
       requiredArtifacts: ['Accessibility']
     };
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
-   */
-  static audit(artifacts) {
-    const violations = artifacts.Accessibility.violations || [];
-    const rule = violations.find(result => result.id === 'tabindex');
-
-    return TabIndex.generateAuditResult({
-      rawValue: typeof rule === 'undefined',
-      debugString: A11yHelpers.createDebugString(rule),
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
-        value: rule
-      }
-    });
   }
 }
 
