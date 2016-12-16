@@ -9,13 +9,14 @@
         "diagnostics": true
     },
     "exclude": [
-        "node_modules",
-        "lighthouse-extension",
-        "lighthouse-core/closure",
-        "lighthouse-cli",
+        "**/node_modules",
+        "**/third_party",
+        "**/dist",
 
-        "third_party",
-        "lighthouse-core/third_party",
-        "dist"
+        "lighthouse-core/closure",
+
+        "lighthouse-extension",
+        "lighthouse-cli",
+        "lighthouse-viewer"
     ]
 }
