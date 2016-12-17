@@ -67,8 +67,6 @@ function requestHandler(request, response) {
         headers = {'Content-Type': 'text/html'};
       } else if (filePath.endsWith('.json')) {
         headers = {'Content-Type': 'text/json'};
-      } else if (filePath.endsWith('.ico')) {
-        headers = {'Content-Type': 'image/x-icon'};
       }
     }
     response.writeHead(statusCode, headers);
