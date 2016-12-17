@@ -64,7 +64,6 @@ const cliFlags = yargs
   })
 
   .group([
-    'mobile',
     'save-assets',
     'save-artifacts',
     'list-all-audits',
