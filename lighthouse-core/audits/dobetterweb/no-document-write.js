@@ -34,7 +34,10 @@ class NoDocWriteAudit extends Audit {
       category: 'Performance',
       name: 'no-document-write',
       description: 'Site does not use document.write()',
-      helpText: 'Consider using <code>&lt;script async></code> to load scripts. <code>document.write()</code> is considered <a href="https://developers.google.com/web/updates/2016/08/removing-document-write" target="_blank">harmful for performance</a>.',
+      helpText: 'For users on slow connections, external scripts dynamically injected via ' +
+          '<code>document.write()</code> can delay page load by tens of seconds. ' +
+          '<a href="https://developers.google.com/web/tools/lighthouse/audits/' +
+          'document-write" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['DocWriteUse']
     };
   }

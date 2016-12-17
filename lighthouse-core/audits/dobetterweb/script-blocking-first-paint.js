@@ -34,7 +34,10 @@ class ScriptBlockingFirstPaint extends Audit {
       category: 'Performance',
       name: 'script-blocking-first-paint',
       description: 'Site does not use <script> in head that delays first paint',
-      helpText: '&lt;script> elements are <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp" target="_blank">delaying the first paint</a> of your page! Consider inlining or adding <code>async</code> or <code>defer</code> attributes.',
+      helpText: 'Script elements are blocking the first paint of your page. Consider inlining ' +
+          'critical scripts and deferring non-critical ones. ' +
+          '<a href="https://developers.google.com/web/tools/lighthouse/' +
+          'audits/blocking-resources" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['TagsBlockingFirstPaint']
     };
   }

@@ -51,7 +51,9 @@ class NoMutationEventsAudit extends Audit {
       category: 'JavaScript',
       name: 'no-mutation-events',
       description: 'Site does not use Mutation Events in its own scripts',
-      helpText: 'Using <a href="https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Mutation_events" target="_blank">Mutation events</a> degrades application performance. They are deprecated in the DOM events spec, replaced by <a href="https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver" target="_blank">MutationObservers</a>.',
+      helpText: 'Mutation Events are deprecated and harm performance. Consider using Mutation ' +
+          'Observers instead. <a href="https://developers.google.com/web/tools/lighthouse' +
+          '/audits/mutation-events" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['URL', 'EventListeners']
     };
   }

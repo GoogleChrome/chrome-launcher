@@ -34,7 +34,9 @@ class NoWebSQLAudit extends Audit {
       category: 'Offline',
       name: 'no-websql',
       description: 'Site does not use WebSQL DB.',
-      helpText: 'Web SQL Database is <a href="https://dev.w3.org/html5/webdatabase/" target="_blank">deprecated</a>. Consider implementing an offline solution using <a href="https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB" target="_blank">IndexedDB</a>.',
+      helpText: 'Web SQL is deprecated. Consider using IndexedDB instead. ' +
+          '<a href="https://developers.google.com/web/tools/lighthouse/audits/web-sql" ' +
+          'target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['WebSQL']
     };
   }

@@ -34,7 +34,10 @@ class LinkBlockingFirstPaintAudit extends Audit {
       category: 'Performance',
       name: 'link-blocking-first-paint',
       description: 'Site does not use <link> that delay first paint',
-      helpText: '&lt;link> elements are <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp" target="_blank">delaying the first paint</a> of your page! For stylesheets, consider inlining or using the <code>disabled</code> and <code>media</code> attributes. For HTML Imports, use the <code>async</code> attribute. These techniques will <a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css" target="_blank">make the resource(s) non-render blocking</a>.',
+      helpText: 'Link elements are blocking the first paint of your page. Consider ' +
+          'inlining critical links and deferring non-critical ones. ' +
+          '<a href="https://developers.google.com/web/tools/lighthouse/audits/' +
+          'blocking-resources" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['TagsBlockingFirstPaint']
     };
   }

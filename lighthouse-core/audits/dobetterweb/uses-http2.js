@@ -36,7 +36,9 @@ class UsesHTTP2Audit extends Audit {
       category: 'Performance',
       name: 'uses-http2',
       description: 'Site uses HTTP/2 for its own resources',
-      helpText: 'h2 offers many benefits over its http/1.1 predecessor: binary, multiplexing, server push, etc. See <a href="https://http2.github.io/faq/" target="_blank">this FAQ</a> for more information.',
+      helpText: 'HTTP/2 offers many benefits over HTTP/1.1, including binary headers, ' +
+          'multiplexing, and server push. <a href="https://developers.google.com/' +
+          'web/tools/lighthouse/audits/http2" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['URL', 'networkRecords']
     };
   }
