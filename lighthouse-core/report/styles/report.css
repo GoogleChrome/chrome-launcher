@@ -64,6 +64,7 @@ span, div, p, section, header, h1, h2, li, ul {
   --subheading-font-size: 16px;
   --subheading-line-height: 20px;
   --subheading-color: inherit;
+  --report-header-height: 0;
   --heading-font-size: 20px;
   --heading-line-height: 24px;
   --subitem-indent: 24px;
@@ -76,6 +77,7 @@ html {
   line-height: 1;
   margin: 0;
   padding: 0;
+  min-width: 455px;
 }
 
 html, body {
@@ -869,11 +871,16 @@ body {
 }
 
 :root[data-report-context="devtools"] .report {
-  margin: 0;
+  margin: 10px 10px;
+  padding: 10px;
   box-shadow: none;
   max-width: none;
+  width: auto;
 }
 
+:root[data-report-context="devtools"] report-body__aggregations-container > section:first-child {
+  padding-top: calc(var(--heading-line-height) / 3);
+}
 :root[data-report-context="devtools"] .report-body__menu-container {
   display: none;
 }
