@@ -82,7 +82,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
 
   // HTML report.
   if (outputMode === OutputMode.html) {
-    return reportGenerator.generateHTML(results, {inline: true});
+    return reportGenerator.generateHTML(results, 'cli');
   }
 
   // JSON report.
