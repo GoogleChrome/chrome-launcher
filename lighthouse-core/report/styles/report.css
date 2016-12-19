@@ -749,6 +749,10 @@ body {
 }
 
 @media print {
+  body {
+    -webkit-print-color-adjust: exact; /* print background colors */
+  }
+
   .report {
     box-shadow: none;
   }
@@ -756,6 +760,10 @@ body {
   .report-body__header,
   .report-body__menu-container {
     display: none;
+  }
+
+  .report-body__content {
+    margin-left: 0;
   }
 }
 

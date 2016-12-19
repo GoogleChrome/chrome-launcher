@@ -132,6 +132,11 @@
   }
 }
 
+@media print {
+  .log-wrapper {
+    display: none;
+  }
+}
 
 /* app z-indexes */
 .drop_zone {
