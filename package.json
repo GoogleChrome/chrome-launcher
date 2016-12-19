@@ -41,7 +41,8 @@
     "jsdom": "^9.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^2.3.3",
-    "walk": "^2.3.9"
+    "walk": "^2.3.9",
+    "zone.js": "^0.7.3"
   },
   "dependencies": {
     "axe-core": "2.1.7",
@@ -52,13 +53,13 @@
     "handlebars": "^4.0.5",
     "json-stringify-safe": "^5.0.1",
     "mkdirp": "^0.5.1",
+    "opn": "^4.0.2",
     "rimraf": "^2.2.8",
     "semver": ">=4.3.3",
     "speedline": "1.0.3",
     "whatwg-url": "^4.0.0",
     "ws": "^1.1.1",
-    "yargs": "3.30.0",
-    "opn": "^4.0.2"
+    "yargs": "3.30.0"
   },
   "repository": "googlechrome/lighthouse",
   "keywords": [

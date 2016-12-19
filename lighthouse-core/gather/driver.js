@@ -143,15 +143,19 @@ class Driver {
       );
 
       this.sendCommand('Runtime.evaluate', {
-        // We need to wrap the raw expression for several purposes
+        // We need to explicitly wrap the raw expression for several purposes:
         // 1. Ensure that the expression will be a native Promise and not a polyfill/non-Promise.
-        // 2. Ensure that errors captured in the Promise are converted into plain-old JS Objects
+        // 2. Ensure that errors in the expression are captured by the Promise.
+        // 3. Ensure that errors captured in the Promise are converted into plain-old JS Objects
         //    so that they can be serialized properly b/c JSON.stringify(new Error('foo')) === '{}'
         expression: `(function wrapInNativePromise() {
           const __nativePromise = window.__nativePromise || Promise;
-          return __nativePromise.resolve()
-            .then(_ => ${expression})
-            .catch(${wrapRuntimeEvalErrorInBrowser.toString()});
+          return new __nativePromise(function (resolve) {
+            return __nativePromise.resolve()
+              .then(_ => ${expression})
+              .catch(${wrapRuntimeEvalErrorInBrowser.toString()})
+              .then(resolve);
+          });
         }())`,
         includeCommandLineAPI: true,
         awaitPromise: true,

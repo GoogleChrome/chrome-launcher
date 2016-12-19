@@ -2873,3 +2873,7 @@ yargs@~3.10.0:
     cliui "^2.1.0"
     decamelize "^1.0.0"
     window-size "0.1.0"
+
+zone.js@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.yarnpkg.com/zone.js/-/zone.js-0.7.3.tgz#d91432b6584f73c2c9e03ce4bb0870becc45d445"
