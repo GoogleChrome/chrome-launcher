@@ -18,75 +18,71 @@
 'use strict';
 /**
  * @fileoverview Server script for Project Performance Experiment.
- * Start Server by calling startServer(port).
  *
  * Functionalities:
  *   Host report pages.
- *     Report pages should be stored in ./src/reports
- *     Report pages can be accessed via URL http://localhost:[PORT]/reports/[REPORT_FILENAME]
+ *     Report pages can be accessed via URL http://localhost:[PORT]/reports?key=[REPORT_KEY]
  */
 
 const http = require('http');
-const fs = require('fs');
 const parse = require('url').parse;
 const path = require('path');
+const fs = require('fs');
 const log = require('../../lighthouse-core/lib/log');
+const assetSaver = require('../../lighthouse-core/lib/asset-saver');
+const ReportGenerator = require('../../lighthouse-core/report/report-generator');
 
 const ROOT = `${__dirname}/src`;
-const FOLDERS = {
-  REPORTS: `${ROOT}/reports`
-};
-
 const server = http.createServer(requestHandler);
 server.on('error', err => log.error('PerformanceXServer', err.code, err));
 
 function requestHandler(request, response) {
-  const pathname = parse(request.url).pathname;
+  request.parsedUrl = parse(request.url, true);
+  const pathname = path.normalize(request.parsedUrl.pathname);
+  request.parsedUrl.pathname = pathname;
 
-  // Only files inside src are accessible
-  const filePath = (path.normalize(pathname).startsWith('../')) ? '' : `${ROOT}${pathname}`;
-  fs.readFile(filePath, 'binary', readFileCallback);
-
-  function readFileCallback(err, file) {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        sendResponse(404, `404 - File not found. ${pathname}`);
-        return;
-      }
-      log.error('PerformanceXServer', `Unable to read local file ${filePath}:`, err);
-      sendResponse(500, '500 - Internal Server Error');
-      return;
-    }
-    sendResponse(200, file);
-  }
-
-  function sendResponse(statusCode, data) {
-    let headers;
-    if (filePath) {
-      if (filePath.endsWith('.html')) {
-        headers = {'Content-Type': 'text/html'};
-      } else if (filePath.endsWith('.json')) {
-        headers = {'Content-Type': 'text/json'};
-      }
-    }
-    response.writeHead(statusCode, headers);
-    response.write(data, 'binary');
+  if (pathname === '/reports') {
+    reportRequestHandler(request, response);
+  } else {
+    response.writeHead(400);
+    response.write('400 - Bad request');
     response.end();
   }
 }
 
-function prepareServer() {
-  for (const folder in FOLDERS) {
-    if (!FOLDERS.hasOwnProperty(folder)) {
-      continue;
-    }
-
-    // Create dirs synchronously. Dirs need to be created before server start.
-    const folderPath = FOLDERS[folder];
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
-    }
+function reportRequestHandler(request, response) {
+  const key = request.parsedUrl.query.key;
+  const filePath = `${ROOT}/${key}/results.json`;
+  if (fs.existsSync(filePath)) {
+    const reportGenerator = new ReportGenerator();
+    const results = JSON.parse(fs.readFileSync(filePath));
+    const html = reportGenerator.generateHTML(results, 'cli');
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write(html);
+  } else {
+    response.writeHead(404);
+    response.write(`404 - Report not found. Key = ${key}`);
   }
+  response.end();
+}
+
+/**
+ * Start the server with an arbitrary port if it's not already started.
+ * Save experiment configuration (flags) and results
+ * @param {!Object} flags
+ * @param {!Object} results
+ * @return {!Promise<string>} Promise that resolves to the url where report can be accessed
+ */
+function hostExperiment(flags, results) {
+  return startServer(0).then(port => {
+    const key = assetSaver.getFilenamePrefix({url: results.initialUrl});
+    const dir = `${ROOT}/${key}`;
+    fs.mkdirSync(dir);
+    fs.writeFileSync(`${dir}/flags.json`, JSON.stringify(flags));
+    fs.writeFileSync(`${dir}/results.json`, JSON.stringify(results));
+    log.log('PerformanceXServer', 'Save experiment data:', `file path: ${dir}`);
+    return `http://localhost:${port}/reports?key=${key}`;
+  });
 }
 
 /**
@@ -98,14 +94,16 @@ let portPromise;
 function startServer(port) {
   if (!portPromise) {
     portPromise = new Promise(resolve => {
-      prepareServer();
-      server.listen(port, _ => resolve(server.address().port));
+      if (!fs.existsSync(ROOT)) {
+        fs.mkdirSync(ROOT);
+      }
+      server.listen(port, () => resolve(server.address().port));
     });
   }
   return portPromise;
 }
 
 module.exports = {
-  startServer,
-  FOLDERS
+  hostExperiment,
+  startServer
 };

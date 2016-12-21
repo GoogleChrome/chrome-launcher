@@ -270,12 +270,7 @@ function runLighthouse(url: string,
 
       // If --view, generate report.html, host it, and open it in the default browser
       if (flags.view) {
-        return performanceXServer.startServer(0).then((port: number) => {
-          const filePath = `${performanceXServer.FOLDERS.REPORTS}/${filename}`;
-          return Printer.write(results, 'html', filePath).then(() => {
-            opn(`http://localhost:${port}/reports/${filename}`);
-          });
-        });
+        return performanceXServer.hostExperiment(flags, results).then(opn);
       }
     })
     .then(() => chromeLauncher.kill())
