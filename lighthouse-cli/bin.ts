@@ -262,13 +262,12 @@ function runLighthouse(url: string,
     .then(() => lighthouse(url, flags, config))
     .then((results: Results) => Printer.write(results, flags.output, flags.outputPath))
     .then((results: Results) => {
-      const filename = `${assetSaver.getFilenamePrefix({url})}.report.html`;
-
       if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
+        const filename = `${assetSaver.getFilenamePrefix({url})}.report.html`;
         Printer.write(results, 'html', filename);
       }
 
-      // If --view, generate report.html, host it, and open it in the default browser
+      // If --view, save and host this experiment, and open report.html in the default browser
       if (flags.view) {
         return performanceXServer.hostExperiment(flags, results).then(opn);
       }
