@@ -43,6 +43,9 @@ module.exports = {
   },
   cleanAndDisableBrowserCaches() {},
   clearDataForOrigin() {},
+  cacheNatives() {
+    return Promise.resolve();
+  },
   beginTrace() {
     return Promise.resolve();
   },

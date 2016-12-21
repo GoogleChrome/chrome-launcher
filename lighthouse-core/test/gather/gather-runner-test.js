@@ -54,6 +54,9 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
     assertNoSameOriginServiceWorkerClients() {
       return Promise.resolve();
     }
+    cacheNatives() {
+      return Promise.resolve();
+    }
     cleanAndDisableBrowserCaches() {}
     clearDataForOrigin() {}
   };
