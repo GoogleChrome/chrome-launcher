@@ -25,6 +25,9 @@ const idb = require('idb-keyval');
 const logger = require('./logger');
 const ReportGenerator = require('../../../lighthouse-core/report/report-generator');
 
+// TODO: We only need getFilenamePrefix from asset-saver. Tree shake!
+const getFilenamePrefix = require('../../../lighthouse-core/lib/asset-saver').getFilenamePrefix;
+
 const LH_CURRENT_VERSION = require('../../../package.json').version;
 const APP_URL = `${location.origin}${location.pathname}`;
 
@@ -40,6 +43,9 @@ class LighthouseViewerReport {
     this.onCopyButtonClick = this.onCopyButtonClick.bind(this);
     this.onFileUpload = this.onFileUpload.bind(this);
     this.onPaste = this.onPaste.bind(this);
+    this.onExportButtonClick = this.onExportButtonClick.bind(this);
+    this.onExport = this.onExport.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
 
     this._copyAttempt = false;
 
@@ -54,13 +60,6 @@ class LighthouseViewerReport {
   }
 
   initUI() {
-    const printButton = document.querySelector('.js-print');
-    if (printButton) {
-      printButton.addEventListener('click', _ => {
-        window.print();
-      });
-    }
-
     this.shareButton = document.querySelector('.js-share');
     if (this.shareButton) {
       this.shareButton.addEventListener('click', this.onShare);
@@ -81,6 +80,13 @@ class LighthouseViewerReport {
     }
 
     document.addEventListener('paste', this.onPaste);
+
+    this.exportButton = document.querySelector('.js-export');
+    if (this.exportButton) {
+      this.exportButton.addEventListener('click', this.onExportButtonClick);
+      const dropdown = document.querySelector('.export-dropdown');
+      dropdown.addEventListener('click', this.onExport);
+    }
   }
 
   enableShareButton() {
@@ -91,6 +97,10 @@ class LighthouseViewerReport {
   disableShareButton() {
     this.shareButton.classList.add('disable');
     this.shareButton.disabled = true;
+  }
+
+  closeExportDropdown() {
+    this.exportButton.classList.remove('active');
   }
 
   loadFromURL() {
@@ -258,6 +268,74 @@ class LighthouseViewerReport {
       ga('send', 'event', 'report', 'paste');
     } catch (err) {
       // noop
+    }
+  }
+
+  /**
+   * Click handler for export button.
+   */
+  onExportButtonClick(e) {
+    e.target.classList.toggle('active');
+    document.addEventListener('keydown', this.onKeyDown);
+  }
+
+  /**
+   * Downloads a file (blob) using a[download].
+   * @param {Blob|File} The file to save.
+   */
+  _saveFile(blob) {
+    const filename = getFilenamePrefix({
+      url: this.json.url,
+      date: new Date(this.json.generatedTime)
+    });
+
+    const ext = blob.type.match('json') ? '.json' : '.html';
+
+    const a = document.createElement('a');
+    a.download = `${filename}${ext}`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+
+    setTimeout(_ => URL.revokeObjectURL(a.href), 500); // cleanup.
+  }
+
+  /**
+   * Handler for "export as" button.
+   */
+  onExport(e) {
+    if (!e.target.dataset.action) {
+      return;
+    }
+
+    switch (e.target.dataset.action) {
+      case 'print':
+        window.print();
+        break;
+      case 'save-json':
+        const jsonStr = JSON.stringify(this.json, null, 2);
+        this._saveFile(new Blob([jsonStr], {type: 'application/json'}));
+        break;
+      case 'save-html':
+        const reportGenerator = new ReportGenerator();
+        try {
+          const htmlStr = reportGenerator.generateHTML(this.json, 'cli');
+          this._saveFile(new Blob([htmlStr], {type: 'text/html'}));
+        } catch (err) {
+          logger.error('Could not export as HTML.');
+        }
+        break;
+    }
+
+    this.closeExportDropdown();
+    document.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  /**
+   * Keydown handler for the document.
+   */
+  onKeyDown(e) {
+    if (e.keyCode === 27) { // ESC
+      this.closeExportDropdown();
     }
   }
 }

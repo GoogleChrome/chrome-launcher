@@ -52,6 +52,13 @@ describe('Report', () => {
     assert.ok(html.includes('<html data-report-context="viewer"'), 'viewer report context');
   });
 
+  it('adds export button for viewer context', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults, 'viewer');
+    assert.ok(!html.includes('<button class="print js-print'),
+                             'viewer report does not contain print button');
+  });
+
   it('generates HTML', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults);
@@ -62,5 +69,6 @@ describe('Report', () => {
     assert.ok(html.includes('.report-body {'), 'report.css was not inlined');
     assert.ok(!html.includes('&quot;lighthouseVersion'), 'lhresults were not escaped');
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
+    assert.ok(html.includes('export-button'), 'page includes export button');
   });
 });

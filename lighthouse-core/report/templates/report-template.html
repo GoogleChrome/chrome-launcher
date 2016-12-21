@@ -38,9 +38,19 @@ limitations under the License.
         <div class="report-body__url">Generated on: {{generatedTime}}</div>
       </div>
       <div class="report-body__buttons">
+        <span class="export-section">
+          <button class="export-button js-export" title="Export report in different formats">Export...</button>
+          <ul class="export-dropdown">
+            <a href="#" data-action="print">Print...</a>
+            <a href="#" data-action="save-html">Save as HTML...</a>
+            <a href="#" data-action="save-json">Save as JSON...</a>
+          </ul>
+        </span>
         <button class="report-body__icon share js-share"></button>
         <button class="report-body__icon copy js-copy"></button>
-        <button class="report-body__icon print js-print"></button>
+        {{#if_not_eq reportContext "viewer"}}
+          <button class="report-body__icon print js-print"></button>
+        {{/if_not_eq}}
       </div>
     </div>
     <div class="report-body__content">
