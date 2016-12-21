@@ -27,7 +27,7 @@ class Viewport extends Audit {
       category: 'Mobile Friendly',
       name: 'viewport',
       description: 'HTML has a viewport <meta>',
-      helpText: 'Add a viewport meta tag to optimize your app for mobile screens. <a href="https://developers.google.com/web/tools/lighthouse/audits/has-viewport-meta-tag" target="_blank" rel="noopener noreferrer">Learn more</a>.',
+      helpText: 'Add a viewport meta tag to optimize your app for mobile screens. <a href="https://developers.google.com/web/tools/lighthouse/audits/has-viewport-meta-tag" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['Viewport']
     };
   }

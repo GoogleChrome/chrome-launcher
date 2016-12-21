@@ -36,7 +36,7 @@ class FirstMeaningfulPaint extends Audit {
       name: 'first-meaningful-paint',
       description: 'First meaningful paint',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
-      helpText: 'First meaningful paint measures when the primary content of a page is visible. <a href="https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint" target="_blank" rel="noreferrer noopener">Learn more</a>.',
+      helpText: 'First meaningful paint measures when the primary content of a page is visible. <a href="https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint" target="_blank" rel="noopener">Learn more</a>.',
       requiredArtifacts: ['traces']
     };
   }
