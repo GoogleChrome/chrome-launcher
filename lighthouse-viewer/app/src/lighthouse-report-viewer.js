@@ -189,12 +189,16 @@ class LighthouseViewerReport {
    */
   onFileUpload(file) {
     return FileUploader.readFile(file).then(str => {
-      if (!file.type.match('json')) {
-        throw new Error('Unsupported report format. Expected JSON.');
+      let json;
+      try {
+        json = JSON.parse(str);
+      } catch(e) {
+        throw new Error('Could not parse JSON file.');
       }
+
       this._isNewReport = true;
 
-      this.replaceReportHTML(JSON.parse(str));
+      this.replaceReportHTML(json);
     }).catch(err => logger.error(err.message));
   }
 
