@@ -29,7 +29,6 @@ const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
-const spawnSync = childProcess.spawnSync;
 
 class ChromeLauncher {
   prepared: Boolean = false
@@ -215,7 +214,7 @@ class ChromeLauncher {
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
         if (process.platform === 'win32') {
-          spawnSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+          execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
         } else {
           process.kill(-this.chrome.pid);
         }
