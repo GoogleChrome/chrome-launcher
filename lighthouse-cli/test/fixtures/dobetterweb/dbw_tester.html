@@ -82,6 +82,9 @@
 <template id="noopener-links-tmpl">
   <!-- FAIL - does not use rel="noopener" to open external link -->
   <a href="https://www.google.com/" target="_blank">external link</a>
+  <!-- FAIL - does not use rel="noopener" and has no href attribute, giving an
+    href value of '' when read, which will throw in a `new URL('')` constructor -->
+  <a target="_blank">external link</a>
   <!-- PASS -->
   <a href="https://www.google.com/" target="_blank" rel="noopener nofollow">external link that uses rel noopener and another unrelated rel attribute</a>
   <!-- PASS -->

@@ -51,15 +51,16 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
 
     const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usages to exclude anchors that are same origin
+    // TODO: better extendedInfo for anchors with no href attribute:
+    // https://github.com/GoogleChrome/lighthouse/issues/1233
     const failingAnchors = artifacts.AnchorsWithNoRelNoopener.usages
-      .filter(anchor => new URL(anchor.href).host !== pageHost)
+      .filter(anchor => anchor.href === '' || new URL(anchor.href).host !== pageHost)
       .map(anchor => {
         return {
-          url: `<a
-            href="${anchor.href}"
-            ${anchor.target ? ` target="${anchor.target}"` : ''}
-            ${anchor.rel ? ` rel="${anchor.rel}"` : ''}>...
-          </a>`
+          url: '<a' +
+              (anchor.href ? ` href="${anchor.href}"` : '') +
+              (anchor.target ? ` target="${anchor.target}"` : '') +
+              (anchor.rel ? ` rel="${anchor.rel}"` : '') + '>'
         };
       });
 
