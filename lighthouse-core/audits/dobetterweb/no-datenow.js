@@ -63,8 +63,15 @@ class NoDateNowAudit extends Audit {
 
     const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usage from other hosts and keep eval'd code.
+    // If there is no .url in the violation, include it in the results because
+    // we cannot determine if it was from the user's page or a third party.
+    // TODO: better extendedInfo for violations with no URL.
+    // https://github.com/GoogleChrome/lighthouse/issues/1263
     const results = artifacts.DateNowUse.usage.filter(err => {
-      return err.isEval ? !!err.url : new URL(err.url).host === pageHost;
+      if (err.isEval) {
+        return !!err.url;
+      }
+      return err.url ? new URL(err.url).host === pageHost : true;
     }).map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`,

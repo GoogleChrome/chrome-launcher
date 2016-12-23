@@ -99,4 +99,19 @@ describe('Page does not use Date.now()', () => {
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 3);
   });
+
+  it('includes results when there is no .url', () => {
+    const auditResult = DateNowUseAudit.audit({
+      DateNowUse: {
+        usage: [
+          {line: 10, col: 1},
+          {line: 2, col: 22}
+        ]
+      },
+      URL: {finalUrl: URL},
+    });
+
+    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.extendedInfo.value.length, 2);
+  });
 });
