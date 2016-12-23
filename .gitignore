@@ -30,3 +30,7 @@ lighthouse-cli/commands/*.js
 
 lighthouse-cli/types/*.js
 lighthouse-cli/types/*.map
+
+/chrome-linux/
+/chrome-win32/
+/chrome.zip

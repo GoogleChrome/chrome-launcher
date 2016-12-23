@@ -1,0 +1,41 @@
+clone_depth: 10
+
+version: "{build}"
+
+environment:
+  matrix:
+    - nodejs_version: "6.9.1"
+      platform: x86
+    - nodejs_version: "7"
+      platform: x86
+
+build: off
+
+install:
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install
+  - npm run install-all
+
+before_test:
+  - set LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe
+  - appveyor DownloadFile https://download-chromium.appspot.com/dl/Win?type=snapshots -FileName chrome-win32.zip
+  - unzip chrome-win32.zip
+  - npm run build-cli
+  - npm run build-extension
+  - npm run build-viewer
+
+test_script:
+  - node --version
+  - npm --version
+  - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
+  - npm run lint
+  - npm run unit
+  - npm run smoke
+  - npm run smokehouse
+
+cache:
+  #- chrome-win32 -> appveyor.yml,package.json
+  - node_modules -> appveyor.yml,package.json
+  - lighthouse-cli\node_modules -> appveyor.yml,package.json,lighthouse-cli\package.json
+  - lighthouse-extension\node_modules -> appveyor.yml,package.json,lighthouse-extension\package.json
+  - lighthouse-viewer\node_modules -> appveyor.yml,package.json,lighthouse-viewer\package.json
