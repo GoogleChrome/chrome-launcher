@@ -29,6 +29,7 @@ const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
+const os = require('os');
 
 class ChromeLauncher {
   prepared: Boolean = false
@@ -191,7 +192,10 @@ class ChromeLauncher {
         launcher
           .isDebuggerReady()
           .then(() => {
-            log.log('ChromeLauncher', waitStatus + `${green}✓${reset}`);
+            if (os.platform() == 'win32')
+              log.log('ChromeLauncher', waitStatus + `${green}\u221A${reset}`);
+            else
+              log.log('ChromeLauncher', waitStatus + `${green}✓${reset}`);
             resolve();
           })
           .catch(err => {

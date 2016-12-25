@@ -22,6 +22,7 @@ const path = require('path');
 const fs = require('fs');
 const Formatter = require('./formatter');
 const html = fs.readFileSync(path.join(__dirname, 'partials/critical-request-chains.html'), 'utf8');
+const os = require('os');
 
 class CriticalRequestChains extends Formatter {
 
@@ -148,7 +149,11 @@ class CriticalRequestChains extends Formatter {
 
         // If the parent is the last child then don't drop the vertical bar.
         const ancestorTreeMarker = treeMarkers.reduce((markers, marker) => {
-          return markers + (marker ? '┃ ' : '  ');
+          if (os.platform() == 'win32') {
+            return markers + (marker ? '\u2502 ' : '  ');
+          } else {
+            return markers + (marker ? '┃ ' : '  ');
+          }
         }, '');
 
         // Copy the tree markers so that we don't change by reference.
@@ -159,9 +164,16 @@ class CriticalRequestChains extends Formatter {
 
         // Create the appropriate tree marker based on the depth of this
         // node as well as whether or not it has children and is itself the last child.
-        const treeMarker = ancestorTreeMarker +
+        const treeMarker = ancestorTreeMarker;
+        if (os.platform() == 'win32') {
+          const treeMarker = ancestorTreeMarker +
+            (isLastChild ? '\u2514\u2500' : '\u251C\u2500') +
+            (hasChildren ? '\u252C' : '\u2500');
+        } else {
+          const treeMarker = ancestorTreeMarker +
             (isLastChild ? '┗━' : '┣━') +
             (hasChildren ? '┳' : '━');
+        }
 
         const parsedURL = CriticalRequestChains.parseURL(node[id].request.url);
 

@@ -32,6 +32,7 @@ const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
 const Formatter = require('../lighthouse-core/formatters/formatter');
 const log = require('../lighthouse-core/lib/log');
+const os = require('os');
 
 /**
  * Verify output path to use, either stdout or a file path.
@@ -56,9 +57,15 @@ function formatAggregationResultItem(score: boolean | number | string, suffix?: 
   const reset = '\x1B[0m';
 
   if (typeof score === 'boolean') {
-    const check = `${green}✓${reset}`;
-    const fail = `${red}✘${reset}`;
-    return score ? check : fail;
+    if (os.platform() == 'win32') {
+      const check = `${green}\u221A${reset}`;
+      const fail = `${red}\u00D7${reset}`;
+      return score ? check : fail;
+    } else {
+      const check = `${green}✓${reset}`;
+      const fail = `${red}✘${reset}`;
+      return score ? check : fail;
+    }
   }
   if (typeof score !== 'number') {
     return `${purple}${score}${reset}`;
@@ -94,11 +101,17 @@ function createOutput(results: Results, outputMode: OutputMode): string {
   const bold = '\x1b[1m';
   const reset = '\x1B[0m';
   const version = results.lighthouseVersion;
+
   let output = `\n\n${bold}Lighthouse (${version}) results:${reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
-		const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : ''
-    output += `▫ ${bold}${aggregation.name}${reset}${total}\n\n`;
+    const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : '';
+
+    if (os.platform() == 'win32') {
+      output += `\u0387 ${bold}${aggregation.name}${reset}${total}\n\n`;
+    } else {
+      output += `▫ ${bold}${aggregation.name}${reset}${total}\n\n`;
+    }
 
     aggregation.score.forEach(item => {
       const score = (item.overall * 100).toFixed(0);
