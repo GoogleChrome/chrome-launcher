@@ -45,6 +45,7 @@
   border-radius: 5px;
   padding: 25px;
   width: 33vw;
+  min-width: 250px;
   height: 20vh;
   display: flex;
   align-items: center;
@@ -63,7 +64,7 @@
   display: flex;
   align-items: center;
   border-radius: 5px;
-  padding: 40px 32px;
+  padding: 16px;
   max-width: 80vw;
   border: 2px dashed rgba(0,0,0,0.2);
   cursor: pointer;
@@ -78,10 +79,18 @@
 }
 .viewer-placeholder__help {
   margin-top: 12px;
+  line-height: 1.4;
 }
 .viewer-placeholder-logo {
-  width: 100px;
-  height: 100px;
+  width: 140px;
+  height: 140px;
+}
+.viewer-placeholder__url {
+  padding: 8px;
+  width: 100%;
+  border: 1px solid #eee;
+  margin-top: 16px;
+  display: none;
 }
 .log-wrapper {
   position: fixed;
@@ -121,9 +130,15 @@
     width: 100px;
     height: 100px;
   }
+  .viewer-placeholder__url {
+    display: block;
+  }
 }
 
 @media screen and (min-width: 636px) {
+  .viewer-placeholder-inner {
+    padding: 40px 32px;
+  }
   .viewer-placeholder__help::before {
     content: 'Instructions: ';
   }
