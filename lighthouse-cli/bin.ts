@@ -30,10 +30,8 @@ if (!environment.checkNodeCompatibility()) {
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';
-import * as fs from 'fs';
 const lighthouse = require('../lighthouse-core');
 const log = require('../lighthouse-core/lib/log');
-const opn = require('opn');
 import * as path from 'path';
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 const performanceXServer = require('./performance-experiment/server');
@@ -264,12 +262,14 @@ function runLighthouse(url: string,
     .then((results: Results) => {
       if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
         const filename = `${assetSaver.getFilenamePrefix({url})}.report.html`;
-        Printer.write(results, 'html', filename);
+        return Printer.write(results, 'html', filename);
       }
-
-      // If --view, save and host this experiment, and open report.html in the default browser
+      return results;
+    })
+    .then((results: Results) => {
+      // If --view, host this experiment and open report.html in the default browser
       if (flags.view) {
-        return performanceXServer.hostExperiment(flags, results).then(opn);
+        return performanceXServer.hostExperiment({url, flags, config}, results);
       }
     })
     .then(() => chromeLauncher.kill())
