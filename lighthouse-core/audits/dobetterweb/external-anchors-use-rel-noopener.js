@@ -49,12 +49,23 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       });
     }
 
+    let debugString;
     const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usages to exclude anchors that are same origin
     // TODO: better extendedInfo for anchors with no href attribute:
     // https://github.com/GoogleChrome/lighthouse/issues/1233
+    // https://github.com/GoogleChrome/lighthouse/issues/1345
     const failingAnchors = artifacts.AnchorsWithNoRelNoopener.usages
-      .filter(anchor => anchor.href === '' || new URL(anchor.href).host !== pageHost)
+      .filter(anchor => {
+        try {
+          return anchor.href === '' || new URL(anchor.href).host !== pageHost;
+        } catch (err) {
+          debugString = 'Lighthouse was unable to determine the destination ' +
+              'of some anchor tags. If they are not used as hyperlinks, ' +
+              'consider removing the _blank target.';
+          return true;
+        }
+      })
       .map(anchor => {
         return {
           url: '<a' +
@@ -69,7 +80,8 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
         value: failingAnchors
-      }
+      },
+      debugString
     });
   }
 }

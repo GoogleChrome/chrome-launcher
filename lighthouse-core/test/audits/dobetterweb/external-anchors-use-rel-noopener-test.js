@@ -64,12 +64,15 @@ describe('External anchors use rel="noopener"', () => {
     const auditResult = ExternalAnchorsAudit.audit({
       AnchorsWithNoRelNoopener: {
         usages: [
-          {href: ''}
+          {href: ''},
+          {href: 'http://'},
+          {href: 'http:'}
         ]
       },
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 1);
+    assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.ok(auditResult.debugString, 'includes debugString');
   });
 });
