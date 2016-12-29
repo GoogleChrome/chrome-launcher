@@ -208,18 +208,29 @@ class Aggregate {
   }
 
   /**
+   * Calculates total score of an aggregate.
+   * @param {!Array<!AggregationResultItem>} scores
+   * @return {number}
+   */
+  static getTotal(scores) {
+    return scores.reduce((total, s) => total + s.overall, 0) / scores.length;
+  }
+
+  /**
    * Aggregates all the results.
    * @param {!Aggregation} aggregation
    * @param {!Array<!AuditResult>} results
    * @return {!AggregationResult}
    */
   static aggregate(aggregation, auditResults) {
+    const score = Aggregate.compare(auditResults, aggregation.items, aggregation.scored);
     return {
       name: aggregation.name,
       description: aggregation.description,
       scored: aggregation.scored,
+      total: (aggregation.scored ? Aggregate.getTotal(score) : null),
       categorizable: aggregation.categorizable,
-      score: Aggregate.compare(auditResults, aggregation.items, aggregation.scored)
+      score: score
     };
   }
 }

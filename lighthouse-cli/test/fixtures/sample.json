@@ -449,6 +449,7 @@
       "name": "Progressive Web App",
       "description": "These audits validate the aspects of a Progressive Web App.",
       "scored": true,
+      "total": 0.40625,
       "categorizable": true,
       "score": [
         {
@@ -559,6 +560,7 @@
       "name": "Best Practices",
       "description": "These audits do not affect your score but are worth a look.",
       "scored": false,
+      "total": null,
       "categorizable": false,
       "score": [
         {
@@ -614,6 +616,7 @@
       "name": "Performance Metrics",
       "description": "These encapsulate your app's performance.",
       "scored": false,
+      "total": null,
       "categorizable": false,
       "score": [
         {
@@ -629,6 +632,7 @@
       "name": "Do Better Web",
       "description": "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls.",
       "scored": false,
+      "total": null,
       "categorizable": true,
       "score": [
         {

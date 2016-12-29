@@ -24,6 +24,7 @@ interface AggregationResultItem {
 interface Aggregation {
   name: string;
   score: Array<AggregationResultItem>;
+  total: number;
 }
 
 interface Results {
