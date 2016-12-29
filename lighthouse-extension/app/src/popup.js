@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', _ => {
 
   const MAX_ISSUE_ERROR_LENGTH = 60;
 
+  let siteURL = null;
+
   /**
    * Error strings that indicate a problem in how Lighthouse was run, not in
    * Lighthouse itself, mapped to more useful strings to report to the user.
@@ -64,6 +66,11 @@ document.addEventListener('DOMContentLoaded', _ => {
 
     let qsBody = '**Lighthouse Version**: ' + getLighthouseVersion() + '\n';
     qsBody += '**Chrome Version**: ' + getChromeVersion() + '\n';
+
+    if (siteURL) {
+      qsBody += '**URL**: ' + siteURL + '\n';
+    }
+
     qsBody += '**Error Message**: ' + err.message + '\n';
     qsBody += '**Stack Trace**:\n ```' + err.stack + '```';
 
@@ -191,7 +198,7 @@ document.addEventListener('DOMContentLoaded', _ => {
       return;
     }
 
-    const siteURL = new URL(tabs[0].url);
+    siteURL = new URL(tabs[0].url);
     siteNameEl.textContent = siteURL.origin;
   });
 });
