@@ -29,7 +29,7 @@ function Artifacts() {}
 /** @type {string} */
 Artifacts.prototype.HTML;
 
-/** @type {{value: (string|number}, debugString: (string|undefined)}} */
+/** @type {{value: (string|number), debugString: (string|undefined)}} */
 Artifacts.prototype.HTMLWithoutJavaScript;
 
 /** @type {boolean} */
