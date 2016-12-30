@@ -64,6 +64,6 @@ describe('Accessibility: aria-allowed-attr audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'Element aria-* roles are valid');
+    assert.equal(output.description, 'Element aria-* attributes are allowed for this role');
   });
 });

@@ -25,10 +25,24 @@ const axe = fs.readFileSync(
 );
 
 // This is run in the page, not Lighthouse itself.
+// axe.run returns a promise which fulfills with a results object
+// containing any violations.
 /* istanbul ignore next */
 function runA11yChecks() {
-  return new Promise((resolve, reject) => {
-    axe.a11yCheck(document, resolve);
+  return axe.run(document, {
+    runOnly: {
+      type: 'rule',
+      values: [
+        'aria-allowed-attr',
+        'aria-required-attr',
+        'aria-valid-attr',
+        'aria-valid-attr-value',
+        'color-contrast',
+        'image-alt',
+        'label',
+        'tabindex'
+      ]
+    }
   });
 }
 

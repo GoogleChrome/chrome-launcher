@@ -32,7 +32,7 @@ class ARIAAllowedAttr extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'aria-allowed-attr',
-      description: 'Element aria-* roles are valid',
+      description: 'Element aria-* attributes are allowed for this role',
       requiredArtifacts: ['Accessibility']
     };
   }
