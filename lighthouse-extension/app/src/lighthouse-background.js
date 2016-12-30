@@ -28,6 +28,9 @@ const ReportGenerator = require('../../../lighthouse-core/report/report-generato
 const STORAGE_KEY = 'lighthouse_audits';
 const _flatten = arr => [].concat(...arr);
 
+let lighthouseIsRunning = false;
+let latestStatusLog = [];
+
 /**
  * Filter out any unrequested aggregations from the config. If any audits are
  * no longer needed by any remaining aggregations, filter out those as well.
@@ -87,8 +90,19 @@ window.runLighthouseForConnection = function(connection, url, options, requested
   // Add url and config to fresh options object.
   const runOptions = Object.assign({}, options, {url, config});
 
+  lighthouseIsRunning = true;
+
   // Run Lighthouse.
-  return Runner.run(connection, runOptions);
+  return Runner.run(connection, runOptions)
+    .then(result => {
+      lighthouseIsRunning = false;
+
+      return result;
+    })
+    .catch(err => {
+      lighthouseIsRunning = false;
+      throw err;
+    });
 };
 
 /**
@@ -213,7 +227,20 @@ window.loadSelectedAggregations = function() {
 };
 
 window.listenForStatus = function(callback) {
-  log.events.addListener('status', callback);
+  log.events.addListener('status', function(log) {
+    latestStatusLog = log;
+    callback(log);
+  });
+
+  // Show latest saved status log to give immediate feedback
+  // when reopening the popup message when lighthouse is running
+  if (lighthouseIsRunning && latestStatusLog) {
+    callback(latestStatusLog);
+  }
+};
+
+window.isRunning = function() {
+  return lighthouseIsRunning;
 };
 
 if (window.chrome && chrome.runtime) {

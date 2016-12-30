@@ -135,6 +135,10 @@ document.addEventListener('DOMContentLoaded', _ => {
     return frag;
   }
 
+  if (background.isRunning()) {
+    startSpinner();
+  }
+
   background.listenForStatus(logstatus);
   background.loadSelectedAggregations().then(aggregations => {
     const frag = generateOptionsList(optionsList, aggregations);
