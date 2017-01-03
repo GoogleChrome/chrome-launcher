@@ -34,7 +34,7 @@ module.exports = [
       'manifest-display': false,
       'without-javascript': true,
       'user-timings': true,
-      'critical-request-chains': false,
+      'critical-request-chains': true,
       'manifest-exists': false,
       'manifest-background-color': false,
       'manifest-theme-color': false,

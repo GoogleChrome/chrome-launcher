@@ -63,10 +63,15 @@ class CriticalRequestChains extends Audit {
         }, '');
       }
 
-      walk(chains, 0);
+      // Account for initial navigation
+      const initialNavigationKey = Object.keys(chains)[0];
+      const initialNavChildren = chains[initialNavigationKey].children;
+      if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
+        walk(initialNavChildren, 0);
+      }
 
       return CriticalRequestChains.generateAuditResult({
-        rawValue: chainCount.length <= this.meta.optimalValue,
+        rawValue: chainCount <= this.meta.optimalValue,
         displayValue: chainCount,
         optimalValue: this.meta.optimalValue,
         extendedInfo: {
