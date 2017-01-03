@@ -36,8 +36,7 @@ class NotificationOnStart extends Audit {
       description: 'Page does not automatically request notification permissions on page load',
       helpText: 'Users are mistrustful of or confused by sites that request to send ' +
           'notifications without context. Consider tying the request to user gestures ' +
-          'instead. <a href="https://developers.google.com/web/tools/lighthouse/audits/' +
-          'notifications-on-load" target="_blank" rel="noopener">Learn more</a>.',
+          'instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/notifications-on-load).',
       requiredArtifacts: ['NotificationOnStart']
     };
   }

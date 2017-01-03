@@ -35,8 +35,7 @@ class NoWebSQLAudit extends Audit {
       name: 'no-websql',
       description: 'Site does not use WebSQL DB.',
       helpText: 'Web SQL is deprecated. Consider using IndexedDB instead. ' +
-          '<a href="https://developers.google.com/web/tools/lighthouse/audits/web-sql" ' +
-          'target="_blank" rel="noopener">Learn more</a>.',
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/web-sql).',
       requiredArtifacts: ['WebSQL']
     };
   }

@@ -28,7 +28,9 @@ class ContentWidth extends Audit {
       category: 'Mobile Friendly',
       name: 'content-width',
       description: 'Content is sized correctly for the viewport',
-      helpText: 'If the width of your app\'s content doesn\'t match the width of the viewport, your app might not be optimized for mobile screens. <a href="https://developers.google.com/web/tools/lighthouse/audits/content-sized-correctly-for-viewport" rel="noopener" target="_blank">Learn more</a>.',
+      helpText: 'If the width of your app\'s content doesn\'t match the width ' +
+          'of the viewport, your app might not be optimized for mobile screens. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/content-sized-correctly-for-viewport).',
       requiredArtifacts: ['ContentWidth']
     };
   }

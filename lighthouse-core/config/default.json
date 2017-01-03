@@ -100,7 +100,7 @@
     "categorizable": true,
     "items": [{
       "name": "App can load on offline/flaky connections",
-      "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
+      "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a [Service Worker](https://developers.google.com/web/fundamentals/primers/service-worker/).",
       "audits": {
         "service-worker": {
           "expectedValue": true,
@@ -177,7 +177,7 @@
       }
     }, {
       "name": "User can be prompted to Add to Homescreen",
-      "description": "While users can manually add your site to their homescreen in the browser menu, the <a href=\"https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android?hl=en\">prompt (aka app install banner)</a> will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
+      "description": "While users can manually add your site to their homescreen in the browser menu, the [prompt (aka app install banner)](https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android) will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
       "see": "https://github.com/GoogleChrome/lighthouse/issues/23",
       "audits": {
         "service-worker": {
@@ -203,7 +203,7 @@
       }
     }, {
       "name": "Installed web app will launch with custom splash screen",
-      "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable <a href=\"https://developers.google.com/web/updates/2015/10/splashscreen?hl=en\">splash screen</a> the user sees between tapping the home screen icon and your app’s first paint.",
+      "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable [splash screen](https://developers.google.com/web/updates/2015/10/splashscreen) the user sees between tapping the home screen icon and your app's first paint.",
       "see": "https://github.com/GoogleChrome/lighthouse/issues/24",
       "audits": {
         "manifest-exists": {
@@ -229,7 +229,7 @@
       }
     }, {
       "name": "Address bar matches brand colors",
-      "description": "The browser address bar can be themed to match your site. A theme-color <a href=\"https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android\">meta tag</a> will upgrade the address bar when a user browses the site, and the <a href=\"https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color\">manifest theme-color</a> will apply the same theme site-wide once it's been added to homescreen.",
+      "description": "The browser address bar can be themed to match your site. A `theme-color` [meta tag](https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android) will upgrade the address bar when a user browses the site, and the [manifest theme-color](https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color) will apply the same theme site-wide once it's been added to homescreen.",
       "audits": {
         "manifest-exists": {
           "expectedValue": true,
@@ -388,21 +388,21 @@
           "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
-          "description": "Payment forms marked up with [autocomplete] attributes",
+          "description": "Payment forms marked up with `autocomplete` attributes",
           "category": "UX"
         },
         "login-autocomplete": {
           "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
-          "description": "Login forms marked up with [autocomplete] attributes",
+          "description": "Login forms marked up with `autocomplete` attributes",
           "category": "UX"
         },
         "input-type": {
           "expectedValue": true,
           "weight": 0,
           "comingSoon": true,
-          "description": "Input fields use appropriate [type] attributes for custom keyboards",
+          "description": "Input fields use appropriate `type` attributes for custom keyboards",
           "category": "UX"
         }
       }

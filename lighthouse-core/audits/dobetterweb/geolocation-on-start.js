@@ -36,8 +36,7 @@ class GeolocationOnStart extends Audit {
       description: 'Page does not automatically request geolocation on page load',
       helpText: 'Users are mistrustful of or confused by sites that request their ' +
           'location without context. Consider tying the request to user gestures instead. ' +
-          '<a href="https://developers.google.com/web/tools/lighthouse/audits/' +
-          'geolocation-on-load" target="_blank" rel="noopener">Learn more</a>.',
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/geolocation-on-load).',
       requiredArtifacts: ['GeolocationOnStart']
     };
   }

@@ -27,7 +27,7 @@ class ManifestDisplay extends Audit {
     return {
       category: 'Manifest',
       name: 'manifest-display',
-      description: 'Manifest\'s display property is set',
+      description: 'Manifest\'s `display` property is set',
       requiredArtifacts: ['Manifest']
     };
   }

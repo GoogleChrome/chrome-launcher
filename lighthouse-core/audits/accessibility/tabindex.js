@@ -32,7 +32,7 @@ class TabIndex extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'tabindex',
-      description: 'No element has a tabindex attribute greater than 0',
+      description: 'No element has a `tabindex` attribute greater than 0',
       requiredArtifacts: ['Accessibility']
     };
   }

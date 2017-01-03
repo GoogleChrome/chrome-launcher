@@ -71,4 +71,44 @@ describe('Report', () => {
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
     assert.ok(html.includes('export-button'), 'page includes export button');
   });
+
+  it('sanitizes JSON input', () => {
+    const modifiedResults = Object.assign({}, sampleResults);
+
+    const item = {
+      score: false,
+      displayValue: '',
+      rawValue: false,
+      name: 'bad-actor-audit-name',
+      category: 'Fake Audit Aggregation',
+      description: 'Report does not inject unknown HTML but `renders code`',
+      helpText: '`Code like this` and [links](http://example.com) should be transformed. ' +
+          'but images (<img src="test.gif" onerror="alert(10)">) and <b>html should not</b>.'
+    };
+
+    modifiedResults.audits['bad-actor-audit-name'] = item;
+
+    modifiedResults.aggregations.push({
+      name: 'Fake Audit Aggregation',
+      score: [{
+        overall: 0,
+        name: 'Blah blah',
+        description: item.description,
+        subItems: [item]
+      }]
+    });
+
+
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(modifiedResults);
+
+    assert.ok(html.includes('but <code>renders code</code>'), 'code blocks transformed');
+    assert.ok(html.includes('<code>Code like this</code>'), 'code blocks transformed');
+    assert.ok(html.includes(
+        '<a href="http://example.com" target="_blank" rel="noopener" title="links">links</a>'),
+        'anchors are transformed');
+    assert.ok(!html.includes(
+        '<img src="test.gif" onerror="alert(10)">'), 'non-recognized HTML is sanitized');
+    assert.ok(!html.includes('<b>html should not</b>'), 'non-recognized HTML is sanitized');
+  });
 });

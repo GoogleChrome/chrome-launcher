@@ -22,6 +22,7 @@ const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
 const fs = require('fs');
 const path = require('path');
+const marked = require('marked');
 
 const RATINGS = {
   GOOD: {label: 'good', minScore: 75},
@@ -60,15 +61,6 @@ class ReportGenerator {
     // Converts a name to a link.
     Handlebars.registerHelper('nameToLink', name => {
       return name.toLowerCase().replace(/\s/, '-');
-    });
-
-    // Helper for either show an "✘" or "✔" booleans, or simply returning the
-    // value if it's of any other type.
-    Handlebars.registerHelper('getItemValue', value => {
-      if (typeof value === 'boolean') {
-        return value ? '&#10004;' : '&#10008;';
-      }
-      return value;
     });
 
     // Figures out the total score for an aggregation
@@ -122,6 +114,38 @@ class ReportGenerator {
         }
       }
       return arg;
+    });
+
+    // eslint-disable-next-line no-unused-vars
+    Handlebars.registerHelper('sanitize', function(str, opts) {
+      // const isViewer = opts.data.root.reportContext === 'viewer';
+
+      // Allow the report to inject HTML, but sanitize it first.
+      // Viewer in particular, allows user's to upload JSON. To mitigate against
+      // XSS, define a renderer that only transforms links and code snippets.
+      // All other markdown ad HTML is ignored.
+      const renderer = new marked.Renderer();
+      renderer.link = (href, title, text) => {
+        title = title || text;
+        return `<a href="${href}" target="_blank" rel="noopener" title="${title}">${text}</a>`;
+      };
+      renderer.codespan = function(str) {
+        return `<code>${str}</code>`;
+      };
+      // Nuke wrapper <p> tag that gets generated.
+      renderer.paragraph = function(str) {
+        return str;
+      };
+
+      try {
+        str = marked(str, {renderer, sanitize: true});
+      } catch (e) {
+        // Ignore fatal errors from marked js.
+      }
+
+      // The input str has been santized and transformed. Mark it as safe so
+      // handlebars renders the text as HTML.
+      return new Handlebars.SafeString(str);
     });
   }
 

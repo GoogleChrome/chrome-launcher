@@ -52,8 +52,7 @@ class NoMutationEventsAudit extends Audit {
       name: 'no-mutation-events',
       description: 'Site does not use Mutation Events in its own scripts',
       helpText: 'Mutation Events are deprecated and harm performance. Consider using Mutation ' +
-          'Observers instead. <a href="https://developers.google.com/web/tools/lighthouse' +
-          '/audits/mutation-events" target="_blank" rel="noopener">Learn more</a>.',
+          'Observers instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/mutation-events).',
       requiredArtifacts: ['URL', 'EventListeners']
     };
   }

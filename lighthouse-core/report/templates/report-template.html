@@ -77,7 +77,7 @@ limitations under the License.
       <section class="js-breakdown aggregations" id="{{nameToLink this.name}}">
         <header class="aggregations__header">
           <h1>{{ this.name }}</h1>
-          <p class="aggregations__desc">{{ this.description }}</p>
+          <p class="aggregations__desc">{{ sanitize this.description }}</p>
           {{#if this.scored}}
           <div class="section-result">
             <span class="section-result__score score-{{ getTotalScoreRating this }}-bg">
@@ -97,7 +97,7 @@ limitations under the License.
             <header class="aggregation__header">
               <h2>{{ aggregation.name }}</h2>
               {{#if aggregation.description }}
-                <p class="aggregation__desc">{{{ aggregation.description }}}</p>
+                <p class="aggregation__desc">{{ sanitize aggregation.description }}</p>
               {{/if}}
             </header>
             {{/if}}
@@ -111,7 +111,7 @@ limitations under the License.
                       <strong class="subitem__category">{{ subItem.category }}:</strong>
                     {{/unless}}
 
-                    {{ subItem.description }}
+                    {{ sanitize subItem.description }}
 
                     {{~#if (and subItem.displayValue (not (is-bool subItem.displayValue))) ~}}
                       <strong class="subitem__raw-value">: {{ subItem.displayValue }}</strong>
@@ -128,14 +128,14 @@ limitations under the License.
                     {{#if subItem.helpText }}
                       <input type="checkbox" class="subitem__help-toggle" title="Toggle help text"  {{#if (shouldShowHelpText subItem.score)}}checked{{/if}}>
                       <span class="subitem__help">
-                        {{{ subItem.helpText }}}
+                        {{ sanitize subItem.helpText }}
                       </span>
                     {{/if}}
                   </p>
 
                   {{#if subItem.debugString }}
                     <div class="subitem__debug">
-                      {{{ subItem.debugString }}}
+                      {{ subItem.debugString }}
                     </div>
                   {{/if}}
 
@@ -151,7 +151,7 @@ limitations under the License.
                         {{/if}}
                       {{else}}
                         <span class="subitem-result__points score-{{ getItemRating subItem.score }}-bg">
-                          {{{ getItemValue subItem.score }}}
+                          {{ subItem.score }}
                         </span>
                       {{/if}}
                     {{/if}}

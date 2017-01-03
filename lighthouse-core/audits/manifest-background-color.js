@@ -28,7 +28,7 @@ class ManifestBackgroundColor extends Audit {
     return {
       category: 'Manifest',
       name: 'manifest-background-color',
-      description: 'Manifest contains background_color',
+      description: 'Manifest contains `background_color`',
       requiredArtifacts: ['Manifest']
     };
   }

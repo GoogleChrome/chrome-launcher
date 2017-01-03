@@ -34,12 +34,11 @@ class NoConsoleTimeAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'no-console-time',
-      description: 'Site does not use console.time() in its own scripts',
-      helpText: 'Consider using <code>performance.mark()</code> and <code>performance.measure()' +
-          '</code> from the User Timing API instead. They provide high-precision timestamps, ' +
+      description: 'Site does not use `console.time()` in its own scripts',
+      helpText: 'Consider using `performance.mark()` and `performance.measure()` ' +
+          'from the User Timing API instead. They provide high-precision timestamps, ' +
           'independent of the system clock, and are integrated in the Chrome DevTools Timeline. ' +
-          '<a href="https://developers.google.com/web/tools/lighthouse/audits/console-time" ' +
-          'target="_blank" rel="noopener">Learn more</a>.',
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/console-time).',
       requiredArtifacts: ['URL', 'ConsoleTimeUsage']
     };
   }

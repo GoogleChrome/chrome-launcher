@@ -42,10 +42,9 @@ class PassiveEventsAudit extends Audit {
       category: 'JavaScript',
       name: 'uses-passive-event-listeners',
       description: 'Site uses passive listeners to improve scrolling performance',
-      helpText: 'Consider marking your touch and wheel event listeners as <code>passive</code> ' +
-          'to improve your page\'s scroll performance. <a href="https://developers.google.com/' +
-          'web/tools/lighthouse/audits/passive-event-listeners" target="_blank" ' +
-          'rel="noopener">Learn more</a>.',
+      helpText: 'Consider marking your touch and wheel event listeners as `passive` ' +
+          'to improve your page\'s scroll performance. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/passive-event-listeners).',
       requiredArtifacts: ['URL', 'EventListeners']
     };
   }

@@ -30,9 +30,9 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       category: 'Performance',
       name: 'external-anchors-use-rel-noopener',
       description: 'Site opens external anchors using rel="noopener"',
-      helpText: 'Open new tabs using <code>rel="noopener"</code> to improve performance and ' +
-          'prevent security vulnerabilities. <a href="https://developers.google.com/web/tools/' +
-          'lighthouse/audits/noopener" target="_blank" rel="noopener">Learn more</a>.',
+      helpText: 'Open new tabs using `rel="noopener"` to improve performance and ' +
+          'prevent security vulnerabilities. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/noopener).',
       requiredArtifacts: ['URL', 'AnchorsWithNoRelNoopener']
     };
   }

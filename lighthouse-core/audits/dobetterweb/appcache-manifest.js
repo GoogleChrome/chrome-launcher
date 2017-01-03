@@ -33,7 +33,7 @@ class AppCacheManifestAttr extends Audit {
       category: 'Offline',
       name: 'appcache-manifest',
       description: 'Site does not use Application Cache',
-      helpText: 'Application Cache has been <a href="https://html.spec.whatwg.org/multipage/browsers.html#offline" target="_blank">deprecated</a> by <a href="https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers" target="_blank">Service Workers</a>. Consider implementing an offline solution using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Cache" target="_blank">Cache Storage API</a>.',
+      helpText: 'Application Cache has been [deprecated](https://html.spec.whatwg.org/multipage/browsers.html#offline) by [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers). Consider implementing an offline solution using the [Cache Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).',
       requiredArtifacts: ['AppCacheManifest']
     };
   }

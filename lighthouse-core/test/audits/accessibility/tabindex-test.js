@@ -64,6 +64,6 @@ describe('Accessibility: tabindex audit', () => {
     };
 
     const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'No element has a tabindex attribute greater than 0');
+    assert.equal(output.description, 'No element has a `tabindex` attribute greater than 0');
   });
 });

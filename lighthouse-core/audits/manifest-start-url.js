@@ -27,7 +27,7 @@ class ManifestStartUrl extends Audit {
     return {
       category: 'Manifest',
       name: 'manifest-start-url',
-      description: 'Manifest contains start_url',
+      description: 'Manifest contains `start_url`',
       requiredArtifacts: ['Manifest']
     };
   }

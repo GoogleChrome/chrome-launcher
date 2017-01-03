@@ -35,11 +35,10 @@ class NoDateNowAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'no-datenow',
-      description: 'Site does not use Date.now() in its own scripts',
-      helpText: 'Consider using <code>performance.now()</code> from the User Timing API ' +
+      description: 'Site does not use `Date.now()` in its own scripts',
+      helpText: 'Consider using `performance.now()` from the User Timing API ' +
           'instead. It provides high-precision timestamps, independent of the system ' +
-          'clock. <a href="https://developers.google.com/web/tools/lighthouse/audits/' +
-          'date-now" target="_blank" rel="noopener">Learn more</a>.',
+          'clock. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/date-now).',
       requiredArtifacts: ['URL', 'DateNowUse']
     };
   }

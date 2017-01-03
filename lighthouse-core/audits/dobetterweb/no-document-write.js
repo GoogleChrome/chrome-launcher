@@ -35,9 +35,8 @@ class NoDocWriteAudit extends Audit {
       name: 'no-document-write',
       description: 'Site does not use document.write()',
       helpText: 'For users on slow connections, external scripts dynamically injected via ' +
-          '<code>document.write()</code> can delay page load by tens of seconds. ' +
-          '<a href="https://developers.google.com/web/tools/lighthouse/audits/' +
-          'document-write" target="_blank" rel="noopener">Learn more</a>.',
+          '`document.write()` can delay page load by tens of seconds. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/document-write).',
       requiredArtifacts: ['DocWriteUse']
     };
   }
