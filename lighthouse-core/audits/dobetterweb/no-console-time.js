@@ -61,10 +61,25 @@ class NoConsoleTimeAudit extends Audit {
       });
     }
 
+    let debugString;
+
     const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usage from other hosts and keep eval'd code.
     const results = artifacts.ConsoleTimeUsage.usage.filter(err => {
-      return err.isEval ? !!err.url : new URL(err.url).host === pageHost;
+      if (err.isEval) {
+        return !!err.url;
+      }
+
+      // If the violation doesn't have a valid url, don't filter it out, but
+      // warn the user that we don't know what the callsite is.
+      try {
+        return new URL(err.url).host === pageHost;
+      } catch (e) {
+        debugString = 'Lighthouse was unable to determine if some API uses ' +
+                      'were made by this page. It\'s possible a Chrome extension' +
+                      'content script or other eval\'d code is calling this API.';
+        return true;
+      }
     }).map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`
@@ -76,7 +91,8 @@ class NoConsoleTimeAudit extends Audit {
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
         value: results
-      }
+      },
+      debugString
     });
   }
 }

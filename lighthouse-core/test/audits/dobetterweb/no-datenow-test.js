@@ -113,5 +113,6 @@ describe('Page does not use Date.now()', () => {
 
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.ok(auditResult.debugString, 'includes debugString');
   });
 });

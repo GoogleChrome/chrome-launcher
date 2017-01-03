@@ -84,4 +84,20 @@ describe('Page does not use console.time()', () => {
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 3);
   });
+
+  it('includes results when there is no .url', () => {
+    const auditResult = NoConsoleTimeAudit.audit({
+      ConsoleTimeUsage: {
+        usage: [
+          {line: 10, col: 1},
+          {line: 2, col: 22}
+        ]
+      },
+      URL: {finalUrl: URL},
+    });
+
+    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.ok(auditResult.debugString, 'includes debugString');
+  });
 });

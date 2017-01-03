@@ -702,7 +702,8 @@ class Driver {
                 'Driver failure: Expected evaluateAsync results to be an array ' +
                 `but got "${JSON.stringify(result)}" instead.`);
           }
-          return result;
+          // Filter out usage from extension content scripts.
+          return result.filter(item => !item.isExtension);
         });
     };
 
@@ -738,24 +739,36 @@ function captureJSCallUsage(funcRef, set) {
       // First frame is the function we injected (the one that just threw).
       // Second, is the actual callsite of the funcRef we're after.
       const callFrame = structStackTrace[1];
-      let url = callFrame.getFileName();
+      let url = callFrame.getFileName() || callFrame.getEvalOrigin();
       const line = callFrame.getLineNumber();
       const col = callFrame.getColumnNumber();
       const isEval = callFrame.isEval();
+      let isExtension = false;
       const stackTrace = structStackTrace.slice(1).map(callsite => callsite.toString());
 
-      // If we don't have an URL, (e.g. eval'd code), use the last entry in the
-      // stack trace to give some context: eval(<context>):<line>:<col>
+      // If we don't have an URL, (e.g. eval'd code), use the 2nd entry in the
+      // stack trace. First is eval context: eval(<context>):<line>:<col>.
+      // Second is the callsite where eval was called.
       // See https://crbug.com/646849.
-      if (!url) {
+      if (isEval) {
+        url = stackTrace[1];
+      }
+
+      // Chrome extension content scripts can produce an empty .url and
+      // "<anonymous>:line:col" for the first entry in the stack trace.
+      if (stackTrace[0].startsWith('<anonymous>')) {
+        // Note: Although captureFunctionCallSites filters out crx usage,
+        // filling url here provides context. We may want to keep those results
+        // some day.
         url = stackTrace[0];
+        isExtension = true;
       }
 
       // TODO: add back when we want stack traces.
       // Stack traces were removed from the return object in
       // https://github.com/GoogleChrome/lighthouse/issues/957 so callsites
       // would be unique.
-      return {url, args, line, col, isEval}; // return value is e.stack
+      return {url, args, line, col, isEval, isExtension}; // return value is e.stack
     };
     const e = new __nativeError(`__called ${funcRef.name}__`);
     set.add(JSON.stringify(e.stack));

@@ -108,6 +108,7 @@ function dateNowTest() {
     return Date.now();
   }
   helloDate();
+  const d = Date.now(); // FAIL
   eval('Date.now()'); // FAIL
   new Function('Date.now()')() // FAIL
 }
