@@ -878,7 +878,7 @@ body {
   width: auto;
 }
 
-:root[data-report-context="devtools"] report-body__aggregations-container > section:first-child {
+:root[data-report-context="devtools"] .report-body__aggregations-container > section:first-child {
   padding-top: calc(var(--heading-line-height) / 3);
 }
 :root[data-report-context="devtools"] .report-body__menu-container {
