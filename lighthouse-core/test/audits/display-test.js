@@ -31,6 +31,8 @@ describe('Mobile-friendly: display audit', () => {
     assert.equal(Audit.hasRecommendedValue('fullscreen'), true);
     assert.equal(Audit.hasRecommendedValue('standalone'), true);
     assert.equal(Audit.hasRecommendedValue('browser'), true);
+    assert.equal(Audit.hasRecommendedValue('minimal-ui'), true);
+    assert.equal(Audit.hasRecommendedValue('different'), false);
     assert.equal(Audit.hasRecommendedValue(undefined), false);
   });
 
