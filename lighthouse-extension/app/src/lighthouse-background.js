@@ -96,6 +96,15 @@ function updateBadgeUI(optUrl) {
 }
 
 /**
+ * Removes artifacts from the result object for portability
+ * @param {!Object} results Lighthouse results object
+ */
+function filterOutArtifacts(result) {
+  // strip them out, as the networkRecords artifact has circular structures
+  result.artifacts = undefined;
+}
+
+/**
  * @param {!Connection} connection
  * @param {string} url
  * @param {!Object} options Lighthouse options.
@@ -120,6 +129,7 @@ window.runLighthouseForConnection = function(connection, url, options, requested
     .then(result => {
       lighthouseIsRunning = false;
       updateBadgeUI();
+      filterOutArtifacts(result);
       return result;
     })
     .catch(err => {

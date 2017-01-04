@@ -20,6 +20,7 @@
 
 const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars');
+const stringify = require('json-stringify-safe');
 const fs = require('fs');
 const path = require('path');
 const marked = require('marked');
@@ -251,7 +252,7 @@ class ReportGenerator {
       errMessage: err.message,
       errStack: err.stack,
       css: this.getReportCSS(),
-      results: JSON.stringify(results, null, 2)
+      results: stringify(results, null, 2)
     });
   }
 
