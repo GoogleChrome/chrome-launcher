@@ -32,7 +32,21 @@ const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
 const Formatter = require('../lighthouse-core/formatters/formatter');
 const log = require('../lighthouse-core/lib/log');
-const os = require('os');
+
+const green = '\x1B[32m';
+const red = '\x1B[31m';
+const yellow = '\x1b[33m';
+const purple = '\x1b[95m';
+const reset = '\x1B[0m';
+const bold = '\x1b[1m';
+
+const isWindows = process.platform === 'win32';
+
+// See https://github.com/GoogleChrome/lighthouse/issues/1228
+const tick = isWindows ? '\u221A' : '✓';
+const cross = isWindows ? '\u00D7' : '✘';
+const whiteSmallSquare = isWindows ? '\u0387' : '▫';
+const doubleLightHorizontal = '──';
 
 /**
  * Verify output path to use, either stdout or a file path.
@@ -50,22 +64,8 @@ function formatAggregationResultItem(score: boolean | number | string, suffix?: 
   // Until we only support node 6 we can not use default args.
   suffix = suffix || '';
 
-  const green = '\x1B[32m';
-  const red = '\x1B[31m';
-  const yellow = '\x1b[33m';
-  const purple = '\x1b[95m';
-  const reset = '\x1B[0m';
-
   if (typeof score === 'boolean') {
-    if (os.platform() == 'win32') {
-      const check = `${green}\u221A${reset}`;
-      const fail = `${red}\u00D7${reset}`;
-      return score ? check : fail;
-    } else {
-      const check = `${green}✓${reset}`;
-      const fail = `${red}✘${reset}`;
-      return score ? check : fail;
-    }
+    return score ? `${green}${tick}${reset}` : `${red}${cross}${reset}`;
   }
   if (typeof score !== 'number') {
     return `${purple}${score}${reset}`;
@@ -98,20 +98,12 @@ function createOutput(results: Results, outputMode: OutputMode): string {
   }
 
   // Pretty printed.
-  const bold = '\x1b[1m';
-  const reset = '\x1B[0m';
   const version = results.lighthouseVersion;
-
   let output = `\n\n${bold}Lighthouse (${version}) results:${reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
     const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : '';
-
-    if (os.platform() == 'win32') {
-      output += `\u0387 ${bold}${aggregation.name}${reset}${total}\n\n`;
-    } else {
-      output += `▫ ${bold}${aggregation.name}${reset}${total}\n\n`;
-    }
+    output += `${whiteSmallSquare} ${bold}${aggregation.name}${reset}${total}\n\n`;
 
     aggregation.score.forEach(item => {
       const score = (item.overall * 100).toFixed(0);
@@ -132,7 +124,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
         if (auditResult.comingSoon === true)
           return;
 
-        let lineItem = ` ── ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
+        let lineItem = ` ${doubleLightHorizontal} ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
         if (auditResult.displayValue) {
           lineItem += ` (${bold}${auditResult.displayValue}${reset})`;
         }
