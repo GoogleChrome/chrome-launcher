@@ -64,5 +64,8 @@ module.exports = {
     return Promise.resolve({
       schemeIsCryptographic: true
     });
+  },
+  blockUrlPatterns() {
+    return Promise.resolve();
   }
 };
