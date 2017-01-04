@@ -18,94 +18,61 @@
 'use strict';
 /**
  * @fileoverview Server script for Project Performance Experiment.
- * Start Server by calling startServer(port).
  *
- * Functionalities:
- *   Host report pages.
- *     Report pages should be stored in ./src/reports
- *     Report pages can be accessed via URL http://localhost:[PORT]/reports/[REPORT_FILENAME]
+ * Functionality:
+ *   Host and open report page.
  */
 
 const http = require('http');
-const fs = require('fs');
 const parse = require('url').parse;
 const path = require('path');
+const opn = require('opn');
 const log = require('../../lighthouse-core/lib/log');
+const ReportGenerator = require('../../lighthouse-core/report/report-generator');
 
-const ROOT = `${__dirname}/src`;
-const FOLDERS = {
-  REPORTS: `${ROOT}/reports`
-};
-
-const server = http.createServer(requestHandler);
-server.on('error', err => log.error('PerformanceXServer', err.code, err));
+/**
+ * Start the server with an arbitrary port and open report page in the default browser.
+ * @param {!Object} lighthouseParams
+ * @param {!Object} results
+ * @return {!Promise<string>} Promise that resolves when server is closed
+ */
+let lhResults;
+function serveAndOpenReport(lighthouseParams, results) {
+  lhResults = results;
+  return new Promise(resolve => {
+    const server = http.createServer(requestHandler);
+    server.listen(0);
+    server.on('listening', () => {
+      opn(`http://localhost:${server.address().port}/`);
+    });
+    server.on('error', err => log.error('PerformanceXServer', err.code, err));
+    server.on('close', resolve);
+    process.on('SIGINT', () => {
+      server.close();
+    });
+  });
+}
 
 function requestHandler(request, response) {
-  const pathname = parse(request.url).pathname;
+  const pathname = path.normalize(parse(request.url).pathname);
 
-  // Only files inside src are accessible
-  const filePath = (path.normalize(pathname).startsWith('../')) ? '' : `${ROOT}${pathname}`;
-  fs.readFile(filePath, 'binary', readFileCallback);
-
-  function readFileCallback(err, file) {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        sendResponse(404, `404 - File not found. ${pathname}`);
-        return;
-      }
-      log.error('PerformanceXServer', `Unable to read local file ${filePath}:`, err);
-      sendResponse(500, '500 - Internal Server Error');
-      return;
-    }
-    sendResponse(200, file);
-  }
-
-  function sendResponse(statusCode, data) {
-    let headers;
-    if (filePath) {
-      if (filePath.endsWith('.html')) {
-        headers = {'Content-Type': 'text/html'};
-      } else if (filePath.endsWith('.json')) {
-        headers = {'Content-Type': 'text/json'};
-      }
-    }
-    response.writeHead(statusCode, headers);
-    response.write(data, 'binary');
+  if (pathname === '/') {
+    reportRequestHandler(request, response);
+  } else {
+    response.writeHead(400);
+    response.write('400 - Bad request');
     response.end();
   }
 }
 
-function prepareServer() {
-  for (const folder in FOLDERS) {
-    if (!FOLDERS.hasOwnProperty(folder)) {
-      continue;
-    }
-
-    // Create dirs synchronously. Dirs need to be created before server start.
-    const folderPath = FOLDERS[folder];
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath);
-    }
-  }
-}
-
-/**
- * Start the server if it's not already started.
- * @param {number} port
- * @return {!Promise<number>} Promise that resolves to port the server is listening to
- */
-let portPromise;
-function startServer(port) {
-  if (!portPromise) {
-    portPromise = new Promise(resolve => {
-      prepareServer();
-      server.listen(port, _ => resolve(server.address().port));
-    });
-  }
-  return portPromise;
+function reportRequestHandler(request, response) {
+  const reportGenerator = new ReportGenerator();
+  const html = reportGenerator.generateHTML(lhResults, 'cli');
+  response.writeHead(200, {'Content-Type': 'text/html'});
+  response.write(html);
+  response.end();
 }
 
 module.exports = {
-  startServer,
-  FOLDERS
+  serveAndOpenReport
 };
