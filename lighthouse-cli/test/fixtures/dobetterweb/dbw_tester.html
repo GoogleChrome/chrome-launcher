@@ -30,6 +30,9 @@
   <link rel="stylesheet" href="./dbw_disabled.css" disabled>
   <link rel="import" href="./dbw_partial_a.html">
   <link rel="import" href="./dbw_partial_b.html" async>
+
+  <!-- doesn't actually block first paint but previously was false positive -->
+  <link rel="preload" href="./dbw_tester.css?delay=true" as="style" onload="this.rel = 'stylesheet'">
 </template>
 
 <style>

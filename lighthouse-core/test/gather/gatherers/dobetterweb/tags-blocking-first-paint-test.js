@@ -28,29 +28,57 @@ const traceData = {
       _mimeType: 'text/css',
       _transferSize: 10,
       _startTime: 10,
-      _endTime: 10
+      _endTime: 10,
+      _initiator: {type: 'parser'}
     },
     {
       _url: 'http://google.com/wc/select.html',
       _mimeType: 'text/html',
       _transferSize: 11,
       _startTime: 11,
-      _endTime: 11
+      _endTime: 11,
+      _initiator: {type: 'other'}
     },
     {
       _url: 'http://google.com/js/app.json',
       _mimeType: 'application/json',
       _transferSize: 24,
       _startTime: 24,
-      _endTime: 24
+      _endTime: 24,
+      _initiator: {type: 'script'}
     },
     {
       _url: 'http://google.com/js/app.js',
       _mimeType: 'text/javascript',
       _transferSize: 12,
       _startTime: 12,
-      _endTime: 22
-    }
+      _endTime: 22,
+      _initiator: {type: 'parser'}
+    },
+    {
+      _url: 'http://google.com/wc/import.html',
+      _mimeType: 'text/html',
+      _transferSize: 13,
+      _startTime: 13,
+      _endTime: 13,
+      _initiator: {type: 'script'}
+    },
+    {
+      _url: 'http://google.com/css/ignored.css',
+      _mimeType: 'text/css',
+      _transferSize: 16,
+      _startTime: 16,
+      _endTime: 16,
+      _initiator: {type: 'script'}
+    },
+    {
+      _url: 'http://google.com/js/ignored.js',
+      _mimeType: 'text/javascript',
+      _transferSize: 16,
+      _startTime: 16,
+      _endTime: 16,
+      _initiator: {type: 'script'}
+    },
   ]
 };
 
@@ -78,7 +106,12 @@ describe('First paint blocking tags', () => {
         transferSize: 12,
         startTime: 12,
         endTime: 22
-      }
+      },
+      'http://google.com/wc/import.html': {
+        transferSize: 13,
+        startTime: 13,
+        endTime: 13
+      },
     });
   });
 
