@@ -52,8 +52,10 @@ class FileUploader {
   }
 
   addListeners() {
-    this.placeholder.firstElementChild.addEventListener('click', _ => {
-      this.fileInput.click();
+    this.placeholder.firstElementChild.addEventListener('click', e => {
+      if (e.target.localName !== 'input') {
+        this.fileInput.click();
+      }
     });
 
     // The mouseleave event is more reliable than dragleave when the user drops

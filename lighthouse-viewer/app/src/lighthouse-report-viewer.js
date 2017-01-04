@@ -46,6 +46,7 @@ class LighthouseViewerReport {
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onExport = this.onExport.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onInputChange = this.onInputChange.bind(this);
 
     this._copyAttempt = false;
 
@@ -56,7 +57,7 @@ class LighthouseViewerReport {
     this._isNewReport = true;
 
     this.initUI();
-    this.loadFromURL();
+    this.loadFromDeepLink();
   }
 
   initUI() {
@@ -87,6 +88,11 @@ class LighthouseViewerReport {
       const dropdown = document.querySelector('.export-dropdown');
       dropdown.addEventListener('click', this.onExport);
     }
+
+    const gistURLInput = document.querySelector('.js-gist-url');
+    if (gistURLInput) {
+      gistURLInput.addEventListener('change', this.onInputChange);
+    }
   }
 
   enableShareButton() {
@@ -103,7 +109,7 @@ class LighthouseViewerReport {
     this.exportButton.classList.remove('active');
   }
 
-  loadFromURL() {
+  loadFromDeepLink() {
     // Pull gist id from URL and render it.
     const params = new URLSearchParams(location.search);
     const gistId = params.get('gist');
@@ -229,7 +235,7 @@ class LighthouseViewerReport {
       // We want to write our own data to the clipboard, not the user's text selection.
       e.preventDefault();
       e.clipboardData.setData('text/plain', JSON.stringify(this.json, null, 2));
-      logger.log('Report copied to clipboard');
+      logger.log('Report JSON copied to clipboard');
     }
 
     this._copyAttempt = false;
@@ -265,6 +271,17 @@ class LighthouseViewerReport {
   onPaste(e) {
     e.preventDefault();
 
+    // Try paste as gist URL.
+    try {
+      const url = new URL(e.clipboardData.getData('text'));
+      this._loadFromGistURL(url);
+
+      ga('send', 'event', 'report', 'paste-link');
+    } catch (err) {
+      // noop
+    }
+
+    // Try paste as json content.
     try {
       const json = JSON.parse(e.clipboardData.getData('text'));
       this.replaceReportHTML(json);
@@ -281,6 +298,46 @@ class LighthouseViewerReport {
   onExportButtonClick(e) {
     e.target.classList.toggle('active');
     document.addEventListener('keydown', this.onKeyDown);
+  }
+
+  /**
+   * Handles changes to the gist url input.
+   */
+  onInputChange(e) {
+    e.stopPropagation();
+
+    if (!e.target.value) {
+      return;
+    }
+
+    try {
+      this._loadFromGistURL(e.target.value);
+    } catch (err) {
+      logger.error('Invalid URL');
+    }
+  }
+
+  /**
+   * Updates URL with user's gist and loads from github.
+   * @param {string} url Gist URL.
+   */
+  _loadFromGistURL(url) {
+    try {
+      url = new URL(url);
+
+      if (url.origin !== 'https://gist.github.com') {
+        logger.error('URL was not a gist');
+        return;
+      }
+
+      const match = url.pathname.match(/[a-f0-9]{5,}/);
+      if (match) {
+        history.pushState({}, null, `${APP_URL}?gist=${match[0]}`);
+        this.loadFromDeepLink();
+      }
+    } catch (err) {
+      logger.error('Invalid URL');
+    }
   }
 
   /**
