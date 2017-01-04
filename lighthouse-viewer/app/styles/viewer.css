@@ -79,7 +79,7 @@
 }
 .viewer-placeholder__help {
   margin-top: 12px;
-  line-height: 1.4;
+  line-height: 1.6;
 }
 .viewer-placeholder-logo {
   width: 140px;
@@ -138,9 +138,6 @@
 @media screen and (min-width: 636px) {
   .viewer-placeholder-inner {
     padding: 40px 32px;
-  }
-  .viewer-placeholder__help::before {
-    content: 'Instructions: ';
   }
   .viewer-placeholder-logo {
     margin-right: 16px;

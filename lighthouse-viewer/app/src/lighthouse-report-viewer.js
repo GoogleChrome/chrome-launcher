@@ -235,7 +235,7 @@ class LighthouseViewerReport {
       // We want to write our own data to the clipboard, not the user's text selection.
       e.preventDefault();
       e.clipboardData.setData('text/plain', JSON.stringify(this.json, null, 2));
-      logger.log('Report copied to clipboard');
+      logger.log('Report JSON copied to clipboard');
     }
 
     this._copyAttempt = false;
