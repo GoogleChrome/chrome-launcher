@@ -97,7 +97,8 @@ function createOutput(results: Results, outputMode: OutputMode): string {
   let output = `\n\n${bold}Lighthouse (${version}) results:${reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
-    output += `▫ ${bold}${aggregation.name}${reset}\n\n`;
+		const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : ''
+    output += `▫ ${bold}${aggregation.name}${reset}${total}\n\n`;
 
     aggregation.score.forEach(item => {
       const score = (item.overall * 100).toFixed(0);

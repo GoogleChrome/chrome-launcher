@@ -457,4 +457,12 @@ describe('Aggregate', () => {
     assert.equal(output.score[0].overall, 1);
     return assert.equal(output.score[0].subItems.length, 1);
   });
+
+  it('counts a total', () => {
+    const scores = [
+      {overall: 1},
+      {overall: 0.5}
+    ];
+    assert.equal(Aggregate.getTotal(scores), 0.75);
+  });
 });
