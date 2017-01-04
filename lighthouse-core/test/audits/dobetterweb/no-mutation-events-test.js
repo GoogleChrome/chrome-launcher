@@ -65,4 +65,24 @@ describe('Page does not use mutation events', () => {
     assert.ok(auditResult.extendedInfo.value[1].url === undefined);
     assert.equal(auditResult.extendedInfo.value.length, 4);
   });
+
+  it('fails when listener has a bad url property', () => {
+    const auditResult = NoMutationEventsAudit.audit({
+      EventListeners: [
+        {
+          objectName: 'Window',
+          type: 'DOMNodeInserted',
+          useCapture: false,
+          passive: false,
+          url: 'eval(<context>):54:21',
+          line: 54,
+          col: 21,
+        },
+      ],
+      URL: {finalUrl: URL},
+    });
+    assert.equal(auditResult.rawValue, false);
+    assert.ok(auditResult.extendedInfo.value[0].url === 'eval(<context>):54:21');
+    assert.equal(auditResult.extendedInfo.value.length, 1);
+  });
 });

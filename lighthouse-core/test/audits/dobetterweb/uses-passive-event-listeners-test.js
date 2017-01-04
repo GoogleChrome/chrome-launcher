@@ -73,4 +73,25 @@ describe('Page uses passive events listeners where applicable', () => {
     assert.ok(auditResult.extendedInfo.value[1].url === undefined);
     assert.equal(auditResult.extendedInfo.value.length, 6);
   });
+
+  it('fails when listener has a bad url property', () => {
+    const auditResult = PassiveEventsAudit.audit({
+      EventListeners: [
+        {
+          objectName: 'Window',
+          type: 'wheel',
+          useCapture: false,
+          passive: false,
+          url: 'eval(<context>):54:21',
+          handler: {description: 'x = 1;'},
+          line: 54,
+          col: 21,
+        },
+      ],
+      URL: {finalUrl: URL},
+    });
+    assert.equal(auditResult.rawValue, false);
+    assert.ok(auditResult.extendedInfo.value[0].url === 'eval(<context>):54:21');
+    assert.equal(auditResult.extendedInfo.value.length, 1);
+  });
 });

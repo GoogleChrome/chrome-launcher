@@ -66,13 +66,18 @@ class NoMutationEventsAudit extends Audit {
       return NoMutationEventsAudit.generateAuditResult(artifacts.EventListeners);
     }
 
+    let debugString;
     const listeners = artifacts.EventListeners;
-
-    const pageHost = new URL(artifacts.URL.finalUrl).host;
 
     const results = listeners.filter(loc => {
       const isMutationEvent = this.MUTATION_EVENTS.indexOf(loc.type) !== -1;
-      const sameHost = loc.url ? new URL(loc.url).host === pageHost : true;
+      let sameHost = URL.hostsMatch(artifacts.URL.finalUrl, loc.url);
+
+      if (!URL.isValid(loc.url)) {
+        sameHost = true;
+        debugString = URL.INVALID_URL_DEBUG_STRING;
+      }
+
       return sameHost && isMutationEvent;
     }).map(EventHelpers.addFormattedCodeSnippet);
 
@@ -83,7 +88,8 @@ class NoMutationEventsAudit extends Audit {
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
         value: groupedResults
-      }
+      },
+      debugString
     });
   }
 }
