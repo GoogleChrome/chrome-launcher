@@ -250,7 +250,8 @@ function handleError(err: LighthouseError) {
 }
 
 function runLighthouse(url: string,
-                       flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any, outputPath: string, view: boolean},
+                       flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
+                         outputPath: string, view: boolean, saveArtifacts: boolean, saveAssets: boolean},
                        config: Object): Promise<undefined> {
 
   let chromeLauncher: ChromeLauncher;
@@ -258,6 +259,19 @@ function runLighthouse(url: string,
     .then(() => getDebuggableChrome(flags))
     .then(chrome => chromeLauncher = chrome)
     .then(() => lighthouse(url, flags, config))
+    .then((results: Results) => {
+      // delete artifacts from result so reports won't include artifacts.
+      const artifacts = results.artifacts;
+      results.artifacts = undefined;
+      
+      if (flags.saveArtifacts) {
+        assetSaver.saveArtifacts(artifacts);
+      }
+      if (flags.saveAssets) {
+        return assetSaver.saveAssets({url: results.url}, artifacts).then(() => results);
+      }
+      return results;
+    })
     .then((results: Results) => Printer.write(results, flags.output, flags.outputPath))
     .then((results: Results) => {
       if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
@@ -267,7 +281,6 @@ function runLighthouse(url: string,
       return results;
     })
     .then((results: Results) => {
-      // If --view, host this experiment and open report.html in the default browser
       if (flags.view) {
         return performanceXServer.serveAndOpenReport({url, flags, config}, results);
       }

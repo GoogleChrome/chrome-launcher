@@ -21,6 +21,7 @@ const Config = require('../config/config');
 const Audit = require('../audits/audit');
 const assert = require('assert');
 const path = require('path');
+const computedArtifacts = require('../gather/gather-runner').instantiateComputedArtifacts();
 
 /* eslint-env mocha */
 
@@ -293,6 +294,77 @@ describe('Runner', () => {
       const auditExpectedName = path.basename(auditFilename, '.js');
       const AuditClass = require(auditPath);
       assert.strictEqual(AuditClass.meta.name, auditExpectedName);
+    });
+  });
+
+  it('results include artifacts when given artifacts and audits', () => {
+    const url = 'https://example.com';
+    const config = new Config({
+      audits: [
+        'is-on-https'
+      ],
+
+      artifacts: {
+        HTTPS: {
+          value: true
+        }
+      }
+    });
+
+    return Runner.run({}, {url, config}).then(results => {
+      assert.strictEqual(results.artifacts.HTTPS.value, true);
+
+      for (const method of Object.keys(computedArtifacts)) {
+        assert.ok(results.artifacts.hasOwnProperty(method));
+      }
+    });
+  });
+
+  it('results include artifacts when given passes and audits', () => {
+    const url = 'https://example.com';
+    const config = new Config({
+      passes: [{
+        gatherers: ['https']
+      }],
+
+      audits: [
+        'is-on-https'
+      ]
+    });
+
+    return Runner.run(null, {url, config, driverMock}).then(results => {
+      // Check whether non-computedArtifacts attributes are returned
+      assert.ok(results.artifacts.HTTPS);
+
+      for (const method of Object.keys(computedArtifacts)) {
+        assert.ok(results.artifacts.hasOwnProperty(method));
+      }
+    });
+  });
+
+  it('results include artifacts when given auditResults', () => {
+    const url = 'https://example.com';
+    const config = new Config({
+      auditResults: [{
+        name: 'is-on-https',
+        rawValue: true,
+        score: true,
+        displayValue: ''
+      }],
+
+      artifacts: {
+        HTTPS: {
+          value: true
+        }
+      }
+    });
+
+    return Runner.run(null, {url, config, driverMock}).then(results => {
+      assert.strictEqual(results.artifacts.HTTPS.value, true);
+
+      for (const method of Object.keys(computedArtifacts)) {
+        assert.ok(results.artifacts.hasOwnProperty(method));
+      }
     });
   });
 });
