@@ -106,12 +106,16 @@ export function linux() {
     'google-chrome',
   ];
   executables.forEach((executable: string) => {
-    const chromePath = execFileSync('which', [executable])
-      .toString()
-      .split(newLineRegex)[0];
+    try {
+      const chromePath = execFileSync('which', [executable])
+        .toString()
+        .split(newLineRegex)[0];
 
-    if (canAccess(chromePath)) {
-      installations.push(chromePath);
+      if (canAccess(chromePath)) {
+        installations.push(chromePath);
+      }
+    } catch (e) {
+      // Not installed.
     }
   });
 
