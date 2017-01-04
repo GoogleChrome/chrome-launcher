@@ -330,9 +330,11 @@ class LighthouseViewerReport {
         return;
       }
 
-      const id = url.href.substring(url.href.lastIndexOf('/') + 1);
-      history.pushState({}, null, `${APP_URL}?gist=${id}`);
-      this.loadFromDeepLink();
+      const match = url.pathname.match(/[a-f0-9]{5,}/);
+      if (match) {
+        history.pushState({}, null, `${APP_URL}?gist=${match[0]}`);
+        this.loadFromDeepLink();
+      }
     } catch (err) {
       logger.error('Invalid URL');
     }
