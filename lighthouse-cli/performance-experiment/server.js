@@ -19,9 +19,8 @@
 /**
  * @fileoverview Server script for Project Performance Experiment.
  *
- * Functionalities:
- *   Host report pages.
- *     Report pages can be accessed via URL http://localhost:[PORT]/reports?key=[REPORT_KEY]
+ * Functionality:
+ *   Host and open report page.
  */
 
 const http = require('http');
@@ -38,7 +37,7 @@ const ReportGenerator = require('../../lighthouse-core/report/report-generator')
  * @return {!Promise<string>} Promise that resolves when server is closed
  */
 let lhResults;
-function hostExperiment(lighthouseParams, results) {
+function serveAndOpenReport(lighthouseParams, results) {
   lhResults = results;
   return new Promise(resolve => {
     const server = http.createServer(requestHandler);
@@ -75,5 +74,5 @@ function reportRequestHandler(request, response) {
 }
 
 module.exports = {
-  hostExperiment
+  serveAndOpenReport
 };

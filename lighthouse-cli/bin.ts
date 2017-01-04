@@ -269,7 +269,7 @@ function runLighthouse(url: string,
     .then((results: Results) => {
       // If --view, host this experiment and open report.html in the default browser
       if (flags.view) {
-        return performanceXServer.hostExperiment({url, flags, config}, results);
+        return performanceXServer.serveAndOpenReport({url, flags, config}, results);
       }
     })
     .then(() => chromeLauncher.kill())
