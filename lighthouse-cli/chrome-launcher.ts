@@ -30,6 +30,14 @@ const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 
+const green = '\x1B[32m';
+const reset = '\x1B[0m';
+
+const isWindows = process.platform === 'win32';
+
+// See https://github.com/GoogleChrome/lighthouse/issues/1228
+const tick = isWindows ? '\u221A' : '✓';
+
 class ChromeLauncher {
   prepared: Boolean = false
   pollInterval: number = 500
@@ -178,9 +186,6 @@ class ChromeLauncher {
       let retries = 0;
       let waitStatus = 'Waiting for browser.';
       (function poll() {
-        const green = '\x1B[32m';
-        const reset = '\x1B[0m';
-
         if (retries === 0) {
           log.log('ChromeLauncher', waitStatus);
         }
@@ -191,7 +196,7 @@ class ChromeLauncher {
         launcher
           .isDebuggerReady()
           .then(() => {
-            log.log('ChromeLauncher', waitStatus + `${green}✓${reset}`);
+            log.log('ChromeLauncher', waitStatus + `${green}${tick}${reset}`);
             resolve();
           })
           .catch(err => {
@@ -213,7 +218,7 @@ class ChromeLauncher {
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
-        if (process.platform === 'win32') {
+        if (isWindows) {
           execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
         } else {
           process.kill(-this.chrome.pid);

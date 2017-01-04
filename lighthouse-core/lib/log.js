@@ -32,13 +32,7 @@ const colors = {
 };
 
 // whitelist non-red/yellow colors for debug()
-if (isBrowser) {
-  const debugBrowser = require('debug/browser');
-  debugBrowser.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
-} else {
-  const debugNode = require('debug/node');
-  debugNode.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
-}
+debug.colors = [colors.cyan, colors.green, colors.blue, colors.magenta];
 
 class Emitter extends EventEmitter {
   /**
@@ -77,9 +71,11 @@ class Log {
       log = debug(title);
       loggersByTitle[title] = log;
       // errors with red, warnings with yellow.
-      // eslint-disable-next-line no-nested-ternary
-      log.color = title.endsWith('error') ? colors.red :
-          title.endsWith('warn') ? colors.yellow : undefined;
+      if (title.endsWith('error')) {
+        log.color = colors.red;
+      } else if (title.endsWith('warn')) {
+        log.color = colors.yellow;
+      }
     }
     return log;
   }
