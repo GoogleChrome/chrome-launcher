@@ -21,25 +21,34 @@
  * or name/value pair.
  *
  * @param {!Array} stylesheets A list of stylesheets used by the page.
- * @param {string=} propName Optional name of the CSS property to filter results
- *     on. If propVal is not specified, all stylesheets that use the property are
+ * @param {string|Array<string>=} propName Optional name of the CSS property/properties to filter
+ *     results on. If propVal is not specified, all stylesheets that use the property are
  *     returned. Otherwise, stylesheets that use the propName: propVal are returned.
- * @param {string=} propVal Optional value of the CSS property to filter results on.
+ * @param {string|Array<string>=} propVal Optional value of the CSS property/propertys to filter
+ *     results on.
  * @return {!Array} A list of stylesheets that use the CSS property.
  */
 function filterStylesheetsByUsage(stylesheets, propName, propVal) {
   if (!propName && !propVal) {
     return [];
   }
-
   // Create deep clone of arrays so multiple calls to filterStylesheetsByUsage
   // don't alter the original artifacts in stylesheets arg.
   const deepClone = stylesheets.map(sheet => Object.assign({}, sheet));
 
   return deepClone.filter(s => {
     s.parsedContent = s.parsedContent.filter(item => {
-      const usedName = item.property.name === propName;
-      const usedVal = item.property.val.indexOf(propVal) === 0; // val should start with needle
+      let usedName = '';
+      let usedVal = '';
+      // Prevent indexOf on null value
+      if (propName) {
+        propName = Array.isArray(propName) ? propName : [propName];
+        usedName = propName.indexOf(item.property.name) > -1;
+      }
+      if (propVal) {
+        propVal = Array.isArray(propVal) ? propVal : [propVal];
+        usedVal = propVal.indexOf(item.property.val) > -1;
+      }
       // Allow search by css property name, a value, or name/value pair.
       if (propName && !propVal) {
         return usedName;
@@ -94,7 +103,26 @@ ${parsedContent.selector} {
   };
 }
 
+/**
+ * Returns an array of all CSS prefixes and the default CSS style names.
+ *
+ * @param {string|Array<string>=} propNames CSS property names.
+ * @return {Array<string>=} CSS property names with and without vendor prefixes.
+ */
+function addVendorPrefixes(propsNames) {
+  const vendorPrefixes = ['-o-', '-ms-', '-moz-', '-webkit-'];
+  propsNames = Array.isArray(propsNames) ? propsNames : [propsNames];
+  let propsNamesWithPrefixes = propsNames;
+  // Map vendorPrefixes to propsNames
+  for (const prefix of vendorPrefixes) {
+    const temp = propsNames.map(propName => `${prefix}${propName}`);
+    propsNamesWithPrefixes = propsNamesWithPrefixes.concat(temp);
+  }
+  // Add original propNames
+  return propsNamesWithPrefixes;
+}
 module.exports = {
   filterStylesheetsByUsage,
-  getFormattedStyleRule
+  getFormattedStyleRule,
+  addVendorPrefixes
 };

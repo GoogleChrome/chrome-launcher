@@ -41,6 +41,22 @@ describe('style helpers', () => {
       results = StyleHelpers.filterStylesheetsByUsage(
           stylesheets, null, 'box');
       assert.equal(results.length, 1, 'accepts only CSS property value');
+
+      results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, ['display'], ['box', 'flexbox']);
+      assert.equal(results.length, 1, 'accepts array CSS property name/value pair');
+
+      results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, 'display', ['box', 'flexbox']);
+      assert.equal(results.length, 1, 'accepts string CSS property name and array value pair');
+
+      results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, ['display'], 'box');
+      assert.equal(results.length, 1, 'accepts array CSS property name and string value pair');
+
+      results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, ['box-flex', 'box-orient', 'box-flex-group', 'display'], 'box');
+      assert.equal(results.length, 1, 'accepts array of CSS property names and string value pair');
     });
 
     it('returns no results when not found', () => {
@@ -63,6 +79,10 @@ describe('style helpers', () => {
       results = StyleHelpers.filterStylesheetsByUsage(
           stylesheets, 'display', 'someunknownval');
       assert.equal(results.length, 0, 'known CSS property with unknown value not found');
+
+      results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, ['display'], 'someunknownval');
+      assert.equal(results.length, 0, 'known CSS property in array with unknown value not found');
     });
   });
 
@@ -70,7 +90,6 @@ describe('style helpers', () => {
     it('formats output correctly', () => {
       const results = StyleHelpers.filterStylesheetsByUsage(
           stylesheets, 'display', 'box');
-
       const actual = StyleHelpers.getFormattedStyleRule(
           results[0].content, results[0].parsedContent[0]);
       const expected = `p,div {
@@ -79,6 +98,41 @@ describe('style helpers', () => {
 
       assert.equal(actual.location, 'line: 8, row: 4, col: 17');
       assert.equal(actual.styleRule, expected);
+    });
+
+    it('formats output correctly', () => {
+      const results = StyleHelpers.filterStylesheetsByUsage(
+          stylesheets, ['display'], ['box']);
+      const actual = StyleHelpers.getFormattedStyleRule(
+          results[0].content, results[0].parsedContent[0]);
+      const expected = `p,div {
+  display: box;
+}`;
+
+      assert.equal(actual.location, 'line: 8, row: 4, col: 17');
+      assert.equal(actual.styleRule, expected);
+    });
+  });
+
+  describe('addWebPrefixes()', function() {
+    it('correctly adds prefixes to array of propsNames', () => {
+      const propsNames = ['box-flex', 'box-orient', 'box-flex-group', 'display'];
+      const results = StyleHelpers.addVendorPrefixes(propsNames).sort();
+      const expected = ['box-flex', 'box-orient', 'box-flex-group', 'display',
+                        '-o-box-flex', '-o-box-orient', '-o-box-flex-group', '-o-display',
+                        '-ms-box-flex', '-ms-box-orient', '-ms-box-flex-group', '-ms-display',
+                        '-moz-box-flex', '-moz-box-orient', '-moz-box-flex-group', '-moz-display',
+                        '-webkit-box-flex', '-webkit-box-orient', '-webkit-box-flex-group',
+                        '-webkit-display'].sort();
+      assert.deepEqual(results, expected);
+    });
+
+    it('correctly adds prefixes to a string propName', () => {
+      const propName = 'display';
+      const results = StyleHelpers.addVendorPrefixes(propName).sort();
+      const expected = ['display', '-o-display', '-ms-display', '-moz-display',
+                        '-webkit-display'].sort();
+      assert.deepEqual(results, expected);
     });
   });
 });
