@@ -21,6 +21,7 @@ const assert = require('assert');
 const traceEvents = require('../fixtures/traces/progressive-app.json');
 const badNavStartTrace = require('../fixtures/traces/bad-nav-start-ts.json');
 const lateTracingStartedTrace = require('../fixtures/traces/tracingstarted-after-navstart.json');
+const preactTrace = require('../fixtures/traces/preactjs.com_ts_of_undefined.json');
 
 function getArtifacts(trace) {
   return {
@@ -73,9 +74,6 @@ describe('Performance: first-meaningful-paint audit', () => {
         assert.equal(result.extendedInfo.value.timestamps.navStart, 29343540951);
         assert.equal(result.extendedInfo.value.timings.fCP, 80.054);
         assert.ok(!result.debugString);
-      }).catch(_ => {
-        console.error(_);
-        assert.ok(false);
       });
     });
 
@@ -86,8 +84,16 @@ describe('Performance: first-meaningful-paint audit', () => {
         assert.equal(result.extendedInfo.value.timestamps.navStart, 8885424467);
         assert.equal(result.extendedInfo.value.timings.fCP, 632.419);
         assert.ok(!result.debugString);
-      }).catch(_ => {
-        assert.ok(false);
+      });
+    });
+
+    it('finds the fMP if it appears slightly before the fCP', () => {
+      return FMPAudit.audit(getArtifacts(preactTrace)).then(result => {
+        assert.equal(result.displayValue, '878.4ms');
+        assert.equal(result.rawValue, 878.4);
+        assert.equal(result.extendedInfo.value.timestamps.navStart, 1805796384607);
+        assert.equal(result.extendedInfo.value.timings.fCP, 879.046);
+        assert.ok(!result.debugString);
       });
     });
   });
