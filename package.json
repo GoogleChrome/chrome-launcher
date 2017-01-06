@@ -18,6 +18,7 @@
     "start": "node ./lighthouse-cli/index.js",
     "test": "npm run lint --silent && npm run unit",
     "cli-unit": "lighthouse-core/scripts/run-mocha.sh --cli",
+    "viewer-unit": "lighthouse-core/scripts/run-mocha.sh --viewer",
     "unit": "lighthouse-core/scripts/run-mocha.sh --default",
     "closure": "cd lighthouse-core && closure/closure-type-checking.js",
     "watch": "lighthouse-core/scripts/run-mocha.sh --watch",
