@@ -36,9 +36,24 @@ echo "Bump the versions in extension/app/manifest.json and package.json"
 # * Test err'thing * 
 echo "Test the CLI."
 yarn run smoke
-echo "Test a fresh local install (see below)"
 echo "Test the extension"
+
+echo "Test a fresh local install (see below)"
+# (starting from lighthouse root...)
+# cd ..; mkdir tmp; cd tmp
+# npm install ../lighthouse
+# npm explore lighthouse -- npm run smoke
+# npm explore lighthouse -- npm run smokehouse
+# npm explore lighthouse -- npm run chrome # try the manual launcher
+# cd ..; rm -rf ./tmp;
+
 echo "Test the lighthouse-viewer build"
+# Manual test for now:
+# cd lighthouse-viewer
+# gulp build
+# start a server in dist/ and open the page in a tab. You should see the viewer.
+# Drop in a results.json or paste an existing gist url (e.g. https://gist.github.com/ebidel/b9fd478b5f40bf5fab174439dc18f83a).
+# Check for errors!
 
 # * Put up the PR *
 echo "Branch and commit the version bump."
@@ -59,11 +74,5 @@ echo "Inform various peoples"
 
 
 # * Testing a fresh local install *
-# (start from lighthouse root)
-cd ..; mkdir tmp; cd tmp
-npm install ../lighthouse
-npm explore lighthouse -- npm run smoke
-npm explore lighthouse -- npm run smokehouse
-npm explore lighthouse -- npm run chrome # try the manual launcher
-cd ..; rm -rf ./tmp;
+
 ```
