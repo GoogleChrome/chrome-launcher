@@ -40,7 +40,6 @@ class LighthouseViewerReport {
   constructor() {
     this.onShare = this.onShare.bind(this);
     this.onCopy = this.onCopy.bind(this);
-    this.onCopyButtonClick = this.onCopyButtonClick.bind(this);
     this.onFileUpload = this.onFileUpload.bind(this);
     this.onPaste = this.onPaste.bind(this);
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
@@ -74,12 +73,6 @@ class LighthouseViewerReport {
       }
     }
 
-    const copyButton = document.querySelector('.js-copy');
-    if (copyButton) {
-      copyButton.addEventListener('click', this.onCopyButtonClick);
-      document.addEventListener('copy', this.onCopy);
-    }
-
     document.addEventListener('paste', this.onPaste);
 
     this.exportButton = document.querySelector('.js-export');
@@ -87,6 +80,8 @@ class LighthouseViewerReport {
       this.exportButton.addEventListener('click', this.onExportButtonClick);
       const dropdown = document.querySelector('.export-dropdown');
       dropdown.addEventListener('click', this.onExport);
+
+      document.addEventListener('copy', this.onCopy);
     }
 
     const gistURLInput = document.querySelector('.js-gist-url');
@@ -369,6 +364,9 @@ class LighthouseViewerReport {
     }
 
     switch (e.target.dataset.action) {
+      case 'copy':
+        this.onCopyButtonClick();
+        break;
       case 'print':
         window.print();
         break;
