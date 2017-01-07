@@ -82,9 +82,18 @@ class SpeedIndexMetric extends Audit {
       score = Math.max(0, score);
 
       const extendedInfo = {
-        first: speedline.first,
-        complete: speedline.complete,
-        duration: speedline.duration,
+        timings: {
+          firstVisualChange: speedline.first,
+          visuallyComplete: speedline.complete,
+          speedIndex: speedline.speedIndex,
+          perceptualSpeedIndex: speedline.perceptualSpeedIndex
+        },
+        timestamps: {
+          firstVisualChange: (speedline.first + speedline.beginning) * 1000,
+          visuallyComplete: (speedline.complete + speedline.beginning) * 1000,
+          speedIndex: (speedline.speedIndex + speedline.beginning) * 1000,
+          perceptualSpeedIndex: (speedline.perceptualSpeedIndex + speedline.beginning) * 1000
+        },
         frames: speedline.frames.map(frame => {
           return {
             timestamp: frame.getTimeStamp(),

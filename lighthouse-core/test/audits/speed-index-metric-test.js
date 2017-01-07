@@ -80,6 +80,8 @@ describe('Performance: speed-index-metric audit', () => {
   it('scores speed index of 831 as 100', () => {
     const SpeedlineResult = {
       frames: [frame(), frame(), frame()],
+      first: 630,
+      complete: 930,
       speedIndex: 831,
       perceptualSpeedIndex: 845
     };
@@ -88,7 +90,10 @@ describe('Performance: speed-index-metric audit', () => {
     return Audit.audit(artifacts).then(response => {
       assert.equal(response.displayValue, '845');
       assert.equal(response.rawValue, 845);
-      assert.equal(response.score, 100);
+      assert.equal(response.extendedInfo.value.timings.firstVisualChange, 630);
+      assert.equal(response.extendedInfo.value.timings.visuallyComplete, 930);
+      assert.equal(response.extendedInfo.value.timings.speedIndex, 831);
+      assert.equal(response.extendedInfo.value.timings.perceptualSpeedIndex, 845);
     });
   });
 });
