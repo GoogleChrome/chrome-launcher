@@ -129,7 +129,40 @@ class Log {
     Log.events.issueStatus(title);
     return Log._logToStdErr(`${title}:verbose`, Array.from(arguments).slice(1));
   }
+
+  /**
+   * Add surrounding escape sequences to turn a string green when logged.
+   * @param {string} str
+   * @return {string}
+   */
+  static greenify(str) {
+    return `${Log.green}${str}${Log.reset}`;
+  }
+
+  /**
+   * Add surrounding escape sequences to turn a string red when logged.
+   * @param {string} str
+   * @return {string}
+   */
+  static redify(str) {
+    return `${Log.red}${str}${Log.reset}`;
+  }
+
 }
+
+Log.green = '\x1B[32m';
+Log.red = '\x1B[31m';
+Log.yellow = '\x1b[33m';
+Log.purple = '\x1b[95m';
+Log.reset = '\x1B[0m';
+Log.bold = '\x1b[1m';
+
+const isWindows = process.platform === 'win32';
+Log.tick = isWindows ? '\u221A' : '✓';
+Log.cross = isWindows ? '\u00D7' : '✘';
+Log.whiteSmallSquare = isWindows ? '\u0387' : '▫';
+Log.doubleLightHorizontal = '──';
+
 Log.events = new Emitter();
 
 module.exports = Log;
