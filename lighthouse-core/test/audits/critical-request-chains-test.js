@@ -51,27 +51,27 @@ const FAILING_REQUEST_CHAIN = {
 };
 
 const FAILING_REQUEST_CHAIN_2 = {
-	13653.1: {
-		request: {
-			url: 'http://localhost:10503/offline-ready.html',
-			startTime: 33552.036878,
-			endTime: 33552.285438,
-			responseReceivedTime: 33552.275677,
-			transferSize: 1849
-		},
-		children: {
-			13653.2: {
-				request: {
-					url: 'http://localhost:10503/icon-128.png?delay',
-					startTime: 33552.318928,
-					endTime: 33554.33721,
-					responseReceivedTime: 33554.334569,
-					transferSize: 99
-				},
-				children: {}
-			}
-		}
-	}
+  13653.1: {
+    request: {
+      url: 'http://localhost:10503/offline-ready.html',
+      startTime: 33552.036878,
+      endTime: 33552.285438,
+      responseReceivedTime: 33552.275677,
+      transferSize: 1849
+    },
+    children: {
+      13653.2: {
+        request: {
+          url: 'http://localhost:10503/icon-128.png?delay',
+          startTime: 33552.318928,
+          endTime: 33554.33721,
+          responseReceivedTime: 33554.334569,
+          transferSize: 99
+        },
+        children: {}
+      }
+    }
+  }
 };
 
 const PASSING_REQUEST_CHAIN = {

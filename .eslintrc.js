@@ -7,6 +7,10 @@ module.exports = {
   },
   "rules": {
     // 2 == error, 1 == warning, 0 == off
+    "indent": [2, 2, {
+      "SwitchCase": 1,
+      "VariableDeclarator": 2
+    }],
     "max-len": [2, 100, {
       "ignoreComments": true,
       "ignoreUrls": true,
