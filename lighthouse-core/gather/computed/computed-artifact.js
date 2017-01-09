@@ -28,7 +28,7 @@ class ComputedArtifact {
    * Override to implement a computed artifact. Can return a Promise or the
    * computed artifact itself.
    * @param {!Object} artifact Input to computation.
-   * @return {!Promise|!Object|!Array}
+   * @throws {Error}
    */
   compute_(artifact) {
     throw new Error('compute_() not implemented for computed artifact ' + this.name);

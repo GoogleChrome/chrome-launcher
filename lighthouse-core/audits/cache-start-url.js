@@ -57,6 +57,7 @@ class CacheStartUrl extends Audit {
 
     // Remove any UTM strings.
     const startURL = manifest.start_url.value;
+    /** @const {string} */
     const altStartURL = startURL
         .replace(/\?utm_([^=]*)=([^&]|$)*/, '')
         .replace(/\?$/, '');

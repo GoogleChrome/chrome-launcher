@@ -255,6 +255,7 @@ class Driver {
    * If our main document URL redirects, we will update options.url accordingly
    * As such, options.url will always represent the post-redirected URL.
    * options.initialUrl is the pre-redirect URL that things started with
+   * @param {!Object} opts
    */
   enableUrlUpdateIfRedirected(opts) {
     this._networkRecorder.on('requestloaded', redirectRequest => {
@@ -417,7 +418,7 @@ class Driver {
   /**
   * @param {string} objectId Object ID for the resolved DOM node
   * @param {string} propName Name of the property
-  * @return {!Promise<String>} The property value, or null, if property not found
+  * @return {!Promise<string>} The property value, or null, if property not found
   */
   getObjectProperty(objectId, propName) {
     return new Promise((resolve, reject) => {

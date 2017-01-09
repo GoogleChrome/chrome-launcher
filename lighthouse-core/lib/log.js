@@ -39,6 +39,7 @@ class Emitter extends EventEmitter {
   /**
    * Fires off all status updates. Listen with
    * `require('lib/log').events.addListener('status', callback)`
+   * @param {string} title
    */
   issueStatus(title, args) {
     if (title === 'status' || title === 'statusEnd') {

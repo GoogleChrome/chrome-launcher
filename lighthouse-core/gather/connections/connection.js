@@ -75,6 +75,7 @@ class Connection {
 
   /**
    * @param {string} message
+   * @return {!Promise}
    * @protected
    */
   sendRawMessage(message) {
@@ -85,6 +86,7 @@ class Connection {
 
   /**
    * @param {string} message
+   * @return {!Promise}
    * @protected
    */
   handleRawMessage(message) {
@@ -133,7 +135,7 @@ class Connection {
   }
 
   /**
-   * @param {!string} command
+   * @param {!string} method
    * @param {!Object} params
    * @protected
    */

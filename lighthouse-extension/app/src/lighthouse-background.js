@@ -97,7 +97,7 @@ function updateBadgeUI(optUrl) {
 
 /**
  * Removes artifacts from the result object for portability
- * @param {!Object} results Lighthouse results object
+ * @param {!Object} result Lighthouse results object
  */
 function filterOutArtifacts(result) {
   // strip them out, as the networkRecords artifact has circular structures

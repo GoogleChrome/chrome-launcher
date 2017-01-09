@@ -20,14 +20,14 @@ const DEFAULT_PASS = 'defaultPass';
 
 class Audit {
   /**
-   * @return {!String}
+   * @return {!string}
    */
   static get DEFAULT_PASS() {
     return DEFAULT_PASS;
   }
 
   /**
-   * @return {!AuditMeta}
+   * @throws {Error}
    */
   static get meta() {
     throw new Error('Audit meta information must be overridden.');

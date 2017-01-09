@@ -219,7 +219,7 @@ class Aggregate {
   /**
    * Aggregates all the results.
    * @param {!Aggregation} aggregation
-   * @param {!Array<!AuditResult>} results
+   * @param {!Array<!AuditResult>} auditResults
    * @return {!AggregationResult}
    */
   static aggregate(aggregation, auditResults) {

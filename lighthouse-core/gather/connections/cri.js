@@ -58,6 +58,7 @@ class CriConnection extends Connection {
   }
 
   /**
+   * @param {!string} command
    * @return {!Promise<string>}
    */
   _runJsonCommand(command) {

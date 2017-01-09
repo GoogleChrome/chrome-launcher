@@ -342,7 +342,7 @@ class LighthouseViewerReport {
 
   /**
    * Downloads a file (blob) using a[download].
-   * @param {Blob|File} The file to save.
+   * @param {Blob|File} blob The file to save.
    */
   _saveFile(blob) {
     const filename = getFilenamePrefix({
