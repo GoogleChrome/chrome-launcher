@@ -268,14 +268,14 @@ function runLighthouse(url: string,
         assetSaver.saveArtifacts(artifacts);
       }
       if (flags.saveAssets) {
-        return assetSaver.saveAssets({url: results.url}, artifacts).then(() => results);
+        return assetSaver.saveAssets(artifacts, results).then(() => results);
       }
       return results;
     })
     .then((results: Results) => Printer.write(results, flags.output, flags.outputPath))
     .then((results: Results) => {
       if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
-        const filename = `${assetSaver.getFilenamePrefix({url})}.report.html`;
+        const filename = `${assetSaver.getFilenamePrefix(results)}.report.html`;
         return Printer.write(results, 'html', filename);
       }
       return results;

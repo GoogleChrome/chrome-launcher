@@ -27,8 +27,26 @@ const Audit = require('../../audits/audit.js');
 
 /* eslint-env mocha */
 describe('asset-saver helper', () => {
+  it('generates filename prefixes', () => {
+    const results = {
+      url: 'https://testexample.com',
+      generatedTime: '2017-01-06T02:34:56.217Z'
+    };
+    const str = assetSaver.getFilenamePrefix(results);
+    // we want the filename to match user timezone, however these tests will run on multiple TZs
+    assert.ok(str.startsWith('testexample.com'), 'hostname is missing');
+    assert.ok(str.includes('2017-'), 'full year is missing');
+    assert.ok(str.endsWith('-56'), 'seconds value is not at the end');
+    // regex of hostname_YYYY-MM-DD_HH-MM-SS
+    const regex = /testexample\.com_\d{4}-[0-1][[0-9]-[0-1][[0-9]_[0-2][0-9]-[0-5][0-9]-[0-5][0-9]/;
+    assert.ok(regex.test(str), `${str} doesn't match pattern: hostname_YYYY-MM-DD_HH-MM-SS`);
+  });
+
   it('generates HTML', () => {
-    const options = {url: 'https://testexample.com'};
+    const options = {
+      url: 'https://testexample.com',
+      generatedTime: '2016-05-31T23:34:30.547Z'
+    };
     const artifacts = {
       traces: {
         [Audit.DEFAULT_PASS]: {
@@ -37,15 +55,15 @@ describe('asset-saver helper', () => {
       },
       requestScreenshots: () => Promise.resolve([]),
     };
-    return assetSaver.prepareAssets(options, artifacts).then(assets => {
+    return assetSaver.prepareAssets(artifacts, options).then(assets => {
       assert.ok(/<!doctype/gim.test(assets[0].html));
     });
   });
 
-  describe('saves files to disk with real filenames', function() {
+  describe('saves files', function() {
     const options = {
       url: 'https://testexample.com/',
-      date: new Date(1464737670547),
+      generatedTime: '2016-05-31T23:34:30.547Z',
       flags: {
         saveAssets: true
       }
@@ -59,7 +77,7 @@ describe('asset-saver helper', () => {
       requestScreenshots: () => Promise.resolve(screenshotFilmstrip)
     };
 
-    assetSaver.saveAssets(options, artifacts);
+    assetSaver.saveAssets(artifacts, options);
 
     it('trace file saved to disk with data', () => {
       const traceFilename = assetSaver.getFilenamePrefix(options) + '-0.trace.json';

@@ -347,7 +347,7 @@ class LighthouseViewerReport {
   _saveFile(blob) {
     const filename = getFilenamePrefix({
       url: this.json.url,
-      date: new Date(this.json.generatedTime)
+      generatedTime: this.json.generatedTime
     });
 
     const ext = blob.type.match('json') ? '.json' : '.html';
