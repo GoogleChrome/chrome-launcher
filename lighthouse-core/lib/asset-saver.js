@@ -18,7 +18,7 @@
 
 const fs = require('fs');
 const log = require('../../lighthouse-core/lib/log.js');
-const stringify = require('json-stringify-safe');
+const stringifySafe = require('json-stringify-safe');
 
 function getFilenamePrefix(options) {
   const url = options.url;
@@ -81,7 +81,8 @@ img {
 /* istanbul ignore next */
 function saveArtifacts(artifacts, filename) {
   const artifactsFilename = filename || 'artifacts.log';
-  fs.writeFileSync(artifactsFilename, stringify(artifacts));
+  // The networkRecords artifacts have circular references
+  fs.writeFileSync(artifactsFilename, stringifySafe(artifacts));
   log.log('artifacts file saved to disk', artifactsFilename);
 }
 
@@ -125,7 +126,7 @@ function saveAssets(options, artifacts) {
       const filenamePrefix = getFilenamePrefix(options);
 
       const traceData = data.traceData;
-      fs.writeFileSync(`${filenamePrefix}-${index}.trace.json`, stringify(traceData, null, 2));
+      fs.writeFileSync(`${filenamePrefix}-${index}.trace.json`, JSON.stringify(traceData, null, 2));
       log.log('trace file saved to disk', filenamePrefix);
 
       fs.writeFileSync(`${filenamePrefix}-${index}.screenshots.html`, data.html);
