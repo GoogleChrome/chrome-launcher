@@ -18,6 +18,7 @@
 
 const debug = require('debug');
 const EventEmitter = require('events').EventEmitter;
+const isWindows = process.platform === 'win32';
 
 // process.browser is set when browserify'd via the `process` npm module
 const isBrowser = process.browser;
@@ -129,7 +130,66 @@ class Log {
     Log.events.issueStatus(title);
     return Log._logToStdErr(`${title}:verbose`, Array.from(arguments).slice(1));
   }
+
+  /**
+   * Add surrounding escape sequences to turn a string green when logged.
+   * @param {string} str
+   * @return {string}
+   */
+  static greenify(str) {
+    return `${Log.green}${str}${Log.reset}`;
+  }
+
+  /**
+   * Add surrounding escape sequences to turn a string red when logged.
+   * @param {string} str
+   * @return {string}
+   */
+  static redify(str) {
+    return `${Log.red}${str}${Log.reset}`;
+  }
+
+  static get green() {
+    return '\x1B[32m';
+  }
+
+  static get red() {
+    return '\x1B[31m';
+  }
+
+  static get yellow() {
+    return '\x1b[33m';
+  }
+
+  static get purple() {
+    return '\x1b[95m';
+  }
+
+  static get reset() {
+    return '\x1B[0m';
+  }
+
+  static get bold() {
+    return '\x1b[1m';
+  }
+
+  static get tick() {
+    return isWindows ? '\u221A' : '✓';
+  }
+
+  static get cross() {
+    return isWindows ? '\u00D7' : '✘';
+  }
+
+  static get whiteSmallSquare() {
+    return isWindows ? '\u0387' : '▫';
+  }
+
+  static get doubleLightHorizontal() {
+    return '──';
+  }
 }
+
 Log.events = new Emitter();
 
 module.exports = Log;

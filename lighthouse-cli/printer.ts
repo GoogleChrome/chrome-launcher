@@ -33,20 +33,6 @@ const ReportGenerator = require('../lighthouse-core/report/report-generator');
 const Formatter = require('../lighthouse-core/formatters/formatter');
 const log = require('../lighthouse-core/lib/log');
 
-const green = '\x1B[32m';
-const red = '\x1B[31m';
-const yellow = '\x1b[33m';
-const purple = '\x1b[95m';
-const reset = '\x1B[0m';
-const bold = '\x1b[1m';
-
-const isWindows = process.platform === 'win32';
-
-// See https://github.com/GoogleChrome/lighthouse/issues/1228
-const tick = isWindows ? '\u221A' : '✓';
-const cross = isWindows ? '\u00D7' : '✘';
-const whiteSmallSquare = isWindows ? '\u0387' : '▫';
-const doubleLightHorizontal = '──';
 
 /**
  * Verify output path to use, either stdout or a file path.
@@ -65,20 +51,20 @@ function formatAggregationResultItem(score: boolean | number | string, suffix?: 
   suffix = suffix || '';
 
   if (typeof score === 'boolean') {
-    return score ? `${green}${tick}${reset}` : `${red}${cross}${reset}`;
+    return score ? `${log.greenify(log.tick)}` : `${log.redify(log.cross)}`;
   }
   if (typeof score !== 'number') {
-    return `${purple}${score}${reset}`;
+    return `${log.purple}${score}${log.reset}`;
   }
 
-  let colorChoice = red;
+  let colorChoice = log.red;
   if (score > 45) {
-    colorChoice = yellow;
+    colorChoice = log.yellow;
   }
   if (score > 75) {
-    colorChoice = green;
+    colorChoice = log.green;
   }
-  return `${colorChoice}${score}${suffix}${reset}`;
+  return `${colorChoice}${score}${suffix}${log.reset}`;
 }
 
 /**
@@ -99,17 +85,17 @@ function createOutput(results: Results, outputMode: OutputMode): string {
 
   // Pretty printed.
   const version = results.lighthouseVersion;
-  let output = `\n\n${bold}Lighthouse (${version}) results:${reset} ${results.url}\n\n`;
+  let output = `\n\n${log.bold}Lighthouse (${version}) results:${log.reset} ${results.url}\n\n`;
 
   results.aggregations.forEach(aggregation => {
     const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : '';
-    output += `${whiteSmallSquare} ${bold}${aggregation.name}${reset}${total}\n\n`;
+    output += `${log.whiteSmallSquare} ${log.bold}${aggregation.name}${log.reset}${total}\n\n`;
 
     aggregation.score.forEach(item => {
       const score = (item.overall * 100).toFixed(0);
 
       if (item.name) {
-        output += `${bold}${item.name}${reset}: ${item.scored ? formatAggregationResultItem(score, '%') : ''}\n`;
+        output += `${log.bold}${item.name}${log.reset}: ${item.scored ? formatAggregationResultItem(score, '%') : ''}\n`;
       }
 
       item.subItems.forEach(subitem => {
@@ -124,9 +110,9 @@ function createOutput(results: Results, outputMode: OutputMode): string {
         if (auditResult.comingSoon === true)
           return;
 
-        let lineItem = ` ${doubleLightHorizontal} ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
+        let lineItem = ` ${log.doubleLightHorizontal} ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
         if (auditResult.displayValue) {
-          lineItem += ` (${bold}${auditResult.displayValue}${reset})`;
+          lineItem += ` (${log.bold}${auditResult.displayValue}${log.reset})`;
         }
         output += `${lineItem}\n`;
         if (auditResult.debugString) {

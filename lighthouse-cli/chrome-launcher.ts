@@ -29,14 +29,7 @@ const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
-
-const green = '\x1B[32m';
-const reset = '\x1B[0m';
-
 const isWindows = process.platform === 'win32';
-
-// See https://github.com/GoogleChrome/lighthouse/issues/1228
-const tick = isWindows ? '\u221A' : '✓';
 
 class ChromeLauncher {
   prepared: Boolean = false
@@ -196,7 +189,7 @@ class ChromeLauncher {
         launcher
           .isDebuggerReady()
           .then(() => {
-            log.log('ChromeLauncher', waitStatus + `${green}${tick}${reset}`);
+            log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
             resolve();
           })
           .catch(err => {

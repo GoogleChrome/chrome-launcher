@@ -20,6 +20,7 @@
 const path = require('path');
 const spawnSync = require('child_process').spawnSync;
 const yargs = require('yargs');
+const log = require('../../../lighthouse-core/lib/log');
 
 const DEFAULT_CONFIG_PATH = 'pwa-config';
 const DEFAULT_EXPECTATIONS_PATH = 'pwa-expectations';
@@ -27,29 +28,6 @@ const DEFAULT_EXPECTATIONS_PATH = 'pwa-expectations';
 const PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 const RETRIES = 3;
 
-const GREEN = '\x1B[32m';
-const RED = '\x1B[31m';
-const RESET = '\x1B[0m';
-const GREEN_CHECK = greenify('✓');
-const RED_X = redify('✘');
-
-/**
- * Add surrounding escape sequences to turn a string green when logged.
- * @param {string} str
- * @return {string}
- */
-function greenify(str) {
-  return `${GREEN}${str}${RESET}`;
-}
-
-/**
- * Add surrounding escape sequences to turn a string red when logged.
- * @param {string} str
- * @return {string}
- */
-function redify(str) {
-  return `${RED}${str}${RESET}`;
-}
 
 /**
  * Attempt to resolve a path locally. If this fails, attempts to locate the path
@@ -159,11 +137,11 @@ function collateResults(actual, expected) {
  */
 function reportAssertion(assertion) {
   if (assertion.equal) {
-    console.log(`  ${GREEN_CHECK} ${assertion.category}: ` +
-        greenify(assertion.actual));
+    console.log(`  ${log.greenify(log.tick)} ${assertion.category}: ` +
+        log.greenify(assertion.actual));
   } else {
-    console.log(`  ${RED_X} ${assertion.category}: ` +
-        redify(`found ${assertion.actual}, expected ${assertion.expected}`));
+    console.log(`  ${log.redify(log.cross)} ${assertion.category}: ` +
+        log.redify(`found ${assertion.actual}, expected ${assertion.expected}`));
   }
 }
 
@@ -189,7 +167,7 @@ function report(results) {
 
   const plural = correctCount === 1 ? '' : 's';
   const correctStr = `${correctCount} audit${plural}`;
-  const colorFn = correctCount === 0 ? redify : greenify;
+  const colorFn = correctCount === 0 ? log.redify : log.greenify;
   console.log(`  Correctly passed ${colorFn(correctStr)}\n`);
 
   return {
@@ -225,9 +203,9 @@ expectations.forEach(expected => {
 });
 
 if (passingCount) {
-  console.log(greenify(`${passingCount} passing`));
+  console.log(log.greenify(`${passingCount} passing`));
 }
 if (failingCount) {
-  console.log(redify(`${failingCount} failing`));
+  console.log(log.redify(`${failingCount} failing`));
   process.exit(1);
 }
