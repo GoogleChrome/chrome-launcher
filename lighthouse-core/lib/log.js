@@ -18,6 +18,7 @@
 
 const debug = require('debug');
 const EventEmitter = require('events').EventEmitter;
+const isWindows = process.platform === 'win32';
 
 // process.browser is set when browserify'd via the `process` npm module
 const isBrowser = process.browser;
@@ -148,20 +149,46 @@ class Log {
     return `${Log.red}${str}${Log.reset}`;
   }
 
+  static get green() {
+    return '\x1B[32m';
+  }
+
+  static get red() {
+    return '\x1B[31m';
+  }
+
+  static get yellow() {
+    return '\x1b[33m';
+  }
+
+  static get purple() {
+    return '\x1b[95m';
+  }
+
+  static get reset() {
+    return '\x1B[0m';
+  }
+
+  static get bold() {
+    return '\x1b[1m';
+  }
+
+  static get tick() {
+    return isWindows ? '\u221A' : '✓';
+  }
+
+  static get cross() {
+    return isWindows ? '\u00D7' : '✘';
+  }
+
+  static get whiteSmallSquare() {
+    return isWindows ? '\u0387' : '▫';
+  }
+
+  static get doubleLightHorizontal() {
+    return '──';
+  }
 }
-
-Log.green = '\x1B[32m';
-Log.red = '\x1B[31m';
-Log.yellow = '\x1b[33m';
-Log.purple = '\x1b[95m';
-Log.reset = '\x1B[0m';
-Log.bold = '\x1b[1m';
-
-const isWindows = process.platform === 'win32';
-Log.tick = isWindows ? '\u221A' : '✓';
-Log.cross = isWindows ? '\u00D7' : '✘';
-Log.whiteSmallSquare = isWindows ? '\u0387' : '▫';
-Log.doubleLightHorizontal = '──';
 
 Log.events = new Emitter();
 
