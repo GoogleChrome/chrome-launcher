@@ -90,7 +90,7 @@ img {
 /**
  * Save entire artifacts object to a single stringified file
  * @param {!Artifacts} artifacts
- * @param {!artifactsFilename} artifactsFilename
+ * @param {!string} artifactsFilename
  */
 // Set to ignore because testing it would imply testing fs, which isn't strictly necessary.
 /* istanbul ignore next */
