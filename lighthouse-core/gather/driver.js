@@ -52,8 +52,9 @@ class Driver {
       'disabled-by-default-devtools.timeline',
       'disabled-by-default-devtools.timeline.frame',
       'disabled-by-default-devtools.timeline.stack',
-      'disabled-by-default-v8.cpu_profiler',
-      'disabled-by-default-v8.cpu_profiler.hires',
+      // Flipped off until bugs.chromium.org/p/v8/issues/detail?id=5820 is fixed in Stable
+      // 'disabled-by-default-v8.cpu_profiler',
+      // 'disabled-by-default-v8.cpu_profiler.hires',
       'disabled-by-default-devtools.screenshot'
     ];
   }
