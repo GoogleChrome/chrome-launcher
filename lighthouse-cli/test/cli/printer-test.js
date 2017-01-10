@@ -23,6 +23,7 @@ const Printer = require('../../printer.js');
 const assert = require('assert');
 const fs = require('fs');
 const sampleResults = require('../fixtures/sample.json');
+const log = require('../../../lighthouse-core/lib/log');
 
 describe('Printer', () => {
   it('accepts valid output paths', () => {
@@ -86,7 +87,9 @@ describe('Printer', () => {
   it('writes extended info', () => {
     const mode = 'pretty';
     const prettyOutput = Printer.createOutput(sampleResults, mode);
+    const output = new RegExp(log.heavyHorizontal + log.heavyHorizontal +
+                   ' images\/chrome-touch-icon-384x384.png', 'i');
 
-    assert.ok(/━━ images\/chrome-touch-icon-384x384.png/i.test(prettyOutput));
+    assert.ok(output.test(prettyOutput));
   });
 });
