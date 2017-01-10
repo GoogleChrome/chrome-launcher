@@ -31,7 +31,7 @@ describe('Resources are fetched over http/2', () => {
       networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: networkRecords}
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.displayValue.match('4 resources were not'));
+    assert.ok(auditResult.displayValue.match('4 requests were not'));
     assert.equal(auditResult.extendedInfo.value.length, 4);
   });
 
@@ -41,7 +41,7 @@ describe('Resources are fetched over http/2', () => {
       URL: {finalUrl: URL},
       networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: entryWithHTTP1}
     });
-    assert.ok(auditResult.displayValue.match('1 resource was not'));
+    assert.ok(auditResult.displayValue.match('1 request was not'));
   });
 
   it('passes when all resources were requested via http/2', () => {
