@@ -25,15 +25,22 @@
 <script src="./dbw_tester.js"></script>
 
 <template id="links-blocking-first-paint-tmpl">
-  <!-- we use a relative protocol url to test that `new URL(resource)` in the critical-request-chains.js formatter can handle it -->
-  <link rel="stylesheet" href="//localhost:10200/dobetterweb/dbw_tester.css">
-  <link rel="stylesheet" href="./dbw_disabled.css" disabled>
-  <link rel="import" href="./dbw_partial_a.html">
-  <link rel="import" href="./dbw_partial_b.html" async>
-
-  <!-- doesn't actually block first paint but previously was false positive -->
-  <link rel="preload" href="./dbw_tester.css?delay=true" as="style" onload="this.rel = 'stylesheet'">
+  <link rel="stylesheet" href="./dbw_tester.css?scriptActivated"> <!-- PASS: initiator is script -->
 </template>
+
+<!-- we use a relative protocol url to test that `new URL(resource)` in the critical-request-chains.js formatter can handle it -->
+<link rel="stylesheet" href="//localhost:10200/dobetterweb/dbw_tester.css"> <!-- FAIL, when run under smokehouse -->
+<link rel="stylesheet" href="https://unknown.com/styles.css?404"> <!-- FAIL -->
+<link rel="stylesheet" href="./dbw_tester.css"> <!-- FAIL -->
+<link rel="stylesheet" href="./dbw_disabled.css" disabled> <!-- PASS -->
+<link rel="import" href="./dbw_partial_a.html"> <!-- FAIL -->
+<link rel="import" href="./dbw_partial_b.html" async> <!-- PASS -->
+
+<!-- PASS: preload that's activated later does not block rendering. -->
+<!-- Note: this only passes when using the static-server.js, which supports the ?delay=true param.
+     If you're using your own server, the resource will load instantly and the
+     gatherer find will see a stylesheet instead of a rel="preload". -->
+<link rel="preload" href="./dbw_tester.css?delay=true" as="style" onload="this.rel = 'stylesheet'">
 
 <style>
   body {
