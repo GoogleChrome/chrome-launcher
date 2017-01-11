@@ -37,6 +37,7 @@ class Driver {
     this._traceCategories = Driver.traceCategories;
     this._eventEmitter = new EventEmitter();
     this._connection = connection;
+    this.online = true;
     connection.on('notification', event => this._eventEmitter.emit(event.method, event.params));
   }
 
@@ -620,7 +621,11 @@ class Driver {
    * @return {!Promise}
    */
   goOffline() {
-    return this.sendCommand('Network.enable').then(_ => emulation.goOffline(this));
+    return this.sendCommand('Network.enable').then(_ => {
+      return emulation.goOffline(this);
+    }).then(_ => {
+      this.online = false;
+    });
   }
 
   /**
@@ -636,6 +641,8 @@ class Driver {
       }
 
       return emulation.disableNetworkThrottling(this);
+    }).then(_ => {
+      this.online = true;
     });
   }
 

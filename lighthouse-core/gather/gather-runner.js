@@ -204,6 +204,13 @@ class GatherRunner {
       log.log('status', status);
       return driver.endNetworkCollect();
     }).then(networkRecords => {
+      const mainRecord = networkRecords.find(record => record.url === options.url);
+      if (driver.online && mainRecord.failed) {
+        log.error('GatherRunner', mainRecord.localizedFailDescription);
+        const error = new Error(`Unable to load the page: ${mainRecord.localizedFailDescription}`);
+        error.code = 'PAGE_LOAD_ERROR';
+        return Promise.reject(error);
+      }
       // Network records only given to gatherers if requested by config.
       config.recordNetwork && (passData.networkRecords = networkRecords);
       log.verbose('statusEnd', status);

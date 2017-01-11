@@ -238,8 +238,15 @@ function showProtocolTimeoutError() {
   process.exit(_PROTOCOL_TIMEOUT_EXIT_CODE);
 }
 
+function showPageLoadError() {
+  console.error('Unable to load the page. Please verify the url you are trying to review.');
+  process.exit(_RUNTIME_ERROR_CODE);
+}
+
 function handleError(err: LighthouseError) {
-  if (err.code === 'ECONNREFUSED') {
+  if (err.code === 'PAGE_LOAD_ERROR') {
+    showPageLoadError();
+  } else if (err.code === 'ECONNREFUSED') {
     showConnectionError();
   } else if (err.code === 'CRI_TIMEOUT') {
     showProtocolTimeoutError();
@@ -262,7 +269,7 @@ function runLighthouse(url: string,
       // delete artifacts from result so reports won't include artifacts.
       const artifacts = results.artifacts;
       results.artifacts = undefined;
-      
+
       if (flags.saveArtifacts) {
         assetSaver.saveArtifacts(artifacts);
       }

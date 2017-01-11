@@ -23,6 +23,8 @@ const GatherRunner = require('../../gather/gather-runner');
 const assert = require('assert');
 const Config = require('../../config/config');
 const path = require('path');
+const recordsFromLogs = require('../../lib/network-recorder').recordsFromLogs;
+const unresolvedPerfLog = require('./../fixtures/unresolved-perflog.json');
 
 class TestGatherer extends Gatherer {
   constructor() {
@@ -248,15 +250,13 @@ describe('GatherRunner', function() {
   it('tells the driver to end tracing', () => {
     let calledTrace = false;
     const fakeTraceData = {traceEvents: ['reallyBelievableTraceEvents']};
-    const driver = {
+
+    const driver = Object.assign({}, fakeDriver, {
       endTrace() {
         calledTrace = true;
         return Promise.resolve(fakeTraceData);
-      },
-      endNetworkCollect() {
-        return Promise.resolve();
       }
-    };
+    });
 
     const config = {
       recordTrace: true,
@@ -295,12 +295,17 @@ describe('GatherRunner', function() {
 
   it('tells the driver to end network collection', () => {
     let calledNetworkCollect = false;
-    const driver = {
+
+    const driver = Object.assign({}, fakeDriver, {
       endNetworkCollect() {
         calledNetworkCollect = true;
-        return Promise.resolve({x: 1});
+        return fakeDriver.endNetworkCollect()
+          .then(records => {
+            records.marker = 'mocked';
+            return records;
+          });
       }
-    };
+    });
 
     const config = {
       recordNetwork: true,
@@ -311,7 +316,7 @@ describe('GatherRunner', function() {
 
     return GatherRunner.afterPass({driver, config}, {TestGatherer: []}).then(vals => {
       assert.equal(calledNetworkCollect, true);
-      assert.deepEqual(vals.networkRecords, {x: 1});
+      assert.strictEqual(vals.networkRecords.marker, 'mocked');
     });
   });
 
@@ -693,6 +698,63 @@ describe('GatherRunner', function() {
         flags: {},
         config: new Config({})
       }).then(_ => assert.ok(false), _ => assert.ok(true));
+    });
+
+    it('rejects when domain name can\'t be resolved', () => {
+      const passes = [{
+        recordNetwork: true,
+        recordTrace: true,
+        passName: 'firstPass',
+        gatherers: []
+      }];
+
+      // Arrange for driver to return unresolved request.
+      const unresolvedDriver = Object.assign({}, fakeDriver, {
+        online: true,
+        endNetworkCollect() {
+          return Promise.resolve(recordsFromLogs(unresolvedPerfLog));
+        }
+      });
+
+      return GatherRunner.run(passes, {
+        driver: unresolvedDriver,
+        url: 'http://www.some-non-existing-domain.com/',
+        flags: {},
+        config: new Config({})
+      })
+        .then(_ => {
+          assert.ok(false);
+        }, error => {
+          assert.ok(true);
+          assert.ok(/net::ERR_NAME_NOT_RESOLVED/.test(error.message));
+        });
+    });
+
+    it('resolves when domain name can\'t be resolved but is offline', () => {
+      const passes = [{
+        recordNetwork: true,
+        recordTrace: true,
+        passName: 'firstPass',
+        gatherers: []
+      }];
+
+      // Arrange for driver to return unresolved request.
+      const unresolvedDriver = Object.assign({}, fakeDriver, {
+        online: false,
+        endNetworkCollect() {
+          return Promise.resolve(recordsFromLogs(unresolvedPerfLog));
+        }
+      });
+
+      return GatherRunner.run(passes, {
+        driver: unresolvedDriver,
+        url: 'http://www.some-non-existing-domain.com/',
+        flags: {},
+        config: new Config({})
+      })
+        .then(_ => {
+          assert.ok(true);
+        });
     });
   });
 });

@@ -49,7 +49,10 @@ document.addEventListener('DOMContentLoaded', _ => {
     // The extension debugger API is forbidden from attaching to the web store.
     // @see https://chromium.googlesource.com/chromium/src/+/5d1f214db0f7996f3c17cd87093d439ce4c7f8f1/chrome/common/extensions/chrome_extensions_client.cc#232
     'The extensions gallery cannot be scripted': 'The Lighthouse extension cannot audit the ' +
-        'Chrome Web Store. If necessary, use the Lighthouse CLI to do so.'
+        'Chrome Web Store. If necessary, use the Lighthouse CLI to do so.',
+    // The user tries to review an error page or has network issues
+    'Unable to load the page': 'Unable to load the page. Please verify the url you ' +
+        'are trying to review.'
   };
 
   function getLighthouseVersion() {
