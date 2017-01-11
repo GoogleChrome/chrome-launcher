@@ -30,6 +30,7 @@
     "passName": "dbw",
     "gatherers": [
       "styles",
+      "css-usage",
       "dobetterweb/all-event-listeners",
       "dobetterweb/anchors-with-no-rel-noopener",
       "dobetterweb/appcache",
@@ -68,6 +69,7 @@
     "manifest-short-name-length",
     "manifest-start-url",
     "theme-color-meta",
+    "unused-css-rules",
     "content-width",
     "accessibility/aria-allowed-attr",
     "accessibility/aria-required-attr",
@@ -282,6 +284,13 @@
         "uses-http2": {
           "expectedValue": false,
           "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
+        }
+      }
+    }, {
+      "name": "Using bytes efficiently",
+      "audits": {
+        "unused-css-rules": {
+          "expectedValue": false
         }
       }
     }, {

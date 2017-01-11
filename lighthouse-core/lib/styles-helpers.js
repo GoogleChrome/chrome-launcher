@@ -37,6 +37,10 @@ function filterStylesheetsByUsage(stylesheets, propName, propVal) {
   const deepClone = stylesheets.map(sheet => Object.assign({}, sheet));
 
   return deepClone.filter(s => {
+    if (s.isDuplicate) {
+      return false;
+    }
+
     s.parsedContent = s.parsedContent.filter(item => {
       let usedName = '';
       let usedVal = '';

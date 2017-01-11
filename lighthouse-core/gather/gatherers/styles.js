@@ -35,6 +35,12 @@ function getCSSPropsInStyleSheet(parseTree) {
   const results = [];
 
   parseTree.traverseByType('declaration', function(node, index, parent) {
+    if (parent.type === 'arguments') {
+      // We don't want to return data URI declarations of the form
+      // background-image: -webkit-image-set(url('data:image/png,...') 1x)
+      return;
+    }
+
     const keyVal = node.toString().split(':').map(item => item.trim());
     results.push({
       property: {name: keyVal[0], val: keyVal[1]},
@@ -115,9 +121,12 @@ class Styles extends Gatherer {
       Promise.all(contentPromises).then(styleHeaders => {
         driver.off('CSS.styleSheetAdded', this._onStyleSheetAdded);
         driver.off('CSS.styleSheetRemoved', this._onStyleSheetRemoved);
-        return driver.sendCommand('CSS.disable')
-          .then(_ => driver.sendCommand('DOM.disable'))
-          .then(_ => resolve(styleHeaders));
+        resolve(styleHeaders);
+        // Currently both CSSUsage and Styles use these domains, so let it disable there.
+        // TODO: have a better way to specify used domains
+        // return driver.sendCommand('CSS.disable')
+        //   .then(_ => driver.sendCommand('DOM.disable'))
+        //   .then(_ => resolve(styleHeaders));
       }).catch(err => reject(err));
     });
   }
@@ -129,13 +138,17 @@ class Styles extends Gatherer {
   afterPass(options) {
     return this.endStylesCollect(options.driver)
       .then(stylesheets => {
-        // Want unique stylesheets. Remove those with the same text content.
+        // Generally want unique stylesheets. Mark those with the same text content.
         // An example where stylesheets are the same is if the user includes a
         // stylesheet more than once (these have unique stylesheet ids according to
         // the DevTools protocol). Another example is many instances of a shadow
         // root that share the same <style> tag.
         const map = new Map(stylesheets.map(s => [s.content, s]));
-        return Array.from(map.values());
+        return stylesheets.map(stylesheet => {
+          const idInMap = map.get(stylesheet.content).header.styleSheetId;
+          stylesheet.isDuplicate = idInMap !== stylesheet.header.styleSheetId;
+          return stylesheet;
+        });
       }, err => {
         return {
           rawValue: -1,

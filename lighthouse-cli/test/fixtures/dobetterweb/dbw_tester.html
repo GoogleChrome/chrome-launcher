@@ -79,6 +79,29 @@
 </style>
 </template>
 
+<template id="unused-css-rules-tmpl">
+  <style>
+  .unused-a {
+    width: 10px;
+  }
+  .unused-b {
+    height: 10px;
+  }
+  .unused-c {
+    font-size: 10px;
+  }
+  .unused-d {
+    position: absolute;
+  }
+  .totally-made-up {
+    color: white;
+  }
+  body {
+    font-size: 20px;
+  }
+  </style>
+</template>
+
 </head>
 <body>
 
@@ -263,6 +286,10 @@ function noRelOpenLinksTest() {
   stampTemplate('noopener-links-tmpl', document.head);
 }
 
+function unusedCssRulesTest() {
+  stampTemplate('unused-css-rules-tmpl', document.head);
+}
+
 // Figure out which tests to fun.
 const params = new URLSearchParams(location.search);
 if (location.search === '') {
@@ -277,6 +304,7 @@ if (location.search === '') {
   linksBlockingFirstPaintTest();
   noRelOpenLinksTest();
   oldCSSFlexboxTest();
+  unusedCssRulesTest();
 } else {
   if (params.has('documentWrite')) {
     documentWriteTest();
@@ -310,6 +338,9 @@ if (location.search === '') {
   }
   if (params.has('oldcssflexbox')) {
     oldCSSFlexboxTest();
+  }
+  if (params.has('unusedcss')) {
+    unusedCssRulesTest();
   }
 }
 </script>

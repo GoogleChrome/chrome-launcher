@@ -38,6 +38,7 @@ module.exports = [
       'no-websql': false,
       'notification-on-start': false,
       'script-blocking-first-paint': false,
+      'unused-css-rules': false,
       'uses-passive-event-listeners': false
     }
   }, {
@@ -57,6 +58,7 @@ module.exports = [
       'no-old-flexbox': true,
       'no-websql': true,
       'script-blocking-first-paint': true,
+      'unused-css-rules': true,
       'uses-passive-event-listeners': true
     }
   }
