@@ -19,6 +19,8 @@
 
 const URL = require('../../lib/url-shim');
 const assert = require('assert');
+const superLongName =
+    'https://example.com/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWeWantToTest.js';
 
 describe('URL Shim', () => {
   it('handles URLs beginning with multiple digits', () => {
@@ -54,5 +56,40 @@ describe('URL Shim', () => {
     const urlA = 'https://google.com/page?query=string#hash';
     const urlB = 'anonymous:45';
     assert.equal(URL.hostsMatch(urlA, urlB), false);
+  });
+});
+
+
+describe('getDisplayName', () => {
+  it('Elides hashes', () => {
+    const url = 'http://example.com/file-f303dec6eec305a4fab8025577db3c2feb418148ac75ba378281399fb1ba670b.css';
+    const result = URL.getDisplayName(url);
+    assert.equal(result, '/file-f303dec\u2026.css');
+  });
+
+  it('Elides hashes in the middle', () => {
+    const url = 'http://example.com/file-f303dec6eec305a4fab80378281399fb1ba670b-somethingmore.css';
+    const result = URL.getDisplayName(url);
+    assert.equal(result, '/file-f303dec\u2026-somethingmore.css');
+  });
+
+  it('Elides long names', () => {
+    const result = URL.getDisplayName(superLongName);
+    const expected = '/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWe\u2026.js';
+    assert.equal(result, expected);
+  });
+
+  it('Elides long names with hash', () => {
+    const url = superLongName.slice(0, -3) +
+        '-f303dec6eec305a4fab8025577db3c2feb418148ac75ba378281399fb1ba670b.css';
+    const result = URL.getDisplayName(url);
+    const expected = '/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichW\u2026.css';
+    assert.equal(result, expected);
+  });
+
+  it('Doesn\'t elide short names', () => {
+    const url = 'http://example.com/file.css';
+    const result = URL.getDisplayName(url);
+    assert.equal(result, '/file.css');
   });
 });

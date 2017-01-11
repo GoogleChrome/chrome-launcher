@@ -97,6 +97,7 @@ describe('CRC Formatter', () => {
     const truncatedURL = criticalRequestChainFormatter.parseURL(superLongName);
     const truncatedURLRegExp = new RegExp(truncatedURL.file, 'im');
     const expectedTreeOne = new RegExp([
+      '<div class="cnc-node" title="https://example.com/">',
       '<span class="cnc-node__tree-marker">',
       '<span class="tree-marker up-right"></span>',
       '<span class="tree-marker right"></span>',
@@ -111,6 +112,7 @@ describe('CRC Formatter', () => {
     assert.ok(expectedTreeOne.test(output));
 
     const expectedTreeTwo = new RegExp([
+      '<div class="cnc-node" title="https://example.com/b.js">',
       '<span class="cnc-node__tree-marker">',
       '<span class="tree-marker space"></span>',
       '<span class="tree-marker space"></span>',
@@ -126,6 +128,10 @@ describe('CRC Formatter', () => {
     ].join('\\s*'), 'im');
 
     assert.ok(expectedTreeTwo.test(output));
+
+    const expectedTreeThree = new RegExp(`<div class="cnc-node" title="${superLongName}">`);
+
+    assert.ok(expectedTreeThree.test(output));
     assert.ok(truncatedURLRegExp.test(output));
   });
 });

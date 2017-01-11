@@ -58,7 +58,7 @@
 </style>
 
 {{#*inline "writeNode"}}
-  <div class="cnc-node" title="{{ @key }}">
+  <div class="cnc-node" title="{{ this.node.request.url }}">
     <span class="cnc-node__tree-marker">
     {{#each treeMarkers as |separator| }}
       {{#separator}}

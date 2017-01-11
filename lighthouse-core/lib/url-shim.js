@@ -57,4 +57,33 @@ URL.hostsMatch = function hostsMatch(urlA, urlB) {
   }
 };
 
+
+/**
+ * @param {string} url
+ * @return {string}
+ */
+URL.getDisplayName = function getDisplayName(url) {
+  const parsed = new URL(url);
+
+  // Handle 'about:*' URLs specially since they have no path.
+  let name = parsed.protocol === 'about:' ? parsed.href :
+      // Otherwise, remove any query strings from the path.
+      parsed.pathname.replace(/\?.*/, '')
+      // And grab the last two parts.
+      .split('/').slice(-2).join('/');
+
+  const MAX_LENGTH = 64;
+  // Always elide hash
+  name = name.replace(/([a-f0-9]{7})[a-f0-9]{13}[a-f0-9]*/g, '$1\u2026');
+  // Elide too long names
+  if (name.length > MAX_LENGTH) {
+    const dotIndex = name.lastIndexOf('.');
+    name = name.slice(0, MAX_LENGTH - 1 - (name.length - dotIndex)) +
+        // Show file extension
+        `\u2026${name.slice(dotIndex)}`;
+  }
+
+  return name;
+};
+
 module.exports = URL;
