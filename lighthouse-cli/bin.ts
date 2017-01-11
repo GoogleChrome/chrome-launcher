@@ -83,18 +83,17 @@ const cliFlags = yargs
     'port': 'The port to use for the debugging protocol. Use 0 for a random port',
     'skip-autolaunch': 'Skip autolaunch of Chrome when already running instance is not found',
     'select-chrome': 'Interactively choose version of Chrome to use when multiple installations are found',
+    'interactive': 'Open Lighthouse in interactive mode'
   })
 
   .group([
     'output',
-    'output-path',
-    'view'
+    'output-path'
   ], 'Output:')
   .describe({
     'output': 'Reporter for the results',
     'output-path': `The file path to output the results
-Example: --output-path=./lighthouse-results.html`,
-    'view': 'Open report.html in browser'
+Example: --output-path=./lighthouse-results.html`
   })
 
   // boolean values
@@ -112,7 +111,7 @@ Example: --output-path=./lighthouse-results.html`,
     'verbose',
     'quiet',
     'help',
-    'view'
+    'interactive'
   ])
   .choices('output', Printer.GetValidOutputOptions())
 
@@ -251,7 +250,7 @@ function handleError(err: LighthouseError) {
 
 function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
-                         outputPath: string, view: boolean, saveArtifacts: boolean, saveAssets: boolean},
+                         outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean},
                        config: Object): Promise<undefined> {
 
   let chromeLauncher: ChromeLauncher;
@@ -281,8 +280,8 @@ function runLighthouse(url: string,
       return results;
     })
     .then((results: Results) => {
-      if (flags.view) {
-        return performanceXServer.serveAndOpenReport({url, flags, config}, results);
+      if (flags.interactive) {
+        return performanceXServer.hostExperiment({url, flags, config}, results);
       }
     })
     .then(() => chromeLauncher.kill())

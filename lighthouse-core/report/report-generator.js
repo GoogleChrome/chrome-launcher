@@ -203,10 +203,15 @@ class ReportGenerator {
 
   /**
    * Gets the script for the report UI
-   * @return {string}
+   * @param {string} reportContext
+   * @return {Array<string>} an array of scripts
    */
-  getReportJS() {
-    return fs.readFileSync(path.join(__dirname, './scripts/lighthouse-report.js'), 'utf8');
+  getReportJS(reportContext) {
+    if (reportContext === 'devtools') {
+      return [];
+    } else {
+      return [fs.readFileSync(path.join(__dirname, './scripts/lighthouse-report.js'), 'utf8')];
+    }
   }
 
   /**
@@ -304,7 +309,7 @@ class ReportGenerator {
       lhresults: this._escapeScriptTags(JSON.stringify(results, null, 2)),
       css: this.getReportCSS(),
       reportContext: reportContext,
-      script: reportContext === 'devtools' ? '' : this.getReportJS(),
+      scripts: this.getReportJS(reportContext),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations)
     });
