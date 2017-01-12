@@ -26,32 +26,86 @@ module.exports = [
     initialUrl: 'http://localhost:10200/online-only.html',
     url: 'http://localhost:10200/online-only.html',
     audits: {
-      'is-on-https': false,
-      'redirects-http': false,
-      'service-worker': false,
-      'works-offline': false,
-      'viewport': true,
-      'manifest-display': false,
-      'without-javascript': true,
-      'user-timings': true,
-      'critical-request-chains': true,
-      'manifest-exists': false,
-      'manifest-background-color': false,
-      'manifest-theme-color': false,
-      'manifest-icons-min-192': false,
-      'manifest-icons-min-144': false,
-      'manifest-name': false,
-      'manifest-short-name': false,
-      'manifest-short-name-length': false,
-      'manifest-start-url': false,
-      'theme-color-meta': false,
-      'aria-valid-attr': true,
-      'aria-allowed-attr': true,
-      'color-contrast': true,
-      'image-alt': true,
-      'label': true,
-      'tabindex': true,
-      'content-width': true
+      'is-on-https': {
+        score: false
+      },
+      'redirects-http': {
+        score: false
+      },
+      'service-worker': {
+        score: false
+      },
+      'works-offline': {
+        score: false
+      },
+      'viewport': {
+        score: true
+      },
+      'manifest-display': {
+        score: false
+      },
+      'without-javascript': {
+        score: true
+      },
+      'user-timings': {
+        score: true,
+        displayValue: '0'
+      },
+      'critical-request-chains': {
+        score: true,
+        displayValue: '0'
+      },
+      'manifest-exists': {
+        score: false
+      },
+      'manifest-background-color': {
+        score: false
+      },
+      'manifest-theme-color': {
+        score: false
+      },
+      'manifest-icons-min-192': {
+        score: false
+      },
+      'manifest-icons-min-144': {
+        score: false
+      },
+      'manifest-name': {
+        score: false
+      },
+      'manifest-short-name': {
+        score: false
+      },
+      'manifest-short-name-length': {
+        score: false
+      },
+      'manifest-start-url': {
+        score: false
+      },
+      'theme-color-meta': {
+        score: false
+      },
+      'aria-valid-attr': {
+        score: true
+      },
+      'aria-allowed-attr': {
+        score: true
+      },
+      'color-contrast': {
+        score: true
+      },
+      'image-alt': {
+        score: true
+      },
+      'label': {
+        score: true
+      },
+      'tabindex': {
+        score: true
+      },
+      'content-width': {
+        score: true
+      }
     }
   },
 
@@ -59,32 +113,86 @@ module.exports = [
     initialUrl: 'http://localhost:10503/offline-ready.html',
     url: 'http://localhost:10503/offline-ready.html',
     audits: {
-      'is-on-https': false,
-      'redirects-http': false,
-      'service-worker': true,
-      'works-offline': true,
-      'viewport': true,
-      'manifest-display': false,
-      'without-javascript': true,
-      'user-timings': true,
-      'critical-request-chains': false,
-      'manifest-exists': false,
-      'manifest-background-color': false,
-      'manifest-theme-color': false,
-      'manifest-icons-min-192': false,
-      'manifest-icons-min-144': false,
-      'manifest-name': false,
-      'manifest-short-name': false,
-      'manifest-short-name-length': false,
-      'manifest-start-url': false,
-      'theme-color-meta': false,
-      'aria-valid-attr': true,
-      'aria-allowed-attr': true,
-      'color-contrast': true,
-      'image-alt': false,
-      'label': true,
-      'tabindex': true,
-      'content-width': true
+      'is-on-https': {
+        score: false
+      },
+      'redirects-http': {
+        score: false
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: true
+      },
+      'viewport': {
+        score: true
+      },
+      'manifest-display': {
+        score: false
+      },
+      'without-javascript': {
+        score: true
+      },
+      'user-timings': {
+        score: true,
+        displayValue: '0'
+      },
+      'critical-request-chains': {
+        score: false,
+        displayValue: '1'
+      },
+      'manifest-exists': {
+        score: false
+      },
+      'manifest-background-color': {
+        score: false
+      },
+      'manifest-theme-color': {
+        score: false
+      },
+      'manifest-icons-min-192': {
+        score: false
+      },
+      'manifest-icons-min-144': {
+        score: false
+      },
+      'manifest-name': {
+        score: false
+      },
+      'manifest-short-name': {
+        score: false
+      },
+      'manifest-short-name-length': {
+        score: false
+      },
+      'manifest-start-url': {
+        score: false
+      },
+      'theme-color-meta': {
+        score: false
+      },
+      'aria-valid-attr': {
+        score: true
+      },
+      'aria-allowed-attr': {
+        score: true
+      },
+      'color-contrast': {
+        score: true
+      },
+      'image-alt': {
+        score: false
+      },
+      'label': {
+        score: true
+      },
+      'tabindex': {
+        score: true
+      },
+      'content-width': {
+        score: true
+      }
     }
   }
 ];

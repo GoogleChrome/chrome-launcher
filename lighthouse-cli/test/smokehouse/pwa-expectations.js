@@ -25,20 +25,52 @@ module.exports = [
     initialUrl: 'https://airhorner.com',
     url: 'https://airhorner.com/',
     audits: {
-      'is-on-https': true,
-      'redirects-http': true,
-      'service-worker': true,
-      'works-offline': true,
-      'manifest-display': true,
-      'manifest-exists': true,
-      'manifest-background-color': true,
-      'manifest-theme-color': true,
-      'manifest-icons-min-192': true,
-      'manifest-icons-min-144': true,
-      'manifest-name': true,
-      'manifest-short-name': true,
-      'manifest-start-url': true,
-      // 'cache-start-url': true
+      'is-on-https': {
+        score: true
+      },
+      'redirects-http': {
+        score: true
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: true
+      },
+      'manifest-display': {
+        score: true,
+        displayValue: 'standalone'
+      },
+      'manifest-exists': {
+        score: true
+      },
+      'manifest-background-color': {
+        score: true,
+        extendedInfo: {
+          value: '#2196F3'
+        }
+      },
+      'manifest-theme-color': {
+        score: true
+      },
+      'manifest-icons-min-192': {
+        score: true
+      },
+      'manifest-icons-min-144': {
+        score: true
+      },
+      'manifest-name': {
+        score: true
+      },
+      'manifest-short-name': {
+        score: true
+      },
+      'manifest-start-url': {
+        score: true
+      },
+      // 'cache-start-url': {
+      //   score: true
+      // }
     }
   },
 
@@ -46,20 +78,52 @@ module.exports = [
     initialUrl: 'https://www.chromestatus.com/',
     url: 'https://www.chromestatus.com/features',
     audits: {
-      'is-on-https': true,
-      'redirects-http': true,
-      'service-worker': true,
-      'works-offline': false,
-      'manifest-display': true,
-      'manifest-exists': true,
-      'manifest-background-color': true,
-      'manifest-theme-color': true,
-      'manifest-icons-min-192': true,
-      'manifest-icons-min-144': true,
-      'manifest-name': true,
-      'manifest-short-name': true,
-      'manifest-start-url': true,
-      // 'cache-start-url': true
+      'is-on-https': {
+        score: true
+      },
+      'redirects-http': {
+        score: true
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: false
+      },
+      'manifest-display': {
+        score: true,
+        displayValue: 'standalone'
+      },
+      'manifest-exists': {
+        score: true
+      },
+      'manifest-background-color': {
+        score: true,
+        extendedInfo: {
+          value: '#366597'
+        }
+      },
+      'manifest-theme-color': {
+        score: true
+      },
+      'manifest-icons-min-192': {
+        score: true
+      },
+      'manifest-icons-min-144': {
+        score: true
+      },
+      'manifest-name': {
+        score: true
+      },
+      'manifest-short-name': {
+        score: true
+      },
+      'manifest-start-url': {
+        score: true
+      },
+      // 'cache-start-url': {
+      //   score: true
+      // }
     }
   },
 
@@ -67,20 +131,54 @@ module.exports = [
     initialUrl: 'https://jakearchibald.github.io/svgomg/',
     url: 'https://jakearchibald.github.io/svgomg/',
     audits: {
-      'is-on-https': true,
-      'redirects-http': true,
-      'service-worker': true,
-      'works-offline': true,
-      'manifest-display': true,
-      'manifest-exists': true,
-      'manifest-background-color': true,
-      'manifest-theme-color': true,
-      'manifest-icons-min-192': true,
-      'manifest-icons-min-144': true,
-      'manifest-name': true,
-      'manifest-short-name': true,
-      'manifest-start-url': true,
-      // 'cache-start-url': true
+      'is-on-https': {
+        score: true
+      },
+      'redirects-http': {
+        score: true
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: true
+      },
+      'manifest-display': {
+        score: true,
+        displayValue: 'standalone'
+      },
+      'manifest-exists': {
+        score: true
+      },
+      'manifest-background-color': {
+        score: true,
+        extendedInfo: {
+          value: '#bababa'
+        }
+      },
+      'manifest-theme-color': {
+        score: true
+      },
+      'manifest-icons-min-192': {
+        score: true,
+        displayValue: 'found sizes: 600x600',
+      },
+      'manifest-icons-min-144': {
+        score: true,
+        displayValue: 'found sizes: 600x600',
+      },
+      'manifest-name': {
+        score: true
+      },
+      'manifest-short-name': {
+        score: true
+      },
+      'manifest-start-url': {
+        score: true
+      },
+      // 'cache-start-url': {
+      //   score: true
+      // }
     }
   },
 
@@ -88,20 +186,52 @@ module.exports = [
     initialUrl: 'https://shop.polymer-project.org/',
     url: 'https://shop.polymer-project.org/',
     audits: {
-      'is-on-https': true,
-      'redirects-http': true,
-      'service-worker': true,
-      'works-offline': true,
-      'manifest-display': true,
-      'manifest-exists': true,
-      'manifest-background-color': true,
-      'manifest-theme-color': true,
-      'manifest-icons-min-192': true,
-      'manifest-icons-min-144': true,
-      'manifest-name': true,
-      'manifest-short-name': true,
-      'manifest-start-url': true,
-      // 'cache-start-url': true
+      'is-on-https': {
+        score: true
+      },
+      'redirects-http': {
+        score: true
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: true
+      },
+      'manifest-display': {
+        score: true,
+        displayValue: 'standalone'
+      },
+      'manifest-exists': {
+        score: true
+      },
+      'manifest-background-color': {
+        score: true,
+        extendedInfo: {
+          value: '#fff'
+        }
+      },
+      'manifest-theme-color': {
+        score: true
+      },
+      'manifest-icons-min-192': {
+        score: true
+      },
+      'manifest-icons-min-144': {
+        score: true
+      },
+      'manifest-name': {
+        score: true
+      },
+      'manifest-short-name': {
+        score: true
+      },
+      'manifest-start-url': {
+        score: true
+      },
+      // 'cache-start-url': {
+      //   score: true
+      // }
     }
   },
 
@@ -109,20 +239,52 @@ module.exports = [
     initialUrl: 'https://pwa.rocks',
     url: 'https://pwa.rocks/',
     audits: {
-      'is-on-https': true,
-      'redirects-http': true,
-      'service-worker': true,
-      'works-offline': true,
-      'manifest-display': true,
-      'manifest-exists': true,
-      'manifest-background-color': true,
-      'manifest-theme-color': true,
-      'manifest-icons-min-192': true,
-      'manifest-icons-min-144': true,
-      'manifest-name': true,
-      'manifest-short-name': true,
-      'manifest-start-url': true,
-      // 'cache-start-url': true
+      'is-on-https': {
+        score: true
+      },
+      'redirects-http': {
+        score: true
+      },
+      'service-worker': {
+        score: true
+      },
+      'works-offline': {
+        score: true
+      },
+      'manifest-display': {
+        score: true,
+        displayValue: 'standalone'
+      },
+      'manifest-exists': {
+        score: true
+      },
+      'manifest-background-color': {
+        score: true,
+        extendedInfo: {
+          value: '#383838'
+        }
+      },
+      'manifest-theme-color': {
+        score: true
+      },
+      'manifest-icons-min-192': {
+        score: true
+      },
+      'manifest-icons-min-144': {
+        score: true
+      },
+      'manifest-name': {
+        score: true
+      },
+      'manifest-short-name': {
+        score: true
+      },
+      'manifest-start-url': {
+        score: true
+      },
+      // 'cache-start-url': {
+      //   score: true
+      // }
     }
   }
 ];

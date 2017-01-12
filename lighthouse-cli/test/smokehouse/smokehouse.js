@@ -97,9 +97,61 @@ function runLighthouse(url, configPath) {
 }
 
 /**
+ * Walk down expected result, comparing to actual result. If a difference is found,
+ * the path to the difference is returned, along with the expected primitive value
+ * and the value actually found at that location. If no difference is found, returns
+ * null.
+ *
+ * Only checks own enumerable properties, not object prototypes, and will loop
+ * until the stack is exhausted, so works best with simple objects (e.g. parsed JSON).
+ * @param {string} path
+ * @param {*} actual
+ * @param {*} expected
+ * @return {({path: string, actual: *, expected: *}|null)}
+ */
+function findDifference(path, actual, expected) {
+  // Strict equality check, plus NaN equivalence.
+  if (Object.is(actual, expected)) {
+    return null;
+  }
+
+  // If they aren't both an object we can't recurse further, so this is the difference.
+  if (actual === null || expected === null || typeof actual !== 'object' ||
+      typeof expected !== 'object') {
+    return {
+      path,
+      actual,
+      expected
+    };
+  }
+
+  // We only care that all expected's own properties are on actual (and not the other way around).
+  for (const key of Object.keys(expected)) {
+    // Bracket numbers, but property names requiring quotes will still be unquoted.
+    const keyAccessor = /^\d+$/.test(key) ? `[${key}]` : `.${key}`;
+    const keyPath = path + keyAccessor;
+    const expectedValue = expected[key];
+
+    if (!(key in actual)) {
+      return {keyPath, undefined, expectedValue};
+    }
+
+    const actualValue = actual[key];
+    const subDifference = findDifference(keyPath, actualValue, expectedValue);
+
+    // Break on first difference found.
+    if (subDifference) {
+      return subDifference;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Collate results into comparisons of actual and expected scores on each audit.
- * @param {{url: string, audits: {score: boolean}}} actual
- * @param {{url: string, audits: boolean}} expected
+ * @param {{url: string, audits: !Array}} actual
+ * @param {{url: string, audits: !Array}} expected
  * @return {{finalUrl: !Object, audits: !Array<!Object>}}
  */
 function collateResults(actual, expected) {
@@ -110,13 +162,15 @@ function collateResults(actual, expected) {
       throw new Error(`Config did not trigger run of expected audit ${auditName}`);
     }
 
-    const actualScore = actualResult.score;
-    const expectedScore = expected.audits[auditName];
+    const expectedResult = expected.audits[auditName];
+    const diff = findDifference(auditName, actualResult, expectedResult);
+
     return {
       category: auditName,
-      actual: actualScore,
-      expected: expectedScore,
-      equal: actualScore === expectedScore
+      actual: actualResult,
+      expected: expectedResult,
+      equal: !diff,
+      diff
     };
   });
 
@@ -133,15 +187,25 @@ function collateResults(actual, expected) {
 
 /**
  * Log the result of an assertion of actual and expected results.
- * @param {{category: string, equal: boolean, actual: boolean, expected: boolean}} assertion
+ * @param {{category: string, equal: boolean, diff: ?Object, actual: boolean, expected: boolean}} assertion
  */
 function reportAssertion(assertion) {
   if (assertion.equal) {
     console.log(`  ${log.greenify(log.tick)} ${assertion.category}: ` +
         log.greenify(assertion.actual));
   } else {
-    console.log(`  ${log.redify(log.cross)} ${assertion.category}: ` +
-        log.redify(`found ${assertion.actual}, expected ${assertion.expected}`));
+    if (assertion.diff) {
+      const diff = assertion.diff;
+      let msg = `  ${log.redify(log.cross)} difference at ${diff.path}: `;
+      msg += log.redify(`found ${diff.actual}, expected ${diff.expected}\n`);
+
+      const fullActual = JSON.stringify(assertion.actual, null, 2).replace(/\n/g, '\n      ');
+      msg += log.redify('      full found result: ' + fullActual);
+      console.log(msg);
+    } else {
+      console.log(`  ${log.redify(log.cross)} ${assertion.category}: ` +
+          log.redify(`found ${assertion.actual}, expected ${assertion.expected}`));
+    }
   }
 }
 
