@@ -6,7 +6,7 @@
   },
   "scripts": {
     "watch": "gulp watch",
-    "build": "gulp build"
+    "build": "gulp build -- $__node_harmony"
   },
   "devDependencies": {
     "brfs": "^1.4.3",

@@ -39,7 +39,7 @@ lighthouse --help
 
 ## Lighthouse Viewer
 
-If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to Github. 
+If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to Github.
 
 Note: shared reports are stashed as a secret Gist in Github, under your account.
 
@@ -51,13 +51,10 @@ git clone https://github.com/GoogleChrome/lighthouse
 
 cd lighthouse
 npm install
+npm install-all
 
-# The CLI is authored in TypeScript and requires compilation:
-cd lighthouse-cli
-npm install
-npm run build
-
-# To run the TS compiler in watch mode:
+# The CLI is authored in TypeScript and requires compilation.
+# If you need to make changes to the CLI, run the TS compiler in watch mode:
 # cd lighthouse-cli && npm run dev
 ```
 

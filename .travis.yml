@@ -15,26 +15,21 @@ cache:
      - lighthouse-viewer/node_modules
 install:
   - npm install
+  - npm run install-all
 before_script:
+  - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
   - npm i -g typescript@2.0
-  - npm --prefix ./lighthouse-extension install ./lighthouse-extension
-  - npm --prefix ./lighthouse-viewer install ./lighthouse-viewer
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./lighthouse-core/scripts/download-chrome.sh
-  - cd lighthouse-cli && tsc && cd ..
+  - npm run build-cli
+  - npm run build-extension
+  - npm run build-viewer
 script:
-  - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
   - npm run lint
   - npm run unit
   - npm run smoke
   - npm run smokehouse
-  - cd lighthouse-extension
-  - gulp build -- $__node_harmony
-  - cd ..
-  - cd lighthouse-viewer
-  - gulp
-  - cd ..
 after_success:
   - npm run coveralls

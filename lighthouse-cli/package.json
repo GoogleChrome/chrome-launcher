@@ -1,6 +1,7 @@
 {
   "main": "index.js",
   "scripts": {
+    "prepublish": "npm run build",
     "build": "tsc",
     "dev": "tsc -w"
   },

@@ -20,25 +20,23 @@ accept your pull requests.
 1. Ensure that your code adheres to the existing style in the sample to which you are contributing.
 1. Submit a pull request.
 
-
 ## Release guide
 
 ```sh
-# * Build the latest *
+# * Install the latest. This also builds the cli, extension, and viewer *
 yarn
-cd lighthouse-cli; yarn; yarn run build; cd ..
-cd lighthouse-viewer; yarn; gulp; cd ..
-cd lighthouse-extension; yarn; gulp build; cd ..
+yarn install-all
+yarn build-all
 
 # * Bump it *
 echo "Bump the versions in extension/app/manifest.json and package.json"
 
-# * Test err'thing * 
+# * Test err'thing *
 echo "Test the CLI."
 yarn run smoke
 echo "Test the extension"
 
-echo "Test a fresh local install (see below)"
+echo "Test a fresh local install"
 # (starting from lighthouse root...)
 # cd ..; mkdir tmp; cd tmp
 # npm install ../lighthouse
@@ -49,9 +47,7 @@ echo "Test a fresh local install (see below)"
 
 echo "Test the lighthouse-viewer build"
 # Manual test for now:
-# cd lighthouse-viewer
-# gulp build
-# start a server in dist/ and open the page in a tab. You should see the viewer.
+# Start a server in lighthouse-viewer/dist/ and open the page in a tab. You should see the viewer.
 # Drop in a results.json or paste an existing gist url (e.g. https://gist.github.com/ebidel/b9fd478b5f40bf5fab174439dc18f83a).
 # Check for errors!
 
@@ -71,8 +67,4 @@ echo "Generate the release notes, and update the release page"
 
 # * Tell the world!!! *
 echo "Inform various peoples"
-
-
-# * Testing a fresh local install *
-
 ```
