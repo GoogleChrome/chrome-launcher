@@ -1844,6 +1844,10 @@ meow@^3.3.0, meow@^3.7.0:
     redent "^1.0.0"
     trim-newlines "^1.0.0"
 
+metaviewport-parser@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/metaviewport-parser/-/metaviewport-parser-0.0.1.tgz#9b28179659b76ff9d21de84ae25583257909b206"
+
 micromatch@^2.3.7:
   version "2.3.11"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-2.3.11.tgz#86677c97d1720b363431d04d0d15293bd38c1565"

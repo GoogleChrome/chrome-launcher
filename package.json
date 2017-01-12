@@ -61,6 +61,7 @@
     "handlebars": "^4.0.5",
     "json-stringify-safe": "^5.0.1",
     "marked": "^0.3.6",
+    "metaviewport-parser": "^0.0.1",
     "mkdirp": "^0.5.1",
     "opn": "^4.0.2",
     "rimraf": "^2.2.8",

@@ -22,9 +22,11 @@ const assert = require('assert');
 
 describe('Mobile-friendly: viewport audit', () => {
   it('fails when no input present', () => {
-    return assert.equal(Audit.audit({
+    const audit = Audit.audit({
       Viewport: -1
-    }).rawValue, false);
+    });
+    assert.equal(audit.rawValue, -1);
+    assert.equal(audit.debugString, 'Error in determining viewport');
   });
 
   it('fails when HTML does not contain a viewport meta tag', () => {
@@ -33,9 +35,50 @@ describe('Mobile-friendly: viewport audit', () => {
     }).rawValue, false);
   });
 
-  it('passes when a viewport is provided', () => {
-    return assert.equal(Audit.audit({
-      Viewport: 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1'
-    }).rawValue, true);
+  it('fails when HTML contains a non-mobile friendly viewport meta tag', () => {
+    const viewport = 'maximum-scale=1';
+    assert.equal(Audit.audit({Viewport: viewport}).rawValue, false);
+    assert.equal(Audit.audit({
+      Viewport: viewport
+    }).debugString, '');
+  });
+
+  it('fails when HTML contains an invalid viewport meta tag key', () => {
+    const viewport = 'nonsense=true';
+    assert.equal(Audit.audit({Viewport: viewport}).rawValue, false);
+    assert.equal(Audit.audit({
+      Viewport: viewport
+    }).debugString, 'Invalid properties found: {"nonsense":"true"}.');
+  });
+
+  it('fails when HTML contains an invalid viewport meta tag value', () => {
+    const viewport = 'initial-scale=microscopic';
+    assert.equal(Audit.audit({Viewport: viewport}).rawValue, false);
+    assert.equal(Audit.audit({
+      Viewport: viewport
+    }).debugString, 'Invalid values found: {"initial-scale":"microscopic"}.');
+  });
+
+  it('fails when HTML contains an invalid viewport meta tag key and value', () => {
+    const viewport = 'nonsense=true, initial-scale=microscopic';
+    assert.equal(Audit.audit({Viewport: viewport}).rawValue, false);
+    assert.equal(Audit.audit({
+      Viewport: viewport
+    }).debugString, 'Invalid properties found: {"nonsense":"true"}. ' +
+        'Invalid values found: {"initial-scale":"microscopic"}.');
+  });
+
+  it('passes when a valid viewport is provided', () => {
+    const viewports = [
+      'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1',
+      'width = device-width, initial-scale = 1',
+      'initial-scale=1',
+      'width=device-width     ',
+    ];
+    viewports.forEach(viewport => {
+      assert.equal(Audit.audit({
+        Viewport: viewport
+      }).rawValue, true);
+    });
   });
 });
