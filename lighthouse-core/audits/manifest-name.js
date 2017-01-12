@@ -28,6 +28,8 @@ class ManifestName extends Audit {
       category: 'Manifest',
       name: 'manifest-name',
       description: 'Manifest contains `name`',
+      helpText: 'The `name` property identifies your app and is required. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-name).',
       requiredArtifacts: ['Manifest']
     };
   }

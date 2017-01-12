@@ -29,6 +29,9 @@ class ManifestIconsMin192 extends Audit {
       category: 'Manifest',
       name: 'manifest-icons-min-192',
       description: 'Manifest contains icons at least 192px',
+      helpText: 'A 192px icon ensures that your app\'s icon displays well ' +
+          'on the homescreens of the largest mobile devices. [Learn ' +
+          'more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-192px-icon).',
       requiredArtifacts: ['Manifest']
     };
   }

@@ -28,6 +28,9 @@ class ManifestExists extends Audit {
       category: 'Manifest',
       name: 'manifest-exists',
       description: 'Manifest exists',
+      helpText: 'The web app manifest is the technology that enables users ' +
+          'to add your web app to their homescreen. [Learn ' +
+          'more](https://developers.google.com/web/tools/lighthouse/audits/manifest-exists).',
       requiredArtifacts: ['Manifest']
     };
   }

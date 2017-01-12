@@ -28,6 +28,9 @@ class ManifestShortName extends Audit {
       category: 'Manifest',
       name: 'manifest-short-name',
       description: 'Manifest contains `short_name`',
+      helpText: 'The `short_name` property is a requirement for Add ' +
+          'To Homescreen. [Learn ' +
+          'more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-short_name).',
       requiredArtifacts: ['Manifest']
     };
   }

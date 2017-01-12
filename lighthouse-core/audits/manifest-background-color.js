@@ -29,6 +29,10 @@ class ManifestBackgroundColor extends Audit {
       category: 'Manifest',
       name: 'manifest-background-color',
       description: 'Manifest contains `background_color`',
+      helpText: 'When your app launches from a user\'s homescreen, the browser ' +
+          'uses `background_color` to paint the background of the browser ' +
+          'while your app loads for a smooth transition experience. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-background_color).',
       requiredArtifacts: ['Manifest']
     };
   }

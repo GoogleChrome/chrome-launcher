@@ -28,6 +28,9 @@ class ManifestStartUrl extends Audit {
       category: 'Manifest',
       name: 'manifest-start-url',
       description: 'Manifest contains `start_url`',
+      helpText: 'Add a `start_url` to instruct the browser to launch a ' +
+          'specific URL whenever your app is launched from a homescreen. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-start_url).',
       requiredArtifacts: ['Manifest']
     };
   }

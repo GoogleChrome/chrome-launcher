@@ -28,6 +28,9 @@ class ManifestDisplay extends Audit {
       category: 'Manifest',
       name: 'manifest-display',
       description: 'Manifest\'s `display` property is set',
+      helpText: 'Set the `display` property to specify how your app ' +
+          'launches from the homescreen. [Learn ' +
+          'more](https://developers.google.com/web/tools/lighthouse/audits/manifest-has-display-set).',
       requiredArtifacts: ['Manifest']
     };
   }

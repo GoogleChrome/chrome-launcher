@@ -28,6 +28,9 @@ class ManifestThemeColor extends Audit {
       category: 'Manifest',
       name: 'manifest-theme-color',
       description: 'Manifest contains `theme_color`',
+      helpText: 'Add a `theme_color` to set the color of the browser\'s ' +
+          'address bar. [Learn ' +
+          'more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-theme_color).',
       requiredArtifacts: ['Manifest']
     };
   }
