@@ -22,6 +22,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
 
+<!-- FAIL: block rendering -->
 <script src="./dbw_tester.js"></script>
 
 <template id="links-blocking-first-paint-tmpl">
@@ -54,7 +55,7 @@
     background: red, green;
     border-radius: 3px;
     transform: translateZ(0);
-    display: box;
+    display: box; /* FAIL */
     transition: opacity 300ms ease-in-out;
   }
   .span {
@@ -345,6 +346,8 @@ if (location.search === '') {
 }
 </script>
 
+<!-- PASS: not in header, so it does not block rendering. zone.js is loaded
+     by the static-server and provides a polyfill for Promise. -->
 <script src="/zone.js"></script>
 </body>
 </html>

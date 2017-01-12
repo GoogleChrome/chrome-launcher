@@ -28,49 +28,103 @@ module.exports = [
         score: false
       },
       'uses-http2': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 10
+          }
+        }
       },
       'external-anchors-use-rel-noopener': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 2
+          }
+        }
       },
       'appcache-manifest': {
-        score: false
+        score: false,
+        displayValue: '<html manifest="clock.appcache">'
       },
       'geolocation-on-start': {
         score: false
       },
       'link-blocking-first-paint': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 4
+          }
+        }
       },
       'no-console-time': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 3
+          }
+        }
       },
       'no-datenow': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 5
+          }
+        }
       },
       'no-document-write': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 3
+          }
+        }
       },
       'no-mutation-events': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 6
+          }
+        }
       },
       'no-old-flexbox': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 4
+          }
+        }
       },
       'no-websql': {
-        score: false
+        score: false,
+        displayValue: 'db name: mydb, version: 1.0'
       },
       'notification-on-start': {
         score: false
       },
       'script-blocking-first-paint': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 1
+          }
+        }
       },
       'unused-css-rules': {
         score: false
       },
       'uses-passive-event-listeners': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            // Note: This would normally be 7 but M56 defaults document-level
+            // listeners to passive. See https://www.chromestatus.com/features/5093566007214080
+            length: 4
+          }
+        }
       }
     }
   }, {
