@@ -19,6 +19,7 @@
 require('../../compiled-check.js')('chrome-launcher.js');
 
 const ChromeLauncher = require('../../chrome-launcher.js').ChromeLauncher;
+const assert = require('assert');
 
 /* eslint-env mocha */
 
@@ -31,6 +32,20 @@ describe('ChromeLauncher', () => {
           chromeInstance.kill(),
           chromeInstance.kill()
         ]);
+      });
+  });
+
+  it('doesn\'t launch multiple chrome processes', () => {
+    const chromeInstance = new ChromeLauncher();
+    let pid;
+    return chromeInstance.run()
+      .then(() => {
+        pid = chromeInstance.chrome.pid;
+        return chromeInstance.run();
+      })
+      .then(() => {
+        assert.strictEqual(pid, chromeInstance.chrome.pid);
+        return chromeInstance.kill();
       });
   });
 });
