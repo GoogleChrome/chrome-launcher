@@ -17,6 +17,8 @@
 
 'use strict';
 
+/* eslint-disable no-console */
+
 /**
  * Logs messages via a UI butter.
  * @class

@@ -280,6 +280,7 @@ window.isRunning = function() {
 if (window.chrome && chrome.runtime) {
   chrome.runtime.onInstalled.addListener(details => {
     if (details.previousVersion) {
+      // eslint-disable-next-line no-console
       console.log('previousVersion', details.previousVersion);
     }
   });

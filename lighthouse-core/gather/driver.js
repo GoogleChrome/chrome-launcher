@@ -739,6 +739,7 @@ class Driver {
  * @return {function(...*): *} A wrapper around the original function.
  */
 function captureJSCallUsage(funcRef, set) {
+  /* global window */
   const __nativeError = window.__nativeError || Error;
   const originalFunc = funcRef;
   const originalPrepareStackTrace = __nativeError.prepareStackTrace;

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-/* global window, document, location */
+/* global window, document, location, fetch */
 
 'use strict';
 

@@ -370,11 +370,12 @@ class LighthouseViewerReport {
       case 'print':
         window.print();
         break;
-      case 'save-json':
+      case 'save-json': {
         const jsonStr = JSON.stringify(this.json, null, 2);
         this._saveFile(new Blob([jsonStr], {type: 'application/json'}));
         break;
-      case 'save-html':
+      }
+      case 'save-html': {
         const reportGenerator = new ReportGenerator();
         try {
           const htmlStr = reportGenerator.generateHTML(this.json, 'cli');
@@ -383,6 +384,7 @@ class LighthouseViewerReport {
           logger.error('Could not export as HTML.');
         }
         break;
+      }
     }
 
     this.closeExportDropdown();

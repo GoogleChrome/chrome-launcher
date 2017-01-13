@@ -17,6 +17,8 @@
 
 'use strict';
 
+/* eslint-disable no-console */
+
 const log = require('./log.js');
 
 class ConsoleQuieter {

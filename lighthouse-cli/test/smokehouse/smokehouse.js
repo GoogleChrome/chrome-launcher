@@ -17,6 +17,8 @@
  */
 'use strict';
 
+/* eslint-disable no-console */
+
 const path = require('path');
 const spawnSync = require('child_process').spawnSync;
 const yargs = require('yargs');

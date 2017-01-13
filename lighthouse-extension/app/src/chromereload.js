@@ -17,6 +17,8 @@
 
 'use strict';
 
+/* eslint-disable no-console */
+
 // Reload client for Chrome Apps & Extensions.
 // The reload client has a compatibility with livereload.
 // WARNING: only supports reload command.
