@@ -65,12 +65,17 @@ URL.hostsMatch = function hostsMatch(urlA, urlB) {
 URL.getDisplayName = function getDisplayName(url) {
   const parsed = new URL(url);
 
-  // Handle 'about:*' URLs specially since they have no path.
-  let name = parsed.protocol === 'about:' ? parsed.href :
-      // Otherwise, remove any query strings from the path.
-      parsed.pathname.replace(/\?.*/, '')
-      // And grab the last two parts.
-      .split('/').slice(-2).join('/');
+  let name;
+
+  if (parsed.protocol === 'about:' || parsed.protocol === 'data:') {
+    // Handle 'about:*' and 'data:*' URLs specially since they have no path.
+    name = parsed.href;
+  } else {
+    // Otherwise, remove any query strings from the path.
+    name = parsed.pathname.replace(/\?.*/, '')
+        // And grab the last two parts.
+        .split('/').slice(-2).join('/');
+  }
 
   const MAX_LENGTH = 64;
   // Always elide hash
@@ -78,9 +83,13 @@ URL.getDisplayName = function getDisplayName(url) {
   // Elide too long names
   if (name.length > MAX_LENGTH) {
     const dotIndex = name.lastIndexOf('.');
-    name = name.slice(0, MAX_LENGTH - 1 - (name.length - dotIndex)) +
-        // Show file extension
-        `\u2026${name.slice(dotIndex)}`;
+    if (dotIndex >= 0) {
+      name = name.slice(0, MAX_LENGTH - 1 - (name.length - dotIndex)) +
+          // Show file extension
+          `\u2026${name.slice(dotIndex)}`;
+    } else {
+      name = name.slice(0, MAX_LENGTH - 1) + '\u2026';
+    }
   }
 
   return name;

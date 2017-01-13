@@ -28,7 +28,7 @@ class UnusedCSSRules extends Audit {
    */
   static get meta() {
     return {
-      category: 'Best Practices',
+      category: 'CSS',
       name: 'unused-css-rules',
       description: 'Site does not have more than 10% unused CSS',
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +

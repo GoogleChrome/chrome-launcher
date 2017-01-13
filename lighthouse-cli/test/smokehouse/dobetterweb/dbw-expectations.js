@@ -125,7 +125,10 @@ module.exports = [
             length: 4
           }
         }
-      }
+      },
+      'uses-optimized-images': {
+        score: false
+      },
     }
   }, {
     initialUrl: 'http://localhost:10200/online-only.html',

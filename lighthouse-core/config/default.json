@@ -39,6 +39,7 @@
       "dobetterweb/document-write",
       "dobetterweb/geolocation-on-start",
       "dobetterweb/notification-on-start",
+      "dobetterweb/optimized-images",
       "dobetterweb/tags-blocking-first-paint",
       "dobetterweb/websql"
     ]
@@ -92,6 +93,7 @@
     "dobetterweb/notification-on-start",
     "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
+    "dobetterweb/uses-optimized-images",
     "dobetterweb/uses-passive-event-listeners"
   ],
 
@@ -289,9 +291,8 @@
     }, {
       "name": "Using bytes efficiently",
       "audits": {
-        "unused-css-rules": {
-          "expectedValue": false
-        }
+        "unused-css-rules": {},
+        "uses-optimized-images": {}
       }
     }, {
       "name": "Using modern CSS features",
