@@ -57,6 +57,7 @@ class LighthouseViewerReport {
 
     this.initUI();
     this.loadFromDeepLink();
+    this.listenForMessages();
   }
 
   initUI() {
@@ -67,9 +68,9 @@ class LighthouseViewerReport {
       // Disable the share button after the user shares the gist or if we're loading
       // a gist from Github. In both cases, the gist is already shared :)
       if (this._isNewReport) {
-        this.enableShareButton();
+        this.enableButton(this.shareButton);
       } else {
-        this.disableShareButton();
+        this.disableButton(this.shareButton);
       }
     }
 
@@ -88,16 +89,21 @@ class LighthouseViewerReport {
     if (gistURLInput) {
       gistURLInput.addEventListener('change', this.onInputChange);
     }
+
+    // Disable "Open in Lighthouse Viewer" button. We're already in the viewer.
+    this.disableButton(document.querySelector('.js-open'));
   }
 
-  enableShareButton() {
-    this.shareButton.classList.remove('disable');
-    this.shareButton.disabled = false;
+  enableButton(button) {
+    if (button) {
+      button.disabled = false;
+    }
   }
 
-  disableShareButton() {
-    this.shareButton.classList.add('disable');
-    this.shareButton.disabled = true;
+  disableButton(button) {
+    if (button) {
+      button.disabled = true;
+    }
   }
 
   closeExportDropdown() {
@@ -214,7 +220,7 @@ class LighthouseViewerReport {
     return this.github.createGist(this.json).then(id => {
       ga('send', 'event', 'report', 'created');
 
-      this.disableShareButton();
+      this.disableButton(this.shareButton);
       history.pushState({}, null, `${APP_URL}?gist=${id}`);
 
       return id;
@@ -397,6 +403,23 @@ class LighthouseViewerReport {
   onKeyDown(e) {
     if (e.keyCode === 27) { // ESC
       this.closeExportDropdown();
+    }
+  }
+
+  /*
+   * Initializes of a `message` listener to respond to postMessage events.
+   */
+  listenForMessages() {
+    window.addEventListener('message', e => {
+      if (e.source === self.opener && e.data.lhresults) {
+        this.replaceReportHTML(e.data.lhresults);
+        ga('send', 'event', 'report', 'open in viewer');
+      }
+    });
+
+    // If the page was opened as a popup, tell the opening window we're ready.
+    if (self.opener && !self.opener.closed) {
+      self.opener.postMessage({opened: true}, '*');
     }
   }
 }

@@ -64,12 +64,30 @@ describe('Report', () => {
     const html = reportGenerator.generateHTML(sampleResults);
 
     assert.ok(html.includes('<footer'), 'no footer tag found');
-    assert.ok(html.includes('printButton = document.querySelector'),
-              'lighthouse-report.js was not inlined');
-    assert.ok(html.includes('.report-body {'), 'report.css was not inlined');
-    assert.ok(!html.includes('&quot;lighthouseVersion'), 'lhresults were not escaped');
+    assert.ok(html.includes('<div id="lhresults-dump">'), 'report results were inlined');
+    assert.ok(html.includes('window.lhresults = JSON.parse('), 'lhresults created');
+    assert.ok(html.includes('.report-body {'), 'report.css inlined');
+    assert.ok(html.includes('&quot;lighthouseVersion'), 'lhresults were escaped');
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
     assert.ok(html.includes('export-button'), 'page includes export button');
+
+    assert.ok(html.includes('printButton = document.querySelector'),
+                            'print button functionality attached');
+    assert.ok(html.includes('openButton = document.querySelector'),
+                            'open button functionality attached');
+    assert.ok(html.includes('share js-share'), 'has share button');
+    assert.ok(html.includes('copy js-copy'), 'has copy button');
+    assert.ok(html.includes('open js-open'), 'has open button');
+    assert.ok(html.includes('print js-print'), 'has print button');
+  });
+
+  it('does not include script for devtools', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults, 'devtools');
+
+    assert.ok(!html.includes('<script'), 'script tag inlined');
+    assert.ok(!html.includes('<div id="lhresults-dump">'), 'report results were inlined');
+    assert.ok(!html.includes('window.lhresults = JSON.parse('), 'lhresults created');
   });
 
   it('sanitizes JSON input', () => {
@@ -109,6 +127,5 @@ describe('Report', () => {
         'anchors are transformed');
     assert.ok(!html.includes(
         '<img src="test.gif" onerror="alert(10)">'), 'non-recognized HTML is sanitized');
-    assert.ok(!html.includes('<b>html should not</b>'), 'non-recognized HTML is sanitized');
   });
 });

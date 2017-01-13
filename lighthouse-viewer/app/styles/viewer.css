@@ -116,7 +116,8 @@
 #log.show {
   transform: translateY(0);
 }
-.share:disabled {
+.share:disabled,
+.open:disabled {
   opacity: 0.2;
   cursor: default;
 }
