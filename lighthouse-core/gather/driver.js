@@ -559,12 +559,19 @@ class Driver {
       options: 'sampling-frequency=10000'  // 1000 is default and too slow.
     };
 
-    // Disable any domains that could interfere or add overhead to the trace
-    return this.sendCommand('Debugger.disable')
-      .then(_ => this.sendCommand('CSS.disable'))
-      .then(_ => this.sendCommand('DOM.disable'))
-      // Enable Page domain to wait for Page.loadEventFired
-      .then(_ => this.sendCommand('Page.enable'))
+    // Check any domains that could interfere with or add overhead to the trace.
+    if (this.isDomainEnabled('Debugger')) {
+      throw new Error('Debugger domain enabled when starting trace');
+    }
+    if (this.isDomainEnabled('CSS')) {
+      throw new Error('CSS domain enabled when starting trace');
+    }
+    if (this.isDomainEnabled('DOM')) {
+      throw new Error('DOM domain enabled when starting trace');
+    }
+
+    // Enable Page domain to wait for Page.loadEventFired
+    return this.sendCommand('Page.enable')
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
 
@@ -583,9 +590,6 @@ class Driver {
 
   _readTraceFromStream(streamHandle) {
     return new Promise((resolve, reject) => {
-      // COMPAT: We've found `result` not retaining its value in this scenario when it's
-      // declared with `let`. Observed in Chrome 50 and 52. While investigating the V8 bug
-      // further, we'll use a plain `var` declaration.
       let isEOF = false;
       let result = '';
 

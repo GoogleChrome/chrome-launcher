@@ -100,7 +100,8 @@ class Connection {
       // handleRawError returns or throws synchronously; wrap to put into promise chain.
       return callback.resolve(Promise.resolve().then(_ => {
         if (object.error) {
-          return this.handleRawError(object.error, callback.method);
+          log.formatProtocol('method <= browser ERR', {method: callback.method}, 'error');
+          throw new Error(`Protocol error (${callback.method}): ${object.error.message}`);
         }
 
         log.formatProtocol('method <= browser OK',
@@ -111,27 +112,6 @@ class Connection {
     log.formatProtocol('<= event',
         {method: object.method, params: object.params}, 'verbose');
     this.emitNotification(object.method, object.params);
-  }
-
-  /**
-   * Handles error responses from the protocol, absorbing errors we don't care
-   * about and throwing on the rest.
-   *
-   * Currently the only error ignored is from defensive calls of `DOM.disable`
-   * when already disabled.
-   * @param {{message: string}} error
-   * @param {string} method Protocol method that received the error response.
-   * @throws {Error}
-   * @protected
-   */
-  handleRawError(error, method) {
-    // We proactively disable the DOM domain. Ignore any errors.
-    if (error.message && error.message.includes('DOM agent hasn\'t been enabled')) {
-      return;
-    }
-
-    log.formatProtocol('method <= browser ERR', {method}, 'error');
-    throw new Error(`Protocol error (${method}): ${error.message}`);
   }
 
   /**

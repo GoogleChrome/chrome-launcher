@@ -121,12 +121,10 @@ class Styles extends Gatherer {
       Promise.all(contentPromises).then(styleHeaders => {
         driver.off('CSS.styleSheetAdded', this._onStyleSheetAdded);
         driver.off('CSS.styleSheetRemoved', this._onStyleSheetRemoved);
-        resolve(styleHeaders);
-        // Currently both CSSUsage and Styles use these domains, so let it disable there.
-        // TODO: have a better way to specify used domains
-        // return driver.sendCommand('CSS.disable')
-        //   .then(_ => driver.sendCommand('DOM.disable'))
-        //   .then(_ => resolve(styleHeaders));
+
+        return driver.sendCommand('CSS.disable')
+          .then(_ => driver.sendCommand('DOM.disable'))
+          .then(_ => resolve(styleHeaders));
       }).catch(err => reject(err));
     });
   }
