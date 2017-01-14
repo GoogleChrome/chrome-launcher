@@ -37,8 +37,9 @@ class Driver {
     this._traceCategories = Driver.traceCategories;
     this._eventEmitter = new EventEmitter();
     this._connection = connection;
-    this.online = true;
     connection.on('notification', event => this._eventEmitter.emit(event.method, event.params));
+    this.online = true;
+    this._domainEnabledCounts = new Map();
   }
 
   static get traceCategories() {
@@ -115,15 +116,67 @@ class Driver {
   }
 
   /**
+   * Debounce enabling or disabling domains to prevent driver users from
+   * stomping on each other. Maintains an internal count of the times a domain
+   * has been enabled. Returns false if the command would have no effect (domain
+   * is already enabled or disabled), or if command would interfere with another
+   * user of that domain (e.g. two gatherers have enabled a domain, both need to
+   * disable it for it to be disabled). Returns true otherwise.
+   * @param {string} domain
+   * @param {boolean} enable
+   * @return {boolean}
+   * @private
+   */
+  _shouldToggleDomain(domain, enable) {
+    const enabledCount = this._domainEnabledCounts.get(domain) || 0;
+    const newCount = enabledCount + (enable ? 1 : -1);
+    this._domainEnabledCounts.set(domain, Math.max(0, newCount));
+
+    // Switching to enabled or disabled, respectively.
+    if ((enable && newCount === 1) || (!enable && newCount === 0)) {
+      log.verbose('Driver', `${domain}.${enable ? 'enable' : 'disable'}`);
+      return true;
+    } else {
+      if (newCount < 0) {
+        log.error('Driver', `Attempted to disable domain '${domain}' when already disabled.`);
+      }
+      return false;
+    }
+  }
+
+  /**
    * Call protocol methods
    * @param {!string} method
    * @param {!Object} params
    * @return {!Promise}
    */
   sendCommand(method, params) {
+    const domainCommand = /^(\w+)\.(enable|disable)$/.exec(method);
+    if (domainCommand) {
+      const enable = domainCommand[2] === 'enable';
+      if (!this._shouldToggleDomain(domainCommand[1], enable)) {
+        return Promise.resolve();
+      }
+    }
+
     return this._connection.sendCommand(method, params);
   }
 
+  /**
+   * Returns whether a domain is currently enabled.
+   * @param {string} domain
+   * @return {boolean}
+   */
+  isDomainEnabled(domain) {
+    // Defined, non-zero elements of the domains map are enabled.
+    return !!this._domainEnabledCounts.get(domain);
+  }
+
+  /**
+   * Add a script to run at load time of all future page loads.
+   * @param {string} scriptSource
+   * @return {!Promise<string>} Identifier of the added script.
+   */
   evaluateScriptOnLoad(scriptSource) {
     return this.sendCommand('Page.addScriptToEvaluateOnLoad', {
       scriptSource
