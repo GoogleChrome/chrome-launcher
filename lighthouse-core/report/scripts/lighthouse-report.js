@@ -45,7 +45,34 @@ function sendJSONReport() {
   const popup = window.open(VIEWER_URL, '_blank');
 }
 
+/**
+ * Sets up listeners to expand audit `<details>` when the user prints the page.
+ * Ideally, a print stylesheet could take care of this, but CSS has no way to
+ * open a `<details>` element. When the user closes the print dialog, all
+ * `<details>` are collapsed.
+ */
+function expandDetailsWhenPrinting() {
+  const details = Array.from(document.querySelectorAll('details'));
+
+  // FF and IE implement these old events.
+  if ('onbeforeprint' in window) {
+    window.addEventListener('beforeprint', _ => {
+      details.map(detail => detail.open = true);
+    });
+    window.addEventListener('afterprint', _ => {
+      details.map(detail => detail.open = false);
+    });
+  } else {
+    // Note: while FF has media listeners, it doesn't fire when matching 'print'.
+    window.matchMedia('print').addListener(mql => {
+      details.map(detail => detail.open = mql.matches);
+    });
+  }
+}
+
 window.addEventListener('DOMContentLoaded', _ => {
+  expandDetailsWhenPrinting();
+
   const printButton = document.querySelector('.js-print');
   printButton.addEventListener('click', _ => {
     window.print();
