@@ -114,7 +114,12 @@ module.exports = [
         }
       },
       'unused-css-rules': {
-        score: false
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 4
+          }
+        }
       },
       'uses-passive-event-listeners': {
         score: false,

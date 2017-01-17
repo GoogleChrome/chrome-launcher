@@ -39,14 +39,13 @@ describe('Best Practices: unused css rules audit', () => {
     beforeEach(() => {
       baseSheet = {
         header: {sourceURL: ''},
-        content: '',
-        used: [],
+        content: 'dummy',
+        used: [{dummy: 1}],
         unused: [],
       };
     });
 
     it('correctly computes percentUsed', () => {
-      assert.ok(/0%/.test(map({used: [], unused: []}).label));
       assert.ok(/0%/.test(map({used: [], unused: [1, 2]}).label));
       assert.ok(/50%/.test(map({used: [1, 2], unused: [1, 2]}).label));
       assert.ok(/100%/.test(map({used: [1, 2], unused: []}).label));
@@ -176,6 +175,67 @@ describe('Best Practices: unused css rules audit', () => {
       assert.ok(result.displayValue);
       assert.equal(result.rawValue, false);
       assert.equal(result.extendedInfo.value.length, 3);
+    });
+
+    it('does not include duplicate sheets', () => {
+      const result = UnusedCSSAudit.audit({
+        CSSUsage: [
+          {styleSheetId: 'a', used: true},
+          {styleSheetId: 'a', used: true},
+          {styleSheetId: 'b', used: false},
+        ],
+        Styles: [
+          {
+            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            content: '.my.selector {color: #ccc;}\n a {color: #fff}'
+          },
+          {
+            isDuplicate: true,
+            header: {styleSheetId: 'b', sourceURL: 'b.css'},
+            content: 'a.other {color: #fff}'
+          },
+        ]
+      });
+
+      assert.ok(!result.displayValue);
+      assert.equal(result.rawValue, true);
+      assert.equal(result.extendedInfo.value.length, 1);
+    });
+
+    it('does not include empty sheets', () => {
+      const result = UnusedCSSAudit.audit({
+        CSSUsage: [
+          {styleSheetId: 'a', used: true},
+          {styleSheetId: 'a', used: true},
+          {styleSheetId: 'b', used: true},
+        ],
+        Styles: [
+          {
+            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            content: '.my.selector {color: #ccc;}\n a {color: #fff}'
+          },
+          {
+            header: {styleSheetId: 'b', sourceURL: 'b.css'},
+            content: '.my.favorite.selector { rule: content; }'
+          },
+          {
+            header: {styleSheetId: 'c', sourceURL: 'c.css'},
+            content: '@import url(http://googlefonts.com?myfont)'
+          },
+          {
+            header: {styleSheetId: 'd', sourceURL: 'd.css'},
+            content: '/* nothing to see here */'
+          },
+          {
+            header: {styleSheetId: 'e', sourceURL: 'e.css'},
+            content: '       '
+          },
+        ]
+      });
+
+      assert.ok(!result.displayValue);
+      assert.equal(result.rawValue, true);
+      assert.equal(result.extendedInfo.value.length, 2);
     });
   });
 });

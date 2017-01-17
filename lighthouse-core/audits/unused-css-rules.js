@@ -63,6 +63,10 @@ class UnusedCSSRules extends Audit {
     rules.forEach(rule => {
       const stylesheetInfo = indexedStylesheets[rule.styleSheetId];
 
+      if (stylesheetInfo.isDuplicate) {
+        return;
+      }
+
       if (rule.used) {
         stylesheetInfo.used.push(rule);
       } else {
@@ -81,7 +85,12 @@ class UnusedCSSRules extends Audit {
   static mapSheetToResult(stylesheetInfo) {
     const numUsed = stylesheetInfo.used.length;
     const numUnused = stylesheetInfo.unused.length;
-    const percentUsed = Math.round(100 * numUsed / (numUsed + numUnused)) || 0;
+
+    if ((numUsed === 0 && numUnused === 0) || stylesheetInfo.isDuplicate) {
+      return null;
+    }
+
+    const percentUsed = Math.round(100 * numUsed / (numUsed + numUnused));
 
     let contentPreview = stylesheetInfo.content;
     if (contentPreview.length > PREVIEW_LENGTH) {
@@ -127,7 +136,7 @@ class UnusedCSSRules extends Audit {
     const unusedRatio = (unused / usage.length) || 0;
     const results = Object.keys(indexedSheets).map(sheetId => {
       return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId]);
-    });
+    }).filter(Boolean);
 
 
     let displayValue = '';

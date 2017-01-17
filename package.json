@@ -25,6 +25,7 @@
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
     "start": "node ./lighthouse-cli/index.js",
     "test": "npm run lint --silent && npm run unit",
+    "core-unit": "lighthouse-core/scripts/run-mocha.sh --core",
     "cli-unit": "lighthouse-core/scripts/run-mocha.sh --cli",
     "viewer-unit": "lighthouse-core/scripts/run-mocha.sh --viewer",
     "unit": "lighthouse-core/scripts/run-mocha.sh --default",
