@@ -25,7 +25,16 @@ class CSSUsage extends Gatherer {
   beforePass(options) {
     return options.driver.sendCommand('DOM.enable')
       .then(_ => options.driver.sendCommand('CSS.enable'))
-      .then(_ => options.driver.sendCommand('CSS.startRuleUsageTracking'));
+      .then(_ => options.driver.sendCommand('CSS.startRuleUsageTracking'))
+      .catch(err => {
+        // TODO(phulce): Remove this once CSS usage hits stable
+        if (/startRuleUsageTracking/.test(err.message)) {
+          this.failure = 'CSS Usage tracking requires Chrome \u2265 56';
+          return;
+        }
+
+        throw err;
+      });
   }
 
   afterPass(options) {
@@ -38,7 +47,7 @@ class CSSUsage extends Gatherer {
     }).catch(err => {
       return {
         rawValue: -1,
-        debugString: err,
+        debugString: this.failure || err,
       };
     });
   }
