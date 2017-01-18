@@ -1,4 +1,6 @@
 {
+  "name": "lighthouse-cli",
+  "private": true,
   "main": "index.js",
   "scripts": {
     "prepublish": "npm run build",
