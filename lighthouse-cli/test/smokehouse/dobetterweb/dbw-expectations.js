@@ -31,7 +31,7 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 10
+            length: 11
           }
         }
       },
@@ -117,7 +117,7 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 4
+            length: 5
           }
         }
       },
@@ -134,6 +134,14 @@ module.exports = [
       'uses-optimized-images': {
         score: false
       },
+      'deprecations': {
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 4
+          }
+        }
+      }
     }
   }, {
     initialUrl: 'http://localhost:10200/online-only.html',

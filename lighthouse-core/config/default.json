@@ -29,6 +29,7 @@
     "recordNetwork": true,
     "passName": "dbw",
     "gatherers": [
+      "chrome-console-messages",
       "styles",
       "css-usage",
       "dobetterweb/all-event-listeners",
@@ -72,6 +73,7 @@
     "theme-color-meta",
     "unused-css-rules",
     "content-width",
+    "deprecations",
     "accessibility/aria-allowed-attr",
     "accessibility/aria-required-attr",
     "accessibility/aria-valid-attr-value",
@@ -332,6 +334,11 @@
         "notification-on-start": {
           "expectedValue": false
         }
+      }
+    }, {
+      "name": "Avoiding deprecated APIs and browser interventions",
+      "audits": {
+        "deprecations": {}
       }
     }, {
       "name": "Accessibility",

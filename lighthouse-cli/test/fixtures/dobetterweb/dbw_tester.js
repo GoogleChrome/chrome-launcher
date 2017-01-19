@@ -40,4 +40,10 @@ if (location.search === '' || params.has('passiveEvents')) {
   });
 }
 
+if (location.search === '' || params.has('deprecations')) {
+  const div = document.createElement('div');
+  div.createShadowRoot();
+  div.createShadowRoot(); // FAIL - multiple shadow v0 roots.
+}
+
 })();
