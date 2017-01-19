@@ -182,8 +182,7 @@ module.exports = [
     }
   },
 
-  // TODO(bckenny): re-enable when shop is back online.
-  /* {
+  {
     initialUrl: 'https://shop.polymer-project.org/',
     url: 'https://shop.polymer-project.org/',
     audits: {
@@ -234,7 +233,7 @@ module.exports = [
       //   score: true
       // }
     }
-  }, */
+  },
 
   {
     initialUrl: 'https://pwa.rocks',
