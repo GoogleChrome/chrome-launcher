@@ -24,8 +24,9 @@ describe('Best Practices: unused css rules audit', () => {
   describe('#mapSheetToResult', () => {
     let baseSheet;
 
-    function map(overrides) {
-      return UnusedCSSAudit.mapSheetToResult(Object.assign(baseSheet, overrides));
+    function map(overrides, url) {
+      url = url || 'the_page';
+      return UnusedCSSAudit.mapSheetToResult(Object.assign(baseSheet, overrides), url);
     }
 
     function generate(content, length) {
@@ -53,7 +54,12 @@ describe('Best Practices: unused css rules audit', () => {
 
     it('correctly computes url', () => {
       assert.equal(map({header: {sourceURL: ''}}).url, 'inline');
+      assert.equal(map({header: {sourceURL: 'page'}}, 'page').url, 'inline');
       assert.equal(map({header: {sourceURL: 'foobar'}}).url, 'foobar');
+    });
+
+    it('does not give content preview when url is present', () => {
+      assert.ok(!map({header: {sourceURL: 'foobar'}}).code);
     });
 
     it('correctly computes short content preview', () => {
@@ -114,6 +120,7 @@ describe('Best Practices: unused css rules audit', () => {
   describe('#audit', () => {
     it('fails when gatherers failed', () => {
       const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
         CSSUsage: {rawValue: -1, debugString: 'It errored'},
         Styles: []
       });
@@ -124,6 +131,7 @@ describe('Best Practices: unused css rules audit', () => {
 
     it('passes when rules are used', () => {
       const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
           {styleSheetId: 'a', used: true},
@@ -148,6 +156,7 @@ describe('Best Practices: unused css rules audit', () => {
 
     it('fails when rules are unused', () => {
       const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
           {styleSheetId: 'a', used: false},
@@ -179,6 +188,7 @@ describe('Best Practices: unused css rules audit', () => {
 
     it('does not include duplicate sheets', () => {
       const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
           {styleSheetId: 'a', used: true},
@@ -204,6 +214,7 @@ describe('Best Practices: unused css rules audit', () => {
 
     it('does not include empty sheets', () => {
       const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
           {styleSheetId: 'a', used: true},

@@ -33,7 +33,7 @@ class UnusedCSSRules extends Audit {
       description: 'Site does not have more than 10% unused CSS',
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +
           'bytes consumed by network activity. [Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)',
-      requiredArtifacts: ['CSSUsage', 'Styles']
+      requiredArtifacts: ['CSSUsage', 'Styles', 'URL']
     };
   }
 
@@ -80,9 +80,10 @@ class UnusedCSSRules extends Audit {
 
   /**
    * @param {!Object} stylesheetInfo The stylesheetInfo object.
+   * @param {string} pageUrl The URL of the page, used to identify inline styles.
    * @return {!{url: string, label: string, code: string}} The result for the URLLIST formatter.
    */
-  static mapSheetToResult(stylesheetInfo) {
+  static mapSheetToResult(stylesheetInfo, pageUrl) {
     const numUsed = stylesheetInfo.used.length;
     const numUnused = stylesheetInfo.unused.length;
 
@@ -110,11 +111,16 @@ class UnusedCSSRules extends Audit {
       }
     }
 
-    return {
-      url: stylesheetInfo.header.sourceURL || 'inline',
-      label: `${percentUsed}% rules used`,
-      code: contentPreview.trim(),
-    };
+    let code;
+    let url = stylesheetInfo.header.sourceURL;
+    const label = `${percentUsed}% rules used`;
+
+    if (!url || url === pageUrl) {
+      url = 'inline';
+      code = contentPreview.trim();
+    }
+
+    return {url, code, label};
   }
 
   /**
@@ -124,6 +130,7 @@ class UnusedCSSRules extends Audit {
   static audit(artifacts) {
     const styles = artifacts.Styles;
     const usage = artifacts.CSSUsage;
+    const pageUrl = artifacts.URL.finalUrl;
 
     if (styles.rawValue === -1) {
       return UnusedCSSRules.generateAuditResult(styles);
@@ -135,7 +142,7 @@ class UnusedCSSRules extends Audit {
     const unused = UnusedCSSRules.countUnusedRules(usage, indexedSheets);
     const unusedRatio = (unused / usage.length) || 0;
     const results = Object.keys(indexedSheets).map(sheetId => {
-      return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId]);
+      return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
     }).filter(Boolean);
 
 
