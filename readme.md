@@ -51,7 +51,7 @@ git clone https://github.com/GoogleChrome/lighthouse
 
 cd lighthouse
 npm install
-npm install-all
+npm run install-all
 
 # The CLI is authored in TypeScript and requires compilation.
 # If you need to make changes to the CLI, run the TS compiler in watch mode:
