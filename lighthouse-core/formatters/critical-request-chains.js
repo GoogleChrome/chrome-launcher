@@ -22,17 +22,10 @@ const path = require('path');
 const fs = require('fs');
 const Formatter = require('./formatter');
 const html = fs.readFileSync(path.join(__dirname, 'partials/critical-request-chains.html'), 'utf8');
+const log = require('../lib/log');
 
-const isWindows = process.platform === 'win32';
-
-// See https://github.com/GoogleChrome/lighthouse/issues/1228
-const heavyHorizontal = isWindows ? '\u2500' : '━';
-const heavyVertical = isWindows ? '\u2502 ' : '┃ ';
-const heavyUpAndRight = isWindows ? '\u2514' : '┗';
-const heavyUpAndRightLong = heavyUpAndRight + heavyHorizontal;
-const heavyVerticalAndRight = isWindows ? '\u251C' : '┣';
-const heavyVerticalAndRightLong = heavyVerticalAndRight + heavyHorizontal;
-const heavyDownAndHorizontal = isWindows ? '\u252C' : '┳';
+const heavyUpAndRightLong = log.heavyUpAndRight + log.heavyHorizontal;
+const heavyVerticalAndRightLong = log.heavyVerticalAndRight + log.heavyHorizontal;
 
 class CriticalRequestChains extends Formatter {
 
@@ -159,7 +152,7 @@ class CriticalRequestChains extends Formatter {
 
         // If the parent is the last child then don't drop the vertical bar.
         const ancestorTreeMarker = treeMarkers.reduce((markers, marker) => {
-          return markers + (marker ? heavyVertical : '  ');
+          return markers + (marker ? log.heavyVertical : '  ');
         }, '');
 
         // Copy the tree markers so that we don't change by reference.
@@ -172,7 +165,7 @@ class CriticalRequestChains extends Formatter {
         // node as well as whether or not it has children and is itself the last child.
         const treeMarker = ancestorTreeMarker +
             (isLastChild ? heavyUpAndRightLong : heavyVerticalAndRightLong) +
-            (hasChildren ? heavyDownAndHorizontal : heavyHorizontal);
+            (hasChildren ? log.heavyDownAndHorizontal : log.heavyHorizontal);
 
         const parsedURL = CriticalRequestChains.parseURL(node[id].request.url);
 

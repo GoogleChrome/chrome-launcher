@@ -19,6 +19,7 @@
 const criticalRequestChainFormatter = require('../../formatters/critical-request-chains.js');
 const assert = require('assert');
 const Handlebars = require('handlebars');
+const log = require('../../lib/log');
 const superLongName =
     'https://example.com/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWeWantToTest.js';
 const extendedInfo = {
@@ -82,9 +83,16 @@ describe('CRC Formatter', () => {
     const output = formatter(extendedInfo);
     const truncatedURL = criticalRequestChainFormatter.parseURL(superLongName);
     const truncatedURLRegExp = new RegExp(truncatedURL.file, 'im');
-
-    assert.ok(/┗━┳ \/ \(example.com\)/im.test(output));
-    assert.ok(/┣━━ \/b.js \(example.com\) - 5000.00ms/im.test(output));
+    const testString = new RegExp(log.heavyUpAndRight +
+                                  log.heavyHorizontal +
+                                  log.heavyDownAndHorizontal +
+                                  ' \\/ \\(example.com\\)', 'im');
+    assert.ok(testString.test(output));
+    const testString2 = new RegExp(log.heavyVerticalAndRight +
+                                   log.heavyHorizontal +
+                                   log.heavyHorizontal +
+                                   ' \\/b.js \\(example.com\\) - 5000.00ms', 'im');
+    assert.ok(testString2.test(output));
     assert.ok(truncatedURLRegExp.test(output));
     assert.ok(/about:blank/.test(output));
   });

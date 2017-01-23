@@ -186,6 +186,26 @@ class Log {
     return isWindows ? '\u0387' : '▫';
   }
 
+  static get heavyHorizontal() {
+    return isWindows ? '\u2500' : '━';
+  }
+
+  static get heavyVertical() {
+    return isWindows ? '\u2502 ' : '┃ ';
+  }
+
+  static get heavyUpAndRight() {
+    return isWindows ? '\u2514' : '┗';
+  }
+
+  static get heavyVerticalAndRight() {
+    return isWindows ? '\u251C' : '┣';
+  }
+
+  static get heavyDownAndHorizontal() {
+    return isWindows ? '\u252C' : '┳';
+  }
+
   static get doubleLightHorizontal() {
     return '──';
   }
