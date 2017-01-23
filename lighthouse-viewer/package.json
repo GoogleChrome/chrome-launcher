@@ -28,9 +28,9 @@
     "typescript": "^2.1.4"
   },
   "dependencies": {
-    "firebase": "^3.6.2",
-    "idb-keyval": "^2.2.0",
-    "url-search-params": "^0.6.1",
-    "whatwg-fetch": "^2.0.1"
+    "firebase": "3.6.3",
+    "idb-keyval": "2.2.0",
+    "url-search-params": "0.6.1",
+    "whatwg-fetch": "2.0.1"
   }
 }
