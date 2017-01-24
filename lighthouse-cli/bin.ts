@@ -21,12 +21,6 @@ const _SIGINT_EXIT_CODE = 130;
 const _RUNTIME_ERROR_CODE = 1;
 const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 
-const environment = require('../lighthouse-core/lib/environment.js');
-if (!environment.checkNodeCompatibility()) {
-  console.warn('Compatibility error', 'Lighthouse requires node 5+ or 4 with --harmony');
-  process.exit(_RUNTIME_ERROR_CODE);
-}
-
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';

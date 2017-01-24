@@ -66,12 +66,6 @@ function runLighthouse(url, configPath) {
     '--port=0'
   ];
 
-  // Assume if currently running in Node v4 that child process will as well, so
-  // run Lighthouse with --harmony flag.
-  if (/v4/.test(process.version)) {
-    args.unshift('--harmony');
-  }
-
   // Lighthouse sometimes times out waiting to for a connection to Chrome in CI.
   // Watch for this error and retry relaunching Chrome and running Lighthouse up
   // to RETRIES times. See https://github.com/GoogleChrome/lighthouse/issues/833

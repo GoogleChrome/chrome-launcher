@@ -20,7 +20,7 @@ Quick-start guide on using the Lighthouse extension: http://bit.ly/lighthouse-qu
 
 ## Install CLI [![NPM lighthouse package](https://img.shields.io/npm/v/lighthouse.svg)](https://npmjs.org/package/lighthouse)
 
-Requires Node v5+ or Node v4 w/ `--harmony`
+Requires Node v6+
 
 ```sh
 npm install -g lighthouse

@@ -2,11 +2,11 @@
   "name": "lighthouse-extension",
   "private": true,
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=6"
   },
   "scripts": {
     "watch": "gulp watch",
-    "build": "gulp build -- $__node_harmony"
+    "build": "gulp build"
   },
   "devDependencies": {
     "brfs": "^1.4.3",
