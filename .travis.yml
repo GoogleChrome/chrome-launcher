@@ -18,7 +18,6 @@ install:
   - npm run install-all
 before_script:
   - if [[ $(node -v) =~ ^v4.* ]]; then export __node_harmony=--harmony; fi
-  - npm i -g typescript@2.0
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
