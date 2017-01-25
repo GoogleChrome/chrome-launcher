@@ -1,0 +1,274 @@
+<style>
+.config-panel {
+  padding: 0 0 0 0;
+  background: #FAFAFA;
+}
+
+.config-panel__header {
+  height: 50px;
+  border-top: 1px solid #EBEBEB;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  padding-right: 30px;
+}
+
+.config-panel__body {
+  border-top: 1px solid #EBEBEB;
+  height: 300px;
+  display: none;
+}
+
+.config-panel.expanded .config-panel__body {
+  display: block;
+}
+
+.config-panel__message {
+  flex: 1 1 0;
+  padding: 0 10px;
+}
+
+.config-panel__panel-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  width: 24px;
+  height: 24px;
+  border: none;
+  flex: 0 0 auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  background-color: transparent;
+  margin-left: 8px;
+}
+
+.config-panel.expanded .config-panel__panel-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+}
+
+.config-panel .url-blocking-entry {
+  display: flex;
+  flex-direction: row;
+  padding: 2px 0;
+}
+
+.config-panel template.url-blocking-entry {
+  display: none;
+}
+
+.config-panel .url-blocking-entry__pattern {
+  flex: 1 0 auto;
+  display: flex;
+  margin-left: 10px;
+  line-height: 17px;
+}
+
+.config-panel .url-blocking-entry__cancel-button {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>');
+  display: flex;
+  padding: 0 0 0 0px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 16px 16px;
+  background-color: transparent;
+}
+
+.config-panel .url-blocking-entry__add-button {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>');
+  display: flex;
+  padding: 0 0 0 0px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 16px 16px;
+  background-color: transparent;
+}
+
+@media screen and (max-width: 767px) {
+  .config-panel {
+    margin-left: 0;
+    width: 100%;
+  }
+  .config-panel__header {
+    padding-right: 2px;
+  }
+}
+
+@media print {
+  .config-panel {
+    display: none;
+  }
+}
+
+#config-panel__tabs__tree-panel .request-blocking-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  display: inline-block;
+  padding: 0 0 0 0px;
+  width: 18px;
+  height: 18px;
+  transform: translate(0px, 5px);
+  border: none;
+  flex: 0 0 auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 16px 16px;
+  background-color: transparent;
+}
+
+#config-panel__tabs__tree-panel .cnc-node.request__block .request-blocking-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="black" height="24" viewBox="0 0 24 24" width="24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path xmlns="http://www.w3.org/2000/svg" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+}
+
+#config-panel__tabs__tree-panel .cnc-node.request__block > .request-blocking-toggle {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="black" height="24" viewBox="0 0 24 24" width="24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path xmlns="http://www.w3.org/2000/svg" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="red" stroke="red"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+}
+
+#config-panel__tabs__tree-panel .cnc-node {
+  height: auto;
+  display: block;
+}
+
+.config-panel__tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.config-panel__tabs__tab-bar {
+  height: 40px;
+  border-bottom: 1px solid #EBEBEB;
+  padding: 0 20px;
+}
+
+.config-panel__tabs__tab {
+  float: left;
+  display: inline-block;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.3s;
+  font-size: 17px;
+  line-height: 40px;
+  height: 40px;
+  padding: 0 10px;
+}
+
+.config-panel__tabs__tab:after {
+  content: '';
+  display: block;
+  margin: auto;
+  height: 3px;
+  width: 0px;
+  transform: translate(0px, -3px);
+  background: transparent;
+  transition: width .5s ease, background-color .5s ease;
+}
+
+.config-panel__tabs__tab.is-active:after {
+  width: 100%;
+  background: #7070fb;
+}
+
+.config-panel__tabs__tab:hover {
+  background-color: #ddd;
+}
+
+.config-panel__tabs__tab-panel {
+  display: none;
+  padding: 10px 20px;
+  overflow-y: scroll;
+  flex: 1 1 auto;
+}
+
+.config-panel__tabs__tab-panel.is-active {
+  display: block;
+}
+
+</style>
+
+{{#*inline "writeNode"}}
+  <div class="cnc-node js-cnc-node" title="{{ this.node.request.url }}">
+    <span class="cnc-node__tree-marker">
+    {{#each treeMarkers as |separator| }}
+      {{#separator}}
+      <span class="tree-marker vert"></span>
+      <span class="tree-marker space"></span>
+      {{else}}
+      <span class="tree-marker space"></span>
+      <span class="tree-marker space"></span>
+      {{/separator}}
+    {{/each}}
+    {{#isLastChild}}
+      <span class="tree-marker up-right"></span>
+      <span class="tree-marker right"></span>
+    {{else}}
+      <span class="tree-marker vert-right"></span>
+      <span class="tree-marker right"></span>
+    {{/isLastChild}}
+    </span>
+
+    <button class="request-blocking-toggle js-request-blocking-toggle"></button>
+    <span class="cnc-node__tree-value">
+      {{#parseURL this.node.request.url }}
+        <span class="cnc-node__tree-file">{{ this.file }}</span>
+        <span class="cnc-node__tree-hostname">({{ this.hostname }})</span>
+      {{/parseURL}}
+      {{#unless hasChildren}}
+        - <span class="cnc-node__chain-duration">{{chainDuration startTime this.node.request.endTime }}ms, {{formatTransferSize this.transferSize}}KB</span>
+      {{/unless}}
+    </span>
+
+    {{#each this.node.children as |child| }}
+      {{#createContextFor ../node.children @key ../treeMarkers ../isLastChild ../startTime ../transferSize }}
+        {{> writeNode this }}
+      {{/createContextFor }}
+    {{/each}}
+  </div>
+{{/inline}}
+<div class="config-panel js-config-panel">
+  <div class="config-panel__body">
+    <div class="config-panel__tabs js-tabs">
+      <div class="config-panel__tabs__tab-bar">
+          <a href="#config-panel__tabs__list-panel" class="config-panel__tabs__tab js-tab is-active">List View</a>
+          <a href="#config-panel__tabs__tree-panel" class="config-panel__tabs__tab js-tab">Tree View</a>
+      </div>
+
+      <div class="config-panel__tabs__tab-panel js-tab-panel is-active" id="config-panel__tabs__list-panel">
+        <ul class="url-blocking-patterns js-url-blocking-patterns">
+          <template class="url-blocking-entry">
+            <li class="url-blocking-entry" data-url-pattern="">
+              <button class="url-blocking-entry__cancel-button"></button>
+              <div class="url-blocking-entry__pattern"></div>
+            </li>
+          </template>
+          <li class="url-blocking-entry">
+            <button class="url-blocking-entry__add-button js-add-button"></button>
+            <input class="url-blocking-entry__pattern js-pattern-input" placeholder="URL blocking Patterns (* for wild card) e.g. *://www.evil.com/*">
+          </li>
+        </ul>
+      </div>
+
+      <div class="config-panel__tabs__tab-panel js-tab-panel" id="config-panel__tabs__tree-panel">
+        <div>Initial navigation</div>
+        {{#createTreeRenderContext this}}
+          {{#each this.tree }}
+            {{#createContextFor ../tree @key undefined undefined ../startTime ../transferSize }}
+              {{> writeNode this }}
+            {{/createContextFor}}
+          {{/each}}
+        {{/createTreeRenderContext}}
+      </div>
+
+    </div>
+  </div>
+  <div class="config-panel__header">
+    <button class="config-panel__panel-toggle js-panel-toggle"></button>
+    <div class="config-panel__message js-message"></div>
+    <button class="js-rerun-button">Rerun</button>
+  </div>
+</div>

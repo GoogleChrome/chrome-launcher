@@ -89,6 +89,17 @@ class ReportGenerator {
     // !value
     Handlebars.registerHelper('not', value => !value);
 
+    // value === value2?
+    Handlebars.registerHelper('if_eq', function(lhs, rhs, options) {
+      if (lhs === rhs) {
+        // eslint-disable-next-line no-invalid-this
+        return options.fn(this);
+      } else {
+        // eslint-disable-next-line no-invalid-this
+        return options.inverse(this);
+      }
+    });
+
     // value !== value2
     Handlebars.registerHelper('if_not_eq', function(lhs, rhs, options) {
       if (lhs !== rhs) {
@@ -195,16 +206,16 @@ class ReportGenerator {
 
   /**
    * Gets the CSS for the report.
-   * @return {string}
+   * @return {!Array<string>} an array of CSS
    */
   getReportCSS() {
-    return fs.readFileSync(path.join(__dirname, './styles/report.css'), 'utf8');
+    return [fs.readFileSync(path.join(__dirname, './styles/report.css'), 'utf8')];
   }
 
   /**
    * Gets the script for the report UI
    * @param {string} reportContext
-   * @return {Array<string>} an array of scripts
+   * @return {!Array<string>} an array of scripts
    */
   getReportJS(reportContext) {
     if (reportContext === 'devtools') {
@@ -263,18 +274,13 @@ class ReportGenerator {
   }
 
   /**
-   * Generates the Lighthouse report HTML.
-   * @param {!Object} results Lighthouse results.
-   * @param {!string} reportContext What app is requesting the report (eg. devtools, extension)
-   * @return {string} HTML of the report page.
+   * Register the formatter for each extendedInfo.
+   * @param {!Object} audits Lighthouse results.audits.
    */
-  generateHTML(results, reportContext) {
-    reportContext = reportContext || 'extension';
-
-    // Ensure the formatter for each extendedInfo is registered.
-    Object.keys(results.audits).forEach(audit => {
+  _registerFormatters(audits) {
+    Object.keys(audits).forEach(audit => {
       // Use value rather than key for audit.
-      audit = results.audits[audit];
+      audit = audits[audit];
 
       if (!audit.extendedInfo) {
         return;
@@ -291,6 +297,18 @@ class ReportGenerator {
 
       Handlebars.registerPartial(audit.name, formatter.getFormatter('html'));
     });
+  }
+
+  /**
+   * Generates the Lighthouse report HTML.
+   * @param {!Object} results Lighthouse results.
+   * @param {!string} reportContext What app is requesting the report (eg. devtools, extension)
+   * @return {string} HTML of the report page.
+   */
+  generateHTML(results, reportContext) {
+    reportContext = reportContext || 'extension';
+
+    this._registerFormatters(results.audits);
 
     results.aggregations.forEach(aggregation => {
       aggregation.score.forEach(score => {
@@ -307,7 +325,7 @@ class ReportGenerator {
       lighthouseVersion: results.lighthouseVersion,
       generatedTime: this._formatTime(results.generatedTime),
       lhresults: this._escapeScriptTags(JSON.stringify(results, null, 2)),
-      css: this.getReportCSS(),
+      stylesheets: this.getReportCSS(),
       reportContext: reportContext,
       scripts: this.getReportJS(reportContext),
       aggregations: results.aggregations,

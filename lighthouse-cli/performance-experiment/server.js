@@ -30,7 +30,7 @@ const http = require('http');
 const parse = require('url').parse;
 const opn = require('opn');
 const log = require('../../lighthouse-core/lib/log');
-const reportGenerator = new (require('./report/perf-x-report-generator'))();
+const PerfXReportGenerator = require('./report/perf-x-report-generator');
 const lighthouse = require('../../lighthouse-core');
 
 
@@ -66,6 +66,8 @@ function requestHandler(request, response) {
   if (request.method === 'GET') {
     if (pathname === '/') {
       reportRequestHandler(request, response);
+    } else if (pathname === '/blocked-url-patterns') {
+      blockedUrlPatternsRequestHandler(request, response);
     } else {
       response.writeHead(404);
       response.end('404: Resource Not Found');
@@ -84,9 +86,14 @@ function requestHandler(request, response) {
 }
 
 function reportRequestHandler(request, response) {
-  const html = reportGenerator.generateHTML(lhResults, 'cli');
+  const html = new PerfXReportGenerator().generateHTML(lhResults, 'perf-x');
   response.writeHead(200, {'Content-Type': 'text/html'});
   response.end(html);
+}
+
+function blockedUrlPatternsRequestHandler(request, response) {
+  response.writeHead(200, {'Content-Type': 'text/json'});
+  response.end(JSON.stringify(lhParams.flags.blockedUrlPatterns || []));
 }
 
 function rerunRequestHandler(request, response) {
@@ -95,7 +102,7 @@ function rerunRequestHandler(request, response) {
 
   request.on('end', () => {
     const additionalFlags = JSON.parse(message);
-    const flags = Object.assign({}, lhParams.flags, additionalFlags);
+    const flags = Object.assign(lhParams.flags, additionalFlags);
 
     lighthouse(lhParams.url, flags, lhParams.config).then(results => {
       results.artifacts = undefined;
