@@ -44,15 +44,20 @@ describe('Page uses passive events listeners where applicable', () => {
     });
     assert.equal(auditResult.rawValue, false);
 
-    for (let i = 0; i < auditResult.extendedInfo.value.length; ++i) {
-      const val = auditResult.extendedInfo.value[i];
+    for (let i = 0; i < auditResult.extendedInfo.value.results.length; ++i) {
+      const val = auditResult.extendedInfo.value.results[i];
       assert.ok(!val.passive, 'results should all be non-passive listeners');
       assert.notEqual(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.indexOf(val.type), -1,
           'results should not contain other types of events');
     }
-    assert.equal(auditResult.extendedInfo.value.length, 6);
-    assert.equal(auditResult.extendedInfo.value[0].url, fixtureData[0].url);
-    assert.ok(auditResult.extendedInfo.value[0].code.match(/addEventListener/));
+    assert.equal(auditResult.extendedInfo.value.results.length, 6);
+    assert.equal(auditResult.extendedInfo.value.results[0].url, fixtureData[0].url);
+    assert.ok(auditResult.extendedInfo.value.results[0].code.match(/addEventListener/));
+
+    const headings = auditResult.extendedInfo.value.tableHeadings;
+    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
+                     ['URL', 'Line/Col', 'Type', 'Snippet'],
+                     'table headings are correct and in order');
   });
 
   it('passes scroll blocking listeners should be passive', () => {
@@ -61,7 +66,7 @@ describe('Page uses passive events listeners where applicable', () => {
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 
   it('fails when listener is missing a url property', () => {
@@ -70,8 +75,8 @@ describe('Page uses passive events listeners where applicable', () => {
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.extendedInfo.value[1].url === undefined);
-    assert.equal(auditResult.extendedInfo.value.length, 6);
+    assert.ok(auditResult.extendedInfo.value.results[1].url === undefined);
+    assert.equal(auditResult.extendedInfo.value.results.length, 6);
   });
 
   it('fails when listener has a bad url property', () => {
@@ -91,7 +96,7 @@ describe('Page uses passive events listeners where applicable', () => {
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.extendedInfo.value[0].url === 'eval(<context>):54:21');
-    assert.equal(auditResult.extendedInfo.value.length, 1);
+    assert.ok(auditResult.extendedInfo.value.results[0].url === 'eval(<context>):54:21');
+    assert.equal(auditResult.extendedInfo.value.results.length, 1);
   });
 });

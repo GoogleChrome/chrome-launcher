@@ -89,21 +89,26 @@ class UsesOptimizedImages extends Audit {
       const url = URL.getDisplayName(image.url);
       const webpSavings = UsesOptimizedImages.computeSavings(image, 'webp');
 
-      let label = `${originalKb} KB total, webp savings: ${webpSavings.percent}%`;
       if (webpSavings.bytes > WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES) {
         hasAllEfficientImages = false;
       }
 
+      let jpegSavingsLabel;
       if (/(jpeg|bmp)/.test(image.mimeType)) {
         const jpegSavings = UsesOptimizedImages.computeSavings(image, 'jpeg');
         if (jpegSavings.bytes > 0) {
           hasAllEfficientImages = false;
-          label += `, jpeg savings: ${jpegSavings.percent}%`;
+          jpegSavingsLabel = `${jpegSavings.percent}%`;
         }
       }
 
       totalWastedBytes += webpSavings.bytes;
-      results.push({url, label});
+      results.push({
+        url,
+        total: `${originalKb} KB`,
+        webpSavings: `${webpSavings.percent}%`,
+        jpegSavings: jpegSavingsLabel
+      });
       return results;
     }, []);
 
@@ -123,8 +128,16 @@ class UsesOptimizedImages extends Audit {
       debugString,
       rawValue: hasAllEfficientImages && totalWastedBytes < TOTAL_WASTED_BYTES_THRESHOLD,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: results
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {
+          results,
+          tableHeadings: {
+            url: 'URL',
+            total: 'Original (KB)',
+            webpSavings: 'WebP savings',
+            jpegSavings: 'JPEG savings'
+          }
+        }
       }
     });
   }

@@ -32,7 +32,11 @@ describe('Resources are fetched over http/2', () => {
     });
     assert.equal(auditResult.rawValue, false);
     assert.ok(auditResult.displayValue.match('4 requests were not'));
-    assert.equal(auditResult.extendedInfo.value.length, 4);
+    assert.equal(auditResult.extendedInfo.value.results.length, 4);
+
+    const headings = auditResult.extendedInfo.value.tableHeadings;
+    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
+                     ['URL', 'Protocol'], 'table headings are correct and in order');
   });
 
   it('displayValue is correct when only one resource fails', () => {
