@@ -33,7 +33,8 @@ describe('Content Width gatherer', () => {
         evaluateAsync() {
           return Promise.resolve({
             scrollWidth: 400,
-            viewportWidth: 400
+            viewportWidth: 400,
+            devicePixelRatio: 2,
           });
         }
       }

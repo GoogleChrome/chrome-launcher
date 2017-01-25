@@ -9,6 +9,7 @@
       "theme-color",
       "manifest",
       "accessibility",
+      "image-usage",
       "content-width"
     ]
   },
@@ -96,6 +97,7 @@
     "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
     "dobetterweb/uses-optimized-images",
+    "dobetterweb/uses-responsive-images",
     "dobetterweb/uses-passive-event-listeners"
   ],
 
@@ -294,7 +296,8 @@
       "name": "Using bytes efficiently",
       "audits": {
         "unused-css-rules": {},
-        "uses-optimized-images": {}
+        "uses-optimized-images": {},
+        "uses-responsive-images": {}
       }
     }, {
       "name": "Using modern CSS features",

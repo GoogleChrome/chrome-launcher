@@ -24,9 +24,11 @@ const Gatherer = require('./gatherer');
 function getContentWidth() {
   // window.innerWidth to get the scrollable size of the window (irrespective of zoom)
   // window.outerWidth to get the size of the visible area
+  // window.devicePixelRatio to get ratio of logical pixels to physical pixels
   return Promise.resolve({
     scrollWidth: window.innerWidth,
-    viewportWidth: window.outerWidth
+    viewportWidth: window.outerWidth,
+    devicePixelRatio: window.devicePixelRatio,
   });
 }
 
@@ -39,7 +41,8 @@ class ContentWidth extends Gatherer {
 
     .then(returnedValue => {
       if (!Number.isFinite(returnedValue.scrollWidth) ||
-          !Number.isFinite(returnedValue.viewportWidth)) {
+          !Number.isFinite(returnedValue.viewportWidth) ||
+          !Number.isFinite(returnedValue.devicePixelRatio)) {
         throw new Error(`ContentWidth results were not numeric: ${JSON.stringify(returnedValue)}`);
       }
 
@@ -47,7 +50,8 @@ class ContentWidth extends Gatherer {
     }, _ => {
       return {
         scrollWidth: -1,
-        viewportWidth: -1
+        viewportWidth: -1,
+        devicePixelRatio: -1,
       };
     });
   }

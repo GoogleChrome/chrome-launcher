@@ -134,6 +134,14 @@ module.exports = [
       'uses-optimized-images': {
         score: false
       },
+      'uses-responsive-images': {
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 2
+          }
+        }
+      },
       'deprecations': {
         score: false,
         extendedInfo: {
