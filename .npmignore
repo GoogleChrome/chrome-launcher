@@ -27,3 +27,4 @@ lighthouse-cli/commands/*.map
 lighthouse-cli/types/*.js
 lighthouse-cli/types/*.map
 
+assets
