@@ -39,9 +39,9 @@ lighthouse --help
 
 ## Lighthouse Viewer
 
-If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to Github.
+If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to GitHub.
 
-Note: shared reports are stashed as a secret Gist in Github, under your account.
+Note: shared reports are stashed as a secret Gist in GitHub, under your account.
 
 ## Develop
 

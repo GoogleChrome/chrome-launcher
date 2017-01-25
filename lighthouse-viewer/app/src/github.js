@@ -25,7 +25,7 @@ const logger = require('./logger');
 const getFilenamePrefix = require('../../../lighthouse-core/lib/asset-saver').getFilenamePrefix;
 
 /**
- * Wrapper around the Github API for reading/writing gists.
+ * Wrapper around the GitHub API for reading/writing gists.
  * @class
  */
 class GithubAPI {
@@ -49,7 +49,7 @@ class GithubAPI {
       return Promise.reject(new Error('Save already in progress'));
     }
 
-    logger.log('Saving report to Github...', false);
+    logger.log('Saving report to GitHub...', false);
     this._saving = true;
 
     return this.auth.getAccessToken()
@@ -97,7 +97,7 @@ class GithubAPI {
       const headers = new Headers();
 
       // If there's an authenticated user, include an Authorization header to
-      // have higher rate limits with the Github API. Otherwise, rely on ETags.
+      // have higher rate limits with the GitHub API. Otherwise, rely on ETags.
       if (user) {
         headers.set('Authorization', `token ${this.auth.accessToken}`);
       }
@@ -112,7 +112,7 @@ class GithubAPI {
           const remaining = resp.headers.get('X-RateLimit-Remaining');
           const limit = resp.headers.get('X-RateLimit-Limit');
           if (Number(remaining) < 10) {
-            logger.warn('Approaching Github\'s rate limit. ' +
+            logger.warn('Approaching GitHub\'s rate limit. ' +
                         `${limit - remaining}/${limit} requests used. Consider signing ` +
                         'in to increase this limit.');
           }

@@ -12,7 +12,7 @@ For production, run `gulp`. This compiles and minifies `dist/src/main.js` using 
 
 ### Deploy
 
-Deploys should be done as part of the Lighthouse release process. To update GH pages,
+Deploys should be done as part of the Lighthouse release process. To update GitHub pages,
 run the following in the root folder of a Lighthouse checkout:
 
     npm run deploy-viewer

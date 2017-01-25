@@ -66,7 +66,7 @@ class LighthouseViewerReport {
       this.shareButton.addEventListener('click', this.onShare);
 
       // Disable the share button after the user shares the gist or if we're loading
-      // a gist from Github. In both cases, the gist is already shared :)
+      // a gist from GitHub. In both cases, the gist is already shared :)
       if (this._isNewReport) {
         this.enableButton(this.shareButton);
       } else {
@@ -115,7 +115,7 @@ class LighthouseViewerReport {
     const params = new URLSearchParams(location.search);
     const gistId = params.get('gist');
     if (gistId) {
-      logger.log('Fetching report from Github...', false);
+      logger.log('Fetching report from GitHub...', false);
 
       this.github.auth.ready.then(_ => {
         this.github.getGistFileContentAsJson(gistId).then(json => {
@@ -210,7 +210,7 @@ class LighthouseViewerReport {
   }
 
   /**
-   * Shares the current report by creating a gist on Github.
+   * Shares the current report by creating a gist on GitHub.
    * @return {!Promise<string>} id of the created gist.
    */
   onShare() {

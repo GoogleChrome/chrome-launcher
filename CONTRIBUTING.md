@@ -62,7 +62,7 @@ echo "Upload the package zip to CWS dev dashboard"
 npm publish
 yarn run deploy-viewer
 
-echo "Use the GH web interface to tag the release"
+echo "Use the GitHub web interface to tag the release"
 echo "Generate the release notes, and update the release page"
 
 # * Tell the world!!! *

@@ -61,7 +61,7 @@ class FirebaseAuth {
   }
 
   /**
-   * Signs in the user to Github using the Firebase API.
+   * Signs in the user to GitHub using the Firebase API.
    * @return {!Promise<string>} The logged in user.
    */
   signIn() {
@@ -70,7 +70,7 @@ class FirebaseAuth {
       this.user = result.user;
       // A limitation of firebase auth is that it doesn't return an oauth token
       // after a page refresh. We'll get a firebase token, but not an oauth token
-      // for GH. Since GH's tokens never expire, stash the access token in IDB.
+      // for GitHub. Since GitHub's tokens never expire, stash the access token in IDB.
       return idb.set('accessToken', this.accessToken).then(_ => {
         return this.accessToken;
       });
