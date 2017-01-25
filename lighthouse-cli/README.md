@@ -1,8 +1,11 @@
 One time setup:
 
-` npm i`
+```sh
+npm i
+```
 
 Live dev:
 
-`npm run dev`
-
+```sh
+npm run dev
+```

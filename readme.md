@@ -16,7 +16,7 @@ Lighthouse requires Chrome 54 or later.
 
 Install from the Chrome Web Store: [chrome.google.com/webstore/detail/lighthouse/…](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
-Quick-start guide on using the Lighthouse extension: http://bit.ly/lighthouse-quickstart
+Quick-start guide on using the Lighthouse extension: <http://bit.ly/lighthouse-quickstart>
 
 ## Install CLI [![NPM lighthouse package](https://img.shields.io/npm/v/lighthouse.svg)](https://npmjs.org/package/lighthouse)
 
@@ -29,6 +29,7 @@ npm install -g lighthouse
 ```
 
 ## Run
+
 ```sh
 # Kick off a lighthouse run
 lighthouse https://airhorner.com/
@@ -39,13 +40,14 @@ lighthouse --help
 
 ## Lighthouse Viewer
 
-If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting http://googlechrome.github.io/lighthouse/viewer/ and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to GitHub.
+If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting <http://googlechrome.github.io/lighthouse/viewer/> and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to GitHub.
 
 Note: shared reports are stashed as a secret Gist in GitHub, under your account.
 
 ## Develop
 
-#### Setup
+### Setup
+
 ```sh
 git clone https://github.com/GoogleChrome/lighthouse
 
@@ -58,7 +60,7 @@ npm run install-all
 # cd lighthouse-cli && npm run dev
 ```
 
-#### Run
+### Run
 
 ```sh
 node lighthouse-cli http://example.com
@@ -93,7 +95,8 @@ If you'd like to contribute, check the [list of issues](https://github.com/Googl
 
 Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
-##### `config.json`
+### `config.json`
+
 ```json
 {
   "audits": [
@@ -124,7 +127,6 @@ Lighthouse can be used to analyze trace and performance data collected from othe
 ```
 
 Then, run with: `lighthouse --config-path=config.json http://www.random.url`
-
 
 ## Lighthouse CLI options
 
@@ -159,7 +161,7 @@ Options:
   --version          Show version number                                                   [boolean]
   --skip-autolaunch  Skip autolaunch of Chrome when accessing port 9222 fails              [boolean]
   --select-chrome    Interactively choose version of Chrome to use when multiple
-                     installations are found                                          [boolean]
+                     installations are found                                               [boolean]
 ```
 
 ## Lighthouse w/ mobile devices
@@ -202,12 +204,12 @@ npm run unit
 
 The same audits are run against from a Chrome extension. See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-extension).
 
-
 ## Architecture
 
 _Some incomplete notes_
 
-#### Components
+### Components
+
 * **Driver** - Interfaces with [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)  ([API viewer](https://chromedevtools.github.io/debugger-protocol-viewer/))
 * **Gathers** - Requesting data from the browser (and maybe post-processing)
 * **Artifacts** - The output of gatherers
@@ -216,11 +218,11 @@ _Some incomplete notes_
 * **Diagnoses** - The perf problems that affect those metrics
 * **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
 
-##### Internal module graph
+#### Internal module graph
+
 ![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/19367685/04d4336a-9151-11e6-9ebb-3b87bdb09a4c.png)
 
-<small><code>npm install -g js-vd; vd --exclude "node_modules|third_party|fs|path|url|log" lighthouse-core/ > graph.html</code></small>
-
+`npm install -g js-vd; vd --exclude "node_modules|third_party|fs|path|url|log" lighthouse-core/ > graph.html`
 
 ### Protocol
 
@@ -230,13 +232,14 @@ _Some incomplete notes_
 ```js
 // will NOT work
 driver.sendCommand('Security.enable').then(_ => {
-	driver.on('Security.securityStateChanged', state => { /* ... */ });
+  driver.on('Security.securityStateChanged', state => { /* ... */ });
 })
 
 // WILL work! happy happy. :)
 driver.on('Security.securityStateChanged', state => { /* ... */ }); // event binding is synchronous
 driver.sendCommand('Security.enable');
 ```
+
 * _Debugging the protocol_: Read [Better debugging of the Protocol](https://github.com/GoogleChrome/lighthouse/issues/184).
 
 ### Gatherers
@@ -293,6 +296,7 @@ node scripts/build-traceviewer-module.js
 ```
 
 <p align="center">
-<img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" height="300px"><br>
-<b>Lighthouse</b>, ˈlītˌhous (n): a <s>tower or other structure</s> tool containing a beacon light to warn or guide <s>ships</s> developers at "sea".
+  <img src="https://cloud.githubusercontent.com/assets/883126/13900813/10a62a14-edcc-11e5-8ad3-f927a592eeb0.png" alt="Lighthouse logo" height="300">
+  <br>
+  <b>Lighthouse</b>, ˈlītˌhous (n): a <s>tower or other structure</s> tool containing a beacon light to warn or guide <s>ships</s> developers at "sea".
 </p>

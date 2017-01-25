@@ -1,10 +1,12 @@
-### Install dogfood extension
+# Lighthouse Extension
 
-* chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk
+## Install dogfood extension
 
-(If the warning bar about the conected debugging agent bothers you, it can be disabled at chrome://flags/#silent-debugger-extension-api )
+* <https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk>
 
-### Dev
+(If the warning bar about the connected debugging agent bothers you, it can be disabled at `chrome://flags/#silent-debugger-extension-api`)
+
+## Dev
 
 * `npm i`
 * `npm run watch`
@@ -19,7 +21,7 @@
 * Verify that the extension in `dist` works.
 * Verify that `dist/manifest.json` bumps the version number vs what's on CWS.
 * `gulp package`
-* Open [https://chrome.google.com/webstore/developer/dashboard](https://chrome.google.com/webstore/developer/dashboard)
+* Open <https://chrome.google.com/webstore/developer/dashboard>
 * Click _Edit_ on lighthouse
 * _Upload Updated Package_
 * Select `packages/lighthouse-1.X.X.zip`
@@ -27,7 +29,7 @@
 
 ## ~~Easier Deploy via API~~
 
-(This appears to be broken, unfortunately.…)
+(This appears to be broken, unfortunately…)
 
 * Install [web store api app](https://chrome.google.com/webstore/detail/web-store-api-sample-app/ndgidogppopohjpghapeojgoehfmflab)
   * Add dist folder
