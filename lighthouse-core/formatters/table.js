@@ -39,7 +39,7 @@ class Table extends Formatter {
             output += '      ';
             row.cols.forEach(col => {
               // Omit code snippet cols.
-              if (col.startsWith('`') && col.endsWith('`')) {
+              if (!col || col.startsWith('`') && col.endsWith('`')) {
                 return;
               }
               output += `${col} `;
