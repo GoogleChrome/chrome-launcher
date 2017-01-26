@@ -801,10 +801,8 @@ function captureJSCallUsage(funcRef, set) {
   const originalFunc = funcRef;
   const originalPrepareStackTrace = __nativeError.prepareStackTrace;
 
-  return function() {
+  return function(...args) {
     // Note: this function runs in the context of the page that is being audited.
-
-    const args = [...arguments]; // callee's arguments.
 
     // See v8's Stack Trace API https://github.com/v8/v8/wiki/Stack-Trace-API#customizing-stack-traces
     __nativeError.prepareStackTrace = function(error, structStackTrace) {
@@ -850,7 +848,7 @@ function captureJSCallUsage(funcRef, set) {
     __nativeError.prepareStackTrace = originalPrepareStackTrace;
 
     // eslint-disable-next-line no-invalid-this
-    return originalFunc.apply(this, arguments);
+    return originalFunc.apply(this, args);
   };
 }
 

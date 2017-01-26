@@ -26,14 +26,14 @@ class ConsoleQuieter {
   static mute(opts) {
     ConsoleQuieter._logs = ConsoleQuieter._logs || [];
 
-    console.log = function() {
-      ConsoleQuieter._logs.push({type: 'log', args: arguments, prefix: opts.prefix});
+    console.log = function(...args) {
+      ConsoleQuieter._logs.push({type: 'log', args, prefix: opts.prefix});
     };
-    console.warn = function() {
-      ConsoleQuieter._logs.push({type: 'warn', args: arguments, prefix: opts.prefix});
+    console.warn = function(...args) {
+      ConsoleQuieter._logs.push({type: 'warn', args, prefix: opts.prefix});
     };
-    console.error = function() {
-      ConsoleQuieter._logs.push({type: 'error', args: arguments, prefix: opts.prefix});
+    console.error = function(...args) {
+      ConsoleQuieter._logs.push({type: 'error', args, prefix: opts.prefix});
     };
   }
 

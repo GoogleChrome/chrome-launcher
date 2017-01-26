@@ -16,11 +16,11 @@ Object.keys(assert)
   .filter(key => typeof assert[key] === 'function')
   .forEach(key => {
     const _origFn = assert[key];
-    assert[key] = function() {
+    assert[key] = function(...args) {
       if (currTest) {
         currTest._assertions++;
       }
-      return _origFn.apply(this, arguments);
+      return _origFn.apply(this, args);
     };
   }
 );
