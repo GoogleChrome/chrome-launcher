@@ -86,8 +86,11 @@ class NoMutationEventsAudit extends Audit {
     return NoMutationEventsAudit.generateAuditResult({
       rawValue: groupedResults.length === 0,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: groupedResults
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {
+          results: groupedResults,
+          tableHeadings: {url: 'URL', lineCol: 'Line/Col', type: 'Event', code: 'Snippet'}
+        }
       },
       debugString
     });
