@@ -63,7 +63,7 @@ class UnusedCSSRules extends Audit {
     rules.forEach(rule => {
       const stylesheetInfo = indexedStylesheets[rule.styleSheetId];
 
-      if (stylesheetInfo.isDuplicate) {
+      if (!stylesheetInfo || stylesheetInfo.isDuplicate) {
         return;
       }
 
