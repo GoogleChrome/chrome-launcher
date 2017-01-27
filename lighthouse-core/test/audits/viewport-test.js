@@ -18,20 +18,12 @@
 const Audit = require('../../audits/viewport.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Mobile-friendly: viewport audit', () => {
-  it('fails when no input present', () => {
-    const audit = Audit.audit({
-      Viewport: -1
-    });
-    assert.equal(audit.rawValue, -1);
-    assert.equal(audit.debugString, 'Error in determining viewport');
-  });
-
   it('fails when HTML does not contain a viewport meta tag', () => {
     return assert.equal(Audit.audit({
-      Viewport: ''
+      Viewport: null
     }).rawValue, false);
   });
 

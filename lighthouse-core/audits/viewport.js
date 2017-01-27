@@ -39,10 +39,10 @@ class Viewport extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (typeof artifacts.Viewport !== 'string') {
+    if (artifacts.Viewport === null) {
       return Viewport.generateAuditResult({
-        debugString: 'Error in determining viewport',
-        rawValue: -1
+        debugString: 'No viewport meta tag found',
+        rawValue: false
       });
     }
 

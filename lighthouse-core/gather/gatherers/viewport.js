@@ -21,17 +21,14 @@ const Gatherer = require('./gatherer');
 class Viewport extends Gatherer {
 
   /**
-   * @param {!{driver: !Object}} options Run options
+   * @param {{driver: !Object}} options Run options
    * @return {!Promise<?string>} The value of the viewport meta's content attribute, or null
    */
   afterPass(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="viewport"]')
-      .then(node => node && node.getAttribute('content'))
-      .catch(_ => {
-        return -1;
-      });
+      .then(node => node && node.getAttribute('content'));
   }
 }
 

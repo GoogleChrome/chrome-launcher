@@ -41,16 +41,4 @@ describe('Viewport gatherer', () => {
       assert.ok(/width=/gim.test(artifact));
     });
   });
-
-  it('handles driver failure', () => {
-    return viewportGather.afterPass({
-      driver: {
-        querySelector() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(artifact => {
-      assert.equal(artifact, -1);
-    });
-  });
 });
