@@ -26,9 +26,13 @@
 .table_list tr:hover {
   background-color: #fafafa;
 }
-.table_list code {
+.table_list code, .table_list pre {
+  display: block;
   white-space: pre;
   font-family: monospace;
+}
+.table_list em + code, .table_list em + pre {
+  margin-top: 10px;
 }
 
 .table_list.multicolumn {

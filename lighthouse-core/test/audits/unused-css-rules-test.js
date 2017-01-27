@@ -21,46 +21,22 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Best Practices: unused css rules audit', () => {
-  describe('#mapSheetToResult', () => {
-    let baseSheet;
+  function generate(content, length) {
+    const arr = [];
+    for (let i = 0; i < length; i++) {
+      arr.push(content);
+    }
+    return arr.join('');
+  }
 
-    function map(overrides, url) {
-      url = url || 'the_page';
-      return UnusedCSSAudit.mapSheetToResult(Object.assign(baseSheet, overrides), url);
+  describe('#determineContentPreview', () => {
+    function assertLinesContained(actual, expected) {
+      expected.split('\n').forEach(line => {
+        assert.ok(actual.indexOf(line.trim()) >= 0, `${line} is found in preview`);
+      });
     }
 
-    function generate(content, length) {
-      const arr = [];
-      for (let i = 0; i < length; i++) {
-        arr.push(content);
-      }
-      return arr.join('');
-    }
-
-    beforeEach(() => {
-      baseSheet = {
-        header: {sourceURL: ''},
-        content: 'dummy',
-        used: [{dummy: 1}],
-        unused: [],
-      };
-    });
-
-    it('correctly computes percentUsed', () => {
-      assert.ok(/0%/.test(map({used: [], unused: [1, 2]}).label));
-      assert.ok(/50%/.test(map({used: [1, 2], unused: [1, 2]}).label));
-      assert.ok(/100%/.test(map({used: [1, 2], unused: []}).label));
-    });
-
-    it('correctly computes url', () => {
-      assert.equal(map({header: {sourceURL: ''}}).url, 'inline');
-      assert.equal(map({header: {sourceURL: 'page'}}, 'page').url, 'inline');
-      assert.equal(map({header: {sourceURL: 'foobar'}}).url, 'foobar');
-    });
-
-    it('does not give content preview when url is present', () => {
-      assert.ok(!map({header: {sourceURL: 'foobar'}}).code);
-    });
+    const preview = UnusedCSSAudit.determineContentPreview;
 
     it('correctly computes short content preview', () => {
       const shortContent = `
@@ -69,7 +45,7 @@ describe('Best Practices: unused css rules audit', () => {
         }
       `.trim();
 
-      assert.equal(map({content: shortContent}).code, shortContent);
+      assertLinesContained(preview(shortContent), shortContent);
     });
 
     it('correctly computes long content preview', () => {
@@ -83,7 +59,7 @@ describe('Best Practices: unused css rules audit', () => {
         }
       `.trim();
 
-      assert.equal(map({content: longContent}).code, `
+      assertLinesContained(preview(longContent), `
         body {
           color: white;
         } ...
@@ -99,7 +75,7 @@ describe('Best Practices: unused css rules audit', () => {
         }
       `.trim();
 
-      assert.equal(map({content: longContent}).code, `
+      assertLinesContained(preview(longContent), `
         body {
           color: white;
           font-size: 20px; ... } ...
@@ -113,13 +89,62 @@ describe('Best Practices: unused css rules audit', () => {
        */
       `.trim();
 
-      assert.ok(/aaa\.\.\.$/.test(map({content: longContent}).code));
+      assert.ok(/aaa\.\.\./.test(preview(longContent)));
+    });
+  });
+
+  describe('#mapSheetToResult', () => {
+    let baseSheet;
+    const baseUrl = 'http://g.co/';
+
+    function map(overrides, url) {
+      if (overrides.header && overrides.header.sourceURL) {
+        overrides.header.sourceURL = baseUrl + overrides.header.sourceURL;
+      }
+      url = url || baseUrl;
+      return UnusedCSSAudit.mapSheetToResult(Object.assign(baseSheet, overrides), url);
+    }
+
+    beforeEach(() => {
+      baseSheet = {
+        header: {sourceURL: baseUrl},
+        content: 'dummy',
+        used: [{dummy: 1}],
+        unused: [],
+      };
+    });
+
+    it('correctly computes potentialSavings', () => {
+      assert.ok(map({used: [], unused: [1, 2]}).potentialSavings, '100%');
+      assert.ok(map({used: [1, 2], unused: [1, 2]}).potentialSavings, '50%');
+      assert.ok(map({used: [1, 2], unused: []}).potentialSavings, '0%');
+    });
+
+    it('correctly computes url', () => {
+      assert.equal(map({header: {sourceURL: ''}}).url, '*inline*```dummy```');
+      assert.equal(map({header: {sourceURL: 'a'}}, 'http://g.co/a').url, '*inline*```dummy```');
+      assert.equal(map({header: {sourceURL: 'foobar'}}).url, '/foobar');
+    });
+
+    it('does not give content preview when url is present', () => {
+      assert.ok(!/dummy/.test(map({header: {sourceURL: 'foobar'}}).url));
     });
   });
 
   describe('#audit', () => {
+    const networkRecords = {
+      defaultPass: [
+        {
+          url: 'file://a.css',
+          transferSize: 10 * 1024,
+          _resourceType: {_name: 'stylesheet'}
+        },
+      ]
+    };
+
     it('fails when gatherers failed', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: {rawValue: -1, debugString: 'It errored'},
         Styles: []
@@ -130,7 +155,8 @@ describe('Best Practices: unused css rules audit', () => {
     });
 
     it('ignores missing stylesheets', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [{styleSheetId: 'a', used: false}],
         Styles: []
@@ -140,7 +166,8 @@ describe('Best Practices: unused css rules audit', () => {
     });
 
     it('passes when rules are used', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -149,11 +176,11 @@ describe('Best Practices: unused css rules audit', () => {
         ],
         Styles: [
           {
-            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            header: {styleSheetId: 'a', sourceURL: 'file://a.css'},
             content: '.my.selector {color: #ccc;}\n a {color: #fff}'
           },
           {
-            header: {styleSheetId: 'b', sourceURL: 'b.css'},
+            header: {styleSheetId: 'b', sourceURL: 'file://b.css'},
             content: '.my.favorite.selector { rule: content; }'
           }
         ]
@@ -161,11 +188,16 @@ describe('Best Practices: unused css rules audit', () => {
 
       assert.ok(!result.displayValue);
       assert.equal(result.rawValue, true);
-      assert.equal(result.extendedInfo.value.length, 2);
+      assert.equal(result.extendedInfo.value.results.length, 2);
+      assert.equal(result.extendedInfo.value.results[0].totalKb, '10 KB');
+      assert.equal(result.extendedInfo.value.results[1].totalKb, '0 KB');
+      assert.equal(result.extendedInfo.value.results[0].potentialSavings, '0%');
+      assert.equal(result.extendedInfo.value.results[1].potentialSavings, '0%');
     });
 
     it('fails when rules are unused', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -177,12 +209,12 @@ describe('Best Practices: unused css rules audit', () => {
         ],
         Styles: [
           {
-            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            header: {styleSheetId: 'a', sourceURL: 'file://a.css'},
             content: '.my.selector {color: #ccc;}\n a {color: #fff}'
           },
           {
-            header: {styleSheetId: 'b', sourceURL: 'b.css'},
-            content: '.my.favorite.selector { rule: content; }'
+            header: {styleSheetId: 'b', sourceURL: 'file://b.css'},
+            content: `.my.favorite.selector { ${generate('rule: a; ', 1000)}; }`
           },
           {
             header: {styleSheetId: 'c', sourceURL: ''},
@@ -193,11 +225,18 @@ describe('Best Practices: unused css rules audit', () => {
 
       assert.ok(result.displayValue);
       assert.equal(result.rawValue, false);
-      assert.equal(result.extendedInfo.value.length, 3);
+      assert.equal(result.extendedInfo.value.results.length, 3);
+      assert.equal(result.extendedInfo.value.results[0].totalKb, '10 KB');
+      assert.equal(result.extendedInfo.value.results[1].totalKb, '3 KB');
+      assert.equal(result.extendedInfo.value.results[2].totalKb, '0 KB');
+      assert.equal(result.extendedInfo.value.results[0].potentialSavings, '67%');
+      assert.equal(result.extendedInfo.value.results[1].potentialSavings, '50%');
+      assert.equal(result.extendedInfo.value.results[2].potentialSavings, '100%');
     });
 
     it('does not include duplicate sheets', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -206,12 +245,12 @@ describe('Best Practices: unused css rules audit', () => {
         ],
         Styles: [
           {
-            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            header: {styleSheetId: 'a', sourceURL: 'file://a.css'},
             content: '.my.selector {color: #ccc;}\n a {color: #fff}'
           },
           {
             isDuplicate: true,
-            header: {styleSheetId: 'b', sourceURL: 'b.css'},
+            header: {styleSheetId: 'b', sourceURL: 'file://b.css'},
             content: 'a.other {color: #fff}'
           },
         ]
@@ -219,11 +258,12 @@ describe('Best Practices: unused css rules audit', () => {
 
       assert.ok(!result.displayValue);
       assert.equal(result.rawValue, true);
-      assert.equal(result.extendedInfo.value.length, 1);
+      assert.equal(result.extendedInfo.value.results.length, 1);
     });
 
     it('does not include empty sheets', () => {
-      const result = UnusedCSSAudit.audit({
+      const result = UnusedCSSAudit.audit_({
+        networkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -232,11 +272,11 @@ describe('Best Practices: unused css rules audit', () => {
         ],
         Styles: [
           {
-            header: {styleSheetId: 'a', sourceURL: 'a.css'},
+            header: {styleSheetId: 'a', sourceURL: 'file://a.css'},
             content: '.my.selector {color: #ccc;}\n a {color: #fff}'
           },
           {
-            header: {styleSheetId: 'b', sourceURL: 'b.css'},
+            header: {styleSheetId: 'b', sourceURL: 'file://b.css'},
             content: '.my.favorite.selector { rule: content; }'
           },
           {
@@ -256,7 +296,7 @@ describe('Best Practices: unused css rules audit', () => {
 
       assert.ok(!result.displayValue);
       assert.equal(result.rawValue, true);
-      assert.equal(result.extendedInfo.value.length, 2);
+      assert.equal(result.extendedInfo.value.results.length, 2);
     });
   });
 });

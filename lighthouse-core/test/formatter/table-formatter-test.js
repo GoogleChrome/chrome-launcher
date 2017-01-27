@@ -75,4 +75,34 @@ describe('TableFormatter', () => {
     const output2 = template(extendedInfoShort).split('\n').join('');
     assert.ok(!output2.match('multicolumn"'), 'does not add multicolumn class for small tables');
   });
+
+  it('handles missing values', () => {
+    const pretty = TableFormatter.getFormatter('pretty');
+    assert.equal(pretty({
+      tableHeadings: {name: 'Name', value: 'Value'},
+      results: [
+        {name: 'thing1', value: 'foo'},
+        {name: 'thing2'},
+        {value: 'bar'},
+      ]
+    }), [
+      '      thing1 foo \n',
+      '      thing2 -- \n',
+      '      -- bar \n',
+    ].join(''));
+  });
+
+  it('handles non-string values', () => {
+    const pretty = TableFormatter.getFormatter('pretty');
+    assert.equal(pretty({
+      tableHeadings: {name: 'Name', value: 'Value'},
+      results: [
+        {name: 'thing1', value: 5},
+        {name: 'thing2', value: false},
+      ]
+    }), [
+      '      thing1 5 \n',
+      '      thing2 false \n',
+    ].join(''));
+  });
 });

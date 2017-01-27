@@ -18,7 +18,9 @@
 
 const Audit = require('./audit');
 const Formatter = require('../formatters/formatter');
+const URL = require('../lib/url-shim');
 
+const KB_IN_BYTES = 1024;
 const PREVIEW_LENGTH = 100;
 const ALLOWABLE_UNUSED_RULES_RATIO = 0.10;
 
@@ -33,19 +35,27 @@ class UnusedCSSRules extends Audit {
       description: 'Site does not have more than 10% unused CSS',
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +
           'bytes consumed by network activity. [Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)',
-      requiredArtifacts: ['CSSUsage', 'Styles', 'URL']
+      requiredArtifacts: ['CSSUsage', 'Styles', 'URL', 'networkRecords']
     };
   }
 
   /**
    * @param {!Array.<{header: {styleSheetId: string}}>} styles The output of the Styles gatherer.
+   * @param {!Array<WebInspector.NetworkRequest>} networkRecords
    * @return {!Object} A map of styleSheetId to stylesheet information.
    */
-  static indexStylesheetsById(styles) {
+  static indexStylesheetsById(styles, networkRecords) {
+    const indexedNetworkRecords = networkRecords
+        .filter(record => record._resourceType && record._resourceType._name === 'stylesheet')
+        .reduce((indexed, record) => {
+          indexed[record.url] = record;
+          return indexed;
+        }, {});
     return styles.reduce((indexed, stylesheet) => {
       indexed[stylesheet.header.styleSheetId] = Object.assign({
         used: [],
         unused: [],
+        networkRecord: indexedNetworkRecords[stylesheet.header.sourceURL],
       }, stylesheet);
       return indexed;
     }, {});
@@ -79,6 +89,42 @@ class UnusedCSSRules extends Audit {
   }
 
   /**
+   * Trims stylesheet content down to the first rule-set definition.
+   * @param {string} content
+   * @return {string}
+   */
+  static determineContentPreview(content) {
+    let preview = content
+        .slice(0, PREVIEW_LENGTH * 5)
+        .replace(/( {2,}|\t)+/g, '  ') // remove leading indentation if present
+        .replace(/\n\s+}/g, '\n}') // completely remove indentation of closing braces
+        .trim(); // trim the leading whitespace
+
+    if (preview.length > PREVIEW_LENGTH) {
+      const firstRuleStart = preview.indexOf('{');
+      const firstRuleEnd = preview.indexOf('}');
+
+      if (firstRuleStart === -1 || firstRuleEnd === -1
+          || firstRuleStart > firstRuleEnd
+          || firstRuleStart > PREVIEW_LENGTH) {
+        // We couldn't determine the first rule-set or it's not within the preview
+        preview = preview.slice(0, PREVIEW_LENGTH) + '...';
+      } else if (firstRuleEnd < PREVIEW_LENGTH) {
+        // The entire first rule-set fits within the preview
+        preview = preview.slice(0, firstRuleEnd + 1) + ' ...';
+      } else {
+        // The first rule-set doesn't fit within the preview, just show as many as we can
+        const lastSemicolonIndex = preview.slice(0, PREVIEW_LENGTH).lastIndexOf(';');
+        preview = lastSemicolonIndex < firstRuleStart ?
+            preview.slice(0, PREVIEW_LENGTH) + '... } ...' :
+            preview.slice(0, lastSemicolonIndex + 1) + ' ... } ...';
+      }
+    }
+
+    return preview;
+  }
+
+  /**
    * @param {!Object} stylesheetInfo The stylesheetInfo object.
    * @param {string} pageUrl The URL of the page, used to identify inline styles.
    * @return {!{url: string, label: string, code: string}} The result for the URLLIST formatter.
@@ -91,36 +137,30 @@ class UnusedCSSRules extends Audit {
       return null;
     }
 
-    const percentUsed = Math.round(100 * numUsed / (numUsed + numUnused));
-
-    let contentPreview = stylesheetInfo.content;
-    if (contentPreview.length > PREVIEW_LENGTH) {
-      const firstRuleStart = contentPreview.indexOf('{');
-      const firstRuleEnd = contentPreview.indexOf('}');
-      if (firstRuleStart === -1 || firstRuleEnd === -1
-          || firstRuleStart > firstRuleEnd
-          || firstRuleStart > PREVIEW_LENGTH) {
-        contentPreview = contentPreview.slice(0, PREVIEW_LENGTH) + '...';
-      } else if (firstRuleEnd < PREVIEW_LENGTH) {
-        contentPreview = contentPreview.slice(0, firstRuleEnd + 1) + ' ...';
-      } else {
-        const lastSemicolonIndex = contentPreview.slice(0, PREVIEW_LENGTH).lastIndexOf(';');
-        contentPreview = lastSemicolonIndex < firstRuleStart ?
-            contentPreview.slice(0, PREVIEW_LENGTH) + '... } ...' :
-            contentPreview.slice(0, lastSemicolonIndex + 1) + ' ... } ...';
-      }
-    }
-
-    let code;
     let url = stylesheetInfo.header.sourceURL;
-    const label = `${percentUsed}% rules used`;
-
     if (!url || url === pageUrl) {
-      url = 'inline';
-      code = contentPreview.trim();
+      const contentPreview = UnusedCSSRules.determineContentPreview(stylesheetInfo.content);
+      url = '*inline*```' + contentPreview + '```';
+    } else {
+      url = URL.getDisplayName(url);
     }
 
-    return {url, code, label};
+    // If we don't know for sure how many bytes this sheet used on the network,
+    // we can guess it was roughly the size of the content gzipped.
+    const totalBytes = stylesheetInfo.networkRecord ?
+        stylesheetInfo.networkRecord.transferSize :
+        Math.round(stylesheetInfo.content.length / 3);
+
+    const percentUnused = numUnused / (numUsed + numUnused);
+    const wastedBytes = Math.round(percentUnused * totalBytes);
+
+    return {
+      url,
+      numUnused,
+      wastedBytes,
+      totalKb: Math.round(totalBytes / KB_IN_BYTES) + ' KB',
+      potentialSavings: `${Math.round(percentUnused * 100)}%`,
+    };
   }
 
   /**
@@ -128,9 +168,22 @@ class UnusedCSSRules extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
+    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
+    return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
+      return UnusedCSSRules.audit_(artifacts, networkThroughput);
+    });
+  }
+
+  /**
+   * @param {!Artifacts} artifacts
+   * @param {number} networkThroughput
+   * @return {!AuditResult}
+   */
+  static audit_(artifacts, networkThroughput) {
     const styles = artifacts.Styles;
     const usage = artifacts.CSSUsage;
     const pageUrl = artifacts.URL.finalUrl;
+    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
 
     if (styles.rawValue === -1) {
       return UnusedCSSRules.generateAuditResult(styles);
@@ -138,27 +191,36 @@ class UnusedCSSRules extends Audit {
       return UnusedCSSRules.generateAuditResult(usage);
     }
 
-    const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles);
+    const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
     const unused = UnusedCSSRules.countUnusedRules(usage, indexedSheets);
     const unusedRatio = (unused / usage.length) || 0;
     const results = Object.keys(indexedSheets).map(sheetId => {
       return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
     }).filter(Boolean);
 
-
+    const wastedBytes = results.reduce((waste, result) => waste + result.wastedBytes, 0);
     let displayValue = '';
-    if (unused > 1) {
-      displayValue = `${unused} CSS rules were unused`;
-    } else if (unused === 1) {
-      displayValue = `${unused} CSS rule was unused`;
+    if (unused > 0) {
+      const wastedKb = Math.round(wastedBytes / KB_IN_BYTES);
+      // Only round to nearest 10ms since we're relatively hand-wavy
+      const wastedMs = Math.round(wastedBytes / networkThroughput * 100) * 10;
+      displayValue = `${wastedKb}KB (~${wastedMs}ms) potential savings`;
     }
 
     return UnusedCSSRules.generateAuditResult({
       displayValue,
       rawValue: unusedRatio < ALLOWABLE_UNUSED_RULES_RATIO,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: results
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {
+          results,
+          tableHeadings: {
+            url: 'URL',
+            numUnused: 'Unused Rules',
+            totalKb: 'Original (KB)',
+            potentialSavings: 'Potential Savings (%)',
+          }
+        }
       }
     });
   }

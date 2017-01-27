@@ -121,7 +121,9 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 5
+            results: {
+              length: 5
+            }
           }
         }
       },
@@ -151,7 +153,9 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 2
+            results: {
+              length: 2
+            }
           }
         }
       },

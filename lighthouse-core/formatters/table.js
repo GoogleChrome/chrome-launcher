@@ -78,13 +78,18 @@ class Table extends Formatter {
 
     const rows = results.map(result => {
       const cols = headingKeys.map(key => {
+        let value = result[key];
+        if (typeof value === 'undefined') {
+          value = '--';
+        }
+
         switch (key) {
           case 'code':
-            return '`' + result[key].trim() + '`';
+            return '`' + value.trim() + '`';
           case 'lineCol':
             return `${result.line}:${result.col}`;
           default:
-            return result[key];
+            return String(value);
         }
       });
 

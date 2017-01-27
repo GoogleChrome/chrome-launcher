@@ -158,8 +158,8 @@ limitations under the License.
                     {{/if}}
                   </div>
 
-                  {{#if subItem.extendedInfo.value}}
-                    {{> (lookup . 'name') subItem.extendedInfo.value }}
+                  {{~#if subItem.extendedInfo.value~}}
+                    {{~> (lookup . 'name') subItem.extendedInfo.value ~}}
                   {{/if}}
                 </li>
               {{/each}}

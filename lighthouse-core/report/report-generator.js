@@ -132,6 +132,7 @@ class ReportGenerator {
       // XSS, define a renderer that only transforms links and code snippets.
       // All other markdown ad HTML is ignored.
       const renderer = new marked.Renderer();
+      renderer.em = str => `<em>${str}</em>`;
       renderer.link = (href, title, text) => {
         title = title || text;
         return `<a href="${href}" target="_blank" rel="noopener" title="${title}">${text}</a>`;
