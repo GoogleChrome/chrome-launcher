@@ -542,10 +542,7 @@ describe('GatherRunner', function() {
 
     it('uses the last not-undefined phase result as artifact', () => {
       const recoverableError = new Error('My recoverable error');
-      recoverableError.recoverable = true;
-
       const someOtherError = new Error('Bad, bad error.');
-      someOtherError.recoverable = true;
 
       // Gatherer results are all expected to be arrays of promises
       const gathererResults = {
@@ -586,28 +583,22 @@ describe('GatherRunner', function() {
       });
     });
 
-    it('supports sync and async throwing of recoverable errors from gatherers', () => {
+    it('supports sync and async throwing of non-fatal errors from gatherers', () => {
       const gatherers = [
         // sync
         new class BeforeSync extends Gatherer {
           beforePass() {
-            const err = new Error(this.name);
-            err.recoverable = true;
-            throw err;
+            throw new Error(this.name);
           }
         }(),
         new class PassSync extends Gatherer {
           pass() {
-            const err = new Error(this.name);
-            err.recoverable = true;
-            throw err;
+            throw new Error(this.name);
           }
         }(),
         new class AfterSync extends Gatherer {
           afterPass() {
-            const err = new Error(this.name);
-            err.recoverable = true;
-            throw err;
+            throw new Error(this.name);
           }
         }(),
 
@@ -615,21 +606,18 @@ describe('GatherRunner', function() {
         new class BeforePromise extends Gatherer {
           beforePass() {
             const err = new Error(this.name);
-            err.recoverable = true;
             return Promise.reject(err);
           }
         }(),
         new class PassPromise extends Gatherer {
           pass() {
             const err = new Error(this.name);
-            err.recoverable = true;
             return Promise.reject(err);
           }
         }(),
         new class AfterPromise extends Gatherer {
           afterPass() {
             const err = new Error(this.name);
-            err.recoverable = true;
             return Promise.reject(err);
           }
         }()
@@ -653,8 +641,10 @@ describe('GatherRunner', function() {
       });
     });
 
-    it('rejects if a gatherer returns an unrecoverable error', () => {
+    it('rejects if a gatherer returns a fatal error', () => {
       const errorMessage = 'Gather Failed in pass()';
+      const err = new Error(errorMessage);
+      err.fatal = true;
       const gatherers = [
         // sync
         new class GathererSuccess extends Gatherer {
@@ -664,7 +654,7 @@ describe('GatherRunner', function() {
         }(),
         new class GathererFailure extends Gatherer {
           pass() {
-            return Promise.reject(new Error(errorMessage));
+            return Promise.reject(err);
           }
         }
       ];

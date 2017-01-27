@@ -23,9 +23,9 @@
  * Promise that resolves to that value.
  *
  * If an Error is thrown (or a Promise that rejects on an Error), the
- * GatherRunner will check for a `recoverable` property on the Error. If set to
- * `true`, the runner will treat it as an expected error internal to the
- * gatherer and continue execution of any remaining gatherers.
+ * GatherRunner will check for a `fatal` property on the Error. If not set to
+ * `true`, the runner will treat it as an error internal to the gatherer and
+ * continue execution of any remaining gatherers.
  */
 class Gatherer {
   /**

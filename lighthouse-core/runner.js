@@ -161,7 +161,7 @@ class Runner {
     return Promise.resolve().then(_ => {
       log.log('status', status);
 
-      // Return an early error if an artifact required for the audit is missing.
+      // Return an early error if an artifact required for the audit is missing or an error.
       for (const artifactName of audit.meta.requiredArtifacts) {
         const noArtifact = typeof artifacts[artifactName] === 'undefined';
 
@@ -175,6 +175,18 @@ class Runner {
           return audit.generateAuditResult({
             rawValue: -1,
             debugString: `Required ${artifactName} gatherer did not run.`
+          });
+        }
+
+        // If artifact was an error, it must be non-fatal (or gatherRunner would
+        // have thrown). Output error result on behalf of audit.
+        if (artifacts[artifactName] instanceof Error) {
+          const artifactError = artifacts[artifactName];
+          log.warn('Runner', `${artifactName} gatherer, required by audit ${audit.meta.name},` +
+            ` encountered an error: ${artifactError.message}`);
+          return audit.generateAuditResult({
+            rawValue: -1,
+            debugString: artifactError.message
           });
         }
       }

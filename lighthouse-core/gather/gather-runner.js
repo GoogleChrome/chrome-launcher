@@ -110,14 +110,14 @@ class GatherRunner {
   }
 
   /**
-   * Catches any `recoverable` errors from the supplied promise, rejecting on
-   * the rest.
+   * Test any error output from the promise, absorbing non-fatal errors and
+   * throwing on fatal ones so that run is stopped.
    * @param {!Promise<*>} promise
    * @return {!Promise<*>}
    */
   static recoverOrThrow(promise) {
     return promise.catch(err => {
-      if (!err.recoverable) {
+      if (err.fatal) {
         throw err;
       }
     });
@@ -237,8 +237,8 @@ class GatherRunner {
   /**
    * Takes the results of each gatherer phase for each gatherer and uses the
    * last produced value (that's not undefined) as the artifact for that
-   * gatherer. If a recoverable error was rejected from a gatherer phase,
-   * uses that error as the artifact instead.
+   * gatherer. If a non-fatal error was rejected from a gatherer phase,
+   * uses that error object as the artifact instead.
    * @param {!Object<!Array<!Promise<*>>} gathererResults
    * @return {!Promise<!Artifacts>}
    */
@@ -257,7 +257,7 @@ class GatherRunner {
           }
           artifacts[gathererName] = artifact;
         }, err => {
-          // To reach this point, all errors are recoverable, so return err to
+          // To reach this point, all errors are non-fatal, so return err to
           // runner to handle turning it into an error audit.
           artifacts[gathererName] = err;
         });
