@@ -142,18 +142,6 @@ describe('Best Practices: unused css rules audit', () => {
       ]
     };
 
-    it('fails when gatherers failed', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
-        URL: {finalUrl: ''},
-        CSSUsage: {rawValue: -1, debugString: 'It errored'},
-        Styles: []
-      });
-
-      assert.equal(result.debugString, 'It errored');
-      assert.equal(result.rawValue, -1);
-    });
-
     it('ignores missing stylesheets', () => {
       const result = UnusedCSSAudit.audit_({
         networkRecords,

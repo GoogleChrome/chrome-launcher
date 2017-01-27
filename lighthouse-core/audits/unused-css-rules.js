@@ -185,12 +185,6 @@ class UnusedCSSRules extends Audit {
     const pageUrl = artifacts.URL.finalUrl;
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
 
-    if (styles.rawValue === -1) {
-      return UnusedCSSRules.generateAuditResult(styles);
-    } else if (usage.rawValue === -1) {
-      return UnusedCSSRules.generateAuditResult(usage);
-    }
-
     const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
     const unused = UnusedCSSRules.countUnusedRules(usage, indexedSheets);
     const unusedRatio = (unused / usage.length) || 0;

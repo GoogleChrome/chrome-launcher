@@ -147,11 +147,6 @@ class Styles extends Gatherer {
           stylesheet.isDuplicate = idInMap !== stylesheet.header.styleSheetId;
           return stylesheet;
         });
-      }, err => {
-        return {
-          rawValue: -1,
-          debugString: err
-        };
       });
   }
 }

@@ -48,10 +48,6 @@ class NoOldFlexboxAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.Styles.rawValue === -1) {
-      return NoOldFlexboxAudit.generateAuditResult(artifacts.Styles);
-    }
-
     // https://www.w3.org/TR/2009/WD-css3-flexbox-20090723/
     // (e.g. box-flex, box-orient, box-flex-group, display: flexbox (2011 version))
     const displayPropResults = StyleHelpers.filterStylesheetsByUsage(artifacts.Styles,

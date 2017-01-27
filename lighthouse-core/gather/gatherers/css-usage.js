@@ -29,8 +29,7 @@ class CSSUsage extends Gatherer {
       .catch(err => {
         // TODO(phulce): Remove this once CSS usage hits stable
         if (/startRuleUsageTracking/.test(err.message)) {
-          this.failure = 'CSS Usage tracking requires Chrome \u2265 56';
-          return;
+          throw new Error('CSS Usage tracking requires Chrome \u2265 56');
         }
 
         throw err;
@@ -44,11 +43,6 @@ class CSSUsage extends Gatherer {
       return driver.sendCommand('CSS.disable')
         .then(_ => driver.sendCommand('DOM.disable'))
         .then(_ => results.ruleUsage);
-    }).catch(err => {
-      return {
-        rawValue: -1,
-        debugString: this.failure || err,
-      };
     });
   }
 }
