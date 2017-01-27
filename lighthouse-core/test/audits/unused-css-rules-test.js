@@ -129,6 +129,16 @@ describe('Best Practices: unused css rules audit', () => {
       assert.equal(result.rawValue, -1);
     });
 
+    it('ignores missing stylesheets', () => {
+      const result = UnusedCSSAudit.audit({
+        URL: {finalUrl: ''},
+        CSSUsage: [{styleSheetId: 'a', used: false}],
+        Styles: []
+      });
+
+      assert.equal(result.rawValue, true);
+    });
+
     it('passes when rules are used', () => {
       const result = UnusedCSSAudit.audit({
         URL: {finalUrl: ''},
