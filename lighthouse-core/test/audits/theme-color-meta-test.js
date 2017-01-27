@@ -19,12 +19,12 @@
 const Audit = require('../../audits/theme-color-meta.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('HTML: theme-color audit', () => {
-  it('fails and warns when no value given', () => {
+  it('fails and warns when no theme-color meta tag found', () => {
     const nullColorAudit = Audit.audit({
-      ThemeColor: -1
+      ThemeColor: null
     });
 
     assert.equal(nullColorAudit.rawValue, false);

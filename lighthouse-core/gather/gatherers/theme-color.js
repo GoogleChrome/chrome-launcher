@@ -20,14 +20,15 @@ const Gatherer = require('./gatherer');
 
 class ThemeColor extends Gatherer {
 
+  /**
+   * @param {{driver: !Object}} options
+   * @return {!Promise<?string>} The value of the theme-color meta's content attribute, or null
+   */
   afterPass(options) {
     const driver = options.driver;
 
     return driver.querySelector('head meta[name="theme-color"]')
-      .then(node => node && node.getAttribute('content'))
-      .catch(_ => {
-        return -1;
-      });
+      .then(node => node && node.getAttribute('content'));
   }
 }
 

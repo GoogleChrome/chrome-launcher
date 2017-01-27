@@ -42,16 +42,4 @@ describe('Theme Color gatherer', () => {
       assert.equal(artifact, '#288A76');
     });
   });
-
-  it('handles driver failure', () => {
-    return themeColorGather.afterPass({
-      driver: {
-        querySelector() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(artifact => {
-      assert.equal(artifact, -1);
-    });
-  });
 });
