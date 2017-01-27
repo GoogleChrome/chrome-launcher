@@ -104,7 +104,9 @@ class GatherRunner {
     // We dont need to hold up the reporting for the reload/disconnect,
     // so we will not return a promise in here.
     log.log('status', 'Disconnecting from browser...');
-    driver.disconnect();
+    driver.disconnect().catch(e => {
+      log.error('gather-runner disconnect', e);
+    });
   }
 
   /**

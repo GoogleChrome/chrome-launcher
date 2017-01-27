@@ -43,6 +43,7 @@ class CriConnection extends Connection {
   connect() {
     return this._runJsonCommand('new').then(response => {
       const url = response.webSocketDebuggerUrl;
+      this._pageId = response.id;
 
       return new Promise((resolve, reject) => {
         const ws = new WebSocket(url);
@@ -74,10 +75,18 @@ class CriConnection extends Connection {
         });
         response.on('end', _ => {
           if (response.statusCode === 200) {
-            resolve(JSON.parse(data));
-            return;
+            try {
+              resolve(JSON.parse(data));
+              return;
+            } catch (e) {
+              // In the case of 'close' Chromium returns a string rather than JSON: goo.gl/7v27xD
+              if (data === 'Target is closing') {
+                return resolve({message: data});
+              }
+              return reject(e);
+            }
           }
-          reject(new Error(`Unable to fetch webSocketDebuggerUrl, status: ${response.statusCode}`));
+          reject(new Error(`Protocol JSON API error (${command}), status: ${response.statusCode}`));
         });
       });
 
@@ -108,10 +117,12 @@ class CriConnection extends Connection {
       log.warn('CriConnection', 'disconnect() was called without an established connection.');
       return Promise.resolve();
     }
-    this._ws.removeAllListeners();
-    this._ws.close();
-    this._ws = null;
-    return Promise.resolve();
+    return this._runJsonCommand(`close/${this._pageId}`).then(_ => {
+      this._ws.removeAllListeners();
+      this._ws.close();
+      this._ws = null;
+      this._pageId = null;
+    });
   }
 
   /**

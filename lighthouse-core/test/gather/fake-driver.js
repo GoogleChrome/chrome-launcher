@@ -22,7 +22,9 @@ module.exports = {
   connect() {
     return Promise.resolve();
   },
-  disconnect() {},
+  disconnect() {
+    return Promise.resolve();
+  },
   gotoURL() {
     return Promise.resolve();
   },
