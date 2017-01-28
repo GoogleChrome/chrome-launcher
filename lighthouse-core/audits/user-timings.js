@@ -19,95 +19,6 @@
 
 const Audit = require('./audit');
 const Formatter = require('../formatters/formatter');
-const TimelineModel = require('../lib/traces/devtools-timeline-model');
-
-/**
- * @param {!Array<!Object>} traceData
- * @return {!Array<!UserTimingsExtendedInfo>}
- */
-function filterTrace(traceData) {
-  const userTimings = [];
-  const measuresStartTimes = {};
-  let traceStartFound = false;
-  let navigationStartTime;
-
-  // Fetch blink.user_timing events from the tracing data
-  const timelineModel = new TimelineModel(traceData);
-  const modeledTraceData = timelineModel.timelineModel();
-
-  // Get all blink.user_timing events
-  // The event phases we are interested in are mark and instant events (R, i, I)
-  // and duration events which correspond to measures (B, b, E, e).
-  // @see https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview#
-  modeledTraceData.mainThreadEvents()
-  .filter(ut => {
-    if (ut.name === 'TracingStartedInPage' || ut.name === 'navigationStart') {
-      return true;
-    }
-
-    if (ut.hasCategory('blink.user_timing')) {
-      // reject these "userTiming" events that aren't really UserTiming, by nuking ones with frame data (or requestStart)
-      // https://cs.chromium.org/search/?q=trace_event.*?user_timing&sq=package:chromium&type=cs
-      return ut.name !== 'requestStart' &&
-          ut.name !== 'paintNonDefaultBackgroundColor' &&
-          ut.args.frame === undefined;
-    }
-
-    return false;
-  })
-  .forEach(ut => {
-    // Mark events fall under phases R and I (or i)
-    if (ut.phase === 'R' || ut.phase.toUpperCase() === 'I') {
-      // We only care about trace events that have to do with the page
-      // Sometimes other frames can show up in the frame beforehand
-      if (ut.name === 'TracingStartedInPage' && !traceStartFound) {
-        traceStartFound = true;
-        return;
-      }
-
-      // Once TraceingStartedInPage has begun, the next navigationStart event
-      // marks the start of navigation
-      // Make sure to not record such events hereafter
-      if (ut.name === 'navigationStart' && traceStartFound && !navigationStartTime) {
-        navigationStartTime = ut.startTime;
-      }
-
-      // Add user timings event to array
-      if (ut.name !== 'navigationStart') {
-        userTimings.push({
-          name: ut.name,
-          isMark: true,        // defines type of performance metric
-          args: ut.args,
-          startTime: ut.startTime
-        });
-      }
-    } else if (ut.phase.toLowerCase() === 'b') {
-      // Beginning of measure event, keep track of this events start time
-      measuresStartTimes[ut.name] = ut.startTime;
-    } else if (ut.phase.toLowerCase() === 'e') {
-      // End of measure event
-      // Add to the array of events
-      userTimings.push({
-        name: ut.name,
-        isMark: false,
-        args: ut.args,
-        startTime: measuresStartTimes[ut.name],
-        duration: ut.startTime - measuresStartTimes[ut.name],
-        endTime: ut.startTime
-      });
-    }
-  });
-
-  userTimings.forEach(ut => {
-    ut.startTime -= navigationStartTime;
-    if (!ut.isMark) {
-      ut.endTime -= navigationStartTime;
-      ut.duration = ut.duration;
-    }
-  });
-
-  return userTimings;
-}
 
 class UserTimings extends Audit {
   /**
@@ -126,20 +37,84 @@ class UserTimings extends Audit {
   }
 
   /**
+   * @param {!Object} tabTrace
+   * @return {!Array<!UserTimingsExtendedInfo>}
+   */
+  static filterTrace(tabTrace) {
+    const userTimings = [];
+    const measuresStartTimes = {};
+
+    // Get all blink.user_timing events
+    // The event phases we are interested in are mark and instant events (R, i, I)
+    // and duration events which correspond to measures (B, b, E, e).
+    // @see https://docs.google.com/document/d/1CvAClvFfyA5R-PhYUmn5OOQtYMH4h6I0nSsKchNAySU/preview#
+    tabTrace.processEvents.filter(evt => {
+      if (!evt.cat.includes('blink.user_timing')) {
+        return false;
+      }
+
+      // reject these "userTiming" events that aren't really UserTiming, by nuking ones with frame data (or requestStart)
+      // https://cs.chromium.org/search/?q=trace_event.*?user_timing&sq=package:chromium&type=cs
+      return evt.name !== 'requestStart' &&
+          evt.name !== 'navigationStart' &&
+          evt.name !== 'paintNonDefaultBackgroundColor' &&
+          evt.args.frame === undefined;
+    })
+    .forEach(ut => {
+      // Mark events fall under phases R and I (or i)
+      if (ut.ph === 'R' || ut.ph.toUpperCase() === 'I') {
+        userTimings.push({
+          name: ut.name,
+          isMark: true,
+          args: ut.args,
+          startTime: ut.ts
+        });
+
+      // Beginning of measure event, keep track of this events start time
+      } else if (ut.ph.toLowerCase() === 'b') {
+        measuresStartTimes[ut.name] = ut.ts;
+
+      // End of measure event
+      } else if (ut.ph.toLowerCase() === 'e') {
+        userTimings.push({
+          name: ut.name,
+          isMark: false,
+          args: ut.args,
+          startTime: measuresStartTimes[ut.name],
+          endTime: ut.ts
+        });
+      }
+    });
+
+    // baseline the timestamps against navStart, and translate to milliseconds
+    userTimings.forEach(ut => {
+      ut.startTime = (ut.startTime - tabTrace.navigationStartEvt.ts) / 1000;
+      if (!ut.isMark) {
+        ut.endTime = (ut.endTime - tabTrace.navigationStartEvt.ts) / 1000;
+        ut.duration = ut.endTime - ut.startTime;
+      }
+    });
+
+    return userTimings;
+  }
+
+  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const traceContents = artifacts.traces[Audit.DEFAULT_PASS].traceEvents;
-    const userTimings = filterTrace(traceContents);
+    const trace = artifacts.traces[Audit.DEFAULT_PASS];
+    return artifacts.requestTraceOfTab(trace).then(tabTrace => {
+      const userTimings = this.filterTrace(tabTrace);
 
-    return UserTimings.generateAuditResult({
-      rawValue: true,
-      displayValue: userTimings.length,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
-        value: userTimings
-      }
+      return UserTimings.generateAuditResult({
+        rawValue: true,
+        displayValue: userTimings.length,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
+          value: userTimings
+        }
+      });
     });
   }
 }

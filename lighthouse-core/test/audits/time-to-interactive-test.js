@@ -21,28 +21,28 @@ const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
 
-const mockArtifacts = GatherRunner.instantiateComputedArtifacts();
 
 /* eslint-env mocha */
 describe('Performance: time-to-interactive audit', () => {
   it('scores a -1 with invalid trace data', () => {
-    return Audit.audit({
-      traces: {
-        [Audit.DEFAULT_PASS]: {
-          traceEvents: '[{"pid": 15256,"tid": 1295,"t'
-        }
-      },
-      requestSpeedline() {
-        return Promise.resolve({first: 500});
+    const artifacts = GatherRunner.instantiateComputedArtifacts();
+    artifacts.traces = {
+      [Audit.DEFAULT_PASS]: {
+        traceEvents: [{pid: 15256, tid: 1295, t: 5}]
       }
-    }).then(output => {
+    };
+    artifacts.requestSpeedline = _ => {
+      return Promise.resolve({first: 500});
+    };
+
+    return Audit.audit(artifacts).then(output => {
       assert.equal(output.rawValue, -1);
       assert(output.debugString);
     });
   });
 
   it('evaluates valid input correctly', () => {
-    const artifacts = mockArtifacts;
+    const artifacts = GatherRunner.instantiateComputedArtifacts();
     artifacts.traces = {
       [Audit.DEFAULT_PASS]: {
         traceEvents: pwaTrace

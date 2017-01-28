@@ -46,7 +46,7 @@ class ComputedArtifact {
       return Promise.resolve(this.cache.get(artifact));
     }
 
-    return Promise.resolve(this.compute_(artifact)).then(computedArtifact => {
+    return Promise.resolve().then(_ => this.compute_(artifact)).then(computedArtifact => {
       this.cache.set(artifact, computedArtifact);
       return computedArtifact;
     });

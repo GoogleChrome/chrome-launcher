@@ -19,24 +19,33 @@ const Audit = require('../../audits/user-timings.js');
 const assert = require('assert');
 const traceEvents = require('../fixtures/traces/trace-user-timings.json');
 
-/* eslint-env mocha */
+const GatherRunner = require('../../gather/gather-runner.js');
+const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
 
+function generateArtifactsWithTrace(trace) {
+  return Object.assign(computedArtifacts, {
+    traces: {
+      [Audit.DEFAULT_PASS]: {traceEvents: Array.isArray(trace) ? trace : trace.traceEvents}
+    }
+  });
+}
+
+/* eslint-env mocha */
 describe('Performance: user-timings audit', () => {
   it('evaluates valid input correctly', () => {
-    const auditResult = Audit.audit({
-      traces: {[Audit.DEFAULT_PASS]: {traceEvents}}
+    return Audit.audit(generateArtifactsWithTrace(traceEvents)).then(auditResult => {
+      assert.equal(auditResult.score, true);
+      assert.equal(auditResult.displayValue, 2);
+
+      assert.equal(auditResult.extendedInfo.value[0].isMark, true);
+      assert.equal(Math.floor(auditResult.extendedInfo.value[0].startTime), 1000);
+      assert.equal(typeof auditResult.extendedInfo.value[0].endTime, 'undefined');
+      assert.equal(typeof auditResult.extendedInfo.value[0].duration, 'undefined');
+
+      assert.equal(auditResult.extendedInfo.value[1].isMark, false);
+      assert.equal(Math.floor(auditResult.extendedInfo.value[1].startTime), 0);
+      assert.equal(Math.floor(auditResult.extendedInfo.value[1].endTime), 1000);
+      assert.equal(Math.floor(auditResult.extendedInfo.value[1].duration), 1000);
     });
-    assert.equal(auditResult.score, true);
-    assert.equal(auditResult.displayValue, 2);
-
-    assert.equal(auditResult.extendedInfo.value[0].isMark, true);
-    assert.equal(Math.floor(auditResult.extendedInfo.value[0].startTime), 1000);
-    assert.equal(typeof auditResult.extendedInfo.value[0].endTime, 'undefined');
-    assert.equal(typeof auditResult.extendedInfo.value[0].duration, 'undefined');
-
-    assert.equal(auditResult.extendedInfo.value[1].isMark, false);
-    assert.equal(Math.floor(auditResult.extendedInfo.value[1].startTime), 0);
-    assert.equal(Math.floor(auditResult.extendedInfo.value[1].endTime), 1000);
-    assert.equal(Math.floor(auditResult.extendedInfo.value[1].duration), 1000);
   });
 });

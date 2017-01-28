@@ -26,11 +26,6 @@ const Formatter = require('../formatters/formatter');
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 1600;
 const SCORING_MEDIAN = 4000;
 
-// We want an fMP at or after our fCP, however we see traces with the sole fMP
-// being up to 1ms BEFORE the fCP. We're okay if this happens, however if we see
-// a gap of more than 2 frames (32,000 microseconds), then it's a bug that should
-// be addressed in FirstMeaningfulPaintDetector.cpp
-const FCPFMP_TOLERANCE = 32 * 1000;
 
 class FirstMeaningfulPaint extends Audit {
   /**
@@ -56,12 +51,26 @@ class FirstMeaningfulPaint extends Audit {
    * @return {!Promise<!AuditResult>} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    return new Promise((resolve, reject) => {
-      const traceContents = artifacts.traces[this.DEFAULT_PASS].traceEvents;
-      const evts = this.collectEvents(traceContents);
-      const result = this.calculateScore(evts);
+    const trace = artifacts.traces[this.DEFAULT_PASS];
+    return artifacts.requestTraceOfTab(trace).then(tabTrace => {
+      // Sometimes fMP is triggered before fCP
+      if (!tabTrace.firstMeaningfulPaintEvt) {
+        throw new Error('No usable `firstMeaningfulPaint` event found in trace');
+      }
 
-      resolve(FirstMeaningfulPaint.generateAuditResult({
+      // navigationStart is currently essential to FMP calculation.
+      // see: https://github.com/GoogleChrome/lighthouse/issues/753
+      if (!tabTrace.navigationStartEvt) {
+        throw new Error('No `navigationStart` event found in trace');
+      }
+
+      const result = this.calculateScore({
+        navigationStart: tabTrace.navigationStartEvt,
+        firstMeaningfulPaint: tabTrace.firstMeaningfulPaintEvt,
+        firstContentfulPaint: tabTrace.firstContentfulPaintEvt
+      });
+
+      return FirstMeaningfulPaint.generateAuditResult({
         score: result.score,
         rawValue: parseFloat(result.duration),
         displayValue: `${result.duration}ms`,
@@ -71,7 +80,7 @@ class FirstMeaningfulPaint extends Audit {
           value: result.extendedInfo,
           formatter: Formatter.SUPPORTED_FORMATS.NULL
         }
-      }));
+      });
     }).catch(err => {
       // Recover from trace parsing failures.
       return FirstMeaningfulPaint.generateAuditResult({
@@ -116,48 +125,6 @@ class FirstMeaningfulPaint extends Audit {
       score: Math.round(score),
       rawValue: parseFloat(firstMeaningfulPaint.toFixed(1)),
       extendedInfo
-    };
-  }
-
-  /**
-   * @param {!Array<!Object>} traceData
-   */
-  static collectEvents(traceData) {
-    // Parse the trace for our key events and sort them by timestamp.
-    const events = traceData.filter(e => {
-      return e.cat.includes('blink.user_timing') || e.name === 'TracingStartedInPage';
-    }).sort((event0, event1) => event0.ts - event1.ts);
-
-    // The first TracingStartedInPage in the trace is definitely our renderer thread of interest
-    // Beware: the tracingStartedInPage event can appear slightly after a navigationStart
-    const startedInPageEvt = events.find(e => e.name === 'TracingStartedInPage');
-    // Filter to just events matching the frame ID for sanity
-    const frameEvents = events.filter(e => e.args.frame === startedInPageEvt.args.data.page);
-
-    // Find our first FCP
-    const firstFCP = frameEvents.find(e => e.name === 'firstContentfulPaint');
-    // Our navStart will be the latest one before fCP.
-    const navigationStart = frameEvents.filter(e =>
-        e.name === 'navigationStart' && e.ts < firstFCP.ts).pop();
-    // fMP will follow at/after the FCP, though we allow some timestamp tolerance
-    const firstMeaningfulPaint = frameEvents.find(e =>
-        e.name === 'firstMeaningfulPaint' && e.ts >= (firstFCP.ts - FCPFMP_TOLERANCE));
-
-    // Sometimes fMP is triggered before fCP
-    if (!firstMeaningfulPaint) {
-      throw new Error('No usable `firstMeaningfulPaint` event found in trace');
-    }
-
-    // navigationStart is currently essential to FMP calculation.
-    // see: https://github.com/GoogleChrome/lighthouse/issues/753
-    if (!navigationStart) {
-      throw new Error('No `navigationStart` event found in trace');
-    }
-
-    return {
-      navigationStart,
-      firstMeaningfulPaint,
-      firstContentfulPaint: firstFCP
     };
   }
 }
