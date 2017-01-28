@@ -17,6 +17,7 @@
 'use strict';
 
 const Gatherer = require('./gatherer');
+const URL = require('../../lib/url-shim');
 
 class Offline extends Gatherer {
   beforePass(options) {
@@ -25,7 +26,8 @@ class Offline extends Gatherer {
 
   afterPass(options, tracingData) {
     const navigationRecord = tracingData.networkRecords.filter(record => {
-      return record._url === options.url && record._fetchedViaServiceWorker;
+      return URL.equalWithExcludedFragments(record._url, options.url) &&
+        record._fetchedViaServiceWorker;
     }).pop(); // Take the last record that matches.
 
     return options.driver.goOnline(options).then(_ => {
