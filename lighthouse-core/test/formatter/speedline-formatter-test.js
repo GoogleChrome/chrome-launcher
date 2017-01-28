@@ -20,18 +20,29 @@
 const SpeedlineFormatter = require('../../formatters/speedline-formatter.js');
 const assert = require('assert');
 
+const mockExtendedInfo = {
+  timings: {
+    firstVisualChange: 100,
+    visuallyComplete: 540,
+    speedIndex: 320,
+    perceptualSpeedIndex: 321
+  },
+  timestamps: {
+    firstVisualChange: 1100,
+    visuallyComplete: 1540,
+    speedIndex: 1320,
+    perceptualSpeedIndex: 1321
+  },
+  frames: []
+};
+
 describe('Formatter', () => {
   it('handles valid input', () => {
     const pretty = SpeedlineFormatter.getFormatter('pretty');
-    const formatted = pretty({
-      first: 0,
-      complete: 0,
-      duration: 0,
-      frames: [
-        {timestamp: 0, progress: 0}
-      ]
-    });
+    const formatted = pretty(mockExtendedInfo);
     assert.equal(typeof formatted, 'string');
-    assert(formatted.length > 0);
+    assert.ok(formatted.length > 0);
+    assert.ok(formatted.includes('100ms'), 'first visual change isnt printed');
+    assert.ok(formatted.includes('540ms'), 'last visual change isnt printed');
   });
 });

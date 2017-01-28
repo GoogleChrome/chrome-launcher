@@ -26,12 +26,12 @@ class SpeedlineFormatter extends Formatter {
     switch (type) {
       case 'pretty':
         return function(info) {
-          if (!info || !Array.isArray(info.frames)) {
+          if (!info || !info.timings) {
             return '';
           }
 
-          const output = `    - First Visual Change: ${info.first}ms\n` +
-          `    - Last Visual Change: ${info.complete}ms\n`;
+          const output = `    - First Visual Change: ${info.timings.firstVisualChange}ms\n` +
+          `    - Last Visual Change: ${info.timings.visuallyComplete}ms\n`;
 
           return output;
         };
