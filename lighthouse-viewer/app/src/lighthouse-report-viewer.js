@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ const GithubAPI = require('./github');
 const idb = require('idb-keyval');
 const logger = require('./logger');
 const ReportGenerator = require('../../../lighthouse-core/report/report-generator');
+const LighthouseReport = require('../../../lighthouse-core/report/scripts/lighthouse-report');
 
 // TODO: We only need getFilenamePrefix from asset-saver. Tree shake!
 const getFilenamePrefix = require('../../../lighthouse-core/lib/asset-saver').getFilenamePrefix;
@@ -35,9 +36,11 @@ const APP_URL = `${location.origin}${location.pathname}`;
  * Class to handle dynamic changes to the page when users view new reports.
  * @class
  */
-class LighthouseViewerReport {
+class LighthouseViewerReport extends LighthouseReport {
 
   constructor() {
+    super();
+
     this.onShare = this.onShare.bind(this);
     this.onCopy = this.onCopy.bind(this);
     this.onFileUpload = this.onFileUpload.bind(this);
@@ -49,18 +52,19 @@ class LighthouseViewerReport {
 
     this._copyAttempt = false;
 
-    this.json = null;
     this.fileUploader = new FileUploader(this.onFileUpload);
     this.github = new GithubAPI();
 
     this._isNewReport = true;
 
-    this.initUI();
+    this._addEventListeners();
     this.loadFromDeepLink();
     this.listenForMessages();
   }
 
-  initUI() {
+  _addEventListeners() {
+    super._addEventListeners();
+
     this.shareButton = document.querySelector('.js-share');
     if (this.shareButton) {
       this.shareButton.addEventListener('click', this.onShare);
@@ -182,7 +186,7 @@ class LighthouseViewerReport {
 
     // Replace the HTML and hook up event listeners to the new DOM.
     document.querySelector('output').innerHTML = html;
-    this.initUI();
+    this._addEventListeners();
 
     ga('send', 'event', 'report', 'view');
   }

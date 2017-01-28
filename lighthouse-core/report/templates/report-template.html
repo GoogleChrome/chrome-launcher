@@ -193,6 +193,14 @@ limitations under the License.
 </script>
 {{/if}}
 
+{{#if scripts }}
 {{#each scripts }}
-  <script>{{{ this }}}</script>
+<script>{{{ this }}}</script>
 {{/each}}
+
+<script>
+window.addEventListener('DOMContentLoaded', _ => {
+  new LighthouseReport(window.lhresults);
+});
+</script>
+{{/if}}

@@ -95,6 +95,8 @@ class LighthouseReport {
   }
 }
 
-window.addEventListener('DOMContentLoaded', _ => {
-  new LighthouseReport(window.lhresults);
-});
+// If in Node, allow others to require us.  By default, browser code can juse
+// use the LighthouseReport class.
+if (typeof module !== 'undefined') {
+  module.exports = LighthouseReport;
+}
