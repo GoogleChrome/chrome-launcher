@@ -17,9 +17,9 @@ install:
   - npm run install-all
 
 before_test:
-  - set LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe
-  - appveyor DownloadFile https://download-chromium.appspot.com/dl/Win?type=snapshots -FileName chrome-win32.zip
-  - unzip chrome-win32.zip
+  - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
+  - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe"
+  - bash ./lighthouse-core/scripts/download-chrome.sh
   - npm run build-cli
   - npm run build-extension
   - npm run build-viewer
@@ -27,7 +27,6 @@ before_test:
 test_script:
   - node --version
   - npm --version
-  - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
   - npm run lint
   - npm run unit
   - npm run smoke
