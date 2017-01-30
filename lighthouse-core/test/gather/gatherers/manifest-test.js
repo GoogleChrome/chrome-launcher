@@ -57,7 +57,7 @@ describe('Manifest gatherer', () => {
       }
     }).then(artifact => {
       assert.ok(artifact.debugString);
-      assert.notStrictEqual(artifact.debugString.indexOf(error), -1);
+      assert.ok(artifact.debugString.includes(error));
     });
   });
 

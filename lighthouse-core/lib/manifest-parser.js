@@ -158,7 +158,7 @@ function parseDisplay(jsonInput) {
   }
 
   display.value = display.value.toLowerCase();
-  if (ALLOWED_DISPLAY_VALUES.indexOf(display.value) === -1) {
+  if (!ALLOWED_DISPLAY_VALUES.includes(display.value)) {
     display.debugString = 'ERROR: \'display\' has invalid value ' + display.value +
         ` will fall back to ${DEFAULT_DISPLAY_MODE}.`;
     display.value = DEFAULT_DISPLAY_MODE;
@@ -171,7 +171,7 @@ function parseOrientation(jsonInput) {
   const orientation = parseString(jsonInput.orientation, true);
 
   if (orientation.value &&
-      ALLOWED_ORIENTATION_VALUES.indexOf(orientation.value.toLowerCase()) === -1) {
+      !ALLOWED_ORIENTATION_VALUES.includes(orientation.value.toLowerCase())) {
     orientation.value = undefined;
     orientation.debugString = 'ERROR: \'orientation\' has an invalid value, will be ignored.';
   }

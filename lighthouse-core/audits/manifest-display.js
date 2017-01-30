@@ -40,7 +40,7 @@ class ManifestDisplay extends Audit {
    * @return {boolean}
    */
   static hasRecommendedValue(val) {
-    return ['browser', 'fullscreen', 'minimal-ui', 'standalone'].indexOf(val) !== -1;
+    return ['browser', 'fullscreen', 'minimal-ui', 'standalone'].includes(val);
   }
 
   /**

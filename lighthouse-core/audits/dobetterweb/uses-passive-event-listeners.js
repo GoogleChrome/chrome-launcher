@@ -64,7 +64,7 @@ class PassiveEventsAudit extends Audit {
     // Flags all touch and wheel listeners that 1) are from same host
     // 2) are not passive 3) do not call preventDefault()
     const results = listeners.filter(loc => {
-      const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.indexOf(loc.type) !== -1;
+      const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.includes(loc.type);
       const mentionsPreventDefault = loc.handler.description.match(
             /\.preventDefault\(\s*\)/g);
       let sameHost = URL.hostsMatch(artifacts.URL.finalUrl, loc.url);

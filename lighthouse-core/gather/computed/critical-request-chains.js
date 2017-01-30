@@ -20,8 +20,6 @@
 const ComputedArtifact = require('./computed-artifact');
 const WebInspector = require('../../lib/web-inspector');
 
-const includes = (arr, elm) => arr.indexOf(elm) > -1;
-
 class CriticalRequestChains extends ComputedArtifact {
 
   get name() {
@@ -47,7 +45,7 @@ class CriticalRequestChains extends ComputedArtifact {
       return false;
     }
 
-    return includes(['VeryHigh', 'High', 'Medium'], request.priority());
+    return ['VeryHigh', 'High', 'Medium'].includes(request.priority());
   }
 
   compute_(networkRecords) {
@@ -87,7 +85,7 @@ class CriticalRequestChains extends ComputedArtifact {
         // requestIdToRequests map, and so we can break the chain here. We should also
         // break it if we've seen this request before because this is some kind of circular
         // reference, and that's bad.
-        if (!ancestorIsCritical || includes(ancestors, ancestorRequest.requestId)) {
+        if (!ancestorIsCritical || ancestors.includes(ancestorRequest.requestId)) {
           // Set the ancestors to an empty array and unset node so that we don't add
           // the request in to the tree.
           ancestors.length = 0;

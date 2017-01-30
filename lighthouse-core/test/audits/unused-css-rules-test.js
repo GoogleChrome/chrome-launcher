@@ -32,7 +32,7 @@ describe('Best Practices: unused css rules audit', () => {
   describe('#determineContentPreview', () => {
     function assertLinesContained(actual, expected) {
       expected.split('\n').forEach(line => {
-        assert.ok(actual.indexOf(line.trim()) >= 0, `${line} is found in preview`);
+        assert.ok(actual.includes(line.trim()), `${line} is found in preview`);
       });
     }
 

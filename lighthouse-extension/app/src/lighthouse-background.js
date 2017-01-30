@@ -259,8 +259,7 @@ window.saveSelectedAggregations = function(selectedAggregations) {
   };
 
   window.getDefaultAggregations().forEach(audit => {
-    const selected = selectedAggregations.indexOf(audit.name) > -1;
-    storage[STORAGE_KEY][audit.name] = selected;
+    storage[STORAGE_KEY][audit.name] = selectedAggregations.includes(audit.name);
   });
 
   chrome.storage.local.set(storage);

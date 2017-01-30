@@ -43,7 +43,7 @@ describe('event helpers', () => {
         const obj = EventHelpers.addFormattedCodeSnippet(listener);
         assert.ok(obj.code.indexOf('Window') !== 0, 'Window was not lowercase');
         assert.ok(obj.code.indexOf('#document') !== 0,
-                    '#document was not replaced with document');
+                  '#document was not replaced with document');
       });
     });
   });

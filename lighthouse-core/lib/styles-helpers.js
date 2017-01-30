@@ -44,14 +44,14 @@ function filterStylesheetsByUsage(stylesheets, propName, propVal) {
     s.parsedContent = s.parsedContent.filter(item => {
       let usedName = '';
       let usedVal = '';
-      // Prevent indexOf on null value
+      // Prevent includes call on null value
       if (propName) {
         propName = Array.isArray(propName) ? propName : [propName];
-        usedName = propName.indexOf(item.property.name) > -1;
+        usedName = propName.includes(item.property.name);
       }
       if (propVal) {
         propVal = Array.isArray(propVal) ? propVal : [propVal];
-        usedVal = propVal.indexOf(item.property.val) > -1;
+        usedVal = propVal.includes(item.property.val);
       }
       // Allow search by css property name, a value, or name/value pair.
       if (propName && !propVal) {

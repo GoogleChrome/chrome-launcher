@@ -47,7 +47,7 @@ describe('Page uses passive events listeners where applicable', () => {
     for (let i = 0; i < auditResult.extendedInfo.value.results.length; ++i) {
       const val = auditResult.extendedInfo.value.results[i];
       assert.ok(!val.passive, 'results should all be non-passive listeners');
-      assert.notEqual(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.indexOf(val.type), -1,
+      assert.ok(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.includes(val.type),
           'results should not contain other types of events');
     }
     assert.equal(auditResult.extendedInfo.value.results.length, 6);

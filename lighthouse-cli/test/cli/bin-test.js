@@ -33,8 +33,7 @@ describe('CLI bin', function() {
     const optionsWithDescriptions = Object.keys(yargs.getUsageInstance().getDescriptions());
 
     allOptions.forEach(opt => {
-      assert.ok(optionsWithDescriptions.indexOf(opt) !== -1,
-          `cli option '${opt}' has no description`);
+      assert.ok(optionsWithDescriptions.includes(opt), `cli option '${opt}' has no description`);
     });
   });
 });

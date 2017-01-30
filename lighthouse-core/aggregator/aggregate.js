@@ -27,7 +27,7 @@ class Aggregate {
    */
   static _filterResultsByAuditNames(results, expected) {
     const expectedNames = Object.keys(expected);
-    return results.filter(r => expectedNames.indexOf(/** @type {string} */ (r.name)) !== -1);
+    return results.filter(r => expectedNames.includes(/** @type {string} */ (r.name)));
   }
 
   /**

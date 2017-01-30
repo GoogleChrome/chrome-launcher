@@ -70,7 +70,7 @@ class NoMutationEventsAudit extends Audit {
     const listeners = artifacts.EventListeners;
 
     const results = listeners.filter(loc => {
-      const isMutationEvent = this.MUTATION_EVENTS.indexOf(loc.type) !== -1;
+      const isMutationEvent = this.MUTATION_EVENTS.includes(loc.type);
       let sameHost = URL.hostsMatch(artifacts.URL.finalUrl, loc.url);
 
       if (!URL.isValid(loc.url)) {
