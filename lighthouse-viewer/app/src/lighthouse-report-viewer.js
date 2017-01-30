@@ -301,6 +301,7 @@ class LighthouseViewerReport extends LighthouseReport {
    * Click handler for export button.
    */
   onExportButtonClick(e) {
+    e.preventDefault();
     e.target.classList.toggle('active');
     document.addEventListener('keydown', this.onKeyDown);
   }
@@ -369,6 +370,7 @@ class LighthouseViewerReport extends LighthouseReport {
    * Handler for "export as" button.
    */
   onExport(e) {
+    e.preventDefault();
     if (!e.target.dataset.action) {
       return;
     }
