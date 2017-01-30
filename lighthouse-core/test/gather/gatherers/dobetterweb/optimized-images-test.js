@@ -45,6 +45,11 @@ const traceData = {
       _resourceSize: 12,
     },
     {
+      _url: 'http://google.com/image.bmp',
+      _mimeType: 'image/bmp',
+      _resourceSize: 12,
+    },
+    {
       _url: 'http://google.com/vector.svg',
       _mimeType: 'image/svg+xml',
       _resourceSize: 13,
