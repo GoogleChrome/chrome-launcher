@@ -128,11 +128,23 @@ function disableCPUThrottling(driver) {
   return driver.sendCommand('Emulation.setCPUThrottlingRate', NO_CPU_THROTTLE_METRICS);
 }
 
+function getEmulationDesc() {
+  const {latency, downloadThroughput, uploadThroughput} = TYPICAL_MOBILE_THROTTLING_METRICS;
+  const byteToMbit = bytes => (bytes / 1024 / 1024 * 8).toFixed(1);
+  return {
+    'deviceEmulation': 'Nexus 5X',
+    'cpuThrottling': `${CPU_THROTTLE_METRICS.rate}x slowdown`,
+    'networkThrottling': `${latency}ms RTT, ${byteToMbit(downloadThroughput)}Mbps down, ` +
+        `${byteToMbit(uploadThroughput)}Mbps up`
+  };
+}
+
 module.exports = {
   enableNexus5X,
   enableNetworkThrottling,
   disableNetworkThrottling,
   enableCPUThrottling,
   disableCPUThrottling,
-  goOffline
+  goOffline,
+  getEmulationDesc
 };

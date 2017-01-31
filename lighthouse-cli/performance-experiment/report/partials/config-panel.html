@@ -26,11 +26,14 @@
 
 .config-panel__message {
   flex: 1 1 0;
-  padding: 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 25px;
 }
 
 .config-panel__panel-toggle {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>');
   width: 24px;
   height: 24px;
   border: none;
@@ -39,11 +42,11 @@
   background-position: center center;
   background-size: contain;
   background-color: transparent;
-  margin-left: 8px;
+  margin: 0 8px 0 8px;
 }
 
 .config-panel.expanded .config-panel__panel-toggle {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
 }
 
 .config-panel .url-blocking-entry {
@@ -57,15 +60,17 @@
 }
 
 .config-panel .url-blocking-entry__pattern {
-  flex: 1 0 auto;
-  display: flex;
+  flex: 1 1 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   margin-left: 10px;
   line-height: 17px;
 }
 
-.config-panel .url-blocking-entry__cancel-button {
-  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>');
+.config-panel .url-blocking-entry__button {
   display: flex;
+  flex: 0 0 auto;
   padding: 0 0 0 0px;
   width: 18px;
   height: 18px;
@@ -76,17 +81,12 @@
   background-color: transparent;
 }
 
-.config-panel .url-blocking-entry__add-button {
+.config-panel .url-blocking-entry__button.cancel {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 11v2h10v-2H7zm5-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>');
+}
+
+.config-panel .url-blocking-entry__button.add {
   background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>');
-  display: flex;
-  padding: 0 0 0 0px;
-  width: 18px;
-  height: 18px;
-  border: none;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 16px 16px;
-  background-color: transparent;
 }
 
 @media screen and (max-width: 767px) {
@@ -95,7 +95,7 @@
     width: 100%;
   }
   .config-panel__header {
-    padding-right: 2px;
+    padding-right: 20px;
   }
 }
 
@@ -242,12 +242,12 @@
         <ul class="url-blocking-patterns js-url-blocking-patterns">
           <template class="url-blocking-entry">
             <li class="url-blocking-entry" data-url-pattern="">
-              <button class="url-blocking-entry__cancel-button"></button>
+              <button class="url-blocking-entry__button cancel"></button>
               <div class="url-blocking-entry__pattern"></div>
             </li>
           </template>
           <li class="url-blocking-entry">
-            <button class="url-blocking-entry__add-button js-add-button"></button>
+            <button class="url-blocking-entry__button add js-add-button"></button>
             <input class="url-blocking-entry__pattern js-pattern-input" placeholder="URL blocking Patterns (* for wild card) e.g. *://www.evil.com/*">
           </li>
         </ul>

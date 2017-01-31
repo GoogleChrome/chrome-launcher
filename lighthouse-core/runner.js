@@ -20,6 +20,7 @@ const Driver = require('./gather/driver.js');
 const GatherRunner = require('./gather/gather-runner');
 const Aggregate = require('./aggregator/aggregate');
 const Audit = require('./audits/audit');
+const emulation = require('./lib/emulation');
 const log = require('./lib/log');
 const fs = require('fs');
 const path = require('path');
@@ -140,6 +141,7 @@ class Runner {
           url: opts.url,
           audits: formattedAudits,
           artifacts: runResults.artifacts,
+          runtimeConfig: Runner.getRuntimeConfig(opts.flags),
           aggregations
         };
       });
@@ -271,6 +273,34 @@ class Runner {
     } catch (requireError) {}
 
     throw new Error(errorString + ` and '${relativePath}')`);
+  }
+
+  /**
+   * Get runtime configuration specified by the flags
+   * @param {!Object} flags
+   * @return {!Object} runtime config
+   */
+  static getRuntimeConfig(flags) {
+    const emulationDesc = emulation.getEmulationDesc();
+    const environment = [
+      {
+        name: 'CPU Throttling',
+        enabled: !flags.disableCpuThrottling,
+        description: emulationDesc['cpuThrottling']
+      },
+      {
+        name: 'Network Throttling',
+        enabled: !flags.disableNetworkThrottling,
+        description: emulationDesc['networkThrottling']
+      },
+      {
+        name: 'Device Emulation',
+        enabled: !flags.disableDeviceEmulation,
+        description: emulationDesc['deviceEmulation']
+      }
+    ];
+
+    return {environment, blockedUrlPatterns: flags.blockedUrlPatterns || []};
   }
 }
 
