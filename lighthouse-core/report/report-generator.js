@@ -159,29 +159,25 @@ class ReportGenerator {
       // handlebars renders the text as HTML.
       return new Handlebars.SafeString(str);
     });
-  }
 
-  /**
-   * Format time
-   * @param {string} date
-   * @return {string}
-   */
-  _formatTime(date) {
-    const options = {
-      day: 'numeric', month: 'numeric', year: 'numeric',
-      hour: 'numeric', minute: 'numeric', second: 'numeric',
-      timeZoneName: 'short'
-    };
-    let formatter = new Intl.DateTimeFormat('en-US', options);
+    // format time
+    Handlebars.registerHelper('format_time', function(date) {
+      const options = {
+        day: 'numeric', month: 'numeric', year: 'numeric',
+        hour: 'numeric', minute: 'numeric', second: 'numeric',
+        timeZoneName: 'short'
+      };
+      let formatter = new Intl.DateTimeFormat('en-US', options);
 
-    // Force UTC if runtime timezone could not be detected.
-    // See https://github.com/GoogleChrome/lighthouse/issues/1056
-    const tz = formatter.resolvedOptions().timeZone;
-    if (!tz || tz.toLowerCase() === 'etc/unknown') {
-      options.timeZone = 'UTC';
-      formatter = new Intl.DateTimeFormat('en-US', options);
-    }
-    return formatter.format(new Date(date));
+      // Force UTC if runtime timezone could not be detected.
+      // See https://github.com/GoogleChrome/lighthouse/issues/1056
+      const tz = formatter.resolvedOptions().timeZone;
+      if (!tz || tz.toLowerCase() === 'etc/unknown') {
+        options.timeZone = 'UTC';
+        formatter = new Intl.DateTimeFormat('en-US', options);
+      }
+      return formatter.format(new Date(date));
+    });
   }
 
   /**
@@ -308,9 +304,10 @@ class ReportGenerator {
    * Generates the Lighthouse report HTML.
    * @param {!Object} results Lighthouse results.
    * @param {!string} reportContext What app is requesting the report (eg. devtools, extension)
+   * @param {?Object} reportsCatalog Basic info about all the reports to include in left nav bar
    * @return {string} HTML of the report page.
    */
-  generateHTML(results, reportContext) {
+  generateHTML(results, reportContext, reportsCatalog) {
     reportContext = reportContext || 'extension';
 
     this._registerFormatters(results.audits);
@@ -324,18 +321,18 @@ class ReportGenerator {
     });
 
     const template = Handlebars.compile(this.getReportTemplate());
-
     return template({
       url: results.url,
       lighthouseVersion: results.lighthouseVersion,
-      generatedTime: this._formatTime(results.generatedTime),
+      generatedTime: results.generatedTime,
       lhresults: this._escapeScriptTags(JSON.stringify(results, null, 2)),
       stylesheets: this.getReportCSS(),
       reportContext: reportContext,
       scripts: this.getReportJS(reportContext),
       aggregations: results.aggregations,
       auditsByCategory: this._createPWAAuditsByCategory(results.aggregations),
-      runtimeConfig: results.runtimeConfig
+      runtimeConfig: results.runtimeConfig,
+      reportsCatalog
     });
   }
 }

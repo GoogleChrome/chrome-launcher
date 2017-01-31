@@ -31,6 +31,7 @@ class ConfigPanel {
     this._messageField = this._configPanel.querySelector('.js-message');
     this._urlBlockingList = this._configPanel.querySelector('.js-url-blocking-patterns');
     this._urlBlockingStatus = {};
+    this._reportId = new URL(window.location).searchParams.get('id');
 
     const bodyToggle = this._configPanel.querySelector('.js-panel-toggle');
     bodyToggle.addEventListener('click', () => this._toggleBody());
@@ -84,9 +85,10 @@ class ConfigPanel {
     });
 
     // get and recover blocked URL patterns of current run
-    fetch('/blocked-url-patterns').then(response => {
+    fetch(`/flags?id=${this._reportId}`).then(response => {
       return response.json();
-    }).then(blockedUrlPatterns => {
+    }).then(flags => {
+      const blockedUrlPatterns = flags.blockedUrlPatterns || [];
       blockedUrlPatterns.forEach(urlPattern => this.addBlockedUrlPattern(urlPattern));
       this.log('');
     });
@@ -94,6 +96,7 @@ class ConfigPanel {
 
   /**
    * Send POST request to rerun lighthouse with additional flags.
+   * @return {!Promise} resolve when rerun is completed.
    */
   _rerunLighthouse() {
     this.log('Start Rerunning Lighthouse');
@@ -102,11 +105,10 @@ class ConfigPanel {
       blockedUrlPatterns: this.getBlockedUrlPatterns()
     };
 
-    return fetch('/rerun', {method: 'POST', body: JSON.stringify(options)}).then(() => {
-      location.reload();
-    }).catch(err => {
-      this.log(`Lighthouse Runtime Error: ${err}`);
-    });
+    return fetch(`/rerun?id=${this._reportId}`, {method: 'POST', body: JSON.stringify(options)})
+      .then(response => response.text())
+      .then(newReportId => location.assign(`?id=${newReportId}`))
+      .catch(err => this.log(`Lighthouse Runtime Error: ${err}`));
   }
 
   /**

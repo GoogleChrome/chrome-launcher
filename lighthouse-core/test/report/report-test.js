@@ -34,7 +34,7 @@ describe('Report', () => {
   it('should format generated Time', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults);
-    assert.ok(/on 11\/\d{1,2}\/2016\, /gim.test(html));
+    assert.ok(/on: 11\/\d{1,2}\/2016\, /gim.test(html));
   });
 
   it('should escape closing </script> tags', () => {

@@ -21,96 +21,139 @@
  *
  * Functionality:
  *    Host experiment.
- *    Report can be access via URL http://localhost:[PORT]/
- *    Rerun data can be access via URL http://localhost:[PORT]/rerun.
- *      This will rerun lighthouse with same parameters and rerun results in JSON format
+ *    Report can be access via URL: /?id=[REPORT_ID]
+ *    Browser can request lighthousr rerun by sending POST request to URL: /rerun?id=[REPORT_ID]
+ *      This will rerun lighthouse with additional cli-flags received from POST request data and
+ *      return the new report id
+ *    Flags can be access via URL: /flags?id=[REPORT_ID]
  */
 
 const http = require('http');
 const parse = require('url').parse;
 const opn = require('opn');
 const log = require('../../lighthouse-core/lib/log');
-const PerfXReportGenerator = require('./report/perf-x-report-generator');
 const lighthouse = require('../../lighthouse-core');
+const ExperimentDatabase = require('./experiment-database/database');
+const PerfXReportGenerator = require('./report/perf-x-report-generator');
 
-
+let database;
+let fallbackReportId;
 /**
  * Start the server with an arbitrary port and open report page in the default browser.
  * @param {!Object} params A JSON contains lighthouse parameters
  * @param {!Object} results
  * @return {!Promise<string>} Promise that resolves when server is closed
  */
-let lhResults;
-let lhParams;
 function hostExperiment(params, results) {
-  lhResults = results;
-  lhParams = params;
-
   return new Promise(resolve => {
+    database = new ExperimentDatabase(params.url, params.config);
+    const id = database.saveData(params.flags, results);
+    fallbackReportId = id;
+
     const server = http.createServer(requestHandler);
     server.listen(0);
-    server.on('listening', () => {
-      opn(`http://localhost:${server.address().port}/`);
-    });
+    server.on('listening', () => opn(`http://localhost:${server.address().port}/?id=${id}`));
     server.on('error', err => log.error('PerformanceXServer', err.code, err));
     server.on('close', resolve);
     process.on('SIGINT', () => {
+      database.clear();
       server.close();
     });
   });
 }
 
 function requestHandler(request, response) {
-  const pathname = parse(request.url).pathname;
-
-  if (request.method === 'GET') {
-    if (pathname === '/') {
-      reportRequestHandler(request, response);
-    } else if (pathname === '/blocked-url-patterns') {
-      blockedUrlPatternsRequestHandler(request, response);
+  request.parsedUrl = parse(request.url, true);
+  const pathname = request.parsedUrl.pathname;
+  try {
+    if (request.method === 'GET') {
+      if (pathname === '/') {
+        reportRequestHandler(request, response);
+      } else if (pathname === '/flags') {
+        flagsRequestHandler(request, response);
+      } else {
+        throw new HTTPError(404);
+      }
+    } else if (request.method === 'POST') {
+      if (pathname === '/rerun') {
+        rerunRequestHandler(request, response);
+      } else {
+        throw new HTTPError(404);
+      }
     } else {
-      response.writeHead(404);
-      response.end('404: Resource Not Found');
+      throw new HTTPError(405);
     }
-  } else if (request.method === 'POST') {
-    if (pathname === '/rerun') {
-      rerunRequestHandler(request, response);
+  } catch (err) {
+    if (err instanceof HTTPError) {
+      response.writeHead(err.statusCode);
+      response.end(err.message || http.STATUS_CODES[err.statusCode]);
     } else {
-      response.writeHead(404);
-      response.end('404: Resource Not Found');
+      response.writeHead(500);
+      response.end(http.STATUS_CODES[500]);
+      log.err('PerformanceXServer', err.code, err);
     }
-  } else {
-    response.writeHead(405);
-    response.end('405: Method Not Supported');
   }
 }
 
 function reportRequestHandler(request, response) {
-  const html = new PerfXReportGenerator().generateHTML(lhResults, 'perf-x');
-  response.writeHead(200, {'Content-Type': 'text/html'});
-  response.end(html);
+  try {
+    const id = request.parsedUrl.query.id || fallbackReportId;
+
+    const reportsMetadata = Object.keys(database.timeStamps).map(key => {
+      const generatedTime = database.timeStamps[key];
+      return {url: database.url, reportHref: `/?id=${key}`, generatedTime};
+    });
+    reportsMetadata.sort((metadata1, metadata2) => {
+      return metadata1.generatedTime - metadata2.generatedTime;
+    });
+    const reportsCatalog = {reportsMetadata, selectedReportHref: `/?id=${id}`};
+
+    const results = database.getResults(id);
+    const perfXReportGenerator = new PerfXReportGenerator();
+
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.end(perfXReportGenerator.generateHTML(results, 'perf-x', reportsCatalog));
+  } catch (err) {
+    throw new HTTPError(404);
+  }
 }
 
-function blockedUrlPatternsRequestHandler(request, response) {
-  response.writeHead(200, {'Content-Type': 'text/json'});
-  response.end(JSON.stringify(lhParams.flags.blockedUrlPatterns || []));
+function flagsRequestHandler(request, response) {
+  try {
+    response.writeHead(200, {'Content-Type': 'text/json'});
+    response.end(JSON.stringify(database.getFlags(request.parsedUrl.query.id || fallbackReportId)));
+  } catch (err) {
+    throw new HTTPError(404);
+  }
 }
 
 function rerunRequestHandler(request, response) {
-  let message = '';
-  request.on('data', data => message += data);
+  try {
+    const flags = database.getFlags(request.parsedUrl.query.id || fallbackReportId);
+    let message = '';
+    request.on('data', data => message += data);
 
-  request.on('end', () => {
-    const additionalFlags = JSON.parse(message);
-    const flags = Object.assign(lhParams.flags, additionalFlags);
+    request.on('end', () => {
+      const additionalFlags = JSON.parse(message);
+      Object.assign(flags, additionalFlags);
 
-    lighthouse(lhParams.url, flags, lhParams.config).then(results => {
-      results.artifacts = undefined;
-      lhResults = results;
-      response.writeHead(200);
-      response.end();
+      lighthouse(database.url, flags, database.config).then(results => {
+        results.artifacts = undefined;
+        const id = database.saveData(flags, results);
+        response.writeHead(200);
+        response.end(id);
+      });
     });
-  });
+  } catch (err) {
+    throw new HTTPError(404);
+  }
+}
+
+class HTTPError extends Error {
+  constructor(statusCode, message) {
+    super(message);
+    this.statusCode = statusCode;
+  }
 }
 
 module.exports = {

@@ -282,6 +282,37 @@ body {
   line-height: 1.5;
 }
 
+.menu__report-tab {
+  padding: 3px 13px;
+  color: #777;
+  border-top: 1px solid #EBEBEB;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-decoration: none;
+  height: 55px;
+}
+
+.menu__report-tab:hover {
+  background-color: #448aff;
+  color: #FFF;
+}
+
+.menu__report-tab__url {
+  font-size: 15px;
+  font-weight: bold;
+  text-overflow: ellipsis;
+  line-height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.menu__report-tab__time {
+  font-size: 11px;
+  line-height: 11px;
+  padding-left: 2px;
+}
+
 .menu__nav {
   list-style: none;
   margin: 0;
@@ -299,6 +330,10 @@ body {
   text-decoration: none;
   color: #777;
   display: flex;
+}
+
+.menu__report-tab + .menu__nav .menu__link {
+  padding-left: 35px;
 }
 
 .menu__link:hover {
