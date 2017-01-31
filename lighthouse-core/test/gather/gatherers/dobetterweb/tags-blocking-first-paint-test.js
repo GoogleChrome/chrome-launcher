@@ -134,28 +134,24 @@ describe('First paint blocking tags', () => {
     return tagsBlockingFirstPaint.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.resolve([linkDetails, scriptDetails]);
+          return Promise.resolve([linkDetails, linkDetails, scriptDetails]);
         }
       }
     }, traceData).then(artifact => {
-      const expected = {
-        items: [
-          {
-            tag: linkDetails,
-            transferSize: 10,
-            spendTime: 0
-          },
-          {
-            tag: scriptDetails,
-            transferSize: 12,
-            spendTime: 10000
-          }
-        ],
-        total: {
-          transferSize: 22,
-          spendTime: 10000
+      const expected = [
+        {
+          tag: linkDetails,
+          transferSize: 10,
+          startTime: 10,
+          endTime: 10
+        },
+        {
+          tag: scriptDetails,
+          transferSize: 12,
+          startTime: 12,
+          endTime: 22
         }
-      };
+      ];
       assert.deepEqual(artifact, expected);
     });
   });

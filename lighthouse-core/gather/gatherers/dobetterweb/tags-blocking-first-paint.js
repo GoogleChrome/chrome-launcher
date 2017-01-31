@@ -123,31 +123,22 @@ class TagsBlockingFirstPaint extends Gatherer {
     return driver.evaluateAsync(scriptSrc).then(tags => {
       const requests = filteredAndIndexedByUrl(networkRecords);
 
-      let totalTransferSize = 0;
-      let totalSpendTime = 0;
-
-      const blockingTags = tags.reduce((prev, tag) => {
+      return tags.reduce((prev, tag) => {
         const request = requests[tag.url];
         if (request) {
-          const data = {
+          prev.push({
             tag,
-            transferSize: request.transferSize,
-            spendTime: Math.round((request.endTime - request.startTime) * 1000)
-          };
-          totalTransferSize += data.transferSize;
-          totalSpendTime += data.spendTime;
-          prev.push(data);
+            transferSize: request.transferSize || 0,
+            startTime: request.startTime,
+            endTime: request.endTime,
+          });
+
+          // Prevent duplicates from showing up again
+          requests[tag.url] = null;
         }
+
         return prev;
       }, []);
-
-      return {
-        items: blockingTags,
-        total: {
-          transferSize: totalTransferSize,
-          spendTime: totalSpendTime
-        }
-      };
     });
   }
 

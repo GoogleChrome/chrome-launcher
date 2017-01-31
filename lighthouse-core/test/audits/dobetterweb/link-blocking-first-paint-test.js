@@ -44,43 +44,39 @@ describe('Link Block First Paint audit', () => {
       rel: 'stylesheet'
     };
     const auditResult = LinkBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        items: [
-          {
-            tag: linkDetails,
-            transferSize: 100,
-            spendTime: 100
-          },
-          {
-            tag: {tagName: 'SCRIPT'},
-            transferSize: 20,
-            spendTime: 20,
-          }
-        ],
-        total: {
-          transferSize: 120,
-          spendTime: 120
+      TagsBlockingFirstPaint: [
+        {
+          tag: linkDetails,
+          transferSize: 100,
+          startTime: 5,
+          endTime: 5.4,
+        },
+        {
+          tag: linkDetails,
+          transferSize: 100,
+          startTime: 4.9,
+          endTime: 5.1,
+        },
+        {
+          tag: {tagName: 'SCRIPT'},
+          transferSize: 20,
+          spendTime: 20,
         }
-      }
+      ]
     });
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.displayValue.match('1 resource delayed first paint by 100ms'));
-    assert.ok(auditResult.extendedInfo.value.length, 1);
-    assert.ok(auditResult.extendedInfo.value[0].url.match(linkDetails.href));
-    assert.ok(auditResult.extendedInfo.value[0].label.match('delayed first paint'));
+    assert.ok(auditResult.displayValue.match('2 resources delayed first paint by 500ms'));
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results[0].url, 'css/style.css');
+    assert.equal(auditResult.extendedInfo.value.results[0].totalMs, '500ms');
+    assert.equal(auditResult.extendedInfo.value.results[1].totalMs, '200ms');
   });
 
   it('passes when there are no links found which block first paint', () => {
     const auditResult = LinkBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        items: [],
-        total: {
-          transferSize: 0,
-          spendTime: 0
-        }
-      }
+      TagsBlockingFirstPaint: []
     });
     assert.equal(auditResult.rawValue, true);
-    assert.ok(auditResult.extendedInfo.value.length === 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 });

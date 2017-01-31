@@ -41,48 +41,39 @@ describe('Script Block First Paint audit', () => {
       url: 'http://google.com/js/app.js',
     };
     const auditResult = ScriptBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        items: [
-          {
-            tag: scriptDetails,
-            transferSize: 100,
-            spendTime: 100
-          },
-          {
-            tag: scriptDetails,
-            transferSize: 50,
-            spendTime: 50
-          },
-          {
-            tag: {tagName: 'LINK'},
-            transferSize: 110,
-            spendTime: 110
-          }
-        ],
-        total: {
-          transferSize: 260,
-          spendTime: 260
+      TagsBlockingFirstPaint: [
+        {
+          tag: scriptDetails,
+          transferSize: 100,
+          startTime: 1,
+          endTime: 1.1
+        },
+        {
+          tag: scriptDetails,
+          transferSize: 50,
+          startTime: .95,
+          endTime: 1
+        },
+        {
+          tag: {tagName: 'LINK'},
+          transferSize: 110,
+          spendTime: 110
         }
-      }
+      ]
     });
     assert.equal(auditResult.rawValue, false);
     assert.ok(auditResult.displayValue.match('2 resources delayed first paint by 150ms'));
-    assert.ok(auditResult.extendedInfo.value.length, 2);
-    assert.ok(auditResult.extendedInfo.value[0].url.match(scriptDetails.src));
-    assert.ok(auditResult.extendedInfo.value[0].label.match('delayed first paint'));
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results[0].url, 'js/app.js');
+    assert.equal(auditResult.extendedInfo.value.results[0].totalMs, '150ms');
+    assert.equal(auditResult.extendedInfo.value.results[1].totalMs, '50ms');
   });
 
   it('passes when there are no scripts found which block first paint', () => {
     const auditResult = ScriptBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        items: [],
-        total: {
-          transferSize: 0,
-          spendTime: 0
-        }
-      }
+      TagsBlockingFirstPaint: []
     });
     assert.equal(auditResult.rawValue, true);
-    assert.ok(auditResult.extendedInfo.value.length === 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 });
