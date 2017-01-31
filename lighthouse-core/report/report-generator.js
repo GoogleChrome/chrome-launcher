@@ -140,6 +140,10 @@ class ReportGenerator {
       renderer.codespan = function(str) {
         return `<code>${str}</code>`;
       };
+      // eslint-disable-next-line no-unused-vars
+      renderer.code = function(code, language) {
+        return `<pre>${code}</pre>`;
+      };
       // Nuke wrapper <p> tag that gets generated.
       renderer.paragraph = function(str) {
         return str;

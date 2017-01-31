@@ -28,7 +28,8 @@ describe('Page does not use old CSS flexbox', () => {
       Styles: {
         rawValue: -1,
         debugString: debugString
-      }
+      },
+      URL: {finalUrl: 'https://example.com'},
     });
     assert.equal(auditResult.rawValue, -1);
     assert.equal(auditResult.debugString, debugString);
@@ -36,28 +37,36 @@ describe('Page does not use old CSS flexbox', () => {
 
   it('passes when no stylesheets were collected on the page', () => {
     const auditResult = NoOldFlexboxAudit.audit({
-      Styles: []
+      Styles: [],
+      URL: {finalUrl: 'https://example.com'},
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 
   it('fails when display: box is used', () => {
     const auditResult = NoOldFlexboxAudit.audit({
-      Styles: stylesData
+      Styles: stylesData,
+      URL: {finalUrl: 'https://example.com'},
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 2);
-    assert.equal(auditResult.extendedInfo.value.length, 2);
-    assert.equal(auditResult.extendedInfo.value[0].url, stylesData[0].header.sourceURL);
-    assert.ok(auditResult.extendedInfo.value[0].code.match(/display\: box/));
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results[0].url, '/do_better_web_tests.html');
+    assert.ok(auditResult.extendedInfo.value.results[0].pre.match(/display\: box/));
+
+    const headings = auditResult.extendedInfo.value.tableHeadings;
+    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
+        ['URL', 'Line in the stylesheet / <style>', 'Column start/end', 'Snippet'],
+        'table headings are correct and in order');
   });
 
   it('passes when display: box is not used', () => {
     const auditResult = NoOldFlexboxAudit.audit({
-      Styles: stylesData.slice(1)
+      Styles: stylesData.slice(1),
+      URL: {finalUrl: 'https://example.com'},
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 });

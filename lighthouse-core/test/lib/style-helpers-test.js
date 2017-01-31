@@ -96,7 +96,8 @@ describe('style helpers', () => {
   display: box;
 }`;
 
-      assert.equal(actual.location, 'line: 8, row: 4, col: 17');
+      assert.equal(actual.location, '4:17');
+      assert.equal(actual.startLine, 8);
       assert.equal(actual.styleRule, expected);
     });
 
@@ -109,7 +110,8 @@ describe('style helpers', () => {
   display: box;
 }`;
 
-      assert.equal(actual.location, 'line: 8, row: 4, col: 17');
+      assert.equal(actual.location, '4:17');
+      assert.equal(actual.startLine, 8);
       assert.equal(actual.styleRule, expected);
     });
   });

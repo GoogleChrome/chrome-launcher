@@ -23,6 +23,7 @@
 'use strict';
 
 const Audit = require('../audit');
+const URL = require('../../lib/url-shim');
 const StyleHelpers = require('../../lib/styles-helpers');
 const Formatter = require('../../formatters/formatter');
 
@@ -38,7 +39,7 @@ class NoOldFlexboxAudit extends Audit {
       description: 'Site does not use the old CSS flexbox',
       helpText: 'The 2009 spec of Flexbox is deprecated and is 2.3x slower than the latest ' +
           'spec. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/old-flexbox).',
-      requiredArtifacts: ['Styles']
+      requiredArtifacts: ['Styles', 'URL']
     };
   }
 
@@ -53,28 +54,46 @@ class NoOldFlexboxAudit extends Audit {
 
     // https://www.w3.org/TR/2009/WD-css3-flexbox-20090723/
     // (e.g. box-flex, box-orient, box-flex-group, display: flexbox (2011 version))
-    const propsNames = ['box-flex', 'box-orient', 'box-flex-group', 'display'];
-    const propsNamesWithPrefixes = StyleHelpers.addVendorPrefixes(propsNames);
-    const propsValues = ['box', 'flexbox'];
-    const sheetsUsingDisplayBox = StyleHelpers.filterStylesheetsByUsage(
-        artifacts.Styles, propsNamesWithPrefixes, propsValues);
+    const displayPropResults = StyleHelpers.filterStylesheetsByUsage(artifacts.Styles,
+        'display', StyleHelpers.addVendorPrefixes(['box', 'flexbox']));
+    const otherPropResults = StyleHelpers.filterStylesheetsByUsage(artifacts.Styles,
+        StyleHelpers.addVendorPrefixes(['box-flex', 'box-orient', 'box-flex-group']));
+
+    const sheetsUsingOldFlexbox = displayPropResults.concat(otherPropResults);
+
+    const pageUrl = artifacts.URL.finalUrl;
+
     const urlList = [];
-    sheetsUsingDisplayBox.forEach(sheet => {
+    sheetsUsingOldFlexbox.forEach(sheet => {
       sheet.parsedContent.forEach(props => {
         const formattedStyleRule = StyleHelpers.getFormattedStyleRule(sheet.content, props);
+
+        let url = sheet.header.sourceURL;
+        if (!URL.isValid(url) || url === pageUrl) {
+          url = 'inline';
+        } else {
+          url = URL.getDisplayName(url);
+        }
+
         urlList.push({
-          url: sheet.header.sourceURL,
-          label: formattedStyleRule.location,
-          code: formattedStyleRule.styleRule
+          url,
+          location: formattedStyleRule.location,
+          startLine: formattedStyleRule.startLine,
+          pre: formattedStyleRule.styleRule
         });
       });
     });
 
     return NoOldFlexboxAudit.generateAuditResult({
-      rawValue: sheetsUsingDisplayBox.length === 0,
+      rawValue: sheetsUsingOldFlexbox.length === 0,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: urlList
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {
+          results: urlList,
+          tableHeadings: {
+            url: 'URL', startLine: 'Line in the stylesheet / <style>', location: 'Column start/end',
+            pre: 'Snippet'}
+        }
       }
     });
   }
