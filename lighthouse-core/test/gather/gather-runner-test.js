@@ -46,7 +46,7 @@ class TestGathererNoArtifact extends Gatherer {
 
 const fakeDriver = require('./fake-driver');
 
-function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
+function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn, blockUrlFn) {
   const Driver = require('../../gather/driver');
   const Connection = require('../../gather/connections/connection');
   const EmulationDriver = class extends Driver {
@@ -63,7 +63,7 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
     clearDataForOrigin() {}
   };
   const EmulationMock = class extends Connection {
-    sendCommand(command) {
+    sendCommand(command, params) {
       let fn = null;
       switch (command) {
         case 'Network.emulateNetworkConditions':
@@ -75,11 +75,14 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn) {
         case 'Emulation.setDeviceMetricsOverride':
           fn = emulationFn;
           break;
+        case 'Network.addBlockedURL':
+          fn = blockUrlFn;
+          break;
         default:
           fn = null;
           break;
       }
-      return Promise.resolve(fn && fn());
+      return Promise.resolve(fn && fn(params));
     }
   };
   return new EmulationDriver(new EmulationMock());
@@ -220,6 +223,28 @@ describe('GatherRunner', function() {
       assert.equal(tests.calledNetworkEmulation, true);
       assert.equal(tests.calledCpuEmulation, false);
     });
+  });
+
+  it('tells the driver to block given URL patterns when blockedUrlPatterns is given', () => {
+    const receivedUrlPatterns = [];
+    const urlPatterns = ['http://*.evil.com', '.jpg', '.woff2'];
+    const driver = getMockedEmulationDriver(null, null, null, params => {
+      receivedUrlPatterns.push(params.url);
+    });
+
+    return GatherRunner.setupDriver(driver, {flags: {blockedUrlPatterns: urlPatterns.slice()}})
+      .then(() => assert.deepStrictEqual(receivedUrlPatterns.sort(), urlPatterns.sort()));
+  });
+
+  it('does not throw when blockedUrlPatterns is not given', () => {
+    const receivedUrlPatterns = [];
+    const driver = getMockedEmulationDriver(null, null, null, params => {
+      receivedUrlPatterns.push(params.url);
+    });
+
+    return GatherRunner.setupDriver(driver, {flags: {}})
+      .then(() => assert.equal(receivedUrlPatterns.length, 0))
+      .catch(() => assert.ok(false));
   });
 
   it('tells the driver to begin tracing', () => {
