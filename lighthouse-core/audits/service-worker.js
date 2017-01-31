@@ -51,14 +51,6 @@ class ServiceWorker extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (!artifacts.ServiceWorker.versions) {
-      // Error in ServiceWorker gatherer.
-      return ServiceWorker.generateAuditResult({
-        rawValue: false,
-        debugString: artifacts.ServiceWorker.debugString
-      });
-    }
-
     // Find active service worker for this URL. Match against
     // artifacts.URL.finalUrl so audit accounts for any redirects.
     const version = getActivatedServiceWorker(

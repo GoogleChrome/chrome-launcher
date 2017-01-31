@@ -27,11 +27,6 @@ class ServiceWorker extends Gatherer {
         return {
           versions: data.versions
         };
-      })
-      .catch(err => {
-        return {
-          debugString: `Error in querying Service Worker status: ${err.message}`
-        };
       });
   }
 }

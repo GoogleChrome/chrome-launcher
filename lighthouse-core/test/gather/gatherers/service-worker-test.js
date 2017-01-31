@@ -45,17 +45,4 @@ describe('Service Worker gatherer', () => {
       assert.deepEqual(artifact.versions, versions);
     });
   });
-
-  it('handles driver failure', () => {
-    return serviceWorkerGatherer.beforePass({
-      driver: {
-        getServiceWorkerVersions() {
-          return Promise.reject('fail');
-        }
-      }
-    }).then(artifact => {
-      assert.ok(!artifact.versions);
-      assert.ok(artifact.debugString);
-    });
-  });
 });

@@ -21,19 +21,6 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Offline: Service Worker audit', () => {
-  it('reports driver error when given no Service Worker versions', () => {
-    const debugString = 'Error string';
-    const output = Audit.audit({
-      ServiceWorker: {
-        debugString
-      }
-    });
-
-    assert.equal(output.score, false);
-    assert.equal(output.rawValue, false);
-    assert.equal(output.debugString, debugString);
-  });
-
   it('passes when given a matching Service Worker version', () => {
     const output = Audit.audit({
       ServiceWorker: {
