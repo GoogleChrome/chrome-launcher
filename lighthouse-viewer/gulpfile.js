@@ -38,7 +38,8 @@ function license() {
 gulp.task('lint', () => {
   return gulp.src([
     'app/src/**/*.js',
-    'gulpfile.js'
+    'gulpfile.js',
+    'sw.js'
   ])
   .pipe($.eslint())
   .pipe($.eslint.format())
@@ -65,7 +66,11 @@ gulp.task('concat-css', ['html', 'css'], () => {
 });
 
 gulp.task('html', () => {
-  return gulp.src('app/*.html').pipe(gulp.dest(DIST_FOLDER));
+  return gulp.src([
+    'app/*.html',
+    'app/sw.js',
+    'app/manifest.json'
+  ]).pipe(gulp.dest(DIST_FOLDER));
 });
 
 gulp.task('polyfills', () => {
@@ -124,7 +129,9 @@ gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'css'],
   });
 
   gulp.watch([
-    'app/index.html'
+    'app/index.html',
+    'app/manifest.json',
+    'app/sw.js'
   ]).on('change', () => {
     runSequence('html');
   });
