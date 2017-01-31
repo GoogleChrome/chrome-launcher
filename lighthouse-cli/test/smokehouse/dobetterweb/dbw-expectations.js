@@ -64,7 +64,9 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 3
+            results: {
+              length: 3
+            }
           }
         }
       },
@@ -72,7 +74,9 @@ module.exports = [
         score: false,
         extendedInfo: {
           value: {
-            length: 5
+            results: {
+              length: 5
+            }
           }
         }
       },

@@ -38,7 +38,7 @@ describe('Page does not use console.time()', () => {
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 
   it('passes when console.time() is used on a different origin', () => {
@@ -52,7 +52,7 @@ describe('Page does not use console.time()', () => {
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 
   it('fails when console.time() is used on the origin', () => {
@@ -67,7 +67,11 @@ describe('Page does not use console.time()', () => {
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+
+    const headings = auditResult.extendedInfo.value.tableHeadings;
+    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
+                     ['URL', 'Line/Col', 'Eval\'d?'], 'table headings are correct and in order');
   });
 
   it('fails when console.time() is used in eval()', () => {
@@ -82,7 +86,7 @@ describe('Page does not use console.time()', () => {
       URL: {finalUrl: URL}
     });
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.equal(auditResult.extendedInfo.value.results.length, 3);
   });
 
   it('includes results when there is no .url', () => {
@@ -97,7 +101,7 @@ describe('Page does not use console.time()', () => {
     });
 
     assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.equal(auditResult.extendedInfo.value.results.length, 2);
     assert.ok(auditResult.debugString, 'includes debugString');
   });
 });

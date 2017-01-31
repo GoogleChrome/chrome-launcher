@@ -75,18 +75,16 @@ class NoDateNowAudit extends Audit {
       // warn the user that we don't know what the callsite is.
       debugString = URL.INVALID_URL_DEBUG_STRING;
       return true;
-    }).map(err => {
-      return Object.assign({
-        label: `line: ${err.line}, col: ${err.col}`,
-        url: err.url
-      }, err);
     });
 
     return NoDateNowAudit.generateAuditResult({
       rawValue: results.length === 0,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
-        value: results
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {
+          results,
+          tableHeadings: {url: 'URL', lineCol: 'Line/Col', isEval: 'Eval\'d?'}
+        }
       },
       debugString
     });

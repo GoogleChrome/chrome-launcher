@@ -34,6 +34,11 @@ class Table extends Formatter {
           }
 
           const table = Table.createTable(result.tableHeadings, result.results);
+          const headings = Object.keys(result.tableHeadings).map(key => {
+            return result.tableHeadings[key].toUpperCase();
+          });
+
+          output += `      ${headings.join(' ')}\n`;
 
           table.rows.forEach(row => {
             output += '      ';
@@ -66,6 +71,7 @@ class Table extends Formatter {
    *       code: wraps the value in ticks as a markdown code snippet.
    *       lineCol: combines the values for the line and col keys into a single
    *                value "line/col".
+   *       isEval: returns "yes" if the script was eval'd.
    *       All other values are passed through as is.
    * @param {!Array<!Object>} results Audit results.
    * @return {{headings: !Array<string>, rows: !Array<{cols: !Array<*>}>}}
@@ -88,6 +94,8 @@ class Table extends Formatter {
             return '`' + value.trim() + '`';
           case 'lineCol':
             return `${result.line}:${result.col}`;
+          case 'isEval':
+            return value ? 'yes' : '';
           default:
             return String(value);
         }

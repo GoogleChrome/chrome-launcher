@@ -24,12 +24,13 @@ const assert = require('assert');
 
 describe('TableFormatter', () => {
   const extendedInfo = {
-    tableHeadings: {url: 'URL', lineCol: 'Line/col', code: 'Snippet'},
+    tableHeadings: {url: 'URL', lineCol: 'Line/col', code: 'Snippet', isEval: 'Eval\'d?'},
     results: [{
       url: 'http://example.com',
       line: 123,
       col: 456,
-      code: 'code snippet'
+      code: 'code snippet',
+      isEval: true
     }]
   };
 
@@ -50,11 +51,14 @@ describe('TableFormatter', () => {
     assert.equal(table.rows[0].cols[0], 'http://example.com');
     assert.equal(table.rows[0].cols[1], '123:456');
     assert.equal(table.rows[0].cols[2], '\`code snippet\`');
+    assert.equal(table.rows[0].cols[3], 'yes');
   });
 
   it('generates valid pretty output', () => {
     const pretty = TableFormatter.getFormatter('pretty');
-    assert.equal(pretty(extendedInfo), '      http://example.com 123:456 \n');
+    const output = pretty(extendedInfo);
+    assert.ok(output.includes('      URL LINE/COL SNIPPET EVAL\'D?\n'), 'prints table headings');
+    assert.ok(output.includes('      http://example.com 123:456 yes \n'), 'prints cells');
   });
 
   it('generates valid html output', () => {
@@ -86,6 +90,7 @@ describe('TableFormatter', () => {
         {value: 'bar'},
       ]
     }), [
+      '      NAME VALUE\n',
       '      thing1 foo \n',
       '      thing2 -- \n',
       '      -- bar \n',
@@ -101,6 +106,7 @@ describe('TableFormatter', () => {
         {name: 'thing2', value: false},
       ]
     }), [
+      '      NAME VALUE\n',
       '      thing1 5 \n',
       '      thing2 false \n',
     ].join(''));
