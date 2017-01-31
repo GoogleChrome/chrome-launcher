@@ -51,7 +51,7 @@ limitations under the License.
       </div>
       <div class="report-body__header-container js-header-container">
         <div class="report-body__header">
-          <button class="report-body__header-toggle js-header-toggle"></button>
+          <button class="report-body__header-toggle js-header-toggle" title="See report's runtime settings"></button>
           <div class="report-body__metadata">
             <div class="report-body__url">Results for: <a href="{{ url }}" target="_blank">{{ url }}</a></div>
             <div class="report-body__url">Generated on: {{generatedTime}}</div>
@@ -73,33 +73,33 @@ limitations under the License.
               <button class="report-body__icon print js-print" title="Print HTML report"></button>
             {{/if_not_eq}}
           </div>
-        </div>
-        <div class="report-body__header-content">
-          <section class="config-section">
-            <h2 class="config-section__title">Runtime Environment</h2>
-            <ul class="config-section__items">
-              {{#each runtimeConfig.environment }}
-              <li class="config-section__item">
-                <p class="config-section__desc">
-                  {{ this.name }} ({{ this.description }}):
-                  <strong> {{#if this.enabled }}Enabled{{else}}Disabled{{/if}}</strong>
-                </p>
-              </li>
-              {{/each}}
-            </ul>
-          </section>
-          {{#if runtimeConfig.blockedUrlPatterns }}
-          <section class="config-section">
-            <h2 class="config-section__title">Blocked URL Patterns</h2>
-            <ul class="config-section__items">
-              {{#each runtimeConfig.blockedUrlPatterns }}
-              <li class="config-section__item">
-                <p class="config-section__desc">{{ this }}</p>
-              </li>
-              {{/each}}
-            </ul>
-          </section>
-          {{/if}}
+          <div class="report-body__header-content">
+            <section class="config-section">
+              <h2 class="config-section__title">Runtime Environment</h2>
+              <ul class="config-section__items">
+                {{#each runtimeConfig.environment }}
+                <li class="config-section__item">
+                  <p class="config-section__desc">
+                    {{ this.name }} ({{ this.description }}):
+                    <strong> {{#if this.enabled }}Enabled{{else}}Disabled{{/if}}</strong>
+                  </p>
+                </li>
+                {{/each}}
+              </ul>
+            </section>
+            {{#if runtimeConfig.blockedUrlPatterns }}
+            <section class="config-section">
+              <h2 class="config-section__title">Blocked URL Patterns</h2>
+              <ul class="config-section__items">
+                {{#each runtimeConfig.blockedUrlPatterns }}
+                <li class="config-section__item">
+                  <p class="config-section__desc">{{ this }}</p>
+                </li>
+                {{/each}}
+              </ul>
+            </section>
+            {{/if}}
+          </div>
         </div>
       </div>
       <div class="report-body__aggregations-container">
