@@ -152,6 +152,11 @@ export function win32() {
     process.env.PROGRAMFILES,
     process.env['PROGRAMFILES(X86)']
   ];
+
+  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
+    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH);
+  }
+
   prefixes.forEach(prefix =>
     suffixes.forEach(suffix => {
       const chromePath = path.join(prefix, suffix);
