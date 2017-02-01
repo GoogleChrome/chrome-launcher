@@ -56,7 +56,7 @@ class ReportGenerator {
 
     // Converts a name to a link.
     Handlebars.registerHelper('nameToLink', name => {
-      return name.toLowerCase().replace(/\s/, '-');
+      return name.toLowerCase().replace(/\s/g, '-');
     });
 
     // Figures out the total score for an aggregation

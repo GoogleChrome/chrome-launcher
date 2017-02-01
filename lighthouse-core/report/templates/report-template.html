@@ -29,7 +29,7 @@ limitations under the License.
 
 <!doctype html>
 
-<html data-report-context="{{reportContext}}">
+<html lang="en" data-report-context="{{reportContext}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
@@ -73,15 +73,15 @@ limitations under the License.
             <div class="report-body__url">Generated on: {{ format_time generatedTime}}</div>
           </div>
           <div class="report-body__buttons">
-            <span class="export-section">
+            <div class="export-section">
               <button class="export-button js-export" title="Export report in different formats">Export...</button>
               <ul class="export-dropdown">
-                <a href="#" data-action="print">Print...</a>
-                <a href="#" data-action="copy">Copy JSON...</a>
-                <a href="#" data-action="save-html">Save as HTML...</a>
-                <a href="#" data-action="save-json">Save as JSON...</a>
+                <li><a href="#" data-action="print">Print...</a></li>
+                <li><a href="#" data-action="copy">Copy JSON...</a></li>
+                <li><a href="#" data-action="save-html">Save as HTML...</a></li>
+                <li><a href="#" data-action="save-json">Save as JSON...</a></li>
               </ul>
-            </span>
+            </div>
             <button class="report-body__icon share js-share" title="Share report on GitHub"></button>
             <button class="report-body__icon copy js-copy" title="Copy JSON report"></button>
             <button class="report-body__icon open js-open" title="Open in Lighthouse Viewer"></button>
@@ -122,7 +122,7 @@ limitations under the License.
       {{#each aggregations}}
       <section class="js-breakdown aggregations" id="{{nameToLink this.name}}">
         <header class="aggregations__header">
-          <h1>{{ this.name }}</h1>
+          <h2>{{ this.name }}</h2>
           <p class="aggregations__desc">{{ sanitize this.description }}</p>
           {{#if this.scored}}
           <div class="section-result">

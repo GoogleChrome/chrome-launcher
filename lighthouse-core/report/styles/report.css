@@ -637,7 +637,7 @@ body {
   position: relative;
 }
 
-.aggregations__header > h1 {
+.aggregations__header > h2 {
   font-size: var(--heading-font-size);
   font-weight: normal;
   line-height: var(--heading-line-height);

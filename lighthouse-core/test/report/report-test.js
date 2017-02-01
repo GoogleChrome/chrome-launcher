@@ -43,13 +43,21 @@ describe('Report', () => {
     assert.ok(/<\/script>/gim.test(html));
   });
 
+  it('`nameToLink` works properly', () => {
+    const reportGenerator = new ReportGenerator();
+    const html = reportGenerator.generateHTML(sampleResults);
+    assert.ok(/class="menu__link" href="#progressive-web-app"/gm.test(html));
+    assert.ok(/id="progressive-web-app"/gm.test(html));
+  });
+
   it('sets report context in HTML', () => {
     const reportGenerator = new ReportGenerator();
     let html = reportGenerator.generateHTML(sampleResults);
     assert.ok(html.includes('data-report-context="extension"'),
               'default report context is "extension"');
     html = reportGenerator.generateHTML(sampleResults, 'viewer');
-    assert.ok(html.includes('<html data-report-context="viewer"'), 'viewer report context');
+    assert.ok(html.includes('<html lang="en" data-report-context="viewer"'),
+              'viewer report context');
   });
 
   it('adds export button for viewer context', () => {

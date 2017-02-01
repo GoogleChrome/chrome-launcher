@@ -2,6 +2,7 @@
 .table_list {
   margin-top: 8px;
   border: 1px solid #EBEBEB;
+  border-spacing: 0;
   max-width: 100%;
 }
 .table_list th,
@@ -56,8 +57,7 @@
 {{#if rows}}
 <details class="subitem__details">
   <summary class="subitem__detail">More information</summary>
-  <table class="table_list {{#if_not_eq headings.length 2}}multicolumn{{/if_not_eq}}"
-         cellspacing="0">
+  <table class="table_list {{#if_not_eq headings.length 2}}multicolumn{{/if_not_eq}}">
     <thead>
       <tr>
         {{#each headings}}<th>{{this}}</th>{{/each}}
