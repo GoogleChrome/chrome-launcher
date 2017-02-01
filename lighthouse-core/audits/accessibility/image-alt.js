@@ -33,6 +33,9 @@ class ImageAlt extends AxeAudit {
       category: 'Accessibility',
       name: 'image-alt',
       description: 'Every image element has an alt attribute',
+      helpText: 'Screen reader users rely on `alt` text to provide descriptions of ' +
+          'images. It\'s also used as fallback content when an image fails to load. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/alt-attribute).',
       requiredArtifacts: ['Accessibility']
     };
   }

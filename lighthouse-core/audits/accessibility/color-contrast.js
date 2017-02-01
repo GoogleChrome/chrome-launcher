@@ -34,6 +34,8 @@ class ColorContrast extends AxeAudit {
       category: 'Accessibility',
       name: 'color-contrast',
       description: 'Background and foreground colors have a sufficient contrast ratio',
+      helpText: 'Low-contrast text is difficult or impossible for many users to read. ' +
+          '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/contrast-ratio).',
       requiredArtifacts: ['Accessibility']
     };
   }
