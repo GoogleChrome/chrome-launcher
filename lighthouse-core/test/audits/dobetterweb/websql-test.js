@@ -51,6 +51,6 @@ describe('No websql audit', () => {
     });
 
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.displayValue.match(/db name: (.*), version: (.*)/));
+    assert.ok(auditResult.debugString.match(/Found database (.*), version: (.*)/));
   });
 });

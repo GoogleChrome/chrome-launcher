@@ -76,22 +76,6 @@ describe('Manifest gatherer', () => {
     });
   });
 
-  it('emits an error when there was no manifest', () => {
-    return manifestGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.resolve({
-            data: '',
-            errors: [],
-            url: ''
-          });
-        }
-      }
-    }).then(artifact => {
-      assert.ok(artifact.debugString);
-    });
-  });
-
   it('creates a manifest object for valid manifest content', () => {
     const data = JSON.stringify({
       name: 'App'

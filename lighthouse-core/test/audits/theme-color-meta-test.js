@@ -28,7 +28,6 @@ describe('HTML: theme-color audit', () => {
     });
 
     assert.equal(nullColorAudit.rawValue, false);
-    assert(nullColorAudit.debugString);
   });
 
   it('fails and warns when theme-color has an invalid CSS color', () => {

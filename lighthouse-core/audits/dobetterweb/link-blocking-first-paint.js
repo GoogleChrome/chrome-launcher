@@ -34,7 +34,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
     return {
       category: 'Performance',
       name: 'link-blocking-first-paint',
-      description: 'Site does not use <link> that delay first paint',
+      description: 'Avoids `<link>` that delay first paint',
       helpText: 'Link elements are blocking the first paint of your page. Consider ' +
           'inlining critical links and deferring non-critical ones. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).',

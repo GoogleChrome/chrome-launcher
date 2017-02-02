@@ -45,8 +45,7 @@ class ManifestIconsMin192 extends Audit {
 
     if (icons.doExist(manifest) === false) {
       return ManifestIconsMin192.generateAuditResult({
-        rawValue: false,
-        debugString: 'WARNING: No icons found in the manifest'
+        rawValue: false
       });
     }
 
@@ -57,7 +56,7 @@ class ManifestIconsMin192 extends Audit {
     if (matchingIcons.length) {
       displayValue = `found sizes: ${matchingIcons.join(', ')}`;
     } else {
-      debugString = 'WARNING: No icons are at least 192px';
+      debugString = 'No icons are at least 192px';
     }
 
     return ManifestIconsMin192.generateAuditResult({

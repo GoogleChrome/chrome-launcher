@@ -32,7 +32,7 @@ class AppCacheManifestAttr extends Audit {
     return {
       category: 'Offline',
       name: 'appcache-manifest',
-      description: 'Site does not use Application Cache',
+      description: 'Avoids Application Cache',
       helpText: 'Application Cache has been [deprecated](https://html.spec.whatwg.org/multipage/browsers.html#offline) by [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers). Consider implementing an offline solution using the [Cache Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Cache).',
       requiredArtifacts: ['AppCacheManifest']
     };
@@ -51,11 +51,12 @@ class AppCacheManifestAttr extends Audit {
     }
 
     const usingAppcache = artifacts.AppCacheManifest !== null;
-    const displayValue = usingAppcache ? `<html manifest="${artifacts.AppCacheManifest}">` : '';
+    const debugString = usingAppcache ?
+        `Found <html manifest="${artifacts.AppCacheManifest}">.` : '';
 
     return AppCacheManifestAttr.generateAuditResult({
       rawValue: !usingAppcache,
-      displayValue: displayValue
+      debugString
     });
   }
 }

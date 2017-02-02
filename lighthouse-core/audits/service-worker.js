@@ -38,7 +38,7 @@ class ServiceWorker extends Audit {
     return {
       category: 'Offline',
       name: 'service-worker',
-      description: 'Has a registered Service Worker',
+      description: 'Registers a Service Worker',
       helpText: 'The service worker is the technology that enables your app to use many ' +
          'Progressive Web App features, such as offline, add to homescreen, and push ' +
          'notifications. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/registered-service-worker).',
@@ -63,11 +63,9 @@ class ServiceWorker extends Audit {
     // artifacts.URL.finalUrl so audit accounts for any redirects.
     const version = getActivatedServiceWorker(
         artifacts.ServiceWorker.versions, artifacts.URL.finalUrl);
-    const debugString = version ? undefined : 'No active service worker found for this origin.';
 
     return ServiceWorker.generateAuditResult({
-      rawValue: !!version,
-      debugString: debugString
+      rawValue: !!version
     });
   }
 }

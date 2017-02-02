@@ -27,7 +27,7 @@ class ThemeColor extends Audit {
     return {
       category: 'HTML',
       name: 'theme-color-meta',
-      description: 'HTML has a `<meta name="theme-color">` tag',
+      description: 'Has a `<meta name="theme-color">` tag',
       requiredArtifacts: ['ThemeColor']
     };
   }
@@ -40,8 +40,7 @@ class ThemeColor extends Audit {
     const themeColorMeta = artifacts.ThemeColor;
     if (themeColorMeta === null) {
       return ThemeColor.generateAuditResult({
-        rawValue: false,
-        debugString: 'No valid theme-color meta tag found.'
+        rawValue: false
       });
     }
 

@@ -34,7 +34,7 @@ class NoConsoleTimeAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'no-console-time',
-      description: 'Site does not use `console.time()` in its own scripts',
+      description: 'Avoids `console.time()` in its own scripts',
       helpText: 'Consider using `performance.mark()` and `performance.measure()` ' +
           'from the User Timing API instead. They provide high-precision timestamps, ' +
           'independent of the system clock, and are integrated in the Chrome DevTools Timeline. ' +

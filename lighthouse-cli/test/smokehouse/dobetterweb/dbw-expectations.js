@@ -47,7 +47,7 @@ module.exports = [
       },
       'appcache-manifest': {
         score: false,
-        displayValue: '<html manifest="clock.appcache">'
+        debugString: 'Found <html manifest="clock.appcache">.'
       },
       'geolocation-on-start': {
         score: false
@@ -112,7 +112,7 @@ module.exports = [
       },
       'no-websql': {
         score: false,
-        displayValue: 'db name: mydb, version: 1.0'
+        debugString: 'Found database "mydb", version: 1.0.'
       },
       'notification-on-start': {
         score: false

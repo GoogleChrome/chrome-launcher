@@ -39,7 +39,6 @@ describe('Mobile-friendly: display audit', () => {
   it('fails when no manifest artifact present', () => {
     const output = Audit.audit({Manifest: {value: undefined}});
     assert.equal(output.rawValue, false);
-    assert.equal(output.debugString && output.debugString.length > 0, true);
   });
 
   it('falls back to the successful default when there is no manifest display property', () => {

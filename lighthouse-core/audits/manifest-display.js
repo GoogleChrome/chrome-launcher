@@ -57,7 +57,7 @@ class ManifestDisplay extends Audit {
       rawValue: hasRecommendedValue,
       displayValue
     };
-    if (!hasRecommendedValue) {
+    if (manifest && !hasRecommendedValue) {
       auditResult.debugString = 'Manifest display property should be set.';
     }
     return ManifestDisplay.generateAuditResult(auditResult);

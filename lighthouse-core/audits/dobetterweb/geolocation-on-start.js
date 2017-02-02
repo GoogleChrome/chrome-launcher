@@ -33,7 +33,7 @@ class GeolocationOnStart extends Audit {
     return {
       category: 'UX',
       name: 'geolocation-on-start',
-      description: 'Page does not automatically request geolocation on page load',
+      description: 'Avoids requesting the geolocation permission on page load',
       helpText: 'Users are mistrustful of or confused by sites that request their ' +
           'location without context. Consider tying the request to user gestures instead. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/geolocation-on-load).',

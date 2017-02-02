@@ -48,9 +48,7 @@ describe('Manifest: icons audits', () => {
       const audit192 = Audit192.audit({Manifest});
 
       assert.equal(audit144.rawValue, false);
-      assert.ok(audit144.debugString.match(/^WARNING/));
       assert.equal(audit192.rawValue, false);
-      assert.ok(audit192.debugString.match(/^WARNING/));
     });
   });
 

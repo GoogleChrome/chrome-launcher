@@ -35,7 +35,7 @@ class NoDateNowAudit extends Audit {
     return {
       category: 'JavaScript',
       name: 'no-datenow',
-      description: 'Site does not use `Date.now()` in its own scripts',
+      description: 'Avoids `Date.now()` in its own scripts',
       helpText: 'Consider using `performance.now()` from the User Timing API ' +
           'instead. It provides high-precision timestamps, independent of the system ' +
           'clock. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/date-now).',

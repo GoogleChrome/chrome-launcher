@@ -33,7 +33,7 @@ class NoWebSQLAudit extends Audit {
     return {
       category: 'Offline',
       name: 'no-websql',
-      description: 'Site does not use WebSQL DB.',
+      description: 'Avoids WebSQL DB',
       helpText: 'Web SQL is deprecated. Consider using IndexedDB instead. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/web-sql).',
       requiredArtifacts: ['WebSQL']
@@ -53,12 +53,12 @@ class NoWebSQLAudit extends Audit {
     }
 
     const db = artifacts.WebSQL.database;
-    const displayValue = (db && db.database ?
-        `db name: ${db.database.name}, version: ${db.database.version}` : '');
+    const debugString = (db && db.database ?
+        `Found database "${db.database.name}", version: ${db.database.version}.` : '');
 
     return NoWebSQLAudit.generateAuditResult({
       rawValue: !db,
-      displayValue: displayValue
+      debugString
     });
   }
 }

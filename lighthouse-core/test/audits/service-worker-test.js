@@ -64,6 +64,5 @@ describe('Offline: Service Worker audit', () => {
 
     assert.equal(output.score, false);
     assert.equal(output.rawValue, false);
-    assert.ok(output.debugString);
   });
 });

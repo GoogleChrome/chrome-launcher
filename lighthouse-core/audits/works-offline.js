@@ -26,7 +26,7 @@ class WorksOffline extends Audit {
     return {
       category: 'Offline',
       name: 'works-offline',
-      description: 'URL responds with a 200 when offline',
+      description: 'Responds with a 200 when offline',
       helpText: 'If you\'re building a Progressive Web App, consider using a service worker so ' +
           'that your app can work offline. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/http-200-when-offline).',
