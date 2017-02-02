@@ -43,13 +43,7 @@ class ChromeConsoleMessages extends Gatherer {
   afterPass(options) {
     options.driver.off('Log.entryAdded', this._onConsoleEntryAdded);
     return options.driver.sendCommand('Log.disable')
-        .then(_ => this._logEntries)
-        .catch(err => {
-          return {
-            rawValue: -1,
-            debugString: err.message
-          };
-        });
+        .then(_ => this._logEntries);
   }
 }
 

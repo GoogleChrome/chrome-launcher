@@ -22,18 +22,6 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Console deprecations audit', () => {
-  it('fails when gather fails', () => {
-    const debugString = 'the uniquest debug string';
-    const auditResult = DeprecationsAudit.audit({
-      ChromeConsoleMessages: {
-        rawValue: -1,
-        debugString
-      }
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.strictEqual(auditResult.debugString, debugString);
-  });
-
   it('passes when no console messages were found', () => {
     const auditResult = DeprecationsAudit.audit({
       ChromeConsoleMessages: []

@@ -45,10 +45,6 @@ class Deprecations extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.ChromeConsoleMessages.rawValue === -1) {
-      return Deprecations.generateAuditResult(artifacts.ChromeConsoleMessages);
-    }
-
     const entries = artifacts.ChromeConsoleMessages;
 
     const deprecations = entries.filter(log => log.entry.source === 'deprecation')
