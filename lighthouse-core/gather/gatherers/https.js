@@ -39,11 +39,6 @@ class HTTPS extends Gatherer {
         return {
           value: state.schemeIsCryptographic
         };
-      }, _ => {
-        return {
-          value: false,
-          debugString: 'Error requesting page security state.'
-        };
       });
 
     let noSecurityChangesTimeout;
@@ -51,10 +46,7 @@ class HTTPS extends Gatherer {
       // Set up a timeout for ten seconds in case we don't get any
       // security events at all. If that happens, bail.
       noSecurityChangesTimeout = setTimeout(_ => {
-        resolve({
-          value: false,
-          debugString: 'Timed out waiting for page security state.'
-        });
+        reject(new Error('Timed out waiting for page security state.'));
       }, timeout);
     });
 
@@ -65,6 +57,9 @@ class HTTPS extends Gatherer {
       // Clear timeout. No effect if it won, no need to wait if it lost.
       clearTimeout(noSecurityChangesTimeout);
       return result;
+    }).catch(err => {
+      clearTimeout(noSecurityChangesTimeout);
+      throw err;
     });
   }
 }
