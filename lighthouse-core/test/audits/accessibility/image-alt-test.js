@@ -36,7 +36,6 @@ describe('Accessibility: image-alt audit', () => {
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.displayValue, '');
-    assert.equal(output.debugString, 'http://example.com/ (Failed on 0 elements)');
   });
 
   it('generates an audit output (single node)', () => {
@@ -53,7 +52,6 @@ describe('Accessibility: image-alt audit', () => {
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.displayValue, '');
-    assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
   });
 
   it('doesn\'t throw an error when violations is undefined', () => {

@@ -19,7 +19,7 @@
 const Formatter = require('../../formatters/formatter.js');
 const assert = require('assert');
 
-/* global describe, it */
+/* eslint-env mocha */
 
 describe('Formatter', () => {
   it('returns supported formats', () => {

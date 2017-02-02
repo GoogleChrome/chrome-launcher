@@ -1,11 +1,10 @@
 <details class="subitem__details">
   <summary class="subitem__detail">
-    {{#if (gt this.nodes.length 1)}}
+    {{~#if (gt this.nodes.length 1)~}}
       {{this.nodes.length}} elements fail this test
-    {{else}}
-      {{this.nodes.length}} element fails this test
-    {{/if}}
-    <a href="{{ this.helpUrl }}" target="_blank"><small>learn more</small></a>
+    {{~else~}}
+      {{this.nodes.length}} element failed this test
+    {{~/if~}}
   </summary>
   <ul class="subitem__details">
   {{#each this.nodes}}

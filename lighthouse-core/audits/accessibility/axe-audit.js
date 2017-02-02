@@ -37,25 +37,11 @@ class AxeAudit extends Audit {
 
     return this.generateAuditResult({
       rawValue: typeof rule === 'undefined',
-      debugString: this.createDebugString(rule),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
       }
     });
-  }
-
-  /**
-   * @param {!{nodes: Array, help: string}} rule
-   * @return {!string}
-   */
-  static createDebugString(rule) {
-    if (typeof rule === 'undefined') {
-      return '';
-    }
-
-    const elementsStr = rule.nodes.length === 1 ? 'element' : 'elements';
-    return `${rule.help} (Failed on ${rule.nodes.length} ${elementsStr})`;
   }
 }
 

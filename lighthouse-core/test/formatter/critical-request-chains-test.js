@@ -16,6 +16,8 @@
 
 'use strict';
 
+/* eslint-env mocha */
+
 const criticalRequestChainFormatter = require('../../formatters/critical-request-chains.js');
 const assert = require('assert');
 const Handlebars = require('handlebars');
@@ -65,8 +67,6 @@ const extendedInfo = {
     }
   }
 };
-
-/* eslint-env mocha */
 
 describe('CRC Formatter', () => {
   it('copes with invalid input', () => {

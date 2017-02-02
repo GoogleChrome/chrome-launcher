@@ -16,10 +16,10 @@
 
 'use strict';
 
+/* eslint-env mocha */
+
 const UserTimingsFormatter = require('../../formatters/user-timings.js');
 const assert = require('assert');
-
-/* global describe, it */
 
 describe('Formatter', () => {
   it('handles invalid input', () => {

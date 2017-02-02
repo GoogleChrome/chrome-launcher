@@ -16,6 +16,7 @@
 'use strict';
 
 /* eslint max-nested-callbacks: ["error", 5] */
+/* eslint-env mocha */
 
 const assert = require('assert');
 const walk = require('walk');
@@ -40,8 +41,6 @@ const walkTree = new Promise((resolve, reject) => {
     resolve(formatters);
   });
 });
-
-/* global describe, it*/
 
 describe('Formatters', () => {
   it('has no formatters failing when getFormatter("html") is called', () => {

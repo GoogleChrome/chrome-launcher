@@ -16,10 +16,11 @@
 
 'use strict';
 
-const AccessibilityFormatter = require('../../formatters/accessibility.js');
-const assert = require('assert');
+/* eslint-env mocha */
 
-/* global describe, it */
+const AccessibilityFormatter = require('../../formatters/accessibility.js');
+const Handlebars = require('handlebars');
+const assert = require('assert');
 
 describe('Formatter', () => {
   it('handles invalid input', () => {
@@ -29,5 +30,21 @@ describe('Formatter', () => {
     assert.doesNotThrow(_ => pretty({impact: ''}));
     assert.doesNotThrow(_ => pretty({impact: '', helpUrl: ''}));
     assert.doesNotThrow(_ => pretty({impact: '', helpUrl: '', nodes: []}));
+  });
+
+  it('generates valid html output', () => {
+    Handlebars.registerHelper(AccessibilityFormatter.getHelpers());
+
+    const formatter = AccessibilityFormatter.getFormatter('html');
+    const template = Handlebars.compile(formatter);
+
+    let output = template({nodes: [{target: 'some-id'}]});
+    assert.ok(output.match(/1 element failed this test/g), 'msg for one input');
+    assert.ok(output.match(/<code>some-id<\/code>/g));
+
+    output = template({nodes: [{target: 'some-id'}, {target: 'some-id2'}]});
+    assert.ok(output.match(/2 elements fail this test/g), 'msg for more than one input');
+    assert.ok(output.match(/<code>some-id<\/code>/g));
+    assert.ok(output.match(/<code>some-id2<\/code>/g));
   });
 });

@@ -48,41 +48,6 @@ describe('Accessibility: axe-audit', () => {
       const output = FakeA11yAudit.audit(artifacts);
       assert.equal(output.rawValue, false);
       assert.equal(output.displayValue, '');
-      assert.equal(output.debugString, 'http://example.com/ (Failed on 1 element)');
-    });
-  });
-
-  describe('createDebugString()', () => {
-    it('handles empty rules', () => {
-      const output = AxeAudit.createDebugString();
-      assert.ok(typeof output === 'string');
-    });
-
-    it('creates debug strings', () => {
-      const emptyDebugString = AxeAudit.createDebugString({
-        nodes: [],
-        help: 'http://example.com/'
-      });
-
-      assert.equal(emptyDebugString, 'http://example.com/ (Failed on 0 elements)');
-    });
-
-    it('refers to a single element if one failure', () => {
-      const debugString = AxeAudit.createDebugString({
-        nodes: [{}],
-        help: 'http://example.com/'
-      });
-
-      assert.equal(debugString, 'http://example.com/ (Failed on 1 element)');
-    });
-
-    it('refers to multiple elements if multiple failures', () => {
-      const debugString = AxeAudit.createDebugString({
-        nodes: [{}, {}],
-        help: 'http://example.com/'
-      });
-
-      assert.equal(debugString, 'http://example.com/ (Failed on 2 elements)');
     });
   });
 });
