@@ -51,41 +51,27 @@ describe('HTML without JavaScript gatherer', () => {
   });
 
   it('returns an artifact', () => {
+    const innerText = 'Hello!';
     return htmlWithoutJavaScriptGather.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.resolve('Hello!');
+          return Promise.resolve(innerText);
         }
       }
     }).then(artifact => {
-      assert.ok(typeof artifact.value === 'string');
-      assert.ok(/Hello/gim.test(artifact.value));
+      assert.strictEqual(artifact.value, innerText);
     });
   });
 
-  it('handles driver returning non-string', () => {
+  it('throws an error when driver returns a non-string', () => {
     return htmlWithoutJavaScriptGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve(null);
         }
       }
-    }).then(artifact => {
-      assert.equal(artifact.value, -1);
-      assert.ok(artifact.debugString);
-    });
-  });
-
-  it('handles driver failure', () => {
-    return htmlWithoutJavaScriptGather.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.reject(new Error('such a fail'));
-        }
-      }
-    }).then(artifact => {
-      assert.equal(artifact.value, -1);
-      assert.ok(/such a fail/i.test(artifact.debugString));
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 });

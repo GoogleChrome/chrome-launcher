@@ -21,32 +21,6 @@ const withoutJsAudit = require('../../audits/without-javascript.js');
 const assert = require('assert');
 
 describe('Progressive Enhancement: without javascript audit', () => {
-  it('passes on the error when there was a driver error', () => {
-    const debugString = 'Unusual error string';
-    const artifacts = {
-      HTMLWithoutJavaScript: {
-        value: -1,
-        debugString
-      }
-    };
-
-    const result = withoutJsAudit.audit(artifacts);
-    assert.equal(result.score, -1);
-    assert.equal(result.debugString, debugString);
-  });
-
-  it('does not error on non-string input', () => {
-    const artifacts = {
-      HTMLWithoutJavaScript: {
-        value: {}
-      }
-    };
-
-    const result = withoutJsAudit.audit(artifacts);
-    assert.equal(result.score, -1);
-    assert.ok(result.debugString);
-  });
-
   it('fails when the js-less body is empty', () => {
     const artifacts = {
       HTMLWithoutJavaScript: {

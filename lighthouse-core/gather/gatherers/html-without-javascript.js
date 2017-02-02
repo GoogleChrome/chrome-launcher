@@ -44,17 +44,11 @@ class HTMLWithoutJavaScript extends Gatherer {
     return options.driver.evaluateAsync(`(${getBodyText.toString()}())`)
       .then(result => {
         if (typeof result !== 'string') {
-          throw new Error('result was not a string');
+          throw new Error('document body innerText returned by protocol was not a string');
         }
 
         return {
           value: result
-        };
-      })
-      .catch(err => {
-        return {
-          value: -1,
-          debugString: `Unable to get document body innerText: ${err.message}`
         };
       });
   }
