@@ -69,17 +69,16 @@ describe('HTTP Redirect gatherer', () => {
     });
   });
 
-  it('handles driver failure', () => {
+  it('throws an error on driver failure', () => {
     return httpRedirectGather.afterPass({
       driver: {
         getSecurityState() {
           return Promise.reject('such a fail');
         }
       }
-    }).then(artifact => {
-      assert.equal(artifact.value, false);
-      assert.ok(artifact.debugString);
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 
   it('handles driver timeout', () => {
@@ -100,9 +99,8 @@ describe('HTTP Redirect gatherer', () => {
       },
 
       _testTimeout: fastTimeout
-    }).then(artifact => {
-      assert.equal(artifact.value, false);
-      assert.ok(artifact.debugString);
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 });

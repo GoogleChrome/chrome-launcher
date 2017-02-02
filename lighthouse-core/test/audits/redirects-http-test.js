@@ -18,7 +18,7 @@
 const Audit = require('../../audits/redirects-http.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Security: HTTP->HTTPS audit', () => {
   it('fails when no redirect detected', () => {
