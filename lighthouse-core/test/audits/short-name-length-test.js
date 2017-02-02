@@ -27,7 +27,9 @@ const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 describe('Manifest: short_name_length audit', () => {
   it('fails when an empty manifest is present', () => {
     const Manifest = manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-    return assert.equal(Audit.audit({Manifest}).rawValue, false);
+    const result = Audit.audit({Manifest});
+    assert.equal(result.rawValue, false);
+    assert.equal(result.debugString, 'No short_name found.');
   });
 
   it('fails when a manifest contains no short_name and too long name', () => {
