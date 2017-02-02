@@ -53,15 +53,4 @@ describe('Accessibility: tabindex audit', () => {
     assert.equal(output.rawValue, false);
     assert.equal(output.displayValue, '');
   });
-
-  it('doesn\'t throw an error when violations is undefined', () => {
-    const artifacts = {
-      Accessibility: {
-        violations: undefined
-      }
-    };
-
-    const output = Audit.audit(artifacts);
-    assert.equal(output.description, 'No element has a `tabindex` attribute greater than 0');
-  });
 });

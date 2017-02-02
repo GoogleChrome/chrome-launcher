@@ -32,7 +32,7 @@ class AxeAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const violations = artifacts.Accessibility.violations || [];
+    const violations = artifacts.Accessibility.violations;
     const rule = violations.find(result => result.id === this.meta.name);
 
     return this.generateAuditResult({

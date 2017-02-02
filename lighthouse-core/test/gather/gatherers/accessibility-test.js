@@ -27,28 +27,30 @@ describe('Accessibility gatherer', () => {
     accessibilityGather = new AccessibilityGather();
   });
 
-  it('fails gracefully', () => {
+  it('fails if nothing is returned', () => {
     return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve();
         }
       }
-    }).then(artifact => {
-      assert.ok(typeof artifact === 'object');
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 
-  it('handles driver failure', () => {
+  it('fails if result has no violations array', () => {
     return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.reject('such a fail');
+          return Promise.resolve({
+            url: 'https://example.com'
+          });
         }
       }
-    }).then(artifact => {
-      assert.ok(artifact.debugString);
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 
   it('propagates error retrieving the results', () => {
@@ -56,28 +58,11 @@ describe('Accessibility gatherer', () => {
     return accessibilityGather.afterPass({
       driver: {
         evaluateAsync() {
-          return Promise.resolve({
-            error
-          });
+          return Promise.reject(new Error(error));
         }
       }
-    }).then(artifact => {
-      assert.ok(artifact.debugString === error);
-    });
-  });
-
-  it('creates an object for valid results', () => {
-    return accessibilityGather.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.resolve({
-            name: 'a11y'
-          });
-        }
-      }
-    }).then(artifact => {
-      assert.ok(typeof artifact === 'object');
-      assert.equal(artifact.name, 'a11y');
-    });
+    }).then(
+      _ => assert.ok(false),
+      err => assert.ok(err.message.includes(error)));
   });
 });

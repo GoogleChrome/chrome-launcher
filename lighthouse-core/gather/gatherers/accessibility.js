@@ -47,14 +47,10 @@ function runA11yChecks() {
 }
 
 class Accessibility extends Gatherer {
-  static _errorAccessibility(errorString) {
-    return {
-      raw: undefined,
-      value: undefined,
-      debugString: errorString
-    };
-  }
-
+  /**
+   * @param {!Object} options
+   * @return {!Promise<{violations: !Array}>}
+   */
   afterPass(options) {
     const driver = options.driver;
     const expression = `(function () {
@@ -63,20 +59,14 @@ class Accessibility extends Gatherer {
     })()`;
 
     return driver
-        .evaluateAsync(expression)
-        .then(returnedValue => {
-          if (!returnedValue) {
-            return Accessibility._errorAccessibility('Unable to parse axe results');
-          }
+      .evaluateAsync(expression)
+      .then(returnedValue => {
+        if (!returnedValue || !Array.isArray(returnedValue.violations)) {
+          throw new Error('Unable to parse axe results' + returnedValue);
+        }
 
-          if (returnedValue.error) {
-            return Accessibility._errorAccessibility(returnedValue.error);
-          }
-
-          return returnedValue;
-        }, _ => {
-          return Accessibility._errorAccessibility('Axe results timed out');
-        });
+        return returnedValue;
+      });
   }
 }
 
