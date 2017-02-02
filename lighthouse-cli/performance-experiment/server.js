@@ -38,6 +38,8 @@ const PerfXReportGenerator = require('./report/perf-x-report-generator');
 
 let database;
 let fallbackReportId;
+let url;
+let config;
 /**
  * Start the server with an arbitrary port and open report page in the default browser.
  * @param {!Object} params A JSON contains lighthouse parameters
@@ -46,7 +48,10 @@ let fallbackReportId;
  */
 function hostExperiment(params, results) {
   return new Promise(resolve => {
-    database = new ExperimentDatabase(params.url, params.config);
+    url = params.url;
+    config = params.config;
+
+    database = new ExperimentDatabase();
     const id = database.saveData(params.flags, results);
     fallbackReportId = id;
 
@@ -101,10 +106,10 @@ function reportRequestHandler(request, response) {
 
     const reportsMetadata = Object.keys(database.timeStamps).map(key => {
       const generatedTime = database.timeStamps[key];
-      return {url: database.url, reportHref: `/?id=${key}`, generatedTime};
+      return {url, reportHref: `/?id=${key}`, generatedTime};
     });
     reportsMetadata.sort((metadata1, metadata2) => {
-      return metadata1.generatedTime - metadata2.generatedTime;
+      return new Date(metadata1.generatedTime) - new Date(metadata2.generatedTime);
     });
     const reportsCatalog = {reportsMetadata, selectedReportHref: `/?id=${id}`};
 
@@ -137,7 +142,7 @@ function rerunRequestHandler(request, response) {
       const additionalFlags = JSON.parse(message);
       Object.assign(flags, additionalFlags);
 
-      lighthouse(database.url, flags, database.config).then(results => {
+      lighthouse(url, flags, config).then(results => {
         results.artifacts = undefined;
         const id = database.saveData(flags, results);
         response.writeHead(200);
