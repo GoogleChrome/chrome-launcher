@@ -423,6 +423,7 @@ body {
   background-size: contain;
   background-color: transparent;
   margin: 0 8px 0 8px;
+  cursor: pointer;
 }
 
 .report-body__header-container.expanded .report-body__header-toggle {
