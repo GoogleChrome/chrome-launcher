@@ -33,17 +33,6 @@ describe('Mobile-friendly: content-width audit', () => {
     assert.ok(result.debugString);
   });
 
-  it('fails when gatherer failed', () => {
-    const result = Audit.audit({
-      ContentWidth: {
-        scrollWidth: -1,
-        viewportWidth: -1
-      }
-    });
-    assert.equal(result.rawValue, false);
-    assert.ok(result.debugString);
-  });
-
   it('passes when widths match', () => {
     return assert.equal(Audit.audit({
       ContentWidth: {

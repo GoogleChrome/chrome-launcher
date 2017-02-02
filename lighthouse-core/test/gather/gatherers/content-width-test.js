@@ -43,16 +43,4 @@ describe('Content Width gatherer', () => {
       assert.ok(artifact.viewportWidth === 400);
     });
   });
-
-  it('handles driver failure', () => {
-    return contentWidthGatherer.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(artifact => {
-      assert.equal(artifact.scrollWidth, -1);
-    });
-  });
 });

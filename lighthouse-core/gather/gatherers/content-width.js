@@ -34,6 +34,10 @@ function getContentWidth() {
 
 class ContentWidth extends Gatherer {
 
+  /**
+   * @param {!Object} options
+   * @return {!Promise<{scrollWidth: number, viewportWidth: number, devicePixelRatio: number}>}
+   */
   afterPass(options) {
     const driver = options.driver;
 
@@ -47,12 +51,6 @@ class ContentWidth extends Gatherer {
       }
 
       return returnedValue;
-    }, _ => {
-      return {
-        scrollWidth: -1,
-        viewportWidth: -1,
-        devicePixelRatio: -1,
-      };
     });
   }
 }
