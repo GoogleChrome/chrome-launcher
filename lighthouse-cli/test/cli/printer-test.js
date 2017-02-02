@@ -75,12 +75,11 @@ describe('Printer', () => {
     });
   });
 
-  it('throws for invalid paths', done => {
+  it('throws for invalid paths', () => {
     const mode = 'html';
     const path = '!/#@.html';
     return Printer.write(sampleResults, mode, path).catch(err => {
       assert.ok(err.code === 'ENOENT');
-      done();
     });
   });
 
