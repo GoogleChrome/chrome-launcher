@@ -511,6 +511,30 @@ describe('GatherRunner', function() {
         });
   });
 
+  describe('#assertPageLoaded', () => {
+    it('passes when the page is loaded', () => {
+      const url = 'http://the-page.com';
+      const records = [{url}];
+      GatherRunner.assertPageLoaded(url, {online: true}, records);
+    });
+
+    it('throws when page fails to load', () => {
+      const url = 'http://the-page.com';
+      const records = [{url, failed: true, localizedFailDescription: 'foobar'}];
+      assert.throws(() => {
+        GatherRunner.assertPageLoaded(url, {online: true}, records);
+      }, /Unable.*foobar/);
+    });
+
+    it('throws when page times out', () => {
+      const url = 'http://the-page.com';
+      const records = [];
+      assert.throws(() => {
+        GatherRunner.assertPageLoaded(url, {online: true}, records);
+      }, /Unable.*timeout/);
+    });
+  });
+
   describe('artifact collection', () => {
     it('supports sync and async return of artifacts from gatherers', () => {
       const gatherers = [
