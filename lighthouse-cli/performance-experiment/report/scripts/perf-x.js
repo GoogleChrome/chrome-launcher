@@ -31,7 +31,10 @@ class ConfigPanel {
     this._messageField = this._configPanel.querySelector('.js-message');
     this._urlBlockingList = this._configPanel.querySelector('.js-url-blocking-patterns');
     this._urlBlockingStatus = {};
-    this._reportId = new URL(window.location).searchParams.get('id');
+
+    // Compat: URL.searchParams isn't yet supported by Safari
+    const match = location.search.match(/[?&]id=([^&]*)/);
+    this._reportId = match ? match[1]: '';
 
     const bodyToggle = this._configPanel.querySelector('.js-panel-toggle');
     bodyToggle.addEventListener('click', () => this._toggleBody());
@@ -83,15 +86,6 @@ class ConfigPanel {
         }
       });
     });
-
-    // get and recover blocked URL patterns of current run
-    fetch(`/flags?id=${this._reportId}`).then(response => {
-      return response.json();
-    }).then(flags => {
-      const blockedUrlPatterns = flags.blockedUrlPatterns || [];
-      blockedUrlPatterns.forEach(urlPattern => this.addBlockedUrlPattern(urlPattern));
-      this.log('');
-    });
   }
 
   /**
@@ -100,15 +94,20 @@ class ConfigPanel {
    */
   _rerunLighthouse() {
     this.log('Start Rerunning Lighthouse');
-
     const options = {
       blockedUrlPatterns: this.getBlockedUrlPatterns()
     };
 
-    return fetch(`/rerun?id=${this._reportId}`, {method: 'POST', body: JSON.stringify(options)})
-      .then(response => response.text())
-      .then(newReportId => location.assign(`?id=${newReportId}`))
-      .catch(err => this.log(`Lighthouse Runtime Error: ${err}`));
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/rerun?id=${this._reportId}`, true);
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        location.assign(`?id=${xhr.responseText}`);
+      } else if (xhr.status === 500) {
+        this.log('Error: Lighthouse runtime error');
+      }
+    };
+    xhr.send(JSON.stringify(options));
   }
 
   /**
@@ -118,8 +117,12 @@ class ConfigPanel {
    * @param {string} urlPattern
    */
   addBlockedUrlPattern(urlPattern) {
-    if (this._urlBlockingStatus[urlPattern]) {
-      this.log(`${urlPattern} is already in the list`);
+    urlPattern = urlPattern.trim();
+    if (urlPattern.length === 0) {
+      this.log('Error: URL blocking pattern is an empty string');
+      return;
+    } else if (this._urlBlockingStatus[urlPattern]) {
+      this.log(`Error: ${urlPattern} is already in the list`);
       return;
     }
 
@@ -150,8 +153,9 @@ class ConfigPanel {
    * @param {string} urlPattern
    */
   removeBlockedUrlPattern(urlPattern) {
+    urlPattern = urlPattern.trim();
     if (!this._urlBlockingStatus[urlPattern]) {
-      this.log(`${urlPattern} is not in the list`);
+      this.log(`Error: ${urlPattern} is not in the list`);
       return;
     }
 
@@ -193,5 +197,11 @@ class ConfigPanel {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  new ConfigPanel();
+  const configPanel = new ConfigPanel();
+
+  // init recover blocked URL patterns
+  [...document.querySelectorAll('.js-currently-blocked-url')].forEach(ele => {
+    configPanel.addBlockedUrlPattern(ele.getAttribute('data-url-pattern'));
+  });
+  configPanel.log('');
 });

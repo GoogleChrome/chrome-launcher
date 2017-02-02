@@ -108,7 +108,7 @@ limitations under the License.
               <h2 class="config-section__title">Blocked URL Patterns</h2>
               <ul class="config-section__items">
                 {{#each runtimeConfig.blockedUrlPatterns }}
-                <li class="config-section__item">
+                <li class="config-section__item js-currently-blocked-url" data-url-pattern="{{ this }}">
                   <p class="config-section__desc">{{ this }}</p>
                 </li>
                 {{/each}}

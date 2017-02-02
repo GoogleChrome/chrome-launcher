@@ -25,7 +25,6 @@
  *    Browser can request lighthousr rerun by sending POST request to URL: /rerun?id=[REPORT_ID]
  *      This will rerun lighthouse with additional cli-flags received from POST request data and
  *      return the new report id
- *    Flags can be access via URL: /flags?id=[REPORT_ID]
  */
 
 const http = require('http');
@@ -74,8 +73,6 @@ function requestHandler(request, response) {
     if (request.method === 'GET') {
       if (pathname === '/') {
         reportRequestHandler(request, response);
-      } else if (pathname === '/flags') {
-        flagsRequestHandler(request, response);
       } else {
         throw new HTTPError(404);
       }
@@ -123,15 +120,6 @@ function reportRequestHandler(request, response) {
   }
 }
 
-function flagsRequestHandler(request, response) {
-  try {
-    response.writeHead(200, {'Content-Type': 'text/json'});
-    response.end(JSON.stringify(database.getFlags(request.parsedUrl.query.id || fallbackReportId)));
-  } catch (err) {
-    throw new HTTPError(404);
-  }
-}
-
 function rerunRequestHandler(request, response) {
   try {
     const flags = database.getFlags(request.parsedUrl.query.id || fallbackReportId);
@@ -147,6 +135,10 @@ function rerunRequestHandler(request, response) {
         const id = database.saveData(flags, results);
         response.writeHead(200);
         response.end(id);
+      }).catch(err => {
+        log.error('PerformanceXServer', err.code, err);
+        response.writeHead(500);
+        response.end(http.STATUS_CODES[500]);
       });
     });
   } catch (err) {

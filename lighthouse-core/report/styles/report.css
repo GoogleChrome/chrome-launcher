@@ -434,6 +434,7 @@ body {
   display: none;
   padding: 10px 0 10px 42px;
   top: 100%;
+  left: 0;
   position: absolute;
   width: 100%;
   background: inherit;
