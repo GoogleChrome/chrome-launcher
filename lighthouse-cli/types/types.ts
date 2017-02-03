@@ -3,6 +3,7 @@ interface AuditResult {
   debugString: string;
   comingSoon?: boolean;
   score: number;
+  error?: boolean;
   description: string;
   name: string;
   category: string;

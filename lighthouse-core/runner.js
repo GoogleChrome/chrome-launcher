@@ -174,10 +174,7 @@ class Runner {
         if (noArtifact || noTrace) {
           log.warn('Runner',
               `${artifactName} gatherer, required by audit ${audit.meta.name}, did not run.`);
-          return audit.generateAuditResult({
-            rawValue: -1,
-            debugString: `Required ${artifactName} gatherer did not run.`
-          });
+          throw new Error(`Required ${artifactName} gatherer did not run.`);
         }
 
         // If artifact was an error, it must be non-fatal (or gatherRunner would
@@ -186,14 +183,19 @@ class Runner {
           const artifactError = artifacts[artifactName];
           log.warn('Runner', `${artifactName} gatherer, required by audit ${audit.meta.name},` +
             ` encountered an error: ${artifactError.message}`);
-          return audit.generateAuditResult({
-            rawValue: -1,
-            debugString: artifactError.message
-          });
+          throw new Error(
+              `Required ${artifactName} gatherer encountered an error: ${artifactError.message}`);
         }
       }
 
       return audit.audit(artifacts);
+    }).catch(err => {
+      if (err.fatal) {
+        throw err;
+      }
+
+      // Non-fatal error become error audit result.
+      return audit.generateErrorAuditResult('Audit error: ' + err.message);
     }).then(result => {
       log.verbose('statusEnd', status);
       return result;

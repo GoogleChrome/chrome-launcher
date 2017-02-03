@@ -110,7 +110,9 @@ function createOutput(results: Results, outputMode: OutputMode): string {
         if (auditResult.comingSoon === true)
           return;
 
-        let lineItem = ` ${log.doubleLightHorizontal} ${formatAggregationResultItem(auditResult.score)} ${auditResult.description}`;
+        const formattedScore = auditResult.error ? `${log.redify('‽')}` :
+            `${formatAggregationResultItem(auditResult.score)}`;
+        let lineItem = ` ${log.doubleLightHorizontal} ${formattedScore} ${auditResult.description}`;
         if (auditResult.displayValue) {
           lineItem += ` (${log.bold}${auditResult.displayValue}${log.reset})`;
         }

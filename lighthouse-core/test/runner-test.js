@@ -141,8 +141,10 @@ describe('Runner', () => {
       });
 
       return Runner.run({}, {url, config}).then(results => {
-        assert.equal(results.audits['user-timings'].rawValue, -1);
-        assert.ok(results.audits['user-timings'].debugString);
+        const auditResult = results.audits['user-timings'];
+        assert.strictEqual(auditResult.rawValue, null);
+        assert.strictEqual(auditResult.error, true);
+        assert.ok(auditResult.debugString.includes('traces'));
       });
     });
 
@@ -158,8 +160,10 @@ describe('Runner', () => {
       });
 
       return Runner.run({}, {url, config}).then(results => {
-        assert.equal(results.audits['is-on-https'].rawValue, -1);
-        assert.ok(results.audits['is-on-https'].debugString);
+        const auditResult = results.audits['is-on-https'];
+        assert.strictEqual(auditResult.rawValue, null);
+        assert.strictEqual(auditResult.error, true);
+        assert.ok(auditResult.debugString.includes('HTTPS'));
       });
     });
 
@@ -182,9 +186,71 @@ describe('Runner', () => {
       config.artifacts.HTTPS = artifactError;
 
       return Runner.run({}, {url, config}).then(results => {
-        assert.equal(results.audits['is-on-https'].rawValue, -1);
-        assert.equal(results.audits['is-on-https'].debugString, errorMessage);
+        const auditResult = results.audits['is-on-https'];
+        assert.strictEqual(auditResult.rawValue, null);
+        assert.strictEqual(auditResult.error, true);
+        assert.ok(auditResult.debugString.includes(errorMessage));
       });
+    });
+  });
+
+  describe('Bad audit behavior handling', () => {
+    const testAuditMeta = {
+      category: 'ThrowThrow',
+      name: 'throwy-audit',
+      description: 'Always throws',
+      requiredArtifacts: []
+    };
+
+    it('produces an error audit result when an audit throws a non-fatal Error', () => {
+      const errorMessage = 'Audit yourself';
+      const url = 'https://example.com';
+      const config = new Config({
+        audits: [
+          class ThrowyAudit extends Audit {
+            static get meta() {
+              return testAuditMeta;
+            }
+            static audit() {
+              throw new Error(errorMessage);
+            }
+          }
+        ],
+
+        artifacts: {}
+      });
+
+      return Runner.run({}, {url, config}).then(results => {
+        const auditResult = results.audits['throwy-audit'];
+        assert.strictEqual(auditResult.rawValue, null);
+        assert.strictEqual(auditResult.error, true);
+        assert.ok(auditResult.debugString.includes(errorMessage));
+      });
+    });
+
+    it('rejects if an audit throws a fatal error', () => {
+      const errorMessage = 'Uh oh';
+      const url = 'https://example.com';
+      const config = new Config({
+        audits: [
+          class FatalThrowyAudit extends Audit {
+            static get meta() {
+              return testAuditMeta;
+            }
+            static audit() {
+              const fatalError = new Error(errorMessage);
+              fatalError.fatal = true;
+              throw fatalError;
+            }
+          }
+        ],
+
+        artifacts: {}
+      });
+
+      return Runner.run({}, {url, config}).then(
+        _ => assert.ok(false),
+        err => assert.strictEqual(err.message, errorMessage));
     });
   });
 

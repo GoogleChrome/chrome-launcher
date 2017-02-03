@@ -18,7 +18,7 @@
 const Aggregate = require('../../aggregator/aggregate');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Aggregate', () => {
   it('filters empty results', () => {
@@ -209,6 +209,20 @@ describe('Aggregate', () => {
     };
 
     return assert.throws(_ => Aggregate._convertToWeight(result, expected));
+  });
+
+  it('returns 0 if audit result was an error', () => {
+    const expected = {
+      expectedValue: true,
+      weight: 1
+    };
+
+    const result = {
+      rawValue: null,
+      error: true,
+    };
+
+    assert.strictEqual(Aggregate._convertToWeight(result, expected), 0);
   });
 
   it('scores a set correctly (contributesToScore: true)', () => {
@@ -403,6 +417,37 @@ describe('Aggregate', () => {
     }];
     const scored = true;
     return assert.equal(Aggregate.compare(results, items, scored)[0].overall, 1);
+  });
+
+  it('if audit result is an error it does not contribute to score', () => {
+    const items = [{
+      audits: {
+        'test': {
+          expectedValue: true,
+          weight: 1
+        },
+        'alternate-test': {
+          expectedValue: 100,
+          weight: 1
+        }
+      }
+    }];
+
+    const errorResult = new Error('error message');
+    errorResult.name = 'alternate-test';
+    const results = [{
+      name: 'test',
+      rawValue: true,
+      score: true,
+      displayValue: ''
+    }, {
+      name: 'alternate-test',
+      rawValue: null,
+      error: true
+    }];
+
+    const aggregate = Aggregate.compare(results, items, true)[0];
+    assert.strictEqual(aggregate.overall, 0.5);
   });
 
   it('outputs subitems', () => {

@@ -34,6 +34,18 @@ class Audit {
   }
 
   /**
+   * @param {string} debugString
+   * @return {!AuditResult}
+   */
+  static generateErrorAuditResult(debugString) {
+    return this.generateAuditResult({
+      rawValue: null,
+      error: true,
+      debugString
+    });
+  }
+
+  /**
    * @param {!AuditResultInput} result
    * @return {!AuditResult}
    */
@@ -57,6 +69,7 @@ class Audit {
       score,
       displayValue: `${displayValue}`,
       rawValue: result.rawValue,
+      error: result.error,
       debugString: result.debugString,
       optimalValue: result.optimalValue,
       extendedInfo: result.extendedInfo,

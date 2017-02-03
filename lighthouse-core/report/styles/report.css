@@ -33,6 +33,7 @@ span, div, p, section, header, h1, h2, li, ul {
   --good-color: #1ac123;
   --average-color: #ffae00;
   --unknown-color: #b3b3b3;
+  --warning-color: #f6be00;
   --gutter-gap: 12px;
   --gutter-width: 40px;
   --body-font-size: 14px;
@@ -895,6 +896,9 @@ body {
 }
 .score-poor-bg {
   background-color: var(--poor-color);
+}
+.score-warning-bg {
+  background-color: var(--warning-color);
 }
 .score-unknown-bg {
   background-color: var(--unknown-color);

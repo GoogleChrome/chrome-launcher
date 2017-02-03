@@ -77,6 +77,12 @@ class Aggregate {
       throw new Error(msg);
     }
 
+    // Audit resulted in an error, so doesn't contribute to score.
+    // TODO: could do NaN instead, as score becomes somewhat meaningless.
+    if (result.error) {
+      return 0;
+    }
+
     if (typeof result === 'undefined' ||
         typeof result.score === 'undefined') {
       let msg =

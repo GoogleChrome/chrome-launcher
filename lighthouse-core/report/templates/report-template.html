@@ -189,6 +189,8 @@ limitations under the License.
                   <div class="subitem-result">
                     {{#if subItem.comingSoon}}
                           <span class="subitem-result__unknown score-unknown-bg">N/A</span>
+                    {{else if subItem.error}}
+                      <span class="subitem-result__unknown score-warning-bg">N/A</span>
                     {{else}}
                       {{#if (is-bool subItem.score)}}
                         {{#if subItem.score}}
