@@ -361,9 +361,12 @@ class LighthouseViewerReport extends LighthouseReport {
     const a = document.createElement('a');
     a.download = `${filename}${ext}`;
     a.href = URL.createObjectURL(blob);
+    document.body.appendChild(a); // Firefox requires anchor to be in the DOM.
     a.click();
 
-    setTimeout(_ => URL.revokeObjectURL(a.href), 500); // cleanup.
+    // cleanup.
+    document.body.removeChild(a);
+    setTimeout(_ => URL.revokeObjectURL(a.href), 500);
   }
 
   /**
