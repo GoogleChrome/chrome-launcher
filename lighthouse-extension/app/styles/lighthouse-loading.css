@@ -18,7 +18,7 @@
 
 @keyframes rotate {
   0% {
-    transform: rotatey(0deg);
+    transform: rotatey(0);
     opacity: 0;
   }
   15% {

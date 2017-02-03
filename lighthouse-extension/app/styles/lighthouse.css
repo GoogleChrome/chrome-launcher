@@ -118,7 +118,7 @@ html, body {
   border: none;
   color: #fff;
   background: #2979ff;
-  box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.50);
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
   border-radius: 2px;
   padding: 7px 12px 5px 12px
 }

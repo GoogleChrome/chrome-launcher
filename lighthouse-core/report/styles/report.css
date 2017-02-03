@@ -116,7 +116,7 @@ body {
   width: 100%;
   margin: 0 auto;
   max-width: var(--report-width);
-  background: #FFF;
+  background: #fff;
   box-shadow: 0 0 6px 0 rgba(0,0,0,0.26);
 }
 
@@ -177,7 +177,7 @@ body {
 }
 
 .score-container__overall-score {
-  color: #FFF;
+  color: #fff;
   font-size: 92px;
   font-weight: 100;
   position: relative;
@@ -199,7 +199,7 @@ body {
 }
 
 .score-container__max-score {
-  color: #57A0A8;
+  color: #57a0a8;
   font-size: 28px;
   font-weight: 500;
 }
@@ -233,12 +233,12 @@ body {
 
 .menu {
   width: var(--report-menu-width);
-  background: #FFFFFF;
+  background: #fff;
   height: 100%;
   top: 0;
   left: 0;
   pointer-events: auto;
-  border-right: 1px solid #DFDFDF;
+  border-right: 1px solid #dfdfdf;
 }
 
 .menu__header {
@@ -246,7 +246,7 @@ body {
   padding: 0 20px;
   height: 115px;
   line-height: 54px;
-  color: #FFF;
+  color: #fff;
   font-family: var(--text-font-family);
   font-size: 18px;
   position: relative;
@@ -287,7 +287,7 @@ body {
 .menu__report-tab {
   padding: 3px 13px;
   color: #777;
-  border-top: 1px solid #EBEBEB;
+  border-top: 1px solid #ebebeb;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -297,12 +297,12 @@ body {
 
 .menu__report-tab:hover {
   background-color: #448aff;
-  color: #FFF;
+  color: #fff;
 }
 
 .menu__report-tab__url {
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 700;
   text-overflow: ellipsis;
   line-height: 30px;
   white-space: nowrap;
@@ -324,7 +324,7 @@ body {
 .menu__nav-item {
   height: 40px;
   line-height: 40px;
-  border-top: 1px solid #EBEBEB;
+  border-top: 1px solid #ebebeb;
 }
 
 .menu__link {
@@ -340,12 +340,12 @@ body {
 
 .menu__link:hover {
   background-color: #448aff;
-  color: #FFF;
+  color: #fff;
 }
 
 .menu__link-label {
   flex: 1;
-  color: #49525F;
+  color: #49525f;
   font-weight: 500;
   overflow: hidden;
   white-space: nowrap;
@@ -404,7 +404,7 @@ body {
   align-items: center;
   justify-content: flex-start;
   padding: 0 var(--heading-line-height) 0 0;
-  border-bottom: 1px solid #EBEBEB;
+  border-bottom: 1px solid #ebebeb;
   position: fixed;
   width: calc(100vw - var(--report-menu-width));
   max-width: calc( var(--report-width) - var(--report-menu-width));
@@ -443,7 +443,7 @@ body {
 
 .report-body__header-container.expanded .report-body__header-content {
   display: block;
-  border-bottom: 1px solid #EBEBEB;
+  border-bottom: 1px solid #ebebeb;
 }
 
 .report-body__header-content .config-section {
@@ -452,7 +452,7 @@ body {
 
 .report-body__header-content .config-section__title {
   font-size: var(--subheading-font-size);
-  font-weight: normal;
+  font-weight: 400;
   line-height: var(--subheading-line-height);
   color: var(--subheading-color);
 }
@@ -515,7 +515,7 @@ body {
 }
 
 .report-section__description {
-  color: #5F6875;
+  color: #5f6875;
   font-size: 16px;
   margin: 0 0 1em 0;
   line-height: 1.4;
@@ -562,7 +562,7 @@ body {
   font-size: 15px;
   color: #555;
   font-style: italic;
-  margin: 0px 0px 16px 24px;
+  margin: 0 0 16px 24px;
   max-width: 90%;
 }
 
@@ -574,7 +574,7 @@ body {
   font-size: 14px;
   color: #999;
   font-style: italic;
-  padding: 8px 0px 16px 24px;
+  padding: 8px 0 16px 24px;
   max-width: 90%;
 }
 
@@ -616,12 +616,12 @@ body {
   line-height: 90px;
   text-align: center;
   font-size: 12px;
-  border-top: 1px solid #EBEBEB;
+  border-top: 1px solid #ebebeb;
   color: #999;
 }
 
 .coming-soon, .coming-soon * {
-  color: #AAA;
+  color: #aaa;
 }
 
 .coming-soon .report-section__item-value {
@@ -642,7 +642,7 @@ body {
 
 .aggregations__header > h2 {
   font-size: var(--heading-font-size);
-  font-weight: normal;
+  font-weight: 400;
   line-height: var(--heading-line-height);
 }
 
@@ -704,7 +704,7 @@ body {
 
 .aggregation__header > h2 {
   font-size: var(--subheading-font-size);
-  font-weight: normal;
+  font-weight: 400;
   line-height: var(--subheading-line-height);
   color: var(--subheading-color);
 }
@@ -737,7 +737,7 @@ body {
 }
 
 .subitem strong {
-  font-weight: bold;
+  font-weight: 700;
 }
 
 .subitem small {
