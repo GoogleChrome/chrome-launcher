@@ -64,8 +64,8 @@ class CriticalRequestChains extends Audit {
       }
 
       // Account for initial navigation
-      const initialNavigationKey = Object.keys(chains)[0];
-      const initialNavChildren = chains[initialNavigationKey].children;
+      const initialNavKey = Object.keys(chains)[0];
+      const initialNavChildren = initialNavKey && chains[initialNavKey].children;
       if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
         walk(initialNavChildren, 0);
       }

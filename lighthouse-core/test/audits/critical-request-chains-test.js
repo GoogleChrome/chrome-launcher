@@ -86,6 +86,8 @@ const PASSING_REQUEST_CHAIN = {
   },
 };
 
+const EMPTY_REQUEST_CHAIN = {};
+
 const mockArtifacts = (mockChain) => {
   return {
     networkRecords: {
@@ -115,6 +117,13 @@ describe('Performance: critical-request-chains audit', () => {
 
   it('calculates the correct chain result for passing example', () => {
     return Audit.audit(mockArtifacts(PASSING_REQUEST_CHAIN)).then(output => {
+      assert.equal(output.displayValue, 0);
+      assert.equal(output.score, true);
+    });
+  });
+
+  it('calculates the correct chain result for empty example', () => {
+    return Audit.audit(mockArtifacts(EMPTY_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 0);
       assert.equal(output.score, true);
     });
