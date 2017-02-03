@@ -27,18 +27,14 @@ function generateRecord(resourceSizeInKb, durationInMs) {
   };
 }
 
-function generateSize(width, height, prefix) {
-  prefix = prefix || 'client';
-
+function generateSize(width, height, prefix = 'client') {
   const size = {};
   size[`${prefix}Width`] = width;
   size[`${prefix}Height`] = height;
   return size;
 }
 
-function generateImage(clientSize, naturalSize, networkRecord, src) {
-  src = src || 'https://google.com/logo.png';
-
+function generateImage(clientSize, naturalSize, networkRecord, src = 'https://google.com/logo.png') {
   const image = {src, networkRecord};
   Object.assign(image, clientSize, naturalSize);
   return image;

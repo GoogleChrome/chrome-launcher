@@ -97,11 +97,10 @@ describe('Best Practices: unused css rules audit', () => {
     let baseSheet;
     const baseUrl = 'http://g.co/';
 
-    function map(overrides, url) {
+    function map(overrides, url = baseUrl) {
       if (overrides.header && overrides.header.sourceURL) {
         overrides.header.sourceURL = baseUrl + overrides.header.sourceURL;
       }
-      url = url || baseUrl;
       return UnusedCSSAudit.mapSheetToResult(Object.assign(baseSheet, overrides), url);
     }
 

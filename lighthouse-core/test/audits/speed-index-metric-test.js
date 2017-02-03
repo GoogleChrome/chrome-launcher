@@ -36,10 +36,7 @@ function mockArtifactsWithSpeedlineResult(result) {
 }
 
 describe('Performance: speed-index-metric audit', () => {
-  function frame(timestamp, progress) {
-    timestamp = timestamp || 0;
-    progress = progress || 0;
-
+  function frame(timestamp = 0, progress = 0) {
     return {
       getTimeStamp: () => timestamp,
       getProgress: () => progress,

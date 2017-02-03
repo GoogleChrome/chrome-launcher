@@ -77,10 +77,7 @@ class Table extends Formatter {
    * @param {!Array<!Object>} results Audit results.
    * @return {{headings: !Array<string>, rows: !Array<{cols: !Array<*>}>}}
    */
-  static createTable(headings, results) {
-    headings = headings || {};
-    results = results || [];
-
+  static createTable(headings = {}, results = []) {
     const headingKeys = Object.keys(headings);
 
     const rows = results.map(result => {

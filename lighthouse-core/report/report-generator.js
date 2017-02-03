@@ -307,9 +307,7 @@ class ReportGenerator {
    * @param {?Object} reportsCatalog Basic info about all the reports to include in left nav bar
    * @return {string} HTML of the report page.
    */
-  generateHTML(results, reportContext, reportsCatalog) {
-    reportContext = reportContext || 'extension';
-
+  generateHTML(results, reportContext = 'extension', reportsCatalog) {
     this._registerFormatters(results.audits);
 
     results.aggregations.forEach(aggregation => {

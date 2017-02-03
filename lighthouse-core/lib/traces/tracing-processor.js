@@ -117,9 +117,7 @@ class TraceProcessor {
    * @return {!Array<{percentile: number, time: number}>}
    * @private
    */
-  static _riskPercentiles(durations, totalTime, percentiles, clippedLength) {
-    clippedLength = clippedLength || 0;
-
+  static _riskPercentiles(durations, totalTime, percentiles, clippedLength = 0) {
     let busyTime = 0;
     for (let i = 0; i < durations.length; i++) {
       busyTime += durations[i];

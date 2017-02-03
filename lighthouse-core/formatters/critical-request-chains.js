@@ -66,16 +66,11 @@ class CriticalRequestChains extends Formatter {
   }
 
   static _traverse(tree, cb) {
-    function walk(node, depth, startTime, transferSize) {
+    function walk(node, depth, startTime, transferSize = 0) {
       const children = Object.keys(node);
       if (children.length === 0) {
         return;
       }
-
-      if (!transferSize) {
-        transferSize = 0;
-      }
-
       children.forEach(id => {
         const child = node[id];
         if (!startTime) {

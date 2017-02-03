@@ -48,10 +48,9 @@ class Connection {
    * @param {!Object} params
    * @return {!Promise}
    */
-  sendCommand(method, params) {
+  sendCommand(method, params = {}) {
     log.formatProtocol('method => browser', {method, params}, 'verbose');
     const id = ++this._lastCommandId;
-    params = params || {};
     const message = JSON.stringify({id, method, params});
     this.sendRawMessage(message);
     return new Promise((resolve, reject) => {
