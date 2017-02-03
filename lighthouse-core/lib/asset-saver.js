@@ -20,6 +20,7 @@ const fs = require('fs');
 const log = require('../../lighthouse-core/lib/log.js');
 const stringifySafe = require('json-stringify-safe');
 const URL = require('./url-shim');
+const Metrics = require('./traces/pwmetrics-events');
 
 /**
  * Generate a filenamePrefix of hostname_YYYY-MM-DD_HH-MM-SS
@@ -119,6 +120,10 @@ function prepareAssets(artifacts, results) {
         const traceData = Object.assign({}, trace);
         const html = screenshotDump(screenshots, results);
 
+        if (results && results.audits) {
+          const evts = new Metrics(traceData.traceEvents, results.audits).generateFakeEvents();
+          traceData.traceEvents.push(...evts);
+        }
         assets.push({
           traceData,
           html

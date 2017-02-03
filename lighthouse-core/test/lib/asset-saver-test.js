@@ -18,11 +18,14 @@
 'use strict';
 
 const assetSaver = require('../../lib/asset-saver');
+const Metrics = require('../../lib/traces/pwmetrics-events');
 const assert = require('assert');
 const fs = require('fs');
 
 const screenshotFilmstrip = require('../fixtures/traces/screenshots.json');
 const traceEvents = require('../fixtures/traces/progressive-app.json');
+const dbwTrace = require('../fixtures/traces/dbw_tester.json');
+const dbwResults = require('../fixtures/dbw_tester-perf-results.json');
 const Audit = require('../../audits/audit.js');
 
 /* eslint-env mocha */
@@ -92,6 +95,24 @@ describe('asset-saver helper', () => {
       assert.ok(/<!doctype/gim.test(ssFileContents));
       assert.ok(ssFileContents.includes('{"timestamp":674089419.919'));
       fs.unlinkSync(ssFilename);
+    });
+  });
+
+  describe('prepareAssets', () => {
+    it('adds fake events to trace', () => {
+      const countEvents = trace => trace.traceEvents.length;
+      const mockArtifacts = {
+        traces: {
+          defaultPass: dbwTrace
+        },
+        requestScreenshots: () => Promise.resolve([]),
+      };
+      const beforeCount = countEvents(dbwTrace);
+      return assetSaver.prepareAssets(mockArtifacts, dbwResults).then(preparedAssets => {
+        const afterCount = countEvents(preparedAssets[0].traceData);
+        const metricsSansNavStart = Metrics.metricsDefinitions.length - 1;
+        assert.equal(afterCount, beforeCount + (2 * metricsSansNavStart), 'unexpected event count');
+      });
     });
   });
 });
