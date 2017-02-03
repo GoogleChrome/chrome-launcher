@@ -29,7 +29,6 @@
   background-color: #fafafa;
 }
 .table_list code, .table_list pre {
-  display: block;
   white-space: pre;
   font-family: monospace;
 }
@@ -47,7 +46,8 @@
 .table_list.multicolumn th,
 .table_list.multicolumn td {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
   flex: 1;
 }
 </style>
