@@ -29,17 +29,11 @@ class DateNowUse extends Gatherer {
     this.collectUsage = options.driver.captureFunctionCallSites('Date.now');
   }
 
+  /**
+   * @return {!Promise<!Array<{url: string, line: number, col: number}>>}
+   */
   afterPass() {
-    return this.collectUsage().then(dateNowUses => {
-      return {
-        usage: dateNowUses
-      };
-    }, e => {
-      return {
-        value: -1,
-        debugString: e.message
-      };
-    });
+    return this.collectUsage();
   }
 }
 

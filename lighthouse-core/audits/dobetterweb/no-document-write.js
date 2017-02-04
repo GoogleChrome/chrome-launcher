@@ -46,19 +46,7 @@ class NoDocWriteAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.DocWriteUse.value === -1) {
-      let debugString = 'Unknown error with the DocWriteUse gatherer';
-      if (artifacts.DocWriteUse.debugString) {
-        debugString = artifacts.DocWriteUse.debugString;
-      }
-
-      return NoDocWriteAudit.generateAuditResult({
-        rawValue: -1,
-        debugString
-      });
-    }
-
-    const results = artifacts.DocWriteUse.usage.map(err => {
+    const results = artifacts.DocWriteUse.map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`
       }, err);

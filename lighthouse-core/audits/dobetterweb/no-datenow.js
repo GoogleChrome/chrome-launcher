@@ -48,21 +48,9 @@ class NoDateNowAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.DateNowUse.value === -1) {
-      let debugString = 'Unknown error with the DateNowUse gatherer';
-      if (artifacts.DateNowUse.debugString) {
-        debugString = artifacts.DateNowUse.debugString;
-      }
-
-      return NoDateNowAudit.generateAuditResult({
-        rawValue: -1,
-        debugString
-      });
-    }
-
     let debugString;
     // Filter usage from other hosts and keep eval'd code.
-    const results = artifacts.DateNowUse.usage.filter(err => {
+    const results = artifacts.DateNowUse.filter(err => {
       if (err.isEval) {
         return !!err.url;
       }

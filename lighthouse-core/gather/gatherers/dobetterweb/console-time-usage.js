@@ -29,17 +29,11 @@ class ConsoleTimeUsage extends Gatherer {
     this.collectUsage = options.driver.captureFunctionCallSites('console.time');
   }
 
+  /**
+   * @return {!Promise<!Array<{url: string, line: number, col: number}>>}
+   */
   afterPass() {
-    return this.collectUsage().then(consoleTimeUsage => {
-      return {
-        usage: consoleTimeUsage
-      };
-    }, e => {
-      return {
-        value: -1,
-        debugString: e.message
-      };
-    });
+    return this.collectUsage();
   }
 }
 

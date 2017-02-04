@@ -29,17 +29,11 @@ class DocWriteUse extends Gatherer {
     this.collectUsage = options.driver.captureFunctionCallSites('document.write');
   }
 
+  /**
+   * @return {!Promise<!Array<{url: string, line: number, col: number}>>}
+   */
   afterPass() {
-    return this.collectUsage().then(DocWriteUses => {
-      return {
-        usage: DocWriteUses
-      };
-    }, e => {
-      return {
-        value: -1,
-        debugString: e.message
-      };
-    });
+    return this.collectUsage();
   }
 }
 

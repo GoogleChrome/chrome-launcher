@@ -48,21 +48,9 @@ class NoConsoleTimeAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.ConsoleTimeUsage.value === -1) {
-      let debugString = 'Unknown error with the ConsoleTimeUsage gatherer';
-      if (artifacts.ConsoleTimeUsage.debugString) {
-        debugString = artifacts.ConsoleTimeUsage.debugString;
-      }
-
-      return NoConsoleTimeAudit.generateAuditResult({
-        rawValue: -1,
-        debugString
-      });
-    }
-
     let debugString;
     // Filter usage from other hosts and keep eval'd code.
-    const results = artifacts.ConsoleTimeUsage.usage.filter(err => {
+    const results = artifacts.ConsoleTimeUsage.filter(err => {
       if (err.isEval) {
         return !!err.url;
       }
