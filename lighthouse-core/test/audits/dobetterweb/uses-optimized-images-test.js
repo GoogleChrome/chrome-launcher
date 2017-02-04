@@ -37,18 +37,6 @@ function generateImage(type, originalSize, webpSize, jpegSize) {
 /* eslint-env mocha */
 
 describe('Page uses optimized images', () => {
-  it('fails when gatherer returns error', () => {
-    const debugString = 'All image optimizations failed.';
-    const auditResult = UsesOptimizedImagesAudit.audit_({
-      OptimizedImages: {
-        rawValue: -1,
-        debugString: debugString
-      },
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.equal(auditResult.debugString, debugString);
-  });
-
   it('fails when one jpeg image is unoptimized', () => {
     const auditResult = UsesOptimizedImagesAudit.audit_({
       OptimizedImages: [

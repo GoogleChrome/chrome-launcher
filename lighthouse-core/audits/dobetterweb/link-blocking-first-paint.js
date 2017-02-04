@@ -49,12 +49,6 @@ class LinkBlockingFirstPaintAudit extends Audit {
    */
   static computeAuditResultForTags(artifacts, tagFilter) {
     const artifact = artifacts.TagsBlockingFirstPaint;
-    if (artifact.value === -1) {
-      return {
-        rawValue: -1,
-        debugString: artifact.debugString
-      };
-    }
 
     const filtered = artifact.filter(item => item.tag.tagName === tagFilter);
 

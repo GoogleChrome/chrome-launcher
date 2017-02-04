@@ -147,15 +147,14 @@ class TagsBlockingFirstPaint extends Gatherer {
     return options.driver.evaluateScriptOnLoad(scriptSrc);
   }
 
+  /**
+   * @param {!Object} options
+   * @param {{networkRecords: !Array<!NetworkRecord>}} tracingData
+   * @return {!Array<{tag: string, transferSize: number, startTime: number, endTime: number}>}
+   */
   afterPass(options, tracingData) {
     return TagsBlockingFirstPaint
-      .findBlockingTags(options.driver, tracingData.networkRecords)
-      .catch(err => {
-        return {
-          value: -1,
-          debugString: err.message
-        };
-      });
+      .findBlockingTags(options.driver, tracingData.networkRecords);
   }
 }
 

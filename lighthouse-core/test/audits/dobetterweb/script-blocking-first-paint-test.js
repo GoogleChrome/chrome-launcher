@@ -22,18 +22,6 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Script Block First Paint audit', () => {
-  it('fails when error input present', () => {
-    const debugString = 'first paint debug string';
-    const auditResult = ScriptBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        value: -1,
-        debugString
-      }
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.strictEqual(auditResult.debugString, debugString);
-  });
-
   it('fails when there are scripts found which block first paint', () => {
     const scriptDetails = {
       tagName: 'SCRIPT',

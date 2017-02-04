@@ -22,18 +22,6 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('Link Block First Paint audit', () => {
-  it('fails when error input present', () => {
-    const debugString = 'the uniquest debug string';
-    const auditResult = LinkBlockingFirstPaintAudit.audit({
-      TagsBlockingFirstPaint: {
-        value: -1,
-        debugString
-      }
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.strictEqual(auditResult.debugString, debugString);
-  });
-
   it('fails when there are links found which block first paint', () => {
     const linkDetails = {
       tagName: 'LINK',

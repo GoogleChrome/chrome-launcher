@@ -114,6 +114,11 @@ class OptimizedImages extends Gatherer {
     });
   }
 
+  /**
+   * @param {!Object} options
+   * @param {{networkRecords: !Array<!NetworRecord>}} traceData
+   * @return {!Promise<!Array<!Object>}
+   */
   afterPass(options, traceData) {
     const networkRecords = traceData.networkRecords;
     const imageRecords = OptimizedImages.filterImageRequests(options.url, networkRecords);
@@ -131,8 +136,6 @@ class OptimizedImages extends Gatherer {
       }
 
       return results;
-    }).catch(err => {
-      return {rawValue: -1, debugString: err};
     });
   }
 }

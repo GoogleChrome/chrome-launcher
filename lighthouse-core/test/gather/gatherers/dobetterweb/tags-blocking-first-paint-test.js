@@ -155,17 +155,4 @@ describe('First paint blocking tags', () => {
       assert.deepEqual(artifact, expected);
     });
   });
-
-  it('handles driver failure', () => {
-    return tagsBlockingFirstPaint.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.reject(new Error('such a fail'));
-        }
-      }
-    }, traceData).then(artifact => {
-      assert.equal(artifact.value, -1);
-      assert.ok(artifact.debugString);
-    });
-  });
 });

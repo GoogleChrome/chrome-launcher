@@ -126,12 +126,4 @@ describe('Optimized images', () => {
       assert.ok(/whoops/.test(failed.err.message), 'passed along error message');
     });
   });
-
-  it('handles total driver failure', () => {
-    options.driver.evaluateAsync = () => Promise.reject(new Error('fatal'));
-    return optimizedImages.afterPass(options, traceData).then(artifact => {
-      assert.equal(artifact.rawValue, -1);
-      assert.ok(artifact.debugString);
-    });
-  });
 });

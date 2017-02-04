@@ -81,10 +81,6 @@ class UsesOptimizedImages extends Audit {
   static audit_(artifacts, networkThroughput) {
     const images = artifacts.OptimizedImages;
 
-    if (images.rawValue === -1) {
-      return UsesOptimizedImages.generateAuditResult(images);
-    }
-
     const failedImages = [];
     let totalWastedBytes = 0;
     let hasAllEfficientImages = true;
