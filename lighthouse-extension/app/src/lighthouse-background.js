@@ -26,8 +26,10 @@ const log = require('../../../lighthouse-core/lib/log');
 const ReportGenerator = require('../../../lighthouse-core/report/report-generator');
 
 const STORAGE_KEY = 'lighthouse_audits';
+const SETTINGS_KEY = 'lighthouse_settings';
 
 let installedExtensions = [];
+let disableExtensionsDuringRun = false;
 let lighthouseIsRunning = false;
 let latestStatusLog = [];
 
@@ -41,6 +43,10 @@ const _flatten = arr => [].concat(...arr);
  * @param {!Promise}
  */
 function enableOtherChromeExtensions(enable) {
+  if (!disableExtensionsDuringRun) {
+    return Promise.resolve();
+  }
+
   const str = enable ? 'enabling' : 'disabling';
   log.log('Chrome', `${str} ${installedExtensions.length} extensions.`);
 
@@ -251,27 +257,34 @@ window.getDefaultAggregations = function() {
 
 /**
  * Save currently selected set of aggregation categories to local storage.
- * @param {!Array<{name: string, audits: !Array<string>}>} selectedAggregations
+ * @param {{selectedAggregations: !Array<string>, disableExtensions: boolean}} settings
  */
-window.saveSelectedAggregations = function(selectedAggregations) {
+window.saveSettings = function(settings) {
   const storage = {
-    [STORAGE_KEY]: {}
+    [STORAGE_KEY]: {},
+    [SETTINGS_KEY]: {}
   };
 
+  // Stash selected aggregations.
   window.getDefaultAggregations().forEach(audit => {
-    storage[STORAGE_KEY][audit.name] = selectedAggregations.includes(audit.name);
+    storage[STORAGE_KEY][audit.name] = settings.selectedAggregations.includes(audit.name);
   });
 
+  // Stash disable extensionS setting.
+  disableExtensionsDuringRun = settings.disableExtensions;
+  storage[SETTINGS_KEY].disableExtensions = disableExtensionsDuringRun;
+
+  // Save object to chrome local storage.
   chrome.storage.local.set(storage);
 };
 
 /**
  * Load selected aggregation categories from local storage.
- * @return {!Promise<!Object<boolean>>}
+ * @return {!Promise<{selectedAggregations: !Object<boolean>, disableExtensions: boolean}>}
  */
-window.loadSelectedAggregations = function() {
+window.loadSettings = function() {
   return new Promise(resolve => {
-    chrome.storage.local.get(STORAGE_KEY, result => {
+    chrome.storage.local.get([STORAGE_KEY, SETTINGS_KEY], result => {
       // Start with list of all default aggregations set to true so list is
       // always up to date.
       const defaultAggregations = {};
@@ -279,13 +292,19 @@ window.loadSelectedAggregations = function() {
         defaultAggregations[aggregation.name] = true;
       });
 
-      // Load saved aggregation selections.
-      const savedSelections = result[STORAGE_KEY];
+      // Load saved aggregations and settings, overwriting defaults with any
+      // saved selections.
+      const savedAggregations = Object.assign(defaultAggregations, result[STORAGE_KEY]);
 
-      // Overwrite defaults with any saved aggregation selections.
-      resolve(
-        Object.assign(defaultAggregations, savedSelections)
-      );
+      const defaultSettings = {
+        disableExtensions: disableExtensionsDuringRun
+      };
+      const savedSettings = Object.assign(defaultSettings, result[SETTINGS_KEY]);
+
+      resolve({
+        selectedAggregations: savedAggregations,
+        disableExtensions: savedSettings.disableExtensions
+      });
     });
   });
 };

@@ -189,12 +189,14 @@ function initPopup() {
 
     background.listenForStatus(logStatus);
 
-    background.loadSelectedAggregations().then(selectedAggregations => {
-      generateOptionsList(background, selectedAggregations);
+    background.loadSettings().then(settings => {
+      generateOptionsList(background, settings.selectedAggregations);
+
+      document.querySelector('.setting-disable-extensions').checked = settings.disableExtensions;
 
       const generateReportButton = document.getElementById('generate-report');
       generateReportButton.addEventListener('click', () => {
-        onGenerateReportButtonClick(background, selectedAggregations);
+        onGenerateReportButtonClick(background, settings.selectedAggregations);
       });
     });
 
@@ -206,10 +208,12 @@ function initPopup() {
 
     const okButton = document.getElementById('ok');
     okButton.addEventListener('click', () => {
-      // Save selected aggregation categories on options page close.
-      const checkedAggregations = Array.from(optionsEl.querySelectorAll(':checked'))
+      // Save settings when options page is closed.
+      const selectedAggregations = Array.from(optionsEl.querySelectorAll(':checked'))
           .map(input => input.value);
-      background.saveSelectedAggregations(checkedAggregations);
+      const disableExtensions = document.querySelector('.setting-disable-extensions').checked;
+
+      background.saveSettings({selectedAggregations, disableExtensions});
 
       optionsEl.classList.remove(subpageVisibleClass);
     });

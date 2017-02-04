@@ -216,15 +216,14 @@ html, body {
 .options {
   overflow: auto; /* [1] */
   display: block;
+  text-align: left;
 }
 
 .options__title {
-  margin: 0 auto;
   font-weight: 300;
 }
 
 .options__list {
   padding: 0;
   list-style: none;
-  text-align: left;
 }
