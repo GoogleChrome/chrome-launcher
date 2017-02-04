@@ -533,7 +533,7 @@ class Driver {
 
   /**
    * @param {string} selector Selector to find in the DOM
-   * @return {!Promise<Element[]>} The found elements, or [], resolved in a promise
+   * @return {!Promise<!Array<!Element>>} The found elements, or [], resolved in a promise
    */
   querySelectorAll(selector) {
     return this.sendCommand('DOM.getDocument')

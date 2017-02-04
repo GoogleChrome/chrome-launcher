@@ -24,22 +24,12 @@ const URL = 'https://google.com/test';
 /* eslint-env mocha */
 
 describe('External anchors use rel="noopener"', () => {
-  it('fails when gatherer failed', () => {
-    const auditResult = ExternalAnchorsAudit.audit({
-      AnchorsWithNoRelNoopener: -1
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.ok(auditResult.debugString);
-  });
-
   it('passes when links are from same hosts as the page host', () => {
     const auditResult = ExternalAnchorsAudit.audit({
-      AnchorsWithNoRelNoopener: {
-        usages: [
-          {href: 'https://google.com/test'},
-          {href: 'https://google.com/test1'}
-        ]
-      },
+      AnchorsWithNoRelNoopener: [
+        {href: 'https://google.com/test'},
+        {href: 'https://google.com/test1'}
+      ],
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, true);
@@ -48,12 +38,10 @@ describe('External anchors use rel="noopener"', () => {
 
   it('fails when links are from different hosts than the page host', () => {
     const auditResult = ExternalAnchorsAudit.audit({
-      AnchorsWithNoRelNoopener: {
-        usages: [
-          {href: 'https://example.com/test'},
-          {href: 'https://example.com/test1'}
-        ]
-      },
+      AnchorsWithNoRelNoopener: [
+        {href: 'https://example.com/test'},
+        {href: 'https://example.com/test1'}
+      ],
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);
@@ -62,13 +50,11 @@ describe('External anchors use rel="noopener"', () => {
 
   it('handles links with no href attribute', () => {
     const auditResult = ExternalAnchorsAudit.audit({
-      AnchorsWithNoRelNoopener: {
-        usages: [
-          {href: ''},
-          {href: 'http://'},
-          {href: 'http:'}
-        ]
-      },
+      AnchorsWithNoRelNoopener: [
+        {href: ''},
+        {href: 'http://'},
+        {href: 'http:'}
+      ],
       URL: {finalUrl: URL},
     });
     assert.equal(auditResult.rawValue, false);

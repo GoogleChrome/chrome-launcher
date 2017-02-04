@@ -42,20 +42,13 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.AnchorsWithNoRelNoopener === -1) {
-      return ExternalAnchorsUseRelNoopenerAudit.generateAuditResult({
-        rawValue: -1,
-        debugString: 'Unknown error with the AnchorsWithNoRelNoopener gatherer.'
-      });
-    }
-
     let debugString;
     const pageHost = new URL(artifacts.URL.finalUrl).host;
     // Filter usages to exclude anchors that are same origin
     // TODO: better extendedInfo for anchors with no href attribute:
     // https://github.com/GoogleChrome/lighthouse/issues/1233
     // https://github.com/GoogleChrome/lighthouse/issues/1345
-    const failingAnchors = artifacts.AnchorsWithNoRelNoopener.usages
+    const failingAnchors = artifacts.AnchorsWithNoRelNoopener
       .filter(anchor => {
         try {
           return anchor.href === '' || new URL(anchor.href).host !== pageHost;
