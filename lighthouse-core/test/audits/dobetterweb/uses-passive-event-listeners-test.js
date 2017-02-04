@@ -24,19 +24,6 @@ const URL = 'https://example.com';
 /* eslint-env mocha */
 
 describe('Page uses passive events listeners where applicable', () => {
-  it('fails when gatherer returns error', () => {
-    const debugString = 'Unable to gather passive event listeners usage.';
-    const auditResult = PassiveEventsAudit.audit({
-      EventListeners: {
-        rawValue: -1,
-        debugString: debugString
-      },
-      URL: {finalUrl: URL}
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.equal(auditResult.debugString, debugString);
-  });
-
   it('fails when scroll blocking listeners should be passive', () => {
     const auditResult = PassiveEventsAudit.audit({
       EventListeners: fixtureData,

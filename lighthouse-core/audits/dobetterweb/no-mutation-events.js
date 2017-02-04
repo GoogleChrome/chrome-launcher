@@ -62,10 +62,6 @@ class NoMutationEventsAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.EventListeners.rawValue === -1) {
-      return NoMutationEventsAudit.generateAuditResult(artifacts.EventListeners);
-    }
-
     let debugString;
     const listeners = artifacts.EventListeners;
 
