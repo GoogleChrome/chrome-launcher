@@ -21,23 +21,12 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('UX: geolocation audit', () => {
-  it('fails when gatherer returns error', () => {
-    const debugString = 'interesting debug string';
-    const auditResult = GeolocationOnStartAudit.audit({
-      GeolocationOnStart: {value: -1, debugString}
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.equal(auditResult.debugString, debugString);
-  });
-
   it('fails when geolocation has been automatically requested', () => {
     const auditResult = GeolocationOnStartAudit.audit({
-      GeolocationOnStart: {
-        usage: [
-          {url: 'http://different.com/two', line: 2, col: 2},
-          {url: 'http://example2.com/two', line: 2, col: 22}
-        ]
-      },
+      GeolocationOnStart: [
+        {url: 'http://different.com/two', line: 2, col: 2},
+        {url: 'http://example2.com/two', line: 2, col: 22}
+      ],
     });
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 2);
@@ -45,7 +34,7 @@ describe('UX: geolocation audit', () => {
 
   it('passes when geolocation has not been automatically requested', () => {
     const auditResult = GeolocationOnStartAudit.audit({
-      GeolocationOnStart: {usage: []}
+      GeolocationOnStart: []
     });
     assert.equal(auditResult.rawValue, true);
     assert.equal(auditResult.extendedInfo.value.length, 0);

@@ -46,19 +46,7 @@ class GeolocationOnStart extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.GeolocationOnStart.value === -1) {
-      let debugString = 'Unknown error with the GeolocationOnStart gatherer';
-      if (artifacts.GeolocationOnStart.debugString) {
-        debugString = artifacts.GeolocationOnStart.debugString;
-      }
-
-      return GeolocationOnStart.generateAuditResult({
-        rawValue: -1,
-        debugString
-      });
-    }
-
-    const results = artifacts.GeolocationOnStart.usage.map(err => {
+    const results = artifacts.GeolocationOnStart.map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`
       }, err);

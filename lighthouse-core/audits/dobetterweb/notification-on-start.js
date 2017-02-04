@@ -46,19 +46,7 @@ class NotificationOnStart extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.NotificationOnStart.value === -1) {
-      let debugString = 'Unknown error with the NotificationOnStart gatherer';
-      if (artifacts.NotificationOnStart.debugString) {
-        debugString = artifacts.NotificationOnStart.debugString;
-      }
-
-      return NotificationOnStart.generateAuditResult({
-        rawValue: -1,
-        debugString
-      });
-    }
-
-    const results = artifacts.NotificationOnStart.usage.map(err => {
+    const results = artifacts.NotificationOnStart.map(err => {
       return Object.assign({
         label: `line: ${err.line}, col: ${err.col}`
       }, err);
