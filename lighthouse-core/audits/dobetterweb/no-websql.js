@@ -45,16 +45,9 @@ class NoWebSQLAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (artifacts.WebSQL.database === -1) {
-      return NoWebSQLAudit.generateAuditResult({
-        rawValue: -1,
-        debugString: artifacts.WebSQL.debugString
-      });
-    }
-
-    const db = artifacts.WebSQL.database;
-    const debugString = (db && db.database ?
-        `Found database "${db.database.name}", version: ${db.database.version}.` : '');
+    const db = artifacts.WebSQL;
+    const debugString = (db ?
+        `Found database "${db.name}", version: ${db.version}.` : '');
 
     return NoWebSQLAudit.generateAuditResult({
       rawValue: !db,

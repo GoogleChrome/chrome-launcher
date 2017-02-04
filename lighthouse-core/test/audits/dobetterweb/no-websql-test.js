@@ -21,36 +21,23 @@ const assert = require('assert');
 /* eslint-env mocha */
 
 describe('No websql audit', () => {
-  it('fails when gatherer returns error', () => {
-    const debugString = 'websql is the best';
-    const auditResult = NoWebSQLAudit.audit({
-      WebSQL: {
-        database: -1,
-        debugString
-      }
-    });
-    assert.equal(auditResult.rawValue, -1);
-    assert.equal(auditResult.debugString, debugString);
-  });
-
   it('passes when no database is created', () => {
     assert.equal(NoWebSQLAudit.audit({
-      WebSQL: {
-        database: null
-      }
+      WebSQL: null
     }).rawValue, true);
   });
 
   it('fails when database is created', () => {
     const auditResult = NoWebSQLAudit.audit({
       WebSQL: {
-        database: {
-          database: 'db-name', version: 1.0
-        }
+        id: '1',
+        domain: 'example.com',
+        name: 'db-name',
+        version: '1.0'
       }
     });
 
     assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.debugString.match(/Found database (.*), version: (.*)/));
+    assert.ok(auditResult.debugString.match(/Found database "db-name", version: 1.0/));
   });
 });

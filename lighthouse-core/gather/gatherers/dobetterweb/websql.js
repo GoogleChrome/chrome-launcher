@@ -43,21 +43,15 @@ class WebSQL extends Gatherer {
     });
   }
 
+  /**
+   * Returns WebSQL database information or null if none was found.
+   * @param {!Object} options
+   * @return {?{id: string, domain: string, name: string, version: string}}
+   */
   afterPass(options) {
     return this.listenForDatabaseEvents(options.driver)
-      .then(database => {
-        const artifact = {
-          database
-        };
-        if (!database) {
-          artifact.debugString = 'No WebSQL databases were opened';
-        }
-        return artifact;
-      }).catch(_ => {
-        return {
-          database: -1,
-          debugString: 'Unable to gather WebSQL database state'
-        };
+      .then(result => {
+        return result && result.database;
       });
   }
 }
