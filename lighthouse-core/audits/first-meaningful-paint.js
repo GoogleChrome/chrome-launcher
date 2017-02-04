@@ -53,9 +53,8 @@ class FirstMeaningfulPaint extends Audit {
   static audit(artifacts) {
     const trace = artifacts.traces[this.DEFAULT_PASS];
     return artifacts.requestTraceOfTab(trace).then(tabTrace => {
-      // Sometimes fMP is triggered before fCP
       if (!tabTrace.firstMeaningfulPaintEvt) {
-        throw new Error('No usable `firstMeaningfulPaint` event found in trace');
+        throw new Error('No usable `firstMeaningfulPaint(Candidate)` events found in trace');
       }
 
       // navigationStart is currently essential to FMP calculation.

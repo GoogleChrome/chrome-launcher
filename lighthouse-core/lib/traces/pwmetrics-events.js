@@ -145,10 +145,10 @@ class Metrics {
    *     { "pid": 89922,"tid":1295,"ts":77176783452,"ph":"b","cat":"blink.user_timing","name":"innermeasure","args":{},"tts":1257886,"id":"0xe66c67"}
    *     { "pid": 89922,"tid":1295,"ts":77176882592,"ph":"e","cat":"blink.user_timing","name":"innermeasure","args":{},"tts":1257898,"id":"0xe66c67"}
    * @param {{ts: number, id: string, name: string}} metric
-   * @param {number} navStartTs
+   * @param {{ts: number, id: string, name: string}} navStart
    * @return {!Array} Pair of trace events (start/end)
    */
-  synthesizeEventPair(metric, navStartTs) {
+  synthesizeEventPair(metric, navStart) {
     // We'll masquerade our fake events to look mostly like navigationStart
     const eventBase = {
       pid: this.getNavigationStartEvt().pid,
@@ -160,7 +160,7 @@ class Metrics {
       id: `0x${((Math.random() * 1000000) | 0).toString(16)}`
     };
     const fakeMeasureStartEvent = Object.assign({}, eventBase, {
-      ts: navStartTs,
+      ts: navStart.ts,
       ph: 'b'
     });
     const fakeMeasureEndEvent = Object.assign({}, eventBase, {
@@ -182,8 +182,8 @@ class Metrics {
     }
 
     // confirm our navStart's correctly match
-    const navStartTs = metrics.find(e => e.id === 'navstart').ts;
-    if (this.getNavigationStartEvt().ts !== navStartTs) {
+    const navStartEvt = metrics.find(e => e.id === 'navstart');
+    if (!navStartEvt || this.getNavigationStartEvt().ts !== navStartEvt.ts) {
       log.error('pwmetrics-events', 'Reference navigationStart doesn\'t match fMP\'s navStart');
       return [];
     }
@@ -197,7 +197,7 @@ class Metrics {
         return;
       }
       log.verbose('pwmetrics-events', `Sythesizing trace events for ${metric.name}`);
-      fakeEvents.push(...this.synthesizeEventPair(metric, navStartTs));
+      fakeEvents.push(...this.synthesizeEventPair(metric, navStartEvt));
     });
     return fakeEvents;
   }

@@ -49,6 +49,7 @@ class Driver {
       'blink.console',
       'blink.user_timing',
       'benchmark',
+      'loading',
       'latencyInfo',
       'devtools.timeline',
       'disabled-by-default-devtools.timeline',

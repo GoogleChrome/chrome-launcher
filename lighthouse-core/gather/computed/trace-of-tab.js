@@ -29,6 +29,7 @@
  */
 
 const ComputedArtifact = require('./computed-artifact');
+const log = require('../../lib/log');
 
 class TraceOfTab extends ComputedArtifact {
 
@@ -51,7 +52,8 @@ class TraceOfTab extends ComputedArtifact {
   compute_(trace) {
     // Parse the trace for our key events and sort them by timestamp.
     const keyEvents = trace.traceEvents.filter(e => {
-      return e.cat.includes('blink.user_timing') || e.name === 'TracingStartedInPage';
+      return e.cat.includes('blink.user_timing') || e.cat.includes('loading') ||
+          e.name === 'TracingStartedInPage';
     }).sort((event0, event1) => event0.ts - event1.ts);
 
     // The first TracingStartedInPage in the trace is definitely our renderer thread of interest
@@ -67,8 +69,22 @@ class TraceOfTab extends ComputedArtifact {
         e.name === 'navigationStart' && e.ts < firstFCP.ts).pop();
 
     // fMP will follow at/after the FCP, though we allow some timestamp tolerance
-    const firstMeaningfulPaint = frameEvents.find(e =>
+    let firstMeaningfulPaint = frameEvents.find(e =>
         e.name === 'firstMeaningfulPaint' && e.ts >= (firstFCP.ts - TraceOfTab.fmpToleranceMs));
+
+    // If there was no firstMeaningfulPaint event found in the trace, the network idle detection
+    // may have not been triggered before Lighthouse finished tracing.
+    // In this case, we'll use the last firstMeaningfulPaintCandidate we can find.
+    // However, if no candidates were found (a bogus trace, likely), we fail.
+    if (!firstMeaningfulPaint) {
+      const fmpCand = 'firstMeaningfulPaintCandidate';
+      log.verbose('trace-of-tab', `No firstMeaningfulPaint found, falling back to last ${fmpCand}`);
+      const lastCandidate = frameEvents.filter(e => e.name === fmpCand).pop();
+      if (!lastCandidate) {
+        log.verbose('trace-of-tab', 'No `firstMeaningfulPaintCandidate` events found in trace');
+      }
+      firstMeaningfulPaint = lastCandidate;
+    }
 
     // subset all trace events to just our tab's process (incl threads other than main)
     const processEvents = trace.traceEvents.filter(e => {
