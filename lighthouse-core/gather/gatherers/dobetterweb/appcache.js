@@ -20,15 +20,17 @@
 const Gatherer = require('../gatherer');
 
 class AppCacheManifest extends Gatherer {
-
+  /**
+   * Retrurns the value of the html element's manifest attribute or null if it
+   * is not defined.
+   * @param {!Object} options
+   * @return {!Promise<?string>}
+   */
   afterPass(options) {
     const driver = options.driver;
 
     return driver.querySelector('html')
-      .then(node => node && node.getAttribute('manifest'))
-      .catch(_ => {
-        return -1;
-      });
+      .then(node => node && node.getAttribute('manifest'));
   }
 }
 
