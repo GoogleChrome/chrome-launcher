@@ -187,7 +187,7 @@ class Runner {
               `Required ${artifactName} gatherer encountered an error: ${artifactError.message}`);
         }
       }
-
+      // all required artifacts are in good shape, so we proceed
       return audit.audit(artifacts);
     }).catch(err => {
       if (err.fatal) {
