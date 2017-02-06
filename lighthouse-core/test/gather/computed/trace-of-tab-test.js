@@ -23,6 +23,7 @@ const badNavStartTrace = require('../../fixtures/traces/bad-nav-start-ts.json');
 const lateTracingStartedTrace = require('../../fixtures/traces/tracingstarted-after-navstart.json');
 const preactTrace = require('../../fixtures/traces/preactjs.com_ts_of_undefined.json');
 const noFMPtrace = require('../../fixtures/traces/no_fmp_event.json');
+const noFCPtrace = require('../../fixtures/traces/airhorner_no_fcp');
 
 /* eslint-env mocha */
 describe('Trace of Tab computed artifact:', () => {
@@ -72,5 +73,13 @@ describe('Trace of Tab computed artifact:', () => {
       assert.equal(trace.firstContentfulPaintEvt.ts, 2146737302468);
       assert.equal(trace.firstMeaningfulPaintEvt.ts, 2146740268666);
     });
+  });
+
+  it('handles traces missing an FCP', () => {
+    const trace = traceOfTab.compute_(noFCPtrace);
+    assert.equal(trace.startedInPageEvt.ts, 2149509117532);
+    assert.equal(trace.navigationStartEvt.ts, 2149509122585);
+    assert.equal(trace.firstContentfulPaintEvt, undefined);
+    assert.equal(trace.firstMeaningfulPaintEvt.ts, 2149509604903);
   });
 });

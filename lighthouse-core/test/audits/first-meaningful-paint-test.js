@@ -23,6 +23,7 @@ const badNavStartTrace = require('../fixtures/traces/bad-nav-start-ts.json');
 const lateTracingStartedTrace = require('../fixtures/traces/tracingstarted-after-navstart.json');
 const preactTrace = require('../fixtures/traces/preactjs.com_ts_of_undefined.json');
 const noFMPtrace = require('../fixtures/traces/no_fmp_event.json');
+const noFCPtrace = require('../fixtures/traces/airhorner_no_fcp');
 
 const GatherRunner = require('../../gather/gather-runner.js');
 const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
@@ -108,6 +109,18 @@ describe('Performance: first-meaningful-paint audit', () => {
         assert.equal(result.extendedInfo.value.timings.fCP, 1494.73);
         assert.ok(!result.debugString);
       });
+    });
+  });
+
+  it('handles traces missing an FCP', () => {
+    return FMPAudit.audit(generateArtifactsWithTrace(noFCPtrace)).then(result => {
+      assert.strictEqual(result.debugString, undefined);
+      assert.strictEqual(result.displayValue, '482.3ms');
+      assert.strictEqual(result.rawValue, 482.3);
+      assert.strictEqual(result.extendedInfo.value.timings.fCP, undefined);
+      assert.strictEqual(result.extendedInfo.value.timings.fMP, 482.318);
+      assert.strictEqual(result.extendedInfo.value.timestamps.fCP, undefined);
+      assert.strictEqual(result.extendedInfo.value.timestamps.fMP, 2149509604903);
     });
   });
 });

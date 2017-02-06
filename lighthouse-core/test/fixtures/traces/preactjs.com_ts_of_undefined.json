@@ -26,18 +26,6 @@
         {
       "pid": 6117,
       "tid": 775,
-      "ts": 1805797082647,
-      "ph": "R",
-      "cat": "blink.user_timing",
-      "name": "navigationStart",
-      "args": {
-        "frame": "0x25edaa655a98"
-      },
-      "tts": 330709
-    },
-        {
-      "pid": 6117,
-      "tid": 775,
       "ts": 1805796384607,
       "ph": "R",
       "cat": "blink.user_timing",
@@ -47,7 +35,31 @@
       },
       "tts": 209369
     },
-
+        {
+      "pid": 6117,
+      "tid": 775,
+      "ts": 1805796843283,
+      "ph": "I",
+      "cat": "blink.user_timing,rail",
+      "name": "firstPaint",
+      "args": {
+        "frame": "0x25edaa521e58"
+      },
+      "tts": 230934,
+      "s": "p"
+    },
+        {
+      "pid": 6117,
+      "tid": 775,
+      "ts": 1805797082647,
+      "ph": "R",
+      "cat": "blink.user_timing",
+      "name": "navigationStart",
+      "args": {
+        "frame": "0x25edaa655a98"
+      },
+      "tts": 330709
+    },
         {
       "pid": 6117,
       "tid": 775,

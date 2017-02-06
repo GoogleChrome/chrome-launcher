@@ -37,14 +37,6 @@ class TraceOfTab extends ComputedArtifact {
     return 'TraceOfTab';
   }
 
-  // We want an fMP at or after our fCP, however we see traces with the sole fMP
-  // being up to 1ms BEFORE the fCP. We're okay if this happens, however if we see
-  // a gap of more than 2 frames (32,000 microseconds), then it's a bug that should
-  // be addressed in FirstMeaningfulPaintDetector.cpp
-  static get fmpToleranceMs() {
-    return 32 * 1000;
-  }
-
   /**
    * @param {{traceEvents: !Array}} trace
    * @return {!{processEvents: !Array<TraceEvent>, startedInPageEvt: TraceEvent, navigationStartEvt: TraceEvent, firstContentfulPaintEvt: TraceEvent, firstMeaningfulPaintEvt: TraceEvent}}
@@ -62,15 +54,19 @@ class TraceOfTab extends ComputedArtifact {
     // Filter to just events matching the frame ID for sanity
     const frameEvents = keyEvents.filter(e => e.args.frame === startedInPageEvt.args.data.page);
 
-    // Find our first FCP
-    const firstFCP = frameEvents.find(e => e.name === 'firstContentfulPaint');
-    // Our navStart will be the latest one before fCP.
+    // Find our first paint of this frame
+    const firstPaint = frameEvents.find(e => e.name === 'firstPaint');
+    // Our navStart will be the latest one before fP.
     const navigationStart = frameEvents.filter(e =>
-        e.name === 'navigationStart' && e.ts < firstFCP.ts).pop();
+        e.name === 'navigationStart' && e.ts < firstPaint.ts).pop();
 
-    // fMP will follow at/after the FCP, though we allow some timestamp tolerance
+    // FCP will follow at/after the FP
+    const firstContentfulPaint = frameEvents.find(e =>
+      e.name === 'firstContentfulPaint' && e.ts >= firstPaint.ts);
+
+    // fMP will follow at/after the FP
     let firstMeaningfulPaint = frameEvents.find(e =>
-        e.name === 'firstMeaningfulPaint' && e.ts >= (firstFCP.ts - TraceOfTab.fmpToleranceMs));
+        e.name === 'firstMeaningfulPaint' && e.ts >= firstPaint.ts);
 
     // If there was no firstMeaningfulPaint event found in the trace, the network idle detection
     // may have not been triggered before Lighthouse finished tracing.
@@ -95,7 +91,8 @@ class TraceOfTab extends ComputedArtifact {
       processEvents,
       startedInPageEvt: startedInPageEvt,
       navigationStartEvt: navigationStart,
-      firstContentfulPaintEvt: firstFCP,
+      firstPaintEvt: firstPaint,
+      firstContentfulPaintEvt: firstContentfulPaint,
       firstMeaningfulPaintEvt: firstMeaningfulPaint
     };
   }
