@@ -87,13 +87,7 @@ class EstimatedInputLatency extends Audit {
     const trace = artifacts.traces[this.DEFAULT_PASS];
 
     return artifacts.requestSpeedline(trace)
-      .then(speedline => EstimatedInputLatency.calculate(speedline, trace))
-      .catch(err => {
-        return EstimatedInputLatency.generateAuditResult({
-          rawValue: -1,
-          debugString: 'Speedline unable to parse trace contents: ' + err.message
-        });
-      });
+      .then(speedline => EstimatedInputLatency.calculate(speedline, trace));
   }
 }
 

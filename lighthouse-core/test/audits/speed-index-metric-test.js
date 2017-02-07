@@ -47,34 +47,23 @@ describe('Performance: speed-index-metric audit', () => {
     };
   }
 
-  it.skip('passes on errors from gatherer', () => {
-    const debugString = 'Real emergency here.';
-    const mockArtifacts = mockArtifactsWithSpeedlineResult();
-    return Audit.audit(mockArtifacts).then(response => {
-      assert.equal(response.rawValue, -1);
-      assert.equal(response.debugString, debugString);
-    });
-  });
-
-  it('gives error string if no frames', () => {
+  it('throws an error if no frames', () => {
     const artifacts = mockArtifactsWithSpeedlineResult({frames: []});
-    return Audit.audit(artifacts).then(response => {
-      assert.equal(response.rawValue, -1);
-      assert(response.debugString);
-    });
+    return Audit.audit(artifacts).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 
-  it('gives error string if speed index of 0', () => {
+  it('throws an error if speed index of 0', () => {
     const SpeedlineResult = {
       frames: [frame(), frame(), frame()],
       speedIndex: 0
     };
     const artifacts = mockArtifactsWithSpeedlineResult(SpeedlineResult);
 
-    return Audit.audit(artifacts).then(response => {
-      assert.equal(response.rawValue, -1);
-      assert(response.debugString);
-    });
+    return Audit.audit(artifacts).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 
   it('scores speed index of 831 as 100', () => {

@@ -80,12 +80,6 @@ class FirstMeaningfulPaint extends Audit {
           formatter: Formatter.SUPPORTED_FORMATS.NULL
         }
       });
-    }).catch(err => {
-      // Recover from trace parsing failures.
-      return FirstMeaningfulPaint.generateAuditResult({
-        rawValue: -1,
-        debugString: err.message
-      });
     });
   }
 

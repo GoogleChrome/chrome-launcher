@@ -33,14 +33,6 @@ function generateArtifactsWithTrace(trace) {
 /* eslint-env mocha */
 
 describe('Performance: estimated-input-latency audit', () => {
-  it('scores a -1 with invalid trace data', () => {
-    const artifacts = generateArtifactsWithTrace({traceEvents: [{pid: 15256, tid: 1295, t: 5}]});
-    return Audit.audit(artifacts).then(output => {
-      assert.equal(output.score, -1);
-      assert.ok(output.debugString);
-    });
-  });
-
   it('evaluates valid input correctly', () => {
     const artifacts = generateArtifactsWithTrace({traceEvents: pwaTrace});
     return Audit.audit(artifacts).then(output => {

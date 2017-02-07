@@ -15,41 +15,23 @@
  */
 'use strict';
 
-const Audit = require('../../audits/time-to-interactive.js');
+const TimeToInteractive = require('../../audits/time-to-interactive.js');
 const GatherRunner = require('../../gather/gather-runner.js');
 const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
 
-
 /* eslint-env mocha */
 describe('Performance: time-to-interactive audit', () => {
-  it('scores a -1 with invalid trace data', () => {
-    const artifacts = GatherRunner.instantiateComputedArtifacts();
-    artifacts.traces = {
-      [Audit.DEFAULT_PASS]: {
-        traceEvents: [{pid: 15256, tid: 1295, t: 5}]
-      }
-    };
-    artifacts.requestSpeedline = _ => {
-      return Promise.resolve({first: 500});
-    };
-
-    return Audit.audit(artifacts).then(output => {
-      assert.equal(output.rawValue, -1);
-      assert(output.debugString);
-    });
-  });
-
   it('evaluates valid input correctly', () => {
     const artifacts = GatherRunner.instantiateComputedArtifacts();
     artifacts.traces = {
-      [Audit.DEFAULT_PASS]: {
+      [TimeToInteractive.DEFAULT_PASS]: {
         traceEvents: pwaTrace
       }
     };
 
-    return Audit.audit(artifacts).then(output => {
+    return TimeToInteractive.audit(artifacts).then(output => {
       assert.equal(output.rawValue, 1105.8, output.debugString);
       assert.equal(output.displayValue, '1105.8ms');
       assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, 20.724);

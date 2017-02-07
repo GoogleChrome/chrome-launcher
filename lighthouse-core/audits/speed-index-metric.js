@@ -54,17 +54,11 @@ class SpeedIndexMetric extends Audit {
     // run speedline
     return artifacts.requestSpeedline(trace).then(speedline => {
       if (speedline.frames.length === 0) {
-        return SpeedIndexMetric.generateAuditResult({
-          rawValue: -1,
-          debugString: 'Trace unable to find visual progress frames.'
-        });
+        throw new Error('Trace unable to find visual progress frames.');
       }
 
       if (speedline.speedIndex === 0) {
-        return SpeedIndexMetric.generateAuditResult({
-          rawValue: -1,
-          debugString: 'Error in Speedline calculating Speed Index (speedIndex of 0).'
-        });
+        throw new Error('Error in Speedline calculating Speed Index (speedIndex of 0).');
       }
 
       // Use the CDF of a log-normal distribution for scoring.
@@ -110,11 +104,6 @@ class SpeedIndexMetric extends Audit {
           formatter: Formatter.SUPPORTED_FORMATS.SPEEDLINE,
           value: extendedInfo
         }
-      });
-    }).catch(err => {
-      return SpeedIndexMetric.generateAuditResult({
-        rawValue: -1,
-        debugString: err.message
       });
     });
   }

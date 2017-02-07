@@ -41,13 +41,6 @@ class Screenshots extends Audit {
     const trace = artifacts.traces[this.DEFAULT_PASS];
 
     return artifacts.requestScreenshots(trace).then(screenshots => {
-      if (typeof screenshots === 'undefined') {
-        return Screenshots.generateAuditResult({
-          rawValue: -1,
-          debugString: 'No screenshot artifact'
-        });
-      }
-
       return Screenshots.generateAuditResult({
         rawValue: screenshots.length || 0,
         extendedInfo: {

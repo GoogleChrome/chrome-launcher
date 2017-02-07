@@ -70,9 +70,6 @@ class TTIMetric extends Audit {
     return Promise.all([pendingSpeedline, pendingFMP]).then(results => {
       const speedline = results[0];
       const fmpResult = results[1];
-      if (fmpResult.rawValue === -1) {
-        return generateError(fmpResult.debugString);
-      }
 
       // Process the trace
       const tracingProcessor = new TracingProcessor();
@@ -114,7 +111,7 @@ class TTIMetric extends Audit {
         endTime = startTime + 500;
         // If there's no more room in the trace to look, we're done.
         if (endTime > endOfTraceTime) {
-          return generateError('Entire trace was found to be busy.');
+          throw new Error('Entire trace was found to be busy.');
         }
         // Get our expected latency for the time window
         const latencies = TracingProcessor.getRiskToResponsiveness(
@@ -164,25 +161,13 @@ class TTIMetric extends Audit {
         rawValue: parseFloat(timeToInteractive.toFixed(1)),
         displayValue: `${parseFloat(timeToInteractive.toFixed(1))}ms`,
         optimalValue: this.meta.optimalValue,
-        debugString: speedline.debugString,
         extendedInfo: {
           value: extendedInfo,
           formatter: Formatter.SUPPORTED_FORMATS.NULL
         }
       });
-    }).catch(err => {
-      return generateError(err);
     });
   }
 }
 
 module.exports = TTIMetric;
-
-function generateError(err) {
-  return TTIMetric.generateAuditResult({
-    value: -1,
-    rawValue: -1,
-    optimalValue: TTIMetric.meta.optimalValue,
-    debugString: err.message || err
-  });
-}
