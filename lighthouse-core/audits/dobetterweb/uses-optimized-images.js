@@ -94,7 +94,6 @@ class UsesOptimizedImages extends Audit {
       }
 
       const originalKb = Math.round(image.originalSize / KB_IN_BYTES);
-      const url = URL.getDisplayName(image.url);
       const webpSavings = UsesOptimizedImages.computeSavings(image, 'webp');
 
       if (webpSavings.bytes > WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES) {
@@ -112,7 +111,8 @@ class UsesOptimizedImages extends Audit {
 
       totalWastedBytes += webpSavings.bytes;
       results.push({
-        url,
+        url: URL.getDisplayName(image.url),
+        preview: {url: image.url, mimeType: image.mimeType},
         total: `${originalKb} KB`,
         webpSavings: `${webpSavings.percent}%`,
         jpegSavings: jpegSavingsLabel
@@ -143,6 +143,7 @@ class UsesOptimizedImages extends Audit {
         value: {
           results,
           tableHeadings: {
+            preview: '',
             url: 'URL',
             total: 'Original (KB)',
             webpSavings: 'WebP Savings (%)',

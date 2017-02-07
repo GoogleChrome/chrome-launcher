@@ -80,7 +80,8 @@ class ImageUsage extends Gatherer {
           resourceSize: record.resourceSize,
           startTime: record.startTime,
           endTime: record.endTime,
-          responseReceivedTime: record.responseReceivedTime
+          responseReceivedTime: record.responseReceivedTime,
+          mimeType: record._mimeType
         };
       }
 

@@ -134,8 +134,8 @@ class ReportGenerator {
       const renderer = new marked.Renderer();
       renderer.em = str => `<em>${str}</em>`;
       renderer.link = (href, title, text) => {
-        title = title || text;
-        return `<a href="${href}" target="_blank" rel="noopener" title="${title}">${text}</a>`;
+        const titleAttr = title ? `title="${title}"` : '';
+        return `<a href="${href}" target="_blank" rel="noopener" ${titleAttr}>${text}</a>`;
       };
       renderer.codespan = function(str) {
         return `<code>${str}</code>`;
@@ -144,6 +144,10 @@ class ReportGenerator {
       renderer.code = function(code, language) {
         return `<pre>${code}</pre>`;
       };
+      renderer.image = function(src, title, text) {
+        return `<img src="${src}" alt="${text}" title="${title}">`;
+      };
+
       // Nuke wrapper <p> tag that gets generated.
       renderer.paragraph = function(str) {
         return str;

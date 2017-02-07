@@ -43,11 +43,13 @@ class Table extends Formatter {
           table.rows.forEach(row => {
             output += '      ';
             row.cols.forEach(col => {
-              // Omit code snippet cols.
-              if (!col || col.startsWith('`') && col.endsWith('`')) {
-                return;
+              // Omit code snippet cols and image previews.
+              if (!col || col.startsWith('`') && col.endsWith('`') ||
+                  col.startsWith('[![Image preview]')) {
+                output += '- ';
+              } else {
+                output += `${col} `;
               }
-              output += `${col} `;
             });
             output += '\n';
           });
@@ -68,6 +70,8 @@ class Table extends Formatter {
    * @param {!Object<string>} headings for the table. The order of this
    *     object's key/value pairs determines the order of the HTML table headings.
    *     There is special handling for certain keys:
+   *       preview {url: string, mimeType: string}: For image mimetypes, wraps
+   *           the value in a markdown image.
    *       code: wraps the value in single ` for a markdown code snippet.
    *       pre: wraps the value in triple ``` for a markdown code block.
    *       lineCol: combines the values for the line and col keys into a single
@@ -88,6 +92,11 @@ class Table extends Formatter {
         }
 
         switch (key) {
+          case 'preview':
+            if (/^image/.test(value.mimeType)) {
+              return `[![Image preview](${value.url} "Image preview")](${value.url})`;
+            }
+            return '';
           case 'code':
             return '`' + value.trim() + '`';
           case 'pre':

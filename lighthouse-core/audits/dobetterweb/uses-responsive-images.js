@@ -121,7 +121,14 @@ class UsesResponsiveImages extends Audit {
 
       hasWastefulImage = hasWastefulImage || processed.isWasteful;
       totalWastedBytes += processed.wastedBytes;
-      results.push(processed.result);
+
+      results.push(Object.assign({
+        preview: {
+          url: image.networkRecord.url,
+          mimeType: image.networkRecord.mimeType
+        }
+      }, processed.result));
+
       return results;
     }, []);
 
@@ -142,6 +149,7 @@ class UsesResponsiveImages extends Audit {
         value: {
           results,
           tableHeadings: {
+            preview: '',
             url: 'URL',
             totalKb: 'Original (KB)',
             potentialSavings: 'Potential Savings (%)'

@@ -26,7 +26,7 @@ describe('TableFormatter', () => {
   const extendedInfo = {
     tableHeadings: {
       url: 'URL', lineCol: 'Line/col', code: 'Snippet', isEval: 'Eval\'d?',
-      pre: 'Code'},
+      pre: 'Code', preview: 'Preview'},
     results: [{
       url: 'http://example.com',
       line: 123,
@@ -34,6 +34,7 @@ describe('TableFormatter', () => {
       code: 'code snippet',
       isEval: true,
       pre: 'pre snippet',
+      preview: {url: 'http://example.com/i.jpg', mimeType: 'image/jpeg'}
     }]
   };
 
@@ -56,15 +57,17 @@ describe('TableFormatter', () => {
     assert.equal(table.rows[0].cols[2], '\`code snippet\`');
     assert.equal(table.rows[0].cols[3], 'yes');
     assert.equal(table.rows[0].cols[4], '\`\`\`\npre snippet\`\`\`');
+    assert.equal(table.rows[0].cols[5],
+        '[![Image preview](http://example.com/i.jpg "Image preview")](http://example.com/i.jpg)');
   });
 
   it('generates valid pretty output', () => {
     const pretty = TableFormatter.getFormatter('pretty');
     const output = pretty(extendedInfo);
     assert.ok(output.includes(
-        '      URL LINE/COL SNIPPET EVAL\'D? CODE\n'), 'prints table headings');
+        '      URL LINE/COL SNIPPET EVAL\'D? CODE PREVIEW\n'), 'prints table headings');
     assert.ok(output.includes(
-        '      http://example.com 123:456 yes \n'), 'prints cells');
+        '      http://example.com 123:456 - yes - - \n'), 'prints cells');
   });
 
   it('generates valid html output', () => {
@@ -77,6 +80,7 @@ describe('TableFormatter', () => {
     const output = template(extendedInfo).split('\n').join('');
     assert.ok(output.match('<table class="table_list'), 'creates a table');
     assert.ok(output.match('multicolumn'), 'adds multicolumn class for large tables');
+    assert.ok(output.match('class="preview-image"'), 'renders image preview');
 
     const extendedInfoShort = {
       tableHeadings: {url: 'URL', lineCol: 'Line/col'},
@@ -84,6 +88,8 @@ describe('TableFormatter', () => {
     };
     const output2 = template(extendedInfoShort).split('\n').join('');
     assert.ok(!output2.match('multicolumn"'), 'does not add multicolumn class for small tables');
+    assert.ok(!output2.match('class="preview-image'),
+                             'does not add preview-image class if table does not have images');
   });
 
   it('handles missing values', () => {
