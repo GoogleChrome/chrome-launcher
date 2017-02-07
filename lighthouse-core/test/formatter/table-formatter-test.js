@@ -72,7 +72,7 @@ describe('TableFormatter', () => {
   });
 
   it('generates valid html output', () => {
-    new ReportGenerator(); // Registers the if_not_eq helper used by the html formatter.
+    new ReportGenerator(); // Registers the ifNotEq helper used by the html formatter.
 
     Handlebars.registerHelper(TableFormatter.getHelpers());
 
