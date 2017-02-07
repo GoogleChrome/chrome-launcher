@@ -1,7 +1,6 @@
 interface AuditResult {
   displayValue: string;
   debugString: string;
-  comingSoon?: boolean;
   score: number;
   error?: boolean;
   description: string;

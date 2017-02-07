@@ -168,20 +168,6 @@ class Aggregate {
       // Step through each item in the expected results, and add them
       // to the overall score and add each to the subItems list.
       expectedNames.forEach(e => {
-        /* istanbul ignore if */
-        // TODO(paullewis): Remove once coming soon audits have landed
-        if (item.audits[e].comingSoon) {
-          subItems.push({
-            score: '¯\\_(ツ)_/¯',
-            name: 'coming-soon',
-            category: item.audits[e].category,
-            description: item.audits[e].description,
-            comingSoon: true
-          });
-
-          return;
-        }
-
         if (!filteredAndRemappedResults[e]) {
           throw new Error(`aggregations: expected audit results not found under audit name ${e}`);
         }

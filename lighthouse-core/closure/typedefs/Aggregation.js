@@ -32,9 +32,6 @@ AggregationCriterion.prototype.rawValue;
 /** @type {number} */
 AggregationCriterion.prototype.weight;
 
-/** @type {boolean|undefined} */
-AggregationCriterion.prototype.comingSoon;
-
 /** @type {string|undefined} */
 AggregationCriterion.prototype.category;
 

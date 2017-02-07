@@ -138,27 +138,6 @@
         "time-to-interactive": {
           "expectedValue": 100,
           "weight": 1
-        },
-        "scrolling-60fps": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Content scrolls at 60fps",
-          "category": "UX"
-        },
-        "touch-150ms": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Touch input gets a response in < 150ms",
-          "category": "UX"
-        },
-        "fmp-no-jank": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "App is interactive without jank after the first meaningful paint",
-          "category": "UX"
         }
       }
     }, {
@@ -389,41 +368,6 @@
         "manifest-display": {
           "expectedValue": true,
           "weight": 1
-        },
-        "serviceworker-push": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Service worker makes use of push notifications, if appropriate",
-          "category": "UX"
-        },
-        "tap-targets": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Tap targets are appropriately sized for touch",
-          "category": "UX"
-        },
-        "payments-autocomplete": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Payment forms marked up with `autocomplete` attributes",
-          "category": "UX"
-        },
-        "login-autocomplete": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Login forms marked up with `autocomplete` attributes",
-          "category": "UX"
-        },
-        "input-type": {
-          "expectedValue": true,
-          "weight": 0,
-          "comingSoon": true,
-          "description": "Input fields use appropriate `type` attributes for custom keyboards",
-          "category": "UX"
         }
       }
     }]

@@ -150,7 +150,7 @@ limitations under the License.
 
             <ul class="subitems">
               {{#each aggregation.subItems as |subItem| }}
-                <li class="subitem {{#if subItem.comingSoon}}--coming-soon{{/if}} {{#if (shouldShowHelpText subItem.score)}}--show-help{{/if}}">
+                <li class="subitem {{#if (shouldShowHelpText subItem.score)}}--show-help{{/if}}">
 
                   <p class="subitem__desc">
                     <!--{{#unless ../../scored }}
@@ -165,10 +165,6 @@ limitations under the License.
 
                     {{#if subItem.optimalValue }}
                       <small>(target: {{ subItem.optimalValue }})</small>
-                    {{/if}}
-
-                    {{#if subItem.comingSoon}}
-                      <small class="subitem__tease">(Coming soon)</small>
                     {{/if}}
 
                     {{#if subItem.helpText }}
@@ -187,9 +183,7 @@ limitations under the License.
                   {{/if}}
 
                   <div class="subitem-result">
-                    {{#if subItem.comingSoon}}
-                          <span class="subitem-result__unknown score-unknown-bg">N/A</span>
-                    {{else if subItem.error}}
+                    {{#if subItem.error}}
                       <span class="subitem-result__unknown score-warning-bg">N/A</span>
                     {{else}}
                       {{#if (is-bool subItem.score)}}

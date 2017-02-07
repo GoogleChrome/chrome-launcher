@@ -858,28 +858,7 @@
             "first-meaningful-paint",
             "speed-index-metric",
             "estimated-input-latency",
-            "time-to-interactive",
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Content scrolls at 60fps",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Touch input gets a response in < 150ms",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "App is interactive without jank after the first meaningful paint",
-              "comingSoon": true
-            }
+            "time-to-interactive"
           ]
         },
         {
@@ -1011,42 +990,7 @@
           "name": "Other",
           "subItems": [
             "manifest-short-name-length",
-            "manifest-display",
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Service worker makes use of push notifications, if appropriate",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Tap targets are appropriately sized for touch",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Payment forms marked up with [autocomplete] attributes",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Login forms marked up with [autocomplete] attributes",
-              "comingSoon": true
-            },
-            {
-              "score": "¯\\_(ツ)_/¯",
-              "name": "coming-soon",
-              "category": "UX",
-              "description": "Input fields use appropriate [type] attributes for custom keyboards",
-              "comingSoon": true
-            }
+            "manifest-display"
           ]
         }
       ]

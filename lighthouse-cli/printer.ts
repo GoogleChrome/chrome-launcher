@@ -107,9 +107,6 @@ function createOutput(results: Results, outputMode: OutputMode): string {
           auditResult = subitem as AuditResult;
         }
 
-        if (auditResult.comingSoon === true)
-          return;
-
         const formattedScore = auditResult.error ? `${log.redify('‽')}` :
             `${formatAggregationResultItem(auditResult.score)}`;
         let lineItem = ` ${log.doubleLightHorizontal} ${formattedScore} ${auditResult.description}`;

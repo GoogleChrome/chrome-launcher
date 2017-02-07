@@ -32,7 +32,6 @@ span, div, p, section, header, h1, h2, li, ul {
   --poor-color: #eb211e;
   --good-color: #1ac123;
   --average-color: #ffae00;
-  --unknown-color: #b3b3b3;
   --warning-color: #f6be00;
   --gutter-gap: 12px;
   --gutter-width: 40px;
@@ -620,14 +619,6 @@ body {
   color: #999;
 }
 
-.coming-soon, .coming-soon * {
-  color: #aaa;
-}
-
-.coming-soon .report-section__item-value {
-  font-size: 70%;
-}
-
 .devtabs {
   flex: 0 1 auto;
   background: right 0 / auto 27px no-repeat url(tabs_right.png),
@@ -730,10 +721,6 @@ body {
   font-size: var(--subitem-font-size);
   padding-left: calc(var(--subitem-indent) + var(--gutter-width) + var(--gutter-gap));
   margin-top: calc(var(--subitem-line-height) / 2);
-}
-
-.subitem.--coming-soon {
-  color: var(--secondary-text-color);
 }
 
 .subitem strong {
@@ -899,9 +886,6 @@ body {
 }
 .score-warning-bg {
   background-color: var(--warning-color);
-}
-.score-unknown-bg {
-  background-color: var(--unknown-color);
 }
 
 .export-section {
