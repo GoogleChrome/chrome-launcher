@@ -2,8 +2,23 @@
   "passes": [{
     "recordNetwork": true,
     "recordTrace": true,
-    "gatherers": []
-  }],
+    "gatherers": [
+      "url",
+      "image-usage",
+      "content-width"
+    ]
+  },
+  {
+    "passName": "css-image-usage",
+    "recordNetwork": true,
+    "gatherers": [
+      "styles",
+      "css-usage",
+      "dobetterweb/tags-blocking-first-paint",
+      "dobetterweb/optimized-images"
+    ]
+  }
+  ],
 
   "audits": [
     "first-meaningful-paint",
@@ -12,7 +27,12 @@
     "time-to-interactive",
     "user-timings",
     "screenshots",
-    "critical-request-chains"
+    "critical-request-chains",
+    "unused-css-rules",
+    "dobetterweb/link-blocking-first-paint",
+    "dobetterweb/script-blocking-first-paint",
+    "dobetterweb/uses-optimized-images",
+    "dobetterweb/uses-responsive-images"
   ],
 
   "aggregations": [{
@@ -49,14 +69,13 @@
     "categorizable": false,
     "items": [{
       "audits": {
-        "critical-request-chains": {
-          "expectedValue": 0,
-          "weight": 1
-        },
-        "user-timings": {
-          "expectedValue": 0,
-          "weight": 1
-        }
+        "unused-css-rules": {},
+        "uses-optimized-images": {},
+        "uses-responsive-images": {},
+        "critical-request-chains": {},
+        "link-blocking-first-paint": {},
+        "script-blocking-first-paint": {},
+        "user-timings": {}
       }
     }]
   }]
