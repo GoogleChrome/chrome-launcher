@@ -182,58 +182,58 @@ module.exports = [
     }
   },
 
-  {
-    initialUrl: 'https://shop.polymer-project.org/',
-    url: 'https://shop.polymer-project.org/',
-    audits: {
-      'is-on-https': {
-        score: true
-      },
-      'redirects-http': {
-        score: true
-      },
-      'service-worker': {
-        score: true
-      },
-      'works-offline': {
-        score: true
-      },
-      'manifest-display': {
-        score: true,
-        displayValue: 'standalone'
-      },
-      'manifest-exists': {
-        score: true
-      },
-      'manifest-background-color': {
-        score: true,
-        extendedInfo: {
-          value: '#fff'
-        }
-      },
-      'manifest-theme-color': {
-        score: true
-      },
-      'manifest-icons-min-192': {
-        score: true
-      },
-      'manifest-icons-min-144': {
-        score: true
-      },
-      'manifest-name': {
-        score: true
-      },
-      'manifest-short-name': {
-        score: true
-      },
-      'manifest-start-url': {
-        score: true
-      },
-      // 'cache-start-url': {
-      //   score: true
-      // }
-    }
-  },
+  // {
+  //   initialUrl: 'https://shop.polymer-project.org/',
+  //   url: 'https://shop.polymer-project.org/',
+  //   audits: {
+  //     'is-on-https': {
+  //       score: true
+  //     },
+  //     'redirects-http': {
+  //       score: true
+  //     },
+  //     'service-worker': {
+  //       score: true
+  //     },
+  //     'works-offline': {
+  //       score: true
+  //     },
+  //     'manifest-display': {
+  //       score: true,
+  //       displayValue: 'standalone'
+  //     },
+  //     'manifest-exists': {
+  //       score: true
+  //     },
+  //     'manifest-background-color': {
+  //       score: true,
+  //       extendedInfo: {
+  //         value: '#fff'
+  //       }
+  //     },
+  //     'manifest-theme-color': {
+  //       score: true
+  //     },
+  //     'manifest-icons-min-192': {
+  //       score: true
+  //     },
+  //     'manifest-icons-min-144': {
+  //       score: true
+  //     },
+  //     'manifest-name': {
+  //       score: true
+  //     },
+  //     'manifest-short-name': {
+  //       score: true
+  //     },
+  //     'manifest-start-url': {
+  //       score: true
+  //     },
+  //     // 'cache-start-url': {
+  //     //   score: true
+  //     // }
+  //   }
+  // },
 
   {
     initialUrl: 'https://pwa.rocks',
