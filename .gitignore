@@ -16,6 +16,7 @@ last-run-results.html
 *.trace.json
 *.screenshots.html
 *.report.html
+*.artifacts.log
 
 closure-error.log
 

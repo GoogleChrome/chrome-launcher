@@ -46,10 +46,6 @@ describe('asset-saver helper', () => {
   });
 
   it('generates HTML', () => {
-    const options = {
-      url: 'https://testexample.com',
-      generatedTime: '2016-05-31T23:34:30.547Z'
-    };
     const artifacts = {
       traces: {
         [Audit.DEFAULT_PASS]: {
@@ -58,19 +54,12 @@ describe('asset-saver helper', () => {
       },
       requestScreenshots: () => Promise.resolve([]),
     };
-    return assetSaver.prepareAssets(artifacts, options).then(assets => {
+    return assetSaver.prepareAssets(artifacts).then(assets => {
       assert.ok(/<!doctype/gim.test(assets[0].html));
     });
   });
 
   describe('saves files', function() {
-    const options = {
-      url: 'https://testexample.com/',
-      generatedTime: '2016-05-31T23:34:30.547Z',
-      flags: {
-        saveAssets: true
-      }
-    };
     const artifacts = {
       traces: {
         [Audit.DEFAULT_PASS]: {
@@ -80,17 +69,17 @@ describe('asset-saver helper', () => {
       requestScreenshots: () => Promise.resolve(screenshotFilmstrip)
     };
 
-    assetSaver.saveAssets(artifacts, options);
+    assetSaver.saveAssets(artifacts, dbwResults.audits, process.cwd() + '/the_file');
 
     it('trace file saved to disk with data', () => {
-      const traceFilename = assetSaver.getFilenamePrefix(options) + '-0.trace.json';
+      const traceFilename = 'the_file-0.trace.json';
       const traceFileContents = fs.readFileSync(traceFilename, 'utf8');
       assert.ok(traceFileContents.length > 3000000);
       fs.unlinkSync(traceFilename);
     });
 
     it('screenshots file saved to disk with data', () => {
-      const ssFilename = assetSaver.getFilenamePrefix(options) + '-0.screenshots.html';
+      const ssFilename = 'the_file-0.screenshots.html';
       const ssFileContents = fs.readFileSync(ssFilename, 'utf8');
       assert.ok(/<!doctype/gim.test(ssFileContents));
       assert.ok(ssFileContents.includes('{"timestamp":674089419.919'));
@@ -108,7 +97,7 @@ describe('asset-saver helper', () => {
         requestScreenshots: () => Promise.resolve([]),
       };
       const beforeCount = countEvents(dbwTrace);
-      return assetSaver.prepareAssets(mockArtifacts, dbwResults).then(preparedAssets => {
+      return assetSaver.prepareAssets(mockArtifacts, dbwResults.audits).then(preparedAssets => {
         const afterCount = countEvents(preparedAssets[0].traceData);
         const metricsSansNavStart = Metrics.metricsDefinitions.length - 1;
         assert.equal(afterCount, beforeCount + (2 * metricsSansNavStart), 'unexpected event count');

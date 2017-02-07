@@ -164,6 +164,23 @@ Options:
                      installations are found                                               [boolean]
 ```
 
+### Output Path Examples
+
+`--output-path=~/mydir/foo.out --save-assets` generates
+* `~/mydir/foo.out`
+* `~/mydir/foo.report.html`
+* `~/mydir/foo-0.trace.json`
+* `~/mydir/foo-0.screenshots.html`
+
+`--output-path=./report.json --output json --save-artifacts` generates
+* `./report.json`
+* `./report.artifacts.log`
+
+`--save-artifacts` prints a pretty report to `stdout` **and** generates 
+* `./<HOST>_<DATE>.report.html`
+* `./<HOST>_<DATE>.artifacts.log`
+
+
 ## Lighthouse w/ mobile devices
 
 Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse.

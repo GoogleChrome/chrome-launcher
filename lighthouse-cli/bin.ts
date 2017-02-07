@@ -249,6 +249,33 @@ function handleError(err: LighthouseError) {
   }
 }
 
+function saveResults(results: Results,
+                     artifacts: Object,
+                     flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean}) {
+    let promise = Promise.resolve(results);
+    const cwd = process.cwd();
+    // Use the output path as the prefix for all generated files.
+    // If no output path is set, generate a file prefix using the URL and date.
+    const configuredPath = !flags.outputPath || flags.outputPath === 'stdout' ?
+        assetSaver.getFilenamePrefix(results) :
+        flags.outputPath.replace(/\.\w{2,4}$/, '');
+    const resolvedPath = path.resolve(cwd, configuredPath);
+
+    if (flags.saveArtifacts) {
+      assetSaver.saveArtifacts(artifacts, resolvedPath);
+    }
+
+    if (flags.saveAssets) {
+      promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
+    }
+
+    if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
+      promise = promise.then(_ => Printer.write(results, 'html', `${resolvedPath}.report.html`));
+    }
+
+    return promise.then(_ => Printer.write(results, flags.output, flags.outputPath));
+}
+
 function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
                          outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean},
@@ -260,30 +287,16 @@ function runLighthouse(url: string,
     .then(chrome => chromeLauncher = chrome)
     .then(() => lighthouse(url, flags, config))
     .then((results: Results) => {
-      // delete artifacts from result so reports won't include artifacts.
+      // remove artifacts from result so reports won't include artifacts.
       const artifacts = results.artifacts;
       results.artifacts = undefined;
 
-      if (flags.saveArtifacts) {
-        assetSaver.saveArtifacts(artifacts);
-      }
-      if (flags.saveAssets) {
-        return assetSaver.saveAssets(artifacts, results).then(() => results);
-      }
-      return results;
-    })
-    .then((results: Results) => Printer.write(results, flags.output, flags.outputPath))
-    .then((results: Results) => {
-      if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
-        const filename = `${assetSaver.getFilenamePrefix(results)}.report.html`;
-        return Printer.write(results, 'html', filename);
-      }
-      return results;
-    })
-    .then((results: Results) => {
+      let promise = saveResults(results, artifacts, flags);
       if (flags.interactive) {
-        return performanceXServer.hostExperiment({url, flags, config}, results);
+        promise = promise.then(() => performanceXServer.hostExperiment({url, flags, config}, results));
       }
+
+      return promise;
     })
     .then(() => chromeLauncher.kill())
     .catch(err => {
