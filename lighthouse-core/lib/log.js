@@ -87,13 +87,13 @@ class Log {
   static setLevel(level) {
     switch (level) {
       case 'silent':
-        debug.disable();
+        debug.enable('-*');
         break;
       case 'verbose':
         debug.enable('*');
         break;
       case 'error':
-        debug.enable('*:error');
+        debug.enable('-*, *:error');
         break;
       default:
         debug.enable('*, -*:verbose');

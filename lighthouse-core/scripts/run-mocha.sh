@@ -3,7 +3,7 @@
 flag=$1
 
 function _runmocha() {
-  mocha $2 $(find $1/test -name '*-test.js') --timeout 60000;
+  mocha --reporter dot $2 $(find $1/test -name '*-test.js') --timeout 60000;
 }
 
 if [ "$flag" == '--watch' ]; then
@@ -15,5 +15,7 @@ elif [ "$flag" == '--viewer' ]; then
 elif [ "$flag" == '--core' ]; then
     _runmocha 'lighthouse-core'
 else
-    _runmocha 'lighthouse-cli' && _runmocha 'lighthouse-core' && _runmocha 'lighthouse-viewer'
+    echo "lighthouse-core tests" && _runmocha 'lighthouse-core' && \
+    echo "lighthouse-cli tests" && _runmocha 'lighthouse-cli' && \
+    echo "lighthouse-viewer tests" && _runmocha 'lighthouse-viewer'
 fi

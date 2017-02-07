@@ -22,7 +22,7 @@ const childProcess = require('child_process');
 
 describe('CLI Tests', function() {
   it('fails if a url is not provided', () => {
-    assert.throws(() => childProcess.execSync('node lighthouse-cli/index.js'),
+    assert.throws(() => childProcess.execSync('node lighthouse-cli/index.js', {stdio: 'pipe'}),
           /Please provide a url/);
   });
 
