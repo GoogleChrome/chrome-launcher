@@ -73,8 +73,9 @@ describe('Report', () => {
 
     assert.ok(html.includes('<footer'), 'no footer tag found');
     assert.ok(html.includes('<div id="lhresults-dump">'), 'report results were inlined');
-    assert.ok(html.includes('window.lhresults = JSON.parse('), 'lhresults created');
-    assert.ok(html.includes('.report-body {'), 'report.css inlined');
+    assert.ok(html.includes('window.lhresults'), 'lhresults created');
+    assert.ok(html.includes('.report-body'), 'report.css inlined');
+    assert.ok(html.includes('.table_list td'), 'formatters css inlined');
     assert.ok(html.includes('&quot;lighthouseVersion'), 'lhresults were escaped');
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
     assert.ok(html.includes('export-button'), 'page includes export button');

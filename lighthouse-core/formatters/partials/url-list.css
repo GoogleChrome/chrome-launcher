@@ -1,0 +1,9 @@
+.http-resource__protocol,
+.http-resource__code {
+  color: var(--secondary-text-color);
+}
+.http-resource__code {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre-line;
+}

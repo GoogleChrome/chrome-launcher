@@ -51,18 +51,14 @@ gulp.task('images', () => {
   .pipe(gulp.dest(`${DIST_FOLDER}/images`));
 });
 
-gulp.task('css', () => {
+gulp.task('concat-css', () => {
   return gulp.src([
-    'app/styles/**/*.css',
-    '../lighthouse-core/report/styles/report.css'
+    '../lighthouse-core/report/styles/report.css',
+    '../lighthouse-core/formatters/partials/*.css',
+    'app/styles/viewer.css',
   ])
+  .pipe($.concat('viewer.css'))
   .pipe(gulp.dest(`${DIST_FOLDER}/styles`));
-});
-
-gulp.task('concat-css', ['html', 'css'], () => {
-  return gulp.src([`${DIST_FOLDER}/index.html`])
-    .pipe($.useref())
-    .pipe(gulp.dest(DIST_FOLDER));
 });
 
 gulp.task('html', () => {
@@ -120,12 +116,13 @@ gulp.task('clean', () => {
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'css'], () => {
+gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'concat-css'], () => {
   gulp.watch([
     'app/styles/**/*.css',
-    '../lighthouse-core/report/styles/**/*.css'
+    '../lighthouse-core/report/styles/**/*.css',
+    '../lighthouse-core/formatters/partials/*.css'
   ]).on('change', () => {
-    runSequence('css');
+    runSequence('concat-css');
   });
 
   gulp.watch([
@@ -165,8 +162,7 @@ gulp.task('deploy', cb => {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'compile',
-    ['html', 'images', 'css', 'polyfills'],
-    'concat-css', cb);
+    ['html', 'images', 'concat-css', 'polyfills'], cb);
 });
 
 gulp.task('default', ['clean'], cb => {
