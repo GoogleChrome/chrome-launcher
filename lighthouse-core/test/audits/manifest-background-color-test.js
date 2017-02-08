@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-background-color.js');
+const ManifestBackgroundColorAudit = require('../../audits/manifest-background-color.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
@@ -34,22 +34,24 @@ function noUrlManifestParser(manifestSrc) {
   return manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 }
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 // Need to disable camelcase check for dealing with background_color.
 /* eslint-disable camelcase */
 describe('Manifest: background color audit', () => {
-  it('fails when no manifest artifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestBackgroundColorAudit.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
       Manifest: noUrlManifestParser('{}')
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    return assert.equal(ManifestBackgroundColorAudit.audit(artifacts).rawValue, false);
   });
 
   it('fails when a minimal manifest contains no background_color', () => {
@@ -58,7 +60,7 @@ describe('Manifest: background color audit', () => {
         start_url: '/'
       }))
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestBackgroundColorAudit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.debugString, undefined);
   });
@@ -69,7 +71,7 @@ describe('Manifest: background color audit', () => {
         background_color: 'no'
       }))
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestBackgroundColorAudit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.debugString, undefined);
   });
@@ -80,13 +82,14 @@ describe('Manifest: background color audit', () => {
         background_color: '#FAFAFA'
       }))
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestBackgroundColorAudit.audit(artifacts);
     assert.equal(output.rawValue, true);
     assert.equal(output.extendedInfo.value, '#FAFAFA');
   });
 
   it('succeeds when a complete manifest contains a background_color', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
+    const result = ManifestBackgroundColorAudit.audit({Manifest: exampleManifest});
+    return assert.equal(result.rawValue, true);
   });
 });
 /* eslint-enable */

@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/cache-start-url.js');
+const CacheStartUrlAudit = require('../../audits/cache-start-url.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
@@ -24,24 +24,21 @@ const URL = 'https://example.com';
 const AltURL = 'https://example.com/?utm_source=http203';
 const exampleManifest = manifestParser(manifestSrc, URL, URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Cache: start_url audit', () => {
-  it('fails when no cache contents given', () => {
-    const artifacts = {
-      Manifest: exampleManifest,
-      URL: {finalUrl: URL},
-      CacheContents: {
-        debugString: 'no cache contents'
-      }
-    };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
-    assert.ok(output.debugString);
+  it('fails with no debugString if page had no manifest', () => {
+    const result = CacheStartUrlAudit.audit({
+      Manifest: null,
+      CacheContents,
+      URL: {finalUrl: URL}
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
   it('succeeds when given a manifest with a start_url, cache contents, and a URL', () => {
-    return assert.equal(Audit.audit({
+    return assert.equal(CacheStartUrlAudit.audit({
       Manifest: exampleManifest,
       CacheContents,
       URL: {finalUrl: URL}
@@ -49,7 +46,7 @@ describe('Cache: start_url audit', () => {
   });
 
   it('handles URLs with utm params', () => {
-    return assert.equal(Audit.audit({
+    return assert.equal(CacheStartUrlAudit.audit({
       Manifest: exampleManifest,
       CacheContents,
       URL: {finalUrl: AltURL}

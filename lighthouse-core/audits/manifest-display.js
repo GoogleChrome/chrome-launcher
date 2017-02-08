@@ -48,16 +48,22 @@ class ManifestDisplay extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const manifest = artifacts.Manifest.value;
-    const displayValue = manifest && manifest.display.value;
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
+      return ManifestDisplay.generateAuditResult({
+        rawValue: false
+      });
+    }
 
+    const manifest = artifacts.Manifest.value;
+    const displayValue = manifest.display.value;
     const hasRecommendedValue = ManifestDisplay.hasRecommendedValue(displayValue);
 
     const auditResult = {
       rawValue: hasRecommendedValue,
       displayValue
     };
-    if (manifest && !hasRecommendedValue) {
+    if (!hasRecommendedValue) {
       auditResult.debugString = 'Manifest display property should be set.';
     }
     return ManifestDisplay.generateAuditResult(auditResult);

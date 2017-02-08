@@ -45,26 +45,21 @@ function getCacheContents() {
 }
 
 class CacheContents extends Gatherer {
-  static _error(errorString) {
-    return {
-      raw: undefined,
-      value: undefined,
-      debugString: errorString
-    };
-  }
-
+  /**
+   * Creates an array of cached URLs.
+   * @param {!Object} options
+   * @return {!Promise<!Array<string>>}
+   */
   afterPass(options) {
     const driver = options.driver;
 
     return driver
         .evaluateAsync(`(${getCacheContents.toString()}())`)
         .then(returnedValue => {
-          if (!returnedValue) {
-            return CacheContents._error('Unable to retrieve cache contents');
+          if (!returnedValue || !Array.isArray(returnedValue)) {
+            throw new Error('Unable to retrieve cache contents');
           }
           return returnedValue;
-        }, _ => {
-          return CacheContents._error('Unable to retrieve cache contents');
         });
   }
 }

@@ -38,21 +38,19 @@ class ManifestBackgroundColor extends Audit {
   }
 
   /**
-   * @param {!Manifest=} manifest
-   * @return {boolean}
-   */
-  static getBackgroundColorValue(manifest) {
-    return manifest !== undefined &&
-      manifest.background_color.value;
-  }
-
-  /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const bgColor = ManifestBackgroundColor.getBackgroundColorValue(artifacts.Manifest.value);
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
+      return ManifestBackgroundColor.generateAuditResult({
+        rawValue: false,
+      });
+    }
 
+    const manifest = artifacts.Manifest.value;
+    const bgColor = manifest.background_color.value;
     return ManifestBackgroundColor.generateAuditResult({
       rawValue: !!bgColor,
       extendedInfo: {

@@ -47,21 +47,7 @@ describe('Manifest gatherer', () => {
     });
   });
 
-  it('propagates error from driver failure', () => {
-    const error = 'There was an error.';
-    return manifestGather.afterPass({
-      driver: {
-        sendCommand() {
-          return Promise.reject(error);
-        }
-      }
-    }).then(artifact => {
-      assert.ok(artifact.debugString);
-      assert.ok(artifact.debugString.includes(error));
-    });
-  });
-
-  it('emits an error when unable to retrieve the manifest', () => {
+  it('throws an error when unable to retrieve the manifest', () => {
     return manifestGather.afterPass({
       driver: {
         sendCommand() {
@@ -71,8 +57,24 @@ describe('Manifest gatherer', () => {
           });
         }
       }
+    }).then(
+      _ => assert.ok(false),
+      err => assert.ok(err.message.includes(EXAMPLE_MANIFEST_URL)));
+  });
+
+  it('returns null when the page had no manifest', () => {
+    return manifestGather.afterPass({
+      driver: {
+        sendCommand() {
+          return Promise.resolve({
+            data: '',
+            errors: [],
+            url: ''
+          });
+        }
+      }
     }).then(artifact => {
-      assert.ok(artifact.debugString);
+      assert.strictEqual(artifact, null);
     });
   });
 
@@ -93,6 +95,7 @@ describe('Manifest gatherer', () => {
       url: EXAMPLE_DOC_URL
     }).then(artifact => {
       assert.ok(typeof artifact.value === 'object');
+      assert.strictEqual(artifact.debugString, undefined);
     });
   });
 });

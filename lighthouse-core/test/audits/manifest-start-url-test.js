@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-name.js');
+const ManifestStartUrlAudit = require('../../audits/manifest-start-url.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
@@ -24,41 +24,52 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
-describe('Manifest: name audit', () => {
-  it('fails when no manifest artifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+describe('Manifest: start_url audit', () => {
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestStartUrlAudit.audit({
+      Manifest: null,
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
       Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = ManifestStartUrlAudit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
-  it('fails when a manifest contains no name', () => {
+  // Need to disable camelcase check for dealing with start_url.
+  /* eslint-disable camelcase */
+  it('fails when a manifest contains no start_url', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
-        display: '/'
+        start_url: undefined
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    const output = ManifestStartUrlAudit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
 
-  it('succeeds when a minimal manifest contains a name', () => {
+  it('succeeds when a minimal manifest contains a start_url', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
-        name: 'Lighthouse PWA'
+        start_url: '/'
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, true);
+    const output = ManifestStartUrlAudit.audit(artifacts);
+    assert.equal(output.rawValue, true);
+    assert.equal(output.debugString, undefined);
   });
+  /* eslint-enable camelcase */
 
-  it('succeeds when a complete manifest contains a name', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
+  it('succeeds when a complete manifest contains a start_url', () => {
+    return assert.equal(ManifestStartUrlAudit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

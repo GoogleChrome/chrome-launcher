@@ -27,53 +27,15 @@ describe('Cache Contents gatherer', () => {
     cacheContentGather = new CacheContentGather();
   });
 
-  it('fails gracefully', () => {
+  it('throws an error when cache getter returns nothing', () => {
     return cacheContentGather.afterPass({
       driver: {
         evaluateAsync() {
           return Promise.resolve();
         }
       }
-    }).then(artifact => {
-      assert.ok(typeof artifact === 'object');
-    });
-  });
-
-  it('handles driver failure', () => {
-    return cacheContentGather.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.reject('such a fail');
-        }
-      }
-    }).then(artifact => {
-      assert.ok(artifact.debugString);
-    });
-  });
-
-  it('propagates error retrieving the results', () => {
-    const error = 'Unable to retrieve cache contents';
-    return cacheContentGather.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.reject(error);
-        }
-      }
-    }).then(artifact => {
-      assert.ok(artifact.debugString === error);
-    });
-  });
-
-  it('creates an object for valid results', () => {
-    return cacheContentGather.afterPass({
-      driver: {
-        evaluateAsync() {
-          return Promise.resolve(['a', 'b', 'c']);
-        }
-      }
-    }).then(artifact => {
-      assert.ok(Array.isArray(artifact));
-      assert.equal(artifact[0], 'a');
-    });
+    }).then(
+      _ => assert.ok(false),
+      _ => assert.ok(true));
   });
 });

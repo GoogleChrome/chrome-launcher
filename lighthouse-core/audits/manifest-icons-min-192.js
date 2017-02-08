@@ -41,8 +41,14 @@ class ManifestIconsMin192 extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const manifest = artifacts.Manifest.value;
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
+      return ManifestIconsMin192.generateAuditResult({
+        rawValue: false
+      });
+    }
 
+    const manifest = artifacts.Manifest.value;
     if (icons.doExist(manifest) === false) {
       return ManifestIconsMin192.generateAuditResult({
         rawValue: false

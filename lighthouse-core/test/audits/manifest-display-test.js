@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-display.js');
+const ManifestDisplayAudit = require('../../audits/manifest-display.js');
 const manifestParser = require('../../lib/manifest-parser');
 const assert = require('assert');
 
@@ -24,28 +24,31 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Mobile-friendly: display audit', () => {
   it('only accepts when a value is set for the display prop', () => {
-    assert.equal(Audit.hasRecommendedValue('fullscreen'), true);
-    assert.equal(Audit.hasRecommendedValue('standalone'), true);
-    assert.equal(Audit.hasRecommendedValue('browser'), true);
-    assert.equal(Audit.hasRecommendedValue('minimal-ui'), true);
-    assert.equal(Audit.hasRecommendedValue('different'), false);
-    assert.equal(Audit.hasRecommendedValue(undefined), false);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue('fullscreen'), true);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue('standalone'), true);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue('browser'), true);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue('minimal-ui'), true);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue('different'), false);
+    assert.equal(ManifestDisplayAudit.hasRecommendedValue(undefined), false);
   });
 
-  it('fails when no manifest artifact present', () => {
-    const output = Audit.audit({Manifest: {value: undefined}});
-    assert.equal(output.rawValue, false);
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestDisplayAudit.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
   it('falls back to the successful default when there is no manifest display property', () => {
     const artifacts = {
       Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestDisplayAudit.audit(artifacts);
 
     assert.equal(output.score, true);
     assert.equal(output.displayValue, 'browser');
@@ -59,7 +62,7 @@ describe('Mobile-friendly: display audit', () => {
         display: 'standalone'
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestDisplayAudit.audit(artifacts);
     assert.equal(output.score, true);
     assert.equal(output.displayValue, 'standalone');
     assert.equal(output.rawValue, true);
@@ -67,6 +70,6 @@ describe('Mobile-friendly: display audit', () => {
   });
 
   it('succeeds when a complete manifest contains a display property', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
+    return assert.equal(ManifestDisplayAudit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

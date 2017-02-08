@@ -40,6 +40,13 @@ class ManifestExists extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
+    if (!artifacts.Manifest) {
+      // Page has no manifest.
+      return ManifestExists.generateAuditResult({
+        rawValue: false
+      });
+    }
+
     return ManifestExists.generateAuditResult({
       rawValue: typeof artifacts.Manifest.value !== 'undefined',
       debugString: artifacts.Manifest.debugString

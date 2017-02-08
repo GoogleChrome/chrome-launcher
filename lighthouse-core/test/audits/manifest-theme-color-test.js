@@ -15,9 +15,8 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-exists.js');
+const ManifestThemeColorAudit = require('../../audits/manifest-theme-color.js');
 const assert = require('assert');
-
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
 
@@ -25,57 +24,53 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
-describe('Manifest: exists audit', () => {
-  it('fails when no manifest artifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+describe('Manifest: theme_color audit', () => {
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestThemeColorAudit.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
-  it('succeeds with a valid minimal manifest', () => {
+  it('fails when an empty manifest is present', () => {
     const artifacts = {
       Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, true);
+    const output = ManifestThemeColorAudit.audit(artifacts);
+    assert.equal(output.rawValue, false);
     assert.equal(output.debugString, undefined);
   });
 
-  it('succeeds with a valid minimal manifest', () => {
+  // Need to disable camelcase check for dealing with theme_color.
+  /* eslint-disable camelcase */
+  it('fails when a minimal manifest contains no theme_color', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
-        name: 'Lighthouse PWA'
+        start_url: '/'
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestThemeColorAudit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.equal(output.debugString, undefined);
+  });
+
+  it('succeeds when a minimal manifest contains a theme_color', () => {
+    const artifacts = {
+      Manifest: manifestParser(JSON.stringify({
+        theme_color: '#bada55'
+      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
+    };
+    const output = ManifestThemeColorAudit.audit(artifacts);
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
 
-  it('correctly passes through debug strings', () => {
-    const debugString = 'No href found on <link rel="manifest">.';
+  /* eslint-enable camelcase */
 
-    assert.equal(Audit.audit({
-      Manifest: {
-        value: {},
-        debugString
-      }
-    }).debugString, debugString);
-  });
-
-  it('correctly passes through a JSON parsing failure', () => {
-    const artifacts = {
-      Manifest: manifestParser('{ \name: Definitely not valid JSON }', EXAMPLE_MANIFEST_URL,
-          EXAMPLE_DOC_URL)
-    };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, false);
-    assert.ok(output.debugString.includes('Unexpected token'), 'No JSON error message');
-  });
-
-  it('succeeds with a complete manifest', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
+  it('succeeds when a complete manifest contains a theme_color', () => {
+    return assert.equal(ManifestThemeColorAudit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

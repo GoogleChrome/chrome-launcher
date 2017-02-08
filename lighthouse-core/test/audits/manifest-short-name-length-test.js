@@ -15,21 +15,29 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-short-name-length.js');
+const ManifestShortNameLengthAudit = require('../../audits/manifest-short-name-length.js');
 const assert = require('assert');
 const manifestParser = require('../../lib/manifest-parser');
 
 const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Manifest: short_name_length audit', () => {
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestShortNameLengthAudit.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
+  });
+
   it('fails when an empty manifest is present', () => {
     const Manifest = manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-    const result = Audit.audit({Manifest});
+    const result = ManifestShortNameLengthAudit.audit({Manifest});
     assert.equal(result.rawValue, false);
-    assert.equal(result.debugString, 'No short_name found.');
+    assert.equal(result.debugString, 'No short_name found in manifest.');
   });
 
   it('fails when a manifest contains no short_name and too long name', () => {
@@ -37,7 +45,7 @@ describe('Manifest: short_name_length audit', () => {
       name: 'i\'m much longer than the recommended size'
     });
     const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-    const out = Audit.audit({Manifest});
+    const out = ManifestShortNameLengthAudit.audit({Manifest});
     assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
   });
@@ -49,7 +57,7 @@ describe('Manifest: short_name_length audit', () => {
       short_name: 'i\'m much longer than the recommended size'
     });
     const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-    const out = Audit.audit({Manifest});
+    const out = ManifestShortNameLengthAudit.audit({Manifest});
     assert.equal(out.rawValue, false);
     assert.notEqual(out.debugString, undefined);
   });
@@ -59,7 +67,7 @@ describe('Manifest: short_name_length audit', () => {
       short_name: 'Lighthouse'
     });
     const Manifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
-    return assert.equal(Audit.audit({Manifest}).rawValue, true);
+    return assert.equal(ManifestShortNameLengthAudit.audit({Manifest}).rawValue, true);
   });
   /* eslint-enable camelcase */
 });

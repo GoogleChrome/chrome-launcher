@@ -15,7 +15,7 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-short-name.js');
+const ManifestShortNameAudit = require('../../audits/manifest-short-name.js');
 const assert = require('assert');
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
@@ -24,20 +24,22 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
 describe('Manifest: short_name audit', () => {
-  it('fails when no manifest artfifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestShortNameAudit.audit({
+      Manifest: null,
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
   it('fails when an empty manifest is present', () => {
     const artifacts = {
       Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    return assert.equal(Audit.audit(artifacts).rawValue, false);
+    return assert.equal(ManifestShortNameAudit.audit(artifacts).rawValue, false);
   });
 
   // Need to disable camelcase check for dealing with short_name.
@@ -50,7 +52,7 @@ describe('Manifest: short_name audit', () => {
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
 
-    const output = Audit.audit(artifacts);
+    const output = ManifestShortNameAudit.audit(artifacts);
     assert.equal(output.rawValue, false);
     assert.equal(output.debugString, undefined);
   });
@@ -63,14 +65,14 @@ describe('Manifest: short_name audit', () => {
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
 
-    const output = Audit.audit(artifacts);
+    const output = ManifestShortNameAudit.audit(artifacts);
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
   /* eslint-enable camelcase */
 
   it('succeeds when a manifest contains a short_name', () => {
-    const output = Audit.audit({Manifest: exampleManifest});
+    const output = ManifestShortNameAudit.audit({Manifest: exampleManifest});
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });

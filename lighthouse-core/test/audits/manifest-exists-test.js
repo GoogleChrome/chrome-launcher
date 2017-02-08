@@ -15,8 +15,9 @@
  */
 'use strict';
 
-const Audit = require('../../audits/manifest-start-url.js');
+const ManifestExistsAudit = require('../../audits/manifest-exists.js');
 const assert = require('assert');
+
 const manifestSrc = JSON.stringify(require('../fixtures/manifest.json'));
 const manifestParser = require('../../lib/manifest-parser');
 
@@ -24,50 +25,59 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-/* global describe, it*/
+/* eslint-env mocha */
 
-describe('Manifest: start_url audit', () => {
-  it('fails when no manifest artifact present', () => {
-    return assert.equal(Audit.audit({Manifest: {
-      value: undefined
-    }}).rawValue, false);
+describe('Manifest: exists audit', () => {
+  it('fails with no debugString if page had no manifest', () => {
+    const result = ManifestExistsAudit.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result.rawValue, false);
+    assert.strictEqual(result.debugString, undefined);
   });
 
-  it('fails when an empty manifest is present', () => {
+  it('succeeds with a valid minimal manifest', () => {
     const artifacts = {
       Manifest: manifestParser('{}', EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestExistsAudit.audit(artifacts);
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
 
-  // Need to disable camelcase check for dealing with start_url.
-  /* eslint-disable camelcase */
-  it('fails when a manifest contains no start_url', () => {
+  it('succeeds with a valid minimal manifest', () => {
     const artifacts = {
       Manifest: manifestParser(JSON.stringify({
-        start_url: undefined
+        name: 'Lighthouse PWA'
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
+    const output = ManifestExistsAudit.audit(artifacts);
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
   });
 
-  it('succeeds when a minimal manifest contains a start_url', () => {
+  it('correctly passes through debug strings', () => {
+    const debugString = 'No href found on <link rel="manifest">.';
+
+    assert.equal(ManifestExistsAudit.audit({
+      Manifest: {
+        value: {},
+        debugString
+      }
+    }).debugString, debugString);
+  });
+
+  it('correctly passes through a JSON parsing failure', () => {
     const artifacts = {
-      Manifest: manifestParser(JSON.stringify({
-        start_url: '/'
-      }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
+      Manifest: manifestParser('{ \name: Definitely not valid JSON }', EXAMPLE_MANIFEST_URL,
+          EXAMPLE_DOC_URL)
     };
-    const output = Audit.audit(artifacts);
-    assert.equal(output.rawValue, true);
-    assert.equal(output.debugString, undefined);
+    const output = ManifestExistsAudit.audit(artifacts);
+    assert.equal(output.rawValue, false);
+    assert.ok(output.debugString.includes('Unexpected token'), 'No JSON error message');
   });
-  /* eslint-enable camelcase */
 
-  it('succeeds when a complete manifest contains a start_url', () => {
-    return assert.equal(Audit.audit({Manifest: exampleManifest}).rawValue, true);
+  it('succeeds with a complete manifest', () => {
+    return assert.equal(ManifestExistsAudit.audit({Manifest: exampleManifest}).rawValue, true);
   });
 });

@@ -40,15 +40,16 @@ class ManifestStartUrl extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    let hasStartUrl = false;
-    const manifest = artifacts.Manifest.value;
-
-    if (manifest && manifest.start_url) {
-      hasStartUrl = (!!manifest.start_url.value);
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
+      return ManifestStartUrl.generateAuditResult({
+        rawValue: false
+      });
     }
 
+    const manifest = artifacts.Manifest.value;
     return ManifestStartUrl.generateAuditResult({
-      rawValue: hasStartUrl
+      rawValue: !!manifest.start_url.value
     });
   }
 }

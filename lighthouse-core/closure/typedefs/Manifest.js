@@ -33,7 +33,7 @@ ManifestNode.prototype.raw;
 /** @type {T} */
 ManifestNode.prototype.value;
 
-/** @type {string} */
+/** @type {string|undefined} */
 ManifestNode.prototype.debugString;
 
 /**

@@ -40,15 +40,16 @@ class ManifestThemeColor extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    let hasThemeColor = false;
-    const manifest = artifacts.Manifest.value;
-
-    if (manifest && manifest.theme_color) {
-      hasThemeColor = (!!manifest.theme_color.value);
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
+      return ManifestThemeColor.generateAuditResult({
+        rawValue: false
+      });
     }
 
+    const manifest = artifacts.Manifest.value;
     return ManifestThemeColor.generateAuditResult({
-      rawValue: hasThemeColor
+      rawValue: !!manifest.theme_color.value
     });
   }
 }

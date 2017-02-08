@@ -28,6 +28,20 @@ const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 /* eslint-env mocha */
 
 describe('Manifest: icons audits', () => {
+  it('fails with no debugString if page had no manifest', () => {
+    const result144 = Audit144.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result144.rawValue, false);
+    assert.strictEqual(result144.debugString, undefined);
+
+    const result192 = Audit192.audit({
+      Manifest: null
+    });
+    assert.strictEqual(result192.rawValue, false);
+    assert.strictEqual(result192.debugString, undefined);
+  });
+
   describe('icons exist check', () => {
     it('fails when a manifest contains no icons array', () => {
       const manifestSrc = JSON.stringify({

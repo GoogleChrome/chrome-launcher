@@ -37,21 +37,18 @@ class CacheStartUrl extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    let cacheHasStartUrl = false;
-    const manifest = artifacts.Manifest.value;
-    const cacheContents = artifacts.CacheContents;
-
-    if (!(manifest && manifest.start_url && manifest.start_url.value)) {
+    if (!artifacts.Manifest || !artifacts.Manifest.value) {
+      // Page has no manifest or was invalid JSON.
       return CacheStartUrl.generateAuditResult({
         rawValue: false,
-        debugString: 'start_url not present in Manifest'
       });
     }
 
-    if (!Array.isArray(cacheContents)) {
+    const manifest = artifacts.Manifest.value;
+    if (!(manifest.start_url && manifest.start_url.value)) {
       return CacheStartUrl.generateAuditResult({
         rawValue: false,
-        debugString: cacheContents.debugString || 'No cache detected'
+        debugString: 'start_url not present in Manifest'
       });
     }
 
@@ -67,7 +64,8 @@ class CacheStartUrl extends Audit {
     // here would be to resolve this more completely by asking the Service Worker about the start
     // URL. However that would also necessitate the cache contents gatherer relying on the manifest
     // gather rather than being independent of it.
-    cacheHasStartUrl = cacheContents.find(req => {
+    const cacheContents = artifacts.CacheContents;
+    const cacheHasStartUrl = cacheContents.find(req => {
       return (startURL === req || altStartURL === req);
     });
 
