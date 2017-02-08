@@ -62,6 +62,10 @@ class Driver {
     ];
   }
 
+  get devtoolsLog() {
+    return this._connection.log.messages;
+  }
+
   /**
    * @return {!Promise<null>}
    */
@@ -571,6 +575,9 @@ class Driver {
       throw new Error('DOM domain enabled when starting trace');
     }
 
+    this._connection.log.reset();
+    this._connection.log.beginRecording();
+
     // Enable Page domain to wait for Page.loadEventFired
     return this.sendCommand('Page.enable')
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
@@ -580,6 +587,7 @@ class Driver {
     return new Promise((resolve, reject) => {
       // When the tracing has ended this will fire with a stream handle.
       this.once('Tracing.tracingComplete', streamHandle => {
+        this._connection.log.endRecording();
         this._readTraceFromStream(streamHandle)
             .then(traceContents => resolve(traceContents), reject);
       });

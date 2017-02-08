@@ -114,6 +114,7 @@ function prepareAssets(artifacts, audits) {
 
   return passNames.reduce((chain, passName) => {
     const trace = artifacts.traces[passName];
+    const devtoolsLog = artifacts.devtoolsLogs[passName];
 
     return chain.then(_ => artifacts.requestScreenshots(trace))
       .then(screenshots => {
@@ -126,6 +127,7 @@ function prepareAssets(artifacts, audits) {
         }
         assets.push({
           traceData,
+          devtoolsLog,
           html
         });
       });
@@ -143,10 +145,13 @@ function prepareAssets(artifacts, audits) {
 function saveAssets(artifacts, audits, pathWithBasename) {
   return prepareAssets(artifacts, audits).then(assets => {
     assets.forEach((data, index) => {
-      const traceData = data.traceData;
       const traceFilename = `${pathWithBasename}-${index}.trace.json`;
-      fs.writeFileSync(traceFilename, JSON.stringify(traceData, null, 2));
+      fs.writeFileSync(traceFilename, JSON.stringify(data.traceData, null, 2));
       log.log('trace file saved to disk', traceFilename);
+
+      const devtoolsLogFilename = `${pathWithBasename}-${index}.devtoolslog.json`;
+      fs.writeFileSync(devtoolsLogFilename, JSON.stringify(data.devtoolsLog, null, 2));
+      log.log('devtools log saved to disk', devtoolsLogFilename);
 
       const screenshotsFilename = `${pathWithBasename}-${index}.screenshots.html`;
       fs.writeFileSync(screenshotsFilename, data.html);

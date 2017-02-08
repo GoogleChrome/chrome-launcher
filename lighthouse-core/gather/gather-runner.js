@@ -219,6 +219,7 @@ class GatherRunner {
         // an object with a traceEvents property. Normalize to object form.
         passData.trace = Array.isArray(traceContents) ?
             {traceEvents: traceContents} : traceContents;
+        passData.devtoolsLog = driver.devtoolsLog;
         log.verbose('statusEnd', 'Retrieving trace');
       });
     }
@@ -288,6 +289,7 @@ class GatherRunner {
     const driver = options.driver;
     const tracingData = {
       traces: {},
+      devtoolsLogs: {},
       networkRecords: {}
     };
 
@@ -330,7 +332,10 @@ class GatherRunner {
               // If requested by config, merge trace and network data for this
               // pass into tracingData.
               const passName = config.passName || Audit.DEFAULT_PASS;
-              config.recordTrace && (tracingData.traces[passName] = passData.trace);
+              if (config.recordTrace) {
+                tracingData.traces[passName] = passData.trace;
+                tracingData.devtoolsLogs[passName] = passData.devtoolsLog;
+              }
               config.recordNetwork &&
                   (tracingData.networkRecords[passName] = passData.networkRecords);
 

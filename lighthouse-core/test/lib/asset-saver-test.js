@@ -47,6 +47,7 @@ describe('asset-saver helper', () => {
 
   it('generates HTML', () => {
     const artifacts = {
+      devtoolsLogs: {},
       traces: {
         [Audit.DEFAULT_PASS]: {
           traceEvents: []
@@ -61,6 +62,9 @@ describe('asset-saver helper', () => {
 
   describe('saves files', function() {
     const artifacts = {
+      devtoolsLogs: {
+        [Audit.DEFAULT_PASS]: [{message: 'first'}, {message: 'second'}]
+      },
       traces: {
         [Audit.DEFAULT_PASS]: {
           traceEvents
@@ -78,6 +82,13 @@ describe('asset-saver helper', () => {
       fs.unlinkSync(traceFilename);
     });
 
+    it('devtools log file saved to disk with data', () => {
+      const filename = 'the_file-0.devtoolslog.json';
+      const fileContents = fs.readFileSync(filename, 'utf8');
+      assert.ok(fileContents.includes('"message": "first"'));
+      fs.unlinkSync(filename);
+    });
+
     it('screenshots file saved to disk with data', () => {
       const ssFilename = 'the_file-0.screenshots.html';
       const ssFileContents = fs.readFileSync(ssFilename, 'utf8');
@@ -91,6 +102,7 @@ describe('asset-saver helper', () => {
     it('adds fake events to trace', () => {
       const countEvents = trace => trace.traceEvents.length;
       const mockArtifacts = {
+        devtoolsLogs: {},
         traces: {
           defaultPass: dbwTrace
         },
