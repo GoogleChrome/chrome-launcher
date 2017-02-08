@@ -112,13 +112,10 @@ class EventListeners extends Gatherer {
    *     listeners found across the elements.
    */
   collectListeners(nodes) {
-    return nodes.reduce((chain, node) => {
-      return chain.then(prevArr => {
-        // Call getEventListeners once for each node in the list.
-        return this.getEventListeners(node.element ? node.element.nodeId : node)
-            .then(result => prevArr.concat(result));
-      });
-    }, Promise.resolve([]));
+    // Gather event listeners from each node in parallel.
+    return Promise.all(nodes.map(node => {
+      return this.getEventListeners(node.element ? node.element.nodeId : node);
+    })).then(nestedListeners => [].concat(...nestedListeners));
   }
 
   beforePass(options) {

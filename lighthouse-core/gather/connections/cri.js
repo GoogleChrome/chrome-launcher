@@ -46,7 +46,9 @@ class CriConnection extends Connection {
       this._pageId = response.id;
 
       return new Promise((resolve, reject) => {
-        const ws = new WebSocket(url);
+        const ws = new WebSocket(url, {
+          perMessageDeflate: false
+        });
         ws.on('open', () => {
           this._ws = ws;
           resolve();
