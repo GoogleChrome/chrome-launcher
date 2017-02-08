@@ -18,15 +18,15 @@
 /* eslint-env mocha */
 
 const assert = require('assert');
-const MessageLog = require('../../../gather/connections/message-log');
+const DevtoolsLog = require('../../gather/devtools-log');
 
-describe('MessageLog', () => {
+describe('DevtoolsLog', () => {
   let messageLog;
   const pageMsg = {method: 'Page.frameStartedLoading'};
   const networkMsg = {method: 'Network.requestWillBeSent'};
   const otherMsg = {method: 'Storage.cleared'};
 
-  beforeEach(() => messageLog = new MessageLog());
+  beforeEach(() => messageLog = new DevtoolsLog(/^(Page|Network)/));
 
   it('returns an array', () => {
     assert.deepEqual(messageLog.messages, []);
@@ -42,7 +42,7 @@ describe('MessageLog', () => {
     assert.equal(messageLog.messages[0].method, networkMsg.method);
   });
 
-  it('does not record non-Network/Page events', () => {
+  it('does not record non-matching events', () => {
     messageLog.beginRecording();
     messageLog.record(pageMsg); // will record
     messageLog.record(networkMsg); // will record
@@ -50,6 +50,15 @@ describe('MessageLog', () => {
     messageLog.endRecording();
     assert.equal(messageLog.messages.length, 2);
     assert.equal(messageLog.messages[0].method, pageMsg.method);
+  });
+
+  it('records everything when no filter provided', () => {
+    messageLog = new DevtoolsLog();
+    messageLog.beginRecording();
+    messageLog.record(pageMsg);
+    messageLog.record(networkMsg);
+    messageLog.record(otherMsg);
+    assert.equal(messageLog.messages.length, 3);
   });
 
   it('resets properly', () => {

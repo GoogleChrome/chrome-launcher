@@ -18,7 +18,6 @@
 
 const EventEmitter = require('events').EventEmitter;
 const log = require('../../lib/log.js');
-const MessageLog = require('./message-log');
 
 class Connection {
 
@@ -27,7 +26,6 @@ class Connection {
     /** @type {!Map<number, {resolve: function(*), reject: function(*), method: string}>}*/
     this._callbacks = new Map();
     this._eventEmitter = new EventEmitter();
-    this.log = new MessageLog();
   }
 
   /**
@@ -111,7 +109,6 @@ class Connection {
       }));
     }
 
-    this.log.record(object);
     log.formatProtocol('<= event',
         {method: object.method, params: object.params}, 'verbose');
     this.emitNotification(object.method, object.params);

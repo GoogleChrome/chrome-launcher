@@ -16,14 +16,23 @@
  */
 'use strict';
 
-class MessageLog {
-  constructor() {
+/**
+ * @fileoverview This class saves all protocol messages whose method match a particular
+ *    regex filter. Used when saving assets for later analysis by another tool such as
+ *    Webpagetest.
+ */
+class DevtoolsLog {
+  /**
+   * @param {RegExp=} regexFilter
+   */
+  constructor(regexFilter) {
+    this._filter = regexFilter;
     this._messages = [];
     this._isRecording = false;
   }
 
   /**
-   * @return {!Array<Object>}
+   * @return {!Array<{method: string, params: !Object}>}
    */
   get messages() {
     return this._messages;
@@ -42,13 +51,14 @@ class MessageLog {
   }
 
   /**
-   * @param {{method: string, params: Object}} message
+   * Records a message if method matches filter and recording has been started.
+   * @param {{method: string, params: !Object}} message
    */
   record(message) {
-    if (this._isRecording && /^(Page|Network)\./.test(message.method)) {
+    if (this._isRecording && (!this._filter || this._filter.test(message.method))) {
       this._messages.push(message);
     }
   }
 }
 
-module.exports = MessageLog;
+module.exports = DevtoolsLog;
