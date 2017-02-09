@@ -18,6 +18,7 @@
 'use strict';
 
 const LighthouseViewerReport = require('./lighthouse-report-viewer');
+const Logger = require('../../../lighthouse-core/report/scripts/logger');
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -40,6 +41,7 @@ if (!('URLSearchParams' in window)) {
 // Lazy load polyfills that are needed. If any of the load promises fails,
 // stop and don't create a report.
 Promise.all(loadPolyfillPromises).then(_ => {
+  window.logger = new Logger('#log');
   // eslint-disable-next-line no-new
   new LighthouseViewerReport();
 });

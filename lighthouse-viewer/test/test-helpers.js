@@ -26,11 +26,14 @@ const PAGE = fs.readFileSync(path.join(__dirname, '../app/index.html'), 'utf8');
 function setupJsDomGlobals() {
   global.document = jsdom.jsdom(PAGE);
   global.window = global.document.defaultView;
+  global.logger = console;
+  global.logger.hide = () => {/* noop */};
 }
 
 function cleanupJsDomGlobals() {
   global.document = undefined;
   global.window = undefined;
+  global.logger = undefined;
 }
 
 module.exports = {

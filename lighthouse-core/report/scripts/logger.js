@@ -67,4 +67,6 @@ class Logger {
   }
 }
 
-module.exports = new Logger('#log'); // singleton
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = Logger;
+}

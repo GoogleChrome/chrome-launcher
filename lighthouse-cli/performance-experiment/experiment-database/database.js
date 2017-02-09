@@ -20,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
-const assetSaver = require('../../../lighthouse-core/lib/asset-saver');
+const getFilenamePrefix = require('../../../lighthouse-core/lib/file-namer').getFilenamePrefix;
 
 class ExperimentDatabase {
   constructor() {
@@ -42,7 +42,7 @@ class ExperimentDatabase {
    * @param {!Object} lhResults
    */
   saveData(lhFlags, lhResults) {
-    const id = assetSaver.getFilenamePrefix(lhResults);
+    const id = getFilenamePrefix(lhResults);
     this._timeStamps[id] = lhResults.generatedTime;
 
     const dirPath = path.join(this._fsRoot, id);

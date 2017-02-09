@@ -22,6 +22,7 @@ const _RUNTIME_ERROR_CODE = 1;
 const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
+const getFilenamePrefix = require('../lighthouse-core/lib/file-namer.js').getFilenamePrefix;
 import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';
 const lighthouse = require('../lighthouse-core');
@@ -257,8 +258,7 @@ function saveResults(results: Results,
     // Use the output path as the prefix for all generated files.
     // If no output path is set, generate a file prefix using the URL and date.
     const configuredPath = !flags.outputPath || flags.outputPath === 'stdout' ?
-        assetSaver.getFilenamePrefix(results) :
-        flags.outputPath.replace(/\.\w{2,4}$/, '');
+        getFilenamePrefix(results) : flags.outputPath.replace(/\.\w{2,4}$/, '');
     const resolvedPath = path.resolve(cwd, configuredPath);
 
     if (flags.saveArtifacts) {

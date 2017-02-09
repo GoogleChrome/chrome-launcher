@@ -30,21 +30,6 @@ const Audit = require('../../audits/audit.js');
 
 /* eslint-env mocha */
 describe('asset-saver helper', () => {
-  it('generates filename prefixes', () => {
-    const results = {
-      url: 'https://testexample.com',
-      generatedTime: '2017-01-06T02:34:56.217Z'
-    };
-    const str = assetSaver.getFilenamePrefix(results);
-    // we want the filename to match user timezone, however these tests will run on multiple TZs
-    assert.ok(str.startsWith('testexample.com'), 'hostname is missing');
-    assert.ok(str.includes('2017-'), 'full year is missing');
-    assert.ok(str.endsWith('-56'), 'seconds value is not at the end');
-    // regex of hostname_YYYY-MM-DD_HH-MM-SS
-    const regex = /testexample\.com_\d{4}-[0-1][[0-9]-[0-1][[0-9]_[0-2][0-9]-[0-5][0-9]-[0-5][0-9]/;
-    assert.ok(regex.test(str), `${str} doesn't match pattern: hostname_YYYY-MM-DD_HH-MM-SS`);
-  });
-
   it('generates HTML', () => {
     const artifacts = {
       devtoolsLogs: {},

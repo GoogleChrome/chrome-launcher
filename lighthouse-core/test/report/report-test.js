@@ -60,11 +60,14 @@ describe('Report', () => {
               'viewer report context');
   });
 
-  it('adds export button for viewer context', () => {
+  it('adds export button', () => {
     const reportGenerator = new ReportGenerator();
-    const html = reportGenerator.generateHTML(sampleResults, 'viewer');
-    assert.ok(!html.includes('<button class="print js-print'),
-                             'viewer report does not contain print button');
+    let html = reportGenerator.generateHTML(sampleResults, 'viewer');
+    assert.ok(!html.includes('data-action="open-viewer"'),
+                             'viewer context does not contain open in viewer button');
+    html = reportGenerator.generateHTML(sampleResults, 'extension');
+    assert.ok(html.includes('class="report__icon open" data-action="open-viewer"'),
+                            'extension context contains open in viewer button');
   });
 
   it('generates HTML', () => {
@@ -79,15 +82,11 @@ describe('Report', () => {
     assert.ok(html.includes('&quot;lighthouseVersion'), 'lhresults were escaped');
     assert.ok(/Version: x\.x\.x/g.test(html), 'Version doesn\'t appear in report');
     assert.ok(html.includes('export-button'), 'page includes export button');
-
-    assert.ok(html.includes('printButton = document.querySelector'),
-                            'print button functionality attached');
-    assert.ok(html.includes('openButton = document.querySelector'),
-                            'open button functionality attached');
     assert.ok(html.includes('share js-share'), 'has share button');
-    assert.ok(html.includes('copy js-copy'), 'has copy button');
-    assert.ok(html.includes('open js-open'), 'has open button');
-    assert.ok(html.includes('print js-print'), 'has print button');
+    assert.ok(html.includes('data-action="save-html" '), 'has save html button');
+    assert.ok(html.includes('data-action="save-json" '), 'has save json button');
+    assert.ok(html.includes('class="report__icon copy"'), 'has copy button');
+    assert.ok(html.includes('class="report__icon print"'), 'has print button');
   });
 
   it('does not include script for devtools', () => {

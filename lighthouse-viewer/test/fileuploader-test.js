@@ -26,10 +26,8 @@ const testHelpers = require('./test-helpers');
 testHelpers.setupJsDomGlobals();
 
 const FileUploader = require('../app/src/fileuploader');
-const logger = require('../app/src/logger');
 
 function assertUIReset(uploader) {
-  assert.ok(!logger.el.classList.contains('show'));
   assert.ok(!uploader.dropZone.classList.contains('dropping'));
   assert.ok(!uploader._dragging);
 }

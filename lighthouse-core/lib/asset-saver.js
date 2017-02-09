@@ -19,31 +19,7 @@
 const fs = require('fs');
 const log = require('../../lighthouse-core/lib/log.js');
 const stringifySafe = require('json-stringify-safe');
-const URL = require('./url-shim');
 const Metrics = require('./traces/pwmetrics-events');
-
-/**
- * Generate a filenamePrefix of hostname_YYYY-MM-DD_HH-MM-SS
- * Date/time uses the local timezone, however Node has unreliable ICU
- * support, so we must construct a YYYY-MM-DD date format manually. :/
- * @param {!Object} results
- * @returns string
- */
-function getFilenamePrefix(results) {
-  const hostname = new URL(results.url).hostname;
-  const date = (results.generatedTime && new Date(results.generatedTime)) || new Date();
-
-  const timeStr = date.toLocaleTimeString('en-US', {hour12: false});
-  const dateParts = date.toLocaleDateString('en-US', {
-    year: 'numeric', month: '2-digit', day: '2-digit'
-  }).split('/');
-  dateParts.unshift(dateParts.pop());
-  const dateStr = dateParts.join('-');
-
-  const filenamePrefix = `${hostname}_${dateStr}_${timeStr}`;
-  // replace characters that are unfriendly to filenames
-  return filenamePrefix.replace(/[\/\?<>\\:\*\|":]/g, '-');
-}
 
 /**
  * Generate basic HTML page of screenshot filmstrip
@@ -163,6 +139,5 @@ function saveAssets(artifacts, audits, pathWithBasename) {
 module.exports = {
   saveArtifacts,
   saveAssets,
-  getFilenamePrefix,
   prepareAssets
 };

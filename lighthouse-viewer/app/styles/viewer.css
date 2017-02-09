@@ -92,32 +92,7 @@
   margin-top: 16px;
   display: none;
 }
-.log-wrapper {
-  position: fixed;
-  top: 0;
-  display: flex;
-  align-content: center;
-  width: 100%;
-  pointer-events: none;
-}
-#log {
-  margin: 0 auto;
-  padding: 16px 32px;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  background: rgba(0,0,0,0.6);
-  max-width: 500px;
-  line-height: 1.4;
-  color: #fff; /*#E53935;*/
-  font-size: 16px;
-  transition: transform 300ms ease-in-out;
-  transform: translateY(-100%);
-}
-#log.show {
-  transform: translateY(0);
-}
-.share:disabled,
-.open:disabled {
+.share:disabled {
   opacity: 0.2;
   cursor: default;
 }
@@ -145,17 +120,7 @@
   }
 }
 
-@media print {
-  .log-wrapper {
-    display: none;
-  }
-}
-
 /* app z-indexes */
 .drop_zone {
   z-index: 2;
-}
-
-.log-wrapper {
-  z-index: 3;
 }

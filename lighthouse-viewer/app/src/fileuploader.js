@@ -17,7 +17,7 @@
 
 'use strict';
 
-const logger = require('./logger');
+/* global logger */
 
 /**
  * Manages drag and drop file input for the page.
