@@ -72,7 +72,7 @@
     "ws": "1.1.1",
     "yargs": "3.30.0"
   },
-  "repository": "googlechrome/lighthouse",
+  "repository": "GoogleChrome/lighthouse",
   "keywords": [
     "google",
     "chrome",
@@ -81,7 +81,7 @@
   "author": "The Chromium Authors",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/googlechrome/lighthouse/issues"
+    "url": "https://github.com/GoogleChrome/lighthouse/issues"
   },
-  "homepage": "https://github.com/googlechrome/lighthouse#readme"
+  "homepage": "https://github.com/GoogleChrome/lighthouse#readme"
 }

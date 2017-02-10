@@ -70,7 +70,7 @@ function buildReportErrorLink(err) {
   qsBody += '**Error Message**: ' + err.message + '\n';
   qsBody += '**Stack Trace**:\n ```' + err.stack + '```';
 
-  const base = 'https://github.com/googlechrome/lighthouse/issues/new?';
+  const base = 'https://github.com/GoogleChrome/lighthouse/issues/new?';
   let titleError = err.message;
 
   if (titleError.length > MAX_ISSUE_ERROR_LENGTH) {
