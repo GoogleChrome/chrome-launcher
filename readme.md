@@ -10,7 +10,7 @@ Default CLI output:
 
 ![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
 
-Lighthouse requires Chrome 54 or later.
+Lighthouse requires Chrome 56 or later.
 
 ## Install Chrome extension
 
