@@ -19,6 +19,7 @@
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
 const path = require('path');
+const URL = require('../lib/url-shim');
 
 /**
  * Class that drives browser to load the page and runs gatherer lifecycle hooks.
@@ -135,7 +136,10 @@ class GatherRunner {
    * @param {!Array<WebInspector.NetworkRequest>} networkRecords
    */
   static assertPageLoaded(url, driver, networkRecords) {
-    const mainRecord = networkRecords.find(record => record.url === url);
+    const mainRecord = networkRecords.find(record => {
+      // record.url is actual request url, so needs to be compared without any URL fragment.
+      return URL.equalWithExcludedFragments(record.url, url);
+    });
     if (driver.online && (!mainRecord || mainRecord.failed)) {
       const message = mainRecord ? mainRecord.localizedFailDescription : 'timeout reached';
       log.error('GatherRunner', message);

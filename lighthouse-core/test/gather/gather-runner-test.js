@@ -273,6 +273,7 @@ describe('GatherRunner', function() {
   });
 
   it('tells the driver to end tracing', () => {
+    const url = 'https://example.com';
     let calledTrace = false;
     const fakeTraceData = {traceEvents: ['reallyBelievableTraceEvents']};
 
@@ -290,7 +291,7 @@ describe('GatherRunner', function() {
       ]
     };
 
-    return GatherRunner.afterPass({driver, config}, {TestGatherer: []}).then(passData => {
+    return GatherRunner.afterPass({url, driver, config}, {TestGatherer: []}).then(passData => {
       assert.equal(calledTrace, true);
       assert.equal(passData.trace, fakeTraceData);
     });
@@ -319,6 +320,7 @@ describe('GatherRunner', function() {
   });
 
   it('tells the driver to end network collection', () => {
+    const url = 'https://example.com';
     let calledNetworkCollect = false;
 
     const driver = Object.assign({}, fakeDriver, {
@@ -339,7 +341,7 @@ describe('GatherRunner', function() {
       ]
     };
 
-    return GatherRunner.afterPass({driver, config}, {TestGatherer: []}).then(vals => {
+    return GatherRunner.afterPass({url, driver, config}, {TestGatherer: []}).then(vals => {
       assert.equal(calledNetworkCollect, true);
       assert.strictEqual(vals.networkRecords.marker, 'mocked');
     });
@@ -515,6 +517,12 @@ describe('GatherRunner', function() {
     it('passes when the page is loaded', () => {
       const url = 'http://the-page.com';
       const records = [{url}];
+      GatherRunner.assertPageLoaded(url, {online: true}, records);
+    });
+
+    it('passes when the page is loaded, ignoring any fragment', () => {
+      const url = 'http://example.com/#/page/list';
+      const records = [{url: 'http://example.com'}];
       GatherRunner.assertPageLoaded(url, {online: true}, records);
     });
 
