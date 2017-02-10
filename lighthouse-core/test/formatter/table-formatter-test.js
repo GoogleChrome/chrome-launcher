@@ -34,7 +34,7 @@ describe('TableFormatter', () => {
       code: 'code snippet',
       isEval: true,
       pre: 'pre snippet',
-      preview: {url: 'http://example.com/i.jpg', mimeType: 'image/jpeg'}
+      preview: {url: 'http://example.com/(format:webp)/i.jpg', mimeType: 'image/jpeg'}
     }]
   };
 
@@ -57,8 +57,9 @@ describe('TableFormatter', () => {
     assert.equal(table.rows[0].cols[2], '\`code snippet\`');
     assert.equal(table.rows[0].cols[3], 'yes');
     assert.equal(table.rows[0].cols[4], '\`\`\`\npre snippet\`\`\`');
+    const expectedUrl = 'http://example.com/(format:webp%29/i.jpg';
     assert.equal(table.rows[0].cols[5],
-        '[![Image preview](http://example.com/i.jpg "Image preview")](http://example.com/i.jpg)');
+        `[![Image preview](${expectedUrl} "Image preview")](${expectedUrl})`);
   });
 
   it('generates valid pretty output', () => {

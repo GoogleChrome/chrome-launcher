@@ -94,7 +94,9 @@ class Table extends Formatter {
         switch (key) {
           case 'preview':
             if (/^image/.test(value.mimeType)) {
-              return `[![Image preview](${value.url} "Image preview")](${value.url})`;
+              // Markdown can't handle URLs with parentheses which aren't automatically encoded
+              const encodedUrl = value.url.replace(/\)/g, '%29');
+              return `[![Image preview](${encodedUrl} "Image preview")](${encodedUrl})`;
             }
             return '';
           case 'code':
