@@ -225,6 +225,60 @@ describe('GatherRunner', function() {
     });
   });
 
+  it('clears the network cache and origin storage', () => {
+    const asyncFunc = () => Promise.resolve();
+    const tests = {
+      calledDisableNetworkCache: false,
+      calledClearStorage: false,
+    };
+    const createCheck = variable => () => {
+      tests[variable] = true;
+      return Promise.resolve();
+    };
+    const driver = {
+      assertNoSameOriginServiceWorkerClients: asyncFunc,
+      beginEmulation: asyncFunc,
+      enableRuntimeEvents: asyncFunc,
+      cacheNatives: asyncFunc,
+      cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
+      clearDataForOrigin: createCheck('calledClearStorage'),
+      blockUrlPatterns: asyncFunc,
+    };
+
+    return GatherRunner.setupDriver(driver, {flags: {}}).then(_ => {
+      assert.equal(tests.calledDisableNetworkCache, true);
+      assert.equal(tests.calledClearStorage, true);
+    });
+  });
+
+  it('does not clear the cache & storage when disable-storage-reset flag is set', () => {
+    const asyncFunc = () => Promise.resolve();
+    const tests = {
+      calledDisableNetworkCache: false,
+      calledClearStorage: false,
+    };
+    const createCheck = variable => () => {
+      tests[variable] = true;
+      return Promise.resolve();
+    };
+    const driver = {
+      assertNoSameOriginServiceWorkerClients: asyncFunc,
+      beginEmulation: asyncFunc,
+      enableRuntimeEvents: asyncFunc,
+      cacheNatives: asyncFunc,
+      cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
+      clearDataForOrigin: createCheck('calledClearStorage'),
+      blockUrlPatterns: asyncFunc,
+    };
+
+    return GatherRunner.setupDriver(driver, {
+      flags: {disableStorageReset: true}
+    }).then(_ => {
+      assert.equal(tests.calledDisableNetworkCache, false);
+      assert.equal(tests.calledClearStorage, false);
+    });
+  });
+
   it('tells the driver to block given URL patterns when blockedUrlPatterns is given', () => {
     const receivedUrlPatterns = [];
     const urlPatterns = ['http://*.evil.com', '.jpg', '.woff2'];

@@ -92,13 +92,14 @@ class GatherRunner {
 
   static setupDriver(driver, options) {
     log.log('status', 'Initializing…');
+    const resetStorage = !options.flags.disableStorageReset;
     // Enable emulation based on flags
     return driver.assertNoSameOriginServiceWorkerClients(options.url)
       .then(_ => driver.beginEmulation(options.flags))
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cacheNatives())
-      .then(_ => driver.cleanAndDisableBrowserCaches())
-      .then(_ => driver.clearDataForOrigin(options.url))
+      .then(_ => resetStorage && driver.cleanAndDisableBrowserCaches())
+      .then(_ => resetStorage && driver.clearDataForOrigin(options.url))
       .then(_ => driver.blockUrlPatterns(options.flags.blockedUrlPatterns || []));
   }
 
