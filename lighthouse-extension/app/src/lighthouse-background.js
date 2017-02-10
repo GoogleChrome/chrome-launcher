@@ -28,39 +28,39 @@ const ReportGenerator = require('../../../lighthouse-core/report/report-generato
 const STORAGE_KEY = 'lighthouse_audits';
 const SETTINGS_KEY = 'lighthouse_settings';
 
-let installedExtensions = [];
+// let installedExtensions = [];
 let disableExtensionsDuringRun = false;
 let lighthouseIsRunning = false;
 let latestStatusLog = [];
 
 const _flatten = arr => [].concat(...arr);
 
-/**
- * Enables or disables all other installed chrome extensions. The initial list
- * of the user's extension is created when the background page is started.
- * @param {!boolean} enable If true, enables all other installed extensions.
- *     False disables them.
- * @param {!Promise}
- */
-function enableOtherChromeExtensions(enable) {
-  if (!disableExtensionsDuringRun) {
-    return Promise.resolve();
-  }
+// /**
+//  * Enables or disables all other installed chrome extensions. The initial list
+//  * of the user's extension is created when the background page is started.
+//  * @param {!boolean} enable If true, enables all other installed extensions.
+//  *     False disables them.
+//  * @param {!Promise}
+//  */
+// function enableOtherChromeExtensions(enable) {
+//   if (!disableExtensionsDuringRun) {
+//     return Promise.resolve();
+//   }
 
-  const str = enable ? 'enabling' : 'disabling';
-  log.log('Chrome', `${str} ${installedExtensions.length} extensions.`);
+//   const str = enable ? 'enabling' : 'disabling';
+//   log.log('Chrome', `${str} ${installedExtensions.length} extensions.`);
 
-  return Promise.all(installedExtensions.map(info => {
-    return new Promise((resolve, reject) => {
-      chrome.management.setEnabled(info.id, enable, _ => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        }
-        resolve();
-      });
-    });
-  }));
-}
+//   return Promise.all(installedExtensions.map(info => {
+//     return new Promise((resolve, reject) => {
+//       chrome.management.setEnabled(info.id, enable, _ => {
+//         if (chrome.runtime.lastError) {
+//           reject(chrome.runtime.lastError);
+//         }
+//         resolve();
+//       });
+//     });
+//   }));
+// }
 
 /**
  * Filter out any unrequested aggregations from the config. If any audits are
@@ -178,18 +178,19 @@ window.runLighthouseInExtension = function(options, requestedAggregations) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new ExtensionProtocol();
-  return enableOtherChromeExtensions(false)
-    .then(_ => connection.getCurrentTabURL())
+  // return enableOtherChromeExtensions(false)
+    // .then(_ => connection.getCurrentTabURL())
+  return connection.getCurrentTabURL()
     .then(url => window.runLighthouseForConnection(connection, url, options, requestedAggregations))
     .then(results => {
-      return enableOtherChromeExtensions(true).then(_ => {
-        const blobURL = window.createReportPageAsBlob(results, 'extension');
-        chrome.tabs.create({url: blobURL});
-      });
+      // return enableOtherChromeExtensions(true).then(_ => {
+      const blobURL = window.createReportPageAsBlob(results, 'extension');
+      chrome.tabs.create({url: blobURL});
+      // });
     }).catch(err => {
-      return enableOtherChromeExtensions(true).then(_ => {
-        throw err;
-      });
+      // return enableOtherChromeExtensions(true).then(_ => {
+      throw err;
+      // });
     });
 };
 
@@ -270,7 +271,7 @@ window.saveSettings = function(settings) {
     storage[STORAGE_KEY][audit.name] = settings.selectedAggregations.includes(audit.name);
   });
 
-  // Stash disable extensionS setting.
+  // Stash disable extensions setting.
   disableExtensionsDuringRun = settings.disableExtensions;
   storage[SETTINGS_KEY].disableExtensions = disableExtensionsDuringRun;
 
@@ -330,14 +331,14 @@ window.isRunning = function() {
 if (window.chrome && chrome.runtime) {
   // Get list of installed extensions that are enabled and can be disabled.
   // Extensions are not allowed to be disabled if they are under an admin policy.
-  chrome.management.getAll(installs => {
-    chrome.management.getSelf(lighthouseCrxInfo => {
-      installedExtensions = installs.filter(info => {
-        return info.id !== lighthouseCrxInfo.id && info.type === 'extension' &&
-               info.enabled && info.mayDisable;
-      });
-    });
-  });
+  // chrome.management.getAll(installs => {
+  //   chrome.management.getSelf(lighthouseCrxInfo => {
+  //     installedExtensions = installs.filter(info => {
+  //       return info.id !== lighthouseCrxInfo.id && info.type === 'extension' &&
+  //              info.enabled && info.mayDisable;
+  //     });
+  //   });
+  // });
 
   chrome.runtime.onInstalled.addListener(details => {
     if (details.previousVersion) {
