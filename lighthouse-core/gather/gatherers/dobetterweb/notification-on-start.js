@@ -34,9 +34,9 @@ class NotificationOnStart extends Gatherer {
     return options.driver.queryPermissionState('notifications')
       .then(state => {
         if (state === 'granted' || state === 'denied') {
-          throw new Error('Unable to determine if this permission was requested on page load ' +
-              'because it had already been set. Try resetting the permission and running ' +
-              'Lighthouse again.');
+          throw new Error('Unable to determine if the Notification permission was ' +
+              `requested on page load because it was already ${state}. ` +
+              'Try resetting the permission and running Lighthouse again.');
         }
 
         return this.collectNotificationUsage();

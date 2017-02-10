@@ -37,12 +37,20 @@ class GeolocationOnStart extends Gatherer {
    * @return {!Promise<!Array<{url: string, line: number, col: number}>>}
    */
   afterPass(options) {
-    return options.driver.queryPermissionState('geolocation')
+    return options.driver.evaluateAsync('(function(){return window.isSecureContext;})()')
+      .then(isSecureContext => {
+        if (!isSecureContext) {
+          throw new Error('Unable to determine if the Geolocation permission requested on page ' +
+              'load because the page is not hosted on a secure origin. The Geolocation API ' +
+              'requires an https URL.');
+        }
+      })
+      .then(_ => options.driver.queryPermissionState('geolocation'))
       .then(state => {
         if (state === 'granted' || state === 'denied') {
-          throw new Error('Unable to determine if this permission was requested on page load ' +
-              'because it had already been set. Try resetting the permission and running ' +
-              'Lighthouse again.');
+          throw new Error('Unable to determine if the Geolocation permission was ' +
+              `requested on page load because it was already ${state}. ` +
+              'Try resetting the permission and running Lighthouse again.');
         }
 
         return this.collectCurrentPosUsage().then(results => {

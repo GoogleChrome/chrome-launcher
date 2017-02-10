@@ -24,8 +24,8 @@ describe('UX: geolocation audit', () => {
   it('fails when geolocation has been automatically requested', () => {
     const auditResult = GeolocationOnStartAudit.audit({
       GeolocationOnStart: [
-        {url: 'http://different.com/two', line: 2, col: 2},
-        {url: 'http://example2.com/two', line: 2, col: 22}
+        {url: 'https://different.com/two', line: 2, col: 2},
+        {url: 'https://example2.com/two', line: 2, col: 22}
       ],
     });
     assert.equal(auditResult.rawValue, false);
