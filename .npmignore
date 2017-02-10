@@ -28,3 +28,7 @@ lighthouse-cli/types/*.js
 lighthouse-cli/types/*.map
 
 assets
+
+lighthouse-core/test
+lighthouse-viewer
+lighthouse-extension
