@@ -1,4 +1,4 @@
-# Lighthouse  [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse) [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
+# Lighthouse  [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse) [![Build Status Windows](https://ci.appveyor.com/api/projects/status/3bdm5qn9r32ha5cg/branch/master?svg=true)](https://ci.appveyor.com/project/paulirish/lighthouse) [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
 
 > Lighthouse analyzes web apps and web pages, collecting modern performance metrics and insights on developer best practices.
 
