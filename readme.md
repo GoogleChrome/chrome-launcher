@@ -66,7 +66,7 @@ npm run install-all
 node lighthouse-cli http://example.com
 ```
 
-Geting started tip: `node --inspect --debug-brk lighthouse-cli http://example.com` to open up Chrome DevTools and step
+Getting started tip: `node --inspect --debug-brk lighthouse-cli http://example.com` to open up Chrome DevTools and step
 through the entire app. See [Debugging Node.js with Chrome
 DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27#.59rma3ukm)
 for more info.
@@ -93,7 +93,7 @@ If you'd like to contribute, check the [list of issues](https://github.com/Googl
 
 ## Lighthouse as trace processor
 
-Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
+Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The performance log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
 ### `config.json`
 
@@ -202,17 +202,16 @@ $ lighthouse --disable-device-emulation --disable-cpu-throttling https://mysite.
 
 ## Tests
 
-Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
+Some basic unit tests forked are in `/test` and run via mocha. ESLint also checks for style violations.
 
 ```sh
 # lint and test all files
 npm test
 
 # watch for file changes and run tests
-#   Requires http://entrproject.org : brew install entr
 npm run watch
 
-## run linting and unit tests seprately
+## run linting and unit tests separately
 npm run lint
 npm run unit
 ```
@@ -272,7 +271,7 @@ Promise.resolve({
   name: 'audit-name',
   tags: ['what have you'],
   description: 'whatnot',
-  // value: The score. Typically a boolean, but can be number 0-100
+  // value: The score. Typically a Boolean, but can be number 0-100
   value: 0,
   // rawValue: Could be anything, as long as it can easily be stringified and displayed,
   //   e.g. 'your score is bad because you wrote ${rawValue}'
