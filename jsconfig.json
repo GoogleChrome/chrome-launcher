@@ -1,22 +1,22 @@
 {
-    "//": "to run: tsc -p ./jsconfig.json ",
+  "//": "to run: tsc -p ./jsconfig.json ",
 
-    "///": "good docs here: https://github.com/Microsoft/vscode-docs/blob/vnext/docs/languages/javascript.md#javascript-projects-jsconfigjson ",
+  "///": "good docs here: https://github.com/Microsoft/vscode-docs/blob/vnext/docs/languages/javascript.md#javascript-projects-jsconfigjson ",
 
-    "compilerOptions": {
-        "target": "ES6",
-        "outDir": "./dist",
-        "diagnostics": true
-    },
-    "exclude": [
-        "**/node_modules",
-        "**/third_party",
-        "**/dist",
+  "compilerOptions": {
+    "target": "ES6",
+    "outDir": "./dist",
+    "diagnostics": true
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/third_party",
+    "**/dist",
 
-        "lighthouse-core/closure",
+    "lighthouse-core/closure",
 
-        "lighthouse-extension",
-        "lighthouse-cli",
-        "lighthouse-viewer"
-    ]
+    "lighthouse-extension",
+    "lighthouse-cli",
+    "lighthouse-viewer"
+  ]
 }

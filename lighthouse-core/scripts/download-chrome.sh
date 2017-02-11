@@ -4,8 +4,8 @@
 
 if [ x"$LIGHTHOUSE_CHROMIUM_PATH" == x ]
 then
-    echo "Error: Environment variable LIGHTHOUSE_CHROMIUM_PATH not set"
-    exit 1
+  echo "Error: Environment variable LIGHTHOUSE_CHROMIUM_PATH not set"
+  exit 1
 fi
 
 if [ -e "$LIGHTHOUSE_CHROMIUM_PATH" ]
