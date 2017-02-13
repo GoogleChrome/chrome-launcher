@@ -33,6 +33,7 @@
   font-family: monospace;
   display: block;
   margin: 0;
+  overflow-x: auto;
 }
 .table_list em + code, .table_list em + pre {
   margin-top: 10px;
