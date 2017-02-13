@@ -96,7 +96,6 @@ class Connection {
       const callback = this._callbacks.get(object.id);
       this._callbacks.delete(object.id);
 
-      // handleRawError returns or throws synchronously; wrap to put into promise chain.
       return callback.resolve(Promise.resolve().then(_ => {
         if (object.error) {
           log.formatProtocol('method <= browser ERR', {method: callback.method}, 'error');
