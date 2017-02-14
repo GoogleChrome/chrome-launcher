@@ -176,7 +176,7 @@ Options:
 * `./report.json`
 * `./report.artifacts.log`
 
-`--save-artifacts` prints a pretty report to `stdout` **and** generates 
+`--save-artifacts` prints a pretty report to `stdout` **and** generates
 * `./<HOST>_<DATE>.report.html`
 * `./<HOST>_<DATE>.artifacts.log`
 
@@ -260,7 +260,7 @@ driver.sendCommand('Security.enable');
 
 ### Gatherers
 
-* _Reading the DOM:_ We prefer reading the DOM right from the browser (See #77). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values.
+* _Reading the DOM:_ We prefer reading the DOM right from the browser (See [#77](https://github.com/GoogleChrome/lighthouse/pull/77)). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values.
 
 ### Audits
 
