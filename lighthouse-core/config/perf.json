@@ -28,11 +28,11 @@
     "user-timings",
     "screenshots",
     "critical-request-chains",
-    "unused-css-rules",
+    "byte-efficiency/unused-css-rules",
+    "byte-efficiency/uses-optimized-images",
+    "byte-efficiency/uses-responsive-images",
     "dobetterweb/link-blocking-first-paint",
-    "dobetterweb/script-blocking-first-paint",
-    "dobetterweb/uses-optimized-images",
-    "dobetterweb/uses-responsive-images"
+    "dobetterweb/script-blocking-first-paint"
   ],
 
   "aggregations": [{

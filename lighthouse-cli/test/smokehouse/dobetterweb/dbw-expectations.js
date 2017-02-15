@@ -127,16 +127,6 @@ module.exports = [
           }
         }
       },
-      'unused-css-rules': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 5
-            }
-          }
-        }
-      },
       'uses-passive-event-listeners': {
         score: false,
         extendedInfo: {
@@ -145,26 +135,6 @@ module.exports = [
             // listeners to passive. See https://www.chromestatus.com/features/5093566007214080
             results: {
               length: 4
-            }
-          }
-        }
-      },
-      'uses-optimized-images': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 1
-            }
-          }
-        }
-      },
-      'uses-responsive-images': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 2
             }
           }
         }
@@ -219,9 +189,6 @@ module.exports = [
         score: true
       },
       'script-blocking-first-paint': {
-        score: true
-      },
-      'unused-css-rules': {
         score: true
       },
       'uses-passive-event-listeners': {

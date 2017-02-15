@@ -15,7 +15,8 @@
  */
 'use strict';
 
-const UsesResponsiveImagesAudit = require('../../../audits/dobetterweb/uses-responsive-images.js');
+const UsesResponsiveImagesAudit =
+    require('../../../audits/byte-efficiency/uses-responsive-images.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
@@ -41,43 +42,59 @@ function generateImage(clientSize, naturalSize, networkRecord, src = 'https://go
 }
 
 describe('Page uses responsive images', () => {
-  it('fails when an image is much larger than displayed size', () => {
-    const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 1},
-      ImageUsage: [
-        generateImage(
-          generateSize(100, 100),
-          generateSize(200, 200, 'natural'),
-          generateRecord(60, 250)
-        ),
-        generateImage(
-          generateSize(100, 100),
-          generateSize(90, 90),
-          generateRecord(30, 200)
-        ),
-      ],
-    });
+  function testImage(condition, data) {
+    const description = `${data.passes ? 'passes' : 'fails'} when an image is ${condition}`;
+    it(description, () => {
+      const result = UsesResponsiveImagesAudit.audit_({
+        ContentWidth: {devicePixelRatio: data.devicePixelRatio || 1},
+        ImageUsage: [
+          generateImage(
+            generateSize(...data.clientSize),
+            generateSize(...data.naturalSize, 'natural'),
+            generateRecord(data.sizeInKb, data.durationInMs || 200)
+          )
+        ]
+      });
 
-    assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.results.length, 1);
-    assert.ok(/45KB/.test(auditResult.displayValue), 'computes total kb');
+      assert.equal(result.passes, data.passes);
+      assert.equal(result.results.length, data.listed || !data.passes ? 1 : 0);
+    });
+  }
+
+  testImage('larger than displayed size', {
+    passes: false,
+    listed: false,
+    devicePixelRatio: 2,
+    clientSize: [100, 100],
+    naturalSize: [300, 300],
+    sizeInKb: 200
   });
 
-  it('fails when an image is much larger than DPR displayed size', () => {
-    const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 2},
-      ImageUsage: [
-        generateImage(
-          generateSize(100, 100),
-          generateSize(300, 300, 'natural'),
-          generateRecord(90, 500)
-        ),
-      ],
-    });
+  testImage('smaller than displayed size', {
+    passes: true,
+    listed: false,
+    devicePixelRatio: 2,
+    clientSize: [200, 200],
+    naturalSize: [300, 300],
+    sizeInKb: 200
+  });
 
-    assert.equal(auditResult.rawValue, false);
-    assert.equal(auditResult.extendedInfo.value.results.length, 1);
-    assert.ok(/80KB/.test(auditResult.displayValue), 'compute total kb');
+  testImage('small in file size', {
+    passes: true,
+    listed: true,
+    devicePixelRatio: 2,
+    clientSize: [100, 100],
+    naturalSize: [300, 300],
+    sizeInKb: 10
+  });
+
+  testImage('very small in file size', {
+    passes: true,
+    listed: false,
+    devicePixelRatio: 2,
+    clientSize: [100, 100],
+    naturalSize: [300, 300],
+    sizeInKb: 1
   });
 
   it('handles images without network record', () => {
@@ -92,8 +109,8 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.results.length, 0);
+    assert.equal(auditResult.passes, true);
+    assert.equal(auditResult.results.length, 0);
   });
 
   it('passes when all images are not wasteful', () => {
@@ -102,7 +119,7 @@ describe('Page uses responsive images', () => {
       ImageUsage: [
         generateImage(
           generateSize(200, 200),
-          generateSize(210, 210, 'natural'),
+          generateSize(450, 450, 'natural'),
           generateRecord(100, 300)
         ),
         generateImage(
@@ -119,7 +136,7 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.results.length, 2);
+    assert.equal(auditResult.passes, true);
+    assert.equal(auditResult.results.length, 2);
   });
 });

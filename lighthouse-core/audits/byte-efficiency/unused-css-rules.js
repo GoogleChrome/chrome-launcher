@@ -16,13 +16,10 @@
  */
 'use strict';
 
-const Audit = require('./audit');
-const Formatter = require('../formatters/formatter');
-const URL = require('../lib/url-shim');
+const Audit = require('./byte-efficiency-audit');
+const URL = require('../../lib/url-shim');
 
-const KB_IN_BYTES = 1024;
 const PREVIEW_LENGTH = 100;
-const ALLOWABLE_UNUSED_RULES_RATIO = 0.10;
 
 class UnusedCSSRules extends Audit {
   /**
@@ -32,7 +29,7 @@ class UnusedCSSRules extends Audit {
     return {
       category: 'CSS',
       name: 'unused-css-rules',
-      description: 'Uses 90% of its CSS rules',
+      description: 'Avoids loading unnecessary CSS',
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +
           'bytes consumed by network activity. ' +
           '[Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)',
@@ -159,65 +156,37 @@ class UnusedCSSRules extends Audit {
       url,
       numUnused,
       wastedBytes,
-      totalKb: Math.round(totalBytes / KB_IN_BYTES) + ' KB',
-      potentialSavings: `${Math.round(percentUnused * 100)}%`,
+      wastedPercent: percentUnused * 100,
+      totalBytes,
     };
   }
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
+   * @return {{results: !Array<Object>, tableHeadings: Object,
+   *     passes: boolean=, debugString: string=}}
    */
-  static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
-      return UnusedCSSRules.audit_(artifacts, networkThroughput);
-    });
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
-   * @param {number} networkThroughput
-   * @return {!AuditResult}
-   */
-  static audit_(artifacts, networkThroughput) {
+  static audit_(artifacts) {
     const styles = artifacts.Styles;
     const usage = artifacts.CSSUsage;
     const pageUrl = artifacts.URL.finalUrl;
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
 
     const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
-    const unused = UnusedCSSRules.countUnusedRules(usage, indexedSheets);
-    const unusedRatio = (unused / usage.length) || 0;
+    UnusedCSSRules.countUnusedRules(usage, indexedSheets);
     const results = Object.keys(indexedSheets).map(sheetId => {
       return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
-    }).filter(Boolean);
+    }).filter(sheet => sheet && sheet.wastedBytes > 1024);
 
-    const wastedBytes = results.reduce((waste, result) => waste + result.wastedBytes, 0);
-    let displayValue = '';
-    if (unused > 0) {
-      const wastedKb = Math.round(wastedBytes / KB_IN_BYTES);
-      // Only round to nearest 10ms since we're relatively hand-wavy
-      const wastedMs = Math.round(wastedBytes / networkThroughput * 100) * 10;
-      displayValue = `${wastedKb}KB (~${wastedMs}ms) potential savings`;
-    }
-
-    return UnusedCSSRules.generateAuditResult({
-      displayValue,
-      rawValue: unusedRatio < ALLOWABLE_UNUSED_RULES_RATIO,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {
-          results,
-          tableHeadings: {
-            url: 'URL',
-            numUnused: 'Unused Rules',
-            totalKb: 'Original (KB)',
-            potentialSavings: 'Potential Savings (%)',
-          }
-        }
+    return {
+      results,
+      tableHeadings: {
+        url: 'URL',
+        numUnused: 'Unused Rules',
+        totalKb: 'Original',
+        potentialSavings: 'Potential Savings',
       }
-    });
+    };
   }
 }
 

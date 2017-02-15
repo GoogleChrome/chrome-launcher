@@ -72,7 +72,6 @@
     "manifest-short-name-length",
     "manifest-start-url",
     "theme-color-meta",
-    "unused-css-rules",
     "content-width",
     "deprecations",
     "accessibility/aria-allowed-attr",
@@ -83,6 +82,9 @@
     "accessibility/image-alt",
     "accessibility/label",
     "accessibility/tabindex",
+    "byte-efficiency/unused-css-rules",
+    "byte-efficiency/uses-optimized-images",
+    "byte-efficiency/uses-responsive-images",
     "dobetterweb/external-anchors-use-rel-noopener",
     "dobetterweb/appcache-manifest",
     "dobetterweb/geolocation-on-start",
@@ -96,8 +98,6 @@
     "dobetterweb/notification-on-start",
     "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
-    "dobetterweb/uses-optimized-images",
-    "dobetterweb/uses-responsive-images",
     "dobetterweb/uses-passive-event-listeners"
   ],
 

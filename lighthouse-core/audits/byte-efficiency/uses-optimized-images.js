@@ -18,20 +18,19 @@
  * @fileoverview This audit determines if the images used are sufficiently larger
  * than Lighthouse optimized versions of the images (as determined by the gatherer).
  * Audit will fail if one of the conditions are met:
- *   * There is at least one JPEG or bitmap image that was larger than canvas encoded JPEG.
- *   * There is at least one image that would have saved more than 50KB by using WebP.
- *   * The savings of moving all images to WebP is greater than 100KB.
+ *   * There is at least one JPEG or bitmap image that was >10KB larger than canvas encoded JPEG.
+ *   * There is at least one image that would have saved more than 100KB by using WebP.
+ *   * The savings of moving all images to WebP is greater than 1MB.
  */
 'use strict';
 
-const Audit = require('../audit');
+const Audit = require('./byte-efficiency-audit');
 const URL = require('../../lib/url-shim');
-const Formatter = require('../../formatters/formatter');
 
-const KB_IN_BYTES = 1024;
-const IGNORE_THRESHOLD_IN_BYTES = 2 * KB_IN_BYTES;
-const TOTAL_WASTED_BYTES_THRESHOLD = 100 * KB_IN_BYTES;
-const WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES = 50 * KB_IN_BYTES;
+const IGNORE_THRESHOLD_IN_BYTES = 2048;
+const TOTAL_WASTED_BYTES_THRESHOLD = 1000 * 1024;
+const JPEG_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES = 25 * 1024;
+const WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES = 100 * 1024;
 
 class UsesOptimizedImages extends Audit {
   /**
@@ -41,7 +40,7 @@ class UsesOptimizedImages extends Audit {
     return {
       category: 'Images',
       name: 'uses-optimized-images',
-      description: 'Has optimized images',
+      description: 'Avoids unoptimized images',
       helpText: 'Images should be optimized to save network bytes. ' +
         'The following images could have smaller file sizes when compressed with ' +
         '[WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. ' +
@@ -53,32 +52,20 @@ class UsesOptimizedImages extends Audit {
   /**
    * @param {{originalSize: number, webpSize: number, jpegSize: number}} image
    * @param {string} type
-   * @return {{bytes: number, kb: number, percent: number}}
+   * @return {{bytes: number, percent: number}}
    */
   static computeSavings(image, type) {
     const bytes = image.originalSize - image[type + 'Size'];
-    const kb = Math.round(bytes / KB_IN_BYTES);
-    const percent = Math.round(100 * bytes / image.originalSize);
-    return {bytes, kb, percent};
+    const percent = 100 * bytes / image.originalSize;
+    return {bytes, percent};
   }
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
+   * @return {{results: !Array<Object>, tableHeadings: Object,
+   *     passes: boolean=, debugString: string=}}
    */
-  static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
-      return UsesOptimizedImages.audit_(artifacts, networkThroughput);
-    });
-  }
-
-  /**
-   * @param {!Artifacts} artifacts
-   * @param {number} networkThroughput
-   * @return {!AuditResult}
-   */
-  static audit_(artifacts, networkThroughput) {
+  static audit_(artifacts) {
     const images = artifacts.OptimizedImages;
 
     const failedImages = [];
@@ -93,40 +80,38 @@ class UsesOptimizedImages extends Audit {
         return results;
       }
 
-      const originalKb = Math.round(image.originalSize / KB_IN_BYTES);
+      const url = URL.getDisplayName(image.url);
       const webpSavings = UsesOptimizedImages.computeSavings(image, 'webp');
 
       if (webpSavings.bytes > WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES) {
         hasAllEfficientImages = false;
+      } else if (webpSavings.bytes < IGNORE_THRESHOLD_IN_BYTES) {
+        return results;
       }
 
       let jpegSavingsLabel;
       if (/(jpeg|bmp)/.test(image.mimeType)) {
         const jpegSavings = UsesOptimizedImages.computeSavings(image, 'jpeg');
-        if (jpegSavings.bytes > 0) {
+        if (jpegSavings.bytes > JPEG_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES) {
           hasAllEfficientImages = false;
-          jpegSavingsLabel = `${jpegSavings.percent}%`;
+        }
+        if (jpegSavings.bytes > IGNORE_THRESHOLD_IN_BYTES) {
+          jpegSavingsLabel = this.toSavingsString(jpegSavings.bytes, jpegSavings.percent);
         }
       }
 
       totalWastedBytes += webpSavings.bytes;
+
       results.push({
-        url: URL.getDisplayName(image.url),
+        url,
         preview: {url: image.url, mimeType: image.mimeType},
-        total: `${originalKb} KB`,
-        webpSavings: `${webpSavings.percent}%`,
+        totalBytes: image.originalSize,
+        wastedBytes: webpSavings.bytes,
+        webpSavings: this.toSavingsString(webpSavings.bytes, webpSavings.percent),
         jpegSavings: jpegSavingsLabel
       });
       return results;
     }, []);
-
-    let displayValue = '';
-    if (totalWastedBytes > 1000) {
-      const totalWastedKb = Math.round(totalWastedBytes / KB_IN_BYTES);
-      // Only round to nearest 10ms since we're relatively hand-wavy
-      const totalWastedMs = Math.round(totalWastedBytes / networkThroughput * 100) * 10;
-      displayValue = `${totalWastedKb}KB (~${totalWastedMs}ms) potential savings`;
-    }
 
     let debugString;
     if (failedImages.length) {
@@ -134,24 +119,18 @@ class UsesOptimizedImages extends Audit {
       debugString = `Lighthouse was unable to decode some of your images: ${urls.join(', ')}`;
     }
 
-    return UsesOptimizedImages.generateAuditResult({
-      displayValue,
+    return {
+      passes: hasAllEfficientImages && totalWastedBytes < TOTAL_WASTED_BYTES_THRESHOLD,
       debugString,
-      rawValue: hasAllEfficientImages && totalWastedBytes < TOTAL_WASTED_BYTES_THRESHOLD,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {
-          results,
-          tableHeadings: {
-            preview: '',
-            url: 'URL',
-            total: 'Original (KB)',
-            webpSavings: 'WebP Savings (%)',
-            jpegSavings: 'JPEG Savings (%)',
-          }
-        }
+      results,
+      tableHeadings: {
+        preview: '',
+        url: 'URL',
+        totalKb: 'Original',
+        webpSavings: 'WebP Savings',
+        jpegSavings: 'JPEG Savings',
       }
-    });
+    };
   }
 }
 
