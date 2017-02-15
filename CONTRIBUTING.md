@@ -1,6 +1,16 @@
-# How to become a contributor and submit your own code
+# For Contributors
 
-## Contributor License Agreements
+We'd love your help! This doc covers how to become a contributor and submit code to the project.
+
+## Follow the coding style
+
+The `.eslintrc` defines all. We use [JSDoc](http://usejsdoc.org/) along with [closure annotations](https://developers.google.com/closure/compiler/docs/js-for-compiler). Annotations encouraged for all contributions.
+
+## Learn about the architecture
+
+See [Lighthouse Architecture](./docs/architecture.md), our overview and tour of the codebase.
+
+## Sign the Contributor License Agreement
 
 We'd love to accept your sample apps and patches! Before we can take them, we have to jump a couple of legal hurdles.
 
@@ -12,7 +22,7 @@ Please fill out either the individual or corporate Contributor License Agreement
 Follow either of the two links above to access the appropriate CLA and instructions for how to sign and return it. Once we receive it, we'll be able to
 accept your pull requests.
 
-## Contributing A Patch
+## Contributing a patch
 
 1. Submit an issue describing your proposed change to the repo in question.
 1. The repo owner will respond to your issue promptly.
@@ -20,6 +30,21 @@ accept your pull requests.
 1. Fork the repo, develop and test your code changes.
 1. Ensure that your code adheres to the existing style in the sample to which you are contributing.
 1. Submit a pull request.
+
+# For Maintainers
+
+## Updating traceviewer source
+
+```sh
+cd lighthouse-core
+# if not already there, clone catapult and copy license over
+git clone --depth=1 https://github.com/catapult-project/catapult.git third_party/src/catapult
+cp third_party/src/catapult/LICENSE third_party/traceviewer-js/
+# pull for latest
+git -C "./third_party/src/catapult/" pull
+# run our conversion script
+node scripts/build-traceviewer-module.js
+```
 
 ## Release guide
 

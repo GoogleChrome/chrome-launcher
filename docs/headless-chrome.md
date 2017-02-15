@@ -1,6 +1,4 @@
-# Lighthouse objects & options
-
-## Running headless Chrome for Lighthouse
+# Running headless Chrome for Lighthouse
 
 The headless_shell still has a few bugs to work out. Until then, Chrome + xvfb is a stable solution.
 These steps mostly worked on Debian Jessie. Also, worth a look: both `.travis.yml` and `launch-chrome.sh`.

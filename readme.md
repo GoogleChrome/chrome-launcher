@@ -2,133 +2,41 @@
 
 > Lighthouse analyzes web apps and web pages, collecting modern performance metrics and insights on developer best practices.
 
-HTML report:
+**Lighthouse requires Chrome 56 or later.**
 
-![image](https://cloud.githubusercontent.com/assets/238208/21210165/b3c368c0-c22d-11e6-91fb-aa24959e2637.png)
+## Installation
 
-Default CLI output:
+### Chrome extension
 
-![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
+[Install from the Chrome Web Store](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
 
-Lighthouse requires Chrome 56 or later.
+### Node CLI [![NPM lighthouse package](https://img.shields.io/npm/v/lighthouse.svg)](https://npmjs.org/package/lighthouse)
 
-## Install Chrome extension
-
-Install from the Chrome Web Store: [chrome.google.com/webstore/detail/lighthouse/…](https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk)
-
-Quick-start guide on using the Lighthouse extension: <http://bit.ly/lighthouse-quickstart>
-
-## Install CLI [![NPM lighthouse package](https://img.shields.io/npm/v/lighthouse.svg)](https://npmjs.org/package/lighthouse)
-
-Requires Node v6+
+**Requires Node v6+.**
 
 ```sh
 npm install -g lighthouse
-# or if you use yarn:
+# or use yarn:
 # yarn global add lighthouse
 ```
 
-## Run
+## Running Lighthouse
+
+### Chrome extension
+
+Check out the quick-start guide: <http://bit.ly/lighthouse-quickstart>
+
+### CLI
+
+Kick off a run by passing `lighthouse` the URL to audit:
 
 ```sh
-# Kick off a lighthouse run
 lighthouse https://airhorner.com/
-
-# see flags and options
-lighthouse --help
 ```
 
-## Lighthouse Viewer
+Lighthouse will prettyprint a report to CLI. You can control the output format by passing flags.
 
-If you run Lighthouse with the `--output=json` flag, it will generate a json dump of the run. You can view this report online by visiting <https://googlechrome.github.io/lighthouse/viewer/> and dragging the file onto the app. Reports can also be shared by clicking the share icon in the top right corner and signing in to GitHub.
-
-Note: shared reports are stashed as a secret Gist in GitHub, under your account.
-
-## Develop
-
-### Setup
-
-```sh
-git clone https://github.com/GoogleChrome/lighthouse
-
-cd lighthouse
-npm install
-npm run install-all
-
-# The CLI is authored in TypeScript and requires compilation.
-# If you need to make changes to the CLI, run the TS compiler in watch mode:
-# cd lighthouse-cli && npm run dev
-```
-
-### Run
-
-```sh
-node lighthouse-cli http://example.com
-```
-
-Getting started tip: `node --inspect --debug-brk lighthouse-cli http://example.com` to open up Chrome DevTools and step
-through the entire app. See [Debugging Node.js with Chrome
-DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27#.59rma3ukm)
-for more info.
-
-## Custom run configuration
-
-You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.json <url>`
-
-## Custom audits and gatherers
-
-The audits and gatherers checked into the lighthouse repo are available to any configuration. If you're interested in writing your own audits or gatherers, you can use them with Lighthouse without necessarily contributing upstream.
-
-Better docs coming soon, but in the meantime look at [PR #593](https://github.com/GoogleChrome/lighthouse/pull/593), and the tests [valid-custom-audit.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-audit.js) and [valid-custom-gatherer.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-gatherer.js). If you have questions, please file an issue and we'll help out!
-
-## Do Better Web
-
-**Do Better Web** is an initiative within Lighthouse to help web developers modernize their existing web applications. By running a set of tests, developers can discover new web platform APIs, become aware of performance pitfalls, and learn (newer) best practices. In other words, do better on the web!
-
-DBW is implemented as a set of standalone [gatherers](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/gather/gatherers/dobetterweb) and [audits](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/audits/dobetterweb) that are run alongside the core Lighthouse tests.
-
-To run DBW, just run `lighthouse` against a URL. The tests show up under "Best Practices" in the report.
-
-If you'd like to contribute, check the [list of issues](https://github.com/GoogleChrome/lighthouse/issues?q=is%3Aissue+is%3Aopen+label%3ADoBetterWeb) or propose a new audit by filing an issue.
-
-## Lighthouse as trace processor
-
-Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The performance log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
-
-### `config.json`
-
-```json
-{
-  "audits": [
-    "user-timings",
-    "critical-request-chains"
-  ],
-
-  "artifacts": {
-    "traces": {
-      "defaultPass": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/trace-user-timings.json"
-    },
-    "performanceLog": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/perflog.json"
-  },
-
-  "aggregations": [{
-    "name": "Performance Metrics",
-    "description": "These encapsulate your app's performance.",
-    "scored": false,
-    "categorizable": false,
-    "items": [{
-      "audits": {
-        "user-timings": { "expectedValue": 0, "weight": 1 },
-        "critical-request-chains": { "expectedValue": 0, "weight": 1}
-      }
-    }]
-  }]
-}
-```
-
-Then, run with: `lighthouse --config-path=config.json http://www.random.url`
-
-## Lighthouse CLI options
+#### CLI options
 
 ```sh
 $ lighthouse --help
@@ -164,7 +72,7 @@ Options:
                      installations are found                                               [boolean]
 ```
 
-### Output Path Examples
+##### Output Path examples
 
 `--output-path=~/mydir/foo.out --save-assets` generates
 * `~/mydir/foo.out`
@@ -180,8 +88,7 @@ Options:
 * `./<HOST>_<DATE>.report.html`
 * `./<HOST>_<DATE>.artifacts.log`
 
-
-## Lighthouse w/ mobile devices
+## Testing on a mobile device
 
 Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse.
 
@@ -200,15 +107,133 @@ $ adb forward tcp:9222 localabstract:chrome_devtools_remote
 $ lighthouse --disable-device-emulation --disable-cpu-throttling https://mysite.com
 ```
 
+## Using programmatically
+
+The example below shows how to setup and run Lighthouse programmatically as a Node module. It
+assumes you've installed Lighthouse as a dependency (`yarn install --dev lighthouse`).
+
+```javascript
+const Lighthouse = require('lighthouse');
+const ChromeLauncher = require('lighthouse/lighthouse-cli/chrome-launcher.js').ChromeLauncher;
+const Printer = require('lighthouse/lighthouse-cli/printer');
+
+function launchChromeAndRunLighthouse(url, flags, config) {
+  const launcher = new ChromeLauncher({port: 9222, autoSelectChrome: true});
+
+  launcher.isDebuggerReady()
+    .catch(() => {
+      if (flags.skipAutolaunch) {
+        return;
+      }
+      return launcher.run(); // Launch Chrome.
+    })
+    .then(() => Lighthouse(url, flags, config)) // Run Lighthouse.
+    .then(results => launcher.kill().then(() => results)) // Kill Chrome and return results.
+    .catch(err => {
+      // Kill Chrome if there's an error.
+      return launcher.kill().then(() => {
+        throw err;
+      }, console.err);
+    });
+  }
+}
+
+// Use an existing config or create a custom one.
+const config = require('lighthouse/lighthouse-core/config/perf.json');
+const url = 'https://example.com';
+const flags = {output: 'html'};
+
+launchChromeAndRunLighthouse(url, flags, config).then(lighthouseResults => {
+  Printer.write(lighthouseResults, flags.output);
+}).catch(err => console.err);
+```
+
+**Example** - extracting an overall score from all scored audits
+
+```javascript
+function getOverallScore(lighthouseResults) {
+  const scoredAggregations = lighthouseResults.aggregations.filter(a => a.scored);
+  const total = scoredAggregations.reduce((sum, aggregation) => sum + aggregation.total, 0);
+  return (total / scoredAggregations.length) * 100;
+}
+```
+
+## Viewing a report
+
+Lighthouse can produce a report as JSON, HTML, or stdout CLI output.
+
+HTML report:
+
+![image](https://cloud.githubusercontent.com/assets/238208/21210165/b3c368c0-c22d-11e6-91fb-aa24959e2637.png)
+
+Default CLI output:
+
+![image](https://cloud.githubusercontent.com/assets/39191/19172762/60358d9a-8bd8-11e6-8c22-7fcb119ea0f5.png)
+
+### Online Viewer
+
+Running Lighthouse with the `--output=json` flag generates a json dump of the run.
+You can view this report online by visiting <https://googlechrome.github.io/lighthouse/viewer/>
+and dragging the file onto the app. You can also use the "Export" button from the
+top of any Lighthouse HTML report and open the report in the
+[Lighthouse Viewer](https://googlechrome.github.io/lighthouse/viewer/).
+
+In the Viewer, reports can be shared by clicking the share icon in the top
+right corner and signing in to GitHub.
+
+> **Note**: shared reports are stashed as a secret Gist in GitHub, under your account.
+
+## Develop
+
+### Setup
+
+```sh
+git clone https://github.com/GoogleChrome/lighthouse
+
+cd lighthouse
+npm install
+npm run install-all
+
+# The CLI is authored in TypeScript and requires compilation.
+# If you need to make changes to the CLI, run the TS compiler in watch mode:
+# cd lighthouse-cli && npm run dev
+```
+
+See [Contributing](./CONTRIBUTING.md) for more information.
+
+### Run
+
+```sh
+node lighthouse-cli http://example.com
+```
+
+> **Getting started tip**: `node --inspect --debug-brk lighthouse-cli http://example.com` to open up Chrome DevTools and step
+through the entire app. See [Debugging Node.js with Chrome
+DevTools](https://medium.com/@paul_irish/debugging-node-js-nightlies-with-chrome-devtools-7c4a1b95ae27#.59rma3ukm)
+for more info.
+
+## Creating custom audits & gatherers
+
+The audits and gatherers checked into the lighthouse repo are available to any configuration. If you're interested in writing your own audits or gatherers, you can use them with Lighthouse without necessarily contributing upstream.
+
+Better docs coming soon, but in the meantime look at [PR #593](https://github.com/GoogleChrome/lighthouse/pull/593), and the tests [valid-custom-audit.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-audit.js) and [valid-custom-gatherer.js](https://github.com/GoogleChrome/lighthouse/blob/3f5c43f186495a7f3ecc16c012ab423cd2bac79d/lighthouse-core/test/fixtures/valid-custom-gatherer.js). If you have questions, please file an issue and we'll help out!
+
+> **Tip**: see [Lighthouse Architecture](./docs/architecture.md) for more information on Audits and Gatherers.
+
+### Custom configurations for runs
+
+You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.json <url>`
+
 ## Tests
 
-Some basic unit tests forked are in `/test` and run via mocha. ESLint also checks for style violations.
+Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.
 
 ```sh
 # lint and test all files
 npm test
 
 # watch for file changes and run tests
+#   Requires http://entrproject.org : brew install entr
 npm run watch
 
 ## run linting and unit tests separately
@@ -216,103 +241,69 @@ npm run lint
 npm run unit
 ```
 
-## Chrome Extension
+## Lighthouse as trace processor
 
-The same audits are run against from a Chrome extension. See [./extension](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-extension).
+Lighthouse can be used to analyze trace and performance data collected from other tools (like WebPageTest and ChromeDriver). The `traces` and `performanceLog` artifact items can be provided using a string for the absolute path on disk. The perf log is captured from the Network domain (a la ChromeDriver's [`enableNetwork` option](https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-perfLoggingPrefs-object)) and reformatted slightly. As an example, here's a trace-only run that's reporting on user timings and critical request chains:
 
-## Architecture
+### `config.json`
 
-_Some incomplete notes_
+```json
+{
+  "audits": [
+    "user-timings",
+    "critical-request-chains"
+  ],
 
-### Components
+  "artifacts": {
+    "traces": {
+      "defaultPass": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/trace-user-timings.json"
+    },
+    "performanceLog": "/User/me/lighthouse/lighthouse-core/test/fixtures/traces/perflog.json"
+  },
 
-* **Driver** - Interfaces with [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)  ([API viewer](https://chromedevtools.github.io/debugger-protocol-viewer/))
-* **Gathers** - Requesting data from the browser (and maybe post-processing)
-* **Artifacts** - The output of gatherers
-* **Audits** - Non-performance evaluations of capabilities and issues. Includes a raw value and score of that value.
-* **Metrics** - Performance metrics summarizing the UX
-* **Diagnoses** - The perf problems that affect those metrics
-* **Aggregators** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
-
-#### Internal module graph
-
-![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/19367685/04d4336a-9151-11e6-9ebb-3b87bdb09a4c.png)
-
-`npm install -g js-vd; vd --exclude "node_modules|third_party|fs|path|url|log" lighthouse-core/ > graph.html`
-
-### Protocol
-
-* _Interacting with Chrome:_ The Chrome protocol connection maintained via [WebSocket](https://github.com/websockets/ws) for the CLI [`chrome.debuggger` API](https://developer.chrome.com/extensions/debugger) when in the Chrome extension.
-* _Event binding & domains_: Some domains must be `enable()`d so they issue events. Once enabled, they flush any events that represent state. As such, network events will only issue after the domain is enabled. All the protocol agents resolve their `Domain.enable()` callback _after_ they have flushed any pending events. See example:
-
-```js
-// will NOT work
-driver.sendCommand('Security.enable').then(_ => {
-  driver.on('Security.securityStateChanged', state => { /* ... */ });
-})
-
-// WILL work! happy happy. :)
-driver.on('Security.securityStateChanged', state => { /* ... */ }); // event binding is synchronous
-driver.sendCommand('Security.enable');
+  "aggregations": [{
+    "name": "Performance Metrics",
+    "description": "These encapsulate your app's performance.",
+    "scored": false,
+    "categorizable": false,
+    "items": [{
+      "audits": {
+        "user-timings": { "expectedValue": 0, "weight": 1 },
+        "critical-request-chains": { "expectedValue": 0, "weight": 1}
+      }
+    }]
+  }]
+}
 ```
 
-* _Debugging the protocol_: Read [Better debugging of the Protocol](https://github.com/GoogleChrome/lighthouse/issues/184).
-
-### Gatherers
-
-* _Reading the DOM:_ We prefer reading the DOM right from the browser (See [#77](https://github.com/GoogleChrome/lighthouse/pull/77)). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values.
-
-### Audits
-
-The return value of each audit takes this shape:
-
-```js
-Promise.resolve({
-  name: 'audit-name',
-  tags: ['what have you'],
-  description: 'whatnot',
-  // value: The score. Typically a Boolean, but can be number 0-100
-  value: 0,
-  // rawValue: Could be anything, as long as it can easily be stringified and displayed,
-  //   e.g. 'your score is bad because you wrote ${rawValue}'
-  rawValue: {},
-  // debugString: Some *specific* error string for helping the user figure out why they failed here.
-  //   The reporter can handle *general* feedback on how to fix, e.g. links to the docs
-  debugString: 'Your manifest 404ed',
-  // fault:  Optional argument when the audit doesn't cover whatever it is you're doing,
-  //   e.g. we can't parse your particular corner case out of a trace yet.
-  //   Whatever is in `rawValue` and `score` would be N/A in these cases
-  fault: 'some reason the audit has failed you, Anakin'
-});
-```
-
-## Code Style
-
-The `.eslintrc` defines all.
-
-We're using [JSDoc](http://usejsdoc.org/) along with [closure annotations](https://developers.google.com/closure/compiler/docs/js-for-compiler). Annotations encouraged for all contributions.
-
-`const` > `let` > `var`.  Use `const` wherever possible. Save `var` for emergencies only.
-
-## Trace processing
+Then, run with: `lighthouse --config-path=config.json http://www.random.url`
 
 The traceviewer-based trace processor from [node-big-rig](https://github.com/GoogleChrome/node-big-rig/tree/master/lib) was forked into Lighthouse. Additionally, the [DevTools' Timeline Model](https://github.com/paulirish/devtools-timeline-model) is available as well. There may be advantages for using one model over another.
 
-**To update traceviewer source:**
+## FAQ
 
-```sh
-cd lighthouse-core
-# if not already there, clone catapult and copy license over
-git clone --depth=1 https://github.com/catapult-project/catapult.git third_party/src/catapult
-cp third_party/src/catapult/LICENSE third_party/traceviewer-js/
-# pull for latest
-git -C "./third_party/src/catapult/" pull
-# run our conversion script
-node scripts/build-traceviewer-module.js
-```
+### What is the architecture?
+
+See [Lighthouse Architecture](./docs/architecture.md).
+
+### What is "Do Better Web"?
+
+**Do Better Web** is an initiative within Lighthouse to help web developers modernize their existing
+web applications. By running a set of tests, developers can discover new web platform APIs, become
+aware of performance pitfalls, and learn (newer) best practices. In other words, do better on the web!
+
+DBW is implemented as a set of standalone [gatherers](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/gather/gatherers/dobetterweb) and [audits](https://github.com/GoogleChrome/lighthouse/tree/master/lighthouse-core/audits/dobetterweb) that are run alongside the core Lighthouse tests. The tests show up under "Best Practices" in the report.
+
+If you'd like to contribute, check the [list of issues](https://github.com/GoogleChrome/lighthouse/issues?q=is%3Aissue+is%3Aopen+label%3ADoBetterWeb) or propose a new audit by filing an issue.
+
+### Are results sent to a remote server?
+
+Nope. Lighthouse runs locally, auditing a page using a local version of the Chrome browser installed the
+machine. Report results are never processed or beaconed to a remote server.
 
 <p align="center">
-  <img src="https://cloud.githubusercontent.com/assets/39191/22478294/23f662f6-e79e-11e6-8de3-ffd7be7bf628.png" alt="Lighthouse logo" height="300">
+  <img src="https://cloud.githubusercontent.com/assets/39191/22478294/23f662f6-e79e-11e6-8de3-ffd7be7bf628.png" alt="Lighthouse logo" height="150">
   <br>
-  <b>Lighthouse</b>, ˈlītˌhous (n): a <s>tower or other structure</s> tool containing a beacon light to warn or guide <s>ships</s> developers at "sea".
+  <b>Lighthouse</b>, ˈlītˌhous (n): a <s>tower or other structure</s> tool containing a beacon light
+  to warn or guide <s>ships at sea</s> developers.
 </p>
