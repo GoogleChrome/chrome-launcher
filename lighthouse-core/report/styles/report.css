@@ -93,7 +93,7 @@ body {
   flex-direction: column;
   align-items: stretch;
   margin: 0;
-  background: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 .report-error {
@@ -105,7 +105,7 @@ body {
 }
 
 .error-results {
-  background: #dedede;
+  background-color: #dedede;
   max-height: 600px;
   overflow: auto;
   border-radius: 2px;
@@ -115,7 +115,7 @@ body {
   width: 100%;
   margin: 0 auto;
   max-width: var(--report-width);
-  background: #fff;
+  background-color: #fff;
   box-shadow: 0 0 6px 0 rgba(0,0,0,0.26);
 }
 
@@ -229,7 +229,7 @@ body {
 
 .menu {
   width: var(--report-menu-width);
-  background: #fff;
+  background-color: #fff;
   height: 100%;
   top: 0;
   left: 0;
@@ -238,7 +238,7 @@ body {
 }
 
 .menu__header {
-  background: #2238b3;
+  background-color: #2238b3;
   padding: 0 20px;
   height: 115px;
   line-height: 54px;
@@ -260,7 +260,7 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  background: url('data:image/svg+xml;utf-8,<svg width="86" height="86" viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>Beta</title><defs><path id="b" d="M-11.704 13.144H125.58v30H-11.703z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="a"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/></filter><path id="d" d="M.4 16.972h119v28.4H.4z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="c"><feGaussianBlur stdDeviation="3.5" in="SourceAlpha" result="shadowBlurInner1"/><feOffset in="shadowBlurInner1" result="shadowOffsetInner1"/><feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.689509737 0" in="shadowInnerInner1"/></filter><text id="f" font-family="Arial-BoldMT, Arial" font-size="13" font-weight="bold" fill="#FFF"><tspan x="37.556" y="34.556">BETA</tspan></text><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="e"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.140964674 0" in="shadowBlurOuter1"/></filter></defs><g fill="none" fill-rule="evenodd"><g mask="url(#mask-2)" transform="rotate(45 55.44 24.523)"><use fill="#000" filter="url(#a)" xlink:href="#b"/><use fill="#CF3A3C" xlink:href="#b"/></g><use filter="url(#c)" xlink:href="#d" mask="url(#mask-2)" transform="rotate(45 58.4 27.55)" fill="#000"/><g mask="url(#mask-2)" transform="rotate(45 52.556 36.435)" fill="white"><use filter="url(#e)" xlink:href="#f"/><use xlink:href="#f"/></g><path d="M8.5-.5l88.204 88.204M8.5-39.5l88.204 88.204" stroke="#FFF" stroke-linecap="square" stroke-dasharray="1,2" opacity=".386" mask="url(#mask-2)" transform="translate(-3)"/></g></svg>') top right no-repeat;
+  background: url('data:image/svg+xml;utf-8,<svg width="86" height="86" viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>Beta</title><defs><path id="b" d="M-11.704 13.144H125.58v30H-11.703z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="a"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/></filter><path id="d" d="M.4 16.972h119v28.4H.4z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="c"><feGaussianBlur stdDeviation="3.5" in="SourceAlpha" result="shadowBlurInner1"/><feOffset in="shadowBlurInner1" result="shadowOffsetInner1"/><feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.689509737 0" in="shadowInnerInner1"/></filter><text id="f" font-family="Arial-BoldMT, Arial" font-size="13" font-weight="700" fill="#FFF"><tspan x="37.556" y="34.556">BETA</tspan></text><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="e"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.140964674 0" in="shadowBlurOuter1"/></filter></defs><g fill="none" fill-rule="evenodd"><g mask="url(#mask-2)" transform="rotate(45 55.44 24.523)"><use fill="#000" filter="url(#a)" xlink:href="#b"/><use fill="#CF3A3C" xlink:href="#b"/></g><use filter="url(#c)" xlink:href="#d" mask="url(#mask-2)" transform="rotate(45 58.4 27.55)" fill="#000"/><g mask="url(#mask-2)" transform="rotate(45 52.556 36.435)" fill="white"><use filter="url(#e)" xlink:href="#f"/><use xlink:href="#f"/></g><path d="M8.5-.5l88.204 88.204M8.5-39.5l88.204 88.204" stroke="#FFF" stroke-linecap="square" stroke-dasharray="1,2" opacity=".386" mask="url(#mask-2)" transform="translate(-3)"/></g></svg>') top right no-repeat;
 }
 
 .menu__header-title {
@@ -312,7 +312,7 @@ body {
 }
 
 .menu__nav {
-  list-style: none;
+  list-style-type: none;
   margin: 0;
   padding: 0;
 }
@@ -406,7 +406,7 @@ body {
   max-width: calc( var(--report-width) - var(--report-menu-width));
   z-index: 1;
   will-change: transform;
-  background: #fafafa;
+  background-color: #fafafa;
 }
 
 .report-body__header-toggle {
@@ -434,7 +434,7 @@ body {
   left: 0;
   position: absolute;
   width: 100%;
-  background: inherit;
+  background-color: inherit;
 }
 
 .report-body__header-container.expanded .report-body__header-content {
@@ -481,7 +481,7 @@ body {
   font-family: var(--text-font-family);
   font-size: 28px;
   font-weight: 500;
-  color: #49525F;
+  color: #49525f;
   display: flex;
   margin: 0.4em 0 0.3em 0;
 }
@@ -505,7 +505,7 @@ body {
   font-family: var(--text-font-family);
   font-size: 18px;
   font-weight: 500;
-  color: #719EA8;
+  color: #719ea8;
   display: flex;
   margin: 24px 0 16px 0;
 }
@@ -535,7 +535,7 @@ body {
 }
 
 .report-section__individual-results {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
   margin: 0;
 }
@@ -654,7 +654,6 @@ body {
   top: 0;
   left: calc((var(--gutter-width) + var(--gutter-gap)) * -1);
   width: var(--gutter-width);
-
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -664,7 +663,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background: #000;
+  background-color: #000;
   color: #fff;
   text-align: center;
   padding: 4px 8px;
@@ -709,7 +708,7 @@ body {
 }
 
 .subitems {
-  list-style: none;
+  list-style-type: none;
   margin-top: var(--subitem-line-height);
 }
 
@@ -779,15 +778,14 @@ body {
 
 .subitem-result__points {
   margin-top: calc((var(--subitem-line-height) - var(--subitem-font-size) - 4px) / 2);
-  background: #000;
+  background-color: #000;
   padding: 2px 4px;
-  border-radius: 1px;
   color: #fff;
   border-radius: 2px;
 }
 
 .subitem__details {
-  list-style: none;
+  list-style-type: none;
   margin: 0;
   padding: 0;
   margin-left: var(--subitem-indent);
@@ -808,7 +806,7 @@ body {
   border: 1px solid #ccc;
   vertical-align: middle;
   margin-left: 8px;
-  outline: 0;
+  outline: none;
   cursor: pointer;
 }
 
@@ -900,7 +898,7 @@ body {
   border-radius: 3px;
   cursor: pointer;
   color: var(--secondary-text-color);
-  outline: 0;
+  outline: none;
   font-weight: 500;
 }
 
@@ -917,7 +915,7 @@ body {
   z-index: 1;
   box-shadow: 1px 1px 3px #ccc;
   min-width: 125px;
-  list-style: none;
+  list-style-type: none;
   line-height: 1.5em;
   visibility: hidden;
   clip: rect(0, 164px, 0, 0);
@@ -947,8 +945,8 @@ body {
 
 .export-dropdown a:hover,
 .export-dropdown a:focus {
-  background-color: rgb(239,239,239);
-  outline: 0;
+  background-color: #efefef;
+  outline: none;
 }
 
 .export-dropdown .report__icon {
@@ -958,7 +956,7 @@ body {
   text-indent: 18px;
 }
 
-/* copy icon is needs slight adjustments to look great */
+/* copy icon needs slight adjustments to look great */
 .export-dropdown .report__icon.copy {
   background-size: 16px;
   background-position: 9px 50%;
@@ -977,10 +975,10 @@ body {
   padding: 16px 32px;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  background: rgba(0,0,0,0.6);
+  background-color: rgba(0,0,0,0.6);
   max-width: 500px;
   line-height: 1.4;
-  color: #fff; /*#E53935;*/
+  color: #fff; /*#e53935;*/
   font-size: 16px;
   transition: transform 300ms ease-in-out;
   transform: translateY(-100%);

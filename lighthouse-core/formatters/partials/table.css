@@ -1,7 +1,7 @@
 .table_list {
   --image-preview: 24px;
   margin-top: 8px;
-  border: 1px solid #EBEBEB;
+  border: 1px solid #ebebeb;
   border-spacing: 0;
   table-layout: fixed;
 }

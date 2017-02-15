@@ -1,7 +1,7 @@
 <style>
 .config-panel {
   padding: 0;
-  background: #fafafa;
+  background-color: #fafafa;
 }
 
 .config-panel__header {
@@ -149,7 +149,7 @@
 .config-panel__tabs__tab {
   float: left;
   display: inline-block;
-  color: black;
+  color: #000;
   text-align: center;
   text-decoration: none;
   transition: 0.3s;
@@ -166,13 +166,13 @@
   height: 3px;
   width: 0;
   transform: translate(0, -3px);
-  background: transparent;
+  background-color: transparent;
   transition: width .5s ease, background-color .5s ease;
 }
 
 .config-panel__tabs__tab.is-active:after {
   width: 100%;
-  background: #7070fb;
+  background-color: #7070fb;
 }
 
 .config-panel__tabs__tab:hover {

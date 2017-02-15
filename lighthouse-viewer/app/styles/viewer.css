@@ -36,7 +36,7 @@
 .drop_zone.dropping {
   visibility: visible;
   font-size: var(--heading-font-size);
-  background: rgba(255,255,255,0.8);
+  background-color: rgba(255,255,255,0.8);
   color: var(--unknown-color);
 }
 .drop_zone.dropping::after {
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background-color: #fff;
 }
 .viewer-placeholder {
   height: 100vh;

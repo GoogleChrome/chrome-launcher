@@ -42,7 +42,7 @@ html, body {
   margin: 0;
   width: 390px;
   height: 200px;
-  background: var(--lh-bg-color);
+  background-color: var(--lh-bg-color);
   color: #212121;
 }
 
@@ -55,7 +55,7 @@ html, body {
   right: 0;
   text-indent: -10000px;
   overflow: hidden;
-  background: url('data:image/svg+xml;utf-8,<svg width="86" height="86" viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>Beta</title><defs><path id="b" d="M-11.704 13.144H125.58v30H-11.703z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="a"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/></filter><path id="d" d="M.4 16.972h119v28.4H.4z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="c"><feGaussianBlur stdDeviation="3.5" in="SourceAlpha" result="shadowBlurInner1"/><feOffset in="shadowBlurInner1" result="shadowOffsetInner1"/><feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.689509737 0" in="shadowInnerInner1"/></filter><text id="f" font-family="Arial-BoldMT, Arial" font-size="13" font-weight="bold" fill="#FFF"><tspan x="37.556" y="34.556">BETA</tspan></text><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="e"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.140964674 0" in="shadowBlurOuter1"/></filter></defs><g fill="none" fill-rule="evenodd"><g mask="url(#mask-2)" transform="rotate(45 55.44 24.523)"><use fill="#000" filter="url(#a)" xlink:href="#b"/><use fill="#CF3A3C" xlink:href="#b"/></g><use filter="url(#c)" xlink:href="#d" mask="url(#mask-2)" transform="rotate(45 58.4 27.55)" fill="#000"/><g mask="url(#mask-2)" transform="rotate(45 52.556 36.435)" fill="#FFF"><use filter="url(#e)" xlink:href="#f"/><use xlink:href="#f"/></g><path d="M8.5-.5l88.204 88.204M8.5-39.5l88.204 88.204" stroke="#FFF" stroke-linecap="square" stroke-dasharray="1,2" opacity=".386" mask="url(#mask-2)" transform="translate(-3)"/></g></svg>') top right no-repeat;
+  background: url('data:image/svg+xml;utf-8,<svg width="86" height="86" viewBox="0 0 86 86" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>Beta</title><defs><path id="b" d="M-11.704 13.144H125.58v30H-11.703z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="a"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0" in="shadowBlurOuter1"/></filter><path id="d" d="M.4 16.972h119v28.4H.4z"/><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="c"><feGaussianBlur stdDeviation="3.5" in="SourceAlpha" result="shadowBlurInner1"/><feOffset in="shadowBlurInner1" result="shadowOffsetInner1"/><feComposite in="shadowOffsetInner1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="shadowInnerInner1"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.689509737 0" in="shadowInnerInner1"/></filter><text id="f" font-family="Arial-BoldMT, Arial" font-size="13" font-weight="700" fill="#FFF"><tspan x="37.556" y="34.556">BETA</tspan></text><filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="e"><feOffset dy="1" in="SourceAlpha" result="shadowOffsetOuter1"/><feGaussianBlur stdDeviation=".5" in="shadowOffsetOuter1" result="shadowBlurOuter1"/><feColorMatrix values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.140964674 0" in="shadowBlurOuter1"/></filter></defs><g fill="none" fill-rule="evenodd"><g mask="url(#mask-2)" transform="rotate(45 55.44 24.523)"><use fill="#000" filter="url(#a)" xlink:href="#b"/><use fill="#CF3A3C" xlink:href="#b"/></g><use filter="url(#c)" xlink:href="#d" mask="url(#mask-2)" transform="rotate(45 58.4 27.55)" fill="#000"/><g mask="url(#mask-2)" transform="rotate(45 52.556 36.435)" fill="#FFF"><use filter="url(#e)" xlink:href="#f"/><use xlink:href="#f"/></g><path d="M8.5-.5l88.204 88.204M8.5-39.5l88.204 88.204" stroke="#FFF" stroke-linecap="square" stroke-dasharray="1,2" opacity=".386" mask="url(#mask-2)" transform="translate(-3)"/></g></svg>') top right no-repeat;
   outline: none;
   z-index: 3;
 }
@@ -104,7 +104,7 @@ html, body {
   height: 70px;
   display: flex;
   padding: 16px;
-  background: var(--lh-blue-color);
+  background-color: var(--lh-blue-color);
   justify-content: space-around;
   align-items: flex-end;
 }
@@ -117,7 +117,7 @@ html, body {
   font-size: 12px;
   border: none;
   color: #fff;
-  background: #2979ff;
+  background-color: #2979ff;
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.50);
   border-radius: 2px;
   padding: 7px 12px 5px 12px
@@ -140,7 +140,7 @@ html, body {
 }
 
 .button--report-error {
-  background: rgba(239, 83, 80, 0.81);
+  background-color: rgba(239, 83, 80, 0.81);
   text-decoration: none;
   padding: 3px 5px;
   font-size: .8em;
@@ -155,7 +155,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--lh-bg-color);
+  background-color: var(--lh-bg-color);
   pointer-events: none;
   display: flex;
   flex-direction: column;
@@ -174,7 +174,7 @@ html, body {
 .status {
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background-color: #fff;
 }
 
 .subpage--visible.status .lighthouse-effects__wrapper {
@@ -225,5 +225,5 @@ html, body {
 
 .options__list {
   padding: 0;
-  list-style: none;
+  list-style-type: none;
 }
