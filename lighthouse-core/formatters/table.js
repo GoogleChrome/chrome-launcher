@@ -117,7 +117,7 @@ class Table extends Formatter {
 
     headings = headingKeys.map(key => headings[key]);
 
-    return {headings, rows};
+    return {headings, rows, headingKeys};
   }
 
   static getHelpers() {

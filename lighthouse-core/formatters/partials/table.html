@@ -7,7 +7,7 @@
     <thead>
       <tr>
         {{#each ../tableHeadings}}
-          <th {{#ifEq @key "preview"}}class="preview-image"{{/ifEq}}>{{this}}</th>
+          <th class="table-column table-column-{{ kebabCase @key }}">{{this}}</th>
         {{/each}}
       </tr>
     </thead>
@@ -15,7 +15,7 @@
       {{#each rows}}
         <tr>
           {{#each cols}}
-            <td>{{ sanitize this}}</td>
+            <td class="table-column table-column-{{ kebabCase (lookup ../../headingKeys @index) }}">{{ sanitize this}}</td>
           {{/each}}
         </tr>
       {{/each}}

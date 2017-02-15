@@ -28,11 +28,6 @@
 .table_list tr:hover {
   background-color: #fafafa;
 }
-.table_list em {
-  color: #999;
-  font-style: normal;
-  margin-left: 10px;
-}
 .table_list code, .table_list pre {
   white-space: pre;
   font-family: monospace;
@@ -43,11 +38,26 @@
 .table_list em + code, .table_list em + pre {
   margin-top: 10px;
 }
-.table_list td img {
+.table_list .table-column {
+  text-align: right;
+}
+.table_list .table-column.table-column-pre, .table_list .table-column.table-column-code {
+  text-align: left;
+}
+.table_list .table-column.table-column-url {
+  text-align: left;
+  width: 250px;
+}
+.table-column-potential-savings em, .table-column-webp-savings em, .table-column-jpeg-savings em {
+  color: #999;
+  font-style: normal;
+  padding-left: 10px;
+}
+.table-column-preview img {
   height: var(--image-preview);
   width: var(--image-preview);
   object-fit: contain;
 }
-.table_list .preview-image {
+.table-column-preview {
   width: calc(var(--image-preview) * 2);
 }

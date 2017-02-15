@@ -33,4 +33,13 @@ describe('Handlebar helpers', () => {
     const text = handlebarHelpers.not(false);
     assert.ok(text);
   });
+
+  it('`kebabCase` works properly', () => {
+    assert.equal(handlebarHelpers.kebabCase(undefined), '');
+    assert.equal(handlebarHelpers.kebabCase('foo'), 'foo');
+    assert.equal(handlebarHelpers.kebabCase('fooBarBaz'), 'foo-bar-baz');
+    assert.equal(handlebarHelpers.kebabCase('a long Phrase'), 'a-long-phrase');
+    assert.equal(handlebarHelpers.kebabCase('myURL$'), 'my-url');
+    assert.equal(handlebarHelpers.kebabCase('the401k%_value'), 'the401k-value');
+  });
 });
