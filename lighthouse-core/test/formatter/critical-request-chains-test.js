@@ -46,7 +46,7 @@ const extendedInfo = {
       },
       2: {
         request: {
-          endTime: 17,
+          endTime: 17.123456789,
           responseReceivedTime: 15,
           startTime: 12,
           url: superLongName,
@@ -91,7 +91,8 @@ describe('CRC Formatter', () => {
     const testString2 = new RegExp(log.heavyVerticalAndRight +
                                    log.heavyHorizontal +
                                    log.heavyHorizontal +
-                                   ' \\/b.js \\(example.com\\) - 5000.00ms', 'im');
+                                   ' \\/b.js \\(example.com\\) - 5,000ms', 'im');
+    assert.ok(output.includes('6,123.5ms'), 'Millisecond values are not formatted as expected');
     assert.ok(testString2.test(output));
     assert.ok(truncatedURLRegExp.test(output));
     assert.ok(/about:blank/.test(output));
@@ -131,11 +132,12 @@ describe('CRC Formatter', () => {
       '<span class="cnc-node__tree-value">',
       '<span class="cnc-node__tree-file">/b.js</span>',
       '<span class="cnc-node__tree-hostname">\\(example.com\\)</span>',
-      '- <span class="cnc-node__chain-duration">16000.00ms, 0.00KB</span>',
+      '- <span class="cnc-node__chain-duration">16,000ms</span>,',
+      '<span class="cnc-node__chain-duration">0KB</span>',
       '</span>'
     ].join('\\s*'), 'im');
 
-    assert.ok(expectedTreeTwo.test(output));
+    assert.ok(expectedTreeTwo.test(output), output);
 
     const expectedTreeThree = new RegExp(`<div class="cnc-node" title="${superLongName}">`);
 

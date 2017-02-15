@@ -30,7 +30,8 @@
         <span class="cnc-node__tree-hostname">({{ this.hostname }})</span>
       {{/parseURL}}
       {{#unless hasChildren}}
-        - <span class="cnc-node__chain-duration">{{chainDuration startTime this.node.request.endTime }}ms, {{formatTransferSize this.transferSize}}KB</span>
+        - <span class="cnc-node__chain-duration">{{chainDuration startTime this.node.request.endTime }}ms</span>,
+          <span class="cnc-node__chain-duration">{{formatTransferSize this.transferSize}}KB</span>
       {{/unless}}
     </span>
   </div>
@@ -43,17 +44,19 @@
 {{/inline}}
 
 <ul class="subitem__details">
-  <li class="subitem__detail">Longest request chain (shorter is better): <strong>{{longestChain this}}</strong></li>
-  <li class="subitem__detail">Longest chain duration (shorter is better): <strong>{{formatTime (longestDuration this)}}ms</strong></li>
-  <li class="subitem__detail">Longest chain transfer size (smaller is better): <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></li>
+  <li class="subitem__detail">Longest chain: <strong>{{formatNumber (longestDuration this)}}ms</strong>
+   over <strong>{{longestChain this}}</strong> requests, totalling <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></li>
   <li class="subitem__detail">
-    <div>Initial navigation</div>
-    {{#createTreeRenderContext this}}
-      {{#each this.tree }}
-        {{#createContextFor ../tree @key undefined undefined ../startTime ../transferSize }}
-          {{> writeNode this }}
-        {{/createContextFor}}
-      {{/each}}
-    {{/createTreeRenderContext}}
+    <details>
+      <summary>View critical network waterfall</summary>
+      <div class="initial-nav">Initial navigation</div>
+      {{#createTreeRenderContext this}}
+        {{#each this.tree }}
+          {{#createContextFor ../tree @key undefined undefined ../startTime ../transferSize }}
+            {{> writeNode this }}
+          {{/createContextFor}}
+        {{/each}}
+      {{/createTreeRenderContext}}
+    </details>
   </li>
 </ul>

@@ -53,3 +53,9 @@
 .cnc-node__tree-hostname {
   color: #999;
 }
+
+.initial-nav {
+  color: #a9a9a9;
+  margin: 10px 0 0;
+  font-style: italic;
+}

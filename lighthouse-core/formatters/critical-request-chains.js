@@ -41,16 +41,15 @@ class CriticalRequestChains extends Formatter {
             return '';
           }
 
-          const longestChain = CriticalRequestChains._getLongestChainLength(info);
-          const longestDuration =
-              CriticalRequestChains._getLongestChainDuration(info).toFixed(2);
+          const longestChain = CriticalRequestChains._getLongestChain(info).length;
+          const longestDuration = CriticalRequestChains.formatNumber(
+              CriticalRequestChains._getLongestChain(info).duration);
           const longestTransferSize = CriticalRequestChains.formatTransferSize(
-              CriticalRequestChains._getLongestChainTransferSize(info));
+              CriticalRequestChains._getLongestChain(info).transferSize);
           const urlTree = CriticalRequestChains._createURLTreeOutput(info);
 
-          const output = `    - Longest request chain (shorter is better): ${longestChain}\n` +
-          `    - Longest chain duration (shorter is better): ${longestDuration}ms\n` +
-          `    - Longest chain transfer size (smaller is better): ${longestTransferSize}KB\n` +
+          const output = `    - Longest request chain: ${longestDuration}ms` +
+          ` over ${longestChain} requests, totalling ${longestTransferSize}KB\n` +
           '    - Initial navigation\n' +
               '      ' + urlTree.replace(/\n/g, '\n      ') + '\n';
           return output;
@@ -94,39 +93,27 @@ class CriticalRequestChains extends Formatter {
     walk(tree, 0);
   }
 
-  static _getLongestChainLength(tree) {
-    let longestChain = 0;
-    this._traverse(tree, opts => {
-      const depth = opts.depth;
-      if (depth > longestChain) {
-        longestChain = depth;
-      }
-    });
-
-    // Always return the longest chain + 1 because the depth is zero indexed.
-    return (longestChain + 1);
-  }
-
-  static _getLongestChainDuration(tree) {
-    let longestChainDuration = 0;
+  /**
+   * Get stats about the longest initiator chain (as determined by time duration)
+   * @return {{duration: number, length: number, transferSize: number}}
+   */
+  static _getLongestChain(tree) {
+    const longest = {
+      duration: 0,
+      length: 0,
+      transferSize: 0
+    };
     this._traverse(tree, opts => {
       const duration = opts.chainDuration;
-      if (duration > longestChainDuration) {
-        longestChainDuration = duration;
+      if (duration > longest.duration) {
+        longest.duration = duration;
+        longest.transferSize = opts.chainTransferSize;
+        longest.length = opts.depth;
       }
     });
-    return longestChainDuration;
-  }
-
-  static _getLongestChainTransferSize(tree) {
-    let transferSize = 0;
-    this._traverse(tree, opts => {
-      const chainTransferSize = opts.chainTransferSize;
-      if (chainTransferSize > transferSize) {
-        transferSize = chainTransferSize;
-      }
-    });
-    return transferSize;
+    // Always return the longest chain + 1 because the depth is zero indexed.
+    longest.length++;
+    return longest;
   }
 
   /**
@@ -168,7 +155,8 @@ class CriticalRequestChains extends Formatter {
           startTime = node[id].request.startTime;
         }
 
-        const duration = ((node[id].request.endTime - startTime) * 1000).toFixed(2);
+        const duration = CriticalRequestChains.formatNumber(
+            (node[id].request.endTime - startTime) * 1000);
         const chainTransferSize = transferSize + node[id].request.transferSize;
         const formattedTransferSize = CriticalRequestChains.formatTransferSize(chainTransferSize);
 
@@ -195,12 +183,12 @@ class CriticalRequestChains extends Formatter {
     });
   }
 
-  static formatTime(time) {
-    return time.toFixed(2);
+  static formatNumber(num) {
+    return num.toLocaleString(undefined, {maximumFractionDigits: 1});
   }
 
   static formatTransferSize(size) {
-    return (size / 1024).toFixed(2);
+    return (size / 1024).toLocaleString(undefined, {maximumFractionDigits: 2});
   }
 
   static parseURL(resourceURL, opts) {
@@ -221,26 +209,26 @@ class CriticalRequestChains extends Formatter {
   static getHelpers() {
     return {
       longestChain(info) {
-        return CriticalRequestChains._getLongestChainLength(info);
+        return CriticalRequestChains._getLongestChain(info).length;
       },
 
       longestDuration(info) {
-        return CriticalRequestChains._getLongestChainDuration(info);
+        return CriticalRequestChains._getLongestChain(info).duration;
       },
 
       longestChainTransferSize(info) {
-        return CriticalRequestChains._getLongestChainTransferSize(info);
+        return CriticalRequestChains._getLongestChain(info).transferSize;
       },
 
       chainDuration(startTime, endTime) {
-        return ((endTime - startTime) * 1000).toFixed(2);
+        return CriticalRequestChains.formatNumber((endTime - startTime) * 1000);
       },
 
       formatTransferSize: CriticalRequestChains.formatTransferSize,
 
       parseURL: CriticalRequestChains.parseURL,
 
-      formatTime: CriticalRequestChains.formatTime,
+      formatNumber: CriticalRequestChains.formatNumber,
 
       /**
        * Helper function for Handlebars that creates the context for each node
