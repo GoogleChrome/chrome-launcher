@@ -230,10 +230,14 @@ class ChromeLauncher {
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
-        if (isWindows) {
-          execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
-        } else {
-          process.kill(-this.chrome.pid);
+        try {
+          if (isWindows) {
+            execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+          } else {
+            process.kill(-this.chrome.pid);
+          }
+        } catch (err) {
+          log.warn('ChromeLauncher', `Chrome could not be killed ${err.message}`);
         }
 
         this.chrome = null;
