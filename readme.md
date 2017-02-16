@@ -57,6 +57,12 @@ Configuration:
   --list-trace-categories       Prints a list of all required trace categories and exits   [boolean]
   --config-path                 The path to the config JSON.
   --perf                        Use a performance-test-only configuration                  [boolean]
+  --port                        The port to use for the debugging protocol. Use 0 for a
+                                random port.                                         [default: 9222]
+  --max-wait-for-load           The timeout (in milliseconds) to wait before the page is
+                                considered done loading and the run should continue.
+                                WARNING: Very high values can lead to large traces and
+                                instability.                                        [default: 25000]
 
 Output:
   --output       Reporter for the results

@@ -27,6 +27,7 @@ import {ChromeLauncher} from './chrome-launcher';
 import * as Commands from './commands/commands';
 const lighthouse = require('../lighthouse-core');
 const log = require('../lighthouse-core/lib/log');
+const Driver = require('../lighthouse-core/gather/driver.js');
 import * as path from 'path';
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 const performanceXServer = require('./performance-experiment/server');
@@ -63,7 +64,8 @@ const cliFlags = yargs
     'list-trace-categories',
     'config-path',
     'perf',
-    'port'
+    'port',
+    'max-wait-for-load'
   ], 'Configuration:')
   .describe({
     'disable-storage-reset': 'Disable clearing the browser cache and other storage APIs before a run',
@@ -77,6 +79,7 @@ const cliFlags = yargs
     'config-path': 'The path to the config JSON.',
     'perf': 'Use a performance-test-only configuration',
     'port': 'The port to use for the debugging protocol. Use 0 for a random port',
+    'max-wait-for-load': 'The timeout (in milliseconds) to wait before the page is considered done loading and the run should continue. WARNING: Very high values can lead to large traces and instability',
     'skip-autolaunch': 'Skip autolaunch of Chrome when already running instance is not found',
     'select-chrome': 'Interactively choose version of Chrome to use when multiple installations are found',
     'interactive': 'Open Lighthouse in interactive mode'
@@ -117,6 +120,7 @@ Example: --output-path=./lighthouse-results.html`
   .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.pretty])
   .default('output-path', 'stdout')
   .default('port', 9222)
+  .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
   .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
     // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
     // or --list-trace-categories. If not, stop the program and ask for a url
@@ -139,12 +143,6 @@ if (cliFlags.listTraceCategories) {
 }
 
 const url = cliFlags._[0];
-
-// Work around camelCase bug for default value in yargs 3.30.
-// see: https://github.com/yargs/yargs/issues/341
-if (!cliFlags.outputPath && cliFlags['output-path']) {
-  cliFlags.outputPath = cliFlags['output-path'];
-}
 
 let config: Object | null = null;
 if (cliFlags.configPath) {
@@ -280,7 +278,8 @@ function saveResults(results: Results,
 
 function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
-                         outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean},
+                         outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
+                         maxWaitForLoad: number},
                        config: Object): Promise<undefined> {
 
   let chromeLauncher: ChromeLauncher;
