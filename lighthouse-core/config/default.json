@@ -103,7 +103,7 @@
 
   "aggregations": [{
     "name": "Progressive Web App",
-    "description": "These audits validate the aspects of a Progressive Web App.",
+    "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
     "scored": true,
     "categorizable": true,
     "items": [{
