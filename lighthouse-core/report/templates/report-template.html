@@ -68,7 +68,7 @@ limitations under the License.
       </div>
       <div class="report-body__header-container js-header-container">
         <div class="report-body__header">
-          <button class="report-body__header-toggle js-header-toggle" title="See report's runtime settings"></button>
+          <button class="report-body__more-toggle js-header-toggle" title="See report's runtime settings"></button>
           <div class="report-body__metadata">
             <div class="report-body__url">Results for: <a href="{{ url }}" target="_blank" rel="noopener">{{ url }}</a></div>
             <div class="report-body__url">Generated on: {{ formatDateTime generatedTime}}</div>
@@ -136,15 +136,21 @@ limitations under the License.
 
         <div class="js-report-by-user-feature">
           {{#each this.score as |aggregation|}}
-            <section class="aggregation">
+            <section class="aggregation" data-rating="{{ getAggregationScoreRating aggregation.overall }}">
 
             {{#if aggregation.name }}
-            <header class="aggregation__header">
-              <h2>{{ aggregation.name }}</h2>
-              {{#if aggregation.description }}
-                <p class="aggregation__desc">{{ sanitize aggregation.description }}</p>
-              {{/if}}
-            </header>
+            <details class="aggregation__details" {{#ifEq (getAggregationScoreRating aggregation.overall) "poor"}}open{{/ifEq}}>
+              <summary>
+                <header class="aggregation__header">
+                  <span class="aggregation__header__score score-{{ getAggregationScoreRating aggregation.overall }}-bg subitem-result__{{ getAggregationScoreRating aggregation.overall }}"></span>
+                  <h2>{{ aggregation.name }}</h2>
+                  <div class="report-body__more-toggle" title="See audits"></div>
+                </header>
+              </summary>
+            {{/if}}
+
+            {{#if aggregation.description }}
+              <p class="aggregation__desc">{{ sanitize aggregation.description }}</p>
             {{/if}}
 
             <ul class="subitems">
@@ -208,6 +214,9 @@ limitations under the License.
               {{/each}}
             </ul>
           </section>
+          {{#if aggregation.name }}
+            </details>
+          {{/if}}
           {{/each}}
         </div>
       </section>

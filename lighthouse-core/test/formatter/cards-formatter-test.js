@@ -24,9 +24,9 @@ const assert = require('assert');
 describe('CardsFormatter', () => {
   const extendedInfo = {
     value: [
-      {title: 'Total DOM Nodes', value: 3500},
+      {title: 'Total DOM Nodes', value: 3500, target: '1,500 nodes'},
       {title: 'DOM Depth', value: 10, snippet: 'snippet'},
-      {title: 'Maximum Children', value: 20, snippet: 'snippet2'}
+      {title: 'Maximum Children', value: 20, snippet: 'snippet2', target: 20}
     ]
   };
 
@@ -52,7 +52,9 @@ describe('CardsFormatter', () => {
     const template = Handlebars.compile(formatter);
     const output = template(extendedInfo.value).split('\n').join('');
     assert.ok(output.match('title="snippet"'), 'adds title attribute for snippet');
-    assert.ok(output.match('class="subitem__details cards__container"'), 'adds wrapper class');
+    assert.ok(output.match('class="cards__container"'), 'adds wrapper class');
+    assert.ok(output.match('target: 1,500 nodes'), 'adds target val html');
+    assert.ok(!output.match('target: 10'), 'omits target html without a value');
     assert.equal(output.match(/class=\"[^"]*scorecard-value/g).length, extendedInfo.value.length);
     assert.equal(output.match(/class=\"[^"]*scorecard-title/g).length, extendedInfo.value.length);
   });

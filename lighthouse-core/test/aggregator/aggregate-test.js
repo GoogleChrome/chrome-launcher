@@ -250,9 +250,8 @@ describe('Aggregate', () => {
       score: 50,
       displayValue: '50'
     }];
-    const scored = true;
 
-    return assert.deepEqual(Aggregate.compare(results, items, scored)[0], {
+    return assert.deepEqual(Aggregate.compare(results, items)[0], {
       overall: 0.375,
       name: undefined,
       description: undefined,
@@ -288,10 +287,8 @@ describe('Aggregate', () => {
       score: 50,
       displayValue: '50'
     }];
-    const scored = false;
-
-    return assert.deepEqual(Aggregate.compare(results, items, scored)[0], {
-      overall: 0,
+    return assert.deepEqual(Aggregate.compare(results, items)[0], {
+      overall: 0.375,
       name: undefined,
       description: undefined,
       subItems: [
@@ -316,9 +313,8 @@ describe('Aggregate', () => {
       value: 'should be rawValue',
       displayValue: ''
     }];
-    const scored = true;
 
-    return assert.throws(_ => Aggregate.compare(results, items, scored));
+    return assert.throws(_ => Aggregate.compare(results, items));
   });
 
   it('throws when given an audit containing no expectedValue property', () => {
@@ -335,9 +331,8 @@ describe('Aggregate', () => {
       score: false,
       displayValue: ''
     }];
-    const scored = true;
 
-    return assert.throws(_ => Aggregate.compare(results, items, scored));
+    return assert.throws(_ => Aggregate.compare(results, items));
   });
 
   it('throws when attempting to aggregate an audit name not in audit results', () => {
@@ -358,8 +353,7 @@ describe('Aggregate', () => {
       contributesToScore: true
     }];
 
-    const scored = true;
-    assert.throws(_ => Aggregate.compare(results, items, scored)[0],
+    assert.throws(_ => Aggregate.compare(results, items)[0],
       /my-audit-test-name/);
   });
 
@@ -387,8 +381,7 @@ describe('Aggregate', () => {
       contributesToScore: true
     }];
 
-    const scored = true;
-    const aggregation = Aggregate.compare(results, items, scored)[0];
+    const aggregation = Aggregate.compare(results, items)[0];
     assert.deepEqual(aggregation, {
       overall: 1,
       name: undefined,
@@ -415,8 +408,7 @@ describe('Aggregate', () => {
       score: true,
       displayValue: ''
     }];
-    const scored = true;
-    return assert.equal(Aggregate.compare(results, items, scored)[0].overall, 1);
+    return assert.equal(Aggregate.compare(results, items)[0].overall, 1);
   });
 
   it('if audit result is an error it does not contribute to score', () => {
@@ -446,7 +438,7 @@ describe('Aggregate', () => {
       error: true
     }];
 
-    const aggregate = Aggregate.compare(results, items, true)[0];
+    const aggregate = Aggregate.compare(results, items)[0];
     assert.strictEqual(aggregate.overall, 0.5);
   });
 
@@ -467,8 +459,7 @@ describe('Aggregate', () => {
       displayValue: ''
     }];
 
-    const scored = true;
-    return assert.ok(Array.isArray(Aggregate.compare(results, items, scored)[0].subItems));
+    return assert.ok(Array.isArray(Aggregate.compare(results, items)[0].subItems));
   });
 
   it('aggregates', () => {

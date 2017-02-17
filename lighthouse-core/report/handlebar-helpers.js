@@ -63,6 +63,12 @@ const handlebarHelpers = {
     return calculateRating(totalScore);
   },
 
+  // Converts an aggregation's score to a rating used for styling.
+  getAggregationScoreRating: score => {
+    const rating = calculateRating(score * 100);
+    return rating !== 'good' ? 'poor' : rating; // avg rating maps to failure for aggregation.
+  },
+
   // Converts a value to a rating string, which can be used inside the report
   // for color styling.
   getItemRating,

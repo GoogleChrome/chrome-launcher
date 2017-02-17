@@ -89,11 +89,21 @@ class DOMSize extends Audit {
     // Clamp the score to 0 <= x <= 100.
     score = Math.max(0, Math.min(100, score));
 
-    const cards = [
-      {title: 'Total DOM Nodes', value: stats.totalDOMNodes.toLocaleString()},
-      {title: 'DOM Depth', value: stats.depth.max.toLocaleString(), snippet: depthSnippet},
-      {title: 'Maximum Children', value: stats.width.max.toLocaleString(), snippet: widthSnippet}
-    ];
+    const cards = [{
+      title: 'Total DOM Nodes',
+      value: stats.totalDOMNodes.toLocaleString(),
+      target: `< ${MAX_DOM_NODES.toLocaleString()} nodes`
+    }, {
+      title: 'DOM Depth',
+      value: stats.depth.max.toLocaleString(),
+      snippet: depthSnippet,
+      target: `< ${MAX_DOM_TREE_DEPTH.toLocaleString()}`
+    }, {
+      title: 'Maximum Children',
+      value: stats.width.max.toLocaleString(),
+      snippet: widthSnippet,
+      target: `< ${MAX_DOM_TREE_WIDTH.toLocaleString()} nodes`
+    }];
 
     return DOMSize.generateAuditResult({
       rawValue: stats.totalDOMNodes,

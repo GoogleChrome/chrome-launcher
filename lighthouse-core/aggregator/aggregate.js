@@ -147,10 +147,9 @@ class Aggregate {
    * Compares the set of audit results to the expected values.
    * @param {!Array<!AuditResult>} results The audit results.
    * @param {!Array<!AggregationItem>} items The aggregation's expected values and weighting.
-   * @param {!boolean} aggregationIsScored Whether or not the aggregation is scored.
    * @return {!Array<!AggregationResultItem>} The aggregation score.
    */
-  static compare(results, items, aggregationIsScored) {
+  static compare(results, items) {
     return items.map(item => {
       const expectedNames = Object.keys(item.audits);
 
@@ -174,21 +173,13 @@ class Aggregate {
 
         subItems.push(filteredAndRemappedResults[e].name);
 
-        // Only add to the score if this aggregation contributes to the
-        // overall score.
-        if (!aggregationIsScored) {
-          return;
-        }
-
         overallScore += Aggregate._convertToWeight(
             filteredAndRemappedResults[e],
             item.audits[e],
             e);
       });
 
-      if (aggregationIsScored) {
-        maxScore = Aggregate._getTotalWeight(item.audits);
-      }
+      maxScore = Aggregate._getTotalWeight(item.audits);
 
       return {
         overall: (overallScore / maxScore),
@@ -215,7 +206,7 @@ class Aggregate {
    * @return {!AggregationResult}
    */
   static aggregate(aggregation, auditResults) {
-    const score = Aggregate.compare(auditResults, aggregation.items, aggregation.scored);
+    const score = Aggregate.compare(auditResults, aggregation.items);
     return {
       name: aggregation.name,
       description: aggregation.description,

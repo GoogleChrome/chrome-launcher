@@ -258,73 +258,98 @@
       "name": "Using modern offline features",
       "audits": {
         "appcache-manifest": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "no-websql": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         }
       }
     }, {
       "name": "Using modern protocols",
       "audits": {
         "is-on-https": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "uses-http2": {
-          "expectedValue": false,
-          "description": "Resources made by this application should be severed over HTTP/2 for improved performance."
+          "expectedValue": true,
+          "description": "Resources made by this application should be severed over HTTP/2 for improved performance.",
+          "weight": 1
         }
       }
     }, {
       "name": "Using bytes efficiently",
       "audits": {
-        "unused-css-rules": {},
-        "uses-optimized-images": {},
-        "uses-responsive-images": {}
+        "unused-css-rules": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "uses-optimized-images": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "uses-responsive-images": {
+          "expectedValue": true,
+          "weight": 1
+        }
       }
     }, {
       "name": "Using modern CSS features",
       "audits": {
         "no-old-flexbox": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         }
       }
     }, {
       "name": "Using modern JavaScript features",
       "audits": {
         "uses-passive-event-listeners": {
-          "expectedValue": true
+          "expectedValue": true,
+          "weight": 1
         },
         "no-mutation-events": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         }
       }
     }, {
       "name": "Avoiding APIs that harm the user experience",
       "audits": {
         "no-document-write": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "link-blocking-first-paint": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "script-blocking-first-paint": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "external-anchors-use-rel-noopener": {
-          "expectedValue": true
+          "expectedValue": true,
+          "weight": 1
         },
         "geolocation-on-start": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "notification-on-start": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         }
       }
     }, {
       "name": "Avoiding deprecated APIs and browser interventions",
       "audits": {
-        "deprecations": {}
+        "deprecations": {
+          "expectedValue": true,
+          "weight": 1
+        }
       }
     }, {
       "name": "Accessibility",
@@ -387,11 +412,11 @@
           "weight": 1
         },
         "critical-request-chains": {
-          "expectedValue": 0,
+          "expectedValue": true,
           "weight": 1
         },
         "user-timings": {
-          "expectedValue": 0,
+          "expectedValue": true,
           "weight": 1
         }
       }
@@ -405,10 +430,12 @@
       "name": "New JavaScript features",
       "audits": {
         "no-datenow": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         },
         "no-console-time": {
-          "expectedValue": false
+          "expectedValue": true,
+          "weight": 1
         }
       }
     }]
