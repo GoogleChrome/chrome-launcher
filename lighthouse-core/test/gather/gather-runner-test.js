@@ -423,6 +423,7 @@ describe('GatherRunner', function() {
     const flags = {};
 
     const passes = [{
+      blankDuration: 0,
       recordNetwork: true,
       recordTrace: true,
       passName: 'firstPass',
@@ -430,6 +431,7 @@ describe('GatherRunner', function() {
         t1
       ]
     }, {
+      blankDuration: 0,
       passName: 'secondPass',
       gatherers: [
         t2
@@ -449,11 +451,13 @@ describe('GatherRunner', function() {
 
   it('respects trace names', () => {
     const passes = [{
+      blankDuration: 0,
       recordNetwork: true,
       recordTrace: true,
       passName: 'firstPass',
       gatherers: [new TestGatherer()]
     }, {
+      blankDuration: 0,
       recordNetwork: true,
       recordTrace: true,
       passName: 'secondPass',
@@ -547,6 +551,7 @@ describe('GatherRunner', function() {
 
   it('will instantiate computed artifacts during a run', () => {
     const passes = [{
+      blankDuration: 0,
       recordNetwork: true,
       recordTrace: true,
       passName: 'firstPass',
@@ -636,6 +641,7 @@ describe('GatherRunner', function() {
       ];
       const gathererNames = gatherers.map(gatherer => gatherer.name);
       const passes = [{
+        blankDuration: 0,
         gatherers
       }];
 
@@ -735,6 +741,7 @@ describe('GatherRunner', function() {
       ];
       const gathererNames = gatherers.map(gatherer => gatherer.name);
       const passes = [{
+        blankDuration: 0,
         gatherers
       }];
 
@@ -770,6 +777,7 @@ describe('GatherRunner', function() {
         }
       ];
       const passes = [{
+        blankDuration: 0,
         gatherers
       }];
 
@@ -785,6 +793,7 @@ describe('GatherRunner', function() {
 
     it('rejects if a gatherer does not provide an artifact', () => {
       const passes = [{
+        blankDuration: 0,
         recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
@@ -803,6 +812,7 @@ describe('GatherRunner', function() {
 
     it('rejects when domain name can\'t be resolved', () => {
       const passes = [{
+        blankDuration: 0,
         recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
@@ -833,6 +843,7 @@ describe('GatherRunner', function() {
 
     it('resolves when domain name can\'t be resolved but is offline', () => {
       const passes = [{
+        blankDuration: 0,
         recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
