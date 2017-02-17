@@ -1,0 +1,8 @@
+<ul class="subitem__details cards__container">
+  {{#each this}}
+    <div class="subitem__detail scorecard" {{#if snippet}}title="{{snippet}}"{{/if}}>
+      <div class="scorecard-title">{{title}}</div>
+      <div class="scorecard-value">{{value}}</div>
+    </div>
+  {{/each}}
+</ul>

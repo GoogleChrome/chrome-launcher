@@ -1,0 +1,94 @@
+<!doctype html>
+<!--
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+-->
+<html>
+<head>
+  <title>DoBetterWeb - DOM size tester</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+</head>
+<body>
+  <main>
+    <section>
+      <div>
+        <div>6</div>
+      </div>
+      <div>
+        <div>
+          <div id="attachshadow">7</div>
+        </div>
+      </div>
+      <div>
+        <template>
+          <div><div><div><div>10, but noop in template</div></div></div></div>
+        </template>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div id="attachshadow-big" class="test this out">4</div>
+    <div>3</div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </footer>
+<script>
+  function withShadowDOMTest() {
+    const el = document.querySelector('#attachshadow');
+    el.innerHTML = `<div>7</div>`;
+    el.attachShadow({mode: 'open'}).innerHTML = `
+      <div>
+        <div class="here">9</div>
+      </div>
+    `;
+
+    const el2 = document.querySelector('#attachshadow-big');
+    el2.attachShadow({mode: 'open'}).innerHTML = `
+      <div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+        <div>6</div>
+      </div>
+    `;
+  }
+
+  function domTest(numNodes=1500) {
+    const frag = new DocumentFragment();
+    for (let i = 0; i < numNodes; ++i) {
+      frag.appendChild(document.createElement('span'));
+    }
+    document.body.appendChild(frag);
+  }
+
+  const params = new URLSearchParams(location.search);
+  if (params.has('smallDOM')) {
+    domTest(1300);
+  } else if (params.has('largeDOM')) {
+    domTest(6000);
+  }
+  if (params.has('withShadowDOM')) {
+    withShadowDOMTest();
+  }
+</script>
+</body>
+</html>

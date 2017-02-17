@@ -64,6 +64,7 @@ class ReportGenerator {
     // Cannot DRY this up and dynamically create paths because fs.readdirSync
     // doesn't browserify well with a variable path. See https://github.com/substack/brfs/issues/36.
     const partialStyles = [
+      fs.readFileSync(__dirname + '/../formatters/partials/cards.css', 'utf8'),
       fs.readFileSync(__dirname + '/../formatters/partials/critical-request-chains.css', 'utf8'),
       fs.readFileSync(__dirname + '/../formatters/partials/table.css', 'utf8'),
       fs.readFileSync(__dirname + '/../formatters/partials/url-list.css', 'utf8'),

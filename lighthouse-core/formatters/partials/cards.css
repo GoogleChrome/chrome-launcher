@@ -1,0 +1,40 @@
+.cards__container {
+  --padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.scorecard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 150px;
+  flex-direction: column;
+  padding: calc(var(--padding) / 2);
+  padding-top: calc(32px + var(--padding) / 2);
+  border-radius: 3px;
+  margin-right: var(--padding);
+  position: relative;
+  color: var(--secondary-text-color);
+  line-height: inherit;
+  border: 1px solid #ebebeb;
+}
+.scorecard-title {
+  /*text-transform: uppercase;*/
+  font-size: var(--subitem-font-size);
+  line-height: var(--heading-line-height);
+  background-color: #eee;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #ebebeb;
+}
+.scorecard-value {
+  font-size: 24px;
+}
+.scorecard-summary {
+  margin-top: calc(var(--padding) / 2);
+}

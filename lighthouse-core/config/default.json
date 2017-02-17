@@ -43,6 +43,7 @@
       "dobetterweb/document-write",
       "dobetterweb/geolocation-on-start",
       "dobetterweb/notification-on-start",
+      "dobetterweb/domstats",
       "dobetterweb/optimized-images",
       "dobetterweb/tags-blocking-first-paint",
       "dobetterweb/websql"
@@ -87,8 +88,9 @@
     "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",
     "byte-efficiency/uses-responsive-images",
-    "dobetterweb/external-anchors-use-rel-noopener",
     "dobetterweb/appcache-manifest",
+    "dobetterweb/dom-size",
+    "dobetterweb/external-anchors-use-rel-noopener",
     "dobetterweb/geolocation-on-start",
     "dobetterweb/link-blocking-first-paint",
     "dobetterweb/no-console-time",
@@ -380,6 +382,10 @@
     "categorizable": false,
     "items": [{
       "audits": {
+        "dom-size": {
+          "expectedValue": 100,
+          "weight": 1
+        },
         "critical-request-chains": {
           "expectedValue": 0,
           "weight": 1

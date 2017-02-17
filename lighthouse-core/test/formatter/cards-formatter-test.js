@@ -1,0 +1,59 @@
+/**
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+'use strict';
+
+/* eslint-env mocha */
+
+const CardsFormatter = require('../../formatters/cards.js');
+const Handlebars = require('handlebars');
+const assert = require('assert');
+
+describe('CardsFormatter', () => {
+  const extendedInfo = {
+    value: [
+      {title: 'Total DOM Nodes', value: 3500},
+      {title: 'DOM Depth', value: 10, snippet: 'snippet'},
+      {title: 'Maximum Children', value: 20, snippet: 'snippet2'}
+    ]
+  };
+
+  it('handles invalid input', () => {
+    const pretty = CardsFormatter.getFormatter('pretty');
+    assert.equal(pretty(), '');
+    assert.equal(pretty(null), '');
+    assert.equal(pretty({}), '');
+    assert.equal(pretty({results: 'blah'}), '');
+  });
+
+  it('generates valid pretty output', () => {
+    const pretty = CardsFormatter.getFormatter('pretty');
+    const output = pretty(extendedInfo.value);
+    const str = `    - ${extendedInfo.value[0].title}: ${extendedInfo.value[0].value}\n` +
+        `    - ${extendedInfo.value[1].title}: ${extendedInfo.value[1].value}\n` +
+        `    - ${extendedInfo.value[2].title}: ${extendedInfo.value[2].value}\n`;
+    assert.equal(output, str);
+  });
+
+  it('generates valid html output', () => {
+    const formatter = CardsFormatter.getFormatter('html');
+    const template = Handlebars.compile(formatter);
+    const output = template(extendedInfo.value).split('\n').join('');
+    assert.ok(output.match('title="snippet"'), 'adds title attribute for snippet');
+    assert.ok(output.match('class="subitem__details cards__container"'), 'adds wrapper class');
+    assert.equal(output.match(/class=\"[^"]*scorecard-value/g).length, extendedInfo.value.length);
+    assert.equal(output.match(/class=\"[^"]*scorecard-title/g).length, extendedInfo.value.length);
+  });
+});
