@@ -29,10 +29,10 @@ span, div, p, section, header, h1, h2, li, ul {
   --text-color: #222;
   --secondary-text-color: #606060;
   --accent-color: #3879d9;
-  --poor-color: #eb211e;
-  --good-color: #1ac123;
-  --average-color: #ffae00;
-  --warning-color: #f6be00;
+  --poor-color: #e81e1b;
+  --good-color: #008a07;
+  --average-color: #9f6d00;
+  --warning-color: #947200;
   --gutter-gap: 12px;
   --gutter-width: 40px;
   --body-font-size: 14px;
@@ -273,8 +273,7 @@ body {
 }
 
 .menu__header-version {
-  opacity: 0.4;
-  color: #fff;
+  color: #aab3ed;
   font-family: var(--text-font-family);
   font-size: 14px;
   line-height: 1.5;
@@ -326,7 +325,7 @@ body {
 .menu__link {
   padding: 0 20px;
   text-decoration: none;
-  color: #777;
+  color: #767676;
   display: flex;
 }
 
@@ -613,7 +612,7 @@ body {
   text-align: center;
   font-size: 12px;
   border-top: 1px solid #ebebeb;
-  color: #999;
+  color: #767676;
 }
 
 .devtabs {
