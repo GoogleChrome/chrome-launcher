@@ -141,7 +141,6 @@ function launchChromeAndRunLighthouse(url, flags, config) {
         throw err;
       }, console.err);
     });
-  }
 }
 
 // Use an existing config or create a custom one.
@@ -150,8 +149,9 @@ const url = 'https://example.com';
 const flags = {output: 'html'};
 
 launchChromeAndRunLighthouse(url, flags, config).then(lighthouseResults => {
-  Printer.write(lighthouseResults, flags.output);
-}).catch(err => console.err);
+  lighthouseResults.artifacts = undefined; // You can save the artifacts separately if so desired
+  return Printer.write(lighthouseResults, flags.output);
+}).catch(err => console.error(err));
 ```
 
 **Example** - extracting an overall score from all scored audits
