@@ -126,7 +126,7 @@ const Printer = require('lighthouse/lighthouse-cli/printer');
 function launchChromeAndRunLighthouse(url, flags, config) {
   const launcher = new ChromeLauncher({port: 9222, autoSelectChrome: true});
 
-  launcher.isDebuggerReady()
+  return launcher.isDebuggerReady()
     .catch(() => {
       if (flags.skipAutolaunch) {
         return;
