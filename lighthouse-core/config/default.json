@@ -1,5 +1,6 @@
 {
   "passes": [{
+    "passName": "defaultPass",
     "recordNetwork": true,
     "recordTrace": true,
     "gatherers": [
@@ -22,13 +23,14 @@
     ]
   },
   {
+    "passName": "redirectPass",
     "gatherers": [
       "http-redirect",
       "html-without-javascript"
     ]
   }, {
-    "recordNetwork": true,
     "passName": "dbw",
+    "recordNetwork": true,
     "gatherers": [
       "chrome-console-messages",
       "styles",

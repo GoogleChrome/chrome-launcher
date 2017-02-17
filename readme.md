@@ -230,6 +230,37 @@ Better docs coming soon, but in the meantime look at [PR #593](https://github.co
 
 You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.json <url>`
 
+If you are simply adding additional audits/gatherers or tweaking flags, you can extend the default configuration without having to copy the default and maintain it. Passes with the same name will be merged together, all other arrays will be concatenated, and primitive values will override the defaults. See the example below that adds a custom gatherer to the default pass and an audit.
+
+```json
+{
+  "extends": true,
+  "passes": [
+    {
+      "passName": "defaultPass",
+      "gatherers": ["path/to/custom/gatherer.js"]
+    }
+  ],
+  "audits": ["path/to/custom/audit.js"],
+  "aggregations": [
+    {
+      "name": "Custom Section",
+      "description": "Enter description here.",
+      "scored": false,
+      "categorizable": false,
+      "items": [
+        {
+          "name": "My Custom Audits",
+          "audits": {
+            "name-of-custom-audit": {}
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Tests
 
 Some basic unit tests forked are in `/test` and run via mocha. eslint is also checked for style violations.

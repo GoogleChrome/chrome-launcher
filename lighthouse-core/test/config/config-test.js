@@ -313,4 +313,58 @@ describe('Config', () => {
     assert.ok(config.artifacts.traces.defaultPass.traceEvents.find(
           e => e.name === 'TracingStartedInPage' && e.args.data.page === '0xhad00p'));
   });
+
+  describe('#extendConfigJSON', () => {
+    it('should merge passes', () => {
+      const configA = {
+        passes: [
+          {passName: 'passA', recordNetwork: true, gatherers: ['a']},
+          {passName: 'passB', gatherers: ['b']},
+          {gatherers: ['c']}
+        ]
+      };
+      const configB = {
+        passes: [
+          {passName: 'passB', recordTrace: true, gatherers: ['d']},
+          {gatherers: ['e']}
+        ]
+      };
+
+      const merged = Config.extendConfigJSON(configA, configB);
+      assert.equal(merged.passes.length, 4);
+      assert.equal(merged.passes[1].recordTrace, true);
+      assert.deepEqual(merged.passes[1].gatherers, ['b', 'd']);
+      assert.deepEqual(merged.passes[3].gatherers, ['e']);
+    });
+
+    it('should merge audits', () => {
+      const configA = {audits: ['a', 'b']};
+      const configB = {audits: ['c']};
+      const merged = Config.extendConfigJSON(configA, configB);
+      assert.deepEqual(merged.audits, ['a', 'b', 'c']);
+    });
+
+    it('should merge aggregations', () => {
+      const configA = {aggregations: [{name: 'A'}, {name: 'B'}]};
+      const configB = {aggregations: [{name: 'C'}]};
+      const merged = Config.extendConfigJSON(configA, configB);
+      assert.deepEqual(merged.aggregations, [
+        {name: 'A'},
+        {name: 'B'},
+        {name: 'C'},
+      ]);
+    });
+
+    it('should merge other values', () => {
+      const artifacts = {
+        traces: {defaultPass: '../some/long/path'},
+        performanceLog: 'path/to/performance/log',
+      };
+      const configA = {};
+      const configB = {extends: true, artifacts};
+      const merged = Config.extendConfigJSON(configA, configB);
+      assert.equal(merged.extends, true);
+      assert.equal(merged.artifacts, configB.artifacts);
+    });
+  });
 });
