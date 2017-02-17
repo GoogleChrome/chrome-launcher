@@ -41,11 +41,13 @@ module.exports = {
   },
   {
     gatherers: [
+      'dobetterweb/domstats',
       'http-redirect'
     ]
   }],
 
   audits: [
+    'dobetterweb/dom-size',
     'is-on-https',
     'redirects-http',
     'service-worker',

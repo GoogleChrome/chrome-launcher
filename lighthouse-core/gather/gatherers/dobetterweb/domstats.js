@@ -39,9 +39,11 @@ function createSelectorsLabel(element) {
   if (idAttr) {
     name += `#${idAttr}`;
   }
-  const className = element.className;
+  // svg elements return SVGAnimatedString for .className, which is an object.
+  // Stringify classList instead.
+  const className = element.classList.toString();
   if (className) {
-    name += `.${className.replace(/\s+/g, '.')}`;
+    name += `.${className.trim().replace(/\s+/g, '.')}`;
   }
   return name;
 }
@@ -55,7 +57,11 @@ function elementPathInDOM(element) {
   const path = [createSelectorsLabel(element)];
   let node = element;
   while (node) {
-    node = node.parentNode && node.parentNode.host ? node.parentNode.host : node.parentElement;
+    // Anchor elements have a .host property. Be sure we've found a shadow root
+    // host and not an anchor.
+    const shadowHost = node.parentNode && node.parentNode.host &&
+                       node.parentNode.localName !== 'a';
+    node = shadowHost ? node.parentNode.host : node.parentElement;
     if (node) {
       path.unshift(createSelectorsLabel(node));
     }
