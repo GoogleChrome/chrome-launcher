@@ -302,7 +302,7 @@ class GatherRunner {
     };
 
     if (typeof options.url !== 'string' || options.url.length === 0) {
-      return Promise.reject(new Error('You must provide a url to the driver'));
+      return Promise.reject(new Error('You must provide a url to the gather-runner'));
     }
 
     if (typeof options.flags === 'undefined') {

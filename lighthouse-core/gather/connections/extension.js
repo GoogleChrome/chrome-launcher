@@ -136,8 +136,7 @@ class ExtensionConnection extends Connection {
     return new Promise((resolve, reject) => {
       const queryOpts = {
         active: true,
-        lastFocusedWindow: true,
-        windowType: 'normal'
+        currentWindow: true
       };
 
       chrome.tabs.query(queryOpts, (tabs => {
@@ -148,6 +147,9 @@ class ExtensionConnection extends Connection {
           const message = 'Couldn\'t resolve current tab. Please file a bug.';
           return reject(new Error(message));
         }
+        if (tabs.length > 1) {
+          log.warn('ExtensionConnection', '_queryCurrentTab returned multiple tabs');
+        }
         resolve(tabs[0]);
       }));
     });
@@ -157,7 +159,12 @@ class ExtensionConnection extends Connection {
    * Used by lighthouse-background to kick off the run on the current page
    */
   getCurrentTabURL() {
-    return this._queryCurrentTab().then(tab => tab.url);
+    return this._queryCurrentTab().then(tab => {
+      if (!tab.url) {
+        log.error('ExtensionConnection', 'getCurrentTabURL returned empty string', tab);
+      }
+      return tab.url;
+    });
   }
 }
 

@@ -36,7 +36,7 @@ class Runner {
     // save the initialUrl provided by the user
     opts.initialUrl = opts.url;
     if (typeof opts.initialUrl !== 'string' || opts.initialUrl.length === 0) {
-      return Promise.reject(new Error('You must provide a url to the driver'));
+      return Promise.reject(new Error('You must provide a url to the runner'));
     }
 
     let parsedURL;
