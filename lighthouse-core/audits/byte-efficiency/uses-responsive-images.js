@@ -62,9 +62,6 @@ class UsesResponsiveImages extends Audit {
 
     if (!Number.isFinite(wastedRatio)) {
       return new Error(`Invalid image sizing information ${url}`);
-    } else if (wastedRatio <= 0 || wastedBytes < IGNORE_THRESHOLD_IN_BYTES) {
-      // Image did not have sufficient resolution to fill display size
-      return null;
     }
 
     return {
@@ -90,29 +87,33 @@ class UsesResponsiveImages extends Audit {
     const contentWidth = artifacts.ContentWidth;
 
     let debugString;
-    let hasWastefulImage = false;
     const DPR = contentWidth.devicePixelRatio;
-    const results = images.reduce((results, image) => {
-      if (!image.networkRecord) {
+    const resultsMap = images.reduce((results, image) => {
+      // TODO: give SVG a free pass until a detail per pixel metric is available
+      if (!image.networkRecord || image.networkRecord.mimeType === 'image/svg+xml') {
         return results;
       }
 
       const processed = UsesResponsiveImages.computeWaste(image, DPR);
-      if (!processed) {
-        return results;
-      } else if (processed instanceof Error) {
+      if (processed instanceof Error) {
         debugString = processed.message;
         return results;
       }
 
-      hasWastefulImage = hasWastefulImage || processed.isWasteful;
-      results.push(processed);
-      return results;
-    }, []);
+      // Don't warn about an image that was later used appropriately
+      const existing = results.get(processed.preview.url);
+      if (!existing || existing.wastedBytes > processed.wastedBytes) {
+        results.set(processed.preview.url, processed);
+      }
 
+      return results;
+    }, new Map());
+
+    const results = Array.from(resultsMap.values())
+        .filter(item => item.wastedBytes > IGNORE_THRESHOLD_IN_BYTES);
     return {
       debugString,
-      passes: !hasWastefulImage,
+      passes: !results.find(item => item.isWasteful),
       results,
       tableHeadings: {
         preview: '',

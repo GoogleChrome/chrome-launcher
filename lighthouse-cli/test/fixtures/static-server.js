@@ -59,6 +59,8 @@ function requestHandler(request, response) {
       headers = {'Content-Type': 'text/javascript'};
     } else if (filePath.endsWith('.css')) {
       headers = {'Content-Type': 'text/css'};
+    } else if (filePath.endsWith('.svg')) {
+      headers = {'Content-Type': 'image/svg+xml'};
     }
     response.writeHead(statusCode, headers);
 
