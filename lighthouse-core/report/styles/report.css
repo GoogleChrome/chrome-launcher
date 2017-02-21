@@ -29,10 +29,10 @@ span, div, p, section, header, h1, h2, li, ul {
   --text-color: #222;
   --secondary-text-color: #606060;
   --accent-color: #3879d9;
-  --poor-color: #e81e1b;
-  --good-color: #008a07;
-  --average-color: #9f6d00;
-  --warning-color: #947200;
+  --poor-color: #e53935; /* md red 600 */
+  --good-color: #43a047; /* md green 600 */
+  --average-color: #ef6c00; /* md orange 800 */
+  --warning-color: #757575; /* md grey 600 */
   --gutter-gap: 12px;
   --gutter-width: 40px;
   --body-font-size: 14px;
