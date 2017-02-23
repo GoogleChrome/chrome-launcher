@@ -31,17 +31,17 @@ const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 
-class ChromeLauncher {
+export class ChromeLauncher {
   prepared: Boolean = false
   pollInterval: number = 500
   autoSelectChrome: Boolean
   TMP_PROFILE_DIR: string
-  outFile: number
-  errFile: number
+  outFile?: number
+  errFile?: number
   pidFile: string
   startingUrl: string
   additionalFlags: Array<string>
-  chrome: childProcess.ChildProcess
+  chrome?: childProcess.ChildProcess
   port: number
 
   // We can not use default args here due to support node pre 6.
@@ -176,7 +176,7 @@ class ChromeLauncher {
   }
 
   // resolves if ready, rejects otherwise
-  isDebuggerReady(): Promise<undefined> {
+  isDebuggerReady(): Promise<{}> {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(this.port);
       client.once('error', err => {
@@ -191,7 +191,7 @@ class ChromeLauncher {
   }
 
   // resolves when debugger is ready, rejects after 10 polls
-  waitUntilReady(): Promise<undefined> {
+  waitUntilReady(): Promise<{}> {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
@@ -221,7 +221,7 @@ class ChromeLauncher {
     });
   }
 
-  kill(): Promise<undefined> {
+  kill(): Promise<{}> {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
@@ -240,7 +240,7 @@ class ChromeLauncher {
           log.warn('ChromeLauncher', `Chrome could not be killed ${err.message}`);
         }
 
-        this.chrome = null;
+        delete this.chrome;
       } else {
         // fail silently as we did not start chrome
         resolve();
@@ -248,7 +248,7 @@ class ChromeLauncher {
     });
   }
 
-  destroyTmp(): Promise<undefined> {
+  destroyTmp(): Promise<{}> {
     return new Promise(resolve => {
       if (!this.TMP_PROFILE_DIR) {
         return resolve();
@@ -258,12 +258,12 @@ class ChromeLauncher {
 
       if (this.outFile) {
         fs.closeSync(this.outFile);
-        this.outFile = null;
+        delete this.outFile;
       }
 
       if (this.errFile) {
         fs.closeSync(this.errFile);
-        this.errFile = null;
+        delete this.errFile;
       }
 
       rimraf(this.TMP_PROFILE_DIR, () => resolve());
@@ -293,5 +293,3 @@ function win32TmpDir() {
   mkdirp.sync(tmpdir);
   return tmpdir;
 }
-
-export {ChromeLauncher};

@@ -276,40 +276,37 @@ function saveResults(results: Results,
     return promise.then(_ => Printer.write(results, flags.output, flags.outputPath));
 }
 
-function runLighthouse(url: string,
+export async function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
                          outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
                          maxWaitForLoad: number},
-                       config: Object): Promise<undefined> {
+                       config: Object | null): Promise<{}|void> {
 
-  let chromeLauncher: ChromeLauncher;
-  return initPort(flags)
-    .then(() => getDebuggableChrome(flags))
-    .then(chrome => chromeLauncher = chrome)
-    .then(() => lighthouse(url, flags, config))
-    .then((results: Results) => {
-      // remove artifacts from result so reports won't include artifacts.
-      const artifacts = results.artifacts;
-      results.artifacts = undefined;
+  let chromeLauncher: ChromeLauncher | undefined = undefined;
 
-      let promise = saveResults(results, artifacts, flags);
-      if (flags.interactive) {
-        promise = promise.then(() => performanceXServer.hostExperiment({url, flags, config}, results));
-      }
+  try {
+    await initPort(flags)
+    const chromeLauncher = await getDebuggableChrome(flags)
+    const results = await lighthouse(url, flags, config);
 
-      return promise;
-    })
-    .then(() => chromeLauncher.kill())
-    .catch(err => {
-      return chromeLauncher.kill().then(() => handleError(err), handleError);
-    });
-}
+    const artifacts = results.artifacts;
+    delete results.artifacts;
 
-function run() {
+    await saveResults(results, artifacts!, flags);
+    if (flags.interactive) {
+      await performanceXServer.hostExperiment({url, flags, config}, results);
+    }
+
+    return await chromeLauncher.kill();
+  } catch (err) {
+    if (typeof chromeLauncher !== 'undefined') {
+      await chromeLauncher!.kill();
+    }
+
+    return handleError(err);
+  }
+ }
+
+export function run() {
   return runLighthouse(url, cliFlags, config);
-}
-
-export {
-  runLighthouse,
-  run
 }

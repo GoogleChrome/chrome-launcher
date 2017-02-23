@@ -133,7 +133,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
 /**
  * Writes the output to stdout.
  */
-function writeToStdout(output: string): Promise<undefined> {
+function writeToStdout(output: string): Promise<{}> {
   return new Promise((resolve, reject) => {
     // small delay to avoid race with debug() logs
     setTimeout(_ => {
@@ -146,7 +146,7 @@ function writeToStdout(output: string): Promise<undefined> {
 /**
  * Writes the output to a file.
  */
-function writeFile(filePath: string, output: string, outputMode: OutputMode): Promise<undefined> {
+function writeFile(filePath: string, output: string, outputMode: OutputMode): Promise<{}> {
   return new Promise((resolve, reject) => {
     // TODO: make this mkdir to the filePath.
     fs.writeFile(filePath, output, 'utf8', (err: Error) => {
