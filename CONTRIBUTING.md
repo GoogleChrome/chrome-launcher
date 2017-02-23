@@ -82,7 +82,7 @@ echo "Branch and commit the version bump."
 echo "Generate a PR and get it merged."
 
 # * Deploy-time *
-cd lighthouse-extension; gulp build; gulp package; cd ..
+cd lighthouse-extension; yarn build; gulp package; cd ..
 echo "Upload the package zip to CWS dev dashboard"
 
 npm publish
