@@ -41,22 +41,42 @@ class CriConnection extends Connection {
    * @return {!Promise}
    */
   connect() {
-    return this._runJsonCommand('new').then(response => {
-      const url = response.webSocketDebuggerUrl;
-      this._pageId = response.id;
-
-      return new Promise((resolve, reject) => {
-        const ws = new WebSocket(url, {
-          perMessageDeflate: false
+    return this._runJsonCommand('new')
+      .then(response => this._connectToSocket(response))
+      .catch(_ => {
+        // headless doesn't support `/json/new` (#970), so we fallback to reuse
+        log.warn('CriConnection', 'Cannot create new tab; reusing open tab.');
+        return this._runJsonCommand('list').then(tabs => {
+          const firstTab = tabs[0];
+          if (!Array.isArray(tabs) || !firstTab) {
+            return Promise.reject(new Error('Cannot create new tab, and no tabs already open.'));
+          }
+          // first, we activate it to a foreground tab, then we connect
+          return this._runJsonCommand(`activate/${firstTab.id}`)
+              .then(_ => this._connectToSocket(firstTab));
         });
-        ws.on('open', () => {
-          this._ws = ws;
-          resolve();
-        });
-        ws.on('message', data => this.handleRawMessage(data));
-        ws.on('close', this.dispose.bind(this));
-        ws.on('error', reject);
       });
+  }
+
+  /**
+   * @param {!Object} response
+   * @return {!Promise}
+   */
+  _connectToSocket(response) {
+    const url = response.webSocketDebuggerUrl;
+    this._pageId = response.id;
+
+    return new Promise((resolve, reject) => {
+      const ws = new WebSocket(url, {
+        perMessageDeflate: false
+      });
+      ws.on('open', () => {
+        this._ws = ws;
+        resolve();
+      });
+      ws.on('message', data => this.handleRawMessage(data));
+      ws.on('close', this.dispose.bind(this));
+      ws.on('error', reject);
     });
   }
 
@@ -81,8 +101,8 @@ class CriConnection extends Connection {
               resolve(JSON.parse(data));
               return;
             } catch (e) {
-              // In the case of 'close' Chromium returns a string rather than JSON: goo.gl/7v27xD
-              if (data === 'Target is closing') {
+              // In the case of 'close' & 'activate' Chromium returns a string rather than JSON: goo.gl/7v27xD
+              if (data === 'Target is closing' || data === 'Target activated') {
                 return resolve({message: data});
               }
               return reject(e);
