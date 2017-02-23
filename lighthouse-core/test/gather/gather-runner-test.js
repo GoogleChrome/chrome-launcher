@@ -238,6 +238,7 @@ describe('GatherRunner', function() {
     const driver = {
       assertNoSameOriginServiceWorkerClients: asyncFunc,
       beginEmulation: asyncFunc,
+      setThrottling: asyncFunc,
       enableRuntimeEvents: asyncFunc,
       cacheNatives: asyncFunc,
       cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
@@ -264,6 +265,7 @@ describe('GatherRunner', function() {
     const driver = {
       assertNoSameOriginServiceWorkerClients: asyncFunc,
       beginEmulation: asyncFunc,
+      setThrottling: asyncFunc,
       enableRuntimeEvents: asyncFunc,
       cacheNatives: asyncFunc,
       cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),

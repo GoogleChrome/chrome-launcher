@@ -2,6 +2,7 @@
   "passes": [{
     "recordNetwork": true,
     "recordTrace": true,
+    "useThrottling": true,
     "gatherers": [
       "url",
       "image-usage",
@@ -11,6 +12,7 @@
   {
     "passName": "css-image-usage",
     "recordNetwork": true,
+    "useThrottling": false,
     "gatherers": [
       "styles",
       "css-usage",

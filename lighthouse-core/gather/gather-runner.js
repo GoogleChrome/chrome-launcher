@@ -333,6 +333,7 @@ class GatherRunner {
         return passes.reduce((chain, config, passIndex) => {
           const runOptions = Object.assign({}, options, {config});
           return chain
+            .then(_ => driver.setThrottling(options.flags, config))
             .then(_ => GatherRunner.beforePass(runOptions, gathererResults))
             .then(_ => GatherRunner.pass(runOptions, gathererResults))
             .then(_ => GatherRunner.afterPass(runOptions, gathererResults))

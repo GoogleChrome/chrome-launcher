@@ -678,21 +678,21 @@ class Driver {
   }
 
   beginEmulation(flags) {
-    const emulations = [];
+    return Promise.resolve().then(_ => {
+      if (!flags.disableDeviceEmulation) return emulation.enableNexus5X(this);
+    }).then(_ => this.setThrottling(flags, {useThrottling: true}));
+  }
 
-    if (!flags.disableDeviceEmulation) {
-      emulations.push(emulation.enableNexus5X(this));
+  setThrottling(flags, passConfig) {
+    const p = [];
+    if (passConfig.useThrottling) {
+      if (!flags.disableNetworkThrottling) p.push(emulation.enableNetworkThrottling(this));
+      if (!flags.disableCpuThrottling) p.push(emulation.enableCPUThrottling(this));
+    } else {
+      p.push(emulation.disableNetworkThrottling(this));
+      p.push(emulation.disableCPUThrottling(this));
     }
-
-    if (!flags.disableNetworkThrottling) {
-      emulations.push(emulation.enableNetworkThrottling(this));
-    }
-
-    if (!flags.disableCpuThrottling) {
-      emulations.push(emulation.enableCPUThrottling(this));
-    }
-
-    return Promise.all(emulations);
+    return Promise.all(p);
   }
 
   /**
@@ -700,11 +700,9 @@ class Driver {
    * @return {!Promise}
    */
   goOffline() {
-    return this.sendCommand('Network.enable').then(_ => {
-      return emulation.goOffline(this);
-    }).then(_ => {
-      this.online = false;
-    });
+    return this.sendCommand('Network.enable')
+      .then(_ => emulation.goOffline(this))
+      .then(_ => this.online = false);
   }
 
   /**
@@ -714,15 +712,8 @@ class Driver {
    * @return {!Promise}
    */
   goOnline(options) {
-    return this.sendCommand('Network.enable').then(_ => {
-      if (!options.flags.disableNetworkThrottling) {
-        return emulation.enableNetworkThrottling(this);
-      }
-
-      return emulation.disableNetworkThrottling(this);
-    }).then(_ => {
-      this.online = true;
-    });
+    return this.setThrottling(options.flags, options.config)
+        .then(_ => this.online = true);
   }
 
   cleanAndDisableBrowserCaches() {

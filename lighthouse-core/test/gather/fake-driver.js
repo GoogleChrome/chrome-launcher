@@ -31,6 +31,9 @@ module.exports = {
   beginEmulation() {
     return Promise.resolve();
   },
+  setThrottling() {
+    return Promise.resolve();
+  },
   assertNoSameOriginServiceWorkerClients() {
     return Promise.resolve();
   },
