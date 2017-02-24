@@ -139,7 +139,7 @@ function launchChromeAndRunLighthouse(url, flags, config) {
       // Kill Chrome if there's an error.
       return launcher.kill().then(() => {
         throw err;
-      }, console.err);
+      }, console.error);
     });
 }
 
