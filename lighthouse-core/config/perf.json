@@ -6,7 +6,8 @@
     "gatherers": [
       "url",
       "image-usage",
-      "content-width"
+      "content-width",
+      "dobetterweb/domstats"
     ]
   },
   {
@@ -33,18 +34,17 @@
     "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",
     "byte-efficiency/uses-responsive-images",
+    "dobetterweb/dom-size",
     "dobetterweb/link-blocking-first-paint",
     "dobetterweb/script-blocking-first-paint"
   ],
 
   "aggregations": [{
-    "name": "Perf metrics",
+    "name": "Performance metrics",
     "description": "",
-    "scored": true,
-    "categorizable": true,
+    "scored": false,
+    "categorizable": false,
     "items": [{
-      "name": "Page load performance is fast",
-      "description": "",
       "audits": {
         "first-meaningful-paint": {
           "expectedValue": 100,
@@ -71,13 +71,38 @@
     "categorizable": false,
     "items": [{
       "audits": {
-        "unused-css-rules": {},
-        "uses-optimized-images": {},
-        "uses-responsive-images": {},
-        "critical-request-chains": {},
-        "link-blocking-first-paint": {},
-        "script-blocking-first-paint": {},
-        "user-timings": {}
+        "unused-css-rules": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "uses-optimized-images": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "uses-responsive-images": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "critical-request-chains": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "link-blocking-first-paint": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "script-blocking-first-paint": {
+          "expectedValue": true,
+          "weight": 1
+        },
+        "dom-size": {
+          "expectedValue": 100,
+          "weight": 1
+        },
+        "user-timings": {
+          "expectedValue": true,
+          "weight": 1
+        }
       }
     }]
   }]
