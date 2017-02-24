@@ -35,6 +35,7 @@ import * as Printer from './printer';
 import * as randomPort from './random-port';
 import {Results} from './types/types';
 const yargs = require('yargs');
+const opn = require('opn');
 
 interface LighthouseError extends Error {
   code?: string
@@ -87,12 +88,14 @@ const cliFlags = yargs
 
   .group([
     'output',
-    'output-path'
+    'output-path',
+    'view'
   ], 'Output:')
   .describe({
     'output': 'Reporter for the results',
     'output-path': `The file path to output the results
-Example: --output-path=./lighthouse-results.html`
+Example: --output-path=./lighthouse-results.html`,
+    'view': 'Open HTML report in your browser'
   })
 
   // boolean values
@@ -106,6 +109,7 @@ Example: --output-path=./lighthouse-results.html`
     'list-all-audits',
     'list-trace-categories',
     'perf',
+    'view',
     'skip-autolaunch',
     'select-chrome',
     'verbose',
@@ -117,7 +121,7 @@ Example: --output-path=./lighthouse-results.html`
 
   // default values
   .default('disable-cpu-throttling', true)
-  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.pretty])
+  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.none])
   .default('output-path', 'stdout')
   .default('port', 9222)
   .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
@@ -252,7 +256,7 @@ function handleError(err: LighthouseError) {
 
 function saveResults(results: Results,
                      artifacts: Object,
-                     flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean}) {
+                     flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean, view: boolean}) {
     let promise = Promise.resolve(results);
     const cwd = process.cwd();
     // Use the output path as the prefix for all generated files.
@@ -269,8 +273,15 @@ function saveResults(results: Results,
       promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
     }
 
-    if (flags.output === Printer.OutputMode[Printer.OutputMode.pretty]) {
-      promise = promise.then(_ => Printer.write(results, 'html', `${resolvedPath}.report.html`));
+    if (flags.output === Printer.OutputMode[Printer.OutputMode.none]) {
+      promise = promise
+          .then(_ => Printer.write(results, 'html', `${resolvedPath}.report.html`))
+          .then(_ => {
+            if (flags.view) return opn(`${resolvedPath}.report.html`, {wait: false});
+
+            log.warn('CLI', 'Report output no longer defaults to stdout. Use `--output=pretty` to re-enable.');
+            log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
+          });
     }
 
     return promise.then(_ => Printer.write(results, flags.output, flags.outputPath));
@@ -279,7 +290,7 @@ function saveResults(results: Results,
 export async function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
                          outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
-                         maxWaitForLoad: number},
+                         maxWaitForLoad: number, view: boolean},
                        config: Object | null): Promise<{}|void> {
 
   let chromeLauncher: ChromeLauncher | undefined = undefined;
