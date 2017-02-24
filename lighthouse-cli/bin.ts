@@ -64,6 +64,7 @@ const cliFlags = yargs
     'list-all-audits',
     'list-trace-categories',
     'config-path',
+    'chrome-flags',
     'perf',
     'port',
     'max-wait-for-load'
@@ -78,6 +79,7 @@ const cliFlags = yargs
     'list-all-audits': 'Prints a list of all available audits and exits',
     'list-trace-categories': 'Prints a list of all required trace categories and exits',
     'config-path': 'The path to the config JSON.',
+    'chrome-flags': 'Custom flags to pass to Chrome.',
     'perf': 'Use a performance-test-only configuration',
     'port': 'The port to use for the debugging protocol. Use 0 for a random port',
     'max-wait-for-load': 'The timeout (in milliseconds) to wait before the page is considered done loading and the run should continue. WARNING: Very high values can lead to large traces and instability',
@@ -120,6 +122,7 @@ Example: --output-path=./lighthouse-results.html`,
   .choices('output', Printer.GetValidOutputOptions())
 
   // default values
+  .default('chrome-flags', '')
   .default('disable-cpu-throttling', true)
   .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.none])
   .default('output-path', 'stdout')
@@ -189,9 +192,11 @@ function initPort(flags: {port: number}): Promise<undefined> {
  * port. If none is found and the `skipAutolaunch` flag is not true, launches
  * a debuggable instance.
  */
-function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, selectChrome: boolean}): Promise<ChromeLauncher> {
+function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, selectChrome: boolean,
+                               chromeFlags: string}): Promise<ChromeLauncher> {
   const chromeLauncher = new ChromeLauncher({
     port: flags.port,
+    additionalFlags: flags.chromeFlags.split(' '),
     autoSelectChrome: !flags.selectChrome,
   });
 
@@ -290,7 +295,7 @@ function saveResults(results: Results,
 export async function runLighthouse(url: string,
                        flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
                          outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
-                         maxWaitForLoad: number, view: boolean},
+                         chromeFlags: string, maxWaitForLoad: number, view: boolean},
                        config: Object | null): Promise<{}|void> {
 
   let chromeLauncher: ChromeLauncher | undefined = undefined;
