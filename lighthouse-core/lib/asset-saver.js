@@ -29,19 +29,20 @@ const Metrics = require('./traces/pwmetrics-events');
 function screenshotDump(screenshots) {
   return `
   <!doctype html>
+  <meta charset="utf-8">
   <title>screenshots</title>
   <style>
 html {
     overflow-x: scroll;
     overflow-y: hidden;
     height: 100%;
-    background: linear-gradient(to left, #4CA1AF , #C4E0E5);
+    background-image: linear-gradient(to left, #4ca1af , #c4e0e5);
     background-attachment: fixed;
     padding: 10px;
 }
 body {
     white-space: nowrap;
-    background: linear-gradient(to left, #4CA1AF , #C4E0E5);
+    background-image: linear-gradient(to left, #4ca1af , #c4e0e5);
     width: 100%;
     margin: 0;
 }
