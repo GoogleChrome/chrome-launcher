@@ -29,7 +29,7 @@ const WASTEFUL_THRESHOLD_IN_BYTES = 20 * KB_IN_BYTES;
 class UnusedBytes extends Audit {
   /**
    * @param {number} bytes
-   * @return {number}
+   * @return {string}
    */
   static bytesToKbString(bytes) {
     return Math.round(bytes / KB_IN_BYTES).toLocaleString() + ' KB';
@@ -37,12 +37,22 @@ class UnusedBytes extends Audit {
 
   /**
    * @param {number} bytes
-   * @param {percent} percent
+   * @param {number} percent
+   * @return {string}
    */
   static toSavingsString(bytes = 0, percent = 0) {
     const kbDisplay = this.bytesToKbString(bytes);
     const percentDisplay = Math.round(percent).toLocaleString() + '%';
     return `${kbDisplay} _${percentDisplay}_`;
+  }
+
+  /**
+   * @param {number} bytes
+   * @param {number} networkThroughput measured in bytes/second
+   * @return {string}
+   */
+  static bytesToMsString(bytes, networkThroughput) {
+    return (Math.round(bytes / networkThroughput * 100) * 10).toLocaleString() + 'ms';
   }
 
   /**
@@ -52,25 +62,25 @@ class UnusedBytes extends Audit {
   static audit(artifacts) {
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
     return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
-      const result = this.audit_(artifacts);
+      const result = this.audit_(artifacts, networkRecords);
       const debugString = result.debugString;
       const results = result.results
           .map(item => {
             item.wastedKb = this.bytesToKbString(item.wastedBytes);
+            item.wastedMs = this.bytesToMsString(item.wastedBytes, networkThroughput);
             item.totalKb = this.bytesToKbString(item.totalBytes);
+            item.totalMs = this.bytesToMsString(item.totalBytes, networkThroughput);
             item.potentialSavings = this.toSavingsString(item.wastedBytes, item.wastedPercent);
             return item;
           })
           .sort((itemA, itemB) => itemB.wastedBytes - itemA.wastedBytes);
 
       const wastedBytes = results.reduce((sum, item) => sum + item.wastedBytes, 0);
-      // Only round to nearest 10ms since we're relatively hand-wavy
-      const wastedMs = Math.round(wastedBytes / networkThroughput * 100) * 10;
 
-      let displayValue = '';
-      if (wastedBytes) {
+      let displayValue = result.displayValue || '';
+      if (typeof result.displayValue === 'undefined' && wastedBytes) {
         const wastedKbDisplay = this.bytesToKbString(wastedBytes);
-        const wastedMsDisplay = wastedMs.toLocaleString() + 'ms';
+        const wastedMsDisplay = this.bytesToMsString(wastedBytes, networkThroughput);
         displayValue = `Potential savings of ${wastedKbDisplay} (~${wastedMsDisplay})`;
       }
 

@@ -89,6 +89,7 @@
     "accessibility/image-alt",
     "accessibility/label",
     "accessibility/tabindex",
+    "byte-efficiency/total-byte-weight",
     "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",
     "byte-efficiency/uses-responsive-images",
@@ -397,6 +398,10 @@
         },
         "uses-responsive-images": {
           "expectedValue": true,
+          "weight": 1
+        },
+        "total-byte-weight": {
+          "expectedValue": 100,
           "weight": 1
         },
         "critical-request-chains": {
