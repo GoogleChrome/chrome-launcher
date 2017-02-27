@@ -596,7 +596,10 @@ class Driver {
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
   }
 
-  endTrace() {
+  /**
+   * @param {number=} pauseBeforeTraceEndMs Wait this many milliseconds before ending the trace
+   */
+  endTrace(pauseBeforeTraceEndMs = 0) {
     return new Promise((resolve, reject) => {
       // When the tracing has ended this will fire with a stream handle.
       this.once('Tracing.tracingComplete', streamHandle => {
@@ -605,8 +608,9 @@ class Driver {
             .then(traceContents => resolve(traceContents), reject);
       });
 
-      // Issue the command to stop tracing.
-      this.sendCommand('Tracing.end').catch(reject);
+      // Issue the command to stop tracing after an optional delay.
+      // Audits like TTI may require slightly longer trace to find a minimum window size.
+      setTimeout(() => this.sendCommand('Tracing.end').catch(reject), pauseBeforeTraceEndMs);
     });
   }
 

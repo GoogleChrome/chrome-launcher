@@ -2,6 +2,7 @@
   "passes": [{
     "recordNetwork": true,
     "recordTrace": true,
+    "pauseBeforeTraceEndMs": 500,
     "useThrottling": true,
     "gatherers": [
       "url",
