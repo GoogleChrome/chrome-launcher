@@ -42,4 +42,12 @@ describe('Handlebar helpers', () => {
     assert.equal(handlebarHelpers.kebabCase('myURL$'), 'my-url');
     assert.equal(handlebarHelpers.kebabCase('the401k%_value'), 'the401k-value');
   });
+
+  it('`getAggregationScoreRating` calculates rating', () => {
+    assert.equal(handlebarHelpers.getAggregationScoreRating(undefined), 'poor');
+    assert.equal(handlebarHelpers.getAggregationScoreRating(1), 'good');
+    assert.equal(handlebarHelpers.getAggregationScoreRating(0.95), 'good');
+    assert.equal(handlebarHelpers.getAggregationScoreRating(0.50), 'average');
+    assert.equal(handlebarHelpers.getAggregationScoreRating(0.10), 'poor');
+  });
 });

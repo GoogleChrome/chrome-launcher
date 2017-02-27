@@ -136,10 +136,11 @@ limitations under the License.
 
         <div class="js-report-by-user-feature">
           {{#each this.score as |aggregation|}}
-            <section class="aggregation" data-rating="{{ getAggregationScoreRating aggregation.overall }}">
+            <section class="aggregation" data-rating="{{ getAggregationScoreRating aggregation.overall }}"
+                     data-score="{{aggregation.overall}}">
 
             {{#if aggregation.name }}
-            <details class="aggregation__details" {{#ifEq (getAggregationScoreRating aggregation.overall) "poor"}}open{{/ifEq}}>
+            <details class="aggregation__details" {{#ifNotEq aggregation.overall 1}}open{{/ifNotEq}}>
               <summary>
                 <header class="aggregation__header">
                   <span class="aggregation__header__score score-{{ getAggregationScoreRating aggregation.overall }}-bg subitem-result__{{ getAggregationScoreRating aggregation.overall }}"></span>
