@@ -152,7 +152,7 @@ const handlebarHelpers = {
       return `<a href="${href}" target="_blank" rel="noopener" ${titleAttr}>${text}</a>`;
     };
     renderer.codespan = function(str) {
-      return `<code>${Handlebars.Utils.escapeExpression(str)}</code>`;
+      return `<code>${str}</code>`;
     };
     // eslint-disable-next-line no-unused-vars
     renderer.code = function(code, language) {
