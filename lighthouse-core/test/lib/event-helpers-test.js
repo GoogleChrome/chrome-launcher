@@ -30,19 +30,19 @@ describe('event helpers', () => {
       eventListeners.forEach(listener => {
         const obj = EventHelpers.addFormattedCodeSnippet(listener);
         assert.ok('label' in obj, 'helper adds a label property');
-        assert.ok('code' in obj, 'helper adds a code property');
+        assert.ok('pre' in obj, 'helper adds a pre property');
         assert.ok(obj.label.match(/line: (?:\d+), col: (?:\d+)/),
                   'label is not formatted correctly');
         const regEx = new RegExp(`.addEventListener\\('${listener.type}', `);
-        assert.ok(obj.code.match(regEx), 'code snippet is not formatted correctly');
+        assert.ok(obj.pre.match(regEx), 'code snippet is not formatted correctly');
       });
     });
 
     it('normalizes document and window objects', () => {
       eventListeners.forEach(listener => {
         const obj = EventHelpers.addFormattedCodeSnippet(listener);
-        assert.ok(obj.code.indexOf('Window') !== 0, 'Window was not lowercase');
-        assert.ok(obj.code.indexOf('#document') !== 0,
+        assert.ok(obj.pre.indexOf('Window') !== 0, 'Window was not lowercase');
+        assert.ok(obj.pre.indexOf('#document') !== 0,
                   '#document was not replaced with document');
       });
     });

@@ -30,7 +30,7 @@ function addFormattedCodeSnippet(listener) {
   const objectName = listener.objectName.toLowerCase().replace('#document', 'document');
   return Object.assign({
     label: `line: ${listener.line}, col: ${listener.col}`,
-    code: `${objectName}.addEventListener('${listener.type}', ${handler})`
+    pre: `${objectName}.addEventListener('${listener.type}', ${handler})`
   }, listener);
 }
 
@@ -47,7 +47,7 @@ function addFormattedCodeSnippet(listener) {
  * same location.
  *
  * @param {!Array<!Object>} listeners Results from the event listener gatherer.
- * @return {!Array<{line: number, col: number, url: string, type: string, code: string, label: string}>}
+ * @return {!Array<{line: number, col: number, url: string, type: string, pre: string, label: string}>}
  *     A list of slimmed down listener objects.
  */
 function groupCodeSnippetsByLocation(listeners) {
@@ -66,9 +66,9 @@ function groupCodeSnippetsByLocation(listeners) {
     const lineColUrlObj = JSON.parse(key);
     // Aggregate the code snippets.
     const codeSnippets = listenersForLocation.reduce((prev, loc) => {
-      return prev + loc.code.trim() + '\n\n';
+      return prev + loc.pre.trim() + '\n\n';
     }, '');
-    lineColUrlObj.code = codeSnippets;
+    lineColUrlObj.pre = codeSnippets;
     // All listeners under this bucket have the same line/col. We use the first's
     // label as the label for all of them.
     lineColUrlObj.label = listenersForLocation[0].label;

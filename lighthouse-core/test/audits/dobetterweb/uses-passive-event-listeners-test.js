@@ -39,7 +39,7 @@ describe('Page uses passive events listeners where applicable', () => {
     }
     assert.equal(auditResult.extendedInfo.value.results.length, 6);
     assert.equal(auditResult.extendedInfo.value.results[0].url, fixtureData[0].url);
-    assert.ok(auditResult.extendedInfo.value.results[0].code.match(/addEventListener/));
+    assert.ok(auditResult.extendedInfo.value.results[0].pre.match(/addEventListener/));
 
     const headings = auditResult.extendedInfo.value.tableHeadings;
     assert.deepEqual(Object.keys(headings).map(key => headings[key]),

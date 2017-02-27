@@ -143,8 +143,8 @@ const handlebarHelpers = {
 
     // Allow the report to inject HTML, but sanitize it first.
     // Viewer in particular, allows user's to upload JSON. To mitigate against
-    // XSS, define a renderer that only transforms links and code snippets.
-    // All other markdown ad HTML is ignored.
+    // XSS, define a renderer that only transforms a few types of markdown blocks.
+    // All other markdown and HTML is ignored.
     const renderer = new marked.Renderer();
     renderer.em = str => `<em>${str}</em>`;
     renderer.link = (href, title, text) => {
@@ -152,11 +152,11 @@ const handlebarHelpers = {
       return `<a href="${href}" target="_blank" rel="noopener" ${titleAttr}>${text}</a>`;
     };
     renderer.codespan = function(str) {
-      return `<code>${str}</code>`;
+      return `<code>${Handlebars.Utils.escapeExpression(str)}</code>`;
     };
     // eslint-disable-next-line no-unused-vars
     renderer.code = function(code, language) {
-      return `<pre>${code}</pre>`;
+      return `<pre>${Handlebars.Utils.escapeExpression(code)}</pre>`;
     };
     renderer.image = function(src, title, text) {
       return `<img src="${src}" alt="${text}" title="${title}">`;

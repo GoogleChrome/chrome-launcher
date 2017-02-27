@@ -44,6 +44,9 @@
 .table_list .table-column.table-column-pre, .table_list .table-column.table-column-code {
   text-align: left;
 }
+.table_list .table-column.table-column-pre pre {
+  max-height: 150px;
+}
 .table_list .table-column.table-column-url {
   text-align: left;
   width: 250px;

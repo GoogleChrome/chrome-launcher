@@ -82,7 +82,7 @@ class PassiveEventsAudit extends Audit {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
         value: {
           results: groupedResults,
-          tableHeadings: {url: 'URL', lineCol: 'Line/Col', type: 'Type', code: 'Snippet'}
+          tableHeadings: {url: 'URL', lineCol: 'Line/Col', type: 'Type', pre: 'Snippet'}
         }
       },
       debugString
