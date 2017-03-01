@@ -822,7 +822,18 @@ summary {
   background-size: 12px;
 }
 
-.subitem-result__average:after,
+.subitem-result__average::after {
+  background: none;
+  content: "!";
+  background-color: var(--average-color);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  font-size: 15px;
+}
+
 .subitem-result__poor::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>poor</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="white"/></svg>') no-repeat 50% 50%;
   background-size: 12px;
