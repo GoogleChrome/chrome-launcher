@@ -709,10 +709,7 @@ summary {
   left: calc(-1 * var(--aggregation-icon-size) - var(--subitem-indent) / 2);
   width: var(--aggregation-icon-size);
   height: var(--aggregation-icon-size);
-}
-
-.aggregation__header :-moz-any(.aggregation__header__score) {
-  margin-top: calc(-1 * var(--subitem-indent) / 2); /* FF compat*/
+  top: 2px;
 }
 
 .aggregation__header .aggregation__header__score::after {
