@@ -34,7 +34,7 @@ describe('Report', () => {
   it('should format generated Time', () => {
     const reportGenerator = new ReportGenerator();
     const html = reportGenerator.generateHTML(sampleResults);
-    assert.ok(/on: 11\/\d{1,2}\/2016\, /gim.test(html));
+    assert.ok(/on: 2\/\d{1,2}\/2017\, /gim.test(html));
   });
 
   it('should escape closing </script> tags', () => {
@@ -87,6 +87,8 @@ describe('Report', () => {
     assert.ok(html.includes('data-action="save-json" '), 'has save json button');
     assert.ok(html.includes('class="report__icon copy"'), 'has copy button');
     assert.ok(html.includes('class="report__icon print"'), 'has print button');
+    assert.ok(html.includes(
+        '<code>&lt;meta name=&quot;viewport&quot;&gt;</code>'), 'escapes <code>, once.');
   });
 
   it('does not include script for devtools', () => {

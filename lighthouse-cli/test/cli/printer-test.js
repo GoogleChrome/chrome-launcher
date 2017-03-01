@@ -22,7 +22,7 @@ require('../../compiled-check.js')('printer.js');
 const Printer = require('../../printer.js');
 const assert = require('assert');
 const fs = require('fs');
-const sampleResults = require('../fixtures/sample.json');
+const sampleResults = require('../../../lighthouse-core/test/results/sample.json');
 const log = require('../../../lighthouse-core/lib/log');
 
 describe('Printer', () => {
@@ -87,7 +87,7 @@ describe('Printer', () => {
     const mode = 'pretty';
     const prettyOutput = Printer.createOutput(sampleResults, mode);
     const output = new RegExp(log.heavyHorizontal + log.heavyHorizontal +
-                   ' images\/chrome-touch-icon-384x384.png', 'i');
+                   ' dobetterweb/dbw_tester.css', 'i');
 
     assert.ok(output.test(prettyOutput));
   });

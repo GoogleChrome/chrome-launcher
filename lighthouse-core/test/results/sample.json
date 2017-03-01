@@ -1,6 +1,6 @@
 {
   "lighthouseVersion": "x.x.x",
-  "generatedTime": "2016-11-22T00:12:14.826Z",
+  "generatedTime": "2017-02-27T23:55:30.011Z",
   "initialUrl": "http://localhost:8080/dbw_tester.html",
   "url": "http://localhost:8080/dbw_tester.html",
   "audits": {
@@ -10,7 +10,8 @@
       "rawValue": false,
       "name": "is-on-https",
       "category": "Security",
-      "description": "Site is on HTTPS"
+      "description": "Uses HTTPS",
+      "helpText": "All sites should be protected with HTTPS, even ones that don't handle sensitive data. HTTPS prevents intruders from tampering with or passively listening in on the communications between your app and your users, and is a prerequisite for HTTP/2 and many new web platform APIs. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/https)."
     },
     "redirects-http": {
       "score": false,
@@ -18,16 +19,17 @@
       "rawValue": false,
       "name": "redirects-http",
       "category": "Security",
-      "description": "Site redirects HTTP traffic to HTTPS"
+      "description": "Redirects HTTP traffic to HTTPS",
+      "helpText": "If you've already set up HTTPS, make sure that you redirect all HTTP traffic to HTTPS. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/http-redirects-to-https)."
     },
     "service-worker": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "No active service worker found for this origin.",
       "name": "service-worker",
       "category": "Offline",
-      "description": "Has a registered Service Worker"
+      "description": "Registers a Service Worker",
+      "helpText": "The service worker is the technology that enables your app to use many Progressive Web App features, such as offline, add to homescreen, and push notifications. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/registered-service-worker)."
     },
     "works-offline": {
       "score": false,
@@ -35,24 +37,27 @@
       "rawValue": false,
       "name": "works-offline",
       "category": "Offline",
-      "description": "URL responds with a 200 when offline"
+      "description": "Responds with a 200 when offline",
+      "helpText": "If you're building a Progressive Web App, consider using a service worker so that your app can work offline. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/http-200-when-offline)."
     },
     "viewport": {
       "score": true,
       "displayValue": "",
       "rawValue": true,
+      "debugString": "",
       "name": "viewport",
       "category": "Mobile Friendly",
-      "description": "HTML has a viewport <meta>"
+      "description": "Has a `<meta name=\"viewport\">` tag with `width` or `initial-scale`",
+      "helpText": "Add a viewport meta tag to optimize your app for mobile screens. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/has-viewport-meta-tag)."
     },
     "manifest-display": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "Manifest display property should be set.",
       "name": "manifest-display",
       "category": "Manifest",
-      "description": "Manifest's display property is set"
+      "description": "Manifest's `display` property is set",
+      "helpText": "Set the `display` property to specify how your app launches from the homescreen. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-has-display-set)."
     },
     "without-javascript": {
       "score": true,
@@ -60,48 +65,65 @@
       "rawValue": true,
       "name": "without-javascript",
       "category": "JavaScript",
-      "description": "Page contains some content when its scripts are not available"
+      "description": "Contains some content when JavaScript is not available",
+      "helpText": "Your app should display some content when JavaScript is disabled, even if it's just a warning to the user that JavaScript is required to use the app. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/no-js)."
     },
     "first-meaningful-paint": {
       "score": 100,
-      "displayValue": "845.9ms",
-      "rawValue": 845.9,
+      "displayValue": "199.2ms",
+      "rawValue": 199.2,
       "optimalValue": "1,600ms",
       "extendedInfo": {
         "value": {
+          "timestamps": {
+            "navStart": 375525901626,
+            "fCP": 375526100809,
+            "fMP": 375526100817
+          },
           "timings": {
-            "fMP": 845.816,
-            "navStart": 162729031.977
+            "navStart": 0,
+            "fCP": 199.183,
+            "fMP": 199.191
           }
         },
         "formatter": "null"
       },
       "name": "first-meaningful-paint",
       "category": "Performance",
-      "description": "First meaningful paint"
+      "description": "First meaningful paint",
+      "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
     },
     "speed-index-metric": {
       "score": 100,
-      "displayValue": "865",
-      "rawValue": 865,
+      "displayValue": "237",
+      "rawValue": 237,
       "optimalValue": "1,250",
       "extendedInfo": {
         "formatter": "speedline",
         "value": {
-          "first": 865,
-          "complete": 865,
-          "duration": 1590,
+          "timings": {
+            "firstVisualChange": 237,
+            "visuallyComplete": 237,
+            "speedIndex": 237.2039999961853,
+            "perceptualSpeedIndex": 237.2039999961853
+          },
+          "timestamps": {
+            "firstVisualChange": 375526132907,
+            "visuallyComplete": 375526132907,
+            "speedIndex": 375526133111,
+            "perceptualSpeedIndex": 375526133111
+          },
           "frames": [
             {
-              "timestamp": 162729024.872,
+              "timestamp": 375525895.907,
               "progress": 0
             },
             {
-              "timestamp": 162729855.609,
-              "progress": 0
+              "timestamp": 375526133.111,
+              "progress": 100
             },
             {
-              "timestamp": 162729890.227,
+              "timestamp": 375526207.222,
               "progress": 100
             }
           ]
@@ -109,7 +131,8 @@
       },
       "name": "speed-index-metric",
       "category": "Performance",
-      "description": "Perceptual Speed Index"
+      "description": "Perceptual Speed Index",
+      "helpText": "Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index)."
     },
     "estimated-input-latency": {
       "score": 100,
@@ -132,11 +155,11 @@
           },
           {
             "percentile": 0.99,
-            "time": 24.282179999947402
+            "time": 16
           },
           {
             "percentile": 1,
-            "time": 31.534999999999854
+            "time": 21.192999999999984
           }
         ],
         "formatter": "null"
@@ -144,25 +167,30 @@
       "name": "estimated-input-latency",
       "category": "Performance",
       "description": "Estimated Input Latency",
-      "helpText": "Primarily a measure of the main thread's activity. There is a 90% probabililty a user would encounter input latency of this amount or less. 10% of touches can expect additional latency."
+      "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
     },
     "time-to-interactive": {
       "score": 100,
-      "displayValue": "858.3ms",
-      "rawValue": 858.3,
+      "displayValue": "231.5ms",
+      "rawValue": 231.5,
       "optimalValue": "5,000ms",
       "extendedInfo": {
         "value": {
           "timings": {
-            "fMP": "845.9",
-            "visuallyReady": "858.3",
-            "mainThreadAvail": "858.3"
+            "fMP": 199.2,
+            "visuallyReady": 231.485,
+            "timeToInteractive": 231.485
           },
-          "expectedLatencyAtTTI": "16.00",
+          "timestamps": {
+            "fMP": 375526100817,
+            "visuallyReady": 375526133111,
+            "timeToInteractive": 375526133111
+          },
+          "expectedLatencyAtTTI": 16,
           "foundLatencies": [
             {
-              "estLatency": "16.00",
-              "startTime": "858.3"
+              "estLatency": 16,
+              "startTime": "231.5"
             }
           ]
         },
@@ -170,26 +198,21 @@
       },
       "name": "time-to-interactive",
       "category": "Performance",
-      "description": "Time To Interactive (alpha)"
+      "description": "Time To Interactive (alpha)",
+      "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
     },
     "user-timings": {
-      "score": 1,
-      "displayValue": "",
-      "rawValue": 1,
+      "score": true,
+      "displayValue": "0",
+      "rawValue": true,
       "extendedInfo": {
         "formatter": "userTimings",
-        "value": [
-          {
-            "name": "paintNonDefaultBackgroundColor",
-            "isMark": true,
-            "args": {},
-            "startTime": 845.8289999961853
-          }
-        ]
+        "value": []
       },
       "name": "user-timings",
       "category": "Performance",
-      "description": "User Timing marks and measures"
+      "description": "User Timing marks and measures",
+      "helpText": "Consider instrumenting your app with the User Timing API to create custom, real-world measurements of key user experiences. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/user-timing)."
     },
     "screenshots": {
       "score": 2,
@@ -199,12 +222,12 @@
         "formatter": "null",
         "value": [
           {
-            "timestamp": 162729855.609,
-            "datauri": "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAIkAdQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6pooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//Z"
+            "timestamp": 375526133.111,
+            "datauri": "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAGvAlQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6TopkkixrlzgetCSI5IVgSO3egfK7XsPoopqurlgpyVOD7UBYdRRSZBxyOenvQIWiiigAoopCQASegoAWimowdQynIPQ0uRnGeaAsLRRSZGcZ5oAWiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCrqX/Hqw7kiopizXAeDnZGckfyq/RSsbQrcqtbv+JUtHZpcbiybASSc4aoHLLLMY2IcyDAHetKiiw1WSk3Yzg8jiXc5DDdlec9OKSMgPbEE/cI6nr6VpUUrFfWFtYzBLIbd28w7gORzkHP6VehQ+VzIzbuck9KloppEVKvMrJWM5DOXRSW6lCc9/WnCR2lkDPggkbTnkY/zzV+iixTrp/ZM+yZg0KqxKlTuHpSzMyXUxUnf5fyir9FFgddOTlb+rmd5j+WCsoYcHaSR25GabvYPIyl95jBXPWtKlosP6wv5TOaR/LQiU4Lr0PQY5qzOGis3w7FgPvE81YpkqCSMo2cHriixLqptaaJlAzOA5EjFNq5PXB9KBO2MNIdokIxnnH1rQRQqBRyAMc02SJZCpbqOlKzLVeF7OJREkn7tWlGCpO7PGc1ornaM9cU2ONY1wo4zmn00jKrUU9kFFFFMyCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiobgEhNo5DDtmmW6sr8jj5ucY78UjRQvG9yzRVMecp3AMWwAcjqef8A61O3TYyC3Az92i5To+aLVFQxBt25s52gdMdzU1MykrOwUUUUCCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDC8V68dAXT5WgEsM87pKd2CiJBLMSox8xxFjHHWsSX4gRQ3UlvLp8iyxwm4JEqlSuISMHHJxOPxU9iCd3xTqFhp0WnPqlqlxFLeRwxs4QrDIc7XO7pjnkc81z9hqeg6nbrFZ+HrW4SKW4EcISA48mQQvIq5+7x94dgB3AoAj1fx1PDBY6hZWYk09xLM481N0sSQzOeOqMDF0I74z1xbk8ciO+8k6ZN5PnNF5vmr0WeOFmx/vSoQO43dMDNTS9a8M6hLYC80K2sF1aH7ZbvdQw4n80Rr2J+ZvOCnPU5HORnUa78FK4DNoSszlQCsQJOUc9veNs/7p9DQBSHxBt/s8NwdPnFtLDb3KybwQIpxJ5ROOjF49hXsXXk841tH8TDUpb1RZSxx2wlHmeYpDvE5SRAMg5DDr0wRkjpVc6tpFrNapp+mLPZXl0sMlzbJH5aTbyAHGQxYMvOASvBNQ3Ov6Lp1/qxj0v94zSxTzRQoDdSxQea0Z7sdmcE8ZUj0yAU1+I9n9mlnaxuPLtoDPeDIVrdcygBlfac5iIIOCCR15IsX3iy6h1F7WWzSBIzabpI51lJ8668kADGNpHOeCM9K6C20nSpEtrhdLs0dYyI826Bo1cfMo44znkDrSroOjrHDGulaeEhAWJRbJhAG3YUY4+YA8d+aAOVn+I0SW8EsWlzy/aLZLyICVQDC8M0qkns2LdwV7Ejk847mCQTQxyrna6hhn0Iqk2h6SylW0yxZSzOQbdCCSCCenUhmB9ifWr8aJHGqRqqIoCqqjAAHQAUAOooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDM1zR4dYFiJ5poxaXSXSiPbh2XOA24Hjntg+9Zml+D7bTbtri3vr0uRdgBvLwv2mUSuRhB0ZRj265rpqKAOSPgayNhpVob6/wDK061itIjmPLJHJFIpb5OuYUBxjjPfmoYPh7psdilm95fSW62s1ltPlLmKRAmCVQEkBRhuvqTXZ0UAczbeFDBc2Eya1qOLQlvKEdsqSsepYCIYJHy5XacZ9SSsfhG1WeSaS8u5ZHaSXL+XgTPEImlwExu254+7yeOa6WigBqKVRVLFiBjJxk/lTqKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/Z"
           },
           {
-            "timestamp": 162729890.227,
-            "datauri": "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAIkAdQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6TorzP4laxcWHi7TLaPVrixt5dLvZnEL4/eps8khe7ZLAD+Lpg03wJ438Qajqul6Tr+krb3jw7bobSskbrbxSGVh0CM0hTGOCOp5AAPTqK8QsPiNr2kLe213bLfxpeTj7VIDmzT7cYU87kDb5ZDKcrwvJxzUyfEHxEuqqLprJEGqJC9pFCXPlNp/nKqvnndLlVbHJ6cfLQB7TRXlfhj4ga5r+o6BbQWmkxjUY3nkLSMSiJ5JZQATiT95INp7x5OMkDR1zxd4jsfHCaJbaMk1nLLEqXgRiqpIj7Wb5h0eNwcdsHvigD0OivDtQ+I3iC6bT9Qt4bexSCe7Etu7Fg2yGYiKZQcq26NMHgkuOPXpfGnjfV9Dk0i7hsx5Vxo9zfSWDxEyNMgiIj3DpgOxIx0VvwAPTKK8X1v4m68un3q2ttYxOtq00N3D/AKQhxJgscP8AL8hVhkFck/McYq3N8S9ZkvJLaystMDHU002M3DsuNzECRlByFYbXB44JHOM0Aeu0V5x498c6p4Y1SwsobaxuJprP7S0RLbppBNFGY4uep8wkZB+709OYuPjPdJDeEW2mR+XMscUs83lo25LghfmZed0Crk7ceZkjjkA9uorhfAXjG/8AEes6lZ3dnawR2mVzHLuYkBMMOTlHDEq3AwOC3JHdUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUVzPiS/1e11FE06F5LfbCWKxM2MzBXxhTn5MnqMdearahr2tWs9s0OkzXEJt45HjWJ9xdiARu24BHocd84oA66iuRXxBrU2+MaQYNyuEnKTMARGGB2mMHq3Q4+6wznArrh0oAWiiigBKWiigBMUtFFAFGTS7OTV4dUeHN/FE0CS7jkIxBK4zjBIB6dh6UappNlqqwrfwCXyWLxncVKkggkEEHoSPxq9RQBFa28NrbRW9tGkUESCOONBgKoGAAPQCpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAwNbGvDUFOkmM2xjUYfbgP8APknPOD8nTtnHNY8v/CYzWwJjSKZAGXY0eGbnIbnp0/A+orQ8S+HJtW1GO5imijCrCNrLnPlzCTnjPbHBHPrWe3g24R1ns57a2vFljlFxEpVsiHY2cdQW+bB4PegCcv4w3vtS3wWfbuCAKNo2dG5+b73+yDjnFXbYeJEupBcPbPCIn8tlUHLgsFzyOoCNjp8zAngGqMPhzW1MJm1ppwqgSRyM5SXkk5Geh6Y9D7CkbwlcSwWsUs9uscMLxbI1YAbg+dvoDvwQOwAFACZ8ZSW8qutvFIYsIUKHbJt4OTwQT14GDjGVzSynxeok+zxw7d0pQOUZiN2UzluuM57Y24xzXY0tACDpS0UUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB/9k="
+            "timestamp": 375526207.222,
+            "datauri": "data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAGvAlQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6TopkkixrlzgetCSI5IVgSO3egfK7XsPoopqurlgpyVOD7UBYdRRSZBxyOenvQIWiiigAoopCQASegoAWimowdQynIPQ0uRnGeaAsLRRSZGcZ5oAWiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCrqX/Hqw7kiopizXAeDnZGckfyq/RSsbQrcqtbv+JUtHZpcbiybASSc4aoHLLLMY2IcyDAHetKiiw1WSk3Yzg8jiXc5DDdlec9OKSMgPbEE/cI6nr6VpUUrFfWFtYzBLIbd28w7gORzkHP6VehQ+VzIzbuck9KloppEVKvMrJWM5DOXRSW6lCc9/WnCR2lkDPggkbTnkY/zzV+iixTrp/ZM+yZg0KqxKlTuHpSzMyXUxUnf5fyir9FFgddOTlb+rmd5j+WCsoYcHaSR25GabvYPIyl95jBXPWtKlosP6wv5TOaR/LQiU4Lr0PQY5qzOGis3w7FgPvE81YpkqCSMo2cHriixLqptaaJlAzOA5EjFNq5PXB9KBO2MNIdokIxnnH1rQRQqBRyAMc02SJZCpbqOlKzLVeF7OJREkn7tWlGCpO7PGc1ornaM9cU2ONY1wo4zmn00jKrUU9kFFFFMyCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiobgEhNo5DDtmmW6sr8jj5ucY78UjRQvG9yzRVMecp3AMWwAcjqef8A61O3TYyC3Az92i5To+aLVFQxBt25s52gdMdzU1MykrOwUUUUCCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDC8V68dAXT5WgEsM87pKd2CiJBLMSox8xxFjHHWsSX4gRQ3UlvLp8iyxwm4JEqlSuISMHHJxOPxU9iCd3xTqFhp0WnPqlqlxFLeRwxs4QrDIc7XO7pjnkc81z9hqeg6nbrFZ+HrW4SKW4EcISA48mQQvIq5+7x94dgB3AoAj1fx1PDBY6hZWYk09xLM481N0sSQzOeOqMDF0I74z1xbk8ciO+8k6ZN5PnNF5vmr0WeOFmx/vSoQO43dMDNTS9a8M6hLYC80K2sF1aH7ZbvdQw4n80Rr2J+ZvOCnPU5HORnUa78FK4DNoSszlQCsQJOUc9veNs/7p9DQBSHxBt/s8NwdPnFtLDb3KybwQIpxJ5ROOjF49hXsXXk841tH8TDUpb1RZSxx2wlHmeYpDvE5SRAMg5DDr0wRkjpVc6tpFrNapp+mLPZXl0sMlzbJH5aTbyAHGQxYMvOASvBNQ3Ov6Lp1/qxj0v94zSxTzRQoDdSxQea0Z7sdmcE8ZUj0yAU1+I9n9mlnaxuPLtoDPeDIVrdcygBlfac5iIIOCCR15IsX3iy6h1F7WWzSBIzabpI51lJ8668kADGNpHOeCM9K6C20nSpEtrhdLs0dYyI826Bo1cfMo44znkDrSroOjrHDGulaeEhAWJRbJhAG3YUY4+YA8d+aAOVn+I0SW8EsWlzy/aLZLyICVQDC8M0qkns2LdwV7Ejk847mCQTQxyrna6hhn0Iqk2h6SylW0yxZSzOQbdCCSCCenUhmB9ifWr8aJHGqRqqIoCqqjAAHQAUAOooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDM1zR4dYFiJ5poxaXSXSiPbh2XOA24Hjntg+9Zml+D7bTbtri3vr0uRdgBvLwv2mUSuRhB0ZRj265rpqKAOSPgayNhpVob6/wDK061itIjmPLJHJFIpb5OuYUBxjjPfmoYPh7psdilm95fSW62s1ltPlLmKRAmCVQEkBRhuvqTXZ0UAczbeFDBc2Eya1qOLQlvKEdsqSsepYCIYJHy5XacZ9SSsfhG1WeSaS8u5ZHaSXL+XgTPEImlwExu254+7yeOa6WigBqKVRVLFiBjJxk/lTqKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/Z"
           }
         ]
       },
@@ -213,70 +236,129 @@
       "description": "Screenshots of all captured frames"
     },
     "critical-request-chains": {
-      "score": 4,
-      "displayValue": "",
-      "rawValue": 4,
+      "score": false,
+      "displayValue": "11",
+      "rawValue": false,
       "optimalValue": 0,
       "extendedInfo": {
         "formatter": "criticalRequestChains",
         "value": {
-          "40777.1": {
+          "62339.1": {
             "request": {
               "url": "http://localhost:8080/dbw_tester.html",
-              "startTime": 162729.035424,
-              "endTime": 162729.039395,
-              "responseReceivedTime": 162729.03851,
-              "transferSize": 7260
+              "startTime": 375525.905246,
+              "endTime": 375525.917734,
+              "responseReceivedTime": 375525.915263,
+              "transferSize": 10189
             },
             "children": {
-              "40777.2": {
+              "62339.4": {
                 "request": {
-                  "url": "http://localhost:8080/dbw_tester.js",
-                  "startTime": 162729.047233,
-                  "endTime": 162729.054453,
-                  "responseReceivedTime": 162729.053951,
-                  "transferSize": 1734
-                },
-                "children": {
-                  "40777.4": {
-                    "request": {
-                      "url": "http://example.com/file.js",
-                      "startTime": 162729.056987,
-                      "endTime": 162729.71555,
-                      "responseReceivedTime": 162729.611017,
-                      "transferSize": 93126
-                    },
-                    "children": {}
-                  }
-                }
-              },
-              "40777.8": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_tester.css",
-                  "startTime": 162729.831028,
-                  "endTime": 162729.835839,
-                  "responseReceivedTime": 162729.835253,
-                  "transferSize": 935
+                  "url": "http://localhost:10200/dobetterweb/dbw_tester.css",
+                  "startTime": 375525.926168,
+                  "endTime": 375525.933177,
+                  "responseReceivedTime": -1,
+                  "transferSize": 0
                 },
                 "children": {}
               },
-              "40777.9": {
+              "62339.2": {
+                "request": {
+                  "url": "http://localhost:8080/dbw_tester.css?delay=true",
+                  "startTime": 375525.925625,
+                  "endTime": 375525.933737,
+                  "responseReceivedTime": 375525.932265,
+                  "transferSize": 984
+                },
+                "children": {}
+              },
+              "62339.3": {
+                "request": {
+                  "url": "http://localhost:8080/dbw_tester.js",
+                  "startTime": 375525.926712,
+                  "endTime": 375525.935932,
+                  "responseReceivedTime": 375525.935188,
+                  "transferSize": 1749
+                },
+                "children": {}
+              },
+              "62339.6": {
+                "request": {
+                  "url": "http://localhost:8080/dbw_tester.css",
+                  "startTime": 375525.927667,
+                  "endTime": 375525.936634,
+                  "responseReceivedTime": 375525.935497,
+                  "transferSize": 984
+                },
+                "children": {}
+              },
+              "62339.8": {
                 "request": {
                   "url": "http://localhost:8080/dbw_partial_a.html",
-                  "startTime": 162729.831369,
-                  "endTime": 162729.836968,
-                  "responseReceivedTime": 162729.83603,
+                  "startTime": 375525.928213,
+                  "endTime": 375525.937276,
+                  "responseReceivedTime": 375525.936243,
                   "transferSize": 920
                 },
                 "children": {}
               },
-              "40777.10": {
+              "62339.7": {
+                "request": {
+                  "url": "http://localhost:8080/dbw_disabled.css",
+                  "startTime": 375525.927946,
+                  "endTime": 375525.938708,
+                  "responseReceivedTime": 375525.938255,
+                  "transferSize": 1273
+                },
+                "children": {}
+              },
+              "62339.10": {
+                "request": {
+                  "url": "http://localhost:8080/zone.js",
+                  "startTime": 375525.928984,
+                  "endTime": 375525.943795,
+                  "responseReceivedTime": 375525.938834,
+                  "transferSize": 133
+                },
+                "children": {}
+              },
+              "62339.9": {
                 "request": {
                   "url": "http://localhost:8080/dbw_partial_b.html",
-                  "startTime": 162729.831742,
-                  "endTime": 162729.837366,
-                  "responseReceivedTime": 162729.836445,
+                  "startTime": 375525.928423,
+                  "endTime": 375525.939544,
+                  "responseReceivedTime": 375525.938926,
                   "transferSize": 917
+                },
+                "children": {}
+              },
+              "62339.5": {
+                "request": {
+                  "url": "https://unknown.invalid/styles.css?404",
+                  "startTime": 375525.926261,
+                  "endTime": 375526.007039,
+                  "responseReceivedTime": -1,
+                  "transferSize": 0
+                },
+                "children": {}
+              },
+              "62339.20": {
+                "request": {
+                  "url": "http://localhost:8080/dbw_tester.css?scriptActivated",
+                  "startTime": 375526.040491,
+                  "endTime": 375526.044114,
+                  "responseReceivedTime": 375526.04342,
+                  "transferSize": 984
+                },
+                "children": {}
+              },
+              "62339.22": {
+                "request": {
+                  "url": "http://localhost:8080/zone.js",
+                  "startTime": 375526.067101,
+                  "endTime": 375526.102578,
+                  "responseReceivedTime": 375526.068399,
+                  "transferSize": 133
                 },
                 "children": {}
               }
@@ -286,28 +368,26 @@
       },
       "name": "critical-request-chains",
       "category": "Performance",
-      "description": "Critical Request Chains"
+      "description": "Critical Request Chains",
+      "helpText": "The Critical Request Chains below show you what resources are required for first render of this page. Improve page load by reducing the length of chains, reducing the download size of resources, or deferring the download of unnecessary resources. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/critical-request-chains)."
     },
     "manifest-exists": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "No manifest found.",
       "name": "manifest-exists",
       "category": "Manifest",
-      "description": "Manifest exists"
+      "description": "Manifest exists",
+      "helpText": "The web app manifest is the technology that enables users to add your web app to their homescreen. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-exists)."
     },
     "manifest-background-color": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "extendedInfo": {
-        "value": false,
-        "formatter": "null"
-      },
       "name": "manifest-background-color",
       "category": "Manifest",
-      "description": "Manifest contains background_color"
+      "description": "Manifest contains `background_color`",
+      "helpText": "When your app launches from a user's homescreen, the browser uses `background_color` to paint the background of the browser while your app loads for a smooth transition experience. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-background_color)."
     },
     "manifest-theme-color": {
       "score": false,
@@ -315,22 +395,22 @@
       "rawValue": false,
       "name": "manifest-theme-color",
       "category": "Manifest",
-      "description": "Manifest contains theme_color"
+      "description": "Manifest contains `theme_color`",
+      "helpText": "Add a `theme_color` to set the color of the browser's address bar. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-theme_color)."
     },
     "manifest-icons-min-192": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "WARNING: No icons found in the manifest",
       "name": "manifest-icons-min-192",
       "category": "Manifest",
-      "description": "Manifest contains icons at least 192px"
+      "description": "Manifest contains icons at least 192px",
+      "helpText": "A 192px icon ensures that your app's icon displays well on the homescreens of the largest mobile devices. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-192px-icon)."
     },
     "manifest-icons-min-144": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "WARNING: No icons found in the manifest",
       "name": "manifest-icons-min-144",
       "category": "Manifest",
       "description": "Manifest contains icons at least 144px"
@@ -341,7 +421,8 @@
       "rawValue": false,
       "name": "manifest-name",
       "category": "Manifest",
-      "description": "Manifest contains name"
+      "description": "Manifest contains `name`",
+      "helpText": "The `name` property identifies your app and is required. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-name)."
     },
     "manifest-short-name": {
       "score": false,
@@ -349,7 +430,8 @@
       "rawValue": false,
       "name": "manifest-short-name",
       "category": "Manifest",
-      "description": "Manifest contains short_name"
+      "description": "Manifest contains `short_name`",
+      "helpText": "The `short_name` property is a requirement for Add To Homescreen. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-short_name)."
     },
     "manifest-short-name-length": {
       "score": false,
@@ -357,7 +439,8 @@
       "rawValue": false,
       "name": "manifest-short-name-length",
       "category": "Manifest",
-      "description": "Manifest's short_name won't be truncated when displayed on homescreen"
+      "description": "Manifest's `short_name` won't be truncated when displayed on homescreen",
+      "helpText": "Make your app's `short_name` less than 12 characters to ensure that it's not truncated on homescreens. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-short_name-is-not-truncated)."
     },
     "manifest-start-url": {
       "score": false,
@@ -365,88 +448,16 @@
       "rawValue": false,
       "name": "manifest-start-url",
       "category": "Manifest",
-      "description": "Manifest contains start_url"
+      "description": "Manifest contains `start_url`",
+      "helpText": "Add a `start_url` to instruct the browser to launch a specific URL whenever your app is launched from a homescreen. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/manifest-contains-start_url)."
     },
     "theme-color-meta": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
-      "debugString": "No valid theme-color meta tag found.",
       "name": "theme-color-meta",
       "category": "HTML",
-      "description": "HTML has a theme-color <meta>"
-    },
-    "aria-valid-attr": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "aria-valid-attr",
-      "category": "Accessibility",
-      "description": "Element aria-* attributes are valid ARIA attributes"
-    },
-    "aria-allowed-attr": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "aria-allowed-attr",
-      "category": "Accessibility",
-      "description": "Element aria-* roles are valid"
-    },
-    "color-contrast": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "color-contrast",
-      "category": "Accessibility",
-      "description": "Background and foreground colors have a sufficient contrast ratio"
-    },
-    "image-alt": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "image-alt",
-      "category": "Accessibility",
-      "description": "Every image element has an alt attribute"
-    },
-    "label": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "label",
-      "category": "Accessibility",
-      "description": "Every form element has a label"
-    },
-    "tabindex": {
-      "score": true,
-      "displayValue": "",
-      "rawValue": true,
-      "debugString": "",
-      "extendedInfo": {
-        "formatter": "accessibility"
-      },
-      "name": "tabindex",
-      "category": "Accessibility",
-      "description": "No element has a tabindex attribute greater than 0"
+      "description": "Has a `<meta name=\"theme-color\">` tag"
     },
     "content-width": {
       "score": true,
@@ -455,7 +466,476 @@
       "debugString": "",
       "name": "content-width",
       "category": "Mobile Friendly",
-      "description": "Content is sized correctly for the viewport"
+      "description": "Content is sized correctly for the viewport",
+      "helpText": "If the width of your app's content doesn't match the width of the viewport, your app might not be optimized for mobile screens. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/content-sized-correctly-for-viewport)."
+    },
+    "deprecations": {
+      "score": false,
+      "displayValue": "4 warnings found",
+      "rawValue": false,
+      "extendedInfo": {
+        "formatter": "urllist",
+        "value": [
+          {
+            "label": "line: 45",
+            "url": "http://localhost:8080/dbw_tester.js",
+            "code": "Calling Element.createShadowRoot() for an element which already hosts a shadow root is deprecated. See https://www.chromestatus.com/features/4668884095336448 for more details.",
+            "source": "deprecation",
+            "level": "warning",
+            "text": "Calling Element.createShadowRoot() for an element which already hosts a shadow root is deprecated. See https://www.chromestatus.com/features/4668884095336448 for more details.",
+            "timestamp": 1488239728558,
+            "lineNumber": 45,
+            "stackTrace": {
+              "callFrames": [
+                {
+                  "functionName": "",
+                  "scriptId": "85",
+                  "url": "http://localhost:8080/dbw_tester.js",
+                  "lineNumber": 45,
+                  "columnNumber": 6
+                },
+                {
+                  "functionName": "",
+                  "scriptId": "85",
+                  "url": "http://localhost:8080/dbw_tester.js",
+                  "lineNumber": 48,
+                  "columnNumber": 2
+                }
+              ]
+            }
+          },
+          {
+            "label": "line: 291",
+            "url": "http://localhost:8080/dbw_tester.html",
+            "code": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
+            "source": "deprecation",
+            "level": "warning",
+            "text": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
+            "timestamp": 1488239728611.79,
+            "lineNumber": 291,
+            "stackTrace": {
+              "callFrames": [
+                {
+                  "functionName": "deprecationsTest",
+                  "scriptId": "88",
+                  "url": "http://localhost:8080/dbw_tester.html",
+                  "lineNumber": 291,
+                  "columnNumber": 6
+                },
+                {
+                  "functionName": "",
+                  "scriptId": "88",
+                  "url": "http://localhost:8080/dbw_tester.html",
+                  "lineNumber": 311,
+                  "columnNumber": 2
+                }
+              ]
+            }
+          },
+          {
+            "label": "line: 294",
+            "url": "http://localhost:8080/dbw_tester.html",
+            "code": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
+            "source": "deprecation",
+            "level": "warning",
+            "text": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
+            "timestamp": 1488239728614.37,
+            "lineNumber": 294,
+            "stackTrace": {
+              "callFrames": [
+                {
+                  "functionName": "deprecationsTest",
+                  "scriptId": "88",
+                  "url": "http://localhost:8080/dbw_tester.html",
+                  "lineNumber": 294,
+                  "columnNumber": 8
+                },
+                {
+                  "functionName": "",
+                  "scriptId": "88",
+                  "url": "http://localhost:8080/dbw_tester.html",
+                  "lineNumber": 311,
+                  "columnNumber": 2
+                }
+              ]
+            }
+          },
+          {
+            "label": "line: ???",
+            "url": "Unable to determine URL",
+            "code": "/deep/ combinator is deprecated. See https://www.chromestatus.com/features/6750456638341120 for more details.",
+            "source": "deprecation",
+            "level": "warning",
+            "text": "/deep/ combinator is deprecated. See https://www.chromestatus.com/features/6750456638341120 for more details.",
+            "timestamp": 1488239728615.09
+          }
+        ]
+      },
+      "name": "deprecations",
+      "category": "Deprecations",
+      "description": "Avoids deprecated APIs",
+      "helpText": "We found some uses of deprecated APIs. Please consider migrating to a newer option. [Learn more](https://www.chromestatus.com/features#deprecated)."
+    },
+    "aria-allowed-attr": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "aria-allowed-attr",
+      "category": "Accessibility",
+      "description": "Element aria-* attributes are allowed for this role",
+      "helpText": "Each ARIA `role` supports a specific subset of `aria-*` attributes. Mismatching these invalidates the `aria-*` attributes. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/aria-allowed-attributes)."
+    },
+    "aria-required-attr": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "aria-required-attr",
+      "category": "Accessibility",
+      "description": "Elements with ARIA roles have the required aria-* attributes",
+      "helpText": "Some ARIA roles have required attributes that describe the state of the element to screen readers. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/required-aria-attributes)."
+    },
+    "aria-valid-attr-value": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "aria-valid-attr-value",
+      "category": "Accessibility",
+      "description": "Element aria-* attributes have valid values",
+      "helpText": "Assistive technologies, like screen readers, can't interpret ARIA attributes with invalid values. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/valid-aria-values)."
+    },
+    "aria-valid-attr": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "aria-valid-attr",
+      "category": "Accessibility",
+      "description": "Element aria-* attributes are valid and not misspelled or non-existent.",
+      "helpText": "Assistive technologies, like screen readers, can't interpret ARIA attributes with invalid names. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/valid-aria-attributes)."
+    },
+    "color-contrast": {
+      "score": false,
+      "displayValue": "",
+      "rawValue": false,
+      "extendedInfo": {
+        "formatter": "accessibility",
+        "value": {
+          "id": "color-contrast",
+          "impact": "critical",
+          "tags": [
+            "wcag2aa",
+            "wcag143"
+          ],
+          "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
+          "help": "Elements must have sufficient color contrast",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/color-contrast?application=axeAPI",
+          "nodes": [
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "fgColor": "#ffc0cb",
+                    "bgColor": "#eeeeee",
+                    "contrastRatio": "1.33",
+                    "fontSize": "18.0pt",
+                    "fontWeight": "bold"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "critical",
+                  "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "critical",
+              "html": "<h2>Do better web tester page</h2>",
+              "target": [
+                "body > div > h2"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+            },
+            {
+              "any": [
+                {
+                  "id": "color-contrast",
+                  "data": {
+                    "fgColor": "#ffc0cb",
+                    "bgColor": "#eeeeee",
+                    "contrastRatio": "1.33",
+                    "fontSize": "12.0pt",
+                    "fontWeight": "normal"
+                  },
+                  "relatedNodes": [
+                    {
+                      "html": "<body>",
+                      "target": [
+                        "body"
+                      ]
+                    }
+                  ],
+                  "impact": "critical",
+                  "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                }
+              ],
+              "all": [],
+              "none": [],
+              "impact": "critical",
+              "html": "<span>Hi there!</span>",
+              "target": [
+                "body > div > span"
+              ],
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+            }
+          ]
+        }
+      },
+      "name": "color-contrast",
+      "category": "Accessibility",
+      "description": "Background and foreground colors have a sufficient contrast ratio",
+      "helpText": "Low-contrast text is difficult or impossible for many users to read. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/contrast-ratio)."
+    },
+    "image-alt": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "image-alt",
+      "category": "Accessibility",
+      "description": "Every image element has an alt attribute",
+      "helpText": "Screen reader users rely on `alt` text to provide descriptions of images. It's also used as fallback content when an image fails to load. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/alt-attribute)."
+    },
+    "label": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "label",
+      "category": "Accessibility",
+      "description": "Every form element has a label",
+      "helpText": "Labels ensure that form controls are announced properly by assistive technologies, like screen readers. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/form-labels)."
+    },
+    "tabindex": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "accessibility"
+      },
+      "name": "tabindex",
+      "category": "Accessibility",
+      "description": "No element has a `tabindex` attribute greater than 0",
+      "helpText": "A value greater than 0 implies an explicit navigation ordering. Although technically valid, this often creates frustrating experiences for users who rely on assistive technologies. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/tabindex)."
+    },
+    "total-byte-weight": {
+      "score": 100,
+      "displayValue": "Total size was 29 KB",
+      "rawValue": 30071,
+      "optimalValue": "1,600 KB",
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "/dbw_tester.html",
+              "totalBytes": 10189,
+              "totalKb": "10 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_tester.html",
+              "totalBytes": 10189,
+              "totalKb": "10 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_tester.js",
+              "totalBytes": 1749,
+              "totalKb": "2 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/favicon.ico",
+              "totalBytes": 1616,
+              "totalKb": "2 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_disabled.css",
+              "totalBytes": 1273,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "totalBytes": 984,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "totalBytes": 984,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "totalBytes": 984,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_partial_a.html",
+              "totalBytes": 920,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dbw_partial_b.html",
+              "totalBytes": 917,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "totalKb": "Total Size",
+            "totalMs": "Transfer Time"
+          }
+        }
+      },
+      "name": "total-byte-weight",
+      "category": "Network",
+      "description": "Avoids enormous network payloads",
+      "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+    },
+    "unused-css-rules": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [],
+          "tableHeadings": {
+            "url": "URL",
+            "numUnused": "Unused Rules",
+            "totalKb": "Original",
+            "potentialSavings": "Potential Savings"
+          }
+        }
+      },
+      "name": "unused-css-rules",
+      "category": "CSS",
+      "description": "Unused CSS rules",
+      "helpText": "Remove unused rules from stylesheets to reduce unnecessary bytes consumed by network activity. [Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)"
+    },
+    "uses-optimized-images": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [],
+          "tableHeadings": {
+            "preview": "",
+            "url": "URL",
+            "totalKb": "Original",
+            "webpSavings": "WebP Savings",
+            "jpegSavings": "JPEG Savings"
+          }
+        }
+      },
+      "name": "uses-optimized-images",
+      "category": "Images",
+      "description": "Unoptimized images",
+      "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+    },
+    "uses-responsive-images": {
+      "score": true,
+      "displayValue": "",
+      "rawValue": true,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [],
+          "tableHeadings": {
+            "preview": "",
+            "url": "URL",
+            "totalKb": "Original",
+            "potentialSavings": "Potential Savings"
+          }
+        }
+      },
+      "name": "uses-responsive-images",
+      "category": "Images",
+      "description": "Oversized Images",
+      "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+    },
+    "appcache-manifest": {
+      "score": false,
+      "displayValue": "",
+      "rawValue": false,
+      "debugString": "Found <html manifest=\"clock.appcache\">.",
+      "name": "appcache-manifest",
+      "category": "Offline",
+      "description": "Avoids Application Cache",
+      "helpText": "Application Cache has been [deprecated](https://html.spec.whatwg.org/multipage/browsers.html#offline) by [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers). Consider implementing an offline solution using the [Cache Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Cache)."
+    },
+    "dom-size": {
+      "score": 100,
+      "displayValue": "33 nodes",
+      "rawValue": 33,
+      "optimalValue": "1,500 nodes",
+      "extendedInfo": {
+        "formatter": "card",
+        "value": [
+          {
+            "title": "Total DOM Nodes",
+            "value": "33",
+            "target": "< 1,500 nodes"
+          },
+          {
+            "title": "DOM Depth",
+            "value": "4",
+            "snippet": "html >\n  body >\n    div >\n      h2",
+            "target": "< 32"
+          },
+          {
+            "title": "Maximum Children",
+            "value": "21",
+            "snippet": "Element with most children:\nhead",
+            "target": "< 60 nodes"
+          }
+        ]
+      },
+      "name": "dom-size",
+      "category": "Performance",
+      "description": "Avoids an excessive DOM size",
+      "helpText": "Browser engineers recommend pages contain fewer than ~1,500 DOM nodes. The sweet spot is a tree depth < 32 elements and fewer than 60 children/parent element. A large DOM can increase memory, cause longer [style calculations](https://developers.google.com/web/fundamentals/performance/rendering/reduce-the-scope-and-complexity-of-style-calculations), and produce costly [layout reflows](https://developers.google.com/speed/articles/reflow). [Learn more](https://developers.google.com/web/fundamentals/performance/rendering/)."
     },
     "external-anchors-use-rel-noopener": {
       "score": false,
@@ -465,23 +945,17 @@
         "formatter": "urllist",
         "value": [
           {
-            "url": "<a\n            href=\"https://www.google.com/\"\n             target=\"_blank\"\n            >...\n          </a>"
+            "url": "<a href=\"https://www.google.com/\" target=\"_blank\">"
+          },
+          {
+            "url": "<a target=\"_blank\">"
           }
         ]
       },
       "name": "external-anchors-use-rel-noopener",
       "category": "Performance",
-      "description": "Site opens external anchors using rel=\"noopener\".",
-      "helpText": "Anchors that open in a new tab should use <code>target=\"_blank\"</code> and <code>rel=\"noopener\"</code> so the <a href=\"https://jakearchibald.com/2016/performance-benefits-of-rel-noopener\" target=\"_blank\">opening page's performance does not suffer.</a>"
-    },
-    "appcache-manifest": {
-      "score": false,
-      "displayValue": "<html manifest=\"clock.appcache\">",
-      "rawValue": false,
-      "name": "appcache-manifest",
-      "category": "Offline",
-      "description": "Site does not use Application Cache",
-      "helpText": "Application Cache has been <a href=\"https://html.spec.whatwg.org/multipage/browsers.html#offline\" target=\"_blank\">deprecated</a> by <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers\" target=\"_blank\">Service Workers</a>. Consider implementing an offline solution using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Cache\" target=\"_blank\">Cache Storage API</a>."
+      "description": "Opens external anchors using rel=\"noopener\"",
+      "helpText": "Open new tabs using `rel=\"noopener\"` to improve performance and prevent security vulnerabilities. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/noopener)."
     },
     "geolocation-on-start": {
       "score": false,
@@ -491,111 +965,191 @@
         "formatter": "urllist",
         "value": [
           {
-            "label": "line: 215, col: 25",
+            "label": "line: 252, col: 25",
             "url": "http://localhost:8080/dbw_tester.html",
             "args": [
               null
             ],
-            "line": 215,
-            "col": 25
+            "line": 252,
+            "col": 25,
+            "isEval": false,
+            "isExtension": false
           },
           {
-            "label": "line: 219, col: 41",
+            "label": "line: 256, col: 41",
             "url": "http://localhost:8080/dbw_tester.html",
             "args": [
               null
             ],
-            "line": 219,
-            "col": 41
+            "line": 256,
+            "col": 41,
+            "isEval": false,
+            "isExtension": false
           }
         ]
       },
       "name": "geolocation-on-start",
       "category": "UX",
-      "description": "Page does not automatically request geolocation on page load",
-      "helpText": "Using the geolocation without context is a poor user experience. Always tie API permissions to user interactions."
+      "description": "Avoids requesting the geolocation permission on page load",
+      "helpText": "Users are mistrustful of or confused by sites that request their location without context. Consider tying the request to user gestures instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/geolocation-on-load)."
     },
     "link-blocking-first-paint": {
       "score": false,
-      "displayValue": "2 resources delayed first paint by 7ms",
+      "displayValue": "5 resources delayed first paint by 33ms",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "url": "http://localhost:8080/dbw_tester.css",
-            "label": "delayed first paint by 4ms"
-          },
-          {
-            "url": "http://localhost:8080/dbw_partial_a.html",
-            "label": "delayed first paint by 3ms"
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "dobetterweb/dbw_tester.css",
+              "totalKb": "0 KB",
+              "totalMs": "5ms"
+            },
+            {
+              "url": "/styles.css",
+              "totalKb": "0 KB",
+              "totalMs": "33ms"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "totalKb": "1 KB",
+              "totalMs": "9ms"
+            },
+            {
+              "url": "/dbw_partial_a.html",
+              "totalKb": "1 KB",
+              "totalMs": "9ms"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "totalKb": "1 KB",
+              "totalMs": "5ms"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "totalKb": "Size (KB)",
+            "totalMs": "Delayed Paint By (ms)"
           }
-        ]
+        }
       },
       "name": "link-blocking-first-paint",
       "category": "Performance",
-      "description": "Site does not use <link> that delay first paint",
-      "helpText": "&lt;link> elements are <a href=\"https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp\" target=\"_blank\">delaying the first paint</a> of your page! For stylesheets, consider inlining or using the <code>disabled</code> and <code>media</code> attributes. For HTML Imports, use the <code>async</code> attribute. These techniques will <a href=\"https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css\" target=\"_blank\">make the resource(s) non-render blocking</a>."
+      "description": "Render-blocking Stylesheets",
+      "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
     },
     "no-console-time": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "label": "line: 106, col: 11",
-            "url": "http://localhost:8080/dbw_tester.html",
-            "args": [
-              "arg1"
-            ],
-            "line": 106,
-            "col": 11
-          },
-          {
-            "label": "line: 109, col: 13",
-            "url": "http://localhost:8080/dbw_tester.html",
-            "args": [
-              "arg2"
-            ],
-            "line": 109,
-            "col": 13
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "http://localhost:8080/dbw_tester.html",
+              "args": [
+                "arg1"
+              ],
+              "line": 141,
+              "col": 11,
+              "isEval": false,
+              "isExtension": false
+            },
+            {
+              "url": "http://localhost:8080/dbw_tester.html",
+              "args": [
+                "arg2"
+              ],
+              "line": 144,
+              "col": 13,
+              "isEval": false,
+              "isExtension": false
+            },
+            {
+              "url": "consoleTimeTest (http://localhost:8080/dbw_tester.html:149:3)",
+              "args": [
+                "arg3"
+              ],
+              "line": 1,
+              "col": 9,
+              "isEval": true,
+              "isExtension": false
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "lineCol": "Line/Col",
+            "isEval": "Eval'd?"
           }
-        ]
+        }
       },
       "name": "no-console-time",
       "category": "JavaScript",
-      "description": "Site does not use console.time() in its own scripts",
-      "helpText": "Consider using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/User_Timing_API\" target=\"_blank\">User Timine API</a> (<a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Performance/mark\" target=\"_blank\">performance.mark()</a> and <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Performance/measure\" target=\"_blank\">performance.measure()</a>), which is a standard, uses high resolution timestamps, and has the added benefit of integrating with the DevTools timeline."
+      "description": "Avoids `console.time()` in its own scripts",
+      "helpText": "Consider using `performance.mark()` and `performance.measure()` from the User Timing API instead. They provide high-precision timestamps, independent of the system clock, and are integrated in the Chrome DevTools Timeline. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/console-time)."
     },
     "no-datenow": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "label": "line: 30, col: 18",
-            "url": "http://localhost:8080/dbw_tester.js",
-            "args": [],
-            "line": 30,
-            "col": 18
-          },
-          {
-            "label": "line: 99, col: 17",
-            "url": "http://localhost:8080/dbw_tester.html",
-            "args": [],
-            "line": 99,
-            "col": 17
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "http://localhost:8080/dbw_tester.js",
+              "args": [],
+              "line": 26,
+              "col": 18,
+              "isEval": false,
+              "isExtension": false
+            },
+            {
+              "url": "http://localhost:8080/dbw_tester.html",
+              "args": [],
+              "line": 131,
+              "col": 17,
+              "isEval": false,
+              "isExtension": false
+            },
+            {
+              "url": "http://localhost:8080/dbw_tester.html",
+              "args": [],
+              "line": 134,
+              "col": 18,
+              "isEval": false,
+              "isExtension": false
+            },
+            {
+              "url": "dateNowTest (http://localhost:8080/dbw_tester.html:135:3)",
+              "args": [],
+              "line": 1,
+              "col": 6,
+              "isEval": true,
+              "isExtension": false
+            },
+            {
+              "url": "dateNowTest (http://localhost:8080/dbw_tester.html:136:29)",
+              "args": [],
+              "line": 2,
+              "col": 6,
+              "isEval": true,
+              "isExtension": false
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "lineCol": "Line/Col",
+            "isEval": "Eval'd?"
           }
-        ]
+        }
       },
       "name": "no-datenow",
       "category": "JavaScript",
-      "description": "Site does not use Date.now() in its own scripts",
-      "helpText": "Consider using <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/Performance/now\" target=\"_blank\">performance.now()</a>, which has better precision than <code>Date.now()</code> and always increases at a constant rate, independent of the system clock."
+      "description": "Avoids `Date.now()` in its own scripts",
+      "helpText": "Consider using `performance.now()` from the User Timing API instead. It provides high-precision timestamps, independent of the system clock. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/date-now)."
     },
     "no-document-write": {
       "score": false,
@@ -605,188 +1159,190 @@
         "formatter": "urllist",
         "value": [
           {
-            "label": "line: 25, col: 12",
-            "url": "http://localhost:8080/dbw_tester.js",
-            "args": [
-              "<script src='//example.com/file.js'></script>"
-            ],
-            "line": 25,
-            "col": 12
-          },
-          {
-            "label": "line: 116, col: 12",
+            "label": "line: 153, col: 12",
             "url": "http://localhost:8080/dbw_tester.html",
             "args": [
               "Hi"
             ],
-            "line": 116,
-            "col": 12
+            "line": 153,
+            "col": 12,
+            "isEval": false,
+            "isExtension": false
           },
           {
-            "label": "line: 117, col: 12",
+            "label": "line: 154, col: 12",
             "url": "http://localhost:8080/dbw_tester.html",
             "args": [
               "There"
             ],
-            "line": 117,
-            "col": 12
+            "line": 154,
+            "col": 12,
+            "isEval": false,
+            "isExtension": false
           },
           {
-            "label": "line: 118, col: 12",
+            "label": "line: 155, col: 12",
             "url": "http://localhost:8080/dbw_tester.html",
             "args": [
               "2.0!"
             ],
-            "line": 118,
-            "col": 12
+            "line": 155,
+            "col": 12,
+            "isEval": false,
+            "isExtension": false
           }
         ]
       },
       "name": "no-document-write",
       "category": "Performance",
-      "description": "Site does not use document.write()",
-      "helpText": "Consider using <code>&lt;script async></code> to load scripts. <code>document.write()</code> is considered <a href=\"https://developers.google.com/web/updates/2016/08/removing-document-write\" target=\"_blank\">harmful for performance</a>."
+      "description": "Avoids `document.write()`",
+      "helpText": "For users on slow connections, external scripts dynamically injected via `document.write()` can delay page load by tens of seconds. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/document-write)."
     },
     "no-mutation-events": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "line": 137,
-            "col": 61,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "DOMNodeInserted",
-            "code": "body.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-            "label": "line: 137, col: 61"
-          },
-          {
-            "line": 143,
-            "col": 50,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "DOMNodeInserted",
-            "code": "section#touchmove-section.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted on element');\n  })\n\n",
-            "label": "line: 143, col: 50"
-          },
-          {
-            "line": 35,
-            "col": 56,
-            "url": "http://localhost:8080/dbw_tester.js",
-            "type": "DOMNodeInserted",
-            "code": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-            "label": "line: 35, col: 56"
-          },
-          {
-            "line": 127,
-            "col": 56,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "DOMNodeInserted",
-            "code": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-            "label": "line: 127, col: 56"
-          },
-          {
-            "line": 132,
-            "col": 55,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "DOMNodeRemoved",
-            "code": "document.addEventListener('DOMNodeRemoved', function (e) {\n    console.log('DOMNodeRemoved');\n  })\n\n",
-            "label": "line: 132, col: 55"
-          },
-          {
-            "line": 148,
-            "col": 54,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "DOMNodeInserted",
-            "code": "window.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-            "label": "line: 148, col: 54"
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "line": 174,
+              "col": 61,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "DOMNodeInserted",
+              "pre": "body.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
+              "label": "line: 174, col: 61"
+            },
+            {
+              "line": 180,
+              "col": 50,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "DOMNodeInserted",
+              "pre": "section#touchmove-section.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted on element');\n  })\n\n",
+              "label": "line: 180, col: 50"
+            },
+            {
+              "line": 31,
+              "col": 56,
+              "url": "http://localhost:8080/dbw_tester.js",
+              "type": "DOMNodeInserted",
+              "pre": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
+              "label": "line: 31, col: 56"
+            },
+            {
+              "line": 164,
+              "col": 56,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "DOMNodeInserted",
+              "pre": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
+              "label": "line: 164, col: 56"
+            },
+            {
+              "line": 169,
+              "col": 55,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "DOMNodeRemoved",
+              "pre": "document.addEventListener('DOMNodeRemoved', function (e) {\n    console.log('DOMNodeRemoved');\n  })\n\n",
+              "label": "line: 169, col: 55"
+            },
+            {
+              "line": 185,
+              "col": 54,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "DOMNodeInserted",
+              "pre": "window.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
+              "label": "line: 185, col: 54"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "lineCol": "Line/Col",
+            "type": "Event",
+            "code": "Snippet"
           }
-        ]
+        }
       },
       "name": "no-mutation-events",
       "category": "JavaScript",
-      "description": "Site does not use Mutation Events in its own scripts",
-      "helpText": "Using <a href=\"https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Mutation_events\" target=\"_blank\">Mutation events</a> degrades application performance. They are deprecated in the DOM events spec, replaced by <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver\" target=\"_blank\">MutationObservers</a>."
+      "description": "Avoids Mutation Events in its own scripts",
+      "helpText": "Mutation Events are deprecated and harm performance. Consider using Mutation Observers instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/mutation-events)."
     },
     "no-old-flexbox": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "url": "",
-            "label": "line: 5, row: 4, col: 17",
-            "code": "p,div {\n  display: box;\n}"
-          },
-          {
-            "url": "",
-            "label": "line: 10, row: 4, col: 17",
-            "code": ".span {\n  display: box;\n}"
-          },
-          {
-            "url": "",
-            "label": "line: 14, row: 10, col: 23",
-            "code": ".span2,.span3 {\n  display: box;\n}"
-          },
-          {
-            "url": "",
-            "label": "line: 18, row: 11, col: 28",
-            "code": ".span4,.span5 {\n  display:     box;\n}"
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "inline",
+              "location": "4:17",
+              "startLine": 5,
+              "pre": "p,div {\n  display: box;\n}"
+            },
+            {
+              "url": "inline",
+              "location": "4:17",
+              "startLine": 10,
+              "pre": ".span {\n  display: box;\n}"
+            },
+            {
+              "url": "inline",
+              "location": "10:23",
+              "startLine": 14,
+              "pre": ".span2,.span3 {\n  display: box;\n}"
+            },
+            {
+              "url": "inline",
+              "location": "11:28",
+              "startLine": 18,
+              "pre": ".span4,.span5 {\n  display:     box;\n}"
+            },
+            {
+              "url": "/dbw_tester.css",
+              "location": "2:19",
+              "startLine": 21,
+              "pre": ".doesnotapply {\n  display: flexbox;\n}"
+            },
+            {
+              "url": "inline",
+              "location": "4:24",
+              "startLine": 5,
+              "pre": ".failedselector {\n  -webkit-box-flex: 1;\n}"
+            },
+            {
+              "url": "inline",
+              "location": "4:16",
+              "startLine": 6,
+              "pre": ".failedselector {\n  box-flex: 1;\n}"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "startLine": "Line in the stylesheet / <style>",
+            "location": "Column start/end",
+            "pre": "Snippet"
           }
-        ]
+        }
       },
       "name": "no-old-flexbox",
       "category": "CSS",
-      "description": "Site does not use the old CSS flexbox",
-      "helpText": "The older spec for CSS Flexbox (<code>display: box</code>) is deprecated and <a href=\"https://developers.google.com/web/updates/2013/10/Flexbox-layout-isn-t-slow?hl=en\" target=\"_blank\">less performant</a>. Consider using the <a href=\"https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Using_CSS_flexible_boxes\" target=\"_blank\">newer version</a> (<code>display: flex</code>), which does not suffer from the same issues."
+      "description": "Avoids old CSS flexbox",
+      "helpText": "The 2009 spec of Flexbox is deprecated and is 2.3x slower than the latest spec. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/old-flexbox)."
     },
     "no-websql": {
       "score": false,
-      "displayValue": "db name: mydb, version: 1.0",
+      "displayValue": "",
       "rawValue": false,
+      "debugString": "Found database \"mydb\", version: 1.0.",
       "name": "no-websql",
       "category": "Offline",
-      "description": "Site does not use WebSQL DB.",
-      "helpText": "Web SQL Database is <a href=\"https://dev.w3.org/html5/webdatabase/\" target=\"_blank\">deprecated</a>. Consider implementing an offline solution using <a href=\"https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB\" target=\"_blank\">IndexedDB</a>."
+      "description": "Avoids WebSQL DB",
+      "helpText": "Web SQL is deprecated. Consider using IndexedDB instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/web-sql)."
     },
-    "uses-http2": {
-      "score": false,
-      "displayValue": "5 resources were not served over h2",
-      "rawValue": false,
-      "extendedInfo": {
-        "formatter": "urllist",
-        "value": [
-          {
-            "label": "http/1.1",
-            "url": "http://localhost:8080/dbw_tester.html"
-          },
-          {
-            "label": "http/1.1",
-            "url": "http://localhost:8080/dbw_tester.js"
-          },
-          {
-            "label": "http/1.1",
-            "url": "http://localhost:8080/dbw_tester.css"
-          },
-          {
-            "label": "http/1.1",
-            "url": "http://localhost:8080/dbw_partial_a.html"
-          },
-          {
-            "label": "http/1.1",
-            "url": "http://localhost:8080/dbw_partial_b.html"
-          }
-        ]
-      },
-      "name": "uses-http2",
-      "category": "Performance",
-      "description": "Site uses HTTP/2 for its own resources",
-      "helpText": "h2 offers many benefits over its http/1.1 predecessor: binary, multiplexing, server push, etc. See <a href=\"https://http2.github.io/faq/\" target=\"_blank\">this FAQ</a> for more information."
-    },
-    "uses-passive-event-listeners": {
+    "notification-on-start": {
       "score": false,
       "displayValue": "",
       "rawValue": false,
@@ -794,49 +1350,194 @@
         "formatter": "urllist",
         "value": [
           {
-            "line": 186,
-            "col": 44,
+            "label": "line: 262, col: 16",
             "url": "http://localhost:8080/dbw_tester.html",
-            "type": "touchmove",
-            "code": "section#touchmove-section.addEventListener('touchmove', function (e) {\n    console.log('touchmove');\n  })\n\n",
-            "label": "line: 186, col: 44"
-          },
-          {
-            "line": 42,
-            "col": 38,
-            "url": "http://localhost:8080/dbw_tester.js",
-            "type": "wheel",
-            "code": "document.addEventListener('wheel', e => {\n    console.log('wheel: arrow function');\n  })\n\n",
-            "label": "line: 42, col: 38"
-          },
-          {
-            "line": 160,
-            "col": 44,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "wheel",
-            "code": "window.addEventListener('wheel', function (e) {\n    console.log('wheel');\n  })\n\n",
-            "label": "line: 160, col: 44"
-          },
-          {
-            "line": 170,
-            "col": 49,
-            "url": "http://localhost:8080/dbw_tester.html",
-            "type": "mousewheel",
-            "code": "window.addEventListener('mousewheel', function (e) {\n    console.log('mousewheel');\n  })\n\n",
-            "label": "line: 170, col: 49"
+            "args": [],
+            "line": 262,
+            "col": 16,
+            "isEval": false,
+            "isExtension": false
           }
         ]
       },
+      "name": "notification-on-start",
+      "category": "UX",
+      "description": "Avoids requesting the notification permission on page load",
+      "helpText": "Users are mistrustful of or confused by sites that request to send notifications without context. Consider tying the request to user gestures instead. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/notifications-on-load)."
+    },
+    "script-blocking-first-paint": {
+      "score": false,
+      "displayValue": "1 resource delayed first paint by 7ms",
+      "rawValue": false,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "/dbw_tester.js",
+              "totalKb": "2 KB",
+              "totalMs": "7ms"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "totalKb": "Size (KB)",
+            "totalMs": "Delayed Paint By (ms)"
+          }
+        }
+      },
+      "name": "script-blocking-first-paint",
+      "category": "Performance",
+      "description": "Render-blocking scripts",
+      "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+    },
+    "uses-http2": {
+      "score": false,
+      "displayValue": "12 requests were not handled over h2",
+      "rawValue": false,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.html"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.css?delay=true"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.js"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.css"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_partial_a.html"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_disabled.css"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/zone.js"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_partial_b.html"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.html"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/dbw_tester.css?scriptActivated"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/zone.js"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:8080/favicon.ico"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "protocol": "Protocol"
+          }
+        }
+      },
+      "name": "uses-http2",
+      "category": "Performance",
+      "description": "Uses HTTP/2 for its own resources",
+      "helpText": "HTTP/2 offers many benefits over HTTP/1.1, including binary headers, multiplexing, and server push. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/http2)."
+    },
+    "uses-passive-event-listeners": {
+      "score": false,
+      "displayValue": "",
+      "rawValue": false,
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "line": 223,
+              "col": 44,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "touchmove",
+              "pre": "section#touchmove-section.addEventListener('touchmove', function (e) {\n    console.log('touchmove');\n  })\n\n",
+              "label": "line: 223, col: 44"
+            },
+            {
+              "line": 38,
+              "col": 38,
+              "url": "http://localhost:8080/dbw_tester.js",
+              "type": "wheel",
+              "pre": "document.addEventListener('wheel', e => {\n    console.log('wheel: arrow function');\n  })\n\n",
+              "label": "line: 38, col: 38"
+            },
+            {
+              "line": 197,
+              "col": 44,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "wheel",
+              "pre": "window.addEventListener('wheel', function (e) {\n    console.log('wheel');\n  })\n\n",
+              "label": "line: 197, col: 44"
+            },
+            {
+              "line": 207,
+              "col": 49,
+              "url": "http://localhost:8080/dbw_tester.html",
+              "type": "mousewheel",
+              "pre": "window.addEventListener('mousewheel', function (e) {\n    console.log('mousewheel');\n  })\n\n",
+              "label": "line: 207, col: 49"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "lineCol": "Line/Col",
+            "type": "Type",
+            "pre": "Snippet"
+          }
+        }
+      },
       "name": "uses-passive-event-listeners",
       "category": "JavaScript",
-      "description": "Site uses passive listeners to improve scrolling performance",
-      "helpText": "<a href=\"https://www.chromestatus.com/features/5745543795965952\" target=\"_blank\">Passive event listeners</a> enable better scrolling performance. If you don't call <code>preventDefault()</code> in your <code>wheel,mousewheel,touchstart,touchmove</code> event listeners, make them passive: <code>addEventListener('touchstart', ..., {passive: true})</code>."
+      "description": "Uses passive listeners to improve scrolling performance",
+      "helpText": "Consider marking your touch and wheel event listeners as `passive` to improve your page's scroll performance. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/passive-event-listeners)."
     }
+  },
+  "runtimeConfig": {
+    "environment": [
+      {
+        "name": "Device Emulation",
+        "enabled": false,
+        "description": "Nexus 5X"
+      },
+      {
+        "name": "Network Throttling",
+        "enabled": false,
+        "description": "150ms RTT, 1.6Mbps down, 0.7Mbps up"
+      },
+      {
+        "name": "CPU Throttling",
+        "enabled": false,
+        "description": "5x slowdown"
+      }
+    ],
+    "blockedUrlPatterns": []
   },
   "aggregations": [
     {
       "name": "Progressive Web App",
-      "description": "These audits validate the aspects of a Progressive Web App.",
+      "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
       "scored": true,
       "total": 0.375,
       "categorizable": true,
@@ -844,7 +1545,7 @@
         {
           "overall": 0,
           "name": "App can load on offline/flaky connections",
-          "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a <a href=\"https://developers.google.com/web/fundamentals/primers/service-worker/\">Service Worker</a>.",
+          "description": "Ensuring your web app can respond when the network connection is unavailable or flaky is critical to providing your users a good experience. This is achieved through use of a [Service Worker](https://developers.google.com/web/fundamentals/primers/service-worker/).",
           "subItems": [
             "service-worker",
             "works-offline"
@@ -881,7 +1582,7 @@
         {
           "overall": 0,
           "name": "User can be prompted to Add to Homescreen",
-          "description": "While users can manually add your site to their homescreen in the browser menu, the <a href=\"https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android?hl=en\">prompt (aka app install banner)</a> will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
+          "description": "While users can manually add your site to their homescreen in the browser menu, the [prompt (aka app install banner)](https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android) will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
           "subItems": [
             "service-worker",
             "manifest-exists",
@@ -893,7 +1594,7 @@
         {
           "overall": 0,
           "name": "Installed web app will launch with custom splash screen",
-          "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable <a href=\"https://developers.google.com/web/updates/2015/10/splashscreen?hl=en\">splash screen</a> the user sees between tapping the home screen icon and your app’s first paint.",
+          "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable [splash screen](https://developers.google.com/web/updates/2015/10/splashscreen) the user sees between tapping the home screen icon and your app's first paint.",
           "subItems": [
             "manifest-exists",
             "manifest-name",
@@ -905,7 +1606,7 @@
         {
           "overall": 0,
           "name": "Address bar matches brand colors",
-          "description": "The browser address bar can be themed to match your site. A theme-color <a href=\"https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android\">meta tag</a> will upgrade the address bar when a user browses the site, and the <a href=\"https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color\">manifest theme-color</a> will apply the same theme site-wide once it's been added to homescreen.",
+          "description": "The browser address bar can be themed to match your site. A `theme-color` [meta tag](https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android) will upgrade the address bar when a user browses the site, and the [manifest theme-color](https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color) will apply the same theme site-wide once it's been added to homescreen.",
           "subItems": [
             "manifest-exists",
             "theme-color-meta",
@@ -957,8 +1658,6 @@
           "overall": 0,
           "name": "Using modern JavaScript features",
           "subItems": [
-            "no-datenow",
-            "no-console-time",
             "uses-passive-event-listeners",
             "no-mutation-events"
           ]
@@ -968,17 +1667,26 @@
           "name": "Avoiding APIs that harm the user experience",
           "subItems": [
             "no-document-write",
-            "link-blocking-first-paint",
             "external-anchors-use-rel-noopener",
-            "geolocation-on-start"
+            "geolocation-on-start",
+            "notification-on-start"
           ]
         },
         {
           "overall": 0,
+          "name": "Avoiding deprecated APIs and browser interventions",
+          "subItems": [
+            "deprecations"
+          ]
+        },
+        {
+          "overall": 0.875,
           "name": "Accessibility",
           "subItems": [
             "aria-allowed-attr",
+            "aria-required-attr",
             "aria-valid-attr",
+            "aria-valid-attr-value",
             "color-contrast",
             "image-alt",
             "label",
@@ -996,17 +1704,41 @@
       ]
     },
     {
-      "name": "Performance Metrics",
+      "name": "Performance",
       "description": "These encapsulate your app's performance.",
       "scored": false,
       "total": null,
       "categorizable": false,
       "score": [
         {
-          "overall": 0,
+          "overall": 0.6666666666666666,
           "subItems": [
+            "unused-css-rules",
+            "uses-optimized-images",
+            "uses-responsive-images",
+            "total-byte-weight",
             "critical-request-chains",
+            "link-blocking-first-paint",
+            "script-blocking-first-paint",
+            "dom-size",
             "user-timings"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fancier stuff",
+      "description": "A list of newer features that you could be using in your app. These audits do not affect your score and are just suggestions.",
+      "scored": false,
+      "total": null,
+      "categorizable": true,
+      "score": [
+        {
+          "overall": 0,
+          "name": "New JavaScript features",
+          "subItems": [
+            "no-datenow",
+            "no-console-time"
           ]
         }
       ]
