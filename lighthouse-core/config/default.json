@@ -432,6 +432,7 @@
     "description": "A list of newer features that you could be using in your app. These audits do not affect your score and are just suggestions.",
     "scored": false,
     "categorizable": true,
+    "additional": true,
     "items": [{
       "name": "New JavaScript features",
       "audits": {

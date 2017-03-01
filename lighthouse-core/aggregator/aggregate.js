@@ -211,6 +211,7 @@ class Aggregate {
       name: aggregation.name,
       description: aggregation.description,
       scored: aggregation.scored,
+      additional: aggregation.additional,
       total: (aggregation.scored ? Aggregate.getTotal(score) : null),
       categorizable: aggregation.categorizable,
       score: score

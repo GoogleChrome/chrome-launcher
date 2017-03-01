@@ -118,7 +118,7 @@ limitations under the License.
         </div>
       </div>
       <div class="report-body__aggregations-container">
-      {{#each aggregations}}
+      {{#each aggregations as |aggregations|}}
       <section class="js-breakdown aggregations" id="{{nameToLink this.name}}">
         <header class="aggregations__header">
           <h2>{{ this.name }}</h2>
@@ -196,9 +196,9 @@ limitations under the License.
                     {{else}}
                       {{#if (isBool subItem.score)}}
                         {{#if subItem.score}}
-                          <span class="subitem-result__good score-good-bg">Pass</span>
+                          <span class="subitem-result__{{ getScoreGoodIcon subItem.informative }} score-good-bg">Pass</span>
                         {{else}}
-                          <span class="subitem-result__poor score-poor-bg">Fail</span>
+                          <span class="subitem-result__{{ getScoreBadIcon subItem.informative aggregations.additional }}">Fail</span>
                         {{/if}}
                       {{else}}
                         <span class="subitem-result__points score-{{ getItemRating subItem.score }}-bg">

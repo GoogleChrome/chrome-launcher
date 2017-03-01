@@ -73,6 +73,7 @@ class Audit {
       debugString: result.debugString,
       optimalValue: result.optimalValue,
       extendedInfo: result.extendedInfo,
+      informative: this.meta.informative,
       name: this.meta.name,
       category: this.meta.category,
       description: this.meta.description,

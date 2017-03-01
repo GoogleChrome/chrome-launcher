@@ -72,6 +72,13 @@ const handlebarHelpers = {
   // for color styling.
   getItemRating,
 
+  // Figures out the icon to display when success or info
+  getScoreGoodIcon: informative => informative ? 'info' : 'good',
+
+  // Figures out the icon to display when fail or warn
+  getScoreBadIcon: (informative, additional) =>
+    (informative || additional) ? 'warning score-warning-bg':'poor score-poor-bg',
+
   shouldShowHelpText: value => (getItemRating(value) !== RATINGS.GOOD.label),
 
   // Convert numbers to fixed point decimals
