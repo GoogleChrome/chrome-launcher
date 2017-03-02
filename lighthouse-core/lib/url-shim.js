@@ -23,6 +23,8 @@
 
 /* global self */
 
+const ELLIPSIS = '\u2026';
+
 // TODO: Add back node require('url').URL parsing when bug is resolved:
 // https://github.com/GoogleChrome/lighthouse/issues/1186
 const URL = (typeof self !== 'undefined' && self.URL) || require('whatwg-url').URL;
@@ -59,9 +61,16 @@ URL.hostsMatch = function hostsMatch(urlA, urlB) {
 
 /**
  * @param {string} url
+ * @param {{numPathParts: number, preserveQuery: boolean, preserveHost: boolean}=} options
  * @return {string}
  */
-URL.getDisplayName = function getDisplayName(url) {
+URL.getDisplayName = function getDisplayName(url, options) {
+  options = Object.assign({
+    numPathParts: 2,
+    preserveQuery: false,
+    preserveHost: false,
+  }, options);
+
   const parsed = new URL(url);
 
   let name;
@@ -70,24 +79,44 @@ URL.getDisplayName = function getDisplayName(url) {
     // Handle 'about:*' and 'data:*' URLs specially since they have no path.
     name = parsed.href;
   } else {
-    // Otherwise, remove any query strings from the path.
-    name = parsed.pathname.replace(/\?.*/, '')
-        // And grab the last two parts.
-        .split('/').slice(-2).join('/');
+    name = parsed.pathname;
+    const parts = name.split('/');
+    if (options.numPathParts && parts.length > options.numPathParts) {
+      name = ELLIPSIS + parts.slice(-1 * options.numPathParts).join('/');
+    }
+
+    if (options.preserveHost) {
+      name = `${parsed.host}/${name.replace(/^\//, '')}`;
+    }
+    if (options.preserveQuery) {
+      name = `${name}${parsed.search}`;
+    }
   }
 
   const MAX_LENGTH = 64;
   // Always elide hash
-  name = name.replace(/([a-f0-9]{7})[a-f0-9]{13}[a-f0-9]*/g, '$1\u2026');
-  // Elide too long names
+  name = name.replace(/([a-f0-9]{7})[a-f0-9]{13}[a-f0-9]*/g, `$1${ELLIPSIS}`);
+
+  // Elide query params first
+  if (name.length > MAX_LENGTH && name.includes('?')) {
+    // Try to leave the first query parameter intact
+    name = name.replace(/\?([^=]*)(=)?.*/, `?$1$2${ELLIPSIS}`);
+
+    // Remove it all if it's still too long
+    if (name.length > MAX_LENGTH) {
+      name = name.replace(/\?.*/, `?${ELLIPSIS}`);
+    }
+  }
+
+  // Elide too long names next
   if (name.length > MAX_LENGTH) {
     const dotIndex = name.lastIndexOf('.');
     if (dotIndex >= 0) {
       name = name.slice(0, MAX_LENGTH - 1 - (name.length - dotIndex)) +
           // Show file extension
-          `\u2026${name.slice(dotIndex)}`;
+          `${ELLIPSIS}${name.slice(dotIndex)}`;
     } else {
-      name = name.slice(0, MAX_LENGTH - 1) + '\u2026';
+      name = name.slice(0, MAX_LENGTH - 1) + ELLIPSIS;
     }
   }
 

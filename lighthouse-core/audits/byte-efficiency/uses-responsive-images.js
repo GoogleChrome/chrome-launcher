@@ -53,7 +53,7 @@ class UsesResponsiveImages extends Audit {
    * @return {?Object}
    */
   static computeWaste(image, DPR) {
-    const url = URL.getDisplayName(image.src);
+    const url = URL.getDisplayName(image.src, {preserveQuery: true});
     const actualPixels = image.naturalWidth * image.naturalHeight;
     const usedPixels = image.clientWidth * image.clientHeight * Math.pow(DPR, 2);
     const wastedRatio = 1 - (usedPixels / actualPixels);

@@ -87,7 +87,7 @@ describe('Printer', () => {
     const mode = 'pretty';
     const prettyOutput = Printer.createOutput(sampleResults, mode);
     const output = new RegExp(log.heavyHorizontal + log.heavyHorizontal +
-                   ' dobetterweb/dbw_tester.css', 'i');
+                   ' \u2026dobetterweb/dbw_tester.css', 'i');
 
     assert.ok(output.test(prettyOutput));
   });

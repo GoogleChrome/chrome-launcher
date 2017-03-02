@@ -50,6 +50,7 @@
 .table_list .table-column.table-column-url {
   text-align: left;
   width: 250px;
+  white-space: nowrap;
 }
 .table-column-potential-savings em, .table-column-webp-savings em, .table-column-jpeg-savings em {
   color: #767676;

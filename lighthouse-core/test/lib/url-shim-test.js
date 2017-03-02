@@ -59,6 +59,24 @@ describe('URL Shim', () => {
   });
 
   describe('getDisplayName', () => {
+    it('respects numPathParts option', () => {
+      const url = 'http://example.com/a/deep/nested/file.css';
+      const result = URL.getDisplayName(url, {numPathParts: 3});
+      assert.equal(result, '\u2026deep/nested/file.css');
+    });
+
+    it('respects preserveQuery option', () => {
+      const url = 'http://example.com/file.css?aQueryString=true';
+      const result = URL.getDisplayName(url, {preserveQuery: true});
+      assert.equal(result, '/file.css?aQueryString=true');
+    });
+
+    it('respects preserveHost option', () => {
+      const url = 'http://example.com/file.css';
+      const result = URL.getDisplayName(url, {preserveHost: true});
+      assert.equal(result, 'example.com/file.css');
+    });
+
     it('Elides hashes', () => {
       const url = 'http://example.com/file-f303dec6eec305a4fab8025577db3c2feb418148ac75ba378281399fb1ba670b.css';
       const result = URL.getDisplayName(url);
@@ -69,6 +87,18 @@ describe('URL Shim', () => {
       const url = 'http://example.com/file-f303dec6eec305a4fab80378281399fb1ba670b-somethingmore.css';
       const result = URL.getDisplayName(url);
       assert.equal(result, '/file-f303dec\u2026-somethingmore.css');
+    });
+
+    it('Elides query strings when can first parameter', () => {
+      const url = 'http://example.com/file.css?aQueryString=true&other_long_query_stuff=false&some_other_super_long_query';
+      const result = URL.getDisplayName(url, {preserveQuery: true});
+      assert.equal(result, '/file.css?aQueryString=\u2026');
+    });
+
+    it('Elides query strings when cannot preserve first parameter', () => {
+      const url = 'http://example.com/file.css?superDuperNoGoodVeryLongExtraSpecialOnlyTheBestEnourmousQueryString=true';
+      const result = URL.getDisplayName(url, {preserveQuery: true});
+      assert.equal(result, '/file.css?\u2026');
     });
 
     it('Elides long names', () => {

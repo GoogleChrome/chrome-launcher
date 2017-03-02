@@ -9,6 +9,7 @@ lighthouse-core/third_party/src
 coverage
 
 lighthouse-cli/results
+lighthouse-cli/performance-experiment/experiment-database/experiment-data*
 results
 results.html
 last-run-results.html
