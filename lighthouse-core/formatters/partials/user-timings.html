@@ -1,11 +1,14 @@
-<ul class="subitem__details">
-  {{#each this}}
-    <li class="subitem__detail">
-      {{#if this.isMark}}
-        <strong class="ut-measure_listing-duration">Mark: {{ decimal this.startTime }}ms</strong> - {{ this.name }}
-      {{else}}
-        <strong class="ut-measure_listing-duration">Measure {{ decimal this.duration }}ms</strong> - {{ this.name }}
-      {{/if}}
-    </li>
-  {{/each}}
-</ul>
+<details class="subitem__details">
+  <summary class="subitem__detail">View {{this.length}} entries</summary>
+  <ul class="subitem__details">
+    {{#each this}}
+      <li>
+        {{#if this.isMark}}
+          <strong class="ut-measure_listing-duration">Mark: {{ decimal this.startTime }}ms</strong> - {{ this.name }}
+        {{else}}
+          <strong class="ut-measure_listing-duration">Measure {{ decimal this.duration }}ms</strong> - {{ this.name }}
+        {{/if}}
+      </li>
+    {{/each}}
+  </ul>
+</details>
