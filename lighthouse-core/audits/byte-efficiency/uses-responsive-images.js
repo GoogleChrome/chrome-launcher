@@ -39,6 +39,7 @@ class UsesResponsiveImages extends Audit {
       category: 'Images',
       name: 'uses-responsive-images',
       description: 'Oversized Images',
+      informative: true,
       helpText:
         'Image sizes served should be based on the device display size to save network bytes. ' +
         'Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) ' +

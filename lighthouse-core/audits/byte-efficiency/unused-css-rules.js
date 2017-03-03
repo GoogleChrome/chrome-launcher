@@ -30,6 +30,7 @@ class UnusedCSSRules extends Audit {
       category: 'CSS',
       name: 'unused-css-rules',
       description: 'Unused CSS rules',
+      informative: true,
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +
           'bytes consumed by network activity. ' +
           '[Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)',

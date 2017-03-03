@@ -29,6 +29,7 @@ class CriticalRequestChains extends Audit {
       category: 'Performance',
       name: 'critical-request-chains',
       description: 'Critical Request Chains',
+      informative: true,
       optimalValue: 0,
       helpText: 'The Critical Request Chains below show you what resources are ' +
           'required for first render of this page. Improve page load by reducing ' +

@@ -41,6 +41,7 @@ class UsesOptimizedImages extends Audit {
       category: 'Images',
       name: 'uses-optimized-images',
       description: 'Unoptimized images',
+      informative: true,
       helpText: 'Images should be optimized to save network bytes. ' +
         'The following images could have smaller file sizes when compressed with ' +
         '[WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. ' +

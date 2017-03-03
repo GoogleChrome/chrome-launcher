@@ -401,10 +401,6 @@
           "expectedValue": true,
           "weight": 1
         },
-        "total-byte-weight": {
-          "expectedValue": 100,
-          "weight": 1
-        },
         "critical-request-chains": {
           "expectedValue": true,
           "weight": 1
@@ -415,6 +411,10 @@
         },
         "script-blocking-first-paint": {
           "expectedValue": true,
+          "weight": 1
+        },
+        "total-byte-weight": {
+          "expectedValue": 100,
           "weight": 1
         },
         "dom-size": {
