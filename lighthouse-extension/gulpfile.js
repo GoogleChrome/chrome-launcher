@@ -139,7 +139,7 @@ gulp.task('browserify-other', () => {
     'app/src/chromereload.js',
   ], {read: false})
     .pipe(tap(file => {
-      let bundle = browserify(file.path); // , {debug: true})
+      let bundle = browserify(file.path); // , {debug: true}); // for sourcemaps
       bundle = applyBrowserifyTransforms(bundle);
       // Inject the new browserified contents back into our gulp pipeline
       file.contents = bundle.bundle();
