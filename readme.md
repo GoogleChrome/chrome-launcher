@@ -4,7 +4,7 @@
 
 **Lighthouse requires Chrome 56 or later.**
 
-## Installation
+## Instalalation
 
 ### Chrome extension
 
@@ -132,7 +132,7 @@ $ lighthouse --disable-device-emulation --disable-cpu-throttling https://mysite.
 
 ## Using programmatically
 
-The example below shows how to setup and run Lighthouse programmatically as a Node module. It
+The exampl below shows how to setup and run Lighthouse programmatically as a Node module. It
 assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`).
 
 ```javascript
