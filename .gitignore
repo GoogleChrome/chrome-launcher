@@ -18,6 +18,8 @@ last-run-results.html
 *.devtoolslog.json
 *.screenshots.html
 *.report.html
+*.report.json
+*.report.pretty
 *.artifacts.log
 
 closure-error.log
