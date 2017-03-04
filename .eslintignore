@@ -17,3 +17,7 @@ coverage/**
 lighthouse-cli/*.js
 lighthouse-cli/commands/*.js
 lighthouse-cli/types/*.js
+
+# Handlebar-templates
+lighthouse-core/report/templates/report-templates.js
+lighthouse-core/formatters/partials/templates/report-partials.js

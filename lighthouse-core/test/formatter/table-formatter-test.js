@@ -20,6 +20,7 @@
 const TableFormatter = require('../../formatters/table.js');
 const Handlebars = require('handlebars');
 const ReportGenerator = require('../../report/report-generator.js');
+const handlebarHelpers = require('../../report/handlebar-helpers.js');
 const assert = require('assert');
 
 describe('TableFormatter', () => {
@@ -73,7 +74,7 @@ describe('TableFormatter', () => {
 
   it('generates valid html output', () => {
     new ReportGenerator(); // Registers the ifNotEq helper used by the html formatter.
-
+    Handlebars.registerHelper(handlebarHelpers);
     Handlebars.registerHelper(TableFormatter.getHelpers());
 
     const formatter = TableFormatter.getFormatter('html');

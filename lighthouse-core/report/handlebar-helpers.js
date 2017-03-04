@@ -18,7 +18,7 @@
 
 /* global Intl */
 
-const Handlebars = require('handlebars');
+const Handlebars = require('handlebars/runtime');
 const marked = require('marked');
 
 const RATINGS = {

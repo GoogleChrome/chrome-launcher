@@ -20,9 +20,7 @@ before_test:
   - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
   - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe"
   - bash ./lighthouse-core/scripts/download-chrome.sh
-  - npm run build-cli
-  - npm run build-extension
-  - npm run build-viewer
+  - npm run build-all
 
 test_script:
   - node --version

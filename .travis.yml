@@ -19,9 +19,7 @@ before_script:
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./lighthouse-core/scripts/download-chrome.sh
-  - npm run build-cli
-  - npm run build-extension
-  - npm run build-viewer
+  - npm run build-all
 script:
   - npm run lint
   - npm run unit

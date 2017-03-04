@@ -216,6 +216,7 @@ git clone https://github.com/GoogleChrome/lighthouse
 cd lighthouse
 npm install
 npm run install-all
+gulp # to precompile the handlebar templates.
 
 # The CLI is authored in TypeScript and requires compilation.
 # If you need to make changes to the CLI, run the TS compiler in watch mode:

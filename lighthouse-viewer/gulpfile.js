@@ -24,16 +24,20 @@ const runSequence = require('run-sequence');
 const browserify = require('browserify');
 const ghpages = require('gh-pages');
 
-const $ = gulpLoadPlugins();
+const compile = require('../gulp/compile');
+const config = require('../gulp/config');
 
-const DIST_FOLDER = 'dist';
+const $ = gulpLoadPlugins();
 
 function license() {
   return $.license('Apache', {
-    organization: 'Copyright 2016 Google Inc. All rights reserved.',
+    organization: 'Copyright 2017 Google Inc. All rights reserved.',
     tiny: true
   });
 }
+
+gulp.task('compileReport', compile.compileReport);
+gulp.task('compilePartials', compile.compilePartials);
 
 gulp.task('lint', () => {
   return gulp.src([
@@ -48,7 +52,7 @@ gulp.task('lint', () => {
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
-  .pipe(gulp.dest(`${DIST_FOLDER}/images`));
+  .pipe(gulp.dest(`${config.dist}/images`));
 });
 
 gulp.task('concat-css', () => {
@@ -58,7 +62,7 @@ gulp.task('concat-css', () => {
     'app/styles/viewer.css',
   ])
   .pipe($.concat('viewer.css'))
-  .pipe(gulp.dest(`${DIST_FOLDER}/styles`));
+  .pipe(gulp.dest(`${config.dist}/styles`));
 });
 
 gulp.task('html', () => {
@@ -66,7 +70,7 @@ gulp.task('html', () => {
     'app/*.html',
     'app/sw.js',
     'app/manifest.json'
-  ]).pipe(gulp.dest(DIST_FOLDER));
+  ]).pipe(gulp.dest(config.dist));
 });
 
 gulp.task('polyfills', () => {
@@ -74,7 +78,7 @@ gulp.task('polyfills', () => {
     'node_modules/url-search-params/build/url-search-params.js',
     'node_modules/whatwg-fetch/fetch.js'
   ])
-  .pipe(gulp.dest(`${DIST_FOLDER}/src/polyfills`));
+  .pipe(gulp.dest(`${config.dist}/src/polyfills`));
 });
 
 gulp.task('browserify', () => {
@@ -100,55 +104,66 @@ gulp.task('browserify', () => {
 
       file.contents = bundle; // Inject transformed content back the gulp pipeline.
     }))
-    .pipe(gulp.dest(`${DIST_FOLDER}/src`));
+    .pipe(gulp.dest(`${config.dist}/src`));
 });
 
 gulp.task('compile', ['browserify'], () => {
-  return gulp.src([`${DIST_FOLDER}/src/main.js`])
+  return gulp.src([`${config.dist}/src/main.js`])
     .pipe($.uglify()) // minify.
     .pipe(license())  // Add license to top.
-    .pipe(gulp.dest(`${DIST_FOLDER}/src`));
+    .pipe(gulp.dest(`${config.dist}/src`));
 });
 
 gulp.task('clean', () => {
-  return del([DIST_FOLDER]).then(paths =>
+  return del([config.dist]).then(paths =>
     paths.forEach(path => $.util.log('deleted:', $.util.colors.blue(path)))
   );
 });
 
-gulp.task('watch', ['lint', 'browserify', 'polyfills', 'html', 'images', 'concat-css'], () => {
-  gulp.watch([
-    'app/styles/**/*.css',
-    '../lighthouse-core/report/styles/**/*.css',
-    '../lighthouse-core/formatters/partials/*.css'
-  ]).on('change', () => {
-    runSequence('concat-css');
-  });
+gulp.task('watch', [
+  'lint',
+  'browserify',
+  'polyfills',
+  'html',
+  'images',
+  'concat-css',
+  'compileReport',
+  'compilePartials'], () => {
+    gulp.watch([
+      'app/styles/**/*.css',
+      '../lighthouse-core/report/styles/**/*.css',
+      '../lighthouse-core/formatters/partials/*.css'
+    ]).on('change', () => {
+      runSequence('concat-css');
+    });
 
-  gulp.watch([
-    'app/index.html',
-    'app/manifest.json',
-    'app/sw.js'
-  ]).on('change', () => {
-    runSequence('html');
-  });
+    gulp.watch([
+      'app/index.html',
+      'app/manifest.json',
+      'app/sw.js'
+    ]).on('change', () => {
+      runSequence('html');
+    });
 
-  gulp.watch([
-    'app/src/**/*.js',
-    '../lighthouse-core/**/*.js'
-  ], ['browserify']);
-});
+    gulp.watch([
+      `../${config.report}`
+    ], ['compileReport']);
+
+    gulp.watch([
+      `../${config.partials}`
+    ], ['compilePartials']);
+  });
 
 gulp.task('create-dir-for-gh-pages', () => {
-  del.sync([`${DIST_FOLDER}/viewer`]);
+  del.sync([`${config.dist}/viewer`]);
 
-  return gulp.src([`${DIST_FOLDER}/**/*`])
-    .pipe(gulp.dest(`${DIST_FOLDER}/viewer/viewer`));
+  return gulp.src([`${config.dist}/**/*`])
+    .pipe(gulp.dest(`${config.dist}/viewer/viewer`));
 });
 
 gulp.task('deploy', cb => {
   runSequence('build', 'create-dir-for-gh-pages', function() {
-    ghpages.publish(`${DIST_FOLDER}/viewer`, {
+    ghpages.publish(`${config.dist}/viewer`, {
       logger: $.util.log
     }, err => {
       if (err) {
@@ -159,9 +174,11 @@ gulp.task('deploy', cb => {
   });
 });
 
+gulp.task('compile-templates', ['compileReport', 'compilePartials']);
+
 gulp.task('build', cb => {
   runSequence(
-    'lint', 'compile',
+    'lint', 'compile-templates', 'compile',
     ['html', 'images', 'concat-css', 'polyfills'], cb);
 });
 
