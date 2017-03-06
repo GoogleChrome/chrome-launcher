@@ -39,9 +39,11 @@ module.exports = [
       },
       'external-anchors-use-rel-noopener': {
         score: false,
+        debugString: 'Lighthouse was unable to determine the destination of some anchor tags. ' +
+                     'If they are not used as hyperlinks, consider removing the _blank target.',
         extendedInfo: {
           value: {
-            length: 2
+            length: 3
           }
         }
       },

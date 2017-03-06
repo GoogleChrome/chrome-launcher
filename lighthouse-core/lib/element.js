@@ -43,6 +43,7 @@ class Element {
         if (attrIndex === -1) {
           return null;
         }
+
         return resp.attributes[attrIndex + 1];
       });
   }
