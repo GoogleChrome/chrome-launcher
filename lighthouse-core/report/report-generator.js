@@ -26,6 +26,9 @@ const reportPartials = require('../formatters/partials/templates/report-partials
 const fs = require('fs');
 const path = require('path');
 
+function toKebabCase(string) {
+  return string && string.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
 
 class ReportGenerator {
 
@@ -151,8 +154,9 @@ class ReportGenerator {
       }
 
       const partials = reportPartials.report.partials;
-      Handlebars.registerPartial(audit.name,
-        Handlebars.template(partials[audit.name] || partials['null-formatter']));
+      const partialName = toKebabCase(audit.extendedInfo.formatter);
+      const partial = partials[partialName] || partials['null-formatter'];
+      Handlebars.registerPartial(audit.name, Handlebars.template(partial));
     });
   }
 
