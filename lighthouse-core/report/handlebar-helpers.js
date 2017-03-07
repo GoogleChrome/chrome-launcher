@@ -27,6 +27,11 @@ const RATINGS = {
   POOR: {label: 'poor'}
 };
 
+/**
+ * Convert a score to a rating label.
+ * @param {number} value
+ * @return {string}
+ */
 function calculateRating(value) {
   let rating = RATINGS.POOR.label;
   if (value >= RATINGS.GOOD.minScore) {
@@ -37,10 +42,21 @@ function calculateRating(value) {
   return rating;
 }
 
+/**
+ * Figures out the total score for an aggregation
+ * @param {{total: number}} aggregation
+ * @return {number}
+ */
 const getTotalScore = function(aggregation) {
   return Math.round(aggregation.total * 100);
 };
 
+/**
+ * Converts a value to a rating string, which can be used inside the report for
+ * color styling.
+ * @param {(boolean|number)} value
+ * @return {string}
+ */
 const getItemRating = function(value) {
   if (typeof value === 'boolean') {
     return value ? RATINGS.GOOD.label : RATINGS.POOR.label;
@@ -49,75 +65,11 @@ const getItemRating = function(value) {
 };
 
 const handlebarHelpers = {
-  // Converts a name to a link.
-  nameToLink: name => {
-    return name.toLowerCase().replace(/\s/g, '-');
-  },
-
-  // Figures out the total score for an aggregation
-  getTotalScore,
-
-  // Converts the total score to a rating that can be used for styling.
-  getTotalScoreRating: aggregation => {
-    const totalScore = getTotalScore(aggregation);
-    return calculateRating(totalScore);
-  },
-
-  // Converts an aggregation's score to a rating that can be used for styling.
-  getAggregationScoreRating: score => {
-    return calculateRating(Math.round(score * 100));
-  },
-
-  // Converts a value to a rating string, which can be used inside the report
-  // for color styling.
-  getItemRating,
-
-  // Figures out the icon to display when success or info
-  getScoreGoodIcon: informative => informative ? 'info' : 'good',
-
-  // Figures out the icon to display when fail or warn
-  getScoreBadIcon: (informative, additional) =>
-    (informative || additional) ? 'warning score-warning-bg':'poor score-poor-bg',
-
-  shouldShowHelpText: value => (getItemRating(value) !== RATINGS.GOOD.label),
-
-  // Convert numbers to fixed point decimals
-  decimal: number => {
-    if (number && number.toFixed) {
-      return number.toFixed(2);
-    }
-    return number;
-  },
-
-  // value is boolean?
-  isBool: value => (typeof value === 'boolean'),
-
-  // !value
-  not: value => !value,
-
-  // value === value2?
-  ifEq: function(lhs, rhs, options) {
-    if (lhs === rhs) {
-      // eslint-disable-next-line no-invalid-this
-      return options.fn(this);
-    } else {
-      // eslint-disable-next-line no-invalid-this
-      return options.inverse(this);
-    }
-  },
-
-  // value !== value2
-  ifNotEq: function(lhs, rhs, options) {
-    if (lhs !== rhs) {
-      // eslint-disable-next-line no-invalid-this
-      return options.fn(this);
-    } else {
-      // eslint-disable-next-line no-invalid-this
-      return options.inverse(this);
-    }
-  },
-
-  // arg1 && arg2 && ... && argn
+  /**
+   * arg1 && arg2 && ... && argn
+   * @param {...*} args
+   * @return {*}
+   */
   and: (...args) => {
     let arg = false;
     for (let i = 0, n = args.length - 1; i < n; i++) {
@@ -129,7 +81,125 @@ const handlebarHelpers = {
     return arg;
   },
 
-  // myFavoriteVar -> my-favorite-var
+  /**
+   * Convert numbers to fixed point decimals strings.
+   * @param {*} maybeNumber
+   * @return {*}
+   */
+  decimal: maybeNumber => {
+    if (maybeNumber && maybeNumber.toFixed) {
+      return maybeNumber.toFixed(2);
+    }
+    return maybeNumber;
+  },
+
+  /**
+   * Format time.
+   * @param {string} date
+   * @return {string}
+   */
+  formatDateTime: date => {
+    const options = {
+      day: 'numeric', month: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: 'numeric', second: 'numeric',
+      timeZoneName: 'short'
+    };
+    let formatter = new Intl.DateTimeFormat('en-US', options);
+
+    // Force UTC if runtime timezone could not be detected.
+    // See https://github.com/GoogleChrome/lighthouse/issues/1056
+    const tz = formatter.resolvedOptions().timeZone;
+    if (!tz || tz.toLowerCase() === 'etc/unknown') {
+      options.timeZone = 'UTC';
+      formatter = new Intl.DateTimeFormat('en-US', options);
+    }
+    return formatter.format(new Date(date));
+  },
+
+  /**
+   * Converts an aggregation's score to a rating that can be used for styling.
+   * @param {number} score
+   * @return {string}
+   */
+  getAggregationScoreRating: score => {
+    return calculateRating(Math.round(score * 100));
+  },
+
+  getItemRating,
+
+  /**
+   * Figures out the icon to display when fail or warn.
+   * @param {boolean} informative
+   * @param {boolean} additional
+   * @return {string}
+   */
+  getScoreBadIcon: (informative, additional) =>
+    (informative || additional) ? 'warning score-warning-bg':'poor score-poor-bg',
+
+  /**
+   * Figures out the icon to display when success or info.
+   * @param {boolean} informative
+   * @return {string}
+   */
+  getScoreGoodIcon: informative => informative ? 'info' : 'good',
+
+  getTotalScore,
+
+  /**
+   * Converts the total score to a rating that can be used for styling.
+   * @param {{total: number}} aggregation
+   * @return {string}
+   */
+  getTotalScoreRating: aggregation => {
+    const totalScore = getTotalScore(aggregation);
+    return calculateRating(totalScore);
+  },
+
+  /**
+   * lhs === rhs
+   * @param {*} lhs
+   * @param {*} rhs
+   * @param {!Object} options
+   * @return {string}
+   */
+  ifEq: function(lhs, rhs, options) {
+    if (lhs === rhs) {
+      // eslint-disable-next-line no-invalid-this
+      return options.fn(this);
+    } else {
+      // eslint-disable-next-line no-invalid-this
+      return options.inverse(this);
+    }
+  },
+
+  /**
+   * lhs !== rhs
+   * @param {*} lhs
+   * @param {*} rhs
+   * @param {!Object} options
+   * @return {string}
+   */
+  ifNotEq: function(lhs, rhs, options) {
+    if (lhs !== rhs) {
+      // eslint-disable-next-line no-invalid-this
+      return options.fn(this);
+    } else {
+      // eslint-disable-next-line no-invalid-this
+      return options.inverse(this);
+    }
+  },
+
+  /**
+   * @param {*} value
+   * @return {boolean}
+   */
+  isBool: value => (typeof value === 'boolean'),
+
+  /**
+   * myFavoriteVar -> my-favorite-var
+   * @param {string} str
+   * @return {string}
+   */
   kebabCase: str => {
     return (str || '')
       // break up camelCase tokens
@@ -144,14 +214,33 @@ const handlebarHelpers = {
       .replace(/(^-|-$)/g, '');
   },
 
-  // eslint-disable-next-line no-unused-vars
-  sanitize: (str, opts) => {
+  /**
+   * Converts a name to a link.
+   * @param {string} name
+   * @return {string}
+   */
+  nameToLink: name => {
+    return name.toLowerCase().replace(/\s/g, '-');
+  },
+
+  /**
+   * Coerces value to boolean, returns the negation.
+   * @param {*} value
+   * @return {boolean}
+   */
+  not: value => !value,
+
+  /**
+   * Allow the report to inject HTML, but sanitize it first.
+   * Viewer in particular, allows user's to upload JSON. To mitigate against
+   * XSS, define a renderer that only transforms a few types of markdown blocks.
+   * All other markdown and HTML is ignored.
+   * @param {string} str
+   * @return {string}
+   */
+  sanitize: (str) => {
     // const isViewer = opts.data.root.reportContext === 'viewer';
 
-    // Allow the report to inject HTML, but sanitize it first.
-    // Viewer in particular, allows user's to upload JSON. To mitigate against
-    // XSS, define a renderer that only transforms a few types of markdown blocks.
-    // All other markdown and HTML is ignored.
     const renderer = new marked.Renderer();
     renderer.em = str => `<em>${str}</em>`;
     renderer.link = (href, title, text) => {
@@ -185,25 +274,11 @@ const handlebarHelpers = {
     return new Handlebars.SafeString(str);
   },
 
-  // format time
-  formatDateTime: date => {
-    const options = {
-      day: 'numeric', month: 'numeric', year: 'numeric',
-      hour: 'numeric', minute: 'numeric', second: 'numeric',
-      timeZoneName: 'short'
-    };
-    let formatter = new Intl.DateTimeFormat('en-US', options);
-
-    // Force UTC if runtime timezone could not be detected.
-    // See https://github.com/GoogleChrome/lighthouse/issues/1056
-    const tz = formatter.resolvedOptions().timeZone;
-    if (!tz || tz.toLowerCase() === 'etc/unknown') {
-      options.timeZone = 'UTC';
-      formatter = new Intl.DateTimeFormat('en-US', options);
-    }
-    return formatter.format(new Date(date));
-  }
-
+  /**
+   * @param {(boolean|number)} value
+   * @return {boolean}
+   */
+  shouldShowHelpText: value => (getItemRating(value) !== RATINGS.GOOD.label)
 };
 
 module.exports = handlebarHelpers;
