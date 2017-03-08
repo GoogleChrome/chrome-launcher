@@ -94,8 +94,11 @@ const cliFlags = yargs
     'view'
   ], 'Output:')
   .describe({
-    'output': 'Reporter for the results, supports multiple values',
-    'output-path': `The file path to output the results
+    'output': `Reporter for the results, supports multiple values`,
+    'output-path': `The file path to output the results. Use 'stdout' to write to stdout.
+If using JSON output, default is stdout.
+If using HTML output, default is a file in the working directory with a name based on the test URL and date.
+If using multiple outputs, --output-path is ignored.
 Example: --output-path=./lighthouse-results.html`,
     'view': 'Open HTML report in your browser'
   })
@@ -124,8 +127,7 @@ Example: --output-path=./lighthouse-results.html`,
   // default values
   .default('chrome-flags', '')
   .default('disable-cpu-throttling', true)
-  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.none])
-  .default('output-path', 'stdout')
+  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.html])
   .default('port', 9222)
   .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
   .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
@@ -168,6 +170,10 @@ if (cliFlags.verbose) {
   cliFlags.logLevel = 'silent';
 }
 log.setLevel(cliFlags.logLevel);
+
+if (cliFlags.output === Printer.OutputMode[Printer.OutputMode.json] && !cliFlags.outputPath) {
+  cliFlags.outputPath = 'stdout';
+}
 
 /**
  * If the requested port is 0, set it to a random, unused port.
@@ -278,17 +284,6 @@ function saveResults(results: Results,
       promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
     }
 
-    if (flags.output === Printer.OutputMode[Printer.OutputMode.none]) {
-      promise = promise
-          .then(_ => Printer.write(results, 'html', `${resolvedPath}.report.html`))
-          .then(_ => {
-            if (flags.view) return opn(`${resolvedPath}.report.html`, {wait: false});
-
-            log.warn('CLI', 'Report output no longer defaults to stdout. Use `--output=pretty` to re-enable.');
-            log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
-          });
-    }
-
     return promise.then(_ => {
       if (Array.isArray(flags.output)) {
         return flags.output.reduce((innerPromise, outputType) => {
@@ -296,7 +291,18 @@ function saveResults(results: Results,
           return innerPromise.then((_: Results) => Printer.write(results, outputType, outputPath));
         }, Promise.resolve(results));
       } else {
-        return Printer.write(results, flags.output, flags.outputPath);
+        const outputPath = flags.outputPath || `${resolvedPath}.report.${flags.output}`;
+        return Printer.write(results, flags.output, outputPath).then(results => {
+          if (flags.output === Printer.OutputMode[Printer.OutputMode.html]) {
+            if (flags.view) {
+              opn(`${resolvedPath}.report.html`, {wait: false});
+            } else {
+              log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
+            }
+          }
+
+          return results;
+        });
       }
     });
 }

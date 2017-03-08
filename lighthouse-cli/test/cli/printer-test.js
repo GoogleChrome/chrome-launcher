@@ -23,7 +23,6 @@ const Printer = require('../../printer.js');
 const assert = require('assert');
 const fs = require('fs');
 const sampleResults = require('../../../lighthouse-core/test/results/sample.json');
-const log = require('../../../lighthouse-core/lib/log');
 
 describe('Printer', () => {
   it('accepts valid output paths', () => {
@@ -40,20 +39,6 @@ describe('Printer', () => {
     const mode = Printer.OutputMode.json;
     const jsonOutput = Printer.createOutput(sampleResults, mode);
     assert.doesNotThrow(_ => JSON.parse(jsonOutput));
-  });
-
-  it('creates Pretty Printed results', () => {
-    const mode = Printer.OutputMode.pretty;
-    const prettyOutput = Printer.createOutput(sampleResults, mode);
-
-    // Just check there's no HTML / JSON there.
-    assert.throws(_ => JSON.parse(prettyOutput));
-    assert.equal(/<!doctype/gim.test(prettyOutput), false);
-
-    const hasScoreOnNonScoredItem = /Using modern offline features.*?(0%|NaN)/.test(prettyOutput);
-    const hasAggregationPresent = prettyOutput.includes('Using modern offline features');
-    assert.equal(hasScoreOnNonScoredItem, false, 'non-scored item was scored');
-    assert.equal(hasAggregationPresent, true, 'non-scored aggregation item is not there');
   });
 
   it('creates HTML for results', () => {
@@ -84,11 +69,10 @@ describe('Printer', () => {
   });
 
   it('writes extended info', () => {
-    const mode = 'pretty';
-    const prettyOutput = Printer.createOutput(sampleResults, mode);
-    const output = new RegExp(log.heavyHorizontal + log.heavyHorizontal +
-                   ' \u2026dobetterweb/dbw_tester.css', 'i');
+    const mode = Printer.OutputMode.html;
+    const htmlOutput = Printer.createOutput(sampleResults, mode);
+    const outputCheck = new RegExp('\u2026dobetterweb/dbw_tester.css', 'i');
 
-    assert.ok(output.test(prettyOutput));
+    assert.ok(outputCheck.test(htmlOutput));
   });
 });

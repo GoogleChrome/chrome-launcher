@@ -34,7 +34,7 @@ Kick off a run by passing `lighthouse` the URL to audit:
 lighthouse https://airhorner.com/
 ```
 
-Lighthouse will prettyprint a report to CLI. You can control the output format by passing flags.
+By default, Lighthouse writes the report to an HTML file. You can control the output format by passing flags.
 
 #### CLI options
 
@@ -66,8 +66,13 @@ Configuration:
 
 Output:
   --output       Reporter for the results, supports multiple values
-                         [choices: "none", "pretty", "json", "html"]               [default: "none"]
-  --output-path  The file path to output the results
+                                    [choices: "json", "html"]                      [default: "html"]
+  --output-path  The file path to output the results. Use 'stdout' to write to
+                 stdout.
+                 If using JSON output, default is stdout.
+                 If using HTML output, default is a file in the working
+                 directory with a name based on the test URL and date.
+                 If using multiple outputs, --output-path is ignored.
                  Example: --output-path=./lighthouse-results.html                [default: "stdout"]
 
 Options:

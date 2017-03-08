@@ -19,12 +19,11 @@
 
 /**
  * An enumeration of acceptable output modes:
- *   'pretty': Pretty print the results
  *   'json': JSON formatted results
  *   'html': An HTML report
  */
-enum OutputMode { pretty, json, html, none };
-type Mode = 'pretty' | 'json' | 'html' | 'none';
+enum OutputMode { json, html };
+type Mode = 'json' | 'html';
 
 import {Results, AuditResult} from './types/types';
 
@@ -46,24 +45,6 @@ function checkOutputPath(path: string): string {
   return path;
 }
 
-function formatAggregationResultItem(score: boolean | number | string, suffix = '') {
-  if (typeof score === 'boolean') {
-    return score ? `${log.greenify(log.tick)}` : `${log.redify(log.cross)}`;
-  }
-  if (typeof score !== 'number') {
-    return `${log.purple}${score}${log.reset}`;
-  }
-
-  let colorChoice = log.red;
-  if (score > 45) {
-    colorChoice = log.yellow;
-  }
-  if (score > 75) {
-    colorChoice = log.green;
-  }
-  return `${colorChoice}${score}${suffix}${log.reset}`;
-}
-
 /**
  * Creates the results output in a format based on the `mode`.
  */
@@ -80,56 +61,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
     return JSON.stringify(results, null, 2);
   }
 
-  // No report (the new default)
-  if (outputMode === OutputMode.none) return '';
-
-  // Pretty printed CLI report.
-  const version = results.lighthouseVersion;
-  let output = `\n\n${log.bold}Lighthouse (${version}) results:${log.reset} ${results.url}\n\n`;
-
-  results.aggregations.forEach(aggregation => {
-    const total = aggregation.total ? ': ' + formatAggregationResultItem(Math.round(aggregation.total * 100), '%') : '';
-    output += `${log.whiteSmallSquare} ${log.bold}${aggregation.name}${log.reset}${total}\n\n`;
-
-    aggregation.score.forEach(item => {
-      const score = (item.overall * 100).toFixed(0);
-
-      if (item.name) {
-        output += `${log.bold}${item.name}${log.reset}: ${item.scored ? formatAggregationResultItem(score, '%') : ''}\n`;
-      }
-
-      item.subItems.forEach(subitem => {
-        let auditResult: AuditResult;
-
-        if (typeof subitem === 'string') {
-          auditResult = (<any>results).audits[subitem];
-        } else {
-          auditResult = subitem as AuditResult;
-        }
-
-        const formattedScore = auditResult.error ? `${log.redify('‽')}` :
-            `${formatAggregationResultItem(auditResult.score)}`;
-        let lineItem = ` ${log.doubleLightHorizontal} ${formattedScore} ${auditResult.description}`;
-        if (auditResult.displayValue) {
-          lineItem += ` (${log.bold}${auditResult.displayValue}${log.reset})`;
-        }
-        output += `${lineItem}\n`;
-        if (auditResult.debugString) {
-          output += `    ${auditResult.debugString}\n`;
-        }
-
-        if (auditResult.extendedInfo && auditResult.extendedInfo.value) {
-          const formatter =
-              Formatter.getByName(auditResult.extendedInfo.formatter).getFormatter('pretty');
-          output += `${formatter(auditResult.extendedInfo.value)}`;
-        }
-      });
-
-      output += '\n';
-    });
-  });
-
-  return output;
+  throw new Error('Invalid output mode: ' + outputMode);
 }
 
 /* istanbul ignore next */
@@ -185,10 +117,8 @@ function write(results: Results, mode: Mode, path: string): Promise<Results> {
 }
 
 function GetValidOutputOptions():Array<Mode> {
-  return [OutputMode[OutputMode.pretty] as Mode,
-          OutputMode[OutputMode.json] as Mode,
-          OutputMode[OutputMode.html] as Mode,
-          OutputMode[OutputMode.none] as Mode];
+  return [OutputMode[OutputMode.json] as Mode,
+          OutputMode[OutputMode.html] as Mode];
 }
 
 export {
