@@ -23,7 +23,7 @@
  */
 
 const Audit = require('../audit');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 class AxeAudit extends Audit {
   /**

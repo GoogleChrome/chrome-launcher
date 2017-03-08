@@ -16,29 +16,23 @@
 
 'use strict';
 
-const Formatter = require('../../formatters/formatter.js');
+const Formatter = require('../../report/formatter.js');
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 
 /* eslint-env mocha */
 
 describe('Formatter', () => {
   it('returns supported formats', () => {
-    // Force the internal _formatters to not exist
-    Formatter._formatters = null;
-    assert.notEqual(Formatter.SUPPORTED_FORMATS, undefined);
+    assert.ok(Formatter.SUPPORTED_FORMATS);
   });
 
-  it('returns supported formats when called by name', () => {
-    // Force the internal _formatters to not exist
-    Formatter._formatters = null;
-    assert.notEqual(Formatter.getByName('accessibility'), undefined);
-  });
-
-  it('throws when invalid format is provided', () => {
-    assert.throws(_ => Formatter.getByName('invalid-format'), Error);
-  });
-
-  it('throws when getFormatter is called directly', () => {
-    assert.throws(_ => Formatter.getFormatter(), Error);
+  it('maps supported format constants to partial filenames', () => {
+    Object.keys(Formatter.SUPPORTED_FORMATS).forEach(capsName => {
+      const baseName = Formatter.SUPPORTED_FORMATS[capsName];
+      const filePath = path.normalize(`${__dirname}/../../report/partials/${baseName}.html`);
+      assert.doesNotThrow(_ => fs.accessSync(filePath), `partial at '${filePath}' not found`);
+    });
   });
 });

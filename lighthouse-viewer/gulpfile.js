@@ -58,7 +58,7 @@ gulp.task('images', () => {
 gulp.task('concat-css', () => {
   return gulp.src([
     '../lighthouse-core/report/styles/report.css',
-    '../lighthouse-core/formatters/partials/*.css',
+    '../lighthouse-core/report/partials/*.css',
     'app/styles/viewer.css',
   ])
   .pipe($.concat('viewer.css'))
@@ -132,7 +132,7 @@ gulp.task('watch', [
     gulp.watch([
       'app/styles/**/*.css',
       '../lighthouse-core/report/styles/**/*.css',
-      '../lighthouse-core/formatters/partials/*.css'
+      '../lighthouse-core/report/partials/*.css'
     ]).on('change', () => {
       runSequence('concat-css');
     });

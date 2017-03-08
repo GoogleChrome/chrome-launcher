@@ -25,7 +25,7 @@
 const Audit = require('../audit');
 const URL = require('../../lib/url-shim');
 const StyleHelpers = require('../../lib/styles-helpers');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 class NoOldFlexboxAudit extends Audit {
 

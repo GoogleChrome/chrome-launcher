@@ -29,7 +29,6 @@ import {Results, AuditResult} from './types/types';
 
 const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
-const Formatter = require('../lighthouse-core/formatters/formatter');
 const log = require('../lighthouse-core/lib/log');
 
 

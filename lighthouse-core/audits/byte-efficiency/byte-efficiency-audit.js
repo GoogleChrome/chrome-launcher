@@ -17,7 +17,7 @@
 'use strict';
 
 const Audit = require('../audit');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 const KB_IN_BYTES = 1024;
 const WASTEFUL_THRESHOLD_IN_BYTES = 20 * KB_IN_BYTES;

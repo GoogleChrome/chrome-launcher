@@ -206,7 +206,7 @@
       "displayValue": "0",
       "rawValue": true,
       "extendedInfo": {
-        "formatter": "userTimings",
+        "formatter": "user-timings",
         "value": []
       },
       "name": "user-timings",
@@ -241,7 +241,7 @@
       "rawValue": false,
       "optimalValue": 0,
       "extendedInfo": {
-        "formatter": "criticalRequestChains",
+        "formatter": "critical-request-chains",
         "value": {
           "chains": {
             "62339.1": {
@@ -481,7 +481,7 @@
       "displayValue": "4 warnings found",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urlList",
+        "formatter": "url-list",
         "value": [
           {
             "label": "line: 45",
@@ -949,7 +949,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urlList",
+        "formatter": "url-list",
         "value": [
           {
             "url": "<a href=\"https://www.google.com/\" target=\"_blank\">"
@@ -969,7 +969,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urlList",
+        "formatter": "url-list",
         "value": [
           {
             "label": "line: 252, col: 25",
@@ -1163,7 +1163,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urlList",
+        "formatter": "url-list",
         "value": [
           {
             "label": "line: 153, col: 12",
@@ -1354,7 +1354,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urlList",
+        "formatter": "url-list",
         "value": [
           {
             "label": "line: 262, col: 16",

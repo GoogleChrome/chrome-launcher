@@ -41,7 +41,7 @@ gulp.task('js-compile', function() {
     .pipe(replace('require(\'../lib/traces/devtools-timeline-model\');',
         'DevtoolsTimelineModel'))
     .pipe(replace('require(\'speedline\');', 'function(arg) {};'))
-    .pipe(replace(/require\('(\.\.\/)*formatters\/formatter'\);/g, '{};'))
+    .pipe(replace(/require\('(\.\.\/)*report\/formatter'\);/g, '{};'))
 
     // Replace any non-local import (e.g. not starting with .) with a dummy type. These are likely
     // the built-in Node modules. But not always, so TODO(samthor): Fix this.

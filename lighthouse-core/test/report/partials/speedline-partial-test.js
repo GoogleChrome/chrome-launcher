@@ -17,10 +17,12 @@
 
 /* eslint-env mocha */
 
-const SpeedlineFormatter = require('../../formatters/speedline-formatter.js');
 const Handlebars = require('handlebars');
 const assert = require('assert');
-const handlebarHelpers = require('../../report/handlebar-helpers');
+const handlebarHelpers = require('../../../report/handlebar-helpers');
+const fs = require('fs');
+const partialHtml = fs.readFileSync(__dirname +
+    '/../../../report/partials/speedline.html', 'utf8');
 
 const mockExtendedInfo = {
   timings: {
@@ -38,7 +40,7 @@ const mockExtendedInfo = {
   frames: []
 };
 
-describe('Formatter', () => {
+describe('Speedline partial generation', () => {
   after(() => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
@@ -46,8 +48,7 @@ describe('Formatter', () => {
   it('generates valid html output', () => {
     Handlebars.registerHelper(handlebarHelpers);
 
-    const formatter = SpeedlineFormatter.getFormatter('html');
-    const template = Handlebars.compile(formatter);
+    const template = Handlebars.compile(partialHtml);
     const formatted = template(mockExtendedInfo).split('\n').join('');
 
     assert.equal(typeof formatted, 'string');

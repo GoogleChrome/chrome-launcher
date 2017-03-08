@@ -18,12 +18,14 @@
 
 /* eslint-env mocha */
 
-const UserTimingsFormatter = require('../../formatters/user-timings.js');
 const assert = require('assert');
 const Handlebars = require('handlebars');
-const handlebarHelpers = require('../../report/handlebar-helpers');
+const handlebarHelpers = require('../../../report/handlebar-helpers');
+const fs = require('fs');
+const partialHtml = fs.readFileSync(__dirname +
+    '/../../../report/partials/user-timings.html', 'utf8');
 
-describe('User Timings Formatter', () => {
+describe('User Timings partial generation', () => {
   after(() => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
@@ -45,8 +47,7 @@ describe('User Timings Formatter', () => {
 
     Handlebars.registerHelper(handlebarHelpers);
 
-    const formatter = UserTimingsFormatter.getFormatter('html');
-    const template = Handlebars.compile(formatter);
+    const template = Handlebars.compile(partialHtml);
     const output = template(extendedInfo).split('\n').join('');
 
     assert.ok(/Mark: 10/.test(output));

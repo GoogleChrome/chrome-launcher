@@ -25,7 +25,7 @@
 const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
 const EventHelpers = require('../../lib/event-helpers');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 class NoMutationEventsAudit extends Audit {
 

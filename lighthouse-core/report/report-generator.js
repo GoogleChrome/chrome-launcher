@@ -21,13 +21,9 @@
 const Handlebars = require('handlebars/runtime');
 const handlebarHelpers = require('./handlebar-helpers');
 const reportTemplate = require('./templates/report-templates');
-const reportPartials = require('../formatters/partials/templates/report-partials');
+const reportPartials = require('../report/partials/templates/report-partials');
 const fs = require('fs');
 const path = require('path');
-
-function toKebabCase(string) {
-  return string && string.replace(/([A-Z])/g, '-$1').toLowerCase();
-}
 
 class ReportGenerator {
 
@@ -52,11 +48,11 @@ class ReportGenerator {
     // Cannot DRY this up and dynamically create paths because fs.readdirSync
     // doesn't browserify well with a variable path. See https://github.com/substack/brfs/issues/36.
     const partialStyles = [
-      fs.readFileSync(__dirname + '/../formatters/partials/cards.css', 'utf8'),
-      fs.readFileSync(__dirname + '/../formatters/partials/critical-request-chains.css', 'utf8'),
-      fs.readFileSync(__dirname + '/../formatters/partials/table.css', 'utf8'),
-      fs.readFileSync(__dirname + '/../formatters/partials/url-list.css', 'utf8'),
-      fs.readFileSync(__dirname + '/../formatters/partials/user-timings.css', 'utf8')
+      fs.readFileSync(__dirname + '/../report/partials/cards.css', 'utf8'),
+      fs.readFileSync(__dirname + '/../report/partials/critical-request-chains.css', 'utf8'),
+      fs.readFileSync(__dirname + '/../report/partials/table.css', 'utf8'),
+      fs.readFileSync(__dirname + '/../report/partials/url-list.css', 'utf8'),
+      fs.readFileSync(__dirname + '/../report/partials/user-timings.css', 'utf8')
     ];
 
     return [
@@ -131,25 +127,23 @@ class ReportGenerator {
   }
 
   /**
-   * Register the formatter for each extendedInfo.
+   * Register the partial used for each extendedInfo under the audit's name.
    * @param {!Object} audits Lighthouse results.audits.
    */
-  _registerFormatters(audits) {
-    Object.keys(audits).forEach(audit => {
-      // Use value rather than key for audit.
-      audit = audits[audit];
+  _registerPartials(audits) {
+    Object.keys(audits).forEach(auditName => {
+      const audit = audits[auditName];
 
       if (!audit.extendedInfo) {
         return;
       }
-      if (!audit.extendedInfo.formatter) {
-        // HTML formatter not provided for this subItem
-        return;
+
+      const partialName = audit.extendedInfo.formatter;
+      const partial = reportPartials.report.partials[partialName];
+      if (!partial) {
+        throw new Error(`${auditName} requested unknown partial for formatting`);
       }
 
-      const partials = reportPartials.report.partials;
-      const partialName = toKebabCase(audit.extendedInfo.formatter);
-      const partial = partials[partialName] || partials['null-formatter'];
       Handlebars.registerPartial(audit.name, Handlebars.template(partial));
     });
   }
@@ -162,7 +156,7 @@ class ReportGenerator {
    * @return {string} HTML of the report page.
    */
   generateHTML(results, reportContext = 'extension', reportsCatalog) {
-    this._registerFormatters(results.audits);
+    this._registerPartials(results.audits);
 
     results.aggregations.forEach(aggregation => {
       aggregation.score.forEach(score => {

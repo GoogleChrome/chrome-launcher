@@ -146,7 +146,7 @@
       "displayValue": "0",
       "rawValue": true,
       "extendedInfo": {
-        "formatter": "userTimings",
+        "formatter": "user-timings",
         "value": []
       },
       "name": "user-timings",
@@ -185,7 +185,7 @@
       "rawValue": false,
       "optimalValue": 0,
       "extendedInfo": {
-        "formatter": "criticalRequestChains",
+        "formatter": "critical-request-chains",
         "value": {
           "chains": {
             "32513.1": {

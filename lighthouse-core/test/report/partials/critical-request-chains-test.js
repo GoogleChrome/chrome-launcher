@@ -18,11 +18,13 @@
 
 /* eslint-env mocha */
 
-const criticalRequestChainFormatter = require('../../formatters/critical-request-chains.js');
 const assert = require('assert');
 const Handlebars = require('handlebars');
-const URL = require('../../lib/url-shim');
-const handlebarHelpers = require('../../report/handlebar-helpers');
+const URL = require('../../../lib/url-shim');
+const handlebarHelpers = require('../../../report/handlebar-helpers');
+const fs = require('fs');
+const partialHtml = fs.readFileSync(__dirname +
+    '/../../../report/partials/critical-request-chains.html', 'utf8');
 
 const superLongName =
     'https://example.com/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWeWantToTest.js';
@@ -77,15 +79,14 @@ const extendedInfo = {
   }
 };
 
-describe('CRC Formatter', () => {
+describe('CRC partial generation', () => {
   after(() => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
 
   it('generates valid HTML output', () => {
     Handlebars.registerHelper(handlebarHelpers);
-    const formatter = criticalRequestChainFormatter.getFormatter('html');
-    const template = Handlebars.compile(formatter);
+    const template = Handlebars.compile(partialHtml);
     const output = template(extendedInfo).split('\n').join('');
     const filename = URL.getDisplayName(superLongName);
     const filenameRegExp = new RegExp(filename, 'im');

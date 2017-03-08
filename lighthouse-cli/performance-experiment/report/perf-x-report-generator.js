@@ -32,8 +32,8 @@ class PerfXReportGenerator extends ReportGenerator {
     return scriptArr;
   }
 
-  _registerFormatters(audits) {
-    super._registerFormatters(audits);
+  _registerPartials(audits) {
+    super._registerPartials(audits);
     const configPanelTemplate = Handlebars.compile(configPanelPartial);
     const criticalRequestChains = audits['critical-request-chains'].extendedInfo.value;
     Handlebars.registerPartial('config-panel', configPanelTemplate(criticalRequestChains));

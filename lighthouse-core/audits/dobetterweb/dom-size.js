@@ -25,7 +25,7 @@
 
 const Audit = require('../audit');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 const MAX_DOM_NODES = 1500;
 const MAX_DOM_TREE_WIDTH = 60;

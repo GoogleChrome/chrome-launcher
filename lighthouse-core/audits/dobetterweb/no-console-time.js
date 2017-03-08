@@ -23,7 +23,7 @@
 
 const URL = require('../../lib/url-shim');
 const Audit = require('../audit');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 class NoConsoleTimeAudit extends Audit {
 

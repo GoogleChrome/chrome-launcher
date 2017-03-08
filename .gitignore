@@ -38,5 +38,5 @@ lighthouse-cli/types/*.map
 /chrome-win32/
 /chrome.zip
 
-lighthouse-core/formatters/partials/templates/
+lighthouse-core/report/partials/templates/
 lighthouse-core/report/templates/*.js

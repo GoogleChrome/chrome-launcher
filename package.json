@@ -54,7 +54,6 @@
     "istanbul": "^0.4.3",
     "jsdom": "^9.0.0",
     "mocha": "^3.2.0",
-    "walk": "^2.3.9",
     "zone.js": "^0.7.3"
   },
   "dependencies": {

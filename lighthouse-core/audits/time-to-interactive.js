@@ -11,7 +11,7 @@
 const Audit = require('./audit');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const FMPMetric = require('./first-meaningful-paint');
-const Formatter = require('../formatters/formatter');
+const Formatter = require('../report/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
 //   https://www.desmos.com/calculator/jlrx14q4w8

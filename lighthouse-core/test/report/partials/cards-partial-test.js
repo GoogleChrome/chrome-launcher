@@ -17,11 +17,12 @@
 
 /* eslint-env mocha */
 
-const CardsFormatter = require('../../formatters/cards.js');
 const Handlebars = require('handlebars');
 const assert = require('assert');
+const fs = require('fs');
+const partialHtml = fs.readFileSync(__dirname + '/../../../report/partials/cards.html', 'utf8');
 
-describe('CardsFormatter', () => {
+describe('Cards partial generation', () => {
   const extendedInfo = {
     value: [
       {title: 'Total DOM Nodes', value: 3500, target: '1,500 nodes'},
@@ -31,8 +32,7 @@ describe('CardsFormatter', () => {
   };
 
   it('generates valid html output', () => {
-    const formatter = CardsFormatter.getFormatter('html');
-    const template = Handlebars.compile(formatter);
+    const template = Handlebars.compile(partialHtml);
     const output = template(extendedInfo.value).split('\n').join('');
     assert.ok(output.match('title="snippet"'), 'adds title attribute for snippet');
     assert.ok(output.match('class="cards__container"'), 'adds wrapper class');

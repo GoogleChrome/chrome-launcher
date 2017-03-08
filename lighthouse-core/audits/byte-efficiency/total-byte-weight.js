@@ -20,7 +20,7 @@
 'use strict';
 
 const Audit = require('./byte-efficiency-audit');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
 const URL = require('../../lib/url-shim');
 

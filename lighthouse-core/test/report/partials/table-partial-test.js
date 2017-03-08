@@ -17,12 +17,14 @@
 
 /* eslint-env mocha */
 
-const TableFormatter = require('../../formatters/table.js');
 const Handlebars = require('handlebars');
-const handlebarHelpers = require('../../report/handlebar-helpers.js');
 const assert = require('assert');
+const handlebarHelpers = require('../../../report/handlebar-helpers');
+const fs = require('fs');
+const partialHtml = fs.readFileSync(__dirname +
+    '/../../../report/partials/table.html', 'utf8');
 
-describe('TableFormatter', () => {
+describe('Table partial generation', () => {
   after(() => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
@@ -45,8 +47,7 @@ describe('TableFormatter', () => {
   it('generates valid html output', () => {
     Handlebars.registerHelper(handlebarHelpers);
 
-    const formatter = TableFormatter.getFormatter('html');
-    const template = Handlebars.compile(formatter);
+    const template = Handlebars.compile(partialHtml);
     const output = template(extendedInfo).split('\n').join('');
     assert.ok(output.match('<table class="table_list'), 'creates a table');
     assert.ok(output.match('multicolumn'), 'adds multicolumn class for large tables');

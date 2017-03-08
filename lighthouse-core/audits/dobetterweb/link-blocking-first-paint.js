@@ -23,7 +23,7 @@
 
 const Audit = require('../audit');
 const URL = require('../../lib/url-shim');
-const Formatter = require('../../formatters/formatter');
+const Formatter = require('../../report/formatter');
 
 class LinkBlockingFirstPaintAudit extends Audit {
 
