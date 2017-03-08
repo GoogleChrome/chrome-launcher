@@ -21,8 +21,13 @@
 const AccessibilityFormatter = require('../../formatters/accessibility.js');
 const Handlebars = require('handlebars');
 const assert = require('assert');
+const handlebarHelpers = require('../../report/handlebar-helpers');
 
 describe('Formatter', () => {
+  after(() => {
+    Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
+  });
+
   it('handles invalid input', () => {
     const pretty = AccessibilityFormatter.getFormatter('pretty');
     assert.doesNotThrow(_ => pretty());
@@ -33,7 +38,7 @@ describe('Formatter', () => {
   });
 
   it('generates valid html output', () => {
-    Handlebars.registerHelper(AccessibilityFormatter.getHelpers());
+    Handlebars.registerHelper(handlebarHelpers);
 
     const formatter = AccessibilityFormatter.getFormatter('html');
     const template = Handlebars.compile(formatter);

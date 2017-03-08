@@ -55,7 +55,7 @@ describe('Formatters', () => {
   it.skip('has formatters that return valid HTML', () => {
     return walkTree.then(formatters => {
       formatters.forEach(formatter => {
-        Handlebars.registerHelper(formatter.getHelpers());
+        // Handlebars.registerHelper(formatter.getHelpers());
         const html = formatter.getFormatter('html');
         const template = Handlebars.compile(html);
         assert.ok(typeof html === 'string');

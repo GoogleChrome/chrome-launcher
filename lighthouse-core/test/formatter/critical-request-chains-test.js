@@ -22,59 +22,71 @@ const criticalRequestChainFormatter = require('../../formatters/critical-request
 const assert = require('assert');
 const Handlebars = require('handlebars');
 const log = require('../../lib/log');
+const handlebarHelpers = require('../../report/handlebar-helpers');
+
 const superLongName =
     'https://example.com/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWeWantToTest.js';
 const extendedInfo = {
-  0: {
-    request: {
-      endTime: 1,
-      responseReceivedTime: 5,
-      startTime: 0,
-      url: 'https://example.com/',
-      transferSize: 1
-    },
-    children: {
-      1: {
-        request: {
-          endTime: 16,
-          responseReceivedTime: 14,
-          startTime: 11,
-          url: 'https://example.com/b.js',
-          transferSize: 1
-        },
-        children: {}
+  chains: {
+    0: {
+      request: {
+        endTime: 1,
+        responseReceivedTime: 5,
+        startTime: 0,
+        url: 'https://example.com/',
+        transferSize: 1
       },
-      2: {
-        request: {
-          endTime: 17.123456789,
-          responseReceivedTime: 15,
-          startTime: 12,
-          url: superLongName,
-          transferSize: 1
+      children: {
+        1: {
+          request: {
+            endTime: 16,
+            responseReceivedTime: 14,
+            startTime: 11,
+            url: 'https://example.com/b.js',
+            transferSize: 1
+          },
+          children: {}
         },
-        children: {}
-      },
-      3: {
-        request: {
-          endTime: 18,
-          responseReceivedTime: 16,
-          startTime: 13,
-          url: 'about:blank',
-          transferSize: 1
+        2: {
+          request: {
+            endTime: 17.123456789,
+            responseReceivedTime: 15,
+            startTime: 12,
+            url: superLongName,
+            transferSize: 1
+          },
+          children: {}
         },
-        children: {}
+        3: {
+          request: {
+            endTime: 18,
+            responseReceivedTime: 16,
+            startTime: 13,
+            url: 'about:blank',
+            transferSize: 1
+          },
+          children: {}
+        }
       }
     }
+  },
+  longestChain: {
+    duration: 7000,
+    length: 2,
+    transferSize: 1
   }
 };
 
 describe('CRC Formatter', () => {
+  after(() => {
+    Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
+  });
+
   it('copes with invalid input', () => {
     const formatter = criticalRequestChainFormatter.getFormatter('pretty');
     assert.doesNotThrow(_ => {
       formatter();
       formatter(null);
-      formatter({});
     });
   });
 
@@ -99,7 +111,7 @@ describe('CRC Formatter', () => {
   });
 
   it('generates valid HTML output', () => {
-    Handlebars.registerHelper(criticalRequestChainFormatter.getHelpers());
+    Handlebars.registerHelper(handlebarHelpers);
     const formatter = criticalRequestChainFormatter.getFormatter('html');
     const template = Handlebars.compile(formatter);
     const output = template(extendedInfo).split('\n').join('');

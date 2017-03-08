@@ -119,14 +119,6 @@ class Table extends Formatter {
 
     return {headings, rows, headingKeys};
   }
-
-  static getHelpers() {
-    return {
-      createTable(headings, results, opts) {
-        return opts.fn(Table.createTable(headings, results));
-      }
-    };
-  }
 }
 
 module.exports = Table;

@@ -18,7 +18,6 @@
 
 /* global Intl */
 
-const Formatter = require('../formatters/formatter');
 const Handlebars = require('handlebars/runtime');
 const handlebarHelpers = require('./handlebar-helpers');
 const reportTemplate = require('./templates/report-templates');
@@ -146,11 +145,6 @@ class ReportGenerator {
       if (!audit.extendedInfo.formatter) {
         // HTML formatter not provided for this subItem
         return;
-      }
-      const formatter = Formatter.getByName(audit.extendedInfo.formatter);
-      const helpers = formatter.getHelpers();
-      if (helpers) {
-        Handlebars.registerHelper(helpers);
       }
 
       const partials = reportPartials.report.partials;

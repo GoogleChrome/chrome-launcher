@@ -41,12 +41,12 @@ class CriticalRequestChains extends Formatter {
             return '';
           }
 
-          const longestChain = CriticalRequestChains._getLongestChain(info).length;
+          const longestChain = info.longestChain.length;
           const longestDuration = CriticalRequestChains.formatNumber(
-              CriticalRequestChains._getLongestChain(info).duration);
+              info.longestChain.duration);
           const longestTransferSize = CriticalRequestChains.formatTransferSize(
-              CriticalRequestChains._getLongestChain(info).transferSize);
-          const urlTree = CriticalRequestChains._createURLTreeOutput(info);
+              info.longestChain.transferSize);
+          const urlTree = CriticalRequestChains._createURLTreeOutput(info.chains);
 
           const output = `    - Longest request chain: ${longestDuration}ms` +
           ` over ${longestChain} requests, totalling ${longestTransferSize}KB\n` +
@@ -62,58 +62,6 @@ class CriticalRequestChains extends Formatter {
       default:
         throw new Error('Unknown formatter type');
     }
-  }
-
-  static _traverse(tree, cb) {
-    function walk(node, depth, startTime, transferSize = 0) {
-      const children = Object.keys(node);
-      if (children.length === 0) {
-        return;
-      }
-      children.forEach(id => {
-        const child = node[id];
-        if (!startTime) {
-          startTime = child.request.startTime;
-        }
-
-        // Call the callback with the info for this child.
-        cb({
-          depth,
-          id,
-          node: child,
-          chainDuration: (child.request.endTime - startTime) * 1000,
-          chainTransferSize: (transferSize + child.request.transferSize)
-        });
-
-        // Carry on walking.
-        walk(child.children, depth + 1, startTime);
-      }, '');
-    }
-
-    walk(tree, 0);
-  }
-
-  /**
-   * Get stats about the longest initiator chain (as determined by time duration)
-   * @return {{duration: number, length: number, transferSize: number}}
-   */
-  static _getLongestChain(tree) {
-    const longest = {
-      duration: 0,
-      length: 0,
-      transferSize: 0
-    };
-    this._traverse(tree, opts => {
-      const duration = opts.chainDuration;
-      if (duration > longest.duration) {
-        longest.duration = duration;
-        longest.transferSize = opts.chainTransferSize;
-        longest.length = opts.depth;
-      }
-    });
-    // Always return the longest chain + 1 because the depth is zero indexed.
-    longest.length++;
-    return longest;
   }
 
   /**
@@ -191,91 +139,13 @@ class CriticalRequestChains extends Formatter {
     return (size / 1024).toLocaleString(undefined, {maximumFractionDigits: 2});
   }
 
-  static parseURL(resourceURL, opts) {
+  static parseURL(resourceURL) {
     const parsedURL = {
       file: URL.getDisplayName(resourceURL),
       hostname: new URL(resourceURL).hostname
     };
 
-    // If we get passed the opts parameter, this is Handlebars, so we
-    // need to return the object back via the opts.fn so it becomes the context.
-    if (opts) {
-      return opts.fn(parsedURL);
-    }
-
     return parsedURL;
-  }
-
-  static getHelpers() {
-    return {
-      longestChain(info) {
-        return CriticalRequestChains._getLongestChain(info).length;
-      },
-
-      longestDuration(info) {
-        return CriticalRequestChains._getLongestChain(info).duration;
-      },
-
-      longestChainTransferSize(info) {
-        return CriticalRequestChains._getLongestChain(info).transferSize;
-      },
-
-      chainDuration(startTime, endTime) {
-        return CriticalRequestChains.formatNumber((endTime - startTime) * 1000);
-      },
-
-      formatTransferSize: CriticalRequestChains.formatTransferSize,
-
-      parseURL: CriticalRequestChains.parseURL,
-
-      formatNumber: CriticalRequestChains.formatNumber,
-
-      /**
-       * Helper function for Handlebars that creates the context for each node
-       * based on its parent. Calculates if this node is the last child, whether
-       * it has any children itself and what the tree looks like all the way back
-       * up to the root, so the tree markers can be drawn correctly.
-       */
-      createContextFor(parent, id, treeMarkers, parentIsLastChild, startTime, transferSize, opts) {
-        const node = parent[id];
-        const siblings = Object.keys(parent);
-        const isLastChild = siblings.indexOf(id) === (siblings.length - 1);
-        const hasChildren = Object.keys(node.children).length > 0;
-
-        // Copy the tree markers so that we don't change by reference.
-        const newTreeMarkers = Array.isArray(treeMarkers) ? treeMarkers.slice(0) : [];
-
-        // Add on the new entry.
-        if (typeof parentIsLastChild !== 'undefined') {
-          newTreeMarkers.push(!parentIsLastChild);
-        }
-
-        return opts.fn({
-          node,
-          isLastChild,
-          hasChildren,
-          startTime,
-          transferSize: (transferSize + node.request.transferSize),
-          treeMarkers: newTreeMarkers
-        });
-      },
-
-      createTreeRenderContext(tree, opts) {
-        const transferSize = 0;
-        let startTime = 0;
-        const rootNodes = Object.keys(tree);
-
-        if (rootNodes.length > 0) {
-          startTime = tree[rootNodes[0]].request.startTime;
-        }
-
-        return opts.fn({
-          tree,
-          startTime,
-          transferSize
-        });
-      }
-    };
   }
 }
 

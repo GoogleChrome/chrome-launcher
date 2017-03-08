@@ -24,6 +24,10 @@ const handlebarHelpers = require('../../report/handlebar-helpers.js');
 const assert = require('assert');
 
 describe('TableFormatter', () => {
+  after(() => {
+    Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
+  });
+
   const extendedInfo = {
     tableHeadings: {
       url: 'URL', lineCol: 'Line/col', code: 'Snippet', isEval: 'Eval\'d?',
@@ -75,7 +79,6 @@ describe('TableFormatter', () => {
   it('generates valid html output', () => {
     new ReportGenerator(); // Registers the ifNotEq helper used by the html formatter.
     Handlebars.registerHelper(handlebarHelpers);
-    Handlebars.registerHelper(TableFormatter.getHelpers());
 
     const formatter = TableFormatter.getFormatter('html');
     const template = Handlebars.compile(formatter);

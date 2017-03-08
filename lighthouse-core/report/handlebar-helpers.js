@@ -20,6 +20,10 @@
 
 const Handlebars = require('handlebars/runtime');
 const marked = require('marked');
+const URL = require('../lib/url-shim');
+
+// TODO(bckenny): temp redirection from formatters
+const TableFormatter = require('../formatters/table');
 
 const RATINGS = {
   GOOD: {label: 'good', minScore: 75},
@@ -43,13 +47,13 @@ function calculateRating(value) {
 }
 
 /**
- * Figures out the total score for an aggregation
- * @param {{total: number}} aggregation
- * @return {number}
+ * Format number.
+ * @param {number} number
+ * @return {string}
  */
-const getTotalScore = function(aggregation) {
-  return Math.round(aggregation.total * 100);
-};
+function formatNumber(number) {
+  return number.toLocaleString(undefined, {maximumFractionDigits: 1});
+}
 
 /**
  * Converts a value to a rating string, which can be used inside the report for
@@ -62,6 +66,15 @@ const getItemRating = function(value) {
     return value ? RATINGS.GOOD.label : RATINGS.POOR.label;
   }
   return calculateRating(value);
+};
+
+/**
+ * Figures out the total score for an aggregation
+ * @param {{total: number}} aggregation
+ * @return {number}
+ */
+const getTotalScore = function(aggregation) {
+  return Math.round(aggregation.total * 100);
 };
 
 const handlebarHelpers = {
@@ -79,6 +92,89 @@ const handlebarHelpers = {
       }
     }
     return arg;
+  },
+
+  /**
+   * @param {number} startTime
+   * @param {number} endTime
+   * @return {string}
+   */
+  chainDuration(startTime, endTime) {
+    return formatNumber((endTime - startTime) * 1000);
+  },
+
+  /**
+   * Helper function for Handlebars that creates the context for each
+   * critical-request-chain node based on its parent. Calculates if this node is
+   * the last child, whether it has any children itself and what the tree looks
+   * like all the way back up to the root, so the tree markers can be drawn
+   * correctly.
+   */
+  createContextFor(parent, id, treeMarkers, parentIsLastChild, startTime, transferSize, opts) {
+    const node = parent[id];
+    const siblings = Object.keys(parent);
+    const isLastChild = siblings.indexOf(id) === (siblings.length - 1);
+    const hasChildren = Object.keys(node.children).length > 0;
+
+    // Copy the tree markers so that we don't change by reference.
+    const newTreeMarkers = Array.isArray(treeMarkers) ? treeMarkers.slice(0) : [];
+
+    // Add on the new entry.
+    if (typeof parentIsLastChild !== 'undefined') {
+      newTreeMarkers.push(!parentIsLastChild);
+    }
+
+    return opts.fn({
+      node,
+      isLastChild,
+      hasChildren,
+      startTime,
+      transferSize: (transferSize + node.request.transferSize),
+      treeMarkers: newTreeMarkers
+    });
+  },
+
+  /**
+   * Preps a formatted table (headings/col vals) for output.
+   * @param {!Object<string>} headings for the table. The order of this
+   *     object's key/value pairs determines the order of the HTML table headings.
+   *     There is special handling for certain keys:
+   *       preview {url: string, mimeType: string}: For image mimetypes, wraps
+   *           the value in a markdown image.
+   *       code: wraps the value in single ` for a markdown code snippet.
+   *       pre: wraps the value in triple ``` for a markdown code block.
+   *       lineCol: combines the values for the line and col keys into a single
+   *                value "line/col".
+   *       isEval: returns "yes" if the script was eval'd.
+   *       All other values are passed through as is.
+   * @param {!Array<!Object>} results Audit results.
+   * @param {{fn: function(*): string}} opts
+   * @return {{headings: !Array<string>, rows: !Array<{cols: !Array<*>}>}}
+   */
+  createTable(headings, results, opts) {
+    return opts.fn(TableFormatter.createTable(headings, results));
+  },
+
+  /**
+   * Create render context for critical-request-chain tree display.
+   * @param {!Object} tree
+   * @param {!Object} opts
+   * @return {string}
+   */
+  createTreeRenderContext(tree, opts) {
+    const transferSize = 0;
+    let startTime = 0;
+    const rootNodes = Object.keys(tree);
+
+    if (rootNodes.length > 0) {
+      startTime = tree[rootNodes[0]].request.startTime;
+    }
+
+    return opts.fn({
+      tree,
+      startTime,
+      transferSize
+    });
   },
 
   /**
@@ -114,6 +210,17 @@ const handlebarHelpers = {
       formatter = new Intl.DateTimeFormat('en-US', options);
     }
     return formatter.format(new Date(date));
+  },
+
+  formatNumber,
+
+  /**
+   * Format transfer size.
+   * @param {number} number
+   * @return {string}
+   */
+  formatTransferSize: size => {
+    return (size / 1024).toLocaleString(undefined, {maximumFractionDigits: 2});
   },
 
   /**
@@ -154,6 +261,14 @@ const handlebarHelpers = {
     const totalScore = getTotalScore(aggregation);
     return calculateRating(totalScore);
   },
+
+  /**
+   * a > b
+   * @param {number} a
+   * @param {number} b
+   * @return {boolean}
+   */
+  gt: (a, b) => a > b,
 
   /**
    * lhs === rhs
@@ -215,6 +330,30 @@ const handlebarHelpers = {
   },
 
   /**
+   * Returns the length of the longest initiator chain (as determined by time
+   * duration).
+   * @param {{longestChain: {length: number}}} info
+   * @return {number}
+   */
+  longestChain: info => info.longestChain.length,
+
+  /**
+   * Returns the duration of the longest initiator chain (as determined by time
+   * duration).
+   * @param {{longestChain: {duration: number}}} info
+   * @return {number}
+   */
+  longestDuration: info => info.longestChain.duration,
+
+  /**
+   * Returns the transfer size of the longest initiator chain (as determined by
+   * time duration).
+   * @param {{longestChain: {transferSize: number}}} info
+   * @return {number}
+   */
+  longestChainTransferSize: info => info.longestChain.transferSize,
+
+  /**
    * Converts a name to a link.
    * @param {string} name
    * @return {string}
@@ -229,6 +368,21 @@ const handlebarHelpers = {
    * @return {boolean}
    */
   not: value => !value,
+
+  /**
+   * Split the URL into a file and hostname for easy display.
+   * @param {string} resourceURL
+   * @param {!Object} opts
+   * @return {string}
+   */
+  parseURL: (resourceURL, opts) => {
+    const parsedURL = {
+      file: URL.getDisplayName(resourceURL),
+      hostname: new URL(resourceURL).hostname
+    };
+
+    return opts.fn(parsedURL);
+  },
 
   /**
    * Allow the report to inject HTML, but sanitize it first.

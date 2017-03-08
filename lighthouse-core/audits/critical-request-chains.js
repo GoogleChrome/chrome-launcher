@@ -40,6 +40,58 @@ class CriticalRequestChains extends Audit {
     };
   }
 
+  static _traverse(tree, cb) {
+    function walk(node, depth, startTime, transferSize = 0) {
+      const children = Object.keys(node);
+      if (children.length === 0) {
+        return;
+      }
+      children.forEach(id => {
+        const child = node[id];
+        if (!startTime) {
+          startTime = child.request.startTime;
+        }
+
+        // Call the callback with the info for this child.
+        cb({
+          depth,
+          id,
+          node: child,
+          chainDuration: (child.request.endTime - startTime) * 1000,
+          chainTransferSize: (transferSize + child.request.transferSize)
+        });
+
+        // Carry on walking.
+        walk(child.children, depth + 1, startTime);
+      }, '');
+    }
+
+    walk(tree, 0);
+  }
+
+  /**
+   * Get stats about the longest initiator chain (as determined by time duration)
+   * @return {{duration: number, length: number, transferSize: number}}
+   */
+  static _getLongestChain(tree) {
+    const longest = {
+      duration: 0,
+      length: 0,
+      transferSize: 0
+    };
+    CriticalRequestChains._traverse(tree, opts => {
+      const duration = opts.chainDuration;
+      if (duration > longest.duration) {
+        longest.duration = duration;
+        longest.transferSize = opts.chainTransferSize;
+        longest.length = opts.depth;
+      }
+    });
+    // Always return the longest chain + 1 because the depth is zero indexed.
+    longest.length++;
+    return longest;
+  }
+
   /**
    * Audits the page to give a score for First Meaningful Paint.
    * @param {!Artifacts} artifacts The artifacts from the gather phase.
@@ -77,7 +129,10 @@ class CriticalRequestChains extends Audit {
         optimalValue: this.meta.optimalValue,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
-          value: chains
+          value: {
+            chains,
+            longestChain: CriticalRequestChains._getLongestChain(chains)
+          }
         }
       });
     });

@@ -243,126 +243,133 @@
       "extendedInfo": {
         "formatter": "criticalRequestChains",
         "value": {
-          "62339.1": {
-            "request": {
-              "url": "http://localhost:8080/dbw_tester.html",
-              "startTime": 375525.905246,
-              "endTime": 375525.917734,
-              "responseReceivedTime": 375525.915263,
-              "transferSize": 10189
-            },
-            "children": {
-              "62339.4": {
-                "request": {
-                  "url": "http://localhost:10200/dobetterweb/dbw_tester.css",
-                  "startTime": 375525.926168,
-                  "endTime": 375525.933177,
-                  "responseReceivedTime": -1,
-                  "transferSize": 0
-                },
-                "children": {}
+          "chains": {
+            "62339.1": {
+              "request": {
+                "url": "http://localhost:8080/dbw_tester.html",
+                "startTime": 375525.905246,
+                "endTime": 375525.917734,
+                "responseReceivedTime": 375525.915263,
+                "transferSize": 10189
               },
-              "62339.2": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_tester.css?delay=true",
-                  "startTime": 375525.925625,
-                  "endTime": 375525.933737,
-                  "responseReceivedTime": 375525.932265,
-                  "transferSize": 984
+              "children": {
+                "62339.4": {
+                  "request": {
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css",
+                    "startTime": 375525.926168,
+                    "endTime": 375525.933177,
+                    "responseReceivedTime": -1,
+                    "transferSize": 0
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.3": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_tester.js",
-                  "startTime": 375525.926712,
-                  "endTime": 375525.935932,
-                  "responseReceivedTime": 375525.935188,
-                  "transferSize": 1749
+                "62339.2": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_tester.css?delay=true",
+                    "startTime": 375525.925625,
+                    "endTime": 375525.933737,
+                    "responseReceivedTime": 375525.932265,
+                    "transferSize": 984
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.6": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_tester.css",
-                  "startTime": 375525.927667,
-                  "endTime": 375525.936634,
-                  "responseReceivedTime": 375525.935497,
-                  "transferSize": 984
+                "62339.3": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_tester.js",
+                    "startTime": 375525.926712,
+                    "endTime": 375525.935932,
+                    "responseReceivedTime": 375525.935188,
+                    "transferSize": 1749
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.8": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_partial_a.html",
-                  "startTime": 375525.928213,
-                  "endTime": 375525.937276,
-                  "responseReceivedTime": 375525.936243,
-                  "transferSize": 920
+                "62339.6": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_tester.css",
+                    "startTime": 375525.927667,
+                    "endTime": 375525.936634,
+                    "responseReceivedTime": 375525.935497,
+                    "transferSize": 984
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.7": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_disabled.css",
-                  "startTime": 375525.927946,
-                  "endTime": 375525.938708,
-                  "responseReceivedTime": 375525.938255,
-                  "transferSize": 1273
+                "62339.8": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_partial_a.html",
+                    "startTime": 375525.928213,
+                    "endTime": 375525.937276,
+                    "responseReceivedTime": 375525.936243,
+                    "transferSize": 920
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.10": {
-                "request": {
-                  "url": "http://localhost:8080/zone.js",
-                  "startTime": 375525.928984,
-                  "endTime": 375525.943795,
-                  "responseReceivedTime": 375525.938834,
-                  "transferSize": 133
+                "62339.7": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_disabled.css",
+                    "startTime": 375525.927946,
+                    "endTime": 375525.938708,
+                    "responseReceivedTime": 375525.938255,
+                    "transferSize": 1273
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.9": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_partial_b.html",
-                  "startTime": 375525.928423,
-                  "endTime": 375525.939544,
-                  "responseReceivedTime": 375525.938926,
-                  "transferSize": 917
+                "62339.10": {
+                  "request": {
+                    "url": "http://localhost:8080/zone.js",
+                    "startTime": 375525.928984,
+                    "endTime": 375525.943795,
+                    "responseReceivedTime": 375525.938834,
+                    "transferSize": 133
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.5": {
-                "request": {
-                  "url": "https://unknown.invalid/styles.css?404",
-                  "startTime": 375525.926261,
-                  "endTime": 375526.007039,
-                  "responseReceivedTime": -1,
-                  "transferSize": 0
+                "62339.9": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_partial_b.html",
+                    "startTime": 375525.928423,
+                    "endTime": 375525.939544,
+                    "responseReceivedTime": 375525.938926,
+                    "transferSize": 917
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.20": {
-                "request": {
-                  "url": "http://localhost:8080/dbw_tester.css?scriptActivated",
-                  "startTime": 375526.040491,
-                  "endTime": 375526.044114,
-                  "responseReceivedTime": 375526.04342,
-                  "transferSize": 984
+                "62339.5": {
+                  "request": {
+                    "url": "https://unknown.invalid/styles.css?404",
+                    "startTime": 375525.926261,
+                    "endTime": 375526.007039,
+                    "responseReceivedTime": -1,
+                    "transferSize": 0
+                  },
+                  "children": {}
                 },
-                "children": {}
-              },
-              "62339.22": {
-                "request": {
-                  "url": "http://localhost:8080/zone.js",
-                  "startTime": 375526.067101,
-                  "endTime": 375526.102578,
-                  "responseReceivedTime": 375526.068399,
-                  "transferSize": 133
+                "62339.20": {
+                  "request": {
+                    "url": "http://localhost:8080/dbw_tester.css?scriptActivated",
+                    "startTime": 375526.040491,
+                    "endTime": 375526.044114,
+                    "responseReceivedTime": 375526.04342,
+                    "transferSize": 984
+                  },
+                  "children": {}
                 },
-                "children": {}
+                "62339.22": {
+                  "request": {
+                    "url": "http://localhost:8080/zone.js",
+                    "startTime": 375526.067101,
+                    "endTime": 375526.102578,
+                    "responseReceivedTime": 375526.068399,
+                    "transferSize": 133
+                  },
+                  "children": {}
+                }
               }
             }
+          },
+          "longestChain": {
+            "duration": 197.33200001064688,
+            "length": 2,
+            "transferSize": 133
           }
         }
       },

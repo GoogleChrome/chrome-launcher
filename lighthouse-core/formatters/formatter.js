@@ -76,11 +76,6 @@ class Formatter {
   static getFormatter() {
     throw new Error('Formatter must implement getPrettyFormatter()');
   }
-
-  /**
-   * Optional function to get any Handlebars helpers this formatter expects to need.
-   */
-  static getHelpers() {}
 }
 
 module.exports = Formatter;
