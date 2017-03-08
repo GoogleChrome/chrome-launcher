@@ -70,7 +70,7 @@ class Deprecations extends Audit {
       rawValue: deprecations.length === 0,
       displayValue,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
+        formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: deprecations
       }
     });

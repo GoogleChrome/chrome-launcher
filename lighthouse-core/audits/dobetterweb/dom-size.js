@@ -111,7 +111,7 @@ class DOMSize extends Audit {
       score: Math.round(score),
       displayValue: `${stats.totalDOMNodes.toLocaleString()} nodes`,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.CARD,
+        formatter: Formatter.SUPPORTED_FORMATS.CARDS,
         value: cards
       }
     });

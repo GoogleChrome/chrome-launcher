@@ -474,7 +474,7 @@
       "displayValue": "4 warnings found",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
+        "formatter": "urlList",
         "value": [
           {
             "label": "line: 45",
@@ -911,7 +911,7 @@
       "rawValue": 33,
       "optimalValue": "1,500 nodes",
       "extendedInfo": {
-        "formatter": "card",
+        "formatter": "cards",
         "value": [
           {
             "title": "Total DOM Nodes",
@@ -942,7 +942,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
+        "formatter": "urlList",
         "value": [
           {
             "url": "<a href=\"https://www.google.com/\" target=\"_blank\">"
@@ -962,7 +962,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
+        "formatter": "urlList",
         "value": [
           {
             "label": "line: 252, col: 25",
@@ -1156,7 +1156,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
+        "formatter": "urlList",
         "value": [
           {
             "label": "line: 153, col: 12",
@@ -1347,7 +1347,7 @@
       "displayValue": "",
       "rawValue": false,
       "extendedInfo": {
-        "formatter": "urllist",
+        "formatter": "urlList",
         "value": [
           {
             "label": "line: 262, col: 16",

@@ -55,7 +55,7 @@ class NotificationOnStart extends Audit {
     return NotificationOnStart.generateAuditResult({
       rawValue: results.length === 0,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URLLIST,
+        formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: results
       }
     });
