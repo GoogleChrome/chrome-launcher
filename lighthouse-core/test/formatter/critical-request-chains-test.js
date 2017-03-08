@@ -21,7 +21,7 @@
 const criticalRequestChainFormatter = require('../../formatters/critical-request-chains.js');
 const assert = require('assert');
 const Handlebars = require('handlebars');
-const log = require('../../lib/log');
+const URL = require('../../lib/url-shim');
 const handlebarHelpers = require('../../report/handlebar-helpers');
 
 const superLongName =
@@ -82,41 +82,13 @@ describe('CRC Formatter', () => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
 
-  it('copes with invalid input', () => {
-    const formatter = criticalRequestChainFormatter.getFormatter('pretty');
-    assert.doesNotThrow(_ => {
-      formatter();
-      formatter(null);
-    });
-  });
-
-  it('generates valid pretty output', () => {
-    const formatter = criticalRequestChainFormatter.getFormatter('pretty');
-    const output = formatter(extendedInfo);
-    const truncatedURL = criticalRequestChainFormatter.parseURL(superLongName);
-    const truncatedURLRegExp = new RegExp(truncatedURL.file, 'im');
-    const testString = new RegExp(log.heavyUpAndRight +
-                                  log.heavyHorizontal +
-                                  log.heavyDownAndHorizontal +
-                                  ' \\/ \\(example.com\\)', 'im');
-    assert.ok(testString.test(output));
-    const testString2 = new RegExp(log.heavyVerticalAndRight +
-                                   log.heavyHorizontal +
-                                   log.heavyHorizontal +
-                                   ' \\/b.js \\(example.com\\) - 5,000ms', 'im');
-    assert.ok(output.includes('6,123.5ms'), 'Millisecond values are not formatted as expected');
-    assert.ok(testString2.test(output));
-    assert.ok(truncatedURLRegExp.test(output));
-    assert.ok(/about:blank/.test(output));
-  });
-
   it('generates valid HTML output', () => {
     Handlebars.registerHelper(handlebarHelpers);
     const formatter = criticalRequestChainFormatter.getFormatter('html');
     const template = Handlebars.compile(formatter);
     const output = template(extendedInfo).split('\n').join('');
-    const truncatedURL = criticalRequestChainFormatter.parseURL(superLongName);
-    const truncatedURLRegExp = new RegExp(truncatedURL.file, 'im');
+    const filename = URL.getDisplayName(superLongName);
+    const filenameRegExp = new RegExp(filename, 'im');
     const expectedTreeOne = new RegExp([
       '<div class="cnc-node" title="https://example.com/">',
       '<span class="cnc-node__tree-marker">',
@@ -154,6 +126,6 @@ describe('CRC Formatter', () => {
     const expectedTreeThree = new RegExp(`<div class="cnc-node" title="${superLongName}">`);
 
     assert.ok(expectedTreeThree.test(output));
-    assert.ok(truncatedURLRegExp.test(output));
+    assert.ok(filenameRegExp.test(output));
   });
 });

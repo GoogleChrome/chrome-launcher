@@ -25,18 +25,6 @@ const html = fs.readFileSync(path.join(__dirname, 'partials/cards.html'), 'utf8'
 class Card extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return result => {
-          if (!result || !Array.isArray(result)) {
-            return '';
-          }
-          let output = '';
-          result.forEach(item => {
-            output += `    - ${item.title}: ${item.value}\n`;
-          });
-          return output;
-        };
-
       case 'html':
         // Returns a handlebars string to be used by the Report.
         return html;

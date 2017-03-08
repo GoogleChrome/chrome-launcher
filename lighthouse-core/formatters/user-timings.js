@@ -25,24 +25,6 @@ const html = fs.readFileSync(path.join(__dirname, 'partials/user-timings.html'),
 class UserTimings extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return events => {
-          if (!Array.isArray(events)) {
-            return '';
-          }
-
-          const measuresStr = events.filter(e => !e.isMark).reduce((prev, event) => {
-            let output = prev + `    - measure ${event.name}: \t`;
-            output += `duration: ${event.duration.toFixed(1)}ms,\t`;
-            output += `start: ${event.startTime.toFixed(1)}ms,\tend: ${event.endTime.toFixed(1)}`;
-            return output + '\n';
-          }, '');
-          const marksStr = events.filter(e => e.isMark).reduce((prev, event) => {
-            return prev + `    - mark ${event.name}: \t time: ${event.startTime.toFixed(1)}ms\n`;
-          }, '');
-          return measuresStr + marksStr;
-        };
-
       case 'html':
         // Returns a handlebars string to be used by the Report.
         return html;

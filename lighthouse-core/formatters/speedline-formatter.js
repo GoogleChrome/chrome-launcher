@@ -24,18 +24,6 @@ const html = fs.readFileSync(path.join(__dirname, 'partials/speedline.html'), 'u
 class SpeedlineFormatter extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return function(info) {
-          if (!info || !info.timings) {
-            return '';
-          }
-
-          const output = `    - First Visual Change: ${info.timings.firstVisualChange}ms\n` +
-          `    - Last Visual Change: ${info.timings.visuallyComplete}ms\n`;
-
-          return output;
-        };
-
       case 'html':
         // Returns a handlebars string to be used by the Report.
         return html;

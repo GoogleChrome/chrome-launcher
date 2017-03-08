@@ -28,15 +28,6 @@ describe('Formatter', () => {
     Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
 
-  it('handles invalid input', () => {
-    const pretty = AccessibilityFormatter.getFormatter('pretty');
-    assert.doesNotThrow(_ => pretty());
-    assert.doesNotThrow(_ => pretty({}));
-    assert.doesNotThrow(_ => pretty({impact: ''}));
-    assert.doesNotThrow(_ => pretty({impact: '', helpUrl: ''}));
-    assert.doesNotThrow(_ => pretty({impact: '', helpUrl: '', nodes: []}));
-  });
-
   it('generates valid html output', () => {
     Handlebars.registerHelper(handlebarHelpers);
 

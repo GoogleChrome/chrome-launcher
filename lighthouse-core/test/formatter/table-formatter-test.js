@@ -19,7 +19,6 @@
 
 const TableFormatter = require('../../formatters/table.js');
 const Handlebars = require('handlebars');
-const ReportGenerator = require('../../report/report-generator.js');
 const handlebarHelpers = require('../../report/handlebar-helpers.js');
 const assert = require('assert');
 
@@ -43,41 +42,7 @@ describe('TableFormatter', () => {
     }]
   };
 
-  it('handles invalid input', () => {
-    const pretty = TableFormatter.getFormatter('pretty');
-    assert.equal(pretty(), '');
-    assert.equal(pretty(null), '');
-    assert.equal(pretty({}), '');
-    assert.equal(pretty({results: 'blah'}), '');
-  });
-
-  it('createTable() produces formatted rows/cols', () => {
-    const table = TableFormatter.createTable(extendedInfo.tableHeadings, extendedInfo.results);
-    const headings = extendedInfo.tableHeadings;
-    assert.deepEqual(table.headings, Object.keys(headings).map(key => headings[key]));
-    assert.equal(table.rows.length, 1);
-    assert.equal(table.rows[0].cols.length, Object.keys(headings).length);
-    assert.equal(table.rows[0].cols[0], 'http://example.com');
-    assert.equal(table.rows[0].cols[1], '123:456');
-    assert.equal(table.rows[0].cols[2], '\`code snippet\`');
-    assert.equal(table.rows[0].cols[3], 'yes');
-    assert.equal(table.rows[0].cols[4], '\`\`\`\npre snippet\`\`\`');
-    const expectedUrl = 'http://example.com/(format:webp%29/i.jpg';
-    assert.equal(table.rows[0].cols[5],
-        `[![Image preview](${expectedUrl} "Image preview")](${expectedUrl})`);
-  });
-
-  it('generates valid pretty output', () => {
-    const pretty = TableFormatter.getFormatter('pretty');
-    const output = pretty(extendedInfo);
-    assert.ok(output.includes(
-        '      URL LINE/COL SNIPPET EVAL\'D? CODE PREVIEW\n'), 'prints table headings');
-    assert.ok(output.includes(
-        '      http://example.com 123:456 - yes - - \n'), 'prints cells');
-  });
-
   it('generates valid html output', () => {
-    new ReportGenerator(); // Registers the ifNotEq helper used by the html formatter.
     Handlebars.registerHelper(handlebarHelpers);
 
     const formatter = TableFormatter.getFormatter('html');
@@ -96,37 +61,5 @@ describe('TableFormatter', () => {
     assert.ok(!output2.match('multicolumn"'), 'does not add multicolumn class for small tables');
     assert.ok(!output2.match('table-column-preview'),
                              'does not add preview-image class if table does not have images');
-  });
-
-  it('handles missing values', () => {
-    const pretty = TableFormatter.getFormatter('pretty');
-    assert.equal(pretty({
-      tableHeadings: {name: 'Name', value: 'Value'},
-      results: [
-        {name: 'thing1', value: 'foo'},
-        {name: 'thing2'},
-        {value: 'bar'},
-      ]
-    }), [
-      '      NAME VALUE\n',
-      '      thing1 foo \n',
-      '      thing2 -- \n',
-      '      -- bar \n',
-    ].join(''));
-  });
-
-  it('handles non-string values', () => {
-    const pretty = TableFormatter.getFormatter('pretty');
-    assert.equal(pretty({
-      tableHeadings: {name: 'Name', value: 'Value'},
-      results: [
-        {name: 'thing1', value: 5},
-        {name: 'thing2', value: false},
-      ]
-    }), [
-      '      NAME VALUE\n',
-      '      thing1 5 \n',
-      '      thing2 false \n',
-    ].join(''));
   });
 });

@@ -20,9 +20,7 @@ const assert = require('assert');
 
 /* eslint-env mocha */
 
-// Most of the functionality is tested via the Formatter tests, but in this
-// particular case, we need to test the functionality that would be branched for
-// the extension, which is relatively minor stuff.
+// Most of the functionality is tested via the Formatter tests.
 describe('Handlebar helpers', () => {
   it('`nameToLink` works properly', () => {
     const text = handlebarHelpers.nameToLink('href="#Progressive-wEb-app"');
@@ -49,5 +47,40 @@ describe('Handlebar helpers', () => {
     assert.equal(handlebarHelpers.getAggregationScoreRating(0.95), 'good');
     assert.equal(handlebarHelpers.getAggregationScoreRating(0.50), 'average');
     assert.equal(handlebarHelpers.getAggregationScoreRating(0.10), 'poor');
+  });
+
+  it('createTable() produces formatted rows/cols', () => {
+    const extendedInfo = {
+      tableHeadings: {
+        url: 'URL', lineCol: 'Line/col', code: 'Snippet', isEval: 'Eval\'d?',
+        pre: 'Code', preview: 'Preview'},
+      results: [{
+        url: 'http://example.com',
+        line: 123,
+        col: 456,
+        code: 'code snippet',
+        isEval: true,
+        pre: 'pre snippet',
+        preview: {url: 'http://example.com/(format:webp)/i.jpg', mimeType: 'image/jpeg'}
+      }]
+    };
+    const options = {
+      fn: val => val
+    };
+
+    const table = handlebarHelpers.createTable(extendedInfo.tableHeadings, extendedInfo.results,
+        options);
+    const headings = extendedInfo.tableHeadings;
+    assert.deepEqual(table.headings, Object.keys(headings).map(key => headings[key]));
+    assert.equal(table.rows.length, 1);
+    assert.equal(table.rows[0].cols.length, Object.keys(headings).length);
+    assert.equal(table.rows[0].cols[0], 'http://example.com');
+    assert.equal(table.rows[0].cols[1], '123:456');
+    assert.equal(table.rows[0].cols[2], '\`code snippet\`');
+    assert.equal(table.rows[0].cols[3], 'yes');
+    assert.equal(table.rows[0].cols[4], '\`\`\`\npre snippet\`\`\`');
+    const expectedUrl = 'http://example.com/(format:webp%29/i.jpg';
+    assert.equal(table.rows[0].cols[5],
+        `[![Image preview](${expectedUrl} "Image preview")](${expectedUrl})`);
   });
 });

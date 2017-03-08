@@ -25,23 +25,6 @@ const html = fs.readFileSync(path.join(__dirname, 'partials/accessibility.html')
 class Accessibilty extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return function(info) {
-          if (info === null ||
-              typeof info === 'undefined' ||
-              typeof info.impact === 'undefined' ||
-              typeof info.helpUrl === 'undefined' ||
-              typeof info.nodes === 'undefined' ||
-              !Array.isArray(info.nodes)) {
-            return '';
-          }
-
-          const output = `      - Rating: ${info.impact}\n` +
-          `      - See: ${info.helpUrl}\n` +
-          `      - Nodes: ${info.nodes.length} nodes identified (see HTML output for details)\n`;
-          return output;
-        };
-
       case 'html':
         // Returns a handlebars string to be used by the Report.
         return html;

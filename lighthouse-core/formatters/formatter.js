@@ -74,7 +74,7 @@ class Formatter {
   }
 
   static getFormatter() {
-    throw new Error('Formatter must implement getPrettyFormatter()');
+    throw new Error('Formatter must implement getFormatter()');
   }
 }
 

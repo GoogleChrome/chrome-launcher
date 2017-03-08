@@ -22,10 +22,13 @@ const assert = require('assert');
 const walk = require('walk');
 const path = require('path');
 const Handlebars = require('handlebars');
+const handlebarHelpers = require('../../report/handlebar-helpers');
 
 const walkTree = new Promise((resolve, reject) => {
   const fullFilePath = path.join(__dirname, '../../formatters/');
-  const walker = walk.walk(fullFilePath);
+  const walker = walk.walk(fullFilePath, {
+    filters: ['partials']
+  });
   const formatters = [];
 
   walker.on('file', (root, fileStats, next) => {
@@ -43,51 +46,14 @@ const walkTree = new Promise((resolve, reject) => {
 });
 
 describe('Formatters', () => {
-  // TODO : Remove these tests and add appropriate tests based on handlebar pre-compiled templates
-  it.skip('has no formatters failing when getFormatter("html") is called', () => {
-    return walkTree.then(formatters => {
-      formatters.forEach(formatter => {
-        assert.doesNotThrow(_ => formatter.getFormatter('html'));
-      });
-    });
+  after(() => {
+    Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
   });
 
-  it.skip('has formatters that return valid HTML', () => {
+  it('has no formatters failing when getFormatter("html") is called', () => {
     return walkTree.then(formatters => {
       formatters.forEach(formatter => {
-        // Handlebars.registerHelper(formatter.getHelpers());
-        const html = formatter.getFormatter('html');
-        const template = Handlebars.compile(html);
-        assert.ok(typeof html === 'string');
-        assert.doesNotThrow(_ => template({}));
-      });
-    });
-  });
-
-  it.skip('has no formatters failing when getFormatter("pretty") is called', () => {
-    return walkTree.then(formatters => {
-      formatters.forEach(formatter => {
-        assert.doesNotThrow(_ => formatter.getFormatter('pretty'));
-      });
-    });
-  });
-
-  it.skip('has formatters that return a function for pretty printing', () => {
-    return walkTree.then(formatters => {
-      formatters.forEach(formatter => {
-        const pretty = formatter.getFormatter('pretty');
-        assert.ok(typeof pretty === 'function');
-      });
-    });
-  });
-
-  it.skip('has formatters that cope with empty or invalid input', () => {
-    return walkTree.then(formatters => {
-      formatters.forEach(formatter => {
-        const pretty = formatter.getFormatter('pretty');
-        assert.ok(typeof pretty() === 'string');
-        assert.ok(typeof pretty(null) === 'string');
-        assert.ok(typeof pretty({}) === 'string');
+        assert.doesNotThrow(_ => formatter.getFormatter('html'), 'bad: ' + formatter.name);
       });
     });
   });

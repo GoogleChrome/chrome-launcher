@@ -22,9 +22,6 @@ const Formatter = require('./formatter');
 class NullFormatter extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return _ => '';
-
       case 'html':
         return '';
 

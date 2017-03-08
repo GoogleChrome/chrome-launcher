@@ -44,8 +44,8 @@
 {{/inline}}
 
 <ul class="subitem__details">
-  <li class="subitem__detail">Longest chain: <strong>{{formatNumber (longestDuration this)}}ms</strong>
-   over <strong>{{longestChain this}}</strong> requests, totalling <strong>{{formatTransferSize (longestChainTransferSize this)}}KB</strong></li>
+  <li class="subitem__detail">Longest chain: <strong>{{formatNumber this.longestChain.duration}}ms</strong>
+   over <strong>{{this.longestChain.length}}</strong> requests, totalling <strong>{{formatTransferSize this.longestChain.transferSize}}KB</strong></li>
   <li class="subitem__detail">
     <details>
       <summary>View critical network waterfall</summary>

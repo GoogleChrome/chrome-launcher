@@ -25,23 +25,6 @@ const html = fs.readFileSync(path.join(__dirname, 'partials/url-list.html'), 'ut
 class UrlList extends Formatter {
   static getFormatter(type) {
     switch (type) {
-      case 'pretty':
-        return resources => {
-          if (!Array.isArray(resources)) {
-            return '';
-          }
-
-          let output = '';
-          resources.forEach(resource => {
-            output += `      ${resource.url}`;
-            if (resource.label) {
-              output += ` (${resource.label})`;
-            }
-            output += '\n';
-          });
-          return output;
-        };
-
       case 'html':
         // Returns a handlebars string to be used by the Report.
         return html;

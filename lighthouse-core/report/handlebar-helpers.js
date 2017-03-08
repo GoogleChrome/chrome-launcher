@@ -22,9 +22,6 @@ const Handlebars = require('handlebars/runtime');
 const marked = require('marked');
 const URL = require('../lib/url-shim');
 
-// TODO(bckenny): temp redirection from formatters
-const TableFormatter = require('../formatters/table');
-
 const RATINGS = {
   GOOD: {label: 'good', minScore: 75},
   AVERAGE: {label: 'average', minScore: 45},
@@ -152,7 +149,44 @@ const handlebarHelpers = {
    * @return {{headings: !Array<string>, rows: !Array<{cols: !Array<*>}>}}
    */
   createTable(headings, results, opts) {
-    return opts.fn(TableFormatter.createTable(headings, results));
+    const headingKeys = Object.keys(headings);
+
+    const rows = results.map(result => {
+      const cols = headingKeys.map(key => {
+        let value = result[key];
+        if (typeof value === 'undefined') {
+          value = '--';
+        }
+
+        switch (key) {
+          case 'preview':
+            if (/^image/.test(value.mimeType)) {
+              // Markdown can't handle URLs with parentheses which aren't automatically encoded
+              const encodedUrl = value.url.replace(/\)/g, '%29');
+              return `[![Image preview](${encodedUrl} "Image preview")](${encodedUrl})`;
+            }
+            return '';
+          case 'code':
+            return '`' + value.trim() + '`';
+          case 'pre':
+            return '\`\`\`\n' + result[key].trim() + '\`\`\`';
+          case 'lineCol':
+            return `${result.line}:${result.col}`;
+          case 'isEval':
+            return value ? 'yes' : '';
+          default:
+            return String(value);
+        }
+      });
+
+      return {cols};
+    });
+
+    headings = headingKeys.map(key => headings[key]);
+
+    const table = {headings, rows, headingKeys};
+
+    return opts.fn(table);
   },
 
   /**
@@ -328,30 +362,6 @@ const handlebarHelpers = {
       // remove leading or trailing hyphens
       .replace(/(^-|-$)/g, '');
   },
-
-  /**
-   * Returns the length of the longest initiator chain (as determined by time
-   * duration).
-   * @param {{longestChain: {length: number}}} info
-   * @return {number}
-   */
-  longestChain: info => info.longestChain.length,
-
-  /**
-   * Returns the duration of the longest initiator chain (as determined by time
-   * duration).
-   * @param {{longestChain: {duration: number}}} info
-   * @return {number}
-   */
-  longestDuration: info => info.longestChain.duration,
-
-  /**
-   * Returns the transfer size of the longest initiator chain (as determined by
-   * time duration).
-   * @param {{longestChain: {transferSize: number}}} info
-   * @return {number}
-   */
-  longestChainTransferSize: info => info.longestChain.transferSize,
 
   /**
    * Converts a name to a link.

@@ -18,7 +18,9 @@
 /* eslint-env mocha */
 
 const SpeedlineFormatter = require('../../formatters/speedline-formatter.js');
+const Handlebars = require('handlebars');
 const assert = require('assert');
+const handlebarHelpers = require('../../report/handlebar-helpers');
 
 const mockExtendedInfo = {
   timings: {
@@ -37,9 +39,17 @@ const mockExtendedInfo = {
 };
 
 describe('Formatter', () => {
-  it('handles valid input', () => {
-    const pretty = SpeedlineFormatter.getFormatter('pretty');
-    const formatted = pretty(mockExtendedInfo);
+  after(() => {
+    Object.keys(handlebarHelpers).forEach(Handlebars.unregisterHelper, Handlebars);
+  });
+
+  it('generates valid html output', () => {
+    Handlebars.registerHelper(handlebarHelpers);
+
+    const formatter = SpeedlineFormatter.getFormatter('html');
+    const template = Handlebars.compile(formatter);
+    const formatted = template(mockExtendedInfo).split('\n').join('');
+
     assert.equal(typeof formatted, 'string');
     assert.ok(formatted.length > 0);
     assert.ok(formatted.includes('100ms'), 'first visual change isnt printed');
