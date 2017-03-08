@@ -5,18 +5,21 @@
 
   "compilerOptions": {
     "target": "ES6",
-    "outDir": "./dist",
+    "noEmit": true,
     "diagnostics": true
   },
   "exclude": [
-    "**/node_modules",
-    "**/third_party",
-    "**/dist",
-
-    "lighthouse-core/closure",
-
-    "lighthouse-extension",
     "lighthouse-cli",
-    "lighthouse-viewer"
+    "node_modules",
+    "coverage",
+
+    "**/node_modules/*",
+    "**/third_party/*",
+    "**/dist/*",
+    "**/app/scripts/*",
+
+
+    "lighthouse-core/report/templates/*.js",
+    "lighthouse-core/closure"
   ]
 }
