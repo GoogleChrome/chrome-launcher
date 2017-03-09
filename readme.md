@@ -208,9 +208,11 @@ right corner and signing in to GitHub.
 
 ## Related Projects
 
-* [webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin)
-* [lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example)
-* [pwmetrics](https://github.com/paulirish/pwmetrics/)
+* [webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin) -  run Lighthouse from a Webpack build.
+* [lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example) -  gathers performance metrics via Lighthouse and tests them in Mocha
+* [pwmetrics](https://github.com/paulirish/pwmetrics/) - gather performance metrics 
+* [lighthouse-hue](https://github.com/ebidel/lighthouse-hue) - Lighthouse score setting the color of Philips Hue lights
+* [lighthouse-batch](https://www.npmjs.com/package/lighthouse-batch) - Run Lighthouse over a number of sites in sequence and generating a summary report including all of their scores.
 
 ## Develop
 
