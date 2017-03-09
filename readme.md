@@ -132,7 +132,7 @@ $ lighthouse --disable-device-emulation --disable-cpu-throttling https://mysite.
 
 ## Using programmatically
 
-The exampl below shows how to setup and run Lighthouse programmatically as a Node module. It
+The example below shows how to setup and run Lighthouse programmatically as a Node module. It
 assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`).
 
 ```javascript
