@@ -95,6 +95,11 @@ function enableNexus5X(driver) {
 
   return Promise.all([
     driver.sendCommand('Emulation.setDeviceMetricsOverride', NEXUS5X_EMULATION_METRICS),
+    // required for screenshotting emulated page size, rather than full size
+    driver.sendCommand('Emulation.setVisibleSize', {
+      width: NEXUS5X_EMULATION_METRICS.screenWidth,
+      height: NEXUS5X_EMULATION_METRICS.screenHeight
+    }),
     // Network.enable must be called for UA overriding to work
     driver.sendCommand('Network.enable'),
     driver.sendCommand('Network.setUserAgentOverride', NEXUS5X_USERAGENT),

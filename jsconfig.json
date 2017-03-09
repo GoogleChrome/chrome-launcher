@@ -18,7 +18,6 @@
     "**/dist/*",
     "**/app/scripts/*",
 
-
     "lighthouse-core/report/templates/*.js",
     "lighthouse-core/closure"
   ]
