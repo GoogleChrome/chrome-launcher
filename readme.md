@@ -206,6 +206,12 @@ right corner and signing in to GitHub.
 
 > **Note**: shared reports are stashed as a secret Gist in GitHub, under your account.
 
+## Related Projects
+
+* [webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin)
+* [lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example)
+* [pwmetrics](https://github.com/paulirish/pwmetrics/)
+
 ## Develop
 
 ### Setup
