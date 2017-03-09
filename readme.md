@@ -4,7 +4,7 @@
 
 **Lighthouse requires Chrome 56 or later.**
 
-## Instalalation
+## Installation
 
 ### Chrome extension
 
