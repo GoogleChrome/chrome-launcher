@@ -39,6 +39,7 @@ span, div, p, section, header, h1, h2, li, ul {
   --body-line-height: 20px;
   --subitem-font-size: 14px;
   --subitem-line-height: 20px;
+  --subitem-overall-icon-size: 14px;
   --subheading-font-size: 16px;
   --subheading-line-height: 24px;
   --subheading-color: inherit;
@@ -50,6 +51,11 @@ span, div, p, section, header, h1, h2, li, ul {
   --report-width: 1280px;
   --report-menu-width: 280px;
   --report-header-height: 58px;
+  --report-header-bg-color: #fafafa;
+  --report-border-color: #ebebeb;
+
+  --aggregation-padding: calc(var(--heading-line-height) + var(--gutter-width) + var(--gutter-gap));
+  --aggregation-icon-size: 20px;
 }
 
 :root[data-report-context="devtools"] {
@@ -120,7 +126,6 @@ summary {
   margin: 0 auto;
   max-width: var(--report-width);
   background-color: #fff;
-  box-shadow: 0 0 6px 0 rgba(0,0,0,0.26);
 }
 
 .report-body__icon {
@@ -290,7 +295,7 @@ summary {
 .menu__report-tab {
   padding: 3px 13px;
   color: #777;
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--report-border-color);
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -327,7 +332,7 @@ summary {
 .menu__nav-item {
   height: 40px;
   line-height: 40px;
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--report-border-color);
 }
 
 .menu__link {
@@ -406,14 +411,14 @@ summary {
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid var(--report-border-color);
   padding-right: 14px;
   position: fixed;
   width: calc(100vw - var(--report-menu-width));
   max-width: calc( var(--report-width) - var(--report-menu-width));
   z-index: 1;
   will-change: transform;
-  background-color: #fafafa;
+  background-color: var(--report-header-bg-color);
 }
 
 .report-body__more-toggle {
@@ -447,7 +452,7 @@ summary {
   opacity: 0;
   visibility: hidden;
   transition: all 200ms cubic-bezier(0,0,0.2,1);
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid var(--report-border-color);
 }
 
 .report-body__header-container.expanded .report-body__header-content {
@@ -460,7 +465,7 @@ summary {
   padding: 15px 0 15px 0;
 }
 
-.report-body__header-content .config-section__title {
+.config-section__title {
   font-size: var(--subheading-font-size);
   font-weight: 400;
   line-height: var(--subheading-line-height);
@@ -622,12 +627,87 @@ summary {
 .footer {
   margin-top: 40px;
   margin-left: var(--report-menu-width);
-  height: 130px;
-  line-height: 90px;
-  text-align: center;
   font-size: 12px;
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid var(--report-border-color);
   color: #767676;
+  background-color: var(--report-header-bg-color);
+  border-top: 1px solid var(--report-border-color);
+}
+
+.footer__key-description {
+  padding-left: calc(var(--subitem-indent) / 2);
+}
+
+.footer__legend {
+  padding: var(--heading-line-height) var(--aggregation-padding);
+  padding-bottom: 0;
+}
+
+.footer__legend .config-section__title {
+  margin: 0 0 calc(var(--subitem-indent) / 2) 0;
+}
+
+.footer__legend h2.config-section__title {
+  text-transform: uppercase;
+}
+
+.legend_panel {
+  border: 1px solid var(--report-border-color);
+  border-radius: 2px;
+  padding: var(--subitem-indent);
+  background: #fff;
+}
+
+.legend_columns {
+  display: flex;
+  justify-content: space-between;
+}
+
+.legend_columns.single-line {
+  padding-bottom: var(--subitem-indent);
+}
+
+.legend_columns.single-line .legend_column {
+  display: flex;
+  justify-content: space-between;
+}
+
+.legend_categories {
+  width: 100%;
+}
+
+@media screen and (max-width: 900px) {
+  .legend_columns {
+    display: block;
+  }
+  .legend_columns.single-line .legend_column {
+    display: block;
+  }
+}
+
+.legend_column span[class*="subitem-result__"] {
+  flex-shrink: 0;
+}
+
+.legend_categories .aggregation__header__score {
+  height: var(--aggregation-icon-size);
+  width: var(--aggregation-icon-size);
+  flex-shrink: 0;
+}
+
+.legend_categories .aggregation__header__score::after {
+  background-size: var(--subitem-overall-icon-size);
+}
+
+.footer__legend li {
+  padding: calc(var(--subitem-indent) / 2) 0;
+  display: flex;
+  align-items: center;
+}
+
+.footer__generated {
+  text-align: center;
+  line-height: 90px;
 }
 
 .devtabs {
@@ -650,7 +730,7 @@ summary {
 
 .aggregations {
   padding: var(--heading-line-height);
-  padding-left: calc(var(--heading-line-height) + var(--gutter-width) + var(--gutter-gap));
+  padding-left: var(--aggregation-padding);
 }
 
 .aggregations:not(:first-child) {
@@ -717,7 +797,7 @@ summary {
 }
 
 .aggregation__header .aggregation__header__score::after {
-  background-size: 14px;
+  background-size: var(--subitem-overall-icon-size);
 }
 
 .aggregation__header > h2 {
@@ -728,7 +808,6 @@ summary {
 }
 
 .aggregation {
-  --aggregation-icon-size: 20px;
   margin-top: var(--subheading-line-height);
   max-width: var(--max-line-length);
   padding-left: calc(var(--aggregation-icon-size) + var(--subitem-indent) / 2);
@@ -756,7 +835,6 @@ summary {
 
 .aggregation__desc {
   font-size: var(--body-font-size);
-  /*font-style: italic;*/
   color: var(--secondary-text-color);
   line-height: var(--body-line-height);
   margin-top: calc(var(--body-line-height) / 2);
@@ -816,6 +894,7 @@ summary {
   top: 0;
   bottom: 0;
   background-color: #fff;
+  border-radius: inherit;
 }
 
 .subitem-result__good::after {
@@ -980,7 +1059,7 @@ summary {
 
 .export-dropdown {
   position: absolute;
-  background-color: #fafafa;
+  background-color: var(--report-header-bg-color);
   border: 1px solid #ccc;
   border-radius: 3px;
   margin: 0;
