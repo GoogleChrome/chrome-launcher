@@ -94,10 +94,10 @@ function logStatus([, message, details]) {
   statusDetailsMessageEl.textContent = details;
 }
 
-function createOptionItem(text, isChecked) {
+function createOptionItem(text, id, isChecked) {
   const input = document.createElement('input');
   input.setAttribute('type', 'checkbox');
-  input.setAttribute('value', text);
+  input.setAttribute('value', id);
   if (isChecked) {
     input.setAttribute('checked', 'checked');
   }
@@ -122,12 +122,15 @@ function onGenerateReportButtonClick(background, selectedAggregations) {
   const feedbackEl = document.querySelector('.feedback');
   feedbackEl.textContent = '';
 
+  const aggregationIDs = Object.keys(selectedAggregations)
+      .filter(key => !!selectedAggregations[key]);
+
   background.runLighthouseInExtension({
     flags: {
       disableCpuThrottling: true
     },
     restoreCleanState: true
-  }, selectedAggregations).catch(err => {
+  }, aggregationIDs).catch(err => {
     let message = err.message;
     let includeReportLink = true;
 
@@ -163,8 +166,8 @@ function generateOptionsList(background, selectedAggregations) {
   const frag = document.createDocumentFragment();
 
   background.getDefaultAggregations().forEach(aggregation => {
-    const isChecked = selectedAggregations[aggregation.name];
-    frag.appendChild(createOptionItem(aggregation.name, isChecked));
+    const isChecked = selectedAggregations[aggregation.id];
+    frag.appendChild(createOptionItem(aggregation.name, aggregation.id, isChecked));
   });
 
   const optionsList = document.querySelector('.options__list');
@@ -189,23 +192,28 @@ function initPopup() {
 
     background.listenForStatus(logStatus);
 
+    // generate checkboxes from saved settings
     background.loadSettings().then(settings => {
       generateOptionsList(background, settings.selectedAggregations);
-
       document.querySelector('.setting-disable-extensions').checked = settings.disableExtensions;
+    });
 
-      const generateReportButton = document.getElementById('generate-report');
-      generateReportButton.addEventListener('click', () => {
+    // bind Generate Report button
+    const generateReportButton = document.getElementById('generate-report');
+    generateReportButton.addEventListener('click', () => {
+      background.loadSettings().then(settings => {
         onGenerateReportButtonClick(background, settings.selectedAggregations);
       });
     });
 
+    // bind View Options button
     const generateOptionsEl = document.getElementById('configure-options');
     const optionsEl = document.querySelector('.options');
     generateOptionsEl.addEventListener('click', () => {
       optionsEl.classList.add(subpageVisibleClass);
     });
 
+    // bind Save Options button
     const okButton = document.getElementById('ok');
     okButton.addEventListener('click', () => {
       // Save settings when options page is closed.

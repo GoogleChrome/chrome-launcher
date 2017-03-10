@@ -183,7 +183,7 @@ gulp.task('clean', () => {
 });
 
 
-gulp.task('watch', ['lint', 'compileReport', 'compilePartials', 'browserify', 'html'], () => {
+gulp.task('watch', ['compileReport', 'compilePartials', 'browserify', 'html'], () => {
   livereload.listen();
 
   gulp.watch([

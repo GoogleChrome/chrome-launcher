@@ -26,6 +26,8 @@ const path = require('path');
 const Audit = require('../audits/audit');
 const Runner = require('../runner');
 
+const _flatten = arr => [].concat(...arr);
+
 // cleanTrace is run to remove duplicate TracingStartedInPage events,
 // and to change TracingStartedInBrowser events into TracingStartedInPage.
 // This is done by searching for most occuring threads and basing new events
@@ -113,7 +115,7 @@ function validatePasses(passes, audits, rootPath) {
   if (!Array.isArray(passes)) {
     return;
   }
-  const requiredGatherers = getGatherersNeededByAudits(audits);
+  const requiredGatherers = Config.getGatherersNeededByAudits(audits);
 
   // Log if we are running gathers that are not needed by the audits listed in the config
   passes.forEach(pass => {
@@ -141,19 +143,6 @@ function validatePasses(passes, audits, rootPath) {
     }
     usedNames.add(passName);
   });
-}
-
-function getGatherersNeededByAudits(audits) {
-  // It's possible we didn't get given any audits (but existing audit results), in which case
-  // there is no need to do any work here.
-  if (!audits) {
-    return new Set();
-  }
-
-  return audits.reduce((list, audit) => {
-    audit.meta.requiredArtifacts.forEach(artifact => list.add(artifact));
-    return list;
-  }, new Set());
 }
 
 function assertValidAudit(auditDefinition, auditPath) {
@@ -328,6 +317,112 @@ class Config {
     }
 
     return merge(baseJSON, extendJSON);
+  }
+
+ /**
+  * Filter out any unrequested items from the config, based on requested top-level aggregations.
+  * @param {!Object} oldConfig Lighthouse config object
+  * @param {!Array<string>} aggregationIDs Id values of aggregations to include
+  * @return {Object} new config
+  */
+  static generateNewConfigOfAggregations(oldConfig, aggregationIDs) {
+    // 0. Clone config to avoid mutating it
+    const config = JSON.parse(JSON.stringify(oldConfig));
+    // 1. Filter to just the chosen aggregations
+    config.aggregations = config.aggregations.filter(agg => aggregationIDs.includes(agg.id));
+
+    // 2. Resolve which audits will need to run
+    const requestedAuditNames = Config.getAuditsNeededByAggregations(config.aggregations);
+    const auditPathToNameMap = Config.getMapOfAuditPathToName(config);
+    config.audits = config.audits.filter(auditPath =>
+        requestedAuditNames.has(auditPathToNameMap.get(auditPath)));
+
+    // 3. Resolve which gatherers will need to run
+    const auditObjectsSelected = Config.requireAudits(config.audits);
+    const requiredGatherers = Config.getGatherersNeededByAudits(auditObjectsSelected);
+
+    // 4. Filter to only the neccessary passes
+    config.passes = Config.generatePassesNeededByGatherers(config.passes, requiredGatherers);
+    return config;
+  }
+
+ /**
+  * Return IDs of top-level aggregations from a config. Used by tools driving lighthouse-core
+  * @param {{aggregations: !Array<{name: string}>}} Lighthouse config object.
+  * @return {!Array<string>}  Name values of aggregations within
+  */
+  static getAggregations(config) {
+    return config.aggregations.map(agg => ({
+      name: agg.name,
+      id: agg.id
+    }));
+  }
+
+  /**
+   * Find audits required for remaining aggregations.
+   * @param {!Object} aggregations
+   * @return {!Set<string>}
+   */
+  static getAuditsNeededByAggregations(aggregations) {
+    const requestedItems = _flatten(aggregations.map(aggregation => aggregation.items));
+    const requestedAudits = _flatten(requestedItems.map(item => Object.keys(item.audits)));
+    return new Set(requestedAudits);
+  }
+
+  /**
+   * Creates mapping from audit path (used in config.audits) to audit.name (used in config.aggregations)
+   * @param {!Object} config Lighthouse config object.
+   * @return {Map}
+   */
+  static getMapOfAuditPathToName(config) {
+    const auditObjectsAll = Config.requireAudits(config.audits);
+    const auditPathToName = new Map(auditObjectsAll.map((AuditClass, index) => {
+      const auditPath = config.audits[index];
+      const auditName = AuditClass.meta.name;
+      return [auditPath, auditName];
+    }));
+    return auditPathToName;
+  }
+
+  /**
+   * From some requested audits, return names of all required artifacts
+   * @param {!Object} audits
+   * @return {!Set<string>}
+   */
+  static getGatherersNeededByAudits(audits) {
+    // It's possible we weren't given any audits (but existing audit results), in which case
+    // there is no need to do any work here.
+    if (!audits) {
+      return new Set();
+    }
+
+    return audits.reduce((list, audit) => {
+      audit.meta.requiredArtifacts.forEach(artifact => list.add(artifact));
+      return list;
+    }, new Set());
+  }
+
+  /**
+   * Filters to only required passes and gatherers, returning a new passes object
+   * @param {!Object} oldPasses
+   * @param {!Set<string>} requiredGatherers
+   * @return {!Object} fresh passes object
+   */
+  static generatePassesNeededByGatherers(oldPasses, requiredGatherers) {
+    const passes = JSON.parse(JSON.stringify(oldPasses));
+    const filteredPasses = passes.map(pass => {
+      // remove any unncessary gatherers from within the passes
+      pass.gatherers = pass.gatherers.filter(gathererName => {
+        gathererName = GatherRunner.getGathererClass(gathererName).name;
+        return requiredGatherers.has(gathererName);
+      });
+      return pass;
+    }).filter(pass => {
+      // remove any passes lacking concrete gatherers, unless they are dependent on the trace
+      if (pass.recordTrace) return true;
+      return pass.gatherers.length > 0;
+    });
+    return filteredPasses;
   }
 
   /**

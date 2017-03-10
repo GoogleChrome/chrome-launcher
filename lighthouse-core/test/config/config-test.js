@@ -265,53 +265,55 @@ describe('Config', () => {
     }), /generateAuditResult\(\) method/);
   });
 
-  it('expands artifacts', () => {
-    const config = new Config({
-      artifacts: {
-        traces: {
-          defaultPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
-        },
-        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
-      }
-    });
-    const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
-    assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
-    assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
-  });
-
-  it('expands artifacts with multiple named passes', () => {
-    const config = new Config({
-      artifacts: {
-        traces: {
-          defaultPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json'),
-          otherPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
-        },
-        performanceLog: {
-          defaultPass: path.resolve(__dirname, '../fixtures/perflog.json'),
-          otherPass: path.resolve(__dirname, '../fixtures/perflog.json')
+  describe('artifact loading', () => {
+    it('expands artifacts', () => {
+      const config = new Config({
+        artifacts: {
+          traces: {
+            defaultPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
+          },
+          performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
         }
-      }
-    });
-    const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
-    assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
-    assert.deepStrictEqual(config.artifacts.traces.otherPass.traceEvents, traceUserTimings);
-    assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
-    assert.equal(config.artifacts.networkRecords.otherPass.length, 76);
-  });
-
-  it('handles traces with no TracingStartedInPage events', () => {
-    const config = new Config({
-      artifacts: {
-        traces: {
-          defaultPass: path.resolve(__dirname,
-                           '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
-        },
-        performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
-      }
+      });
+      const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
+      assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
+      assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
     });
 
-    assert.ok(config.artifacts.traces.defaultPass.traceEvents.find(
-          e => e.name === 'TracingStartedInPage' && e.args.data.page === '0xhad00p'));
+    it('expands artifacts with multiple named passes', () => {
+      const config = new Config({
+        artifacts: {
+          traces: {
+            defaultPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json'),
+            otherPass: path.resolve(__dirname, '../fixtures/traces/trace-user-timings.json')
+          },
+          performanceLog: {
+            defaultPass: path.resolve(__dirname, '../fixtures/perflog.json'),
+            otherPass: path.resolve(__dirname, '../fixtures/perflog.json')
+          }
+        }
+      });
+      const traceUserTimings = require('../fixtures/traces/trace-user-timings.json');
+      assert.deepStrictEqual(config.artifacts.traces.defaultPass.traceEvents, traceUserTimings);
+      assert.deepStrictEqual(config.artifacts.traces.otherPass.traceEvents, traceUserTimings);
+      assert.equal(config.artifacts.networkRecords.defaultPass.length, 76);
+      assert.equal(config.artifacts.networkRecords.otherPass.length, 76);
+    });
+
+    it('handles traces with no TracingStartedInPage events', () => {
+      const config = new Config({
+        artifacts: {
+          traces: {
+            defaultPass: path.resolve(__dirname,
+                            '../fixtures/traces/trace-user-timings-no-tracingstartedinpage.json')
+          },
+          performanceLog: path.resolve(__dirname, '../fixtures/perflog.json')
+        }
+      });
+
+      assert.ok(config.artifacts.traces.defaultPass.traceEvents.find(
+            e => e.name === 'TracingStartedInPage' && e.args.data.page === '0xhad00p'));
+    });
   });
 
   describe('#extendConfigJSON', () => {
@@ -365,6 +367,58 @@ describe('Config', () => {
       const merged = Config.extendConfigJSON(configA, configB);
       assert.equal(merged.extends, true);
       assert.equal(merged.artifacts, configB.artifacts);
+    });
+  });
+
+  describe('getAggregations', () => {
+    it('returns the IDs & names of the aggregations', () => {
+      const runConfig = JSON.parse(JSON.stringify(defaultConfig));
+      const aggs = Config.getAggregations(runConfig);
+      assert.equal(Array.isArray(aggs), true);
+      assert.equal(aggs.length, 4, 'Did not find more than three aggregations');
+      const haveName = aggs.every(agg => agg.name.length);
+      const haveID = aggs.every(agg => agg.id.length);
+      assert.equal(haveName === haveID === true, true, 'they dont have IDs and names');
+    });
+  });
+
+  describe('generateConfigOfAggregations', () => {
+    const aggregationIDs = ['perf'];
+    const totalAuditCount = defaultConfig.audits.length;
+
+    it('should not mutate the original config', () => {
+      const origConfig = JSON.parse(JSON.stringify(defaultConfig));
+      Config.generateNewConfigOfAggregations(defaultConfig, aggregationIDs);
+      assert.deepStrictEqual(origConfig, defaultConfig, 'Original config mutated');
+    });
+
+    it('should filter out other passes if passed Performance', () => {
+      const config = Config.generateNewConfigOfAggregations(defaultConfig, aggregationIDs);
+      assert.equal(config.aggregations.length, 1, 'other aggregations are present');
+      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
+    });
+
+    it('should filter out other passes if passed PWA', () => {
+      const config = Config.generateNewConfigOfAggregations(defaultConfig, ['pwa']);
+      assert.equal(config.aggregations.length, 1, 'other aggregations are present');
+      assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
+    });
+
+    it('should filter out other passes if passed Best Practices', () => {
+      const config = Config.generateNewConfigOfAggregations(defaultConfig, ['bp']);
+      assert.equal(config.aggregations.length, 1, 'other aggregations are present');
+      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
+    });
+
+    it('should only run audits for ones named by the aggregation', () => {
+      const config = Config.generateNewConfigOfAggregations(defaultConfig, aggregationIDs);
+      const selectedAggregation = defaultConfig.aggregations
+          .find(agg => aggregationIDs.includes(agg.id));
+      const auditCount = Object.keys(selectedAggregation.items[0].audits).length;
+
+      assert.equal(config.audits.length, auditCount, '# of audits match aggregation list');
     });
   });
 });
