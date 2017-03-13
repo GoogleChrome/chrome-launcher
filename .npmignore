@@ -33,6 +33,6 @@ lighthouse-core/test
 lighthouse-viewer
 lighthouse-extension
 
+.appveyor.yml
 .travis.yml
-appveyor.yml
 
