@@ -259,10 +259,6 @@ describe('Config', () => {
     assert.throws(_ => new Config({
       audits: [basePath + '/missing-required-artifacts']
     }), /meta.requiredArtifacts property/);
-
-    return assert.throws(_ => new Config({
-      audits: [basePath + '/missing-generate-audit-result']
-    }), /generateAuditResult\(\) method/);
   });
 
   describe('artifact loading', () => {

@@ -96,7 +96,7 @@ class SpeedIndexMetric extends Audit {
         })
       };
 
-      return SpeedIndexMetric.generateAuditResult({
+      return {
         score: Math.round(score),
         rawValue: Math.round(speedline.perceptualSpeedIndex),
         optimalValue: this.meta.optimalValue,
@@ -104,7 +104,7 @@ class SpeedIndexMetric extends Audit {
           formatter: Formatter.SUPPORTED_FORMATS.SPEEDLINE,
           value: extendedInfo
         }
-      });
+      };
     });
   }
 }

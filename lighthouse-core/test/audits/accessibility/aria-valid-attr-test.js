@@ -35,7 +35,6 @@ describe('Accessibility: aria-valid-attr audit', () => {
 
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
-    assert.equal(output.displayValue, '');
   });
 
   it('generates an audit output (single node)', () => {
@@ -51,6 +50,5 @@ describe('Accessibility: aria-valid-attr audit', () => {
 
     const output = Audit.audit(artifacts);
     assert.equal(output.rawValue, false);
-    assert.equal(output.displayValue, '');
   });
 });

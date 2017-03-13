@@ -41,15 +41,15 @@ class ManifestName extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return ManifestName.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     const manifest = artifacts.Manifest.value;
-    return ManifestName.generateAuditResult({
+    return {
       rawValue: !!manifest.name.value
-    });
+    };
   }
 }
 

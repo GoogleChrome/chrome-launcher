@@ -42,15 +42,15 @@ class ManifestExists extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest) {
       // Page has no manifest.
-      return ManifestExists.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
-    return ManifestExists.generateAuditResult({
+    return {
       rawValue: typeof artifacts.Manifest.value !== 'undefined',
       debugString: artifacts.Manifest.debugString
-    });
+    };
   }
 }
 

@@ -43,15 +43,15 @@ class WithoutJavaScript extends Audit {
     const artifact = artifacts.HTMLWithoutJavaScript;
 
     if (artifact.value.trim() === '') {
-      return WithoutJavaScript.generateAuditResult({
+      return {
         rawValue: false,
         debugString: 'The page body should render some content if its scripts are not available.'
-      });
+      };
     }
 
-    return WithoutJavaScript.generateAuditResult({
+    return {
       rawValue: true
-    });
+    };
   }
 }
 

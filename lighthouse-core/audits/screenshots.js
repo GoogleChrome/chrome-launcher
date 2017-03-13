@@ -41,13 +41,13 @@ class Screenshots extends Audit {
     const trace = artifacts.traces[this.DEFAULT_PASS];
 
     return artifacts.requestScreenshots(trace).then(screenshots => {
-      return Screenshots.generateAuditResult({
+      return {
         rawValue: screenshots.length || 0,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.NULL,
           value: screenshots
         }
-      });
+      };
     });
   }
 }

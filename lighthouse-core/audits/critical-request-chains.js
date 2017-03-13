@@ -123,7 +123,7 @@ class CriticalRequestChains extends Audit {
         walk(initialNavChildren, 0);
       }
 
-      return CriticalRequestChains.generateAuditResult({
+      return {
         rawValue: chainCount <= this.meta.optimalValue,
         displayValue: chainCount,
         optimalValue: this.meta.optimalValue,
@@ -134,7 +134,7 @@ class CriticalRequestChains extends Audit {
             longestChain: CriticalRequestChains._getLongestChain(chains)
           }
         }
-      });
+      };
     });
   }
 }

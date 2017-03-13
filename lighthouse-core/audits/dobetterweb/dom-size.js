@@ -105,7 +105,7 @@ class DOMSize extends Audit {
       target: `< ${MAX_DOM_TREE_WIDTH.toLocaleString()} nodes`
     }];
 
-    return DOMSize.generateAuditResult({
+    return {
       rawValue: stats.totalDOMNodes,
       optimalValue: this.meta.optimalValue,
       score: Math.round(score),
@@ -114,7 +114,7 @@ class DOMSize extends Audit {
         formatter: Formatter.SUPPORTED_FORMATS.CARDS,
         value: cards
       }
-    });
+    };
   }
 
 }

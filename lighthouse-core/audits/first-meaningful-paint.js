@@ -69,7 +69,7 @@ class FirstMeaningfulPaint extends Audit {
         firstContentfulPaint: tabTrace.firstContentfulPaintEvt
       });
 
-      return FirstMeaningfulPaint.generateAuditResult({
+      return {
         score: result.score,
         rawValue: parseFloat(result.duration),
         displayValue: `${result.duration}ms`,
@@ -79,7 +79,7 @@ class FirstMeaningfulPaint extends Audit {
           value: result.extendedInfo,
           formatter: Formatter.SUPPORTED_FORMATS.NULL
         }
-      });
+      };
     });
   }
 

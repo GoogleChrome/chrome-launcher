@@ -39,17 +39,17 @@ class CacheStartUrl extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return CacheStartUrl.generateAuditResult({
+      return {
         rawValue: false,
-      });
+      };
     }
 
     const manifest = artifacts.Manifest.value;
     if (!(manifest.start_url && manifest.start_url.value)) {
-      return CacheStartUrl.generateAuditResult({
+      return {
         rawValue: false,
         debugString: 'start_url not present in Manifest'
-      });
+      };
     }
 
     // Remove any UTM strings.
@@ -69,9 +69,9 @@ class CacheStartUrl extends Audit {
       return (startURL === req || altStartURL === req);
     });
 
-    return CacheStartUrl.generateAuditResult({
+    return {
       rawValue: (cacheHasStartUrl !== undefined)
-    });
+    };
   }
 }
 

@@ -124,14 +124,14 @@ class UserTimings extends Audit {
     return artifacts.requestTraceOfTab(trace).then(tabTrace => {
       const userTimings = this.filterTrace(tabTrace).filter(UserTimings.excludeBlacklisted);
 
-      return UserTimings.generateAuditResult({
+      return {
         rawValue: true,
         displayValue: userTimings.length,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
           value: userTimings
         }
-      });
+      };
     });
   }
 }

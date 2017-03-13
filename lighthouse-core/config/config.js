@@ -171,13 +171,6 @@ function assertValidAudit(auditDefinition, auditPath) {
       `${auditName} has no meta.requiredArtifacts property, or the property is not an array.`
     );
   }
-
-  if (typeof auditDefinition.generateAuditResult !== 'function') {
-    throw new Error(
-      `${auditName} has no generateAuditResult() method. ` +
-        'Did you inherit from the proper base class?'
-    );
-  }
 }
 
 function expandArtifacts(artifacts) {

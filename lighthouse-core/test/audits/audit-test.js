@@ -47,7 +47,7 @@ describe('Audit', () => {
     assert.doesNotThrow(_ => B.audit());
   });
 
-  it('throws if an audit does generate a result with a value', () => {
-    assert.throws(_ => A.generateAuditResult({}));
+  it('throws if an audit does return a result with a rawValue', () => {
+    assert.throws(_ => Audit.generateAuditResult(A, {}));
   });
 });

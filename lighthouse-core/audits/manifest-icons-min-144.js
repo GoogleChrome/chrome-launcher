@@ -40,16 +40,16 @@ class ManifestIconsMin144 extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return ManifestIconsMin144.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     const manifest = artifacts.Manifest.value;
     if (icons.doExist(manifest) === false) {
-      return ManifestIconsMin144.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     const matchingIcons = icons.sizeAtLeast(144, /** @type {!Manifest} */ (manifest));
@@ -62,11 +62,11 @@ class ManifestIconsMin144 extends Audit {
       debugString = 'No icons are at least 144px';
     }
 
-    return ManifestIconsMin144.generateAuditResult({
+    return {
       rawValue: !!matchingIcons.length,
       displayValue,
       debugString
-    });
+    };
   }
 }
 

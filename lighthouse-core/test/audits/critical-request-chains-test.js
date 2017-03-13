@@ -104,28 +104,28 @@ describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain result for failing example', () => {
     return Audit.audit(mockArtifacts(FAILING_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 2);
-      assert.equal(output.score, false);
+      assert.equal(output.rawValue, false);
     });
   });
 
   it('calculates the correct chain result for failing example (no 2.)', () => {
     return Audit.audit(mockArtifacts(FAILING_REQUEST_CHAIN_2)).then(output => {
       assert.equal(output.displayValue, 1);
-      assert.equal(output.score, false);
+      assert.equal(output.rawValue, false);
     });
   });
 
   it('calculates the correct chain result for passing example', () => {
     return Audit.audit(mockArtifacts(PASSING_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 0);
-      assert.equal(output.score, true);
+      assert.equal(output.rawValue, true);
     });
   });
 
   it('calculates the correct chain result for empty example', () => {
     return Audit.audit(mockArtifacts(EMPTY_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 0);
-      assert.equal(output.score, true);
+      assert.equal(output.rawValue, true);
     });
   });
 });

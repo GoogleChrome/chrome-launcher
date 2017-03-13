@@ -151,7 +151,7 @@ class TTIMetric extends Audit {
         foundLatencies
       };
 
-      return TTIMetric.generateAuditResult({
+      return {
         score,
         rawValue: parseFloat(timeToInteractive.toFixed(1)),
         displayValue: `${parseFloat(timeToInteractive.toFixed(1))}ms`,
@@ -160,7 +160,7 @@ class TTIMetric extends Audit {
           value: extendedInfo,
           formatter: Formatter.SUPPORTED_FORMATS.NULL
         }
-      });
+      };
     });
   }
 }

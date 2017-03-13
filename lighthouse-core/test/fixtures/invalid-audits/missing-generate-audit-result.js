@@ -28,9 +28,9 @@ class MissingRequiredArtifacts {
   }
 
   static audit(_) {
-    return MissingRequiredArtifacts.generateAuditResult({
+    return {
       rawValue: true
-    });
+    };
   }
 }
 

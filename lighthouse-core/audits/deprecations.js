@@ -66,14 +66,14 @@ class Deprecations extends Audit {
       displayValue = `${deprecations.length} warning found`;
     }
 
-    return Deprecations.generateAuditResult({
+    return {
       rawValue: deprecations.length === 0,
       displayValue,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: deprecations
       }
-    });
+    };
   }
 }
 

@@ -50,7 +50,6 @@ describe('Mobile-friendly: display audit', () => {
     };
     const output = ManifestDisplayAudit.audit(artifacts);
 
-    assert.equal(output.score, true);
     assert.equal(output.displayValue, 'browser');
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);
@@ -63,7 +62,6 @@ describe('Mobile-friendly: display audit', () => {
       }), EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL)
     };
     const output = ManifestDisplayAudit.audit(artifacts);
-    assert.equal(output.score, true);
     assert.equal(output.displayValue, 'standalone');
     assert.equal(output.rawValue, true);
     assert.equal(output.debugString, undefined);

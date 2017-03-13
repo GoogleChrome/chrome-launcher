@@ -84,7 +84,7 @@ class TotalByteWeight extends Audit {
           SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
       const score = 100 * distribution.computeComplementaryPercentile(totalBytes);
 
-      return this.generateAuditResult({
+      return {
         rawValue: totalBytes,
         optimalValue: this.meta.optimalValue,
         displayValue: `Total size was ${Audit.bytesToKbString(totalBytes)}`,
@@ -100,7 +100,7 @@ class TotalByteWeight extends Audit {
             }
           }
         }
-      });
+      };
     });
   }
 }

@@ -32,7 +32,6 @@ describe('Offline: Service Worker audit', () => {
       URL: {finalUrl: 'https://example.com'}
     });
 
-    assert.equal(output.score, true);
     assert.equal(output.rawValue, true);
   });
 
@@ -49,7 +48,6 @@ describe('Offline: Service Worker audit', () => {
       URL: {finalUrl: 'https://example.com'}
     });
 
-    assert.equal(output.score, false);
     assert.equal(output.rawValue, false);
   });
 });

@@ -189,13 +189,15 @@ class Runner {
       }
       // all required artifacts are in good shape, so we proceed
       return audit.audit(artifacts);
-    }).catch(err => {
+    // Fill remaining audit result fields.
+    }).then(auditResult => Audit.generateAuditResult(audit, auditResult))
+    .catch(err => {
       if (err.fatal) {
         throw err;
       }
 
       // Non-fatal error become error audit result.
-      return audit.generateErrorAuditResult('Audit error: ' + err.message);
+      return Audit.generateErrorAuditResult(audit, 'Audit error: ' + err.message);
     }).then(result => {
       log.verbose('statusEnd', status);
       return result;

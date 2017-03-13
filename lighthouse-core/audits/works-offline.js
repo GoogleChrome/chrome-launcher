@@ -39,9 +39,9 @@ class WorksOffline extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return WorksOffline.generateAuditResult({
+    return {
       rawValue: artifacts.Offline === 200
-    });
+    };
   }
 }
 

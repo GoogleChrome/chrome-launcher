@@ -49,10 +49,10 @@ class NoWebSQLAudit extends Audit {
     const debugString = (db ?
         `Found database "${db.name}", version: ${db.version}.` : '');
 
-    return NoWebSQLAudit.generateAuditResult({
+    return {
       rawValue: !db,
       debugString
-    });
+    };
   }
 }
 

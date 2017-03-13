@@ -39,23 +39,23 @@ class ThemeColor extends Audit {
   static audit(artifacts) {
     const themeColorMeta = artifacts.ThemeColor;
     if (themeColorMeta === null) {
-      return ThemeColor.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     if (!validColor(themeColorMeta)) {
-      return ThemeColor.generateAuditResult({
+      return {
         displayValue: themeColorMeta,
         rawValue: false,
         debugString: 'The theme-color meta tag did not contain a valid CSS color.'
-      });
+      };
     }
 
-    return ThemeColor.generateAuditResult({
+    return {
       displayValue: themeColorMeta,
       rawValue: true
-    });
+    };
   }
 }
 

@@ -29,9 +29,9 @@ class MissingRequiredArtifacts extends LighthouseAudit {
   }
 
   static audit(_) {
-    return MissingRequiredArtifacts.generateAuditResult({
+    return {
       rawValue: true
-    });
+    };
   }
 }
 

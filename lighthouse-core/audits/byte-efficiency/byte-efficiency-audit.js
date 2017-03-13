@@ -84,7 +84,7 @@ class UnusedBytes extends Audit {
         displayValue = `Potential savings of ${wastedKbDisplay} (~${wastedMsDisplay})`;
       }
 
-      return this.generateAuditResult({
+      return {
         debugString,
         displayValue,
         rawValue: typeof result.passes === 'undefined' ?
@@ -94,7 +94,7 @@ class UnusedBytes extends Audit {
           formatter: Formatter.SUPPORTED_FORMATS.TABLE,
           value: {results, tableHeadings: result.tableHeadings}
         }
-      });
+      };
     });
   }
 

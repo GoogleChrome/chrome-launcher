@@ -74,7 +74,6 @@ describe('Performance: speed-index-metric audit', () => {
     const artifacts = mockArtifactsWithSpeedlineResult(SpeedlineResult);
 
     return Audit.audit(artifacts).then(response => {
-      assert.equal(response.displayValue, '845');
       assert.equal(response.rawValue, 845);
       assert.equal(response.extendedInfo.value.timings.firstVisualChange, 630);
       assert.equal(response.extendedInfo.value.timings.visuallyComplete, 930);

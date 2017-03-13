@@ -42,9 +42,9 @@ class ManifestShortNameLength extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return ManifestShortNameLength.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     // When no shortname can be found we look for a name.
@@ -52,10 +52,10 @@ class ManifestShortNameLength extends Audit {
     const shortNameValue = manifest.short_name.value || manifest.name.value;
 
     if (!shortNameValue) {
-      return ManifestShortNameLength.generateAuditResult({
+      return {
         rawValue: false,
         debugString: 'No short_name found in manifest.'
-      });
+      };
     }
 
     // Historically, Chrome recommended 12 chars as the maximum length to prevent truncation.
@@ -70,10 +70,10 @@ class ManifestShortNameLength extends Audit {
       debugString += ` (Found: ${shortNameValue.length} chars).`;
     }
 
-    return ManifestShortNameLength.generateAuditResult({
+    return {
       rawValue: isShortNameShortEnough,
       debugString
-    });
+    };
   }
 }
 

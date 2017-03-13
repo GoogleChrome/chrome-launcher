@@ -29,7 +29,7 @@ describe('Security: HTTPS audit', () => {
         debugString
       }
     });
-    assert.strictEqual(result.score, false);
+    assert.strictEqual(result.rawValue, false);
     assert.strictEqual(result.debugString, debugString);
   });
 
@@ -39,6 +39,6 @@ describe('Security: HTTPS audit', () => {
         value: true
       }
     });
-    assert.strictEqual(result.score, true);
+    assert.strictEqual(result.rawValue, true);
   });
 });

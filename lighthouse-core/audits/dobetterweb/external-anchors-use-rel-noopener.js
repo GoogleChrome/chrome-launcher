@@ -68,14 +68,14 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
         };
       });
 
-    return ExternalAnchorsUseRelNoopenerAudit.generateAuditResult({
+    return {
       rawValue: failingAnchors.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: failingAnchors
       },
       debugString
-    });
+    };
   }
 }
 

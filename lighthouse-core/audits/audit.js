@@ -34,11 +34,12 @@ class Audit {
   }
 
   /**
+   * @param {!Audit} audit
    * @param {string} debugString
-   * @return {!AuditResult}
+   * @return {!AuditFullResult}
    */
-  static generateErrorAuditResult(debugString) {
-    return this.generateAuditResult({
+  static generateErrorAuditResult(audit, debugString) {
+    return Audit.generateAuditResult(audit, {
       rawValue: null,
       error: true,
       debugString
@@ -46,10 +47,11 @@ class Audit {
   }
 
   /**
-   * @param {!AuditResultInput} result
-   * @return {!AuditResult}
+   * @param {!Audit} audit
+   * @param {!AuditResult} result
+   * @return {!AuditFullResult}
    */
-  static generateAuditResult(result) {
+  static generateAuditResult(audit, result) {
     if (typeof result.rawValue === 'undefined') {
       throw new Error('generateAuditResult requires a rawValue');
     }
@@ -73,11 +75,11 @@ class Audit {
       debugString: result.debugString,
       optimalValue: result.optimalValue,
       extendedInfo: result.extendedInfo,
-      informative: this.meta.informative,
-      name: this.meta.name,
-      category: this.meta.category,
-      description: this.meta.description,
-      helpText: this.meta.helpText
+      informative: audit.meta.informative,
+      name: audit.meta.name,
+      category: audit.meta.category,
+      description: audit.meta.description,
+      helpText: audit.meta.helpText
     };
   }
 }

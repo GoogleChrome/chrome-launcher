@@ -65,7 +65,7 @@ class NoConsoleTimeAudit extends Audit {
       return true;
     });
 
-    return NoConsoleTimeAudit.generateAuditResult({
+    return {
       rawValue: results.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
@@ -75,7 +75,7 @@ class NoConsoleTimeAudit extends Audit {
         }
       },
       debugString
-    });
+    };
   }
 }
 

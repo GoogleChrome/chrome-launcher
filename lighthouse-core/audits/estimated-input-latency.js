@@ -62,7 +62,7 @@ class EstimatedInputLatency extends Audit {
         SCORING_POINT_OF_DIMINISHING_RETURNS);
     const score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
 
-    return EstimatedInputLatency.generateAuditResult({
+    return {
       score: Math.round(score),
       optimalValue: this.meta.optimalValue,
       rawValue,
@@ -71,7 +71,7 @@ class EstimatedInputLatency extends Audit {
         value: latencyPercentiles,
         formatter: Formatter.SUPPORTED_FORMATS.NULL
       }
-    });
+    };
   }
 
   /**

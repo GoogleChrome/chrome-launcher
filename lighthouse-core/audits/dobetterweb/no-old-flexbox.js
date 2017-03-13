@@ -80,7 +80,7 @@ class NoOldFlexboxAudit extends Audit {
       });
     });
 
-    return NoOldFlexboxAudit.generateAuditResult({
+    return {
       rawValue: sheetsUsingOldFlexbox.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
@@ -91,7 +91,7 @@ class NoOldFlexboxAudit extends Audit {
             pre: 'Snippet'}
         }
       }
-    });
+    };
   }
 }
 

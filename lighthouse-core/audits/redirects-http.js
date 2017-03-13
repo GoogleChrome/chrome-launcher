@@ -38,10 +38,10 @@ class RedirectsHTTP extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return RedirectsHTTP.generateAuditResult({
+    return {
       rawValue: artifacts.HTTPRedirect.value,
       debugString: artifacts.HTTPRedirect.debugString
-    });
+    };
   }
 }
 

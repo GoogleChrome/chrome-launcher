@@ -24,12 +24,12 @@ describe('Offline: works-offline audit', () => {
   it('correctly audits a 200 code', () => {
     const output = Audit.audit({Offline: 200});
 
-    return assert.equal(output.score, true);
+    return assert.equal(output.rawValue, true);
   });
 
   it('correctly audits a non-200 code', () => {
     const output = Audit.audit({Offline: 203});
 
-    return assert.equal(output.score, false);
+    return assert.equal(output.rawValue, false);
   });
 });

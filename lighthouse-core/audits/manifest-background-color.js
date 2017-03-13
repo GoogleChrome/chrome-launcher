@@ -44,20 +44,20 @@ class ManifestBackgroundColor extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return ManifestBackgroundColor.generateAuditResult({
+      return {
         rawValue: false,
-      });
+      };
     }
 
     const manifest = artifacts.Manifest.value;
     const bgColor = manifest.background_color.value;
-    return ManifestBackgroundColor.generateAuditResult({
+    return {
       rawValue: !!bgColor,
       extendedInfo: {
         value: bgColor,
         formatter: Formatter.SUPPORTED_FORMATS.NULL
       }
-    });
+    };
   }
 }
 

@@ -46,7 +46,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
   /**
    * @param {!Artifacts} artifacts
    * @param {string} tagFilter The tagName to filter on
-   * @return {!Object} The object to pass to `generateAuditResult`
+   * @return {!AuditResult}
    */
   static computeAuditResultForTags(artifacts, tagFilter) {
     const artifact = artifacts.TagsBlockingFirstPaint;
@@ -96,8 +96,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const result = LinkBlockingFirstPaintAudit.computeAuditResultForTags(artifacts, 'LINK');
-    return LinkBlockingFirstPaintAudit.generateAuditResult(result);
+    return LinkBlockingFirstPaintAudit.computeAuditResultForTags(artifacts, 'LINK');
   }
 }
 

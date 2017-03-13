@@ -41,10 +41,10 @@ class HTTPS extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return HTTPS.generateAuditResult({
+    return {
       rawValue: artifacts.HTTPS.value,
       debugString: artifacts.HTTPS.debugString
-    });
+    };
   }
 }
 

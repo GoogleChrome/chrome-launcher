@@ -42,16 +42,16 @@ class ManifestShortName extends Audit {
   static audit(artifacts) {
     if (!artifacts.Manifest || !artifacts.Manifest.value) {
       // Page has no manifest or was invalid JSON.
-      return ManifestShortName.generateAuditResult({
+      return {
         rawValue: false
-      });
+      };
     }
 
     const manifest = artifacts.Manifest.value;
-    return ManifestShortName.generateAuditResult({
+    return {
       // When no shortname can be found we look for a name.
       rawValue: !!(manifest.short_name.value || manifest.name.value)
-    });
+    };
   }
 }
 

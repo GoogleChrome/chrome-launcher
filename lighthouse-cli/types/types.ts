@@ -1,13 +1,25 @@
 interface AuditResult {
+  rawValue: boolean|number;
+  displayValue?: string;
+  debugString?: string;
+  score?: boolean|number;
+  optimalValue: number|string;
+  extendedInfo?: {
+    value: string;
+    formatter: string;
+  };
+}
+
+interface AuditFullResult {
+  rawValue: boolean|number;
   displayValue: string;
-  debugString: string;
-  score: number;
+  debugString?: string;
+  score: boolean|number;
   error?: boolean;
   description: string;
   name: string;
   category: string;
   helpText?: string;
-  requiredArtifacts?: Array<string>;
   extendedInfo?: {
     value: string;
     formatter: string;
@@ -18,7 +30,7 @@ interface AggregationResultItem {
   overall: number;
   name: string;
   scored: boolean;
-  subItems: Array<AuditResult | string>;
+  subItems: Array<AuditFullResult | string>;
 }
 
 interface Aggregation {
@@ -40,4 +52,5 @@ export {
   Aggregation,
   AggregationResultItem,
   AuditResult,
+  AuditFullResult,
 }

@@ -29,7 +29,7 @@ describe('Progressive Enhancement: without javascript audit', () => {
     };
 
     const result = withoutJsAudit.audit(artifacts);
-    assert.equal(result.score, false);
+    assert.equal(result.rawValue, false);
     assert.ok(result.debugString);
   });
 
@@ -41,7 +41,7 @@ describe('Progressive Enhancement: without javascript audit', () => {
     };
 
     const result = withoutJsAudit.audit(artifacts);
-    assert.equal(result.score, false);
+    assert.equal(result.rawValue, false);
     assert.ok(result.debugString);
   });
 
@@ -52,6 +52,6 @@ describe('Progressive Enhancement: without javascript audit', () => {
       }
     };
 
-    assert.equal(withoutJsAudit.audit(artifacts).score, true);
+    assert.equal(withoutJsAudit.audit(artifacts).rawValue, true);
   });
 });

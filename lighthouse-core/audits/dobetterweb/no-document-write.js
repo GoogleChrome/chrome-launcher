@@ -52,13 +52,13 @@ class NoDocWriteAudit extends Audit {
       }, err);
     });
 
-    return NoDocWriteAudit.generateAuditResult({
+    return {
       rawValue: results.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: results
       }
-    });
+    };
   }
 }
 

@@ -40,10 +40,10 @@ class Viewport extends Audit {
    */
   static audit(artifacts) {
     if (artifacts.Viewport === null) {
-      return Viewport.generateAuditResult({
+      return {
         debugString: 'No viewport meta tag found',
         rawValue: false
-      });
+      };
     }
 
     let debugString = '';
@@ -60,10 +60,10 @@ class Viewport extends Audit {
     const viewportProps = parsedProps.validProperties;
     const hasMobileViewport = viewportProps.width || viewportProps['initial-scale'];
 
-    return Viewport.generateAuditResult({
+    return {
       rawValue: !!hasMobileViewport,
       debugString
-    });
+    };
   }
 }
 

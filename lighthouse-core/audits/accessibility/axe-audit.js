@@ -35,13 +35,13 @@ class AxeAudit extends Audit {
     const violations = artifacts.Accessibility.violations;
     const rule = violations.find(result => result.id === this.meta.name);
 
-    return this.generateAuditResult({
+    return {
       rawValue: typeof rule === 'undefined',
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
       }
-    });
+    };
   }
 }
 

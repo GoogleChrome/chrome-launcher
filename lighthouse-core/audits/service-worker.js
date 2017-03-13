@@ -56,9 +56,9 @@ class ServiceWorker extends Audit {
     const version = getActivatedServiceWorker(
         artifacts.ServiceWorker.versions, artifacts.URL.finalUrl);
 
-    return ServiceWorker.generateAuditResult({
+    return {
       rawValue: !!version
-    });
+    };
   }
 }
 
