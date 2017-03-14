@@ -10,7 +10,6 @@
 
 const Audit = require('./audit');
 const TracingProcessor = require('../lib/traces/tracing-processor');
-const FMPMetric = require('./first-meaningful-paint');
 const Formatter = require('../report/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
@@ -64,21 +63,21 @@ class TTIMetric extends Audit {
   static audit(artifacts) {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
 
-    // We start looking at Math.Max(FMPMetric, visProgress[0.85])
+    // We start looking at Math.Max(FMP, visProgress[0.85])
     const pending = [
       artifacts.requestSpeedline(trace),
-      FMPMetric.audit(artifacts),
+      artifacts.requestTraceOfTab(trace),
       artifacts.requestTracingModel(trace)
     ];
-    return Promise.all(pending).then(([speedline, fmpResult, model]) => {
+    return Promise.all(pending).then(([speedline, tabTrace, model]) => {
       const endOfTraceTime = model.bounds.max;
-      const fmpTiming = fmpResult.rawValue;
-      const fmpResultExt = fmpResult.extendedInfo.value;
 
       // frame monotonic timestamps from speedline are in ms (ts / 1000), so we'll match
       //   https://github.com/pmdartus/speedline/blob/123f512632a/src/frame.js#L86
-      const fMPtsInMS = fmpResultExt.timestamps.fMP / 1000;
-      const navStartTsInMS = fmpResultExt.timestamps.navStart / 1000;
+      const fMPtsInMS = tabTrace.firstMeaningfulPaintEvt.ts / 1000;
+      const navStartTsInMS = tabTrace.navigationStartEvt.ts / 1000;
+
+      const fmpTiming = fMPtsInMS - navStartTsInMS;
 
       // look at speedline results for 85% starting at FMP
       let visuallyReadyTiming = 0;
