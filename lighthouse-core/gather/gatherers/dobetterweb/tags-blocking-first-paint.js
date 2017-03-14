@@ -42,10 +42,12 @@ function saveAsyncLinks() {
         window.__asyncLinks[link.href] = true;
       }
     });
+
+    setTimeout(checkForLinks, 50);
   }
 
   window.__asyncLinks = window.__asyncLinks || {};
-  setInterval(checkForLinks, 100);
+  setTimeout(checkForLinks, 50);
   checkForLinks();
 }
 

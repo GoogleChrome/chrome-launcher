@@ -25,6 +25,12 @@ const Audit = require('../audit');
 const URL = require('../../lib/url-shim');
 const Formatter = require('../../report/formatter');
 
+// Because of the way we detect blocking stylesheets, asynchronously loaded
+// CSS with link[rel=preload] and an onload handler (see https://github.com/filamentgroup/loadCSS)
+// can be falsely flagged as blocking. Therefore, ignore stylesheets that loaded fast enough
+// to possibly be non-blocking (and they have minimal impact anyway).
+const LOAD_THRESHOLD_IN_MS = 50;
+
 class LinkBlockingFirstPaintAudit extends Audit {
 
   /**
@@ -46,12 +52,17 @@ class LinkBlockingFirstPaintAudit extends Audit {
   /**
    * @param {!Artifacts} artifacts
    * @param {string} tagFilter The tagName to filter on
-   * @return {!AuditResult}
+   * @param {number=} loadThreshold Filter to resources that took at least this
+   *    many milliseconds to load.
+   * @return {!AuditResult} The object to pass to `generateAuditResult`
    */
-  static computeAuditResultForTags(artifacts, tagFilter) {
+  static computeAuditResultForTags(artifacts, tagFilter, loadThreshold = 0) {
     const artifact = artifacts.TagsBlockingFirstPaint;
 
-    const filtered = artifact.filter(item => item.tag.tagName === tagFilter);
+    const filtered = artifact.filter(item => {
+      return item.tag.tagName === tagFilter &&
+        (item.endTime - item.startTime) * 1000 >= loadThreshold;
+    });
 
     const startTime = filtered.reduce((t, item) => Math.min(t, item.startTime), Number.MAX_VALUE);
     let endTime = 0;
@@ -96,7 +107,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    return LinkBlockingFirstPaintAudit.computeAuditResultForTags(artifacts, 'LINK');
+    return this.computeAuditResultForTags(artifacts, 'LINK', LOAD_THRESHOLD_IN_MS);
   }
 }
 
