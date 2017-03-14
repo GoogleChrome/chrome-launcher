@@ -313,9 +313,8 @@ class GatherRunner {
       return Promise.reject(new Error('You must provide a config'));
     }
 
-    // CPU throttling is temporarily off by default
     if (typeof options.flags.disableCpuThrottling === 'undefined') {
-      options.flags.disableCpuThrottling = true;
+      options.flags.disableCpuThrottling = false;
     }
 
     passes = this.instantiateGatherers(passes, options.config.configDir);

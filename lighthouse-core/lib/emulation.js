@@ -67,7 +67,7 @@ const NO_CPU_THROTTLE_METRICS = {
   rate: 1
 };
 const CPU_THROTTLE_METRICS = {
-  rate: 5
+  rate: 4.5
 };
 
 function enableNexus5X(driver) {

@@ -126,9 +126,6 @@ function onGenerateReportButtonClick(background, selectedAggregations) {
       .filter(key => !!selectedAggregations[key]);
 
   background.runLighthouseInExtension({
-    flags: {
-      disableCpuThrottling: true
-    },
     restoreCleanState: true
   }, aggregationIDs).catch(err => {
     let message = err.message;
