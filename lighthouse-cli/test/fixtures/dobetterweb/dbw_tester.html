@@ -22,27 +22,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 
-<!-- FAIL: block rendering -->
-<script src="./dbw_tester.js?delay=true"></script>
-
 <template id="links-blocking-first-paint-tmpl">
-  <link rel="stylesheet" href="./dbw_tester.css?scriptActivated&delay=true"> <!-- PASS: initiator is script -->
+  <link rel="stylesheet" href="./dbw_tester.css?scriptActivated&delay=200"> <!-- PASS: initiator is script -->
 </template>
 
 <!-- Note: these will only fail when using the static-server.js, which supports the ?delay=true param.
      If you're using your own server, the resource will load instantly and the
      stylesheets will be ignored for being below the threshold. -->
 <!-- we use a relative protocol url to test that `new URL(resource)` in the critical-request-chains.js formatter can handle it -->
-<link rel="stylesheet" href="//localhost:10200/dobetterweb/dbw_tester.css?delay=true"> <!-- FAIL, when run under smokehouse -->
-<link rel="stylesheet" href="./unknown404.css?delay=true"> <!-- FAIL -->
-<link rel="stylesheet" href="./dbw_tester.css?delay=true"> <!-- FAIL -->
-<link rel="stylesheet" href="./dbw_tester.css?tooquick=true"> <!-- PASS -->
-<link rel="stylesheet" href="./dbw_disabled.css?delay=true" disabled> <!-- PASS -->
-<link rel="import" href="./dbw_partial_a.html?delay=true"> <!-- FAIL -->
-<link rel="import" href="./dbw_partial_b.html?delay=true" async> <!-- PASS -->
+<link rel="stylesheet" href="//localhost:10200/dobetterweb/dbw_tester.css?delay=100"> <!-- FAIL, when run under smokehouse -->
+<link rel="stylesheet" href="./unknown404.css?delay=200"> <!-- FAIL -->
+<link rel="stylesheet" href="./dbw_tester.css?delay=2200"> <!-- FAIL -->
+<link rel="stylesheet" href="./dbw_disabled.css?delay=200" disabled> <!-- PASS -->
+<link rel="import" href="./dbw_partial_a.html?delay=200"> <!-- FAIL -->
+<link rel="import" href="./dbw_partial_b.html?delay=200" async> <!-- PASS -->
 
 <!-- PASS: preload that's activated later does not block rendering. -->
-<link rel="preload" href="./dbw_tester.css?delay=true" as="style" onload="this.rel = 'stylesheet'">
+<link rel="preload" href="./dbw_tester.css?delay=2000&async=true" as="style" onload="this.rel = 'stylesheet'">
+
+<!-- FAIL: block rendering -->
+<script src="./dbw_tester.js"></script>
 
 <style>
   body {
