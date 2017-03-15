@@ -105,6 +105,7 @@ class UsesOptimizedImages extends Audit {
 
       results.push({
         url,
+        isCrossOrigin: !image.isSameOrigin,
         preview: {url: image.url, mimeType: image.mimeType},
         totalBytes: image.originalSize,
         wastedBytes: webpSavings.bytes,

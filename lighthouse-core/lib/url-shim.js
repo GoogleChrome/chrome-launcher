@@ -60,6 +60,19 @@ URL.hostsMatch = function hostsMatch(urlA, urlB) {
 };
 
 /**
+ * @param {string} urlA
+ * @param {string} urlB
+ * @return {boolean}
+ */
+URL.originsMatch = function originsMatch(urlA, urlB) {
+  try {
+    return new URL(urlA).origin === new URL(urlB).origin;
+  } catch (e) {
+    return false;
+  }
+};
+
+/**
  * @param {string} url
  * @param {{numPathParts: number, preserveQuery: boolean, preserveHost: boolean}=} options
  * @return {string}

@@ -55,6 +55,10 @@ function generateInlineScriptWithSize(sizeInBytes, firstContent = '', used = fal
   <!-- PASS(responsive): image is used at full size -->
   <img src="lighthouse-unoptimized.jpg">
 
+  <!-- FAIL(optimized): image is not optimized -->
+  <!-- PASS(responsive): image is used at full size -->
+  <img src="http://localhost:10503/byte-efficiency/lighthouse-unoptimized.jpg">
+
   <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
   <!-- FAIL(responsive): image is 25% used at DPR 2 -->
   <img style="width: 256px; height: 170px;" src="lighthouse-1024x680.jpg">

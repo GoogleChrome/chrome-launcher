@@ -58,6 +58,24 @@ describe('URL Shim', () => {
     assert.equal(URL.hostsMatch(urlA, urlB), false);
   });
 
+  it('safely identifies same origins', () => {
+    const urlA = 'https://5321212.fls.net/page?query=string#hash';
+    const urlB = 'https://5321212.fls.net/deeply/nested/page';
+    assert.ok(URL.originsMatch(urlA, urlB));
+  });
+
+  it('safely identifies different origins', () => {
+    const urlA = 'https://5321212.fls.net/page?query=string#hash';
+    const urlB = 'http://5321212.fls.net/deeply/nested/page';
+    assert.equal(URL.originsMatch(urlA, urlB), false);
+  });
+
+  it('safely identifies different invalid origins', () => {
+    const urlA = 'https://google.com/page?query=string#hash';
+    const urlB = 'anonymous:90';
+    assert.equal(URL.originsMatch(urlA, urlB), false);
+  });
+
   describe('getDisplayName', () => {
     it('respects numPathParts option', () => {
       const url = 'http://example.com/a/deep/nested/file.css';
