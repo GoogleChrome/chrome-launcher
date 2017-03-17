@@ -57,45 +57,55 @@ class UnusedBytes extends Audit {
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {!AuditResult}
+   * @return {!Promise<!AuditResult>}
    */
   static audit(artifacts) {
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
     return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
       const result = this.audit_(artifacts, networkRecords);
-      const debugString = result.debugString;
-      const results = result.results
-          .map(item => {
-            item.wastedKb = this.bytesToKbString(item.wastedBytes);
-            item.wastedMs = this.bytesToMsString(item.wastedBytes, networkThroughput);
-            item.totalKb = this.bytesToKbString(item.totalBytes);
-            item.totalMs = this.bytesToMsString(item.totalBytes, networkThroughput);
-            item.potentialSavings = this.toSavingsString(item.wastedBytes, item.wastedPercent);
-            return item;
-          })
-          .sort((itemA, itemB) => itemB.wastedBytes - itemA.wastedBytes);
-
-      const wastedBytes = results.reduce((sum, item) => sum + item.wastedBytes, 0);
-
-      let displayValue = result.displayValue || '';
-      if (typeof result.displayValue === 'undefined' && wastedBytes) {
-        const wastedKbDisplay = this.bytesToKbString(wastedBytes);
-        const wastedMsDisplay = this.bytesToMsString(wastedBytes, networkThroughput);
-        displayValue = `Potential savings of ${wastedKbDisplay} (~${wastedMsDisplay})`;
-      }
-
-      return {
-        debugString,
-        displayValue,
-        rawValue: typeof result.passes === 'undefined' ?
-            wastedBytes < WASTEFUL_THRESHOLD_IN_BYTES :
-            !!result.passes,
-        extendedInfo: {
-          formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-          value: {results, tableHeadings: result.tableHeadings}
-        }
-      };
+      return this.createAuditResult(result, networkThroughput);
     });
+  }
+
+  /**
+   * @param {!{debugString: string=, passes: boolean=, tableHeadings: !Object,
+   *    results: !Array<!Object>}} result
+   * @param {number} networkThroughput
+   * @return {!AuditResult}
+   */
+  static createAuditResult(result, networkThroughput) {
+    const debugString = result.debugString;
+    const results = result.results
+        .map(item => {
+          item.wastedKb = this.bytesToKbString(item.wastedBytes);
+          item.wastedMs = this.bytesToMsString(item.wastedBytes, networkThroughput);
+          item.totalKb = this.bytesToKbString(item.totalBytes);
+          item.totalMs = this.bytesToMsString(item.totalBytes, networkThroughput);
+          item.potentialSavings = this.toSavingsString(item.wastedBytes, item.wastedPercent);
+          return item;
+        })
+        .sort((itemA, itemB) => itemB.wastedBytes - itemA.wastedBytes);
+
+    const wastedBytes = results.reduce((sum, item) => sum + item.wastedBytes, 0);
+
+    let displayValue = result.displayValue || '';
+    if (typeof result.displayValue === 'undefined' && wastedBytes) {
+      const wastedKbDisplay = this.bytesToKbString(wastedBytes);
+      const wastedMsDisplay = this.bytesToMsString(wastedBytes, networkThroughput);
+      displayValue = `Potential savings of ${wastedKbDisplay} (~${wastedMsDisplay})`;
+    }
+
+    return {
+      debugString,
+      displayValue,
+      rawValue: typeof result.passes === 'undefined' ?
+          wastedBytes < WASTEFUL_THRESHOLD_IN_BYTES :
+          !!result.passes,
+      extendedInfo: {
+        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+        value: {results, tableHeadings: result.tableHeadings}
+      }
+    };
   }
 
   /**
