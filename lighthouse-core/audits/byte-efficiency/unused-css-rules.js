@@ -141,7 +141,7 @@ class UnusedCSSRules extends Audit {
       const contentPreview = UnusedCSSRules.determineContentPreview(stylesheetInfo.content);
       url = '*inline*```' + contentPreview + '```';
     } else {
-      url = URL.getDisplayName(url, {preserveQuery: true});
+      url = URL.getDisplayName(url);
     }
 
     // If we don't know for sure how many bytes this sheet used on the network,

@@ -80,7 +80,7 @@ URL.originsMatch = function originsMatch(urlA, urlB) {
 URL.getDisplayName = function getDisplayName(url, options) {
   options = Object.assign({
     numPathParts: 2,
-    preserveQuery: false,
+    preserveQuery: true,
     preserveHost: false,
   }, options);
 

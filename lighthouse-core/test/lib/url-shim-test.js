@@ -85,8 +85,8 @@ describe('URL Shim', () => {
 
     it('respects preserveQuery option', () => {
       const url = 'http://example.com/file.css?aQueryString=true';
-      const result = URL.getDisplayName(url, {preserveQuery: true});
-      assert.equal(result, '/file.css?aQueryString=true');
+      const result = URL.getDisplayName(url, {preserveQuery: false});
+      assert.equal(result, '/file.css');
     });
 
     it('respects preserveHost option', () => {
@@ -109,13 +109,13 @@ describe('URL Shim', () => {
 
     it('Elides query strings when can first parameter', () => {
       const url = 'http://example.com/file.css?aQueryString=true&other_long_query_stuff=false&some_other_super_long_query';
-      const result = URL.getDisplayName(url, {preserveQuery: true});
+      const result = URL.getDisplayName(url);
       assert.equal(result, '/file.css?aQueryString=\u2026');
     });
 
     it('Elides query strings when cannot preserve first parameter', () => {
       const url = 'http://example.com/file.css?superDuperNoGoodVeryLongExtraSpecialOnlyTheBestEnourmousQueryString=true';
-      const result = URL.getDisplayName(url, {preserveQuery: true});
+      const result = URL.getDisplayName(url);
       assert.equal(result, '/file.css?\u2026');
     });
 
