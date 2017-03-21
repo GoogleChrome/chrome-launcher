@@ -45,6 +45,8 @@ interface Results {
   audits: Object;
   lighthouseVersion: string;
   artifacts?: Object;
+  initialUrl: string;
+  generatedTime: string;
 }
 
 export {
