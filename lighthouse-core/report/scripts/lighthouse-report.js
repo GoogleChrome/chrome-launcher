@@ -32,12 +32,13 @@ class LighthouseReport {
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onExport = this.onExport.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.printShortCutDetect = this.printShortCutDetect.bind(this);
 
     this._addEventListeners();
   }
 
   _addEventListeners() {
-    this._setupExpandDetailsWhenPrinting();
+    this._setUpCollaspeDetailsAfterPrinting();
 
     const headerContainer = document.querySelector('.js-header-container');
     if (headerContainer) {
@@ -53,6 +54,7 @@ class LighthouseReport {
 
       document.addEventListener('copy', this.onCopy);
     }
+    document.addEventListener('keydown', this.printShortCutDetect);
   }
 
   /**
@@ -127,6 +129,7 @@ class LighthouseReport {
         this.sendJSONReport();
         break;
       case 'print':
+        this.expandDetailsWhenPrinting();
         window.print();
         break;
       case 'save-json': {
@@ -196,30 +199,45 @@ class LighthouseReport {
   }
 
   /**
-   * Sets up listeners to expand audit `<details>` when the user prints the page.
-   * Ideally, a print stylesheet could take care of this, but CSS has no way to
-   * open a `<details>` element. When the user closes the print dialog, all
-   * `<details>` are collapsed.
+   * Expands details while user using short cut to print report
    */
-  _setupExpandDetailsWhenPrinting() {
+  printShortCutDetect(e) {
+    if ((e.ctrlKey || e.metaKey) && e.keyCode === 80) { // Ctrl+P
+      this.expandDetailsWhenPrinting();
+    }
+  }
+
+  /**
+   * Expands audit `<details>` when the user prints the page.
+   * Ideally, a print stylesheet could take care of this, but CSS has no way to
+   * open a `<details>` element.
+   */
+  expandDetailsWhenPrinting() {
+    const details = Array.from(document.querySelectorAll('details'));
+    details.map(detail => detail.open = true);
+  }
+
+  /**
+   * Sets up listeners to collapse audit `<details>` when the user closes the
+   * print dialog, all `<details>` are collapsed.
+   */
+  _setUpCollaspeDetailsAfterPrinting() {
     const details = Array.from(document.querySelectorAll('details'));
 
     // FF and IE implement these old events.
     if ('onbeforeprint' in window) {
-      window.addEventListener('beforeprint', _ => {
-        details.map(detail => detail.open = true);
-      });
       window.addEventListener('afterprint', _ => {
         details.map(detail => detail.open = false);
       });
     } else {
       // Note: while FF has media listeners, it doesn't fire when matching 'print'.
       window.matchMedia('print').addListener(mql => {
-        details.map(detail => detail.open = mql.matches);
+        if (!mql.matches) {
+          details.map(detail => detail.open = mql.matches);
+        }
       });
     }
   }
-
   /**
    * Downloads a file (blob) using a[download].
    * @param {Blob|File} blob The file to save.
