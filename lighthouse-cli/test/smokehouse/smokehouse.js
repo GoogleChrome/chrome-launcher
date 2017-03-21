@@ -111,9 +111,13 @@ function findDifference(path, actual, expected) {
     return null;
   }
 
+  if (typeof actual === 'string' && expected instanceof RegExp && expected.test(actual)) {
+    return null;
+  }
+
   // If they aren't both an object we can't recurse further, so this is the difference.
   if (actual === null || expected === null || typeof actual !== 'object' ||
-      typeof expected !== 'object') {
+      typeof expected !== 'object' || expected instanceof RegExp) {
     return {
       path,
       actual,

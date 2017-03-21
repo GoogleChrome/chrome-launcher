@@ -83,7 +83,7 @@ module.exports = [
         extendedInfo: {
           value: {
             1: {value: '20'},
-            2: {snippet: 'Element with most children:\nul#versionlist.'}
+            2: {snippet: /ul.versionlist/}
           }
         }
       },
