@@ -80,7 +80,7 @@ class GatherRunner {
   static loadPage(driver, options) {
     return Promise.resolve()
       // Begin tracing only if requested by config.
-      .then(_ => options.config.recordTrace && driver.beginTrace())
+      .then(_ => options.config.recordTrace && driver.beginTrace(options.flags))
       // Network is always recorded for internal use, even if not saved as artifact.
       .then(_ => driver.beginNetworkCollect(options))
       // Navigate.

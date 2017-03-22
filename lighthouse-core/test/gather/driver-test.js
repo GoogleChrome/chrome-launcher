@@ -17,6 +17,8 @@
 
 'use strict';
 
+let sendCommandParams = [];
+
 const Driver = require('../../gather/driver.js');
 const Connection = require('../../gather/connections/connection.js');
 const Element = require('../../lib/element.js');
@@ -53,6 +55,7 @@ function createActiveWorker(id, url, controlledClients) {
 }
 
 connection.sendCommand = function(command, params) {
+  sendCommandParams.push({command, params});
   switch (command) {
     case 'DOM.getDocument':
       return Promise.resolve({root: {nodeId: 249}});
@@ -73,6 +76,8 @@ connection.sendCommand = function(command, params) {
           }
         }]
       });
+    case 'Page.enable':
+    case 'Tracing.start':
     case 'ServiceWorker.enable':
     case 'ServiceWorker.disable':
       return Promise.resolve();
@@ -98,6 +103,10 @@ const mockRedirects = [req1, req2, req3];
 /* eslint-env mocha */
 
 describe('Browser Driver', () => {
+  beforeEach(() => {
+    sendCommandParams = [];
+  });
+
   it('returns null when DOM.querySelector finds no node', () => {
     return driverStub.querySelector('invalid').then(value => {
       assert.equal(value, null);
@@ -150,9 +159,32 @@ describe('Browser Driver', () => {
     assert.notEqual(opts.url, req1.url, 'opts.url changed after the redirects');
     assert.equal(opts.url, req3.url, 'opts.url matches the last redirect');
   });
+
+  it('will request default traceCategories', () => {
+    return driverStub.beginTrace().then(() => {
+      const traceCmd = sendCommandParams.find(obj => obj.command === 'Tracing.start');
+      const categories = traceCmd.params.categories;
+      assert.ok(categories.includes('devtools.timeline'), 'contains devtools.timeline');
+    });
+  });
+
+  it('will use requested additionalTraceCategories', () => {
+    return driverStub.beginTrace({additionalTraceCategories: 'v8,v8.execute,toplevel'}).then(() => {
+      const traceCmd = sendCommandParams.find(obj => obj.command === 'Tracing.start');
+      const categories = traceCmd.params.categories;
+      assert.ok(categories.includes('blink'), 'contains default categories');
+      assert.ok(categories.includes('v8.execute'), 'contains added categories');
+      assert.ok(categories.indexOf('toplevel') === categories.lastIndexOf('toplevel'),
+          'de-dupes categories');
+    });
+  });
 });
 
 describe('Multiple tab check', () => {
+  beforeEach(() => {
+    sendCommandParams = [];
+  });
+
   it('will pass if there are no current service workers', () => {
     const pageUrl = 'https://example.com/';
     driverStub.once = createOnceStub({
