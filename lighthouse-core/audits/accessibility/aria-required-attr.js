@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class ARIARequiredAttr extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'aria-required-attr',
-      description: 'Elements with ARIA roles have the required aria-* attributes',
+      description: '`[role]`s have all required `[aria-*]` attributes.',
       helpText: 'Some ARIA roles have required attributes that describe the state ' +
           'of the element to screen readers. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/required-aria-attributes).',
       requiredArtifacts: ['Accessibility']

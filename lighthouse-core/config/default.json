@@ -82,14 +82,41 @@
     "theme-color-meta",
     "content-width",
     "deprecations",
+    "accessibility/accesskeys",
     "accessibility/aria-allowed-attr",
     "accessibility/aria-required-attr",
+    "accessibility/aria-required-children",
+    "accessibility/aria-required-parent",
+    "accessibility/aria-roles",
     "accessibility/aria-valid-attr-value",
     "accessibility/aria-valid-attr",
+    "accessibility/audio-caption",
+    "accessibility/button-name",
+    "accessibility/bypass",
     "accessibility/color-contrast",
+    "accessibility/definition-list",
+    "accessibility/dlitem",
+    "accessibility/document-title",
+    "accessibility/duplicate-id",
+    "accessibility/frame-title",
+    "accessibility/html-has-lang",
+    "accessibility/html-lang-valid",
     "accessibility/image-alt",
+    "accessibility/input-image-alt",
     "accessibility/label",
+    "accessibility/layout-table",
+    "accessibility/link-name",
+    "accessibility/list",
+    "accessibility/listitem",
+    "accessibility/meta-refresh",
+    "accessibility/meta-viewport",
+    "accessibility/object-alt",
     "accessibility/tabindex",
+    "accessibility/td-headers-attr",
+    "accessibility/th-has-data-cells",
+    "accessibility/valid-lang",
+    "accessibility/video-caption",
+    "accessibility/video-description",
     "byte-efficiency/total-byte-weight",
     "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",
@@ -336,42 +363,6 @@
         }
       }
     }, {
-      "name": "Accessibility",
-      "audits": {
-        "aria-allowed-attr": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "aria-required-attr": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "aria-valid-attr": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "aria-valid-attr-value": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "color-contrast": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "image-alt": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "label": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "tabindex": {
-          "expectedValue": true,
-          "weight": 1
-        }
-      }
-    }, {
       "name": "Other",
       "audits": {
         "manifest-short-name-length": {
@@ -385,6 +376,193 @@
       }
     }]
   }, {
+      "name": "Accessibility",
+      "id": "accessibility",
+      "description": "These checks highlight opportunities to improve the accessibility of your app.",
+      "scored": false,
+      "categorizable": true,
+      "items": [{
+        "name": "Color contrast of elements is satisfactory",
+        "audits": {
+          "color-contrast": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Elements are well structured",
+        "audits": {
+          "definition-list": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "dlitem": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "duplicate-id": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "list": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "listitem": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Elements avoid incorrect use of attributes",
+        "audits": {
+          "accesskeys": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "audio-caption": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "image-alt": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "input-image-alt": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "tabindex": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "td-headers-attr": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "th-has-data-cells": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Elements applying ARIA follow correct practices",
+        "audits": {
+          "aria-allowed-attr": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-required-attr": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-required-children": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-required-parent": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-roles": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-valid-attr-value": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "aria-valid-attr": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Elements describe their contents well",
+        "audits": {
+          "document-title": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "frame-title": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "label": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "layout-table": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "object-alt": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "video-caption": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "video-description": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "The page's language is specified and valid",
+        "audits": {
+          "html-has-lang": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "html-lang-valid": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "valid-lang": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "The document does not use <meta http-equiv=\"refresh\">",
+        "audits": {
+          "meta-refresh": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "The <meta name=\"viewport\"> element follows best practices",
+        "audits": {
+          "meta-viewport": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Links and buttons have discernable names",
+        "audits": {
+          "button-name": {
+            "expectedValue": true,
+            "weight": 1
+          },
+          "link-name": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }, {
+        "name": "Repetitive content can be bypassed",
+        "audits": {
+          "bypass": {
+            "expectedValue": true,
+            "weight": 1
+          }
+        }
+      }]
+    }, {
     "name": "Performance",
     "id": "perf",
     "description": "These encapsulate your app's performance.",

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class Label extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'label',
-      description: 'Every form element has a label',
+      description: 'Form elements have associated labels.',
       helpText: 'Labels ensure that form controls are announced properly by assistive ' +
           'technologies, like screen readers. [Learn ' +
           'more](https://developers.google.com/web/tools/lighthouse/audits/form-labels).',

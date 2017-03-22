@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class TabIndex extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'tabindex',
-      description: 'No element has a `tabindex` attribute greater than 0',
+      description: 'No element has a `[tabindex]` value greater than 0.',
       helpText: 'A value greater than 0 implies an explicit navigation ordering. ' +
           'Although technically valid, this often creates frustrating experiences ' +
           'for users who rely on assistive technologies. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/tabindex).',

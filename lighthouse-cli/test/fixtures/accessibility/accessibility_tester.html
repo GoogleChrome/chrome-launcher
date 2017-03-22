@@ -15,29 +15,54 @@
  * limitations under the License.
 -->
 
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>A11y Test Page</title>
+    <meta name="viewport" content="user-scalable=no, maximum-scale=1.0">
   </head>
   <body>
-    <h2>aria-allowed-attr</h2>
+    <p>accesskeys</p>
+    <section>
+      <div accesskey="h" tabindex="0">accesskey h</div>
+      <div accesskey="h" tabindex="0">accesskey h</div>
+    </section>
+    <p>aria-allowed-attr</p>
     <section>
       <div
         id="aria-allowed-attr"
-        role="navigation"
+        role="alert"
         aria-checked="true">
       </div>
     </section>
-    <h2>aria-required-attr</h2>
+    <p>aria-required-attr</p>
     <section>
       <div
         id="aria-required-attr"
         role="checkbox">
       </div>
     </section>
-    <h2>aria-valid-attr</h2>
+    <p>aria-required-children</p>
+    <section>
+      <div
+        id="aria-required-children"
+        role="radiogroup">
+        <div></div>
+      </div>
+    </section>
+    <p>aria-required-parent</p>
+    <section>
+      <div>
+        <div
+          id="aria-required-parent"
+          role="option">
+        </div>
+      </div>
+    </section>
+    <p>aria-roles</p>
+    <section>
+      <div role="foo"></div>
+    </section>
+    <p>aria-valid-attr</p>
     <section>
       <div
         id="aria-valid-attr"
@@ -45,7 +70,7 @@
         aria-chked="true">
       </div>
     </section>
-    <h2>aria-valid-attr-value</h2>
+    <p>aria-valid-attr-value</p>
     <section>
       <div
         id="aria-valid-attr-value"
@@ -53,7 +78,15 @@
         aria-checked="0">
       </div>
     </section>
-    <h2>color-contrast</h2>
+    <p>audio-caption</p>
+    <section>
+      <audio id="audio-caption"></audio>
+    </section>
+    <p>button-name</p>
+    <section>
+      <button id="button-name"></button>
+    </section>
+    <p>color-contrast</p>
     <section>
       <div
         id="color-contrast"
@@ -61,14 +94,39 @@
           Hello
       </div>
     </section>
-    <h2>image-alt</h2>
+    <p>definition-list</p>
+    <section>
+      <dl id="definition-list">
+        <p></p>
+      </dl>
+    </section>
+    <p>dlitem</p>
+    <section>
+      <div id="dlitem">
+        <dd></dd>
+      </div>
+    </section>
+    <p>duplicate-id</p>
+    <section>
+      <div id="duplicate-id"></div>
+      <div id="duplicate-id"></div>
+    </section>
+    <p>frame-title</p>
+    <section>
+      <iframe id="frame-title"></iframe>
+    </section>
+    <p>image-alt</p>
     <section>
       <img
         id="image-alt"
         src="./bogus.jpg">
       </img>
     </section>
-    <h2>label</h2>
+    <p>input-image-alt</p>
+    <section>
+      <input type="image" id="input-image-alt">
+    </section>
+    <p>label</p>
     <section>
       <form>
         <input
@@ -76,12 +134,78 @@
           type="text">
       </form>
     </section>
-    <h2>tabindex</h2>
+    <p>layout-table</p>
+    <section>
+      <table id="layout-table" role="presentation">
+        <th></th>
+      </table>
+    </section>
+    <p>link-name</p>
+    <section>
+      <a id="link-name" href="google.com"></a>
+    </section>
+    <p>list</p>
+    <section>
+      <ul id="list">
+        <p></p>
+      </ul>
+    </section>
+    <p>listitem</p>
+    <section>
+      <li id="listitem"></li>
+    </section>
+    <p>object-alt</p>
+    <section>
+      <object id="object-alt"></object>
+    </section>
+    <p>tabindex</p>
     <section>
       <div
         id="tabindex"
         tabindex="10">
       </div>
+    </section>
+    <p>table-fake-caption</p>
+    <section>
+      <table id="table-fake-caption" role="grid">
+        <tr><td colspan="2">FOO</td></tr>
+        <tr><td>foo</td><td>foo</td><tr>
+      </table>
+    </section>
+    <p>td-has-header</p>
+    <section>
+      <table id="td-has-header">
+        <tr><th>FOO</th><th>FOO</th><th>FOO</th><td>FOO</td></tr>
+        <tr><td>foo</td><td>foo</td><td>foo</td><td>foo</td></tr>
+        <tr><td>foo</td><td>foo</td><td>foo</td><td>foo</td></tr>
+        <tr><td>foo</td><td>foo</td><td>foo</td><td>foo</td></tr>
+      </table>
+    </section>
+    <p>td-headers-attr</p>
+    <section>
+      <table id="td-headers-attr">
+			  <tr><th>FOO</th></tr>
+			  <tr><td headers="bogus-td-headers-attr">foo</th></tr>
+			</table>
+    </section>
+    <p>th-has-data-cells</p>
+    <section>
+      <table id="th-has-data-cells">
+        <tr><th>FOO</th><th>FOO</th></tr>
+        <tr><td>foo</td></tr>
+      </table>
+    </section>
+    <p>valid-lang</p>
+    <section>
+      <p id="valid-lang" lang="foo">foo</p>
+    </section>
+    <p>video-caption</p>
+    <section>
+      <video id="video-caption"></video>
+    </section>
+    <p>video-description</p>
+    <section>
+      <video id="video-description"></video>
     </section>
   </body>
 </html>

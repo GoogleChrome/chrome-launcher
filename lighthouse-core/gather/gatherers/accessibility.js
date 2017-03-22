@@ -31,17 +31,19 @@ const axe = fs.readFileSync(
 function runA11yChecks() {
   return axe.run(document, {
     runOnly: {
-      type: 'rule',
+      type: 'tag',
       values: [
-        'aria-allowed-attr',
-        'aria-required-attr',
-        'aria-valid-attr',
-        'aria-valid-attr-value',
-        'color-contrast',
-        'image-alt',
-        'label',
-        'tabindex'
+        'wcag2a',
+        'wcag2aa'
       ]
+    },
+    rules: {
+      'tabindex': {enabled: true},
+      'table-fake-caption': {enabled: true},
+      'td-has-header': {enabled: true},
+      'area-alt': {enabled: false},
+      'blink': {enabled: false},
+      'server-side-image-map': {enabled: false}
     }
   });
 }

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ class ImageAlt extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'image-alt',
-      description: 'Every image element has an alt attribute',
-      helpText: 'Screen reader users rely on `alt` text to provide descriptions of ' +
-          'images. It\'s also used as fallback content when an image fails to load. ' +
+      description: 'Image elements have `[alt]` attributes.',
+      helpText: 'Informative elements should aim for short, descriptive alternate text. ' +
+          'Decorative elements can be ignored with an empty alt attributes, e.g. [alt=""].' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/alt-attribute).',
       requiredArtifacts: ['Accessibility']
     };

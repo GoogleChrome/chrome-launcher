@@ -371,7 +371,7 @@ describe('Config', () => {
       const runConfig = JSON.parse(JSON.stringify(defaultConfig));
       const aggs = Config.getAggregations(runConfig);
       assert.equal(Array.isArray(aggs), true);
-      assert.equal(aggs.length, 4, 'Did not find more than three aggregations');
+      assert.equal(aggs.length, 5, 'Found the correct number of aggregations');
       const haveName = aggs.every(agg => agg.name.length);
       const haveID = aggs.every(agg => agg.id.length);
       assert.equal(haveName === haveID === true, true, 'they dont have IDs and names');

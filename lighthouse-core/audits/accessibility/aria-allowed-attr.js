@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ class ARIAAllowedAttr extends AxeAudit {
     return {
       category: 'Accessibility',
       name: 'aria-allowed-attr',
-      description: 'Element aria-* attributes are allowed for this role',
+      description: '`[aria-*]` attributes match their roles.',
       helpText: 'Each ARIA `role` supports a specific subset of `aria-*` attributes. ' +
           'Mismatching these invalidates the `aria-*` attributes. [Learn ' +
           'more](https://developers.google.com/web/tools/lighthouse/audits/aria-allowed-attributes).',
