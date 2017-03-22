@@ -64,6 +64,7 @@
     "manifest-display",
     "without-javascript",
     "first-meaningful-paint",
+    "load-fast-enough-for-pwa",
     "speed-index-metric",
     "estimated-input-latency",
     "time-to-interactive",
@@ -161,6 +162,10 @@
       "name": "Page load performance is fast",
       "description": "Users notice if sites and apps don't perform well. These top-level metrics capture the most important perceived performance concerns.",
       "audits": {
+        "load-fast-enough-for-pwa": {
+          "expectedValue": true,
+          "weight": 1
+        },
         "first-meaningful-paint": {
           "expectedValue": 100,
           "weight": 1

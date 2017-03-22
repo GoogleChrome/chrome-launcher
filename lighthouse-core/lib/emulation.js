@@ -151,5 +151,14 @@ module.exports = {
   enableCPUThrottling,
   disableCPUThrottling,
   goOffline,
-  getEmulationDesc
+  getEmulationDesc,
+  settings: {
+    NEXUS5X_EMULATION_METRICS,
+    NEXUS5X_USERAGENT,
+    TYPICAL_MOBILE_THROTTLING_METRICS,
+    OFFLINE_METRICS,
+    NO_THROTTLING_METRICS,
+    NO_CPU_THROTTLE_METRICS,
+    CPU_THROTTLE_METRICS
+  }
 };
