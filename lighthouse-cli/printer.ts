@@ -25,7 +25,7 @@
 enum OutputMode { json, html };
 type Mode = 'json' | 'html';
 
-import {Results, AuditResult} from './types/types';
+import {Results} from './types/types';
 
 const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
@@ -68,7 +68,7 @@ function createOutput(results: Results, outputMode: OutputMode): string {
  * Writes the output to stdout.
  */
 function writeToStdout(output: string): Promise<{}> {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     // small delay to avoid race with debug() logs
     setTimeout(_ => {
       process.stdout.write(`${output}\n`);

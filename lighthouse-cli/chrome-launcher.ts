@@ -142,7 +142,7 @@ export class ChromeLauncher {
   }
 
   spawn(execPath: string): Promise<any[]> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
         return resolve(this.chrome.pid);

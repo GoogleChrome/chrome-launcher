@@ -20,7 +20,7 @@
 const readline = require('readline');
 
 function ask(question: string, options: string[]): Promise<string> {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const iface = readline.createInterface(process.stdin, process.stdout);
     const optionsStr = options.map((o, i) => i + 1 + '. ' + o).join('\r\n');
 
