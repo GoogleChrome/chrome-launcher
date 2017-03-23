@@ -38,7 +38,7 @@ class UsesResponsiveImages extends Audit {
     return {
       category: 'Images',
       name: 'uses-responsive-images',
-      description: 'Oversized Images',
+      description: 'Oversized images',
       informative: true,
       helpText:
         'Image sizes served should be based on the device display size to save network bytes. ' +

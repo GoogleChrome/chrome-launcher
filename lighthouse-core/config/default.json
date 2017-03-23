@@ -576,12 +576,12 @@
     "categorizable": false,
     "items": [{
       "audits": {
-        "unused-css-rules": {
-          "expectedValue": true,
+        "total-byte-weight": {
+          "expectedValue": 100,
           "weight": 1
         },
-        "offscreen-images": {
-          "expectedValue": true,
+        "dom-size": {
+          "expectedValue": 100,
           "weight": 1
         },
         "uses-optimized-images": {
@@ -592,7 +592,11 @@
           "expectedValue": true,
           "weight": 1
         },
-        "critical-request-chains": {
+        "offscreen-images": {
+          "expectedValue": true,
+          "weight": 1
+        },
+         "unused-css-rules": {
           "expectedValue": true,
           "weight": 1
         },
@@ -604,12 +608,8 @@
           "expectedValue": true,
           "weight": 1
         },
-        "total-byte-weight": {
-          "expectedValue": 100,
-          "weight": 1
-        },
-        "dom-size": {
-          "expectedValue": 100,
+         "critical-request-chains": {
+          "expectedValue": true,
           "weight": 1
         },
         "user-timings": {

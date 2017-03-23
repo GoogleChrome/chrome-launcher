@@ -39,6 +39,7 @@ class OffscreenImages extends Audit {
       category: 'Images',
       name: 'offscreen-images',
       description: 'Offscreen images',
+      informative: true,
       helpText: 'Images that are not above the fold should be lazily loaded after the page is ' +
         'interactive. Consider using the [IntersectionObserver](https://developers.google.com/web/updates/2016/04/intersectionobserver) API.',
       requiredArtifacts: ['ImageUsage', 'ViewportDimensions', 'traces', 'networkRecords']
