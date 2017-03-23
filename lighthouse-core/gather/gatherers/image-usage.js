@@ -28,12 +28,20 @@ const Gatherer = require('./gatherer');
 /* istanbul ignore next */
 function collectImageElementInfo() {
   return [...document.querySelectorAll('img')].map(element => {
+    const clientRect = element.getBoundingClientRect();
     return {
       // currentSrc used over src to get the url as determined by the browser
       // after taking into account srcset/media/sizes/etc.
       src: element.currentSrc,
       clientWidth: element.clientWidth,
       clientHeight: element.clientHeight,
+      clientRect: {
+        // manually copy the properties because ClientRect does not JSONify
+        top: clientRect.top,
+        bottom: clientRect.bottom,
+        left: clientRect.left,
+        right: clientRect.right,
+      },
       naturalWidth: element.naturalWidth,
       naturalHeight: element.naturalHeight,
       isPicture: element.parentElement.tagName === 'PICTURE',

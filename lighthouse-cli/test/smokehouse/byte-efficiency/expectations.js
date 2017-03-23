@@ -34,6 +34,16 @@ module.exports = [
           }
         }
       },
+      'offscreen-images': {
+        score: false,
+        extendedInfo: {
+          value: {
+            results: {
+              length: 3
+            }
+          }
+        }
+      },
       'uses-optimized-images': {
         score: false,
         extendedInfo: {

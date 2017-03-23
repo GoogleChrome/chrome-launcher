@@ -44,7 +44,7 @@ class UsesResponsiveImages extends Audit {
         'Image sizes served should be based on the device display size to save network bytes. ' +
         'Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) ' +
         'and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints).',
-      requiredArtifacts: ['ImageUsage', 'ContentWidth', 'networkRecords']
+      requiredArtifacts: ['ImageUsage', 'ViewportDimensions', 'networkRecords']
     };
   }
 
@@ -85,10 +85,9 @@ class UsesResponsiveImages extends Audit {
    */
   static audit_(artifacts) {
     const images = artifacts.ImageUsage;
-    const contentWidth = artifacts.ContentWidth;
+    const DPR = artifacts.ViewportDimensions.devicePixelRatio;
 
     let debugString;
-    const DPR = contentWidth.devicePixelRatio;
     const resultsMap = images.reduce((results, image) => {
       // TODO: give SVG a free pass until a detail per pixel metric is available
       if (!image.networkRecord || image.networkRecord.mimeType === 'image/svg+xml') {

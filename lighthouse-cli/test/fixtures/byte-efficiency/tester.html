@@ -40,6 +40,12 @@ function generateInlineScriptWithSize(sizeInBytes, firstContent = '', used = fal
   style.appendChild(document.createTextNode(textContent));
   document.head.appendChild(style);
 }
+
+// Lazily load the image
+setTimeout(() => {
+  const template = document.getElementById('lazily-loaded-image');
+  document.body.appendChild(template.content.cloneNode(true));
+}, 3000);
 </script>
 </head>
 
@@ -53,7 +59,8 @@ function generateInlineScriptWithSize(sizeInBytes, firstContent = '', used = fal
 <div class="images">
   <!-- FAIL(optimized): image is not JPEG optimized -->
   <!-- PASS(responsive): image is used at full size -->
-  <img src="lighthouse-unoptimized.jpg">
+  <!-- FAIL(offscreen): image is offscreen -->
+  <img style="position: absolute; top: -10000px;" src="lighthouse-unoptimized.jpg">
 
   <!-- FAIL(optimized): image is not optimized -->
   <!-- PASS(responsive): image is used at full size -->
@@ -61,32 +68,46 @@ function generateInlineScriptWithSize(sizeInBytes, firstContent = '', used = fal
 
   <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
   <!-- FAIL(responsive): image is 25% used at DPR 2 -->
+  <!-- PASS(offscreen): image is onscreen -->
   <img style="width: 256px; height: 170px;" src="lighthouse-1024x680.jpg">
 
   <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
   <!-- PASS(responsive): image is fully used at DPR 2 -->
+  <!-- PASS(offscreen): image is onscreen -->
   <img style="width: 240px; height: 160px;" src="lighthouse-480x320.jpg">
 
   <!-- PASS(optimized): image has insignificant WebP savings -->
   <!-- PASS(responsive): image is used at full size -->
+  <!-- PASS(offscreen): image is onscreen -->
   <img src="lighthouse-320x212-poor.jpg">
 
   <!-- PASS(optimized): image is fully optimized -->
   <!-- PASSWARN(responsive): image is 25% used at DPR 2 (but small savings) -->
-  <img style="width: 120px; height: 80px;" src="lighthouse-480x320.webp">
+  <!-- FAIL(offscreen): image is offscreen -->
+  <img style="margin-top: 1000px; width: 120px; height: 80px;" src="lighthouse-480x320.webp">
 
   <!-- PASS(optimized): image is vector -->
   <!-- PASS(responsive): image is vector -->
+  <!-- FAIL(offscreen): image is offscreen -->
   <img style="width: 100px; height: 100px;" src="large.svg">
 
   <!-- PASS(optimized): image has insignificant WebP savings -->
   <!-- PASS(responsive): image is later used at full size -->
+  <!-- PASS(offscreen): image is later used onscreen -->
   <img style="width: 24px; height: 16px;"src="lighthouse-320x212-poor.jpg?duplicate">
 
   <!-- PASS(optimized): image has insignificant WebP savings -->
   <!-- PASS(responsive): image is used at full size -->
-  <img src="lighthouse-320x212-poor.jpg?duplicate">
+  <!-- PASS(offscreen): image is onscreen -->
+  <img style="position: absolute; top: 0; left: 0;" src="lighthouse-320x212-poor.jpg?duplicate">
 </div>
+
+<template id="lazily-loaded-image">
+  <!-- PASS(optimized): image is WebP -->
+  <!-- PASS(responsive): image is used at full size -->
+  <!-- PASS(offscreen): image is lazily loaded after TTI -->
+  <img style="position: absolute; top: -5000px;" src="lighthouse-480x320.webp?lazilyLoaded=true">
+</template>
 
 <script>
 // PASS: unused but too small savings
@@ -99,5 +120,7 @@ generateInlineScriptWithSize(2000, '.kinda-unused { background: none; }\n');
 generateInlineScriptWithSize(24000, '.definitely-unused { background: none; }\n');
 </script>
 
+<!-- Ensure the page takes at least 5 seconds and we don't exit before the lazily loaded image -->
+<script src="delay-complete.js?delay=5000"></script>
 </body>
 </html>

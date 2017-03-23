@@ -31,7 +31,7 @@ class ContentWidth extends Audit {
       helpText: 'If the width of your app\'s content doesn\'t match the width ' +
           'of the viewport, your app might not be optimized for mobile screens. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/content-sized-correctly-for-viewport).',
-      requiredArtifacts: ['ContentWidth']
+      requiredArtifacts: ['ViewportDimensions']
     };
   }
 
@@ -40,13 +40,13 @@ class ContentWidth extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const scrollWidth = artifacts.ContentWidth.scrollWidth;
-    const viewportWidth = artifacts.ContentWidth.viewportWidth;
-    const widthsMatch = scrollWidth === viewportWidth;
+    const viewportWidth = artifacts.ViewportDimensions.innerWidth;
+    const windowWidth = artifacts.ViewportDimensions.outerWidth;
+    const widthsMatch = viewportWidth === windowWidth;
 
     return {
       rawValue: widthsMatch,
-      debugString: this.createDebugString(widthsMatch, artifacts.ContentWidth)
+      debugString: this.createDebugString(widthsMatch, artifacts.ViewportDimensions)
     };
   }
 
@@ -55,8 +55,8 @@ class ContentWidth extends Audit {
       return '';
     }
 
-    return 'The content scroll size is ' + artifact.scrollWidth + 'px, ' +
-        'whereas the viewport size is ' + artifact.viewportWidth + 'px.';
+    return 'The viewport size is ' + artifact.innerWidth + 'px, ' +
+        'whereas the window size is ' + artifact.outerWidth + 'px.';
   }
 }
 

@@ -48,7 +48,7 @@ describe('Page uses responsive images', () => {
     const description = `${data.passes ? 'passes' : 'fails'} when an image is ${condition}`;
     it(description, () => {
       const result = UsesResponsiveImagesAudit.audit_({
-        ContentWidth: {devicePixelRatio: data.devicePixelRatio || 1},
+        ViewportDimensions: {devicePixelRatio: data.devicePixelRatio || 1},
         ImageUsage: [
           generateImage(
             generateSize(...data.clientSize),
@@ -101,7 +101,7 @@ describe('Page uses responsive images', () => {
 
   it('handles images without network record', () => {
     const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 2},
+      ViewportDimensions: {devicePixelRatio: 2},
       ImageUsage: [
         generateImage(
           generateSize(100, 100),
@@ -117,7 +117,7 @@ describe('Page uses responsive images', () => {
 
   it('passes when all images are not wasteful', () => {
     const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 2},
+      ViewportDimensions: {devicePixelRatio: 2},
       ImageUsage: [
         generateImage(
           generateSize(200, 200),
@@ -150,7 +150,7 @@ describe('Page uses responsive images', () => {
     const recordA = generateRecord(100, 300, 'image/svg+xml');
 
     const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 1},
+      ViewportDimensions: {devicePixelRatio: 1},
       ImageUsage: [
         generateImage(generateSize(10, 10), naturalSizeA, recordA, urlA),
       ],
@@ -169,7 +169,7 @@ describe('Page uses responsive images', () => {
     const recordB = generateRecord(10, 20); // make it small to still test passing
 
     const auditResult = UsesResponsiveImagesAudit.audit_({
-      ContentWidth: {devicePixelRatio: 1},
+      ViewportDimensions: {devicePixelRatio: 1},
       ImageUsage: [
         generateImage(generateSize(10, 10), naturalSizeA, recordA, urlA),
         generateImage(generateSize(450, 450), naturalSizeA, recordA, urlA),
