@@ -69,6 +69,7 @@ echo "Test a fresh local install"
 # npm explore lighthouse -- npm run smoke
 # npm explore lighthouse -- npm run smokehouse
 # npm explore lighthouse -- npm run chrome # try the manual launcher
+# npm explore lighthouse -- npm run fast -- http://example.com
 # cd ..; rm -rf ./tmp;
 
 echo "Test the lighthouse-viewer build"
