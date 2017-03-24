@@ -85,6 +85,11 @@ echo "Generate a PR and get it merged."
 cd lighthouse-extension; yarn build; gulp package; cd ..
 echo "Upload the package zip to CWS dev dashboard"
 
+echo "Verify the npm package won't include unncessary files"
+yarn global add irish-pub pkgfiles
+irish-pub; pkgfiles;  
+
+echo "ship it"
 npm publish
 yarn run deploy-viewer
 
