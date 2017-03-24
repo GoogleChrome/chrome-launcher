@@ -24,6 +24,7 @@ const lateTracingStartedTrace = require('../../fixtures/traces/tracingstarted-af
 const preactTrace = require('../../fixtures/traces/preactjs.com_ts_of_undefined.json');
 const noFMPtrace = require('../../fixtures/traces/no_fmp_event.json');
 const noFCPtrace = require('../../fixtures/traces/airhorner_no_fcp');
+const backgroundTabTrace = require('../../fixtures/traces/backgrounded-tab-missing-paints');
 
 /* eslint-env mocha */
 describe('Trace of Tab computed artifact:', () => {
@@ -77,9 +78,23 @@ describe('Trace of Tab computed artifact:', () => {
 
   it('handles traces missing an FCP', () => {
     const trace = traceOfTab.compute_(noFCPtrace);
-    assert.equal(trace.startedInPageEvt.ts, 2149509117532);
-    assert.equal(trace.navigationStartEvt.ts, 2149509122585);
-    assert.equal(trace.firstContentfulPaintEvt, undefined);
-    assert.equal(trace.firstMeaningfulPaintEvt.ts, 2149509604903);
+    assert.equal(trace.startedInPageEvt.ts, 2149509117532, 'bad tracingstartedInPage');
+    assert.equal(trace.navigationStartEvt.ts, 2149509122585, 'bad navStart');
+    assert.equal(trace.firstContentfulPaintEvt, undefined, 'bad fcp');
+    assert.equal(trace.firstMeaningfulPaintEvt.ts, 2149509604903, 'bad fmp');
+  });
+
+  it('handles traces missing a paints (captured in background tab)', () => {
+    const trace = traceOfTab.compute_(backgroundTabTrace);
+    assert.equal(trace.startedInPageEvt.ts, 1966813248134);
+    assert.notEqual(trace.navigationStartEvt.ts, 1966813346529, 'picked wrong frame');
+    assert.notEqual(trace.navigationStartEvt.ts, 1966813520313, 'picked wrong frame');
+    assert.equal(
+      trace.navigationStartEvt.ts,
+      1966813258737,
+      'didnt select navStart event with same timestamp as usertiming measure'
+    );
+    assert.equal(trace.firstContentfulPaintEvt, undefined, 'bad fcp');
+    assert.equal(trace.firstMeaningfulPaintEvt, undefined, 'bad fmp');
   });
 });

@@ -32,7 +32,6 @@ const ComputedArtifact = require('./computed-artifact');
 const log = require('../../lib/log');
 
 class TraceOfTab extends ComputedArtifact {
-
   get name() {
     return 'TraceOfTab';
   }
@@ -43,10 +42,13 @@ class TraceOfTab extends ComputedArtifact {
   */
   compute_(trace) {
     // Parse the trace for our key events and sort them by timestamp.
-    const keyEvents = trace.traceEvents.filter(e => {
-      return e.cat.includes('blink.user_timing') || e.cat.includes('loading') ||
+    const keyEvents = trace.traceEvents
+      .filter(e => {
+        return e.cat.includes('blink.user_timing') ||
+          e.cat.includes('loading') ||
           e.name === 'TracingStartedInPage';
-    }).sort((event0, event1) => event0.ts - event1.ts);
+      })
+      .sort((event0, event1) => event0.ts - event1.ts);
 
     // The first TracingStartedInPage in the trace is definitely our renderer thread of interest
     // Beware: the tracingStartedInPage event can appear slightly after a navigationStart
@@ -54,19 +56,22 @@ class TraceOfTab extends ComputedArtifact {
     // Filter to just events matching the frame ID for sanity
     const frameEvents = keyEvents.filter(e => e.args.frame === startedInPageEvt.args.data.page);
 
+    // Our navStart will be the last frame navigation in the trace
+    const navigationStart = frameEvents.filter(e => e.name === 'navigationStart').pop();
+    if (!navigationStart) throw new Error('navigationStart was not found in the trace');
+
     // Find our first paint of this frame
-    const firstPaint = frameEvents.find(e => e.name === 'firstPaint');
-    // Our navStart will be the latest one before fP.
-    const navigationStart = frameEvents.filter(e =>
-        e.name === 'navigationStart' && e.ts < firstPaint.ts).pop();
+    const firstPaint = frameEvents.find(e => e.name === 'firstPaint' && e.ts > navigationStart.ts);
 
     // FCP will follow at/after the FP
-    const firstContentfulPaint = frameEvents.find(e =>
-      e.name === 'firstContentfulPaint' && e.ts >= firstPaint.ts);
+    const firstContentfulPaint = frameEvents.find(
+      e => e.name === 'firstContentfulPaint' && e.ts > navigationStart.ts
+    );
 
     // fMP will follow at/after the FP
-    let firstMeaningfulPaint = frameEvents.find(e =>
-        e.name === 'firstMeaningfulPaint' && e.ts >= firstPaint.ts);
+    let firstMeaningfulPaint = frameEvents.find(
+      e => e.name === 'firstMeaningfulPaint' && e.ts > navigationStart.ts
+    );
 
     // If there was no firstMeaningfulPaint event found in the trace, the network idle detection
     // may have not been triggered before Lighthouse finished tracing.
@@ -83,9 +88,9 @@ class TraceOfTab extends ComputedArtifact {
     }
 
     // subset all trace events to just our tab's process (incl threads other than main)
-    const processEvents = trace.traceEvents.filter(e => {
-      return e.pid === startedInPageEvt.pid;
-    }).sort((event0, event1) => event0.ts - event1.ts);
+    const processEvents = trace.traceEvents
+      .filter(e => e.pid === startedInPageEvt.pid)
+      .sort((event0, event1) => event0.ts - event1.ts);
 
     return {
       processEvents,
@@ -93,7 +98,7 @@ class TraceOfTab extends ComputedArtifact {
       navigationStartEvt: navigationStart,
       firstPaintEvt: firstPaint,
       firstContentfulPaintEvt: firstContentfulPaint,
-      firstMeaningfulPaintEvt: firstMeaningfulPaint
+      firstMeaningfulPaintEvt: firstMeaningfulPaint,
     };
   }
 }
