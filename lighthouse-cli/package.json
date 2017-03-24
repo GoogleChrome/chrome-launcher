@@ -11,6 +11,7 @@
     "typescript": "^2.2.0"
   },
   "dependencies": {
-    "@types/node": "^6.0.45"
+    "@types/node": "^6.0.45",
+    "update-notifier": "^2.1.0"
   }
 }

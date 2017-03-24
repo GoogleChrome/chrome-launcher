@@ -36,6 +36,10 @@ import * as randomPort from './random-port';
 import {Results} from './types/types';
 const yargs = require('yargs');
 const opn = require('opn');
+const updateNotifier = require('update-notifier');
+const pkg = require('../package.json');
+
+updateNotifier({pkg}).notify(); // Tell user if there's a newer version of LH.
 
 interface LighthouseError extends Error {
   code?: string
@@ -43,7 +47,7 @@ interface LighthouseError extends Error {
 
 const cliFlags = yargs
   .help('help')
-  .version(() => require('../package').version)
+  .version(() => pkg.version)
   .showHelpOnFail(false, 'Specify --help for available options')
 
   .usage('$0 url')
