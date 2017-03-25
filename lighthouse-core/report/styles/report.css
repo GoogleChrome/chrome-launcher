@@ -27,10 +27,10 @@ span, div, p, section, header, h1, h2, li, ul {
 :root {
   --text-font-family: "Roboto", -apple-system, BlinkMacSystemFont,  "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   --text-color: #222;
-  --secondary-text-color: #606060;
+  --secondary-text-color: #565656;
   --accent-color: #3879d9;
-  --poor-color: #e53935; /* md red 600 */
-  --good-color: #43a047; /* md green 600 */
+  --poor-color: #df332f;
+  --good-color: #2b882f;
   --average-color: #ef6c00; /* md orange 800 */
   --warning-color: #757575; /* md grey 600 */
   --gutter-gap: 12px;
@@ -39,7 +39,7 @@ span, div, p, section, header, h1, h2, li, ul {
   --body-line-height: 20px;
   --subitem-font-size: 14px;
   --subitem-line-height: 20px;
-  --subitem-overall-icon-size: 14px;
+  --subitem-overall-icon-size: 20px;
   --subheading-font-size: 16px;
   --subheading-line-height: 24px;
   --subheading-color: inherit;
@@ -55,7 +55,9 @@ span, div, p, section, header, h1, h2, li, ul {
   --report-border-color: #ebebeb;
 
   --aggregation-padding: calc(var(--heading-line-height) + var(--gutter-width) + var(--gutter-gap));
-  --aggregation-icon-size: 20px;
+  --aggregation-icon-size: 24px;
+  --audit-icon-size: 19px;
+  --audit-icon-background-size: 17px;
 }
 
 :root[data-report-context="devtools"] {
@@ -90,7 +92,7 @@ html, body {
 }
 
 a {
-  color: #15c;
+  color: #0c50c7;
 }
 
 body {
@@ -338,7 +340,7 @@ summary {
 .menu__link {
   padding: 0 20px;
   text-decoration: none;
-  color: #767676;
+  color: #595959;
   display: flex;
 }
 
@@ -629,7 +631,7 @@ summary {
   margin-left: var(--report-menu-width);
   font-size: 12px;
   border-top: 1px solid var(--report-border-color);
-  color: #767676;
+  color: #565656;
   background-color: var(--report-header-bg-color);
   border-top: 1px solid var(--report-border-color);
 }
@@ -878,9 +880,9 @@ summary {
   position: relative;
   display: block;
   overflow: hidden;
-  margin-top: calc((var(--subitem-line-height) - 16px) / 2);
-  width: 16px;
-  height: 16px;
+  margin-top: calc((var(--subitem-line-height) - var(--audit-icon-size)) / 2);
+  width: var(--audit-icon-size);
+  height: var(--audit-icon-size);
   border-radius: 50%;
   color: transparent;
   background-color: #000;
@@ -899,7 +901,7 @@ summary {
 
 .subitem-result__good::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>good</title><path d="M9.17 2.33L4.5 7 2.83 5.33 1.5 6.66l3 3 6-6z" fill="white" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
-  background-size: 12px;
+  background-size: var(--audit-icon-background-size);
 }
 
 .subitem-result__average::after {
@@ -916,27 +918,29 @@ summary {
 
 .subitem-result__poor::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>poor</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="white"/></svg>') no-repeat 50% 50%;
-  background-size: 12px;
+  background-size: var(--audit-icon-background-size);
 }
 .subitem-result__warning::after {
   background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>warn</title><path d="M0 0h24v24H0z" fill="none"/><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="white"/></svg>') no-repeat 50% 50%;
-  background-size: 12px;
+  background-size: calc(var(--audit-icon-background-size) + -2px);
+  background-position: 50% 1px;
 }
 .subitem-result__info::after {
   background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>info</title><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="white"/></svg>') no-repeat 50% 50%;
-  background-size: 12px;
+  background-size: calc(var(--audit-icon-background-size) + 2px);
 }
 .subitem-result__unknown::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>neutral</title><path d="M2 5h8v2H2z" fill="white" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
-  background-size: 12px;
+  background-size: var(--audit-icon-background-size);
 }
 
 .subitem-result__points {
-  margin-top: calc((var(--subitem-line-height) - var(--subitem-font-size) - 4px) / 2);
   background-color: #000;
   padding: 2px 4px;
   color: #fff;
   border-radius: 2px;
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .subitem__details {
