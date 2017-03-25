@@ -1,38 +1,40 @@
-node_modules
-.DS_Store
-npm-debug.log
-.vscode
+# folders
+.vscode/
+assets/
+coverage/
+gulp/
 
-lighthouse-extension/dist
-lighthouse-core/third_party/src
-**/pages/scripts/lighthouse-report.js
-coverage
-
-lighthouse-cli/results
-results
-results.html
-last-run-results.html
-
-*.trace.json
-*.screenshots.html
-*.report.html
-
-closure-error.log
+lighthouse-core/scripts/
+lighthouse-core/test/
+lighthouse-core/third_party/src/
+lighthouse-viewer/
+lighthouse-extension/
+lighthouse-cli/test/
+lighthouse-cli/results/
 
 !lighthouse-cli/index.js
 lighthouse-cli/*.map
-
 lighthouse-cli/commands/*.map
-
 lighthouse-cli/types/*.js
 lighthouse-cli/types/*.map
 
-assets
+node_modules/
+results/
 
-lighthouse-core/test
-lighthouse-viewer
-lighthouse-extension
-
+# files
+**/pages/scripts/lighthouse-report.js
+*.report.html
+*.screenshots.html
+*.trace.json
 .appveyor.yml
+.DS_Store
+.editorconfig
+.eslintignore
+.eslintrc.js
 .travis.yml
-
+closure-error.log
+gulpfile.js
+last-run-results.html
+latest.artifacts.log
+npm-debug.log
+results.html
