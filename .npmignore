@@ -1,3 +1,5 @@
+# use npm modules `pkgfiles` or `irish-pub` to validate which files are selected
+
 # folders
 .vscode/
 assets/
@@ -9,8 +11,12 @@ lighthouse-core/test/
 lighthouse-core/third_party/src/
 lighthouse-viewer/
 lighthouse-extension/
-lighthouse-cli/test/
 lighthouse-cli/results/
+
+# excluding cli/test minus smokehouse
+lighthouse-cli/test
+!lighthouse-cli/test/smokehouse
+!lighthouse-cli/test/fixtures/
 
 !lighthouse-cli/index.js
 lighthouse-cli/*.map
@@ -21,20 +27,23 @@ lighthouse-cli/types/*.map
 node_modules/
 results/
 
-# files
+# generated files
 **/pages/scripts/lighthouse-report.js
 *.report.html
 *.screenshots.html
+*.devtoolslog.json
 *.trace.json
+closure-error.log
+last-run-results.html
+latest.artifacts.log
+npm-debug.log
+results.html
+
+# dev files
 .appveyor.yml
 .DS_Store
 .editorconfig
 .eslintignore
 .eslintrc.js
 .travis.yml
-closure-error.log
 gulpfile.js
-last-run-results.html
-latest.artifacts.log
-npm-debug.log
-results.html
