@@ -71,6 +71,7 @@
     "rimraf": "2.2.8",
     "semver": "5.3.0",
     "speedline": "1.0.3",
+    "update-notifier": "^2.1.0",
     "whatwg-url": "4.0.0",
     "ws": "1.1.1",
     "yargs": "3.32.0"
