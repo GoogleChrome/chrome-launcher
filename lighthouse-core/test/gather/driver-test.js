@@ -74,6 +74,8 @@ connection.sendCommand = function(command, params) {
           value: {
             value: '123'
           }
+        }, {
+          name: 'novalue'
         }]
       });
     case 'Page.enable':
@@ -139,7 +141,13 @@ describe('Browser Driver', () => {
   });
 
   it('returns null when getObjectProperty finds no property name', () => {
-    return driverStub.getObjectProperty('invalid', 'invalid').catch(value => {
+    return driverStub.getObjectProperty('invalid', 'invalid').then(value => {
+      assert.deepEqual(value, null);
+    });
+  });
+
+  it('returns null when getObjectProperty finds property name with no value', () => {
+    return driverStub.getObjectProperty('test', 'novalue').then(value => {
       assert.deepEqual(value, null);
     });
   });

@@ -496,7 +496,7 @@ class Driver {
   * @return {!Promise<string>} The property value, or null, if property not found
   */
   getObjectProperty(objectId, propName) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       this.sendCommand('Runtime.getProperties', {
         objectId,
         accessorPropertiesOnly: true,
@@ -507,12 +507,12 @@ class Driver {
         const propertyForName = properties.result
           .find(property => property.name === propName);
 
-        if (propertyForName) {
+        if (propertyForName && propertyForName.value) {
           resolve(propertyForName.value.value);
         } else {
           resolve(null);
         }
-      });
+      }).catch(reject);
     });
   }
 
