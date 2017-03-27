@@ -116,6 +116,12 @@ NOTE: specifying an output path with multiple formats ignores your specified ext
 * `./<HOST>_<DATE>.report.html`
 * `./<HOST>_<DATE>.artifacts.log`
 
+### Testing on a site with authentication
+
+ - `chrome-debug`
+ - open and login to your site
+ - `lighthouse http://mysite.com`
+
 ## Testing on a mobile device
 
 Lighthouse can run against a real mobile device. You can follow the [Remote Debugging on Android (Legacy Workflow)](https://developer.chrome.com/devtools/docs/remote-debugging-legacy) up through step 3.3, but the TL;DR is install & run adb, enable USB debugging, then port forward 9222 from the device to the machine with Lighthouse.
