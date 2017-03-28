@@ -37,35 +37,13 @@ module.exports = [
       'works-offline': {
         score: true
       },
-      'manifest-display': {
-        score: true,
-        displayValue: 'standalone'
-      },
-      'manifest-exists': {
+      'webapp-install-banner': {
         score: true
       },
-      'manifest-background-color': {
-        score: true,
-        extendedInfo: {
-          value: '#2196F3'
-        }
-      },
-      'manifest-theme-color': {
+      'splash-screen': {
         score: true
       },
-      'manifest-icons-min-192': {
-        score: true
-      },
-      'manifest-icons-min-144': {
-        score: true
-      },
-      'manifest-name': {
-        score: true
-      },
-      'manifest-short-name': {
-        score: true
-      },
-      'manifest-start-url': {
+      'themed-omnibox': {
         score: true
       },
       // 'cache-start-url': {
@@ -99,35 +77,13 @@ module.exports = [
       'works-offline': {
         score: false
       },
-      'manifest-display': {
-        score: true,
-        displayValue: 'standalone'
-      },
-      'manifest-exists': {
+      'webapp-install-banner': {
         score: true
       },
-      'manifest-background-color': {
-        score: true,
-        extendedInfo: {
-          value: '#366597'
-        }
-      },
-      'manifest-theme-color': {
+      'splash-screen': {
         score: true
       },
-      'manifest-icons-min-192': {
-        score: true
-      },
-      'manifest-icons-min-144': {
-        score: true
-      },
-      'manifest-name': {
-        score: true
-      },
-      'manifest-short-name': {
-        score: true
-      },
-      'manifest-start-url': {
+      'themed-omnibox': {
         score: true
       },
       // 'cache-start-url': {
@@ -152,37 +108,13 @@ module.exports = [
       'works-offline': {
         score: true
       },
-      'manifest-display': {
-        score: true,
-        displayValue: 'standalone'
+      'webapp-install-banner': {
+        score: false
       },
-      'manifest-exists': {
+      'splash-screen': {
         score: true
       },
-      'manifest-background-color': {
-        score: true,
-        extendedInfo: {
-          value: '#bababa'
-        }
-      },
-      'manifest-theme-color': {
-        score: true
-      },
-      'manifest-icons-min-192': {
-        score: true,
-        displayValue: 'found sizes: 600x600',
-      },
-      'manifest-icons-min-144': {
-        score: true,
-        displayValue: 'found sizes: 600x600',
-      },
-      'manifest-name': {
-        score: true
-      },
-      'manifest-short-name': {
-        score: true
-      },
-      'manifest-start-url': {
+      'themed-omnibox': {
         score: true
       },
       // 'cache-start-url': {
@@ -260,36 +192,14 @@ module.exports = [
       'works-offline': {
         score: true
       },
-      'manifest-display': {
-        score: true,
-        displayValue: 'standalone'
-      },
-      'manifest-exists': {
+      'webapp-install-banner': {
         score: true
       },
-      'manifest-background-color': {
-        score: true,
-        extendedInfo: {
-          value: '#383838'
-        }
+      'splash-screen': {
+        score: false
       },
-      'manifest-theme-color': {
-        score: true
-      },
-      'manifest-icons-min-192': {
-        score: true
-      },
-      'manifest-icons-min-144': {
-        score: true
-      },
-      'manifest-name': {
-        score: true
-      },
-      'manifest-short-name': {
-        score: true
-      },
-      'manifest-start-url': {
-        score: true
+      'themed-omnibox': {
+        score: false
       },
       // 'cache-start-url': {
       //   score: true

@@ -90,11 +90,11 @@ describe('Manifest Parser', function() {
       assert.equal(icons.value.length, 1);
     });
 
-    it('finds three icons in the stub manifest', function() {
+    it('finds four icons in the stub manifest', function() {
       const parsedManifest = manifestParser(JSON.stringify(manifestStub), EXAMPLE_MANIFEST_URL,
           EXAMPLE_DOC_URL);
       assert(!parsedManifest.debugString);
-      assert.equal(parsedManifest.value.icons.value.length, 3);
+      assert.equal(parsedManifest.value.icons.value.length, 4);
     });
 
     it('parses icons with extra whitespace', function() {
@@ -250,10 +250,8 @@ describe('Manifest Parser', function() {
       assert.equal(parsedUrl.value, docUrl);
     });
 
-    // TODO(bckenny): run these tests when we have a proper URL parser:
-    // https://github.com/GoogleChrome/lighthouse/issues/602
     // 8.10(5)
-    it.skip('falls back to document URL and issues a warning for an invalid URL', () => {
+    it('falls back to document URL and issues a warning for an invalid URL', () => {
       // `new URL('/manifest.json', '')` is invalid and will throw.
       const manifestSrc = JSON.stringify({
         start_url: '/manifest.json'

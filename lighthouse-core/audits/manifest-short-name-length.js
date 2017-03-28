@@ -35,45 +35,44 @@ class ManifestShortNameLength extends Audit {
     };
   }
 
+
+  static assessManifest(manifestValues, failures) {
+    if (manifestValues.isParseFailure) {
+      failures.push(manifestValues.parseFailureReason);
+      return;
+    }
+
+    const themeColorCheck = manifestValues.allChecks.find(i => i.id === 'hasThemeColor');
+    if (!themeColorCheck.passing) {
+      failures.push(themeColorCheck.failureText);
+    }
+  }
+
   /**
    * @param {!Artifacts} artifacts
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    if (!artifacts.Manifest || !artifacts.Manifest.value) {
-      // Page has no manifest or was invalid JSON.
+    return artifacts.requestManifestValues(artifacts.Manifest).then(manifestValues => {
+      if (manifestValues.isParseFailure) {
+        return {
+          rawValue: false
+        };
+      }
+
+      const hasShortName = manifestValues.allChecks.find(i => i.id === 'hasShortName').passing;
+      if (!hasShortName) {
+        return {
+          rawValue: false,
+          debugString: 'No short_name found in manifest.'
+        };
+      }
+
+      const isShortEnough = manifestValues.allChecks.find(i => i.id === 'shortNameLength').passing;
       return {
-        rawValue: false
+        rawValue: isShortEnough
       };
-    }
-
-    // When no shortname can be found we look for a name.
-    const manifest = artifacts.Manifest.value;
-    const shortNameValue = manifest.short_name.value || manifest.name.value;
-
-    if (!shortNameValue) {
-      return {
-        rawValue: false,
-        debugString: 'No short_name found in manifest.'
-      };
-    }
-
-    // Historically, Chrome recommended 12 chars as the maximum length to prevent truncation.
-    // See #69 for more discussion.
-    // https://developer.chrome.com/apps/manifest/name#short_name
-    const suggestedLength = 12;
-    const isShortNameShortEnough = shortNameValue.length <= suggestedLength;
-
-    let debugString;
-    if (!isShortNameShortEnough) {
-      debugString = `${suggestedLength} chars is the suggested maximum homescreen label length`;
-      debugString += ` (Found: ${shortNameValue.length} chars).`;
-    }
-
-    return {
-      rawValue: isShortNameShortEnough,
-      debugString
-    };
+    });
   }
 }
 

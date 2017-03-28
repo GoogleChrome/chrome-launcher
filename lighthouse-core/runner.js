@@ -212,6 +212,7 @@ class Runner {
     const ignoredFiles = [
       'audit.js',
       'accessibility/axe-audit.js',
+      'multi-check-audit.js',
       'byte-efficiency/byte-efficiency-audit.js'
     ];
 

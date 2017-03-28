@@ -61,7 +61,6 @@
     "service-worker",
     "works-offline",
     "viewport",
-    "manifest-display",
     "without-javascript",
     "first-meaningful-paint",
     "load-fast-enough-for-pwa",
@@ -71,16 +70,10 @@
     "user-timings",
     "screenshots",
     "critical-request-chains",
-    "manifest-exists",
-    "manifest-background-color",
-    "manifest-theme-color",
-    "manifest-icons-min-192",
-    "manifest-icons-min-144",
-    "manifest-name",
-    "manifest-short-name",
+    "webapp-install-banner",
+    "splash-screen",
+    "themed-omnibox",
     "manifest-short-name-length",
-    "manifest-start-url",
-    "theme-color-meta",
     "content-width",
     "deprecations",
     "accessibility/accesskeys",
@@ -208,69 +201,24 @@
       }
     }, {
       "name": "User can be prompted to Add to Homescreen",
-      "description": "While users can manually add your site to their homescreen in the browser menu, the [prompt (aka app install banner)](https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android) will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
-      "see": "https://github.com/GoogleChrome/lighthouse/issues/23",
       "audits": {
-        "service-worker": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-exists": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-start-url": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-icons-min-144": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-short-name": {
+        "webapp-install-banner": {
           "expectedValue": true,
           "weight": 1
         }
       }
     }, {
       "name": "Installed web app will launch with custom splash screen",
-      "description": "A default splash screen will be constructed, but meeting these requirements guarantee a high-quality and customizable [splash screen](https://developers.google.com/web/updates/2015/10/splashscreen) the user sees between tapping the home screen icon and your app's first paint.",
-      "see": "https://github.com/GoogleChrome/lighthouse/issues/24",
       "audits": {
-        "manifest-exists": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-name": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-background-color": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-theme-color": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-icons-min-192": {
+        "splash-screen": {
           "expectedValue": true,
           "weight": 1
         }
       }
     }, {
       "name": "Address bar matches brand colors",
-      "description": "The browser address bar can be themed to match your site. A `theme-color` [meta tag](https://developers.google.com/web/updates/2014/11/Support-for-theme-color-in-Chrome-39-for-Android) will upgrade the address bar when a user browses the site, and the [manifest theme-color](https://developers.google.com/web/updates/2015/08/using-manifest-to-set-sitewide-theme-color) will apply the same theme site-wide once it's been added to homescreen.",
       "audits": {
-        "manifest-exists": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "theme-color-meta": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-theme-color": {
+        "themed-omnibox": {
           "expectedValue": true,
           "weight": 1
         }
@@ -372,10 +320,6 @@
       "name": "Other",
       "audits": {
         "manifest-short-name-length": {
-          "expectedValue": true,
-          "weight": 1
-        },
-        "manifest-display": {
           "expectedValue": true,
           "weight": 1
         }
