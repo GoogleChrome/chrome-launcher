@@ -18,18 +18,38 @@
 const Audit = require('../../audits/works-offline.js');
 const assert = require('assert');
 
-/* global describe, it*/
+/* eslint-env mocha */
+
+const URL = 'https://www.chromestatus.com';
 
 describe('Offline: works-offline audit', () => {
   it('correctly audits a 200 code', () => {
-    const output = Audit.audit({Offline: 200});
+    const output = Audit.audit({
+      Offline: 200,
+      URL: {initialUrl: URL, finalUrl: URL}
+    });
 
-    return assert.equal(output.rawValue, true);
+    assert.equal(output.rawValue, true);
+    assert.ok(!output.debugString);
+  });
+
+  it('warns if initial url does not match final url', () => {
+    const output = Audit.audit({
+      Offline: 200,
+      URL: {initialUrl: URL, finalUrl: `${URL}/features`}
+    });
+
+    assert.equal(output.rawValue, true);
+    assert.ok(output.debugString);
   });
 
   it('correctly audits a non-200 code', () => {
-    const output = Audit.audit({Offline: 203});
+    const output = Audit.audit({
+      Offline: 203,
+      URL: {initialUrl: URL, finalUrl: URL}
+    });
 
-    return assert.equal(output.rawValue, false);
+    assert.equal(output.rawValue, false);
+    assert.ok(!output.debugString);
   });
 });
