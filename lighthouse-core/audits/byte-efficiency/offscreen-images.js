@@ -72,7 +72,8 @@ class OffscreenImages extends Audit {
     const url = URL.getDisplayName(image.src, {preserveQuery: true});
     const totalPixels = image.clientWidth * image.clientHeight;
     const visiblePixels = this.computeVisiblePixels(image.clientRect, viewportDimensions);
-    const wastedRatio = 1 - visiblePixels / totalPixels;
+    // Treat images with 0 area as if they're offscreen. See https://github.com/GoogleChrome/lighthouse/issues/1914
+    const wastedRatio = totalPixels === 0 ? 1 : 1 - visiblePixels / totalPixels;
     const totalBytes = image.networkRecord.resourceSize;
     const wastedBytes = Math.round(totalBytes * wastedRatio);
 

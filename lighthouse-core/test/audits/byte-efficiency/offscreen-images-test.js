@@ -115,6 +115,17 @@ describe('OffscreenImages audit', () => {
     });
   });
 
+  it('finds images with 0 area', () => {
+    return UnusedImages.audit_({
+      ViewportDimensions: DEFAULT_DIMENSIONS,
+      ImageUsage: [
+        generateImage(generateSize(0, 0), [0, 0], generateRecord(100)),
+      ],
+    }).then(auditResult => {
+      assert.equal(auditResult.results.length, 1);
+    });
+  });
+
   it('de-dupes images', () => {
     const urlB = 'https://google.com/logo2.png';
     return UnusedImages.audit_({
