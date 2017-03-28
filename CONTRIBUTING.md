@@ -59,6 +59,7 @@ echo "Bump the versions in extension/app/manifest.json and package.json"
 
 # * Test err'thing *
 echo "Test the CLI."
+lighthouse --perf "chrome://version"
 yarn run smoke
 echo "Test the extension"
 
