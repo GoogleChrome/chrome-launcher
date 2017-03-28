@@ -177,8 +177,8 @@ describe('GatherRunner', function() {
       calledNetworkEmulation: false,
       calledCpuEmulation: false,
     };
-    const createEmulationCheck = variable => () => {
-      tests[variable] = true;
+    const createEmulationCheck = variable => (...args) => {
+      tests[variable] = args;
       return true;
     };
     const driver = getMockedEmulationDriver(
@@ -192,9 +192,11 @@ describe('GatherRunner', function() {
         disableNetworkThrottling: true,
       }
     }).then(_ => {
-      assert.equal(tests.calledDeviceEmulation, true);
-      assert.equal(tests.calledNetworkEmulation, false);
-      assert.equal(tests.calledCpuEmulation, true);
+      assert.ok(tests.calledDeviceEmulation, 'called device emulation');
+      assert.deepEqual(tests.calledNetworkEmulation, [{
+        latency: 0, downloadThroughput: 0, uploadThroughput: 0, offline: false
+      }]);
+      assert.ok(tests.calledCpuEmulation, 'called CPU emulation');
     });
   });
 
@@ -204,8 +206,8 @@ describe('GatherRunner', function() {
       calledNetworkEmulation: false,
       calledCpuEmulation: false,
     };
-    const createEmulationCheck = variable => () => {
-      tests[variable] = true;
+    const createEmulationCheck = variable => (...args) => {
+      tests[variable] = args;
       return true;
     };
     const driver = getMockedEmulationDriver(
@@ -219,9 +221,9 @@ describe('GatherRunner', function() {
         disableCpuThrottling: true,
       }
     }).then(_ => {
-      assert.equal(tests.calledDeviceEmulation, true);
-      assert.equal(tests.calledNetworkEmulation, true);
-      assert.equal(tests.calledCpuEmulation, false);
+      assert.ok(tests.calledDeviceEmulation, 'called device emulation');
+      assert.ok(tests.calledNetworkEmulation, 'called network emulation');
+      assert.deepEqual(tests.calledCpuEmulation, [{rate: 1}]);
     });
   });
 

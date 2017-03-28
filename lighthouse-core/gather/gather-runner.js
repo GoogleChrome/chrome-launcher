@@ -47,7 +47,7 @@ const URL = require('../lib/url-shim');
  *       c. navigate to options.url (and wait for onload)
  *     ii. all gatherer's pass()
  *   C. GatherRunner.afterPass()
- *     i. endTrace (if requested) & endNetworkCollect
+ *     i. endTrace (if requested) & endNetworkCollect & endThrottling
  *     ii. all gatherer's afterPass()
  *
  * 3. Teardown
@@ -243,6 +243,9 @@ class GatherRunner {
       config.recordNetwork && (passData.networkRecords = networkRecords);
       log.verbose('statusEnd', status);
     });
+
+    // Disable throttling so the afterPass analysis isn't throttled
+    pass = pass.then(_ => driver.setThrottling(options.flags, {useThrottling: false}));
 
     pass = gatherers.reduce((chain, gatherer) => {
       const status = `Retrieving: ${gatherer.name}`;
