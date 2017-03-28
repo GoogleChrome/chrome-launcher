@@ -16,8 +16,8 @@
  */
 'use strict';
 
-const defaultConfigPath = './default.json';
-const defaultConfig = require('./default.json');
+const defaultConfigPath = './default.js';
+const defaultConfig = require('./default.js');
 const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
 
 const GatherRunner = require('../gather/gather-runner');

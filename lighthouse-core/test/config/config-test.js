@@ -18,7 +18,7 @@
 const Config = require('../../config/config');
 const assert = require('assert');
 const path = require('path');
-const defaultConfig = require('../../config/default.json');
+const defaultConfig = require('../../config/default.js');
 const log = require('../../lib/log');
 const Gatherer = require('../../gather/gatherers/gatherer');
 const Audit = require('../../audits/audit');
@@ -191,7 +191,7 @@ describe('Config', () => {
   });
 
   it('throws on a non-absolute config path', () => {
-    const configPath = '../../config/default.json';
+    const configPath = '../../config/default.js';
 
     return assert.throws(_ => new Config({
       audits: []

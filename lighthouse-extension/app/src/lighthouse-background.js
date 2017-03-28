@@ -20,7 +20,7 @@ const ExtensionProtocol = require('../../../lighthouse-core/gather/connections/e
 const RawProtocol = require('../../../lighthouse-core/gather/connections/raw');
 const Runner = require('../../../lighthouse-core/runner');
 const Config = require('../../../lighthouse-core/config/config');
-const defaultConfig = require('../../../lighthouse-core/config/default.json');
+const defaultConfig = require('../../../lighthouse-core/config/default.js');
 const log = require('../../../lighthouse-core/lib/log');
 
 const ReportGenerator = require('../../../lighthouse-core/report/report-generator');

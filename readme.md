@@ -221,7 +221,7 @@ right corner and signing in to GitHub.
 
 * [webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin) -  run Lighthouse from a Webpack build.
 * [lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example) -  gathers performance metrics via Lighthouse and tests them in Mocha
-* [pwmetrics](https://github.com/paulirish/pwmetrics/) - gather performance metrics 
+* [pwmetrics](https://github.com/paulirish/pwmetrics/) - gather performance metrics
 * [lighthouse-hue](https://github.com/ebidel/lighthouse-hue) - Lighthouse score setting the color of Philips Hue lights
 * [lighthouse-batch](https://www.npmjs.com/package/lighthouse-batch) - Run Lighthouse over a number of sites in sequence and generating a summary report including all of their scores.
 
@@ -265,7 +265,7 @@ Better docs coming soon, but in the meantime look at [PR #593](https://github.co
 
 ### Custom configurations for runs
 
-You can supply your own run configuration to customize what audits you want details on. Copy the [default.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.json) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.json <url>`
+You can supply your own run configuration to customize what audits you want details on. Copy the [default.js](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/default.js) and start customizing. Then provide to the CLI with `lighthouse --config-path=myconfig.js <url>`
 
 If you are simply adding additional audits/gatherers or tweaking flags, you can extend the default configuration without having to copy the default and maintain it. Passes with the same name will be merged together, all other arrays will be concatenated, and primitive values will override the defaults. See the example below that adds a custom gatherer to the default pass and an audit.
 
