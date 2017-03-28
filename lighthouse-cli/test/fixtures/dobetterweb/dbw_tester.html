@@ -353,5 +353,7 @@ if (location.search === '') {
 <!-- PASS: not in header, so it does not block rendering. zone.js is loaded
      by the static-server and provides a polyfill for Promise. -->
 <script src="/zone.js"></script>
+<!-- FAIL(is-on-https): requires a non-localhost http file -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </body>
 </html>

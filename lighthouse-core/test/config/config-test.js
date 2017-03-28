@@ -138,7 +138,6 @@ describe('Config', () => {
       passes: [{
         gatherers: [
           'url',
-          'https',
           'viewport'
         ]
       }],
@@ -146,7 +145,7 @@ describe('Config', () => {
     };
 
     const _ = new Config(configJSON);
-    assert.equal(configJSON.passes[0].gatherers.length, 3);
+    assert.equal(configJSON.passes[0].gatherers.length, 2);
   });
 
   it('contains new copies of auditResults and aggregations', () => {

@@ -200,7 +200,7 @@ module.exports = [
     url: 'http://localhost:10200/online-only.html',
     audits: {
       'is-on-https': {
-        score: false
+        score: true
       },
       'uses-http2': {
         score: false

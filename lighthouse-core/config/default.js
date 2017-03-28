@@ -8,7 +8,6 @@ module.exports = {
     "useThrottling": true,
     "gatherers": [
       "url",
-      "https",
       "viewport",
       "viewport-dimensions",
       "theme-color",

@@ -17,6 +17,11 @@
 'use strict';
 
 const Audit = require('./audit');
+const Formatter = require('../report/formatter');
+const URL = require('../lib/url-shim');
+
+const SECURE_SCHEMES = ['data', 'https', 'wss'];
+const SECURE_DOMAINS = ['localhost', '127.0.0.1'];
 
 class HTTPS extends Audit {
   /**
@@ -32,8 +37,16 @@ class HTTPS extends Audit {
           'in on the communications between your app and your users, and is a prerequisite for ' +
           'HTTP/2 and many new web platform APIs. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/https).',
-      requiredArtifacts: ['HTTPS']
+      requiredArtifacts: ['networkRecords']
     };
+  }
+
+  /**
+   * @param {{scheme: string, domain: string}} record
+   * @return {boolean}
+   */
+  static isSecureRecord(record) {
+    return SECURE_SCHEMES.includes(record.scheme) || SECURE_DOMAINS.includes(record.domain);
   }
 
   /**
@@ -41,9 +54,25 @@ class HTTPS extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
+    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
+    const insecureRecords = networkRecords
+        .filter(record => !HTTPS.isSecureRecord(record))
+        .map(record => ({url: URL.getDisplayName(record.url, {preserveHost: true})}));
+
+    let displayValue = '';
+    if (insecureRecords.length > 1) {
+      displayValue = `${insecureRecords.length} insecure requests found`;
+    } else if (insecureRecords.length === 1) {
+      displayValue = `${insecureRecords.length} insecure request found`;
+    }
+
     return {
-      rawValue: artifacts.HTTPS.value,
-      debugString: artifacts.HTTPS.debugString
+      rawValue: insecureRecords.length === 0,
+      displayValue,
+      extendedInfo: {
+        formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
+        value: insecureRecords
+      }
     };
   }
 }
