@@ -21,14 +21,15 @@ limitations under the License.
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
   <title>Lighthouse Report</title>
+  <style>%%LIGHTHOUSE_CSS%%</style>
 </head>
 <body>
   <noscript>Lighthouse report requires JavaScript. Please enable.</noscript>
   <script>%%LIGHTHOUSE_JAVASCRIPT%%</script>
   <script>window.__LIGHTHOUSE_JSON__ = %%LIGHTHOUSE_JSON%%</script>
   <script>
-    const renderer = new ReportRenderer(window.__LIGHTHOUSE_JSON__);
-    renderer.render(document.body);
+    const renderer = new ReportRenderer(document);
+    document.body.appendChild(renderer.renderReport(window.__LIGHTHOUSE_JSON__));
   </script>
 </body>
 </html>
