@@ -30,7 +30,6 @@
     "estimated-input-latency",
     "time-to-interactive",
     "user-timings",
-    "screenshots",
     "critical-request-chains",
     "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",

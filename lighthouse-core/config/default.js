@@ -68,7 +68,6 @@ module.exports = {
     "estimated-input-latency",
     "time-to-interactive",
     "user-timings",
-    "screenshots",
     "critical-request-chains",
     "webapp-install-banner",
     "splash-screen",
