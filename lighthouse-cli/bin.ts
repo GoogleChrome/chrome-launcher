@@ -290,18 +290,21 @@ function saveResults(results: Results,
       promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
     }
 
+    const typeToExtension = (type: string) => type === 'domhtml' ? 'dom.html' : type;
     return promise.then(_ => {
       if (Array.isArray(flags.output)) {
         return flags.output.reduce((innerPromise, outputType) => {
-          const outputPath = `${resolvedPath}.report.${outputType}`;
+          const outputPath = `${resolvedPath}.report.${typeToExtension(outputType)}`;
           return innerPromise.then((_: Results) => Printer.write(results, outputType, outputPath));
         }, Promise.resolve(results));
       } else {
-        const outputPath = flags.outputPath || `${resolvedPath}.report.${flags.output}`;
+        const outputPath = flags.outputPath ||
+            `${resolvedPath}.report.${typeToExtension(flags.output)}`;
         return Printer.write(results, flags.output, outputPath).then(results => {
-          if (flags.output === Printer.OutputMode[Printer.OutputMode.html]) {
+          if (flags.output === Printer.OutputMode[Printer.OutputMode.html] ||
+              flags.output === Printer.OutputMode[Printer.OutputMode.domhtml]) {
             if (flags.view) {
-              opn(`${resolvedPath}.report.html`, {wait: false});
+              opn(outputPath, {wait: false});
             } else {
               log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
             }

@@ -39,7 +39,7 @@ module.exports = {
     "gatherers": [
       "chrome-console-messages",
       "styles",
-      "css-usage",
+      // "css-usage",
       "dobetterweb/all-event-listeners",
       "dobetterweb/anchors-with-no-rel-noopener",
       "dobetterweb/appcache",
@@ -582,5 +582,104 @@ module.exports = {
         }
       }
     }]
-  }]
+  }],
+  "categories": {
+    "pwa": {
+      "name": "Progressive Web App",
+      "weight": 1,
+      "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
+      "audits": [
+        {"id": "service-worker", "weight": 1},
+        {"id": "works-offline", "weight": 1},
+        {"id": "without-javascript", "weight": 1},
+        {"id": "is-on-https", "weight": 1},
+        {"id": "redirects-http", "weight": 1},
+        {"id": "load-fast-enough-for-pwa", "weight": 1},
+        {"id": "webapp-install-banner", "weight": 1},
+        {"id": "splash-screen", "weight": 1},
+        {"id": "themed-omnibox", "weight": 1},
+        {"id": "viewport", "weight": 1},
+        {"id": "content-width", "weight": 1}
+      ]
+    },
+    "performance": {
+      "name": "Performance",
+      "description": "These encapsulate your app's performance.",
+      "audits": [
+        {"id": "first-meaningful-paint", "weight": 5},
+        {"id": "speed-index-metric", "weight": 1},
+        {"id": "estimated-input-latency", "weight": 1},
+        {"id": "time-to-interactive", "weight": 5},
+        {"id": "link-blocking-first-paint", "weight": 0},
+        {"id": "script-blocking-first-paint", "weight": 0},
+        // {"id": "unused-css-rules", "weight": 0},
+        {"id": "uses-optimized-images", "weight": 0},
+        {"id": "uses-responsive-images", "weight": 0},
+        {"id": "total-byte-weight", "weight": 0},
+        {"id": "dom-size", "weight": 0},
+        {"id": "critical-request-chains", "weight": 0},
+        {"id": "user-timings", "weight": 0}
+      ]
+    },
+    "accessibility": {
+      "name": "Accessibility",
+      "description": "These audits validate that your app [works for all users](https://developers.google.com/web/fundamentals/accessibility/).",
+      "audits": [
+        {"id": "accesskeys", "weight": 1},
+        {"id": "aria-allowed-attr", "weight": 1},
+        {"id": "aria-required-attr", "weight": 1},
+        {"id": "aria-required-children", "weight": 1},
+        {"id": "aria-required-parent", "weight": 1},
+        {"id": "aria-roles", "weight": 1},
+        {"id": "aria-valid-attr-value", "weight": 1},
+        {"id": "aria-valid-attr", "weight": 1},
+        {"id": "audio-caption", "weight": 1},
+        {"id": "button-name", "weight": 1},
+        {"id": "bypass", "weight": 1},
+        {"id": "color-contrast", "weight": 1},
+        {"id": "definition-list", "weight": 1},
+        {"id": "dlitem", "weight": 1},
+        {"id": "document-title", "weight": 1},
+        {"id": "duplicate-id", "weight": 1},
+        {"id": "frame-title", "weight": 1},
+        {"id": "html-has-lang", "weight": 1},
+        {"id": "html-lang-valid", "weight": 1},
+        {"id": "image-alt", "weight": 1},
+        {"id": "input-image-alt", "weight": 1},
+        {"id": "label", "weight": 1},
+        {"id": "layout-table", "weight": 1},
+        {"id": "link-name", "weight": 1},
+        {"id": "list", "weight": 1},
+        {"id": "listitem", "weight": 1},
+        {"id": "meta-refresh", "weight": 1},
+        {"id": "meta-viewport", "weight": 1},
+        {"id": "object-alt", "weight": 1},
+        {"id": "tabindex", "weight": 1},
+        {"id": "td-headers-attr", "weight": 1},
+        {"id": "th-has-data-cells", "weight": 1},
+        {"id": "valid-lang", "weight": 1},
+        {"id": "video-caption", "weight": 1},
+        {"id": "video-description", "weight": 1},
+      ]
+    },
+    "best-practices": {
+      "name": "Best Practices",
+      "description": "We've compiled some recommendations for modernizing your web app and avoiding performance pitfalls. These audits do not affect your score but are worth a look.",
+      "audits": [
+        {"id": "appcache-manifest", "weight": 1},
+        {"id": "no-websql", "weight": 1},
+        {"id": "is-on-https", "weight": 1},
+        {"id": "uses-http2", "weight": 1},
+        {"id": "no-old-flexbox", "weight": 1},
+        {"id": "uses-passive-event-listeners", "weight": 1},
+        {"id": "no-mutation-events", "weight": 1},
+        {"id": "no-document-write", "weight": 1},
+        {"id": "external-anchors-use-rel-noopener", "weight": 1},
+        {"id": "geolocation-on-start", "weight": 1},
+        {"id": "notification-on-start", "weight": 1},
+        {"id": "deprecations", "weight": 1},
+        {"id": "manifest-short-name-length", "weight": 1},
+      ]
+    }
+  }
 }

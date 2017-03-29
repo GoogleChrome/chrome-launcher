@@ -21,14 +21,16 @@
  * An enumeration of acceptable output modes:
  *   'json': JSON formatted results
  *   'html': An HTML report
+ *   'domhtml': An HTML report rendered client-side with DOM elements
  */
-enum OutputMode { json, html };
-type Mode = 'json' | 'html';
+enum OutputMode { json, html, domhtml };
+type Mode = 'json' | 'html' | 'domhtml';
 
 import {Results} from './types/types';
 
 const fs = require('fs');
 const ReportGenerator = require('../lighthouse-core/report/report-generator');
+const ReportGeneratorV2 = require('../lighthouse-core/report/v2/report-generator');
 const log = require('../lighthouse-core/lib/log');
 
 
@@ -53,6 +55,10 @@ function createOutput(results: Results, outputMode: OutputMode): string {
   // HTML report.
   if (outputMode === OutputMode.html) {
     return reportGenerator.generateHTML(results, 'cli');
+  }
+
+  if (outputMode === OutputMode.domhtml) {
+    return new ReportGeneratorV2().generateReportHtml(results);
   }
 
   // JSON report.
@@ -117,7 +123,8 @@ function write(results: Results, mode: Mode, path: string): Promise<Results> {
 
 function GetValidOutputOptions():Array<Mode> {
   return [OutputMode[OutputMode.json] as Mode,
-          OutputMode[OutputMode.html] as Mode];
+          OutputMode[OutputMode.html] as Mode,
+          OutputMode[OutputMode.domhtml] as Mode];
 }
 
 export {
