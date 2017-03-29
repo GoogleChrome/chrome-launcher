@@ -5,19 +5,9 @@
     "pauseBeforeTraceEndMs": 500,
     "useThrottling": true,
     "gatherers": [
-      "url",
       "image-usage",
-      "content-width",
-      "dobetterweb/domstats"
-    ]
-  },
-  {
-    "passName": "css-image-usage",
-    "recordNetwork": true,
-    "useThrottling": false,
-    "gatherers": [
-      "styles",
-      "css-usage",
+      "viewport-dimensions",
+      "dobetterweb/domstats",
       "dobetterweb/tags-blocking-first-paint",
       "dobetterweb/optimized-images"
     ]
@@ -31,7 +21,6 @@
     "time-to-interactive",
     "user-timings",
     "critical-request-chains",
-    "byte-efficiency/unused-css-rules",
     "byte-efficiency/uses-optimized-images",
     "byte-efficiency/uses-responsive-images",
     "dobetterweb/dom-size",
@@ -71,10 +60,6 @@
     "categorizable": false,
     "items": [{
       "audits": {
-        "unused-css-rules": {
-          "expectedValue": true,
-          "weight": 1
-        },
         "uses-optimized-images": {
           "expectedValue": true,
           "weight": 1
