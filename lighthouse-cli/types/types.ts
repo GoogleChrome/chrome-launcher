@@ -10,6 +10,10 @@ interface AuditResult {
   };
 }
 
+interface AuditResults {
+  [metric: string]: AuditResult
+}
+
 interface AuditFullResult {
   rawValue: boolean|number;
   displayValue: string;
@@ -24,6 +28,10 @@ interface AuditFullResult {
     value: string;
     formatter: string;
   };
+}
+
+interface AuditFullResults {
+  [metric: string]: AuditFullResult
 }
 
 interface AggregationResultItem {
@@ -42,7 +50,7 @@ interface Aggregation {
 interface Results {
   url: string;
   aggregations: Array<Aggregation>;
-  audits: Object;
+  audits: AuditFullResults;
   lighthouseVersion: string;
   artifacts?: Object;
   initialUrl: string;
@@ -54,5 +62,7 @@ export {
   Aggregation,
   AggregationResultItem,
   AuditResult,
+  AuditResults,
   AuditFullResult,
+  AuditFullResults,
 }
