@@ -45,8 +45,15 @@ function generateInlineScriptWithSize(sizeInBytes, firstContent = '', used = fal
 setTimeout(() => {
   const template = document.getElementById('lazily-loaded-image');
   document.body.appendChild(template.content.cloneNode(true));
-}, 3000);
+}, 6000);
 </script>
+<style>
+  .onscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
 </head>
 
 <body>
@@ -99,7 +106,20 @@ setTimeout(() => {
   <!-- PASS(optimized): image has insignificant WebP savings -->
   <!-- PASS(responsive): image is used at full size -->
   <!-- PASS(offscreen): image is onscreen -->
-  <img style="position: absolute; top: 0; left: 0;" src="lighthouse-320x212-poor.jpg?duplicate">
+  <img class="onscreen" src="lighthouse-320x212-poor.jpg?duplicate">
+
+  <!-- PASS(optimized): image is WebP -->
+  <!-- FAIL(responsive): image is used at 1/16 size -->
+  <!-- PASS(offscreen): image is onscreen -->
+  <div class="onscreen" style="width: 120px; height: 80px; background: 50% 50% url(lighthouse-480x320.webp?css);"></div>
+
+  <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
+  <!-- PASS(responsive): image is used numerous times in sprite-fashion -->
+  <!-- PASS(offscreen): image is onscreen -->
+  <div class="onscreen" style="width: 30px; height: 30px; background: 0% 50% url(lighthouse-480x320.jpg?sprite);"></div>
+  <div class="onscreen" style="width: 30px; height: 30px; background: 25% 50% url(lighthouse-480x320.jpg?sprite);"></div>
+  <div class="onscreen" style="width: 30px; height: 30px; background: 50% 50% url(lighthouse-480x320.jpg?sprite);"></div>
+  <div class="onscreen" style="width: 30px; height: 30px; background: 75% 50% url(lighthouse-480x320.jpg?sprite);"></div>
 </div>
 
 <template id="lazily-loaded-image">
@@ -120,7 +140,7 @@ generateInlineScriptWithSize(2000, '.kinda-unused { background: none; }\n');
 generateInlineScriptWithSize(24000, '.definitely-unused { background: none; }\n');
 </script>
 
-<!-- Ensure the page takes at least 5 seconds and we don't exit before the lazily loaded image -->
-<script src="delay-complete.js?delay=5000"></script>
+<!-- Ensure the page takes at least 7 seconds and we don't exit before the lazily loaded image -->
+<script src="delay-complete.js?delay=7000"></script>
 </body>
 </html>

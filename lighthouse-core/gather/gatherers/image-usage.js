@@ -23,30 +23,73 @@
 
 const Gatherer = require('./gatherer');
 
-/* global document, Image */
+/* global window, document, Image */
 
 /* istanbul ignore next */
 function collectImageElementInfo() {
-  return [...document.querySelectorAll('img')].map(element => {
+  function getClientRect(element) {
     const clientRect = element.getBoundingClientRect();
+    return {
+      // manually copy the properties because ClientRect does not JSONify
+      top: clientRect.top,
+      bottom: clientRect.bottom,
+      left: clientRect.left,
+      right: clientRect.right,
+    };
+  }
+
+  const htmlImages = [...document.querySelectorAll('img')].map(element => {
     return {
       // currentSrc used over src to get the url as determined by the browser
       // after taking into account srcset/media/sizes/etc.
       src: element.currentSrc,
       clientWidth: element.clientWidth,
       clientHeight: element.clientHeight,
-      clientRect: {
-        // manually copy the properties because ClientRect does not JSONify
-        top: clientRect.top,
-        bottom: clientRect.bottom,
-        left: clientRect.left,
-        right: clientRect.right,
-      },
+      clientRect: getClientRect(element),
       naturalWidth: element.naturalWidth,
       naturalHeight: element.naturalHeight,
+      isCss: false,
       isPicture: element.parentElement.tagName === 'PICTURE',
     };
   });
+
+  // Chrome normalizes background image style from getComputedStyle to be an absolute URL in quotes.
+  // Only match basic background-image: url("http://host/image.jpeg") declarations
+  const CSS_URL_REGEX = /^url\("([^"]+)"\)$/;
+  // Only find images that aren't specifically scaled
+  const CSS_SIZE_REGEX = /(auto|contain|cover)/;
+  const cssImages = [...document.querySelectorAll('html /deep/ *')].reduce((images, element) => {
+    const style = window.getComputedStyle(element);
+    if (!CSS_URL_REGEX.test(style.backgroundImage) ||
+        !CSS_SIZE_REGEX.test(style.backgroundSize)) {
+      return images;
+    }
+
+    const imageMatch = style.backgroundImage.match(CSS_URL_REGEX);
+    const url = imageMatch[1];
+
+    // Heuristic to filter out sprite sheets
+    const differentImages = images.filter(image => image.src !== url);
+    if (images.length - differentImages.length > 2) {
+      return differentImages;
+    }
+
+    images.push({
+      src: url,
+      clientWidth: element.clientWidth,
+      clientHeight: element.clientHeight,
+      clientRect: getClientRect(element),
+      // CSS Images do not expose natural size, we'll determine the size later
+      naturalWidth: Number.MAX_VALUE,
+      naturalHeight: Number.MAX_VALUE,
+      isCss: true,
+      isPicture: false,
+    });
+
+    return images;
+  }, []);
+
+  return htmlImages.concat(cssImages);
 }
 
 /* istanbul ignore next */
@@ -103,9 +146,10 @@ class ImageUsage extends Gatherer {
             // link up the image with its network record
             element.networkRecord = indexedNetworkRecords[element.src];
 
-            // Images within `picture` behave strangely and natural size information
-            // isn't accurate. Try to get the actual size if we can.
-            const elementPromise = element.isPicture && element.networkRecord ?
+            // Images within `picture` behave strangely and natural size information isn't accurate,
+            // CSS images have no natural size information at all.
+            // Try to get the actual size if we can.
+            const elementPromise = (element.isPicture || element.isCss) && element.networkRecord ?
                 this.fetchElementWithSizeInformation(element) :
                 Promise.resolve(element);
 
