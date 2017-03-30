@@ -93,7 +93,7 @@ URL.getDisplayName = function getDisplayName(url, options) {
     name = parsed.href;
   } else {
     name = parsed.pathname;
-    const parts = name.split('/');
+    const parts = name.split('/').filter(part => part.length);
     if (options.numPathParts && parts.length > options.numPathParts) {
       name = ELLIPSIS + parts.slice(-1 * options.numPathParts).join('/');
     }

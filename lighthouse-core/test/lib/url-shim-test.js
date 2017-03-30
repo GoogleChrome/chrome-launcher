@@ -133,10 +133,19 @@ describe('URL Shim', () => {
       assert.equal(result, expected);
     });
 
-    it('Doesn\'t elide short names', () => {
-      const url = 'http://example.com/file.css';
-      const result = URL.getDisplayName(url);
-      assert.equal(result, '/file.css');
+    it('Elides path parts properly', () => {
+      assert.equal(URL.getDisplayName('http://example.com/file.css'), '/file.css');
+      assert.equal(URL.getDisplayName('http://t.co//file.css'), '//file.css');
+      assert.equal(URL.getDisplayName('http://t.co/a/file.css'), '/a/file.css');
+      assert.equal(URL.getDisplayName('http://t.co/a/b/file.css'), '\u2026b/file.css');
+    });
+
+    it('Elides path parts properly when used with preserveHost', () => {
+      const getResult = path => URL.getDisplayName(`http://g.co${path}`, {preserveHost: true});
+      assert.equal(getResult('/file.css'), 'g.co/file.css');
+      assert.equal(getResult('/img/logo.jpg'), 'g.co/img/logo.jpg');
+      assert.equal(getResult('//logo.jpg'), 'g.co//logo.jpg');
+      assert.equal(getResult('/a/b/logo.jpg'), 'g.co/\u2026b/logo.jpg');
     });
   });
 

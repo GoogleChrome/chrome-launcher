@@ -71,7 +71,7 @@ describe('Printer', () => {
   it('writes extended info', () => {
     const mode = Printer.OutputMode.html;
     const htmlOutput = Printer.createOutput(sampleResults, mode);
-    const outputCheck = new RegExp('\u2026dobetterweb/dbw_tester.css', 'i');
+    const outputCheck = new RegExp('dobetterweb/dbw_tester.css', 'i');
 
     assert.ok(outputCheck.test(htmlOutput));
   });
