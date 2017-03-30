@@ -192,6 +192,11 @@ function getOverallScore(lighthouseResults) {
 }
 ```
 
+### Recipes
+> Helpful for CI integration
+
+  - [gulp](docs/recipes/gulp)
+
 ## Viewing a report
 
 Lighthouse can produce a report as JSON, HTML, or stdout CLI output.
