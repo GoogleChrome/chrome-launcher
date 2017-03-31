@@ -21,6 +21,27 @@ const ReportGeneratorV2 = require('../../../report/v2/report-generator.js');
 /* eslint-env mocha */
 
 describe('ReportGeneratorV2', () => {
+  describe('#replaceStrings', () => {
+    it('should replace all occurrences', () => {
+      const source = '%foo! %foo %bar!';
+      const result = ReportGeneratorV2.replaceStrings(source, [
+        {search: '%foo', replacement: 'hey'},
+        {search: '%bar', replacement: 'you'},
+      ]);
+
+      assert.equal(result, 'hey! hey you!');
+    });
+
+    it('should not replace serial occurences', () => {
+      const result = ReportGeneratorV2.replaceStrings('%1', [
+        {search: '%1', replacement: '%2'},
+        {search: '%2', replacement: 'pwnd'},
+      ]);
+
+      assert.equal(result, '%2');
+    });
+  });
+
   describe('#arithmeticMean', () => {
     it('should work for empty list', () => {
       assert.equal(ReportGeneratorV2.arithmeticMean([]), 0);
@@ -104,6 +125,29 @@ describe('ReportGeneratorV2', () => {
       assert.equal(result.categories.length, 2);
       assert.equal(result.categories[0].score, 0);
       assert.equal(result.categories[1].score, 55);
+    });
+  });
+
+  describe('#generateHtmlReport', () => {
+    it('should return html', () => {
+      const result = new ReportGeneratorV2().generateReportHtml({});
+      assert.ok(result.includes('doctype html'), 'includes doctype');
+      assert.ok(result.trim().match(/<\/html>$/), 'ends with HTML tag');
+    });
+
+    it('should inject the report JSON', () => {
+      const code = 'hax</script><script>console.log("pwned");%%LIGHTHOUSE_JAVASCRIPT%%';
+      const result = new ReportGeneratorV2().generateReportHtml({code});
+      assert.ok(result.includes('"code":"hax'), 'injects the json');
+      assert.ok(result.includes('\\u003c/script'), 'escapes HTML tags');
+      assert.ok(result.includes('LIGHTHOUSE_JAVASCRIPT'), 'cannot be tricked');
+    });
+
+    it('should inject the report renderer javascript', () => {
+      const result = new ReportGeneratorV2().generateReportHtml({});
+      assert.ok(result.includes('ReportRenderer'), 'injects the script');
+      assert.ok(result.includes('pre$`post'), 'does not break from String.replace');
+      assert.ok(result.includes('LIGHTHOUSE_JSON'), 'cannot be tricked');
     });
   });
 });

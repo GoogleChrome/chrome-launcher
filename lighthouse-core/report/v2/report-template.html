@@ -24,8 +24,8 @@ limitations under the License.
 </head>
 <body>
   <noscript>Lighthouse report requires JavaScript. Please enable.</noscript>
-  <script>window.__LIGHTHOUSE_JSON__ = %%LIGHTHOUSE_JSON%%</script>
   <script>%%LIGHTHOUSE_JAVASCRIPT%%</script>
+  <script>window.__LIGHTHOUSE_JSON__ = %%LIGHTHOUSE_JSON%%</script>
   <script>
     const renderer = new ReportRenderer(window.__LIGHTHOUSE_JSON__);
     renderer.render(document.body);

@@ -43,6 +43,24 @@ class ReportGeneratorV2 {
   }
 
   /**
+   * Replaces all the specified strings in source without serial replacements.
+   * @param {string} source
+   * @param {!Array<{search: string, replacement: string}>} replacements
+   */
+  static replaceStrings(source, replacements) {
+    if (replacements.length === 0) {
+      return source;
+    }
+
+    const firstReplacement = replacements[0];
+    const nextReplacements = replacements.slice(1);
+    return source
+        .split(firstReplacement.search)
+        .map(part => ReportGeneratorV2.replaceStrings(part, nextReplacements))
+        .join(firstReplacement.replacement);
+  }
+
+  /**
    * Returns the report JSON object with computed scores.
    * @param {{categories: !Object<{audits: !Array}>}} config
    * @param {!Object<{score: ?number|boolean|undefined}>} resultsByAuditId
@@ -79,9 +97,11 @@ class ReportGeneratorV2 {
   generateReportHtml(reportAsJson) {
     const sanitizedJson = JSON.stringify(reportAsJson).replace(/</g, '\\u003c');
     const sanitizedJavascript = REPORT_JAVASCRIPT.replace(/<\//g, '\\u003c/');
-    return REPORT_TEMPLATE
-      .replace(/%%LIGHTHOUSE_JSON%%/, sanitizedJson)
-      .replace(/%%LIGHTHOUSE_JAVASCRIPT%%/, sanitizedJavascript);
+
+    return ReportGeneratorV2.replaceStrings(REPORT_TEMPLATE, [
+      {search: '%%LIGHTHOUSE_JSON%%', replacement: sanitizedJson},
+      {search: '%%LIGHTHOUSE_JAVASCRIPT%%', replacement: sanitizedJavascript},
+    ]);
   }
 }
 

@@ -17,6 +17,12 @@
 
 /* eslint-env browser */
 
+/**
+ * @fileoverview The entry point for rendering the Lighthouse report based on the JSON output.
+ *    This file is injected into the report HTML along with the JSON report.
+ *
+ * Dummy text for ensuring report robustness: </script> pre$`post %%LIGHTHOUSE_JSON%%
+ */
 window.ReportRenderer = class ReportRenderer {
   /**
    * @param {!Object} report
