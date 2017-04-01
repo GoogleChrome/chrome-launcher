@@ -14,50 +14,43 @@
  * limitations under the License.
  */
 
+ :root {
+  --text-font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+  --body-font-size: 13px;
+
+  --secondary-text-color: #565656;
+  /*--accent-color: #3879d9;*/
+  --poor-color: #df332f;
+  --good-color: #2b882f;
+  --average-color: #ef6c00; /* md orange 800 */
+  --warning-color: #757575; /* md grey 600 */
+
+  --report-border-color: #ebebeb;
+
+  --lh-score-width: 50px;
+  --lh-score-margin: 20px;
+}
+
 * {
   box-sizing: border-box;
+}
+
+body {
+  font-family: var(--text-font-family);
+  font-size: var(--body-font-size);
+  margin: 0;
+  line-height: var(--body-line-height);
 }
 
 .--hidden {
   display: none !important;
 }
 
-/* Text */
-
-.lighthouse-text {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  flex: none;
-}
-
-/* Block */
-
-.lighthouse-block {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* List */
-
-.lighthouse-list {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
 .lighthouse-list__header {
-  text-decoration: underline;
+  cursor: pointer;
 }
 
 .lighthouse-list__items {
-  flex: none;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
   padding-left: 10px;
 }
 
@@ -70,51 +63,46 @@
 
 .lighthouse-score {
   display: flex;
-  flex: none;
-  flex-direction: row;
   align-items: flex-start;
 }
 
 .lighthouse-score__value {
   flex: none;
-  font-size: larger;
   padding: 5px;
-  margin-right: 20px;
-  width: 50px;
+  margin-right: var(--lh-score-margin);
+  width: var(--lh-score-width);
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: green;
+  justify-content: center;
+  background: var(--warning-color);
+  color: #fff;
+  border-radius: 2px;
 }
 
-.lighthouse-score__value--failed {
-  background: red;
+.lighthouse-score__value--good {
+  background: var(--good-color);
 }
 
-.lighthouse-score > :not(.lighthouse-score__value) {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+.lighthouse-score__value--average {
+  background: var(--average-color);
+}
+
+.lighthouse-score__value--poor {
+  background: var(--poor-color);
 }
 
 .lighthouse-score__title {
-  flex: none;
   margin-bottom: 10px;
 }
 
 .lighthouse-score__description {
-  flex: none;
-  white-space: normal;
   font-size: smaller;
+  color: var(--secondary-text-color);
 }
 
 /* Audit */
 
 .lighthouse-audit {
-  display: flex;
-  flex-direction: column;
-  flex: none;
-  align-items: stretch;
+  margin-top: 20px;
 }
 
 .lighthouse-audit > .lighthouse-score {
@@ -133,28 +121,29 @@
 }
 
 .lighthouse-report {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  padding: 16px;
 }
 
 .lighthouse-category {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  margin-bottom: 20px;
-  flex: none;
+  padding: 24px 0;
+  border-top: 1px solid var(--report-border-color);
+}
+
+.lighthouse-category:first-of-type {
+  border: none;
+  padding-top: 0;
 }
 
 .lighthouse-category > *:not(.lighthouse-score) {
-  margin-left: 50px;
+  margin-left: calc(var(--lh-score-width) + var(--lh-score-margin));
 }
 
 .lighthouse-category > .lighthouse-score {
   font-size: 20px;
 }
 
-.lighthouse-category > .lighthouse-audit {
-  margin-top: 20px;
+.lighthouse-category > .lighthouse-score .lighthouse-score__title {
+  font-size: 24px;
+  font-weight: 400;
 }
+
