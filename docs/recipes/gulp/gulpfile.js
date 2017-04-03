@@ -80,7 +80,7 @@ const handleOk = function(results) {
  */
 const handleError = function(e) {
   stopServer();
-  console.error(e);
+  console.error(e); // eslint-disable-line no-console
   throw e; // Throw to exit process with status 1.
 };
 
