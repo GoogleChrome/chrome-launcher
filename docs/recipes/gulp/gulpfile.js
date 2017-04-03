@@ -69,22 +69,23 @@ const runLighthouse = function() {
  */
 const handleOk = function(results) {
   stopServer();
-  // TODO: use lighthouse results for checking your performance expectations
-  /* eslint-disable no-console */
-  console.log(results);
-  process.exit(0);
+  console.log(results); // eslint-disable-line no-console
+  // TODO: use lighthouse results for checking your performance expectations.
+  // e.g. process.exit(1) or throw Error if score falls below a certain threshold.
+  return results;
 };
 
 /**
  * Handle error
  */
-const handleError = function() {
+const handleError = function(e) {
   stopServer();
-  process.exit(1);
+  console.error(e);
+  throw e; // Throw to exit process with status 1.
 };
 
 gulp.task('lighthouse', function() {
-  launchChrome().then(_ => {
+  return launchChrome().then(_ => {
     startServer();
     return runLighthouse()
       .then(handleOk)
