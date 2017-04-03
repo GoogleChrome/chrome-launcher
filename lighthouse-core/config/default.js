@@ -4,7 +4,7 @@ module.exports = {
     "passName": "defaultPass",
     "recordNetwork": true,
     "recordTrace": true,
-    "pauseBeforeTraceEndMs": 500,
+    "pauseBeforeTraceEndMs": 5000,
     "useThrottling": true,
     "gatherers": [
       "url",

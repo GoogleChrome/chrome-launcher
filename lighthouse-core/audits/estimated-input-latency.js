@@ -44,9 +44,8 @@ class EstimatedInputLatency extends Audit {
     };
   }
 
-  static calculate(speedline, model, trace) {
-    // Use speedline's first paint as start of range for input latency check.
-    const startTime = speedline.first;
+  static calculate(tabTrace, model, trace) {
+    const startTime = tabTrace.timings.firstMeaningfulPaint;
 
     const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
     const ninetieth = latencyPercentiles.find(result => result.percentile === 0.9);
@@ -84,11 +83,12 @@ class EstimatedInputLatency extends Audit {
     const trace = artifacts.traces[this.DEFAULT_PASS];
 
     const pending = [
-      artifacts.requestSpeedline(trace),
+      artifacts.requestTraceOfTab(trace),
       artifacts.requestTracingModel(trace)
     ];
-    return Promise.all(pending).then(([speedline, model]) =>
-        EstimatedInputLatency.calculate(speedline, model, trace));
+    return Promise.all(pending).then(([tabTrace, model]) => {
+      return EstimatedInputLatency.calculate(tabTrace, model, trace);
+    });
   }
 }
 

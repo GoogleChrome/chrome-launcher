@@ -37,6 +37,97 @@ class TTIMetric extends Audit {
   }
 
   /**
+   *
+   * @param {number} minTime
+   * @param {number} maxTime
+   * @param {{model: !Object, trace: !Object}} data
+   * @param {number=} windowSize
+   * @return {{timeInMs: number|undefined, currentLatency: number, foundLatencies: !Array}}
+   */
+  static _forwardWindowTTI(minTime, maxTime, data, windowSize = 500) {
+    // Find first window where Est Input Latency is <50ms at the 90% percentile.
+    let startTime = minTime - 50;
+    let endTime;
+    let currentLatency = Infinity;
+    const percentiles = [0.9]; // [0.75, 0.9, 0.99, 1];
+    const threshold = 50;
+    const foundLatencies = [];
+
+    // When we've found a latency that's good enough, we're good.
+    while (currentLatency > threshold) {
+      // While latency is too high, increment just 50ms and look again.
+      startTime += 50;
+      endTime = startTime + windowSize;
+      // If there's no more room in the trace to look, we're done.
+      if (endTime > maxTime) {
+        return {currentLatency, foundLatencies};
+      }
+
+      // Get our expected latency for the time window
+      const latencies = TracingProcessor.getRiskToResponsiveness(
+        data.model, data.trace, startTime, endTime, percentiles);
+      const estLatency = latencies[0].time;
+      foundLatencies.push({
+        estLatency: estLatency,
+        startTime: startTime.toFixed(1)
+      });
+
+      // Grab this latency and try the threshold again
+      currentLatency = estLatency;
+    }
+
+    return {
+      // The start of our window is our TTI
+      timeInMs: startTime,
+      currentLatency,
+      foundLatencies,
+    };
+  }
+
+  /**
+   * @param {{fmpTiming: number, visuallyReadyTiming: number, traceEndTiming: number}} times
+   * @param {{model: !Object, trace: !Object}} data
+   * @return {{timeInMs: number|undefined, currentLatency: number, foundLatencies: !Array}}
+   */
+  static findTTIAlpha(times, data) {
+    return TTIMetric._forwardWindowTTI(
+      // when screenshots are not available, visuallyReady is 0 and this falls back to fMP
+      Math.max(times.fmpTiming, times.visuallyReadyTiming),
+      times.traceEndTiming,
+      data,
+      500
+    );
+  }
+
+  /**
+   * @param {{fmpTiming: number, visuallyReadyTiming: number, traceEndTiming: number}} times
+   * @param {{model: !Object, trace: !Object}} data
+   * @return {{timeInMs: number|undefined, currentLatency: number, foundLatencies: !Array}}
+   */
+  static findTTIAlphaFMPOnly(times, data) {
+    return TTIMetric._forwardWindowTTI(
+      times.fmpTiming,
+      times.traceEndTiming,
+      data,
+      500
+    );
+  }
+
+  /**
+   * @param {{fmpTiming: number, visuallyReadyTiming: number, traceEndTiming: number}} times
+   * @param {{model: !Object, trace: !Object}} data
+   * @return {{timeInMs: number|undefined, currentLatency: number, foundLatencies: !Array}}
+   */
+  static findTTIAlphaFMPOnly5s(times, data) {
+    return TTIMetric._forwardWindowTTI(
+      times.fmpTiming,
+      times.traceEndTiming,
+      data,
+      5000
+    );
+  }
+
+  /**
    * Identify the time the page is "interactive"
    * @see https://docs.google.com/document/d/1oiy0_ych1v2ADhyG_QW7Ps4BNER2ShlJjx2zCbVzVyY/edit#
    *
@@ -63,25 +154,28 @@ class TTIMetric extends Audit {
   static audit(artifacts) {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
 
+    let debugString;
     // We start looking at Math.Max(FMP, visProgress[0.85])
     const pending = [
-      artifacts.requestSpeedline(trace),
+      artifacts.requestSpeedline(trace).catch(err => {
+        debugString = `Trace error: ${err.message}`;
+        return null;
+      }),
       artifacts.requestTraceOfTab(trace),
       artifacts.requestTracingModel(trace)
     ];
     return Promise.all(pending).then(([speedline, tabTrace, model]) => {
-      const endOfTraceTime = model.bounds.max;
-
       // frame monotonic timestamps from speedline are in ms (ts / 1000), so we'll match
       //   https://github.com/pmdartus/speedline/blob/123f512632a/src/frame.js#L86
-      const fMPtsInMS = tabTrace.firstMeaningfulPaintEvt.ts / 1000;
-      const navStartTsInMS = tabTrace.navigationStartEvt.ts / 1000;
+      const fMPtsInMS = tabTrace.timestamps.firstMeaningfulPaint;
+      const navStartTsInMS = tabTrace.timestamps.navigationStart;
 
-      const fmpTiming = fMPtsInMS - navStartTsInMS;
+      const fmpTiming = tabTrace.timings.firstMeaningfulPaint;
+      const traceEndTiming = tabTrace.timings.traceEnd;
 
       // look at speedline results for 85% starting at FMP
       let visuallyReadyTiming = 0;
-      if (speedline.frames) {
+      if (speedline && speedline.frames) {
         const eightyFivePctVC = speedline.frames.find(frame => {
           return frame.getTimeStamp() >= fMPtsInMS && frame.getProgress() >= 85;
         });
@@ -90,37 +184,15 @@ class TTIMetric extends Audit {
         }
       }
 
-      // Find first 500ms window where Est Input Latency is <50ms at the 90% percentile.
-      let startTime = Math.max(fmpTiming, visuallyReadyTiming) - 50;
-      let endTime;
-      let currentLatency = Infinity;
-      const percentiles = [0.9]; // [0.75, 0.9, 0.99, 1];
-      const threshold = 50;
-      const foundLatencies = [];
+      const times = {fmpTiming, visuallyReadyTiming, traceEndTiming};
+      const data = {tabTrace, model, trace};
+      const timeToInteractive = TTIMetric.findTTIAlpha(times, data);
+      const timeToInteractiveB = TTIMetric.findTTIAlphaFMPOnly(times, data);
+      const timeToInteractiveC = TTIMetric.findTTIAlphaFMPOnly5s(times, data);
 
-      // When we've found a latency that's good enough, we're good.
-      while (currentLatency > threshold) {
-        // While latency is too high, increment just 50ms and look again.
-        startTime += 50;
-        endTime = startTime + 500;
-        // If there's no more room in the trace to look, we're done.
-        if (endTime > endOfTraceTime) {
-          throw new Error('Entire trace was found to be busy.');
-        }
-        // Get our expected latency for the time window
-        const latencies = TracingProcessor.getRiskToResponsiveness(
-          model, trace, startTime, endTime, percentiles);
-        const estLatency = latencies[0].time;
-        foundLatencies.push({
-          estLatency: estLatency,
-          startTime: startTime.toFixed(1)
-        });
-
-        // Grab this latency and try the threshold again
-        currentLatency = estLatency;
+      if (!timeToInteractive.timeInMs) {
+        throw new Error('Entire trace was found to be busy.');
       }
-      // The start of our window is our TTI
-      const timeToInteractive = startTime;
 
       // Use the CDF of a log-normal distribution for scoring.
       //   < 1200ms: score≈100
@@ -128,7 +200,7 @@ class TTIMetric extends Audit {
       //   >= 15000ms: score≈0
       const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
           SCORING_POINT_OF_DIMINISHING_RETURNS);
-      let score = 100 * distribution.computeComplementaryPercentile(startTime);
+      let score = 100 * distribution.computeComplementaryPercentile(timeToInteractive.timeInMs);
 
       // Clamp the score to 0 <= x <= 100.
       score = Math.min(100, score);
@@ -139,21 +211,32 @@ class TTIMetric extends Audit {
         timings: {
           fMP: parseFloat(fmpTiming.toFixed(3)),
           visuallyReady: parseFloat(visuallyReadyTiming.toFixed(3)),
-          timeToInteractive: parseFloat(startTime.toFixed(3))
+          timeToInteractive: parseFloat(timeToInteractive.timeInMs.toFixed(3)),
+          timeToInteractiveB: timeToInteractiveB.timeInMs,
+          timeToInteractiveC: timeToInteractiveC.timeInMs,
+          endOfTrace: traceEndTiming,
         },
         timestamps: {
           fMP: fMPtsInMS * 1000,
           visuallyReady: (visuallyReadyTiming + navStartTsInMS) * 1000,
-          timeToInteractive: (timeToInteractive + navStartTsInMS) * 1000
+          timeToInteractive: (timeToInteractive.timeInMs + navStartTsInMS) * 1000,
+          timeToInteractiveB: (timeToInteractiveB.timeInMs + navStartTsInMS) * 1000,
+          timeToInteractiveC: (timeToInteractiveC.timeInMs + navStartTsInMS) * 1000,
+          endOfTrace: (traceEndTiming + navStartTsInMS) * 1000,
         },
-        expectedLatencyAtTTI: parseFloat(currentLatency.toFixed(3)),
-        foundLatencies
+        latencies: {
+          timeToInteractive: timeToInteractive.foundLatencies,
+          timeToInteractiveB: timeToInteractiveB.foundLatencies,
+          timeToInteractiveC: timeToInteractiveC.foundLatencies,
+        },
+        expectedLatencyAtTTI: parseFloat(timeToInteractive.currentLatency.toFixed(3))
       };
 
       return {
         score,
-        rawValue: parseFloat(timeToInteractive.toFixed(1)),
-        displayValue: `${parseFloat(timeToInteractive.toFixed(1))}ms`,
+        debugString,
+        rawValue: parseFloat(timeToInteractive.timeInMs.toFixed(1)),
+        displayValue: `${parseFloat(timeToInteractive.timeInMs.toFixed(1))}ms`,
         optimalValue: this.meta.optimalValue,
         extendedInfo: {
           value: extendedInfo,

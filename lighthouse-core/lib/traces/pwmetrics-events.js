@@ -87,11 +87,27 @@ class Metrics {
         },
       },
       {
-        name: 'Time to Interactive',
+        name: 'Time to Interactive (vAlpha)',
         id: 'tti',
         getTs: auditResults => {
           const ttiExt = auditResults['time-to-interactive'].extendedInfo;
           return ttiExt.value.timestamps.timeToInteractive;
+        },
+      },
+      {
+        name: 'Time to Interactive (vAlpha non-visual)',
+        id: 'tti-non-visual',
+        getTs: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return ttiExt.value.timestamps.timeToInteractiveB;
+        },
+      },
+      {
+        name: 'Time to Interactive (vAlpha non-visual, 5s)',
+        id: 'tti-non-visual-5s',
+        getTs: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return ttiExt.value.timestamps.timeToInteractiveC;
         },
       },
     ];
