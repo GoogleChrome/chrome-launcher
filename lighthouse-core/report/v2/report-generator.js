@@ -74,20 +74,19 @@ class ReportGeneratorV2 {
       const audits = category.audits.map(audit => {
         const result = resultsByAuditId[audit.id];
         // Cast to number to catch `null` and undefined when audits error
-        let score = Number(result.score) || 0;
+        let auditScore = Number(result.score) || 0;
         if (typeof result.score === 'boolean') {
-          score = result.score ? 100 : 0;
+          auditScore = result.score ? 100 : 0;
         }
 
-        return Object.assign({}, audit, {result, score});
+        return Object.assign({}, audit, {result, score: auditScore});
       });
 
-      const score = ReportGeneratorV2.arithmeticMean(audits);
-      return Object.assign({}, category, {audits, score});
+      const categoryScore = ReportGeneratorV2.arithmeticMean(audits);
+      return Object.assign({}, category, {audits, score: categoryScore});
     });
-
-    const score = ReportGeneratorV2.arithmeticMean(categories);
-    return {score, categories};
+    const overallScore = ReportGeneratorV2.arithmeticMean(categories);
+    return {score: overallScore, categories};
   }
 
   /**
