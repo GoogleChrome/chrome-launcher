@@ -79,7 +79,8 @@ class Audit {
       name: audit.meta.name,
       category: audit.meta.category,
       description: audit.meta.description,
-      helpText: audit.meta.helpText
+      helpText: audit.meta.helpText,
+      details: result.details,
     };
   }
 }

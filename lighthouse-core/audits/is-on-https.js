@@ -72,6 +72,11 @@ class HTTPS extends Audit {
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: insecureRecords
+      },
+      details: {
+        type: 'list',
+        header: {type: 'text', text: 'Insecure URLs:'},
+        items: insecureRecords.map(record => ({type: 'text', text: record.url})),
       }
     };
   }
