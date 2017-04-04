@@ -170,6 +170,10 @@ class TTIMetric extends Audit {
       const fMPtsInMS = tabTrace.timestamps.firstMeaningfulPaint;
       const navStartTsInMS = tabTrace.timestamps.navigationStart;
 
+      if (!fMPtsInMS) {
+        throw new Error('No firstMeaningfulPaint event found in trace');
+      }
+
       const fmpTiming = tabTrace.timings.firstMeaningfulPaint;
       const traceEndTiming = tabTrace.timings.traceEnd;
 

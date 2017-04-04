@@ -46,6 +46,9 @@ class EstimatedInputLatency extends Audit {
 
   static calculate(tabTrace, model, trace) {
     const startTime = tabTrace.timings.firstMeaningfulPaint;
+    if (!startTime) {
+      throw new Error('No firstMeaningfulPaint event found in trace');
+    }
 
     const latencyPercentiles = TracingProcessor.getRiskToResponsiveness(model, trace, startTime);
     const ninetieth = latencyPercentiles.find(result => result.percentile === 0.9);
