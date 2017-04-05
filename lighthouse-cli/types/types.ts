@@ -19,6 +19,7 @@ interface AuditFullResult {
   displayValue: string;
   debugString?: string;
   score: boolean|number;
+  scoringMode: string;
   error?: boolean;
   description: string;
   name: string;

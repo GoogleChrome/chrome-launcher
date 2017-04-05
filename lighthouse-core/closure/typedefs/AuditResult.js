@@ -66,6 +66,9 @@ function AuditFullResult() {}
 AuditFullResult.prototype.score;
 
 /** @type {string} */
+AuditFullResult.prototype.scoringMode;
+
+/** @type {string} */
 AuditFullResult.prototype.displayValue;
 
 /** @type {(boolean|number)} */

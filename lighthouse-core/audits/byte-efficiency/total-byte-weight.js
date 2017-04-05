@@ -45,6 +45,7 @@ class TotalByteWeight extends Audit {
           'Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) ' +
           'and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. ' +
           'Try to find ways to reduce the size of required files.',
+      scoringMode: Audit.SCORING_MODES.NUMERIC,
       requiredArtifacts: ['networkRecords']
     };
   }

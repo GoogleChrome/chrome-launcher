@@ -38,6 +38,7 @@ class SpeedIndexMetric extends Audit {
       helpText: 'Speed Index shows how quickly the contents of a page are visibly populated. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index).',
       optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString(),
+      scoringMode: Audit.SCORING_MODES.NUMERIC,
       requiredArtifacts: ['traces']
     };
   }

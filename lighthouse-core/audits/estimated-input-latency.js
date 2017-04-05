@@ -40,6 +40,7 @@ class EstimatedInputLatency extends Audit {
           'of latency, or less. 10% of the time a user can expect additional latency. If your ' +
           'score is higher than Lighthouse\'s target score, users may perceive your app as ' +
           'laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency).',
+      scoringMode: Audit.SCORING_MODES.NUMERIC,
       requiredArtifacts: ['traces']
     };
   }
