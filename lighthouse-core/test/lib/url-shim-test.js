@@ -29,6 +29,12 @@ describe('URL Shim', () => {
     assert.doesNotThrow(_ => new URL(url));
   });
 
+  it.skip('handles URLs with multiple dashes', () => {
+    // from https://github.com/GoogleChrome/lighthouse/issues/1972
+    const url = 'https://r15---sn-o097znl7.googlevideo.com/generate_204?conn2';
+    assert.doesNotThrow(_ => new URL(url));
+  });
+
   it('safely identifies valid URLs', () => {
     assert.ok(URL.isValid('https://5321212.fls.net/page?query=string#hash'));
     assert.ok(URL.isValid('https://localhost:8080/page?query=string#hash'));
@@ -176,6 +182,10 @@ describe('URL Shim', () => {
         'chrome://chrome/settings/',
       ];
       assert.ok(URL.equalWithExcludedFragments(...pair));
+    });
+
+    it('returns false for invalid URLs', () => {
+      assert.ok(!URL.equalWithExcludedFragments('utter nonsense', 'http://example.com'));
     });
   });
 });

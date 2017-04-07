@@ -152,14 +152,17 @@ function rewriteChromeInternalUrl(url) {
  */
 URL.equalWithExcludedFragments = function(url1, url2) {
   [url1, url2] = [url1, url2].map(rewriteChromeInternalUrl);
+  try {
+    url1 = new URL(url1);
+    url1.hash = '';
 
-  url1 = new URL(url1);
-  url1.hash = '';
+    url2 = new URL(url2);
+    url2.hash = '';
 
-  url2 = new URL(url2);
-  url2.hash = '';
-
-  return url1.href === url2.href;
+    return url1.href === url2.href;
+  } catch (e) {
+    return false;
+  }
 };
 
 module.exports = URL;
