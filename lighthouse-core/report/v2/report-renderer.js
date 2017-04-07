@@ -15,26 +15,31 @@
  */
 'use strict';
 
-/* eslint-env browser */
-/* eslint indent: [2, 2, { "SwitchCase": 1, "outerIIFEBody": 0 }] */
+/**
+ * @fileoverview The entry point for rendering the Lighthouse report based on the JSON output.
+ *    This file is injected into the report HTML along with the JSON report.
+ *
+ * Dummy text for ensuring report robustness: </script> pre$`post %%LIGHTHOUSE_JSON%%
+ */
 
-(function() {
+/* eslint-env browser */
+
 const RATINGS = {
-  GOOD: {label: 'good', minScore: 75},
+  PASS: {label: 'pass', minScore: 75},
   AVERAGE: {label: 'average', minScore: 45},
-  POOR: {label: 'poor'}
+  FAIL: {label: 'fail'}
 };
 
 /**
  * Convert a score to a rating label.
- * @param {number} value
+ * @param {number} score
  * @return {string}
  */
-function calculateRating(value) {
-  let rating = RATINGS.POOR.label;
-  if (value >= RATINGS.GOOD.minScore) {
-    rating = RATINGS.GOOD.label;
-  } else if (value >= RATINGS.AVERAGE.minScore) {
+function calculateRating(score) {
+  let rating = RATINGS.FAIL.label;
+  if (score >= RATINGS.PASS.minScore) {
+    rating = RATINGS.PASS.label;
+  } else if (score >= RATINGS.AVERAGE.minScore) {
     rating = RATINGS.AVERAGE.label;
   }
   return rating;
@@ -49,13 +54,7 @@ function formatNumber(number) {
   return number.toLocaleString(undefined, {maximumFractionDigits: 1});
 }
 
-/**
- * @fileoverview The entry point for rendering the Lighthouse report based on the JSON output.
- *    This file is injected into the report HTML along with the JSON report.
- *
- * Dummy text for ensuring report robustness: </script> pre$`post %%LIGHTHOUSE_JSON%%
- */
-window.ReportRenderer = class ReportRenderer {
+class ReportRenderer {
   /**
    * @param {!Document} document
    */
@@ -75,7 +74,7 @@ window.ReportRenderer = class ReportRenderer {
     }
   }
 
-  /**
+ /**
    * @param {string} name
    * @param {string=} className
    * @param {!Object<string, string>=} attrs Attribute key/val pairs.
@@ -86,31 +85,82 @@ window.ReportRenderer = class ReportRenderer {
     if (className) {
       element.className = className;
     }
-    for (const [key, val] of Object.entries(attrs)) {
-      element.setAttribute(key, val);
-    }
+    Object.keys(attrs).forEach(key => {
+      element.setAttribute(key, attrs[key]);
+    });
     return element;
   }
 
   /**
+   * @param {string} selector
+   * @return {!DocumentFragment} A clone of the template content.
+   * @throws {Error}
+   */
+  _cloneTemplate(selector) {
+    const template = this._document.querySelector(selector);
+    if (!template) {
+      throw new Error(`Template not found: template${selector}`);
+    }
+    return this._document.importNode(template.content, true);
+  }
+
+  /**
+   * @param {!DocumentFragment|!Element} element DOM node to populate with values.
    * @param {number} score
+   * @param {string} scoringMode
    * @param {string} title
    * @param {string} description
    * @return {!Element}
    */
-  _renderScore(score, title, description) {
-    const element = this._createElement('div', 'lighthouse-score');
+  _populateScore(element, score, scoringMode, title, description) {
+    // Fill in the blanks.
+    const valueEl = element.querySelector('.lighthouse-score__value');
+    valueEl.textContent = formatNumber(score);
+    valueEl.classList.add(`lighthouse-score__value--${calculateRating(score)}`,
+                          `lighthouse-score__value--${scoringMode}`);
 
-    const value = element.appendChild(this._createElement('div', 'lighthouse-score__value'));
-    value.textContent = formatNumber(score);
-    value.classList.add(`lighthouse-score__value--${calculateRating(score)}`);
-
-    const column = element.appendChild(this._createElement('div', 'lighthouse-score__text'));
-    column.appendChild(this._createElement('div', 'lighthouse-score__title')).textContent = title;
-    column.appendChild(
-      this._createElement('div', 'lighthouse-score__description')).textContent = description;
+    element.querySelector('.lighthouse-score__title').textContent = title;
+    element.querySelector('.lighthouse-score__description').textContent = description;
 
     return element;
+  }
+
+  /**
+   * @param {!AuditJSON} audit
+   * @return {!Element}
+   */
+  _renderAuditScore(audit) {
+    const tmpl = this._cloneTemplate('#tmpl-lighthouse-audit-score');
+
+    const scoringMode = audit.result.scoringMode;
+    const description = audit.result.helpText;
+    let title = audit.result.description;
+
+    if (audit.result.displayValue) {
+      title += `:  ${audit.result.displayValue}`;
+    }
+    if (audit.result.optimalValue) {
+      title += ` (target: ${audit.result.optimalValue})`;
+    }
+
+    // Append audit details to header section so the entire audit is within a <details>.
+    const header = tmpl.querySelector('.lighthouse-score__header');
+    header.open = audit.score < 100; // expand failed audits
+    if (audit.result.details) {
+      header.appendChild(this._renderDetails(audit.result.details));
+    }
+
+    return this._populateScore(tmpl, audit.score, scoringMode, title, description);
+  }
+
+  /**
+   * @param {!CategoryJSON} category
+   * @return {!Element}
+   */
+  _renderCategoryScore(category) {
+    const tmpl = this._cloneTemplate('#tmpl-lighthouse-category-score');
+    const score = Math.round(category.score);
+    return this._populateScore(tmpl, score, 'numeric', category.name, category.description);
   }
 
   /**
@@ -200,7 +250,7 @@ window.ReportRenderer = class ReportRenderer {
    */
   _renderCategory(category) {
     const element = this._createElement('div', 'lighthouse-category');
-    element.appendChild(this._renderScore(category.score, category.name, category.description));
+    element.appendChild(this._renderCategoryScore(category));
     for (const audit of category.audits) {
       element.appendChild(this._renderAudit(audit));
     }
@@ -213,18 +263,14 @@ window.ReportRenderer = class ReportRenderer {
    */
   _renderAudit(audit) {
     const element = this._createElement('div', 'lighthouse-audit');
-    let title = audit.result.description;
-    if (audit.result.displayValue) {
-      title += ': ' + audit.result.displayValue;
-    }
-    element.appendChild(this._renderScore(audit.score, title, audit.result.helpText));
-    if (audit.result.details) {
-      element.appendChild(this._renderDetails(audit.result.details));
-    }
+    element.appendChild(this._renderAuditScore(audit));
     return element;
   }
-};
-})();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = ReportRenderer;
+}
 
 /** @typedef {{type: string, text: string|undefined, header: DetailsJSON|undefined, items: Array<DetailsJSON>|undefined}} */
 let DetailsJSON; // eslint-disable-line no-unused-vars

@@ -16,7 +16,10 @@
 'use strict';
 
 const assert = require('assert');
+const fs = require('fs');
+const jsdom = require('jsdom');
 const ReportGeneratorV2 = require('../../../report/v2/report-generator.js');
+const TEMPLATES_FILE = fs.readFileSync(__dirname + '/../../../report/v2/templates.html', 'utf8');
 
 /* eslint-env mocha */
 
@@ -141,6 +144,19 @@ describe('ReportGeneratorV2', () => {
       assert.ok(result.includes('"code":"hax'), 'injects the json');
       assert.ok(result.includes('\\u003c/script'), 'escapes HTML tags');
       assert.ok(result.includes('LIGHTHOUSE_JAVASCRIPT'), 'cannot be tricked');
+    });
+
+    it('should inject the report templates', () => {
+      const page = jsdom.jsdom(new ReportGeneratorV2().generateReportHtml({}));
+      const templates = jsdom.jsdom(TEMPLATES_FILE);
+      assert.equal(page.querySelectorAll('template[id^="tmpl-"]').length,
+          templates.querySelectorAll('template[id^="tmpl-"]').length, 'all templates injected');
+    });
+
+    it('should inject the report CSS', () => {
+      const result = new ReportGeneratorV2().generateReportHtml({});
+      assert.ok(!result.includes('/*%%LIGHTHOUSE_CSS%%*/'));
+      assert.ok(result.includes('--pass-color'));
     });
 
     it('should inject the report renderer javascript', () => {
