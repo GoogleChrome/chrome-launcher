@@ -19,6 +19,7 @@
     "build-cli": "cd ./lighthouse-cli && npm run build",
     "build-extension": "cd ./lighthouse-extension && npm run build",
     "build-viewer": "cd ./lighthouse-viewer && npm run build",
+    "clean": "rimraf *.report.html *.report.dom.html *.report.json *.screenshots.html *.devtoolslog.json *.trace.json || true",
     "lint": "[ \"$CI\" = true ] && eslint --quiet -f codeframe . || eslint .",
     "smoke": "bash lighthouse-cli/test/smokehouse/offline-local/run-tests.sh && bash lighthouse-cli/test/smokehouse/perf/run-tests.sh && bash lighthouse-cli/test/smokehouse/dobetterweb/run-tests.sh && bash lighthouse-cli/test/smokehouse/byte-efficiency/run-tests.sh",
     "coverage": "node $(npm bin)/istanbul cover -x \"**/third_party/**\" _mocha -- $(find */test -name '*-test.js') --timeout 10000 --reporter progress",
