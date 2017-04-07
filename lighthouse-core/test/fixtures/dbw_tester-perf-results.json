@@ -113,6 +113,7 @@
       "extendedInfo": {
         "value": {
           "timings": {
+            "onLoad": 2956.185,
             "fMP": 2946.14,
             "visuallyReady": 2955.548,
             "timeToInteractive": 2955.548,
@@ -121,6 +122,7 @@
             "endOfTrace": 8471.488999843597
           },
           "timestamps": {
+            "onLoad": 1082005348861.9999,
             "fMP": 1082005338816.9999,
             "visuallyReady": 1082005348224.9999,
             "timeToInteractive": 1082005348224.9999,

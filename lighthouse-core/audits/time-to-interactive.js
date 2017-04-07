@@ -175,6 +175,7 @@ class TTIMetric extends Audit {
         throw new Error('No firstMeaningfulPaint event found in trace');
       }
 
+      const onLoadTiming = tabTrace.timings.onLoad;
       const fmpTiming = tabTrace.timings.firstMeaningfulPaint;
       const traceEndTiming = tabTrace.timings.traceEnd;
 
@@ -214,6 +215,7 @@ class TTIMetric extends Audit {
 
       const extendedInfo = {
         timings: {
+          onLoad: onLoadTiming,
           fMP: parseFloat(fmpTiming.toFixed(3)),
           visuallyReady: parseFloat(visuallyReadyTiming.toFixed(3)),
           timeToInteractive: parseFloat(timeToInteractive.timeInMs.toFixed(3)),
@@ -222,6 +224,7 @@ class TTIMetric extends Audit {
           endOfTrace: traceEndTiming,
         },
         timestamps: {
+          onLoad: (onLoadTiming + navStartTsInMS) * 1000,
           fMP: fMPtsInMS * 1000,
           visuallyReady: (visuallyReadyTiming + navStartTsInMS) * 1000,
           timeToInteractive: (timeToInteractive.timeInMs + navStartTsInMS) * 1000,

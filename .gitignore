@@ -41,3 +41,5 @@ lighthouse-cli/types/*.map
 
 lighthouse-core/report/partials/templates/
 lighthouse-core/report/templates/*.js
+
+plots/out/

@@ -21,3 +21,6 @@ lighthouse-cli/types/*.js
 # Handlebar-templates
 lighthouse-core/report/templates/report-templates.js
 lighthouse-core/report/partials/templates/report-partials.js
+
+# Generated files
+plots/out/**

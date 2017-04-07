@@ -23,11 +23,10 @@ const assert = require('assert');
 const dbwTrace = require('../../fixtures/traces/dbw_tester.json');
 const dbwResults = require('../../fixtures/dbw_tester-perf-results.json');
 
-
 /* eslint-env mocha */
 describe('metrics events class', () => {
   it('exposes metric definitions', () => {
-    assert.equal(Metrics.metricsDefinitions.length, 10, '10 metrics not exposed');
+    assert.equal(Metrics.metricsDefinitions.length, 12, '12 metrics not exposed');
   });
 
   it('generates fake trace events', () => {

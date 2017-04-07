@@ -18,6 +18,22 @@
 
 const log = require('../../../lighthouse-core/lib/log.js');
 
+/**
+ * @param {!Object} object
+ * @param {string} path
+ * @return {*}
+ */
+function safeGet(object, path) {
+  const components = path.split('.');
+  for (const component of components) {
+    if (!object) {
+      return null;
+    }
+    object = object[component];
+  }
+  return object;
+}
+
 class Metrics {
   constructor(traceEvents, auditResults) {
     this._traceEvents = traceEvents;
@@ -35,81 +51,145 @@ class Metrics {
         id: 'navstart',
         getTs: auditResults => {
           const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
-          return fmpExt.value.timestamps.navStart;
+          return safeGet(fmpExt, 'value.timestamps.navStart');
         },
+        getTiming: auditResults => {
+          const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
+          return safeGet(fmpExt, 'value.timings.navStart');
+        }
       },
       {
         name: 'First Contentful Paint',
         id: 'ttfcp',
         getTs: auditResults => {
           const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
-          return fmpExt.value.timestamps.fCP;
+          return safeGet(fmpExt, 'value.timestamps.fCP');
         },
+        getTiming: auditResults => {
+          const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
+          return safeGet(fmpExt, 'value.timings.fCP');
+        }
       },
       {
         name: 'First Meaningful Paint',
         id: 'ttfmp',
         getTs: auditResults => {
           const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
-          return fmpExt.value.timestamps.fMP;
+          return safeGet(fmpExt, 'value.timestamps.fMP');
         },
+        getTiming: auditResults => {
+          const fmpExt = auditResults['first-meaningful-paint'].extendedInfo;
+          return safeGet(fmpExt, 'value.timings.fMP');
+        }
       },
       {
         name: 'Perceptual Speed Index',
         id: 'psi',
         getTs: auditResults => {
           const siExt = auditResults['speed-index-metric'].extendedInfo;
-          return siExt.value.timestamps.perceptualSpeedIndex;
+          return safeGet(siExt, 'value.timestamps.perceptualSpeedIndex');
         },
+        getTiming: auditResults => {
+          const siExt = auditResults['speed-index-metric'].extendedInfo;
+          return safeGet(siExt, 'value.timings.perceptualSpeedIndex');
+        }
       },
       {
         name: 'First Visual Change',
         id: 'fv',
         getTs: auditResults => {
           const siExt = auditResults['speed-index-metric'].extendedInfo;
-          return siExt.value.timestamps.firstVisualChange;
+          return safeGet(siExt, 'value.timestamps.firstVisualChange');
         },
+        getTiming: auditResults => {
+          const siExt = auditResults['speed-index-metric'].extendedInfo;
+          return safeGet(siExt, 'value.timings.firstVisualChange');
+        }
       },
       {
         name: 'Visually Complete 85%',
         id: 'vc85',
         getTs: auditResults => {
           const siExt = auditResults['time-to-interactive'].extendedInfo;
-          return siExt.value.timestamps.visuallyReady;
+          return safeGet(siExt, 'value.timestamps.visuallyReady');
         },
+        getTiming: auditResults => {
+          const siExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(siExt, 'value.timings.visuallyReady');
+        }
       },
       {
         name: 'Visually Complete 100%',
         id: 'vc100',
         getTs: auditResults => {
           const siExt = auditResults['speed-index-metric'].extendedInfo;
-          return siExt.value.timestamps.visuallyComplete;
+          return safeGet(siExt, 'value.timestamps.visuallyComplete');
         },
+        getTiming: auditResults => {
+          const siExt = auditResults['speed-index-metric'].extendedInfo;
+          return safeGet(siExt, 'value.timings.visuallyComplete');
+        }
       },
       {
         name: 'Time to Interactive (vAlpha)',
         id: 'tti',
         getTs: auditResults => {
           const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return ttiExt.value.timestamps.timeToInteractive;
+          return safeGet(ttiExt, 'value.timestamps.timeToInteractive');
         },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timings.timeToInteractive');
+        }
       },
       {
         name: 'Time to Interactive (vAlpha non-visual)',
         id: 'tti-non-visual',
         getTs: auditResults => {
           const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return ttiExt.value.timestamps.timeToInteractiveB;
+          return safeGet(ttiExt, 'value.timestamps.timeToInteractiveB');
         },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timings.timeToInteractiveB');
+        }
       },
       {
         name: 'Time to Interactive (vAlpha non-visual, 5s)',
         id: 'tti-non-visual-5s',
         getTs: auditResults => {
           const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return ttiExt.value.timestamps.timeToInteractiveC;
+          return safeGet(ttiExt, 'value.timestamps.timeToInteractiveC');
         },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timings.timeToInteractiveC');
+        }
       },
+      {
+        name: 'End of Trace',
+        id: 'eot',
+        getTs: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timestamps.endOfTrace');
+        },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timings.endOfTrace');
+        }
+      },
+      {
+        name: 'On Load',
+        id: 'onload',
+        getTs: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timestamps.onLoad');
+        },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timings.onLoad');
+        }
+      }
     ];
   }
 

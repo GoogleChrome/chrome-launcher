@@ -27,6 +27,8 @@ lighthouse-cli/types/*.map
 node_modules/
 results/
 
+plots/
+
 # generated files
 **/pages/scripts/lighthouse-report.js
 *.report.html

@@ -1,0 +1,16 @@
+{
+  "passes": [{
+    "recordNetwork": true,
+    "recordTrace": true,
+    "pauseBeforeTraceEndMs": 5000,
+    "useThrottling": true,
+    "gatherers": []
+  }],
+
+  "audits": [
+    "first-meaningful-paint",
+    "speed-index-metric",
+    "estimated-input-latency",
+    "time-to-interactive"
+  ]
+}

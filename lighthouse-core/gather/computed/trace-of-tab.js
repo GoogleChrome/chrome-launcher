@@ -46,6 +46,7 @@ class TraceOfTab extends ComputedArtifact {
       .filter(e => {
         return e.cat.includes('blink.user_timing') ||
           e.cat.includes('loading') ||
+          e.cat.includes('devtools.timeline') ||
           e.name === 'TracingStartedInPage';
       })
       .sort((event0, event1) => event0.ts - event1.ts);
@@ -87,6 +88,8 @@ class TraceOfTab extends ComputedArtifact {
       firstMeaningfulPaint = lastCandidate;
     }
 
+    const onLoad = keyEvents.find(e => e.name === 'MarkLoad' && e.ts > navigationStart.ts);
+
     // subset all trace events to just our tab's process (incl threads other than main)
     const processEvents = trace.traceEvents
       .filter(e => e.pid === startedInPageEvt.pid)
@@ -102,6 +105,7 @@ class TraceOfTab extends ComputedArtifact {
       firstContentfulPaint,
       firstMeaningfulPaint,
       traceEnd,
+      onLoad,
     };
 
     const timings = {};
@@ -121,6 +125,7 @@ class TraceOfTab extends ComputedArtifact {
       firstPaintEvt: firstPaint,
       firstContentfulPaintEvt: firstContentfulPaint,
       firstMeaningfulPaintEvt: firstMeaningfulPaint,
+      onLoadEvt: onLoad,
     };
   }
 }
