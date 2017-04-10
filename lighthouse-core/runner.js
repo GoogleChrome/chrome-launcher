@@ -18,7 +18,6 @@
 
 const Driver = require('./gather/driver.js');
 const GatherRunner = require('./gather/gather-runner');
-const Aggregate = require('./aggregator/aggregate');
 const ReportGeneratorV2 = require('./report/v2/report-generator');
 const Audit = require('./audits/audit');
 const emulation = require('./lib/emulation');
@@ -128,19 +127,14 @@ class Runner {
           return results;
         }, {});
 
-        // Only run aggregations if needed.
         let aggregations = [];
-        if (config.aggregations) {
-          aggregations = config.aggregations.map(
-            a => Aggregate.aggregate(a, runResults.auditResults));
-        }
-
         let reportCategories = [];
         let score = 0;
         if (config.categories) {
           const reportGenerator = new ReportGeneratorV2();
           const report = reportGenerator.generateReportJson(config, resultsById);
           reportCategories = report.categories;
+          aggregations = report.aggregations;
           score = report.score;
         }
 

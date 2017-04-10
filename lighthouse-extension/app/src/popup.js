@@ -114,20 +114,20 @@ function createOptionItem(text, id, isChecked) {
 /**
  * Click event handler for Generate Report button.
  * @param {!Window} background Reference to the extension's background page.
- * @param {!Object<boolean>} selectedAggregations
+ * @param {!Object<boolean>} selectedCategories
  */
-function onGenerateReportButtonClick(background, selectedAggregations) {
+function onGenerateReportButtonClick(background, selectedCategories) {
   showRunningSubpage();
 
   const feedbackEl = document.querySelector('.feedback');
   feedbackEl.textContent = '';
 
-  const aggregationIDs = Object.keys(selectedAggregations)
-      .filter(key => !!selectedAggregations[key]);
+  const categoryIDs = Object.keys(selectedCategories)
+      .filter(key => !!selectedCategories[key]);
 
   background.runLighthouseInExtension({
     restoreCleanState: true
-  }, aggregationIDs).catch(err => {
+  }, categoryIDs).catch(err => {
     let message = err.message;
     let includeReportLink = true;
 
@@ -155,16 +155,16 @@ function onGenerateReportButtonClick(background, selectedAggregations) {
 
 /**
  * Generates a document fragment containing a list of checkboxes and labels
- * for the aggregation categories.
+ * for the categories.
  * @param {!Window} background Reference to the extension's background page.
- * @param {!Object<boolean>} selectedAggregations
+ * @param {!Object<boolean>} selectedCategories
  */
-function generateOptionsList(background, selectedAggregations) {
+function generateOptionsList(background, selectedCategories) {
   const frag = document.createDocumentFragment();
 
-  background.getDefaultAggregations().forEach(aggregation => {
-    const isChecked = selectedAggregations[aggregation.id];
-    frag.appendChild(createOptionItem(aggregation.name, aggregation.id, isChecked));
+  background.getDefaultCategories().forEach(category => {
+    const isChecked = selectedCategories[category.id];
+    frag.appendChild(createOptionItem(category.name, category.id, isChecked));
   });
 
   const optionsList = document.querySelector('.options__list');
@@ -191,7 +191,7 @@ function initPopup() {
 
     // generate checkboxes from saved settings
     background.loadSettings().then(settings => {
-      generateOptionsList(background, settings.selectedAggregations);
+      generateOptionsList(background, settings.selectedCategories);
       document.querySelector('.setting-disable-extensions').checked = settings.disableExtensions;
     });
 
@@ -199,7 +199,7 @@ function initPopup() {
     const generateReportButton = document.getElementById('generate-report');
     generateReportButton.addEventListener('click', () => {
       background.loadSettings().then(settings => {
-        onGenerateReportButtonClick(background, settings.selectedAggregations);
+        onGenerateReportButtonClick(background, settings.selectedCategories);
       });
     });
 
@@ -214,11 +214,11 @@ function initPopup() {
     const okButton = document.getElementById('ok');
     okButton.addEventListener('click', () => {
       // Save settings when options page is closed.
-      const selectedAggregations = Array.from(optionsEl.querySelectorAll(':checked'))
+      const selectedCategories = Array.from(optionsEl.querySelectorAll(':checked'))
           .map(input => input.value);
       const disableExtensions = document.querySelector('.setting-disable-extensions').checked;
 
-      background.saveSettings({selectedAggregations, disableExtensions});
+      background.saveSettings({selectedCategories, disableExtensions});
 
       optionsEl.classList.remove(subpageVisibleClass);
     });

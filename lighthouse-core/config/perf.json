@@ -28,6 +28,26 @@
     "dobetterweb/script-blocking-first-paint"
   ],
 
+  "categories": {
+    "performance": {
+      "name": "Performance",
+      "description": "These encapsulate your app's performance.",
+      "audits": [
+        {"id": "first-meaningful-paint", "weight": 5},
+        {"id": "speed-index-metric", "weight": 1},
+        {"id": "estimated-input-latency", "weight": 1},
+        {"id": "time-to-interactive", "weight": 5},
+        {"id": "link-blocking-first-paint", "weight": 0},
+        {"id": "script-blocking-first-paint", "weight": 0},
+        {"id": "uses-optimized-images", "weight": 0},
+        {"id": "uses-responsive-images", "weight": 0},
+        {"id": "dom-size", "weight": 0},
+        {"id": "critical-request-chains", "weight": 0},
+        {"id": "user-timings", "weight": 0}
+      ]
+    }
+  },
+
   "aggregations": [{
     "name": "Performance metrics",
     "description": "",

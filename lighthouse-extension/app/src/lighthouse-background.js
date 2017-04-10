@@ -95,11 +95,11 @@ function filterOutArtifacts(result) {
  * @param {!Connection} connection
  * @param {string} url
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} aggregationIDs Name values of aggregations to include.
+ * @param {!Array<string>} categoryIDs Name values of categories to include.
  * @return {!Promise}
  */
-window.runLighthouseForConnection = function(connection, url, options, aggregationIDs) {
-  const newConfig = Config.generateNewConfigOfAggregations(defaultConfig, aggregationIDs);
+window.runLighthouseForConnection = function(connection, url, options, categoryIDs) {
+  const newConfig = Config.generateNewConfigOfCategories(defaultConfig, categoryIDs);
   const config = new Config(newConfig);
 
   // Add url and config to fresh options object.
@@ -124,17 +124,17 @@ window.runLighthouseForConnection = function(connection, url, options, aggregati
 
 /**
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} aggregationIDs Name values of aggregations to include.
+ * @param {!Array<string>} categoryIDs Name values of categories to include.
  * @return {!Promise}
  */
-window.runLighthouseInExtension = function(options, aggregationIDs) {
+window.runLighthouseInExtension = function(options, categoryIDs) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new ExtensionProtocol();
   // return enableOtherChromeExtensions(false)
     // .then(_ => connection.getCurrentTabURL())
   return connection.getCurrentTabURL()
-    .then(url => window.runLighthouseForConnection(connection, url, options, aggregationIDs))
+    .then(url => window.runLighthouseForConnection(connection, url, options, categoryIDs))
     .then(results => {
       // return enableOtherChromeExtensions(true).then(_ => {
       const blobURL = window.createReportPageAsBlob(results, 'extension');
@@ -151,14 +151,14 @@ window.runLighthouseInExtension = function(options, aggregationIDs) {
  * @param {!RawProtocol.Port} port
  * @param {string} url
  * @param {!Object} options Lighthouse options.
- * @param {!Array<string>} aggregationIDs Name values of aggregations to include.
+ * @param {!Array<string>} categoryIDs Name values of categories to include.
  * @return {!Promise}
  */
-window.runLighthouseInWorker = function(port, url, options, aggregationIDs) {
+window.runLighthouseInWorker = function(port, url, options, categoryIDs) {
   // Default to 'info' logging level.
   log.setLevel('info');
   const connection = new RawProtocol(port);
-  return window.runLighthouseForConnection(connection, url, options, aggregationIDs);
+  return window.runLighthouseForConnection(connection, url, options, categoryIDs);
 };
 
 /**
@@ -185,16 +185,16 @@ window.createReportPageAsBlob = function(results, reportContext) {
 };
 
 /**
- * Returns list of top-level aggregation categories from the default config.
+ * Returns list of top-level categories from the default config.
  * @return {!Array<{name: string, id: string}>}
  */
-window.getDefaultAggregations = function() {
-  return Config.getAggregations(defaultConfig);
+window.getDefaultCategories = function() {
+  return Config.getCategories(defaultConfig);
 };
 
 /**
- * Save currently selected set of aggregation categories to local storage.
- * @param {{selectedAggregations: !Array<string>, disableExtensions: boolean}} settings
+ * Save currently selected set of category categories to local storage.
+ * @param {{selectedCategories: !Array<string>, disableExtensions: boolean}} settings
  */
 window.saveSettings = function(settings) {
   const storage = {
@@ -202,9 +202,9 @@ window.saveSettings = function(settings) {
     [SETTINGS_KEY]: {}
   };
 
-  // Stash selected aggregations.
-  window.getDefaultAggregations().forEach(agg => {
-    storage[STORAGE_KEY][agg.id] = settings.selectedAggregations.includes(agg.id);
+  // Stash selected categories.
+  window.getDefaultCategories().forEach(category => {
+    storage[STORAGE_KEY][category.id] = settings.selectedCategories.includes(category.id);
   });
 
   // Stash disable extensions setting.
@@ -216,24 +216,24 @@ window.saveSettings = function(settings) {
 };
 
 /**
- * Load selected aggregation categories from local storage.
- * @return {!Promise<{selectedAggregations: !Object<boolean>, disableExtensions: boolean}>}
+ * Load selected category categories from local storage.
+ * @return {!Promise<{selectedCategories: !Object<boolean>, disableExtensions: boolean}>}
  */
 window.loadSettings = function() {
   return new Promise(resolve => {
     // Protip: debug what's in storage with:
     //   chrome.storage.local.get(['lighthouse_audits'], console.log)
     chrome.storage.local.get([STORAGE_KEY, SETTINGS_KEY], result => {
-      // Start with list of all default aggregations set to true so list is
+      // Start with list of all default categories set to true so list is
       // always up to date.
-      const defaultAggregations = {};
-      window.getDefaultAggregations().forEach(agg => {
-        defaultAggregations[agg.id] = true;
+      const defaultCategories = {};
+      window.getDefaultCategories().forEach(category => {
+        defaultCategories[category.id] = true;
       });
 
-      // Load saved aggregations and settings, overwriting defaults with any
+      // Load saved categories and settings, overwriting defaults with any
       // saved selections.
-      const savedAggregations = Object.assign(defaultAggregations, result[STORAGE_KEY]);
+      const savedCategories = Object.assign(defaultCategories, result[STORAGE_KEY]);
 
       const defaultSettings = {
         disableExtensions: disableExtensionsDuringRun
@@ -241,7 +241,7 @@ window.loadSettings = function() {
       const savedSettings = Object.assign(defaultSettings, result[SETTINGS_KEY]);
 
       resolve({
-        selectedAggregations: savedAggregations,
+        selectedCategories: savedCategories,
         disableExtensions: savedSettings.disableExtensions
       });
     });

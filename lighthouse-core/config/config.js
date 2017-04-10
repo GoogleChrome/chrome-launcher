@@ -313,20 +313,20 @@ class Config {
     return merge(baseJSON, extendJSON);
   }
 
- /**
-  * Filter out any unrequested items from the config, based on requested top-level aggregations.
-  * @param {!Object} oldConfig Lighthouse config object
-  * @param {!Array<string>} aggregationIDs Id values of aggregations to include
-  * @return {Object} new config
-  */
-  static generateNewConfigOfAggregations(oldConfig, aggregationIDs) {
+  /**
+   * Filter out any unrequested items from the config, based on requested top-level categories.
+   * @param {!Object} oldConfig Lighthouse config object
+   * @param {!Array<string>} categoryIds ID values of categories to include
+   * @return {!Object} A new config
+   */
+  static generateNewConfigOfCategories(oldConfig, categoryIds) {
     // 0. Clone config to avoid mutating it
     const config = JSON.parse(JSON.stringify(oldConfig));
-    // 1. Filter to just the chosen aggregations
-    config.aggregations = config.aggregations.filter(agg => aggregationIDs.includes(agg.id));
+    // 1. Filter to just the chosen categories
+    config.categories = Config.filterCategories(config.categories, categoryIds);
 
     // 2. Resolve which audits will need to run
-    const requestedAuditNames = Config.getAuditsNeededByAggregations(config.aggregations);
+    const requestedAuditNames = Config.getAuditIdsInCategories(config.categories);
     const auditPathToNameMap = Config.getMapOfAuditPathToName(config);
     config.audits = config.audits.filter(auditPath =>
         requestedAuditNames.has(auditPathToNameMap.get(auditPath)));
@@ -340,27 +340,43 @@ class Config {
     return config;
   }
 
- /**
-  * Return IDs of top-level aggregations from a config. Used by tools driving lighthouse-core
-  * @param {{aggregations: !Array<{name: string}>}} Lighthouse config object.
-  * @return {!Array<string>}  Name values of aggregations within
-  */
-  static getAggregations(config) {
-    return config.aggregations.map(agg => ({
-      name: agg.name,
-      id: agg.id
-    }));
+  /**
+   * Filter out any unrequested categories from the categories object.
+   * @param {!Object<string, {audits: !Array<{id: string}>}>} categories
+   * @param {Array<string>=} categoryIds
+   * @return {!Object<string, {audits: !Array<{id: string}>}>}
+   */
+  static filterCategories(oldCategories, categoryIds = []) {
+    const categories = {};
+
+    Object.keys(oldCategories).forEach(categoryId => {
+      if (categoryIds.includes(categoryId)) {
+        categories[categoryId] = oldCategories[categoryId];
+      }
+    });
+
+    return categories;
   }
 
   /**
-   * Find audits required for remaining aggregations.
-   * @param {!Object} aggregations
+   * Finds the unique set of audit IDs used by the categories object.
+   * @param {!Object<string, {audits: !Array<{id: string}>}>} categories
    * @return {!Set<string>}
    */
-  static getAuditsNeededByAggregations(aggregations) {
-    const requestedItems = _flatten(aggregations.map(aggregation => aggregation.items));
-    const requestedAudits = _flatten(requestedItems.map(item => Object.keys(item.audits)));
-    return new Set(requestedAudits);
+  static getAuditIdsInCategories(categories) {
+    const audits = _flatten(Object.keys(categories).map(id => categories[id].audits));
+    return new Set(audits.map(audit => audit.id));
+  }
+
+ /**
+  * @param {{categories: !Object<string, {name: string}>}} config
+  * @return {!Array<{id: string, name: string}>}
+  */
+  static getCategories(config) {
+    return Object.keys(config.categories).map(id => {
+      const name = config.categories[id].name;
+      return {id, name};
+    });
   }
 
   /**

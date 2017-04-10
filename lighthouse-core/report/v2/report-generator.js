@@ -62,6 +62,31 @@ class ReportGeneratorV2 {
   }
 
   /**
+   * Convert categories into old-school aggregations for old HTML report compat.
+   * @param {!Array<{name: string, description: string, id: string, score: number,
+   *    audits: !Array<{result: Object}>}>} categories
+   * @return {!Array<!Aggregation>}
+   */
+  static _getAggregations(reportCategories) {
+    return reportCategories.map(category => {
+      const name = category.name;
+      const description = category.description;
+
+      return {
+        name, description,
+        categorizable: false,
+        scored: category.id === 'pwa',
+        total: category.score / 100,
+        score: [{
+          name, description,
+          overall: category.score / 100,
+          subItems: category.audits.map(audit => audit.result),
+        }],
+      };
+    });
+  }
+
+  /**
    * Returns the report JSON object with computed scores.
    * @param {{categories: !Object<{audits: !Array}>}} config
    * @param {!Object<{score: ?number|boolean|undefined}>} resultsByAuditId
@@ -70,6 +95,7 @@ class ReportGeneratorV2 {
   generateReportJson(config, resultsByAuditId) {
     const categories = Object.keys(config.categories).map(categoryId => {
       const category = config.categories[categoryId];
+      category.id = categoryId;
 
       const audits = category.audits.map(audit => {
         const result = resultsByAuditId[audit.id];
@@ -85,8 +111,11 @@ class ReportGeneratorV2 {
       const categoryScore = ReportGeneratorV2.arithmeticMean(audits);
       return Object.assign({}, category, {audits, score: categoryScore});
     });
+
     const overallScore = ReportGeneratorV2.arithmeticMean(categories);
-    return {score: overallScore, categories};
+    // TODO: remove aggregations when old report is fully replaced
+    const aggregations = ReportGeneratorV2._getAggregations(categories);
+    return {score: overallScore, categories, aggregations};
   }
 
   /**
