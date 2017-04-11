@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = {
-  report: 'lighthouse-core/**/templates/*.html',
+  report: 'lighthouse-core/report/templates/*.html',
   reportDist: 'lighthouse-core/report/templates/',
   partials: 'lighthouse-core/report/partials/*.html',
   partialsDist: 'lighthouse-core/report/partials/templates/',
