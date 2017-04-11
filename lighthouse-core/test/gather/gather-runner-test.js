@@ -61,6 +61,9 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn, blo
     }
     cleanAndDisableBrowserCaches() {}
     clearDataForOrigin() {}
+    getUserAgent() {
+      return Promise.resolve('Fake user agent');
+    }
   };
   const EmulationMock = class extends Connection {
     sendCommand(command, params) {
@@ -118,6 +121,17 @@ describe('GatherRunner', function() {
     });
   });
 
+  it('collects user agent as an artifact', () => {
+    const url = 'https://example.com';
+    const driver = fakeDriver;
+    const config = new Config({});
+    const options = {url, driver, config};
+
+    return GatherRunner.run([], options).then(results => {
+      assert.equal(results.UserAgent, 'Fake user agent', 'did not find expected user agent string');
+    });
+  });
+
   it('sets up the driver to begin emulation when all emulation flags are undefined', () => {
     const tests = {
       calledDeviceEmulation: false,
@@ -135,7 +149,7 @@ describe('GatherRunner', function() {
       createEmulationCheck('calledCpuEmulation')
     );
 
-    return GatherRunner.setupDriver(driver, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {}
     }).then(_ => {
       assert.equal(tests.calledDeviceEmulation, true);
@@ -160,7 +174,7 @@ describe('GatherRunner', function() {
       createEmulationCheck('calledCpuEmulation', true)
     );
 
-    return GatherRunner.setupDriver(driver, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {
         disableDeviceEmulation: true,
       }
@@ -187,7 +201,7 @@ describe('GatherRunner', function() {
       createEmulationCheck('calledCpuEmulation')
     );
 
-    return GatherRunner.setupDriver(driver, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {
         disableNetworkThrottling: true,
       }
@@ -216,7 +230,7 @@ describe('GatherRunner', function() {
       createEmulationCheck('calledCpuEmulation')
     );
 
-    return GatherRunner.setupDriver(driver, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {
         disableCpuThrottling: true,
       }
@@ -246,9 +260,10 @@ describe('GatherRunner', function() {
       cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
       clearDataForOrigin: createCheck('calledClearStorage'),
       blockUrlPatterns: asyncFunc,
+      getUserAgent: asyncFunc,
     };
 
-    return GatherRunner.setupDriver(driver, {flags: {}}).then(_ => {
+    return GatherRunner.setupDriver(driver, {}, {flags: {}}).then(_ => {
       assert.equal(tests.calledDisableNetworkCache, true);
       assert.equal(tests.calledClearStorage, true);
     });
@@ -273,9 +288,10 @@ describe('GatherRunner', function() {
       cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
       clearDataForOrigin: createCheck('calledClearStorage'),
       blockUrlPatterns: asyncFunc,
+      getUserAgent: asyncFunc,
     };
 
-    return GatherRunner.setupDriver(driver, {
+    return GatherRunner.setupDriver(driver, {}, {
       flags: {disableStorageReset: true}
     }).then(_ => {
       assert.equal(tests.calledDisableNetworkCache, false);
@@ -290,7 +306,7 @@ describe('GatherRunner', function() {
       receivedUrlPatterns.push(params.url);
     });
 
-    return GatherRunner.setupDriver(driver, {flags: {blockedUrlPatterns: urlPatterns.slice()}})
+    return GatherRunner.setupDriver(driver, {}, {flags: {blockedUrlPatterns: urlPatterns.slice()}})
       .then(() => assert.deepStrictEqual(receivedUrlPatterns.sort(), urlPatterns.sort()));
   });
 
@@ -300,7 +316,7 @@ describe('GatherRunner', function() {
       receivedUrlPatterns.push(params.url);
     });
 
-    return GatherRunner.setupDriver(driver, {flags: {}})
+    return GatherRunner.setupDriver(driver, {}, {flags: {}})
       .then(() => assert.equal(receivedUrlPatterns.length, 0))
       .catch(() => assert.ok(false));
   });

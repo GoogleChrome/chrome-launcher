@@ -80,6 +80,13 @@ class Driver {
   }
 
   /**
+   * @return {!Promise<string>}
+   */
+  getUserAgent() {
+    return this.evaluateAsync('navigator.userAgent');
+  }
+
+  /**
    * @return {!Promise<null>}
    */
   connect() {
