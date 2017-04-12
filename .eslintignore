@@ -23,4 +23,4 @@ lighthouse-core/report/templates/report-templates.js
 lighthouse-core/report/partials/templates/report-partials.js
 
 # Generated files
-plots/out/**
+plots/out*

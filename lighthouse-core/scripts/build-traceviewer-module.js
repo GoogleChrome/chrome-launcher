@@ -71,10 +71,8 @@ function convertImport(src) {
       }
 
       scriptsContent = silenceTheConsole(scriptsContent);
-      // node4 compat
-      scriptsContent = polyfillNode4SupportAndMinify(dest, scriptsContent);
-      // browser compat
       scriptsContent = adjustForBrowserCompat(scriptsContent);
+      scriptsContent = minify(dest, scriptsContent);
 
       writeNewFile(dest, scriptsContent);
 
@@ -125,19 +123,11 @@ function convertImport(src) {
         return '"use strict";\n';
       }
 
-      // adjust and transpile for usage in node 4+
-      function polyfillNode4SupportAndMinify(dest, scriptsContent) {
-        let transformed = scriptsContent;
-        if (dest.endsWith('/slice.js')) {
-          // no babel plugin that can transpile `new.target`, so this is done manually
-          transformed = transformed.replace('if (new.target)', 'if (!(this instanceof Slice))');
-        }
-        transformed = babel.transform(transformed, {
-          plugins: ['transform-es2015-destructuring'],
+      function minify(dest, scriptsContent) {
+        return babel.transform(scriptsContent, {
           comments: false, // Output comments in generated output.
           compact: true // Do not include superfluous whitespace characters and line terminators.
         }).code;
-        return transformed;
       }
 
       function adjustForBrowserCompat(scriptsContent) {
