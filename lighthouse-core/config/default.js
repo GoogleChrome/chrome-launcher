@@ -1,5 +1,6 @@
 /* eslint-disable */
 module.exports = {
+  "settings": {},
   "passes": [{
     "passName": "defaultPass",
     "recordNetwork": true,

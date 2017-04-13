@@ -99,8 +99,10 @@ function filterOutArtifacts(result) {
  * @return {!Promise}
  */
 window.runLighthouseForConnection = function(connection, url, options, categoryIDs) {
-  const newConfig = Config.generateNewConfigOfCategories(defaultConfig, categoryIDs);
-  const config = new Config(newConfig);
+  const config = new Config({
+    extends: 'lighthouse:default',
+    settings: {onlyCategories: categoryIDs},
+  });
 
   // Add url and config to fresh options object.
   const runOptions = Object.assign({}, options, {url, config});

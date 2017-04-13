@@ -265,6 +265,81 @@ describe('Config', () => {
     }), /meta.requiredArtifacts property/);
   });
 
+  it('filters the config', () => {
+    const config = new Config({
+      settings: {
+        onlyCategories: ['needed-category'],
+        onlyAudits: ['color-contrast'],
+      },
+      passes: [
+        {recordTrace: true, gatherers: []},
+        {recordNetwork: true, gatherers: ['accessibility']},
+      ],
+      audits: [
+        'accessibility/color-contrast',
+        'first-meaningful-paint',
+        'time-to-interactive',
+        'estimated-input-latency',
+      ],
+      categories: {
+        'needed-category': {
+          audits: [
+            {id: 'first-meaningful-paint'},
+            {id: 'time-to-interactive'},
+          ],
+        },
+        'other-category': {
+          audits: [
+            {id: 'color-contrast'},
+            {id: 'estimated-input-latency'},
+          ],
+        },
+        'unused-category': {
+          audits: [
+            {id: 'estimated-input-latency'},
+          ]
+        }
+      },
+    });
+
+    assert.ok(config.audits.length, 3);
+    assert.equal(config.passes.length, 2);
+    assert.ok(!config.categories['unused-category'], 'removes unused categories');
+    assert.equal(config.categories['needed-category'].audits.length, 2);
+    assert.equal(config.categories['other-category'].audits.length, 1);
+  });
+
+  it('filtering works with extension', () => {
+    const config = new Config({
+      extends: true,
+      settings: {
+        onlyCategories: ['performance'],
+        onlyAudits: ['is-on-https'],
+      },
+    });
+
+    assert.ok(config.audits.length, 'inherited audits by extension');
+    assert.equal(config.audits.length, origConfig.categories.performance.audits.length + 1);
+    assert.equal(config.passes.length, 2, 'filtered out passes');
+  });
+
+  it('warns for invalid filters', () => {
+    const warnings = [];
+    const saveWarning = evt => warnings.push(evt);
+    log.events.addListener('warning', saveWarning);
+    const config = new Config({
+      extends: true,
+      settings: {
+        onlyCategories: ['performance', 'missing-category'],
+        onlyAudits: ['time-to-interactive', 'missing-audit'],
+      },
+    });
+
+    log.events.removeListener('warning', saveWarning);
+    assert.ok(config, 'failed to generate config');
+    assert.equal(warnings.length, 3, 'did not warn enough');
+  });
+
   describe('artifact loading', () => {
     it('expands artifacts', () => {
       const config = new Config({
@@ -384,13 +459,13 @@ describe('Config', () => {
   describe('generateConfigOfCategories', () => {
     it('should not mutate the original config', () => {
       const configCopy = JSON.parse(JSON.stringify(origConfig));
-      Config.generateNewConfigOfCategories(configCopy, ['performance']);
+      Config.generateNewFilteredConfig(configCopy, ['performance']);
       assert.deepStrictEqual(configCopy, origConfig, 'no mutations');
     });
 
     it('should filter out other passes if passed Performance', () => {
       const totalAuditCount = origConfig.audits.length;
-      const config = Config.generateNewConfigOfCategories(origConfig, ['performance']);
+      const config = Config.generateNewFilteredConfig(origConfig, ['performance']);
       assert.equal(Object.keys(config.categories).length, 1, 'other categories are present');
       assert.equal(config.passes.length, 2, 'incorrect # of passes');
       assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
@@ -398,25 +473,47 @@ describe('Config', () => {
 
     it('should filter out other passes if passed PWA', () => {
       const totalAuditCount = origConfig.audits.length;
-      const config = Config.generateNewConfigOfCategories(origConfig, ['pwa']);
+      const config = Config.generateNewFilteredConfig(origConfig, ['pwa']);
       assert.equal(Object.keys(config.categories).length, 1, 'other categories are present');
       assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
     });
 
     it('should filter out other passes if passed Best Practices', () => {
       const totalAuditCount = origConfig.audits.length;
-      const config = Config.generateNewConfigOfCategories(origConfig, ['best-practices']);
+      const config = Config.generateNewFilteredConfig(origConfig, ['best-practices']);
       assert.equal(Object.keys(config.categories).length, 1, 'other categories are present');
       assert.equal(config.passes.length, 2, 'incorrect # of passes');
       assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
     });
 
     it('should only run audits for ones named by the category', () => {
-      const config = Config.generateNewConfigOfCategories(origConfig, ['performance']);
+      const config = Config.generateNewFilteredConfig(origConfig, ['performance']);
       const selectedCategory = origConfig.categories.performance;
       const auditCount = Object.keys(selectedCategory.audits).length;
 
       assert.equal(config.audits.length, auditCount, '# of audits match aggregation list');
+    });
+
+    it('should only run specified audits', () => {
+      const config = Config.generateNewFilteredConfig(origConfig, [], ['works-offline']);
+      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.equal(config.audits.length, 1, 'audit filtering failed');
+    });
+
+    it('should combine audits and categories additively', () => {
+      const config = Config.generateNewFilteredConfig(origConfig, ['performance'], ['is-on-https']);
+      const selectedCategory = origConfig.categories.performance;
+      const auditCount = Object.keys(selectedCategory.audits).length + 1;
+      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.equal(config.audits.length, auditCount, 'audit filtering failed');
+    });
+
+    it('should support redundant filtering', () => {
+      const config = Config.generateNewFilteredConfig(origConfig, ['pwa'], ['is-on-https']);
+      const selectedCategory = origConfig.categories.pwa;
+      const auditCount = Object.keys(selectedCategory.audits).length;
+      assert.equal(config.passes.length, 3, 'incorrect # of passes');
+      assert.equal(config.audits.length, auditCount, 'audit filtering failed');
     });
   });
 });
