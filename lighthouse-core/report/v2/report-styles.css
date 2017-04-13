@@ -224,7 +224,8 @@ body {
   padding-top: 0;
 }
 
-.lh-category > .lh-audit {
+.lh-category > .lh-audit,
+.lh-category > .lh-passed-audits > .lh-audit {
   margin-left: calc(var(--lh-category-score-width) + var(--lh-score-margin));
 }
 
@@ -246,3 +247,17 @@ body {
   font-weight: 400;
 }
 
+summary.lh-passed-audits-summary {
+  margin: 10px 5px;
+  font-size: 15px;
+}
+
+summary.lh-passed-audits-summary::-webkit-details-marker {
+  background: rgb(66, 175, 69);
+  color: white;
+  position:relative;
+  content: '';
+  padding: 3px;
+}
+
+/*# sourceURL=report.styles.css */

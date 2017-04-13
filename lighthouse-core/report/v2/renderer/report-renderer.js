@@ -164,9 +164,23 @@ class ReportRenderer {
   _renderCategory(category) {
     const element = this._dom.createElement('div', 'lh-category');
     element.appendChild(this._renderCategoryScore(category));
-    for (const audit of category.audits) {
+
+    const passedAudits = category.audits.filter(audit => audit.score === 100);
+    const nonPassedAudits = category.audits.filter(audit => !passedAudits.includes(audit));
+
+    for (const audit of nonPassedAudits) {
       element.appendChild(this._renderAudit(audit));
     }
+
+    const passedElem = this._dom.createElement('details', 'lh-passed-audits');
+    const passedSummary = this._dom.createElement('summary', 'lh-passed-audits-summary');
+    passedSummary.textContent = `View ${passedAudits.length} passed items`;
+    passedElem.appendChild(passedSummary);
+
+    for (const audit of passedAudits) {
+      passedElem.appendChild(this._renderAudit(audit));
+    }
+    element.appendChild(passedElem);
     return element;
   }
 
