@@ -26,7 +26,7 @@ const TEMPLATE_FILE = fs.readFileSync(__dirname + '/../../../../report/v2/templa
 
 /* eslint-env mocha */
 
-describe('DOM', () => {
+describe('DetailsRenderer', () => {
   let renderer;
 
   before(() => {
