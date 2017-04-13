@@ -45,7 +45,7 @@ class DetailsRenderer {
    * @return {!Element}
    */
   _renderText(text) {
-    const element = this._dom.createElement('div', 'lighthouse-text');
+    const element = this._dom.createElement('div', 'lh-text');
     element.textContent = text.text;
     return element;
   }
@@ -55,7 +55,7 @@ class DetailsRenderer {
    * @return {!Element}
    */
   _renderBlock(block) {
-    const element = this._dom.createElement('div', 'lighthouse-block');
+    const element = this._dom.createElement('div', 'lh-block');
     for (const item of block.items) {
       element.appendChild(this.render(item));
     }
@@ -67,14 +67,14 @@ class DetailsRenderer {
    * @return {!Element}
    */
   _renderList(list) {
-    const element = this._dom.createElement('details', 'lighthouse-list');
+    const element = this._dom.createElement('details', 'lh-list');
     if (list.header) {
-      const summary = this._dom.createElement('summary', 'lighthouse-list__header');
+      const summary = this._dom.createElement('summary', 'lh-list__header');
       summary.textContent = list.header.text;
       element.appendChild(summary);
     }
 
-    const items = this._dom.createElement('div', 'lighthouse-list__items');
+    const items = this._dom.createElement('div', 'lh-list__items');
     for (const item of list.items) {
       items.appendChild(this.render(item));
     }

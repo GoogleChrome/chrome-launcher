@@ -44,7 +44,7 @@ describe('DetailsRenderer', () => {
     it('renders text', () => {
       const el = renderer.render({type: 'text', text: 'My text content'});
       assert.equal(el.textContent, 'My text content');
-      assert.ok(el.classList.contains('lighthouse-text'), 'adds classes');
+      assert.ok(el.classList.contains('lh-text'), 'adds classes');
     });
 
     it('renders blocks', () => {
@@ -56,9 +56,9 @@ describe('DetailsRenderer', () => {
         ],
       });
 
-      const children = el.querySelectorAll('.lighthouse-text');
+      const children = el.querySelectorAll('.lh-text');
       assert.equal(children.length, 2, 'renders children');
-      assert.ok(el.classList.contains('lighthouse-block'), 'adds classes');
+      assert.ok(el.classList.contains('lh-block'), 'adds classes');
     });
 
     it('renders lists with headers', () => {
@@ -71,10 +71,10 @@ describe('DetailsRenderer', () => {
         ],
       });
 
-      const header = el.querySelector('.lighthouse-list__header');
+      const header = el.querySelector('.lh-list__header');
       assert.equal(header.textContent, 'My Header', 'did not render header');
 
-      const items = el.querySelector('.lighthouse-list__items');
+      const items = el.querySelector('.lh-list__items');
       assert.equal(items.children.length, 2, 'did not render children');
     });
 
@@ -88,10 +88,10 @@ describe('DetailsRenderer', () => {
         ],
       });
 
-      const header = el.querySelector('.lighthouse-list__header');
+      const header = el.querySelector('.lh-list__header');
       assert.ok(!header, 'rendered header');
 
-      const items = el.querySelector('.lighthouse-list__items');
+      const items = el.querySelector('.lh-list__items');
       assert.equal(items.children.length, 3, 'did not render children');
     });
 
@@ -112,9 +112,9 @@ describe('DetailsRenderer', () => {
         ],
       });
 
-      const textChild = el.querySelector('.lighthouse-block > .lighthouse-text');
-      const listChild = el.querySelector('.lighthouse-block > .lighthouse-list');
-      const textSubChild = el.querySelector('.lighthouse-block .lighthouse-list .lighthouse-text');
+      const textChild = el.querySelector('.lh-block > .lh-text');
+      const listChild = el.querySelector('.lh-block > .lh-list');
+      const textSubChild = el.querySelector('.lh-block .lh-list .lh-text');
       assert.ok(textChild, 'did not render text children');
       assert.ok(listChild, 'did not render list child');
       assert.ok(textSubChild, 'did not render sub-children');

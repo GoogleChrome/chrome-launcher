@@ -51,32 +51,32 @@ body {
 }
 
 /* List */
-.lighthouse-list {
+.lh-list {
   font-size: smaller;
   margin-top: var(--default-padding);
 }
 
-.lighthouse-list__header {
+.lh-list__header {
   cursor: pointer;
 }
 
-.lighthouse-list__items {
+.lh-list__items {
   padding-left: 10px;
 }
 
-.lighthouse-list__items > * {
+.lh-list__items > * {
   border-bottom: 1px solid gray;
   margin-bottom: 2px;
 }
 
 /* Score */
 
-.lighthouse-score {
+.lh-score {
   display: flex;
   align-items: flex-start;
 }
 
-.lighthouse-score__value {
+.lh-score__value {
   flex: none;
   padding: 5px;
   margin-right: var(--lh-score-margin);
@@ -90,7 +90,7 @@ body {
   position: relative;
 }
 
-.lighthouse-score__value::after {
+.lh-score__value::after {
   content: '';
   position: absolute;
   left: 0;
@@ -101,29 +101,29 @@ body {
   border-radius: inherit;
 }
 
-.lighthouse-score__value--binary {
+.lh-score__value--binary {
   text-indent: -500px;
 }
 
 /* No icon for audits with number scores. */
-.lighthouse-score__value:not(.lighthouse-score__value--binary)::after {
+.lh-score__value:not(.lh-score__value--binary)::after {
   content: none;
 }
 
-.lighthouse-score__value--pass {
+.lh-score__value--pass {
   background: var(--pass-color);
 }
 
-.lighthouse-score__value--pass::after {
+.lh-score__value--pass::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>pass</title><path d="M9.17 2.33L4.5 7 2.83 5.33 1.5 6.66l3 3 6-6z" fill="white" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
   background-size: var(--lh-score-icon-background-size);
 }
 
-.lighthouse-score__value--average {
+.lh-score__value--average {
   background: var(--average-color);
 }
 
-.lighthouse-score__value--average::after {
+.lh-score__value--average::after {
   background: none;
   content: '!';
   background-color: var(--average-color);
@@ -135,35 +135,35 @@ body {
   font-size: 15px;
 }
 
-.lighthouse-score__value--fail {
+.lh-score__value--fail {
   background: var(--fail-color);
 }
 
-.lighthouse-score__value--fail::after {
+.lh-score__value--fail::after {
   background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>fail</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="white"/></svg>') no-repeat 50% 50%;
   background-size: var(--lh-score-icon-background-size);
 }
 
-.lighthouse-score__title {
+.lh-score__title {
   margin-bottom: calc(var(--default-padding) / 2);
 }
 
-.lighthouse-score__description {
+.lh-score__description {
   font-size: smaller;
   color: var(--secondary-text-color);
   margin-top: calc(var(--default-padding) / 2);
 }
 
-.lighthouse-score__header {
+.lh-score__header {
   flex: 1;
   margin-top: 2px;
 }
 
-.lighthouse-score__header[open] .lighthouse-score__arrow {
+.lh-score__header[open] .lh-score__arrow {
   transform: rotateZ(90deg);
 }
 
-.lighthouse-score__arrow {
+.lh-score__arrow {
   background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/><path d="M0-.25h24v24H0z" fill="none"/></svg>') no-repeat 50% 50%;
   background-size: contain;
   background-color: transparent;
@@ -174,7 +174,7 @@ body {
   transition: transform 150ms ease-in-out;
 }
 
-.lighthouse-score__snippet {
+.lh-score__snippet {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -182,66 +182,66 @@ body {
   /*outline: none;*/
 }
 
-.lighthouse-score__snippet::-moz-list-bullet {
+.lh-score__snippet::-moz-list-bullet {
   display: none;
 }
 
-.lighthouse-score__snippet::-webkit-details-marker {
+.lh-score__snippet::-webkit-details-marker {
   display: none;
 }
 
-/*.lighthouse-score__snippet:focus .lighthouse-score__title {
+/*.lh-score__snippet:focus .lh-score__title {
   outline: rgb(59, 153, 252) auto 5px;
 }*/
 
 /* Audit */
 
-.lighthouse-audit {
+.lh-audit {
   margin-top: var(--default-padding);
 }
 
-.lighthouse-audit > .lighthouse-score {
+.lh-audit > .lh-score {
   font-size: 16px;
 }
 
 /* Report */
 
-.lighthouse-exception {
+.lh-exception {
   font-size: large;
 }
 
-.lighthouse-report {
+.lh-report {
   padding: var(--default-padding);
 }
 
-.lighthouse-category {
+.lh-category {
   padding: 24px 0;
   border-top: 1px solid var(--report-border-color);
 }
 
-.lighthouse-category:first-of-type {
+.lh-category:first-of-type {
   border: none;
   padding-top: 0;
 }
 
-.lighthouse-category > .lighthouse-audit {
+.lh-category > .lh-audit {
   margin-left: calc(var(--lh-category-score-width) + var(--lh-score-margin));
 }
 
-.lighthouse-category > .lighthouse-score {
+.lh-category > .lh-score {
   font-size: 20px;
 }
 
-.lighthouse-category > .lighthouse-score .lighthouse-score__value {
+.lh-category > .lh-score .lh-score__value {
   width: var(--lh-category-score-width);
 }
 
 /* Category snippet shouldnt have pointer cursor. */
-.lighthouse-category > .lighthouse-score .lighthouse-score__snippet {
+.lh-category > .lh-score .lh-score__snippet {
   cursor: initial;
 }
 
-.lighthouse-category > .lighthouse-score .lighthouse-score__title {
+.lh-category > .lh-score .lh-score__title {
   font-size: 24px;
   font-weight: 400;
 }

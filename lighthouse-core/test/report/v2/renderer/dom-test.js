@@ -58,8 +58,8 @@ describe('DOM', () => {
 
   describe('cloneTemplate', () => {
     it('should clone a template', () => {
-      const clone = dom.cloneTemplate('#tmpl-lighthouse-audit-score');
-      assert.ok(clone.querySelector('.lighthouse-score'));
+      const clone = dom.cloneTemplate('#tmpl-lh-audit-score');
+      assert.ok(clone.querySelector('.lh-score'));
     });
 
     it('fails when template cannot be found', () => {

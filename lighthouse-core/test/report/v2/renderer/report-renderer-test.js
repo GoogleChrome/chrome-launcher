@@ -48,7 +48,7 @@ describe('ReportRenderer V2', () => {
   describe('renderReport', () => {
     it('should render a report', () => {
       const output = renderer.renderReport(sampleResults);
-      assert.ok(output.classList.contains('lighthouse-report'));
+      assert.ok(output.classList.contains('lh-report'));
     });
 
     it('should render an exception for invalid input', () => {
@@ -57,41 +57,41 @@ describe('ReportRenderer V2', () => {
           throw new Error();
         }
       });
-      assert.ok(output.classList.contains('lighthouse-exception'));
+      assert.ok(output.classList.contains('lh-exception'));
     });
 
     it('renders an audit', () => {
       const audit = sampleResults.reportCategories[0].audits[0];
       const auditDOM = renderer._renderAudit(audit);
 
-      const title = auditDOM.querySelector('.lighthouse-score__title');
-      const description = auditDOM.querySelector('.lighthouse-score__description');
-      const score = auditDOM.querySelector('.lighthouse-score__value');
+      const title = auditDOM.querySelector('.lh-score__title');
+      const description = auditDOM.querySelector('.lh-score__description');
+      const score = auditDOM.querySelector('.lh-score__value');
 
       assert.equal(title.textContent, audit.result.description);
       assert.ok(description.querySelector('a'), 'audit help text contains coverted markdown links');
       assert.equal(score.textContent, '0');
-      assert.ok(score.classList.contains('lighthouse-score__value--fail'));
-      assert.ok(score.classList.contains(`lighthouse-score__value--${audit.result.scoringMode}`));
+      assert.ok(score.classList.contains('lh-score__value--fail'));
+      assert.ok(score.classList.contains(`lh-score__value--${audit.result.scoringMode}`));
     });
 
     it('renders a category', () => {
       const category = sampleResults.reportCategories[0];
       const categoryDOM = renderer._renderCategory(category);
 
-      const score = categoryDOM.querySelector('.lighthouse-score');
-      const value = categoryDOM.querySelector('.lighthouse-score  > .lighthouse-score__value');
-      const title = score.querySelector('.lighthouse-score__title');
-      const description = score.querySelector('.lighthouse-score__description');
+      const score = categoryDOM.querySelector('.lh-score');
+      const value = categoryDOM.querySelector('.lh-score  > .lh-score__value');
+      const title = score.querySelector('.lh-score__title');
+      const description = score.querySelector('.lh-score__description');
 
       assert.deepEqual(score, score.firstElementChild, 'first child is a score');
-      assert.ok(value.classList.contains('lighthouse-score__value--numeric'),
+      assert.ok(value.classList.contains('lh-score__value--numeric'),
                 'category score is numeric');
       assert.equal(value.textContent, Math.round(category.score), 'category score is rounded');
       assert.equal(title.textContent, category.name, 'title is set');
       assert.ok(description.querySelector('a'), 'description contains converted markdown links');
 
-      const audits = categoryDOM.querySelectorAll('.lighthouse-category > .lighthouse-audit');
+      const audits = categoryDOM.querySelectorAll('.lh-category > .lh-audit');
       assert.equal(audits.length, category.audits.length, 'renders correct number of audits');
     });
   });

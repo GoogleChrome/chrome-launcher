@@ -85,13 +85,13 @@ class ReportRenderer {
    */
   _populateScore(element, score, scoringMode, title, description) {
     // Fill in the blanks.
-    const valueEl = element.querySelector('.lighthouse-score__value');
+    const valueEl = element.querySelector('.lh-score__value');
     valueEl.textContent = formatNumber(score);
-    valueEl.classList.add(`lighthouse-score__value--${calculateRating(score)}`,
-                          `lighthouse-score__value--${scoringMode}`);
+    valueEl.classList.add(`lh-score__value--${calculateRating(score)}`,
+                          `lh-score__value--${scoringMode}`);
 
-    element.querySelector('.lighthouse-score__title').textContent = title;
-    element.querySelector('.lighthouse-score__description')
+    element.querySelector('.lh-score__title').textContent = title;
+    element.querySelector('.lh-score__description')
         .appendChild(this._dom.createSpanFromMarkdown(description));
 
     return element;
@@ -102,7 +102,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderAuditScore(audit) {
-    const tmpl = this._dom.cloneTemplate('#tmpl-lighthouse-audit-score');
+    const tmpl = this._dom.cloneTemplate('#tmpl-lh-audit-score');
 
     const scoringMode = audit.result.scoringMode;
     const description = audit.result.helpText;
@@ -116,7 +116,7 @@ class ReportRenderer {
     }
 
     // Append audit details to header section so the entire audit is within a <details>.
-    const header = tmpl.querySelector('.lighthouse-score__header');
+    const header = tmpl.querySelector('.lh-score__header');
     header.open = audit.score < 100; // expand failed audits
     if (audit.result.details) {
       header.appendChild(this._detailsRenderer.render(audit.result.details));
@@ -130,7 +130,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderCategoryScore(category) {
-    const tmpl = this._dom.cloneTemplate('#tmpl-lighthouse-category-score');
+    const tmpl = this._dom.cloneTemplate('#tmpl-lh-category-score');
     const score = Math.round(category.score);
     return this._populateScore(tmpl, score, 'numeric', category.name, category.description);
   }
@@ -140,7 +140,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderException(e) {
-    const element = this._dom.createElement('div', 'lighthouse-exception');
+    const element = this._dom.createElement('div', 'lh-exception');
     element.textContent = String(e.stack);
     return element;
   }
@@ -150,7 +150,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderReport(report) {
-    const element = this._dom.createElement('div', 'lighthouse-report');
+    const element = this._dom.createElement('div', 'lh-report');
     for (const category of report.reportCategories) {
       element.appendChild(this._renderCategory(category));
     }
@@ -162,7 +162,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderCategory(category) {
-    const element = this._dom.createElement('div', 'lighthouse-category');
+    const element = this._dom.createElement('div', 'lh-category');
     element.appendChild(this._renderCategoryScore(category));
     for (const audit of category.audits) {
       element.appendChild(this._renderAudit(audit));
@@ -175,7 +175,7 @@ class ReportRenderer {
    * @return {!Element}
    */
   _renderAudit(audit) {
-    const element = this._dom.createElement('div', 'lighthouse-audit');
+    const element = this._dom.createElement('div', 'lh-audit');
     element.appendChild(this._renderAuditScore(audit));
     return element;
   }
