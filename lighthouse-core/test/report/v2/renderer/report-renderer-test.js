@@ -95,6 +95,32 @@ describe('ReportRenderer V2', () => {
     });
   });
 
+  describe('grouping passed/failed', () => {
+    it('separates audits in the DOM', () => {
+      const category = sampleResults.reportCategories[0];
+      const elem = renderer._renderCategory(category);
+      const passedAudits = elem.querySelectorAll('.lh-category > .lh-passed-audits > .lh-audit');
+      const failedAudits = elem.querySelectorAll('.lh-category > .lh-audit');
+
+      assert.equal(passedAudits.length + failedAudits.length, category.audits.length);
+      assert.equal(passedAudits.length, 4);
+      assert.equal(failedAudits.length, 7);
+    });
+
+    it('doesnt create a pased section if there were 0 passed', () => {
+      const category = JSON.parse(JSON.stringify(sampleResults.reportCategories[0]));
+      category.audits.forEach(audit => audit.score = 0);
+      const elem = renderer._renderCategory(category);
+      const passedAudits = elem.querySelectorAll('.lh-category > .lh-passed-audits > .lh-audit');
+      const failedAudits = elem.querySelectorAll('.lh-category > .lh-audit');
+
+      assert.equal(passedAudits.length, 0);
+      assert.equal(failedAudits.length, 11);
+
+      assert.equal(elem.querySelector('.lh-passed-audits-summary'), null);
+    });
+  });
+
   it('can set a custom templateContext', () => {
     assert.equal(renderer._templateContext, renderer._dom.document());
 

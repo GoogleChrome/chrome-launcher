@@ -184,6 +184,9 @@ class ReportRenderer {
       element.appendChild(this._renderAudit(audit));
     }
 
+    // don't create a passed section if there are no passed
+    if (!passedAudits.length) return element;
+
     const passedElem = this._dom.createElement('details', 'lh-passed-audits');
     const passedSummary = this._dom.createElement('summary', 'lh-passed-audits-summary');
     passedSummary.textContent = `View ${passedAudits.length} passed items`;
