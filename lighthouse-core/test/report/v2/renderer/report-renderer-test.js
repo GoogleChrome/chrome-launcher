@@ -33,16 +33,14 @@ describe('ReportRenderer V2', () => {
 
   before(() => {
     global.URL = URL;
-    global.DOM = DOM;
-    global.DetailsRenderer = DetailsRenderer;
     const document = jsdom.jsdom(TEMPLATE_FILE);
-    renderer = new ReportRenderer(document);
+    const dom = new DOM(document);
+    const detailsRenderer = new DetailsRenderer(dom);
+    renderer = new ReportRenderer(dom, detailsRenderer);
   });
 
   after(() => {
     global.URL = undefined;
-    global.DOM = undefined;
-    global.DetailsRenderer = undefined;
   });
 
   describe('renderReport', () => {
@@ -95,5 +93,13 @@ describe('ReportRenderer V2', () => {
           '.lh-category > .lh-passed-audits > .lh-audit');
       assert.equal(audits.length, category.audits.length, 'renders correct number of audits');
     });
+  });
+
+  it('can set a custom templateContext', () => {
+    assert.equal(renderer._templateContext, renderer._dom.document());
+
+    const otherDocument = jsdom.jsdom(TEMPLATE_FILE);
+    renderer.setTemplateContext(otherDocument);
+    assert.equal(renderer._templateContext, otherDocument);
   });
 });

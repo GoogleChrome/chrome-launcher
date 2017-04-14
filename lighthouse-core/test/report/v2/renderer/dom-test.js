@@ -58,12 +58,16 @@ describe('DOM', () => {
 
   describe('cloneTemplate', () => {
     it('should clone a template', () => {
-      const clone = dom.cloneTemplate('#tmpl-lh-audit-score');
+      const clone = dom.cloneTemplate('#tmpl-lh-audit-score', dom.document());
       assert.ok(clone.querySelector('.lh-score'));
     });
 
     it('fails when template cannot be found', () => {
-      assert.throws(() => dom.cloneTemplate('#unknown-selector'));
+      assert.throws(() => dom.cloneTemplate('#unknown-selector', dom.document()));
+    });
+
+    it('fails when a template context isn\'t provided', () => {
+      assert.throws(() => dom.cloneTemplate('#tmpl-lh-audit-score'));
     });
   });
 

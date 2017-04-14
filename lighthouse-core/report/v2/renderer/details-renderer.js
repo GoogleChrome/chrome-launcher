@@ -15,6 +15,8 @@
  */
 'use strict';
 
+/* globals self */
+
 class DetailsRenderer {
   /**
    * @param {!DOM} dom
@@ -34,7 +36,7 @@ class DetailsRenderer {
       case 'block':
         return this._renderBlock(details);
       case 'cards':
-        return this._renderCards(details);
+        return this._renderCards(/** @type {!DetailsRenderer.CardsDetailsJSON} */ (details));
       case 'list':
         return this._renderList(details);
       default:
@@ -43,7 +45,7 @@ class DetailsRenderer {
   }
 
   /**
-   * @param {!DetailsJSON} text
+   * @param {!DetailsRenderer.DetailsJSON} text
    * @return {!Element}
    */
   _renderText(text) {
@@ -53,19 +55,20 @@ class DetailsRenderer {
   }
 
   /**
-   * @param {!DetailsJSON} block
+   * @param {!DetailsRenderer.DetailsJSON} block
    * @return {!Element}
    */
   _renderBlock(block) {
     const element = this._dom.createElement('div', 'lh-block');
-    for (const item of block.items) {
+    const items = block.items || [];
+    for (const item of items) {
       element.appendChild(this.render(item));
     }
     return element;
   }
 
   /**
-   * @param {!DetailsJSON} list
+   * @param {!DetailsRenderer.DetailsJSON} list
    * @return {!Element}
    */
   _renderList(list) {
@@ -76,16 +79,17 @@ class DetailsRenderer {
       element.appendChild(summary);
     }
 
-    const items = this._dom.createElement('div', 'lh-list__items');
-    for (const item of list.items) {
-      items.appendChild(this.render(item));
+    const itemsElem = this._dom.createElement('div', 'lh-list__items');
+    const items = list.items || [];
+    for (const item of items) {
+      itemsElem.appendChild(this.render(item));
     }
-    element.appendChild(items);
+    element.appendChild(itemsElem);
     return element;
   }
 
   /**
-   * @param {!CardsDetailsJSON} details
+   * @param {!DetailsRenderer.CardsDetailsJSON} details
    * @return {!Element}
    */
   _renderCards(details) {
@@ -117,11 +121,25 @@ class DetailsRenderer {
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = DetailsRenderer;
+} else {
+  self.DetailsRenderer = DetailsRenderer;
 }
 
-/** @typedef {{type: string, text: string|undefined, header: DetailsJSON|undefined, items: Array<DetailsJSON>|undefined}} */
+/**
+ * @typedef {{
+ *     type: string,
+ *     text: (string|undefined),
+ *     header: (!DetailsRenderer.DetailsJSON|undefined),
+ *     items: (!Array<!DetailsRenderer.DetailsJSON>|undefined)
+ * }}
+ */
 DetailsRenderer.DetailsJSON; // eslint-disable-line no-unused-expressions
 
-
-/** @typedef {{type: string, text: string, header: DetailsJSON, items: Array<{title: string, value: string, snippet: string|undefined, target: string}>}} */
+/** @typedef {{
+ *     type: string,
+ *     text: string,
+ *     header: !DetailsRenderer.DetailsJSON,
+ *     items: !Array<{title: string, value: string, snippet: (string|undefined), target: string}>
+ * }}
+ */
 DetailsRenderer.CardsDetailsJSON; // eslint-disable-line no-unused-expressions

@@ -30,8 +30,11 @@ limitations under the License.
   <script>%%LIGHTHOUSE_JAVASCRIPT%%</script>
   <script>window.__LIGHTHOUSE_JSON__ = %%LIGHTHOUSE_JSON%%;</script>
   <script>
-    const renderer = new ReportRenderer(document);
-    document.body.appendChild(renderer.renderReport(window.__LIGHTHOUSE_JSON__));
+    const dom = new DOM(document);
+    const detailsRenderer = new DetailsRenderer(dom);
+    const renderer = new ReportRenderer(dom, detailsRenderer);
+    const reportElem = renderer.renderReport(window.__LIGHTHOUSE_JSON__);
+    document.body.appendChild(reportElem);
   </script>
 </body>
 </html>
