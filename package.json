@@ -31,6 +31,7 @@
     "viewer-unit": "bash lighthouse-core/scripts/run-mocha.sh --viewer",
     "unit": "bash lighthouse-core/scripts/run-mocha.sh --default",
     "closure": "cd lighthouse-core && node closure/closure-type-checking.js",
+    "devtools": "bash lighthouse-core/scripts/roll-to-devtools.sh",
     "watch": "bash lighthouse-core/scripts/run-mocha.sh --watch",
     "chrome": "node ./lighthouse-cli/manual-chrome-launcher.js",
     "fast": "npm run start -- --disable-device-emulation --disable-cpu-throttling --disable-network-throttling",
