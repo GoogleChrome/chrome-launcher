@@ -660,7 +660,7 @@ class Driver {
   beginNetworkCollect(opts) {
     return new Promise((resolve, reject) => {
       this._networkRecords = [];
-      this._networkRecorder = new NetworkRecorder(this._networkRecords);
+      this._networkRecorder = new NetworkRecorder(this._networkRecords, this);
       this.enableUrlUpdateIfRedirected(opts);
 
       this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);

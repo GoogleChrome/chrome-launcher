@@ -118,7 +118,8 @@ gulp.task('browserify-lighthouse', () => {
       .ignore('source-map')
       .ignore('whatwg-url')
       .ignore('url')
-      .ignore('debug/node');
+      .ignore('debug/node')
+      .ignore('pako/lib/zlib/inflate.js');
 
       // Expose the audits, gatherers, and computed artifacts so they can be dynamically loaded.
       const corePath = '../lighthouse-core/';

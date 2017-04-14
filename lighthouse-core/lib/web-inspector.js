@@ -239,10 +239,17 @@ module.exports = (function() {
    * Creates a new WebInspector NetworkManager using a mocked Target.
    * @return {!WebInspector.NetworkManager}
    */
-  WebInspector.NetworkManager.createWithFakeTarget = function() {
+  WebInspector.NetworkManager.createWithFakeTarget = function(driver) {
     // Mocked-up WebInspector Target for NetworkManager
     const fakeNetworkAgent = {
-      enable() {}
+      enable() {},
+      getResponseBody(requestId, onComplete) {
+        driver.sendCommand('Network.getResponseBody', {
+          requestId,
+        })
+        .then(response => onComplete(null, response.body, response.base64Encoded))
+        .catch(err => onComplete(err));
+      }
     };
     const fakeConsoleModel = {
       addMessage() {},

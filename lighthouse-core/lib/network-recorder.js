@@ -21,11 +21,11 @@ const EventEmitter = require('events').EventEmitter;
 const log = require('../lib/log.js');
 
 class NetworkRecorder extends EventEmitter {
-  constructor(recordArray) {
+  constructor(recordArray, driver) {
     super();
 
     this._records = recordArray;
-    this.networkManager = NetworkManager.createWithFakeTarget();
+    this.networkManager = NetworkManager.createWithFakeTarget(driver);
 
     this.startedRequestCount = 0;
     this.finishedRequestCount = 0;
