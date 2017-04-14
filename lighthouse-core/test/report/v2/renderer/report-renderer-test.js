@@ -91,7 +91,8 @@ describe('ReportRenderer V2', () => {
       assert.equal(title.textContent, category.name, 'title is set');
       assert.ok(description.querySelector('a'), 'description contains converted markdown links');
 
-      const audits = categoryDOM.querySelectorAll('.lh-category > .lh-audit');
+      const audits = categoryDOM.querySelectorAll('.lh-category > .lh-audit, ' +
+          '.lh-category > .lh-passed-audits > .lh-audit');
       assert.equal(audits.length, category.audits.length, 'renders correct number of audits');
     });
   });
