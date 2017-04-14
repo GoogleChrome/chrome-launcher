@@ -114,6 +114,11 @@ class DOMSize extends Audit {
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.CARDS,
         value: cards
+      },
+      details: {
+        type: 'cards',
+        header: {type: 'text', text: 'View details'},
+        items: cards
       }
     };
   }

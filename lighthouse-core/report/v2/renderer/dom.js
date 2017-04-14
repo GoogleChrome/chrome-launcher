@@ -28,7 +28,9 @@ class DOM {
  /**
    * @param {string} name
    * @param {string=} className
-   * @param {!Object<string, string>=} attrs Attribute key/val pairs.
+   * @param {!Object<string, (string|undefined)>=} attrs Attribute key/val pairs.
+   *     Note: if an attribute key has an undefined value, this method does not
+   *     set the attribute on the node.
    * @return {!Element}
    */
   createElement(name, className, attrs = {}) {
@@ -37,7 +39,9 @@ class DOM {
       element.className = className;
     }
     Object.keys(attrs).forEach(key => {
-      element.setAttribute(key, attrs[key]);
+      if (attrs[key] !== undefined) {
+        element.setAttribute(key, attrs[key]);
+      }
     });
     return element;
   }

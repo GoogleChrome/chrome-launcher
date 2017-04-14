@@ -199,7 +199,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = ReportRenderer;
 }
 
-/** @typedef {{id: string, weight: number, score: number, result: {description: string, displayValue: string, helpText: string, score: number|boolean, details: DetailsRenderer.DetailsJSON|undefined}}} */
+/** @typedef {{id: string, weight: number, score: number, result: {description: string, displayValue: string, helpText: string, score: number|boolean, details: DetailsRenderer.DetailsJSON|DetailsRenderer.CardsDetailsJSON|undefined}}} */
 let AuditJSON; // eslint-disable-line no-unused-vars
 
 /** @typedef {{name: string, weight: number, score: number, description: string, audits: Array<AuditJSON>}} */

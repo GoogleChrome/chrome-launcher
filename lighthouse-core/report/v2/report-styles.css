@@ -50,23 +50,64 @@ body {
   display: none !important;
 }
 
-/* List */
-.lh-list {
+.lh-details {
   font-size: smaller;
   margin-top: var(--default-padding);
 }
 
-.lh-list__header {
+.lh-details summary {
   cursor: pointer;
 }
 
+.lh-details[open] summary {
+  margin-bottom: var(--default-padding);
+}
+
+/* List */
 .lh-list__items {
-  padding-left: 10px;
+  padding-left: var(--default-padding);
 }
 
 .lh-list__items > * {
   border-bottom: 1px solid gray;
   margin-bottom: 2px;
+}
+
+/* Card */
+.lh-scorecards {
+  display: flex;
+  flex-wrap: wrap;
+}
+.lh-scorecard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 180px;
+  flex-direction: column;
+  padding: var(--default-padding);
+  padding-top: calc(32px + var(--default-padding));
+  border-radius: 3px;
+  margin-right: var(--default-padding);
+  position: relative;
+  line-height: inherit;
+  border: 1px solid #ebebeb;
+}
+.lh-scorecard__title {
+  background-color: #eee;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: calc(var(--default-padding) / 2);
+}
+.lh-scorecard__value {
+  font-size: 28px;
+}
+.lh-scorecard__target {
+  margin-top: calc(var(--default-padding) / 2);
 }
 
 /* Score */
