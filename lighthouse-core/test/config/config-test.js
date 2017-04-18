@@ -265,6 +265,32 @@ describe('Config', () => {
     }), /meta.requiredArtifacts property/);
   });
 
+  it('throws when a category references a non-existent audit', () => {
+    return assert.throws(_ => new Config({
+      audits: [],
+      categories: {
+        pwa: {
+          audits: [
+            {id: 'missing-audit'}
+          ]
+        }
+      }
+    }), /could not find missing-audit/);
+  });
+
+  it('throws when a category fails to specify an audit id', () => {
+    return assert.throws(_ => new Config({
+      audits: [],
+      categories: {
+        pwa: {
+          audits: [
+            'oops-wrong-format'
+          ]
+        }
+      }
+    }), 'missing an audit id at pwa[0]');
+  });
+
   it('filters the config', () => {
     const config = new Config({
       settings: {
