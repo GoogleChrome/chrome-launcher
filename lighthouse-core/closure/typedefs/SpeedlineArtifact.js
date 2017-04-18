@@ -30,6 +30,9 @@ function SpeedlineFrames() {}
 SpeedlineFrames.prototype.getProgress = function() {};
 
 /** @return {number} */
+SpeedlineFrames.prototype.getPerceptualProgress = function() {};
+
+/** @return {number} */
 SpeedlineFrames.prototype.getTimeStamp = function() {};
 
 /**

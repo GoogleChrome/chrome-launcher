@@ -18,8 +18,15 @@
 'use strict';
 
 class ComputedArtifact {
-  constructor() {
-    this.cache = new Map();
+  /**
+   * @param {!ComputedArtifacts} allComputedArtifacts
+   */
+  constructor(allComputedArtifacts) {
+    /** @private {!Map} */
+    this._cache = new Map();
+
+    /** @private {!ComputedArtifacts} */
+    this._allComputedArtifacts = allComputedArtifacts;
   }
 
   /* eslint-disable no-unused-vars */
@@ -27,10 +34,12 @@ class ComputedArtifact {
   /**
    * Override to implement a computed artifact. Can return a Promise or the
    * computed artifact itself.
-   * @param {!Object} artifact Input to computation.
+   * @param {*} artifact Input to computation.
+   * @param {!ComputedArtifacts} allComputedArtifacts Access to all computed artifacts.
+   * @return {*}
    * @throws {Error}
    */
-  compute_(artifact) {
+  compute_(artifact, allComputedArtifacts) {
     throw new Error('compute_() not implemented for computed artifact ' + this.name);
   }
 
@@ -38,18 +47,20 @@ class ComputedArtifact {
 
   /**
    * Request a computed artifact, caching the result on the input artifact.
-   * @param {!OBject} artifact
-   * @return {!Promise}
+   * @param {*} artifact
+   * @return {!Promise<*>}
    */
   request(artifact) {
-    if (this.cache.has(artifact)) {
-      return Promise.resolve(this.cache.get(artifact));
+    if (this._cache.has(artifact)) {
+      return Promise.resolve(this._cache.get(artifact));
     }
 
-    return Promise.resolve().then(_ => this.compute_(artifact)).then(computedArtifact => {
-      this.cache.set(artifact, computedArtifact);
-      return computedArtifact;
-    });
+    return Promise.resolve()
+      .then(_ => this.compute_(artifact, this._allComputedArtifacts))
+      .then(computedArtifact => {
+        this._cache.set(artifact, computedArtifact);
+        return computedArtifact;
+      });
   }
 }
 

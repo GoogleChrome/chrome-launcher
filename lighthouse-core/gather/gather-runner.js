@@ -430,13 +430,16 @@ class GatherRunner {
     }
   }
 
+  /**
+   * @return {!ComputedArtifacts}
+   */
   static instantiateComputedArtifacts() {
     const computedArtifacts = {};
     require('fs').readdirSync(path.join(__dirname, 'computed')).forEach(function(file) {
       // Drop `.js` suffix to keep browserify import happy.
       file = file.replace(/\.js$/, '');
       const ArtifactClass = require('./computed/' + file);
-      const artifact = new ArtifactClass();
+      const artifact = new ArtifactClass(computedArtifacts);
       // define the request* function that will be exposed on `artifacts`
       computedArtifacts['request' + artifact.name] = artifact.request.bind(artifact);
     });

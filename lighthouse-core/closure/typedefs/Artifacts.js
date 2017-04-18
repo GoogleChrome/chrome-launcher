@@ -21,8 +21,10 @@
  */
 
 /**
+ * @constructor
  * @struct
  * @record
+ * @extends {ComputedArtifacts}
  */
 function Artifacts() {}
 

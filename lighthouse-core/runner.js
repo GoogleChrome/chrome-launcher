@@ -74,7 +74,7 @@ class Runner {
         run = run.then(_ => GatherRunner.run(config.passes, opts));
       } else if (validArtifactsAndAudits) {
         run = run.then(_ => {
-          return Object.assign(GatherRunner.instantiateComputedArtifacts(), config.artifacts);
+          return Object.assign(config.artifacts, GatherRunner.instantiateComputedArtifacts());
         });
       }
 
@@ -105,8 +105,8 @@ class Runner {
     } else if (config.auditResults) {
       // If there are existing audit results, surface those here.
       // Instantiate and return artifacts for consistency.
-      const artifacts = Object.assign(GatherRunner.instantiateComputedArtifacts(),
-                                      config.artifacts || {});
+      const artifacts = Object.assign(config.artifacts || {},
+          GatherRunner.instantiateComputedArtifacts());
       run = run.then(_ => {
         return {
           artifacts,

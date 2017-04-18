@@ -23,11 +23,11 @@ const GatherRunner = require('../../gather/gather-runner.js');
 const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
-  return Object.assign(computedArtifacts, {
+  return Object.assign({
     traces: {
       [Audit.DEFAULT_PASS]: {traceEvents: Array.isArray(trace) ? trace : trace.traceEvents}
     }
-  });
+  }, computedArtifacts);
 }
 
 /* eslint-env mocha */

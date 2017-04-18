@@ -24,11 +24,11 @@ const pwaTrace = require('../fixtures/traces/progressive-app.json');
 const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
-  return Object.assign(computedArtifacts, {
+  return Object.assign({
     traces: {
       [Audit.DEFAULT_PASS]: trace
     }
-  });
+  }, computedArtifacts);
 }
 /* eslint-env mocha */
 
