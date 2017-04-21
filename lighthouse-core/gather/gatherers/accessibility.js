@@ -16,20 +16,18 @@
  */
 'use strict';
 
-/* global document */
+/* global window, document */
 
 const Gatherer = require('./gatherer');
 const fs = require('fs');
-const axe = fs.readFileSync(
-  require.resolve('axe-core/axe.min.js')
-);
+const axeLibSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 // This is run in the page, not Lighthouse itself.
 // axe.run returns a promise which fulfills with a results object
 // containing any violations.
 /* istanbul ignore next */
 function runA11yChecks() {
-  return axe.run(document, {
+  return window.axe.run(document, {
     runOnly: {
       type: 'tag',
       values: [
@@ -56,7 +54,7 @@ class Accessibility extends Gatherer {
   afterPass(options) {
     const driver = options.driver;
     const expression = `(function () {
-      ${axe};
+      ${axeLibSource};
       return (${runA11yChecks.toString()}());
     })()`;
 
