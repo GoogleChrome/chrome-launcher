@@ -16,7 +16,7 @@
 'use strict';
 
 const TimeToInteractive = require('../../audits/time-to-interactive.js');
-const GatherRunner = require('../../gather/gather-runner.js');
+const Runner = require('../../runner.js');
 const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
@@ -30,7 +30,7 @@ describe('Performance: time-to-interactive audit', () => {
           traceEvents: pwaTrace
         }
       }
-    }, GatherRunner.instantiateComputedArtifacts());
+    }, Runner.instantiateComputedArtifacts());
 
     return TimeToInteractive.audit(artifacts).then(output => {
       assert.equal(output.rawValue, 1105.8, output.debugString);

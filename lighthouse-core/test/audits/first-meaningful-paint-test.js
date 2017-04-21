@@ -25,8 +25,8 @@ const preactTrace = require('../fixtures/traces/preactjs.com_ts_of_undefined.jso
 const noFMPtrace = require('../fixtures/traces/no_fmp_event.json');
 const noFCPtrace = require('../fixtures/traces/airhorner_no_fcp');
 
-const GatherRunner = require('../../gather/gather-runner.js');
-const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
+const Runner = require('../../runner.js');
+const computedArtifacts = Runner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
   return Object.assign({

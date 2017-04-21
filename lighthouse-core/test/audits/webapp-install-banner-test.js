@@ -15,10 +15,10 @@ const EXAMPLE_MANIFEST_URL = 'https://example.com/manifest.json';
 const EXAMPLE_DOC_URL = 'https://example.com/index.html';
 const exampleManifest = manifestParser(manifestSrc, EXAMPLE_MANIFEST_URL, EXAMPLE_DOC_URL);
 
-const GatherRunner = require('../../gather/gather-runner.js');
+const Runner = require('../../runner.js');
 
 function generateMockArtifacts() {
-  const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
+  const computedArtifacts = Runner.instantiateComputedArtifacts();
   const clonedArtifacts = JSON.parse(JSON.stringify({
     Manifest: exampleManifest,
     ServiceWorker: {

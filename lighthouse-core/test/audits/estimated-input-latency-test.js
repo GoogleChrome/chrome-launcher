@@ -16,12 +16,12 @@
 'use strict';
 
 const Audit = require('../../audits/estimated-input-latency.js');
-const GatherRunner = require('../../gather/gather-runner.js');
+const Runner = require('../../runner.js');
 const assert = require('assert');
 
 const pwaTrace = require('../fixtures/traces/progressive-app.json');
 
-const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
+const computedArtifacts = Runner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
   return Object.assign({

@@ -69,14 +69,17 @@ class Runner {
     // to check that there are artifacts specified in the config, and throw if not.
     if (validPassesAndAudits || validArtifactsAndAudits) {
       if (validPassesAndAudits) {
+        // Set up the driver and run gatherers.
         opts.driver = opts.driverMock || new Driver(connection);
-        // Finally set up the driver to gather.
         run = run.then(_ => GatherRunner.run(config.passes, opts));
       } else if (validArtifactsAndAudits) {
-        run = run.then(_ => {
-          return Object.assign(config.artifacts, GatherRunner.instantiateComputedArtifacts());
-        });
+        run = run.then(_ => config.artifacts);
       }
+
+      // Add computed artifacts.
+      run = run.then(artifacts => {
+        return Object.assign({}, artifacts, Runner.instantiateComputedArtifacts());
+      });
 
       // Basic check that the traces (gathered or loaded) are valid.
       run = run.then(artifacts => {
@@ -105,8 +108,8 @@ class Runner {
     } else if (config.auditResults) {
       // If there are existing audit results, surface those here.
       // Instantiate and return artifacts for consistency.
-      const artifacts = Object.assign(config.artifacts || {},
-          GatherRunner.instantiateComputedArtifacts());
+      const artifacts = Object.assign({}, config.artifacts || {},
+          Runner.instantiateComputedArtifacts());
       run = run.then(_ => {
         return {
           artifacts,
@@ -247,6 +250,25 @@ class Runner {
           .map(f => `dobetterweb/${f}`)
     ];
     return fileList.filter(f => /\.js$/.test(f) && f !== 'gatherer.js').sort();
+  }
+
+  /**
+   * @return {!ComputedArtifacts}
+   */
+  static instantiateComputedArtifacts() {
+    const computedArtifacts = {};
+    require('fs').readdirSync(__dirname + '/gather/computed').forEach(function(filename) {
+      // Skip base class.
+      if (filename === 'computed-artifact.js') return;
+
+      // Drop `.js` suffix to keep browserify import happy.
+      filename = filename.replace(/\.js$/, '');
+      const ArtifactClass = require('./gather/computed/' + filename);
+      const artifact = new ArtifactClass(computedArtifacts);
+      // define the request* function that will be exposed on `artifacts`
+      computedArtifacts['request' + artifact.name] = artifact.request.bind(artifact);
+    });
+    return computedArtifacts;
   }
 
   /**

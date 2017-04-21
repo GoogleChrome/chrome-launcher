@@ -19,8 +19,8 @@ const Audit = require('../../audits/user-timings.js');
 const assert = require('assert');
 const traceEvents = require('../fixtures/traces/trace-user-timings.json');
 
-const GatherRunner = require('../../gather/gather-runner.js');
-const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
+const Runner = require('../../runner.js');
+const computedArtifacts = Runner.instantiateComputedArtifacts();
 
 function generateArtifactsWithTrace(trace) {
   return Object.assign({

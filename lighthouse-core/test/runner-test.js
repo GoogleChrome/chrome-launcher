@@ -21,7 +21,7 @@ const Config = require('../config/config');
 const Audit = require('../audits/audit');
 const assert = require('assert');
 const path = require('path');
-const computedArtifacts = require('../gather/gather-runner').instantiateComputedArtifacts();
+const computedArtifacts = Runner.instantiateComputedArtifacts();
 
 /* eslint-env mocha */
 
@@ -410,6 +410,14 @@ describe('Runner', () => {
     });
   });
 
+  it('can create computed artifacts', () => {
+    const computedArtifacts = Runner.instantiateComputedArtifacts();
+    assert.ok(Object.keys(computedArtifacts).length, 'there are a few computed artifacts');
+    Object.keys(computedArtifacts).forEach(artifactRequest => {
+      assert.equal(typeof computedArtifacts[artifactRequest], 'function');
+    });
+  });
+
   it('results include artifacts when given artifacts and audits', () => {
     const url = 'https://example.com';
     const ViewportDimensions = {innerHeight: 10, innerWidth: 10};
@@ -430,10 +438,12 @@ describe('Runner', () => {
     });
   });
 
-  it('results include artifacts when given passes and audits', () => {
+  it('results include artifacts and computedArtifacts when given passes and audits', () => {
     const url = 'https://example.com';
     const config = new Config({
       passes: [{
+        passName: 'firstPass',
+        recordNetwork: true,
         gatherers: ['viewport-dimensions']
       }],
 
@@ -449,6 +459,16 @@ describe('Runner', () => {
       for (const method of Object.keys(computedArtifacts)) {
         assert.ok(results.artifacts.hasOwnProperty(method));
       }
+
+      // Verify a computed artifact. driverMock will include networkRecords
+      // built from fixtures/perflog.json.
+      const networkRecords = results.artifacts.networkRecords.firstPass;
+      const p = results.artifacts.requestCriticalRequestChains(networkRecords);
+      return p.then(chains => {
+        assert.ok(chains['93149.1']);
+        assert.ok(chains['93149.1'].request);
+        assert.ok(chains['93149.1'].children);
+      });
     });
   });
 

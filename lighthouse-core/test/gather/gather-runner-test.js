@@ -561,37 +561,6 @@ describe('GatherRunner', function() {
       /afterPass\(\) method/);
   });
 
-  it('can create computed artifacts', () => {
-    const computedArtifacts = GatherRunner.instantiateComputedArtifacts();
-    assert.ok(Object.keys(computedArtifacts).length, 'there are a few computed artifacts');
-    Object.keys(computedArtifacts).forEach(artifactRequest => {
-      assert.equal(typeof computedArtifacts[artifactRequest], 'function');
-    });
-  });
-
-  it('will instantiate computed artifacts during a run', () => {
-    const passes = [{
-      blankDuration: 0,
-      recordNetwork: true,
-      recordTrace: true,
-      passName: 'firstPass',
-      gatherers: [new TestGatherer()]
-    }];
-    const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};
-
-    return GatherRunner.run(passes, options)
-        .then(artifacts => {
-          const networkRecords = artifacts.networkRecords.firstPass;
-          const p = artifacts.requestCriticalRequestChains(networkRecords);
-          return p.then(chains => {
-            // fakeDriver will include networkRecords built from fixtures/perflog.json
-            assert.ok(chains['93149.1']);
-            assert.ok(chains['93149.1'].request);
-            assert.ok(chains['93149.1'].children);
-          });
-        });
-  });
-
   describe('#assertPageLoaded', () => {
     it('passes when the page is loaded', () => {
       const url = 'http://the-page.com';

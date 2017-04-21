@@ -18,7 +18,6 @@
 
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
-const path = require('path');
 const URL = require('../lib/url-shim');
 
 /**
@@ -373,10 +372,8 @@ class GatherRunner {
       .then(_ => GatherRunner.disposeDriver(driver))
       .then(_ => GatherRunner.collectArtifacts(gathererResults))
       .then(artifacts => {
-        // Add tracing data and computed artifacts to artifacts object.
-        const computedArtifacts = this.instantiateComputedArtifacts();
-        Object.assign(artifacts, computedArtifacts, tracingData);
-        return artifacts;
+        // Add tracing data to the artifacts object.
+        return Object.assign(artifacts, tracingData);
       })
       // cleanup on error
       .catch(err => {
@@ -428,22 +425,6 @@ class GatherRunner {
     if (typeof gathererInstance.afterPass !== 'function') {
       throw new Error(`${gathererName} has no afterPass() method.`);
     }
-  }
-
-  /**
-   * @return {!ComputedArtifacts}
-   */
-  static instantiateComputedArtifacts() {
-    const computedArtifacts = {};
-    require('fs').readdirSync(path.join(__dirname, 'computed')).forEach(function(file) {
-      // Drop `.js` suffix to keep browserify import happy.
-      file = file.replace(/\.js$/, '');
-      const ArtifactClass = require('./computed/' + file);
-      const artifact = new ArtifactClass(computedArtifacts);
-      // define the request* function that will be exposed on `artifacts`
-      computedArtifacts['request' + artifact.name] = artifact.request.bind(artifact);
-    });
-    return computedArtifacts;
   }
 
   static instantiateGatherers(passes, rootPath) {
