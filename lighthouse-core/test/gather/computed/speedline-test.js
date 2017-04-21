@@ -47,7 +47,7 @@ describe('Speedline gatherer', () => {
 
     return speedlineGather.request({traceEvents: threeFrameTrace}).then(speedline => {
       assert.equal(Math.floor(speedline.speedIndex), 2040);
-      return assert.equal(Math.floor(speedline.perceptualSpeedIndex), 2066);
+      return assert.equal(Math.floor(speedline.perceptualSpeedIndex), 2030);
     });
   });
 

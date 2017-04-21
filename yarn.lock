@@ -2870,9 +2870,9 @@ spdx-license-ids@^1.0.2:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-1.2.2.tgz#c9df7a3424594ade6bd11900d596696dc06bac57"
 
-speedline@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/speedline/-/speedline-1.0.3.tgz#ee1d98c18d583a2d8488aaded2db9334b943dbbd"
+speedline@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/speedline/-/speedline-1.1.1.tgz#d70d7bfbe630eb63424a830ec0e02ddfcc6051b7"
   dependencies:
     babar "0.0.3"
     image-ssim "^0.2.0"
