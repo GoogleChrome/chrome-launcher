@@ -105,7 +105,7 @@ class DOM {
    * @param {!DocumentFragment|!Element} context
    * @return {!Element}
    */
-  find(context, query) {
+  find(query, context) {
     const result = context.querySelector(query);
     if (result === null) {
       throw new Error(`query ${query} not found`);

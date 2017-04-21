@@ -32,7 +32,8 @@ limitations under the License.
   <script>
     const dom = new DOM(document);
     const detailsRenderer = new DetailsRenderer(dom);
-    const renderer = new ReportRenderer(dom, detailsRenderer);
+    const categoryRenderer = new CategoryRenderer(dom, detailsRenderer);
+    const renderer = new ReportRenderer(dom, categoryRenderer);
     const reportElem = renderer.renderReport(window.__LIGHTHOUSE_JSON__);
     document.body.appendChild(reportElem);
   </script>
