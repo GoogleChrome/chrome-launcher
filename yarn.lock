@@ -1237,12 +1237,12 @@ glogg@^1.0.0:
   dependencies:
     sparkles "^1.0.0"
 
-google-closure-compiler@^20161201.0.0:
-  version "20161201.0.0"
-  resolved "https://registry.yarnpkg.com/google-closure-compiler/-/google-closure-compiler-20161201.0.0.tgz#2bcf0206060ad4f4031f64f73eaab7119ff76738"
+google-closure-compiler@20170409.0.0:
+  version "20170409.0.0"
+  resolved "https://registry.yarnpkg.com/google-closure-compiler/-/google-closure-compiler-20170409.0.0.tgz#dc1be29a9f7eef8611364533b271b9fac757c970"
   dependencies:
     chalk "^1.0.0"
-    vinyl "^1.2.0"
+    vinyl "^2.0.1"
     vinyl-sourcemaps-apply "^0.2.0"
 
 got@^6.7.1:
@@ -3232,15 +3232,7 @@ vinyl@^0.5.0:
     clone-stats "^0.0.1"
     replace-ext "0.0.1"
 
-vinyl@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/vinyl/-/vinyl-1.2.0.tgz#5c88036cf565e5df05558bfc911f8656df218884"
-  dependencies:
-    clone "^1.0.0"
-    clone-stats "^0.0.1"
-    replace-ext "0.0.1"
-
-vinyl@^2.0.0:
+vinyl@^2.0.0, vinyl@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/vinyl/-/vinyl-2.0.1.tgz#1c3b4931e7ac4c1efee743f3b91a74c094407bb6"
   dependencies:

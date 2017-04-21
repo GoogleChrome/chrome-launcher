@@ -22,6 +22,7 @@ class DOM {
    * @param {!Document} document
    */
   constructor(document) {
+    /** @private {!Document} */
     this._document = document;
   }
 
@@ -33,9 +34,7 @@ class DOM {
    *     set the attribute on the node.
    * @return {!Element}
    */
-  createElement(name, className, attrs) {
-    // TODO(all): adopt `attrs` default arg when https://codereview.chromium.org/2821773002/ lands
-    attrs = attrs || {};
+  createElement(name, className, attrs = {}) {
     const element = this._document.createElement(name);
     if (className) {
       element.className = className;
@@ -56,7 +55,7 @@ class DOM {
    * @throws {Error}
    */
   cloneTemplate(selector, context) {
-    const template = context.querySelector(selector);
+    const template = /** @type {?HTMLTemplateElement} */ (context.querySelector(selector));
     if (!template) {
       throw new Error(`Template not found: template${selector}`);
     }
@@ -80,7 +79,7 @@ class DOM {
 
       // Append link if there are any.
       if (linkText && linkHref) {
-        const a = this.createElement('a');
+        const a = /** @type {!HTMLAnchorElement} */ (this.createElement('a'));
         a.rel = 'noopener';
         a.target = '_blank';
         a.textContent = linkText;
@@ -97,6 +96,21 @@ class DOM {
    */
   document() {
     return this._document;
+  }
+
+  /**
+   * Guaranteed context.querySelector. Always returns an element or throws if
+   * nothing matches query.
+   * @param {string} query
+   * @param {!DocumentFragment|!Element} context
+   * @return {!Element}
+   */
+  find(context, query) {
+    const result = context.querySelector(query);
+    if (result === null) {
+      throw new Error(`query ${query} not found`);
+    }
+    return result;
   }
 }
 

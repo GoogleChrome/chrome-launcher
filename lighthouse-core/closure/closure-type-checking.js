@@ -22,67 +22,76 @@ const gulp = require('gulp');
 const gutil = require('gulp-util');
 const replace = require('gulp-replace');
 
+// Flags to generate additional debug information.
+const PRINT_AST = false;
+const PRINT_CODE = !PRINT_AST && false;
+const OUTPUT_FILE = PRINT_AST ? '../closure-tree.txt' : 'closure-output.js';
+
 /* eslint-disable camelcase */
-gulp.task('js-compile', function() {
+gulp.task('compile-report', () => {
   return gulp.src([
-    'closure/typedefs/*.js',
-    'closure/third_party/*.js',
-    'audits/**/*.js',
-    'lib/event-helpers.js',
-    'lib/icons.js',
-    'lib/styles-helpers.js',
-    'lib/url-shim.js',
-    'aggregator/**/*.js'
+    // externs
+    'closure/third_party/commonjs.js',
+
+    'report/v2/renderer/*.js',
   ])
-    // Hack to remove `require`s that Closure currently can't resolve.
-    .pipe(replace('require(\'../lib/web-inspector\').Color.parse;',
-        'WebInspector.Color.parse;'))
-    .pipe(replace('require(\'../lib/traces/tracing-processor\');', '/** @type {?} */ (null);'))
-    .pipe(replace('require(\'../lib/traces/devtools-timeline-model\');',
-        'DevtoolsTimelineModel'))
-    .pipe(replace('require(\'speedline\');', 'function(arg) {};'))
-    .pipe(replace(/require\('(\.\.\/)*report\/formatter'\);/g, '{};'))
 
-    // Replace any non-local import (e.g. not starting with .) with a dummy type. These are likely
-    // the built-in Node modules. But not always, so TODO(samthor): Fix this.
-    .pipe(replace(/require\(\'[^\.].*?\'\)/g, '/** @type {*} */ ({})'))
+  // Ignore `module.exports` and `self.ClassName = ClassName` statements.
+  .pipe(replace(/^\s\smodule\.exports = \w+;$/gm, ';'))
+  .pipe(replace(/^\s\sself\.(\w+) = \1;$/gm, ';'))
 
-    .pipe(closureCompiler({
-      compilation_level: 'SIMPLE',
-      process_common_js_modules: true,
-      new_type_inf: true,
-      checks_only: true,
-      language_in: 'ECMASCRIPT6_STRICT',
-      language_out: 'ECMASCRIPT5_STRICT',
-      warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
-      jscomp_error: [
-        'checkTypes',
-        'conformanceViolations'
-      ],
-      jscomp_warning: [
-        // https://github.com/google/closure-compiler/wiki/Warnings
-        'accessControls',
-        'checkRegExp',
-        'const',
-        // 'reportUnknownTypes',
-        'missingProperties',
-        'missingReturn',
-        'newCheckTypes',
-        'strictModuleDepCheck',
-        'typeInvalidation',
-        'undefinedNames',
-        'visibility'
-      ],
-      conformance_configs: 'closure/conformance_config.textproto'
-    }))
-    .on('error', error => {
-      gutil.log('Closure compilation failed. Check `closure-error.log` for details.');
-      require('fs').writeFileSync('closure-error.log', error);
-    })
-    .on('end', () => {
-      gutil.log('Closure compilation successful.');
-    });
+  .pipe(closureCompiler({
+    compilation_level: 'SIMPLE',
+    // new_type_inf: true,
+    language_in: 'ECMASCRIPT6_STRICT',
+    language_out: 'ECMASCRIPT5_STRICT',
+    warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
+    jscomp_error: [
+      'checkTypes',
+    ],
+    jscomp_warning: [
+      // https://github.com/google/closure-compiler/wiki/Warnings
+      'accessControls',
+      'checkRegExp',
+      'const',
+      'reportUnknownTypes',
+      'missingProperties',
+      'missingReturn',
+      'strictModuleDepCheck',
+      'typeInvalidation',
+      'undefinedNames',
+      'visibility',
+
+      'checkDebuggerStatement',
+      'externsValidation',
+      'uselessCode',
+      'ambiguousFunctionDecl',
+      'checkTypes',
+      'es3',
+      'es5Strict',
+      'globalThis',
+      'nonStandardJsDocs',
+      'suspiciousCode',
+      'unknownDefines',
+
+      // nullable/undefined checker when new_type_inf enabled.
+      'newCheckTypesAllChecks',
+    ],
+    conformance_configs: 'closure/conformance_config.textproto',
+
+    // Debug output control.
+    checks_only: !PRINT_CODE,
+    print_tree: PRINT_AST,
+    js_output_file: OUTPUT_FILE,
+    formatting: 'PRETTY_PRINT',
+    preserve_type_annotations: true,
+  }))
+  .pipe(gulp.dest('../'))
+  .on('end', () => {
+    gutil.log('Closure compilation successful.');
+  });
 });
+
 /* eslint-enable */
 
-gulp.start('js-compile');
+gulp.start('compile-report');

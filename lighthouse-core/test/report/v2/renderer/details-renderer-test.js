@@ -47,20 +47,6 @@ describe('DetailsRenderer', () => {
       assert.ok(el.classList.contains('lh-text'), 'adds classes');
     });
 
-    it('renders blocks', () => {
-      const el = renderer.render({
-        type: 'block',
-        items: [
-          {type: 'text', text: 'content 1'},
-          {type: 'text', text: 'content 2'},
-        ],
-      });
-
-      const children = el.querySelectorAll('.lh-text');
-      assert.equal(children.length, 2, 'renders children');
-      assert.ok(el.classList.contains('lh-block'), 'adds classes');
-    });
-
     it('renders lists with headers', () => {
       const el = renderer.render({
         type: 'list',
@@ -93,31 +79,6 @@ describe('DetailsRenderer', () => {
 
       const items = el.querySelector('.lh-list__items');
       assert.equal(items.children.length, 3, 'did not render children');
-    });
-
-    it('renders nested structures', () => {
-      const el = renderer.render({
-        type: 'block',
-        items: [
-          {type: 'text', text: 'content 1'},
-          {type: 'text', text: 'content 2'},
-          {
-            type: 'list',
-            header: {type: 'text', text: 'header'},
-            items: [
-              {type: 'text', text: 'sub-content 1'},
-              {type: 'text', text: 'sub-content 2'},
-            ]
-          },
-        ],
-      });
-
-      const textChild = el.querySelector('.lh-block > .lh-text');
-      const listChild = el.querySelector('.lh-block > .lh-details');
-      const textSubChild = el.querySelector('.lh-block .lh-details .lh-text');
-      assert.ok(textChild, 'did not render text children');
-      assert.ok(listChild, 'did not render list child');
-      assert.ok(textSubChild, 'did not render sub-children');
     });
 
     it('renders cards', () => {

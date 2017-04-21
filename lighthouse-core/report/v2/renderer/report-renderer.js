@@ -60,9 +60,11 @@ class ReportRenderer {
    * @param {!DetailsRenderer} detailsRenderer
    */
   constructor(dom, detailsRenderer) {
+    /** @private {!DOM} */
     this._dom = dom;
+    /** @private {!DetailsRenderer} */
     this._detailsRenderer = detailsRenderer;
-
+    /** @private {!Document|!Element} */
     this._templateContext = this._dom.document();
   }
 
@@ -73,7 +75,7 @@ class ReportRenderer {
   renderReport(report) {
     try {
       return this._renderReport(report);
-    } catch (e) {
+    } catch (/** @type {!Error} */ e) {
       return this._renderException(e);
     }
   }
@@ -88,13 +90,13 @@ class ReportRenderer {
    */
   _populateScore(element, score, scoringMode, title, description) {
     // Fill in the blanks.
-    const valueEl = element.querySelector('.lh-score__value');
+    const valueEl = this._dom.find(element, '.lh-score__value');
     valueEl.textContent = formatNumber(score);
     valueEl.classList.add(`lh-score__value--${calculateRating(score)}`,
-                          `lh-score__value--${scoringMode}`);
+        `lh-score__value--${scoringMode}`);
 
-    element.querySelector('.lh-score__title').textContent = title;
-    element.querySelector('.lh-score__description')
+    this._dom.find(element, '.lh-score__title').textContent = title;
+    this._dom.find(element, '.lh-score__description')
         .appendChild(this._dom.createSpanFromMarkdown(description));
 
     return /** @type {!Element} **/ (element);
@@ -128,7 +130,7 @@ class ReportRenderer {
     }
 
     // Append audit details to header section so the entire audit is within a <details>.
-    const header = tmpl.querySelector('.lh-score__header');
+    const header = /** @type {!HTMLDetailsElement} */ (this._dom.find(tmpl, '.lh-score__header'));
     header.open = audit.score < 100; // expand failed audits
     if (audit.result.details) {
       header.appendChild(this._detailsRenderer.render(audit.result.details));
@@ -218,15 +220,17 @@ if (typeof module !== 'undefined' && module.exports) {
 
 /**
  * @typedef {{
- *     id: string, weight:
- *     number, score: number,
+ *     id: string,
+ *     weight: number,
+ *     score: number,
  *     result: {
  *       description: string,
  *       displayValue: string,
  *       helpText: string,
  *       score: (number|boolean),
  *       scoringMode: string,
- *       details: (!DetailsRenderer.DetailsJSON|!DetailsRenderer.CardsDetailsJSON|undefined)
+ *       optimalValue: number,
+ *       details: (!DetailsRenderer.DetailsJSON|undefined)
  *     }
  * }}
  */
@@ -245,11 +249,10 @@ ReportRenderer.CategoryJSON; // eslint-disable-line no-unused-expressions
 
 /**
  * @typedef {{
- *     lighthouseVersion: !string,
- *     generatedTime: !string,
- *     initialUrl: !string,
- *     url: !string,
- *     audits: ?Object,
+ *     lighthouseVersion: string,
+ *     generatedTime: string,
+ *     initialUrl: string,
+ *     url: string,
  *     reportCategories: !Array<!ReportRenderer.CategoryJSON>
  * }}
  */

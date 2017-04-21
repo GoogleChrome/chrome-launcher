@@ -15,18 +15,18 @@
 # This file defines the additional JS conformance tests run over lighthouse code
 # when compiled with the Closure Compiler. For more, see https://github.com/google/closure-compiler/wiki/JS-Conformance-Framework
 
+# Better covered by newCheckTypesAllChecks under NTI
+# requirement: {
+#   type: CUSTOM
+#   java_class: 'com.google.javascript.jscomp.ConformanceRules$BanNullDeref'
+#   error_message: 'Dereferencing `null` or `undefined` is usually an error. See https://github.com/google/closure-compiler/wiki/JS-Conformance-Framework#bannullderef'
+# }
+
 requirement: {
   type: CUSTOM
-  java_class: 'com.google.javascript.jscomp.ConformanceRules$BanNullDeref'
-  error_message: 'Dereferencing `null` or `undefined` is usually an error. See https://github.com/google/closure-compiler/wiki/JS-Conformance-Framework#bannullderef'
+  java_class: 'com.google.javascript.jscomp.ConformanceRules$BanUnknownThis'
+  error_message: 'References to `this` that are typed as `unknown` are not allowed. See https://github.com/google/closure-compiler/wiki/JS-Conformance-Framework#banunknownthis'
 }
-
-# TODO(bckenny): fix unknown this error(s)
-# requirement: {
-#  type: CUSTOM
-#  java_class: 'com.google.javascript.jscomp.ConformanceRules$BanUnknownThis'
-#  error_message: 'References to `this` that are typed as `unknown` are not allowed. See https://github.com/google/closure-compiler/wiki/JS-Conformance-Framework#banunknownthis'
-# }
 
 requirement: {
   type: CUSTOM
