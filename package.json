@@ -12,9 +12,9 @@
   },
   "scripts": {
     "install-all": "npm run install-cli && npm run install-extension && npm run install-viewer",
-    "install-cli": "cd ./lighthouse-cli && npm install && npm build",
-    "install-extension": "cd ./lighthouse-extension && npm install",
-    "install-viewer": "cd ./lighthouse-viewer && npm install",
+    "install-cli": "cd ./lighthouse-cli && yarn install && yarn build",
+    "install-extension": "cd ./lighthouse-extension && yarn install",
+    "install-viewer": "cd ./lighthouse-viewer && yarn install",
     "build-all": "gulp && npm run build-cli && npm run build-extension && npm run build-viewer",
     "build-cli": "cd ./lighthouse-cli && npm run build",
     "build-extension": "cd ./lighthouse-extension && npm run build",
