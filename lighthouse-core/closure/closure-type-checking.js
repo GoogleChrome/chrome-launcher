@@ -48,25 +48,26 @@ gulp.task('compile-report', () => {
     warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
     jscomp_error: [
       'checkTypes',
+      'missingProperties',
+      'accessControls',
+      'const',
+      'visibility',
+
+      // This is *very* strict, so we can move back to a warning if needed.
+      'reportUnknownTypes',
     ],
     jscomp_warning: [
       // https://github.com/google/closure-compiler/wiki/Warnings
-      'accessControls',
       'checkRegExp',
-      'const',
-      'reportUnknownTypes',
-      'missingProperties',
       'missingReturn',
       'strictModuleDepCheck',
       'typeInvalidation',
       'undefinedNames',
-      'visibility',
 
       'checkDebuggerStatement',
       'externsValidation',
       'uselessCode',
       'ambiguousFunctionDecl',
-      'checkTypes',
       'es3',
       'es5Strict',
       'globalThis',
