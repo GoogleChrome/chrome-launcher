@@ -58,6 +58,19 @@ describe('CategoryRenderer', () => {
     assert.ok(score.classList.contains(`lh-score__value--${audit.result.scoringMode}`));
   });
 
+  it('renders an audit debug str when appropriate', () => {
+    const audit1 = renderer._renderAudit({
+      scoringMode: 'binary', score: 0,
+      result: {helpText: '', debugString: 'Debug string'},
+    });
+    assert.ok(audit1.querySelector('.lh-debug'));
+
+    const audit2 = renderer._renderAudit({
+      scoringMode: 'binary', score: 0, result: {helpText: ''},
+    });
+    assert.ok(!audit2.querySelector('.lh-debug'));
+  });
+
   it('renders a category', () => {
     const category = sampleResults.reportCategories[0];
     const categoryDOM = renderer.render(category);
@@ -91,7 +104,7 @@ describe('CategoryRenderer', () => {
       assert.equal(failedAudits.length, 7);
     });
 
-    it('doesnt create a pased section if there were 0 passed', () => {
+    it('doesnt create a passed section if there were 0 passed', () => {
       const category = JSON.parse(JSON.stringify(sampleResults.reportCategories[0]));
       category.audits.forEach(audit => audit.score = 0);
       const elem = renderer.render(category);

@@ -17,6 +17,7 @@
  :root {
   --text-font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   --body-font-size: 13px;
+  --body-line-height: 1.5;
   --default-padding: 16px;
 
   --secondary-text-color: #565656;
@@ -243,6 +244,12 @@ body {
 
 .lh-audit > .lh-score {
   font-size: 16px;
+}
+
+.lh-debug {
+  margin-top: calc(var(--default-padding) / 2);
+  margin-left: calc(var(--lh-audit-score-width) + var(--lh-score-margin));
+  color: var(--fail-color);
 }
 
 /* Report */

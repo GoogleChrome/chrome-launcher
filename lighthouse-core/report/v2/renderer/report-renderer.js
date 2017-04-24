@@ -93,6 +93,7 @@ if (typeof module !== 'undefined' && module.exports) {
  *     score: number,
  *     result: {
  *       description: string,
+ *       debugString: string,
  *       displayValue: string,
  *       helpText: string,
  *       score: (number|boolean),

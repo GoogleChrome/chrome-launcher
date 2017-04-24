@@ -79,6 +79,11 @@ class CategoryRenderer {
       title += ` (target: ${audit.result.optimalValue})`;
     }
 
+    if (audit.result.debugString) {
+      const debugStrEl = tmpl.appendChild(this._dom.createElement('div', 'lh-debug'));
+      debugStrEl.textContent = audit.result.debugString;
+    }
+
     // Append audit details to header section so the entire audit is within a <details>.
     const header = /** @type {!HTMLDetailsElement} */ (this._dom.find('.lh-score__header', tmpl));
     header.open = audit.score < 100; // expand failed audits
@@ -153,8 +158,10 @@ class CategoryRenderer {
       element.appendChild(this._renderAudit(audit));
     }
 
-    // don't create a passed section if there are no passed
-    if (!passedAudits.length) return element;
+    // Don't create a passed section if there are no passed.
+    if (!passedAudits.length) {
+      return element;
+    }
 
     const passedElem = this._dom.createElement('details', 'lh-passed-audits');
     const passedSummary = this._dom.createElement('summary', 'lh-passed-audits-summary');
