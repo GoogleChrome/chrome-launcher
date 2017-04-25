@@ -24,3 +24,92 @@
     </details>
   </div>
 </template>
+
+<!-- Lighthouse score gauge -->
+<template id="tmpl-lh-gauge">
+  <style>
+    .lh-gauge {
+      --circle-size: 80px;
+      --circle-size-half: calc(var(--circle-size) / 2);
+      --circle-background: #eee;
+      --circle-border-width: 8px;
+      --inset-size: calc(var(--circle-size) - var(--circle-border-width));
+      --inset-color: #fff;
+      --transition-length: 1s;
+      width: var(--circle-size);
+      height: var(--circle-size);
+      background-color: var(--circle-background);
+      border-radius: 50%;
+    }
+    .lh-gauge--pass {
+      --circle-color: var(--pass-color);
+      color: var(--circle-color);
+    }
+    .lh-gauge--average {
+      --circle-color: var(--average-color);
+      color: var(--circle-color);
+    }
+    .lh-gauge--fail {
+      --circle-color: var(--fail-color);
+      color: var(--circle-color);
+    }
+    .lh-gauge__mask,
+    .lh-gauge__fill {
+      width: var(--circle-size);
+      height: var(--circle-size);
+      position: absolute;
+      transition: transform var(--transition-length);
+      border-radius: 50%;
+    }
+    .lh-gauge__mask {
+      clip: rect(0px, var(--circle-size), var(--circle-size), var(--circle-size-half));
+    }
+    .lh-gauge__mask .lh-gauge__fill {
+      clip: rect(0px, var(--circle-size-half), var(--circle-size), 0px);
+      background-color: var(--circle-color);
+      backface-visibility: hidden;
+    }
+    .lh-gauge__percentage {
+      --spacer: calc((var(--circle-size) - var(--inset-size)) / 2);
+      width: var(--inset-size);
+      height: var(--inset-size);
+      position: absolute;
+      margin-left: var(--spacer);
+      margin-top: var(--spacer);
+      background-color: var(--inset-color);
+      border-radius: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: calc(var(--circle-size) / 3);
+    }
+    .lh-gauge__wrapper {
+      display: inline-flex;
+      align-items: center;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      flex: 1;
+    }
+    .lh-gauge__label {
+      font-size: 16px;
+      margin-top: var(--default-padding);
+      white-space: nowrap;
+    }
+  </style>
+  <a href="#" class="lh-gauge__wrapper">
+    <div class="lh-gauge" data-progress="0">
+      <div class="lh-gauge__circle">
+        <div class="lh-gauge__mask lh-gauge__mask--full">
+          <div class="lh-gauge__fill"></div>
+        </div>
+        <div class="lh-gauge__mask lh-gauge__mask--half">
+          <div class="lh-gauge__fill"></div>
+          <div class="lh-gauge__fill lh-gauge__fill--fix"></div>
+        </div>
+      </div>
+      <div class="lh-gauge__percentage"></div>
+    </div>
+    <div class="lh-gauge__label"><!-- fill me --></div>
+  </a>
+</template>

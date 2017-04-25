@@ -69,6 +69,13 @@ describe('DOM', () => {
     it('fails when a template context isn\'t provided', () => {
       assert.throws(() => dom.cloneTemplate('#tmpl-lh-audit-score'));
     });
+
+    it('does not inject duplicate styles', () => {
+      const clone = dom.cloneTemplate('#tmpl-lh-gauge', dom.document());
+      const clone2 = dom.cloneTemplate('#tmpl-lh-gauge', dom.document());
+      assert.ok(clone.querySelector('style'));
+      assert.ok(!clone2.querySelector('style'));
+    });
   });
 
   describe('createSpanFromMarkdown', () => {

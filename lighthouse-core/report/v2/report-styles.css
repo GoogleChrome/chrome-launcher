@@ -45,6 +45,7 @@ body {
   font-size: var(--body-font-size);
   margin: 0;
   line-height: var(--body-line-height);
+  scroll-behavior: smooth;
 }
 
 [hidden] {
@@ -260,6 +261,11 @@ body {
 
 .lh-report {
   padding: var(--default-padding);
+}
+
+.lh-scores-header {
+  display: flex;
+  margin: var(--default-padding) 0 calc(var(--default-padding) * 2) 0;
 }
 
 .lh-category {

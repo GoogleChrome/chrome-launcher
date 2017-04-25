@@ -49,6 +49,8 @@ describe('ReportRenderer V2', () => {
     it('should render a report', () => {
       const output = renderer.renderReport(sampleResults);
       assert.ok(output.classList.contains('lh-report'));
+      assert.equal(output.querySelectorAll('.lh-gauge').length,
+          sampleResults.reportCategories.length, 'renders category gauges');
     });
 
     it('should render an exception for invalid input', () => {
