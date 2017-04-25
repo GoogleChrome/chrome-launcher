@@ -1,5 +1,7 @@
 # Lighthouse Viewer
 
+Online at https://googlechrome.github.io/lighthouse/viewer/
+
 ## Development
 
 * `npm i`

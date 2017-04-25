@@ -1,5 +1,7 @@
 # Lighthouse Metrics Analysis
 
+Online at https://googlechrome.github.io/lighthouse/plots/
+
 For context and roadmap, please see issue:
 https://github.com/GoogleChrome/lighthouse/issues/1924
 
