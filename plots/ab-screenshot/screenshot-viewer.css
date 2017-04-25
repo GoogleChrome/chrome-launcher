@@ -1,0 +1,175 @@
+/**
+ * Copyright 2017 Google Inc. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --header-height: 55px;
+}
+
+body {
+  font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+  color: #555;
+  width: 100%;
+  margin-top: calc(var(--header-height) + 5px);
+  margin-bottom: 300px; /* Leave room at the bottom of the page for the image popover */
+}
+
+.legend {
+  display: inline-block;
+  margin-left: 100px;
+  padding-top: 6px;
+}
+
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: var(--header-height);
+  width: 100%;
+  color: white;
+  padding: 0 15px;
+  font-size: 16px;
+  background-color: #3367d6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .28);
+  z-index: 1;
+}
+
+.settings {
+  position: absolute;
+  right: 40px;
+  top: 20px;
+}
+
+.checkbox {
+  -webkit-appearance: none;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 12px;
+  height: 12px;
+  outline: 0;
+}
+
+.checkbox::after {
+  position: absolute;
+  content: '';
+  width: 12px;
+  height: 12px;
+  -webkit-mask: 0 0 / 12px 12px no-repeat;
+  -webkit-mask-image: url(./images/checkbox_off_2x.png);
+  background-color: #e5e8ee;
+}
+
+.checkbox:focus::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 1px;
+}
+
+.checkbox:checked::after {
+  -webkit-mask-image: url(./images/checkbox_on_2x.png);
+  background-color: #e5e8ee;
+}
+
+.screenshot-image {
+  margin: 4px;
+  width: 50px;
+  border: 1px solid;
+}
+
+#image-popover {
+  position: fixed;
+  outline: 1px solid black;
+}
+
+#image-popover img {
+  width: 200px;
+}
+
+h1 {
+  margin: 0;
+  font-weight: 300;
+  text-align: center;
+  display: inline-block;
+}
+
+.screenshot-container {
+  display: inline-block
+}
+
+.site-container {
+  margin-bottom: 10px;
+}
+
+.site-name {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.screenshot-header {
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.screenshot-header-label.is-fcp {
+  background: orange;
+  color: white;
+}
+
+.screenshot-header-label.is-fmp {
+  background: #7115a0;
+  color: white;
+}
+
+.screenshot-header-label.is-vc85 {
+  background: lightgreen;
+  color: black;
+}
+
+.screenshot-header-label.is-vc100 {
+  background: green;
+  color: white;
+}
+
+.timeline-container {
+  position: relative;
+  white-space: nowrap;
+}
+
+.x-axis-container {
+  position: relative;
+}
+
+.x-axis-marker {
+  position: absolute;
+}
+
+.run-container {
+  margin-bottom: 10px;
+}
+
+.hidden {
+  visibility: hidden;
+}

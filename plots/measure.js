@@ -184,7 +184,7 @@ function singleRunAnalysis(url, id, {ignoreRun}) {
   if (!ignoreRun) {
     mkdirp.sync(runPath);
   }
-  const outputPath = path.resolve(runPath, 'lighthouse.json');
+  const outputPath = path.resolve(runPath, constants.LIGHTHOUSE_RESULTS_FILENAME);
   const assetsPath = path.resolve(runPath, 'assets');
   return analyzeWithLighthouse(url, outputPath, assetsPath, {ignoreRun});
 }

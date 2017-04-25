@@ -96,7 +96,7 @@ function prepareAssets(artifacts, audits) {
     return chain.then(_ => artifacts.requestScreenshots(trace))
       .then(screenshots => {
         const traceData = Object.assign({}, trace);
-        const html = screenshotDump(screenshots);
+        const screenshotsHTML = screenshotDump(screenshots);
 
         if (audits) {
           const evts = new Metrics(traceData.traceEvents, audits).generateFakeEvents();
@@ -105,7 +105,8 @@ function prepareAssets(artifacts, audits) {
         assets.push({
           traceData,
           devtoolsLog,
-          html
+          screenshotsHTML,
+          screenshots
         });
       });
   }, Promise.resolve())
@@ -130,9 +131,13 @@ function saveAssets(artifacts, audits, pathWithBasename) {
       fs.writeFileSync(devtoolsLogFilename, JSON.stringify(data.devtoolsLog, null, 2));
       log.log('devtools log saved to disk', devtoolsLogFilename);
 
-      const screenshotsFilename = `${pathWithBasename}-${index}.screenshots.html`;
-      fs.writeFileSync(screenshotsFilename, data.html);
-      log.log('screenshots saved to disk', screenshotsFilename);
+      const screenshotsHTMLFilename = `${pathWithBasename}-${index}.screenshots.html`;
+      fs.writeFileSync(screenshotsHTMLFilename, data.screenshotsHTML);
+      log.log('screenshots saved to disk', screenshotsHTMLFilename);
+
+      const screenshotsJSONFilename = `${pathWithBasename}-${index}.screenshots.json`;
+      fs.writeFileSync(screenshotsJSONFilename, JSON.stringify(data.screenshots, null, 2));
+      log.log('screenshots saved to disk', screenshotsJSONFilename);
     });
   });
 }

@@ -41,7 +41,7 @@ describe('asset-saver helper', () => {
       requestScreenshots: () => Promise.resolve([]),
     };
     return assetSaver.prepareAssets(artifacts).then(assets => {
-      assert.ok(/<!doctype/gim.test(assets[0].html));
+      assert.ok(/<!doctype/gim.test(assets[0].screenshotsHTML));
     });
   });
 
@@ -74,12 +74,20 @@ describe('asset-saver helper', () => {
       fs.unlinkSync(filename);
     });
 
-    it('screenshots file saved to disk with data', () => {
-      const ssFilename = 'the_file-0.screenshots.html';
-      const ssFileContents = fs.readFileSync(ssFilename, 'utf8');
+    it('screenshots html file saved to disk with data', () => {
+      const ssHTMLFilename = 'the_file-0.screenshots.html';
+      const ssFileContents = fs.readFileSync(ssHTMLFilename, 'utf8');
       assert.ok(/<!doctype/gim.test(ssFileContents));
-      assert.ok(ssFileContents.includes('{"timestamp":674089419.919'));
-      fs.unlinkSync(ssFilename);
+      const expectedScreenshotContent = '{"timestamp":674089419.919';
+      assert.ok(ssFileContents.includes(expectedScreenshotContent), 'unexpected screenshot html');
+      fs.unlinkSync(ssHTMLFilename);
+    });
+
+    it('screenshots json file saved to disk with data', () => {
+      const ssJSONFilename = 'the_file-0.screenshots.json';
+      const ssContents = JSON.parse(fs.readFileSync(ssJSONFilename, 'utf8'));
+      assert.equal(ssContents[0].timestamp, 674089419.919, 'unexpected screenshot json');
+      fs.unlinkSync(ssJSONFilename);
     });
   });
 

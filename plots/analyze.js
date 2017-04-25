@@ -19,12 +19,13 @@
 const fs = require('fs');
 const path = require('path');
 
+const opn = require('opn');
+
 const constants = require('./constants');
 const utils = require('./utils');
 const Metrics = require('../lighthouse-core/lib/traces/pwmetrics-events');
 
 const GENERATED_RESULTS_PATH = path.resolve(constants.OUT_PATH, 'generatedResults.js');
-const LIGHTHOUSE_REPORT_FILENAME = 'lighthouse.json';
 
 /**
  * Analyzes output generated from the measure step and
@@ -44,6 +45,8 @@ function main() {
     GENERATED_RESULTS_PATH,
     `var generatedResults = ${JSON.stringify(generatedResults)}`
   );
+  console.log('Opening the charts web page...');  // eslint-disable-line no-console
+  opn(path.resolve(__dirname, 'index.html'));
 }
 
 main();
@@ -57,11 +60,11 @@ function analyzeSite(sitePath) {
   console.log('Analyzing', sitePath); // eslint-disable-line no-console
   const runResults = [];
   fs.readdirSync(sitePath).forEach(runDir => {
-    const lighthouseReportPath = path.resolve(sitePath, runDir, LIGHTHOUSE_REPORT_FILENAME);
-    if (!utils.isFile(lighthouseReportPath)) {
+    const resultsPath = path.resolve(sitePath, runDir, constants.LIGHTHOUSE_RESULTS_FILENAME);
+    if (!utils.isFile(resultsPath)) {
       return;
     }
-    const metrics = readResult(lighthouseReportPath);
+    const metrics = readResult(resultsPath);
     console.log(`Metric for ${runDir}: ${JSON.stringify(metrics)}`); // eslint-disable-line no-console
     runResults[runDir] = {
       runId: runDir,
