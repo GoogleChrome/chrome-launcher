@@ -93,6 +93,12 @@ class Runner {
         return artifacts;
       });
 
+
+      run = run.then(artifacts => {
+        log.log('status', 'Analyzing and running audits...');
+        return artifacts;
+      });
+
       // Run each audit sequentially, the auditResults array has all our fine work
       const auditResults = [];
       for (const audit of config.audits) {
@@ -125,6 +131,8 @@ class Runner {
     // Format and aggregate results before returning.
     run = run
       .then(runResults => {
+        log.log('status', 'Generating results...');
+
         const resultsById = runResults.auditResults.reduce((results, audit) => {
           results[audit.name] = audit;
           return results;
@@ -202,6 +210,7 @@ class Runner {
     // Fill remaining audit result fields.
     }).then(auditResult => Audit.generateAuditResult(audit, auditResult))
     .catch(err => {
+      log.warn(audit.meta.name, `Caught exception: ${err.message}`);
       if (err.fatal) {
         throw err;
       }
