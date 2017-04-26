@@ -176,7 +176,7 @@
       }
     }, {
       "name": "User can be prompted to Add to Homescreen",
-      "description": "While users can manually add your site to their homescreen in the browser menu, the [prompt (aka app install banner)](https://developers.google.com/web/updates/2015/03/increasing-engagement-with-app-install-banners-in-chrome-for-android) will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
+      "description": "While users can manually add your site to their homescreen in the browser menu, the [prompt (aka app install banner)](https://developers.google.com/web/fundamentals/engage-and-retain/app-install-banners/) will proactively prompt the user to install the app if the below requirements are met and the user has visited your site at least twice (with at least five minutes between visits).",
       "see": "https://github.com/GoogleChrome/lighthouse/issues/23",
       "audits": {
         "service-worker": {
