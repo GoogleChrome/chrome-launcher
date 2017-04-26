@@ -12,13 +12,14 @@ env:
     - secure: WNrQ6K8eS8/lVml6qz031oV3HQM0M3WB1+1K9DTbjlVSuYgzu3tLGCRWn67tF8+3AQWIRDXyHByONrGinWTm1teZA9SaTzuVhMrO7CHdsWTWsypQ0UqJ6H4mH/wJwJv/kW6OtQSQJGUTF8kEz33nDQVW+iFWxJx3Ow4egya6cb9D89TnUJ0FBLxYYS2DjNTbIMVBMBqSGyrd/Ww5CoYzKR96Y9jby5IId9TFFJqk3qFfXVh3Diy5TX8hUvqUpD48cfQpxE8cLZ/uOXtRsHjwMvekCSG7fNMlbQ9nJ4MmnIwhdvFrKbx1xS7g5FdRfyN+q3QcDxskytWYmtzREoRjU3N6ao8IGsXG88yXpK1bdGQ2BdNAg4IltQDGMKMzVC37sAFmXvI9S00TmWQOoAu5D4KuW9Gchc+syCpZ+umqPGePgfGryWBt0slOkFi3mixavL0kAr1kAbWbeGFBLEeX80NFFm+F2qOMuwPSsmVJ8bsgsEp0DkceyggAqb9VDyTq9ci8l/pTGTQfqbEBcXgS19BY2zDldvncfmHFisd13zHOYkqn+pi+Ta87xlskL93FOxQFn14avJo/5iNa2HmEh8vq/jBbocVr+Tt+T+OMzN/RFGBfzqU4T2K3rj9hG1cCgZFuVm+sdSuulzeUjV7y3rDAT3eAUwBnERCzwDhCpT0=
     - secure: UdWqkZHhU2PDMKleiL386FHI6S+N0PETDd5RWPBNM/YvMREWHyWeb3vZwsMqSVri1DNk8SqI2d0PC4/jLGKchRBqlO4+smuw9f09ihn+mGI67GFsyJu6UQ5/nz5eiUKx2ZRsuB8t8BbCGiOWh+UQUuHTEgAi8ndL+ml+Vy1XRpqbT49rOTKcr+G/4J+TyEjq+wRrpZMZmhYeX0EZAcofL8KYvgbV5jbkOnQV2oI0cyCO1FQxnIz9yopvwrMlKz/1jmKiRyJOj0YaKSJ5lWs0G2RFsWmXrEAgDAlOqoJ2QCTCM5M1Fnh+0oWPholN7X4Nj/USqxRlcGaUwDLh5RhcDlrFv+wC9iBIDIay3K1/IKndikkO8OP+tCYDlx2VQRX50LPUTEQzrXEbD6pFUl1ezLQCZPejX7R/HI5rOr8WcmZzKXtl1MP0h8YX1e9HX7gXBUB0RGwnTV/P+Q6WEcxN32T/xdwbYi/YQsXfzeL7fzF5PI5LnaAc141lhcUiILs9HwnEyB7gWWLlut+GNKfse6DrNkKc3I12TVVMbHWuP2waGuc1EMcMCyC/9lb17sk5q1gbIbAsSWki9mHtrJsk0KtriKY/uOFiK5W6Dno1ITbMqbTvIelMKgQPkjYmvqyLDhADRXQz9kxlSmxcdTG5dB9lOm6ubFdRmWEPhPumq4I=
 cache:
+  yarn: true
   directories:
     - node_modules
     - chrome-linux
     - lighthouse-extension/node_modules
     - lighthouse-viewer/node_modules
 install:
-  - npm install
+  - yarn
   - npm run install-all
 before_script:
   - gem install travis-artifacts
