@@ -46,11 +46,12 @@ function createSWRegistration(id, url, isDeleted) {
   };
 }
 
-function createActiveWorker(id, url, controlledClients) {
+function createActiveWorker(id, url, controlledClients, status = 'activated') {
   return {
     registrationId: id,
     scriptURL: url,
     controlledClients,
+    status,
   };
 }
 
@@ -199,9 +200,12 @@ describe('Multiple tab check', () => {
       'ServiceWorker.workerRegistrationUpdated': {
         registrations: []
       },
+    });
+
+    driverStub.on = createOnceStub({
       'ServiceWorker.workerVersionUpdated': {
         versions: []
-      }
+      },
     });
 
     return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
@@ -223,9 +227,12 @@ describe('Multiple tab check', () => {
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
       },
+    });
+
+    driverStub.on = createOnceStub({
       'ServiceWorker.workerVersionUpdated': {
         versions
-      }
+      },
     });
 
     return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
@@ -244,10 +251,13 @@ describe('Multiple tab check', () => {
     driverStub.once = createOnceStub({
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
-      },
+      }
+    });
+
+    driverStub.on = createOnceStub({
       'ServiceWorker.workerVersionUpdated': {
         versions
-      }
+      },
     });
 
     return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl)
@@ -267,10 +277,46 @@ describe('Multiple tab check', () => {
       'ServiceWorker.workerRegistrationUpdated': {
         registrations
       },
+    });
+
+    driverStub.on = createOnceStub({
       'ServiceWorker.workerVersionUpdated': {
         versions
-      }
+      },
     });
+
+    return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
+  });
+
+  it('will wait for serviceworker to be activated', () => {
+    const pageUrl = 'https://example.com/';
+    const swUrl = `${pageUrl}sw.js`;
+    const registrations = [createSWRegistration(1, pageUrl)];
+    const versions = [createActiveWorker(1, swUrl, [], 'installing')];
+
+    driverStub.once = createOnceStub({
+      'ServiceWorker.workerRegistrationUpdated': {
+        registrations
+      },
+    });
+
+    driverStub.on = (eventName, cb) => {
+      if (eventName === 'ServiceWorker.workerVersionUpdated') {
+        cb({versions});
+
+        setTimeout(() => {
+          cb({
+            versions: [
+              createActiveWorker(1, swUrl, [], 'activated'),
+            ]
+          });
+        }, 1000);
+
+        return;
+      }
+
+      throw Error(`Stub not implemented: ${eventName}`);
+    };
 
     return driverStub.assertNoSameOriginServiceWorkerClients(pageUrl);
   });
