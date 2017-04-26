@@ -235,11 +235,13 @@ right corner and signing in to GitHub.
 ### Setup
 
 ```sh
+# yarn should be installed, first
+
 git clone https://github.com/GoogleChrome/lighthouse
 
 cd lighthouse
 yarn install-all
-gulp # to precompile the handlebar templates.
+yarn build-all
 
 # The CLI is authored in TypeScript and requires compilation.
 # If you need to make changes to the CLI, run the TS compiler in watch mode:
