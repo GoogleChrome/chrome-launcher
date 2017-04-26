@@ -176,6 +176,10 @@ class Log {
     return '\x1b[1m';
   }
 
+  static get dim() {
+    return '\x1b[2m';
+  }
+
   static get tick() {
     return isWindows ? '\u221A' : '✓';
   }

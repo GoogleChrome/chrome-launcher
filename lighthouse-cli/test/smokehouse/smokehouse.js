@@ -83,6 +83,7 @@ function runLighthouse(url, configPath, saveAssetsPath) {
     }
 
     runCount++;
+    console.log(`${log.dim}$ ${command} ${args.join(' ')} ${log.reset}`);
     runResults = spawnSync(command, args, {encoding: 'utf8', stdio: ['pipe', 'pipe', 'inherit']});
   } while (runResults.status === PROTOCOL_TIMEOUT_EXIT_CODE && runCount <= RETRIES);
 
