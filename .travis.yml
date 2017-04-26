@@ -13,6 +13,7 @@ env:
     - secure: UdWqkZHhU2PDMKleiL386FHI6S+N0PETDd5RWPBNM/YvMREWHyWeb3vZwsMqSVri1DNk8SqI2d0PC4/jLGKchRBqlO4+smuw9f09ihn+mGI67GFsyJu6UQ5/nz5eiUKx2ZRsuB8t8BbCGiOWh+UQUuHTEgAi8ndL+ml+Vy1XRpqbT49rOTKcr+G/4J+TyEjq+wRrpZMZmhYeX0EZAcofL8KYvgbV5jbkOnQV2oI0cyCO1FQxnIz9yopvwrMlKz/1jmKiRyJOj0YaKSJ5lWs0G2RFsWmXrEAgDAlOqoJ2QCTCM5M1Fnh+0oWPholN7X4Nj/USqxRlcGaUwDLh5RhcDlrFv+wC9iBIDIay3K1/IKndikkO8OP+tCYDlx2VQRX50LPUTEQzrXEbD6pFUl1ezLQCZPejX7R/HI5rOr8WcmZzKXtl1MP0h8YX1e9HX7gXBUB0RGwnTV/P+Q6WEcxN32T/xdwbYi/YQsXfzeL7fzF5PI5LnaAc141lhcUiILs9HwnEyB7gWWLlut+GNKfse6DrNkKc3I12TVVMbHWuP2waGuc1EMcMCyC/9lb17sk5q1gbIbAsSWki9mHtrJsk0KtriKY/uOFiK5W6Dno1ITbMqbTvIelMKgQPkjYmvqyLDhADRXQz9kxlSmxcdTG5dB9lOm6ubFdRmWEPhPumq4I=
 cache:
   yarn: true
+  bundler: true
   directories:
     - node_modules
     - chrome-linux
