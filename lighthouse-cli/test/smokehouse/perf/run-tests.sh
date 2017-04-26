@@ -13,7 +13,7 @@ if [[ "$CI" = true ]]; then
   save_assets="--save-assets-path=perf.json"
 fi
 
-npm run -s smokehouse -- --config-path=$config --expectations-path=$expectations "$save_assets"
+yarn smokehouse -- --config-path=$config --expectations-path=$expectations "$save_assets"
 exit_code=$?
 
 # kill test servers

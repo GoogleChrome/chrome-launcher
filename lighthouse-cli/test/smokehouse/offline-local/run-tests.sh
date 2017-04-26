@@ -8,7 +8,7 @@ config="lighthouse-core/config/default.js"
 expectations="lighthouse-cli/test/smokehouse/offline-local/offline-expectations.js"
 
 # run smoketest, expecting results found in offline-expectations
-npm run -s smokehouse -- --config-path=$config --expectations-path=$expectations
+yarn smokehouse -- --config-path=$config --expectations-path=$expectations
 exit_code=$?
 
 # kill test servers

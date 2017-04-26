@@ -8,7 +8,7 @@ config="lighthouse-core/config/default.js"
 expectations="lighthouse-cli/test/smokehouse/dobetterweb/dbw-expectations.js"
 
 # run smoketest on DBW test page.
-npm run -s smokehouse -- --config-path=$config --expectations-path=$expectations
+yarn smokehouse -- --config-path=$config --expectations-path=$expectations
 exit_code=$?
 
 # kill test servers

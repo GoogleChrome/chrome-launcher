@@ -60,7 +60,7 @@ echo "Bump the versions in extension/app/manifest.json and package.json"
 # * Test err'thing *
 echo "Test the CLI."
 lighthouse --perf "chrome://version"
-yarn run smoke
+yarn smoke
 echo "Test the extension"
 
 echo "Test a fresh local install"
@@ -93,7 +93,7 @@ irish-pub; pkgfiles;
 
 echo "ship it"
 npm publish
-yarn run deploy-viewer
+yarn deploy-viewer
 
 echo "Use the GitHub web interface to tag the release"
 echo "Generate the release notes, and update the release page"

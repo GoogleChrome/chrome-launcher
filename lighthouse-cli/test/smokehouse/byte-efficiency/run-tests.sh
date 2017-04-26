@@ -7,7 +7,7 @@ sleep 0.5s
 config="lighthouse-core/config/default.js"
 expectations="lighthouse-cli/test/smokehouse/byte-efficiency/expectations.js"
 
-npm run -s smokehouse -- --config-path=$config --expectations-path=$expectations
+yarn smokehouse -- --config-path=$config --expectations-path=$expectations
 exit_code=$?
 
 # kill test servers

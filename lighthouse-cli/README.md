@@ -1,11 +1,11 @@
 One time setup:
 
 ```sh
-npm i
+yarn
 ```
 
 Live dev:
 
 ```sh
-npm run dev
+yarn dev
 ```

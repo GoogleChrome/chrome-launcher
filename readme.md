@@ -238,13 +238,12 @@ right corner and signing in to GitHub.
 git clone https://github.com/GoogleChrome/lighthouse
 
 cd lighthouse
-npm install
-npm run install-all
+yarn install-all
 gulp # to precompile the handlebar templates.
 
 # The CLI is authored in TypeScript and requires compilation.
 # If you need to make changes to the CLI, run the TS compiler in watch mode:
-# cd lighthouse-cli && npm run dev
+# cd lighthouse-cli && yarn dev
 ```
 
 See [Contributing](./CONTRIBUTING.md) for more information.
@@ -309,15 +308,15 @@ Some basic unit tests forked are in `/test` and run via mocha. eslint is also ch
 
 ```sh
 # lint and test all files
-npm test
+yarn test
 
 # watch for file changes and run tests
 #   Requires http://entrproject.org : brew install entr
-npm run watch
+yarn watch
 
 ## run linting and unit tests separately
-npm run lint
-npm run unit
+yarn lint
+yarn unit
 ```
 
 ## Lighthouse as trace processor

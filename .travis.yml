@@ -20,21 +20,21 @@ cache:
     - lighthouse-viewer/node_modules
 install:
   - yarn
-  - npm run install-all
+  - yarn install-all
 before_script:
   - gem install travis-artifacts
   - export DISPLAY=:99.0
   - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - ./lighthouse-core/scripts/download-chrome.sh
-  - npm run build-all
+  - yarn build-all
 script:
-  - npm run lint
-  - npm run unit
-  - npm run closure
-  - npm run smoke
-  - npm run smokehouse
+  - yarn lint
+  - yarn unit
+  - yarn closure
+  - yarn smoke
+  - yarn smokehouse
 after_success:
-  - npm run coveralls
+  - yarn coveralls
 after_failure:
   - grep 'No screenshots' perf.json && travis-artifacts upload --path perf-0.trace.json

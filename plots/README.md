@@ -16,15 +16,15 @@ You need to build lighthouse first.
 ```
 # View all commands
 $ cd plots
-$ npm run
+$ yarn run
 
 # Run lighthouse to collect metrics data
-$ npm run measure
+$ yarn measure
 
 # Analyze the data to generate a summary file (i.e. out/generatedResults.js)
 # This will launch the charts web page in the browser
-$ npm run analyze
+$ yarn analyze
 
 # If you need to view the charts later
-$ npm run open
+$ yarn open
 ```

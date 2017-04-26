@@ -9,7 +9,7 @@
 ## Dev
 
 * `npm i`
-* `npm run watch`
+* `yarn watch`
 * Load `/app` as Unpacked extension.
 * Saved changes _should_ trigger a recompile followed by browsersync automatically refreshing the extension.
 * Scripts in `./app/src/` are browserified into `./app/scripts`.
@@ -17,7 +17,7 @@
 ## Manual Deploy to CWS
 
 * Be in lighthouse-extension-owners group
-* `npm run build`
+* `yarn build`
 * Verify that the extension in `dist` works.
 * Verify that `dist/manifest.json` bumps the version number vs what's on CWS.
 * `gulp package`
@@ -33,5 +33,5 @@
 
 * Install [web store api app](https://chrome.google.com/webstore/detail/web-store-api-sample-app/ndgidogppopohjpghapeojgoehfmflab)
   * Add dist folder
-* `npm run build`
+* `yarn build`
 * Use ID: `blipmdconlkpinefehnmjammfjpmpbjk`
