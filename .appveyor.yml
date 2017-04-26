@@ -13,22 +13,23 @@ build: off
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm install
-  - npm run install-all
+  - yarn
+  - yarn install-all
 
 before_test:
   - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
   - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe"
   - bash ./lighthouse-core/scripts/download-chrome.sh
-  - npm run build-all
+  - yarn build-all
 
 test_script:
   - node --version
   - npm --version
-  - npm run lint
-  - npm run unit
-  - npm run smoke
-  - npm run smokehouse
+  - yarn --version
+  - yarn lint
+  - yarn unit
+  - yarn smoke
+  - yarn smokehouse
 
 cache:
   #- chrome-win32 -> appveyor.yml,package.json
@@ -36,3 +37,4 @@ cache:
   - lighthouse-cli\node_modules -> appveyor.yml,package.json,lighthouse-cli\package.json
   - lighthouse-extension\node_modules -> appveyor.yml,package.json,lighthouse-extension\package.json
   - lighthouse-viewer\node_modules -> appveyor.yml,package.json,lighthouse-viewer\package.json
+  - "%LOCALAPPDATA%\\Yarn"
