@@ -50,7 +50,7 @@ class DOM {
 
   /**
    * @param {string} selector
-   * @param {!Document|!Element} context
+   * @param {!Node} context
    * @return {!DocumentFragment} A clone of the template content.
    * @throws {Error}
    */
@@ -71,6 +71,15 @@ class DOM {
     template.setAttribute('data-stamped', true);
 
     return clone;
+  }
+
+  /**
+   * Resets the "stamped" state of the templates.
+   */
+  resetTemplates() {
+    this.findAll('template[data-stamped]', this._document).forEach(t => {
+      t.removeAttribute('data-stamped');
+    });
   }
 
   /**
@@ -113,7 +122,7 @@ class DOM {
    * Guaranteed context.querySelector. Always returns an element or throws if
    * nothing matches query.
    * @param {string} query
-   * @param {!DocumentFragment|!Element} context
+   * @param {!Node} context
    * @return {!Element}
    */
   find(query, context) {
@@ -127,8 +136,8 @@ class DOM {
   /**
    * Helper for context.querySelectorAll. Returns an Array instead of a NodeList.
    * @param {string} query
-   * @param {!DocumentFragment|!Element} context
-   * @return {!Array<Element>}
+   * @param {!Node} context
+   * @return {!Array<!Element>}
    */
   findAll(query, context) {
     return Array.from(context.querySelectorAll(query));

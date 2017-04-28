@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All Rights Reserved.
+ * Copyright 2017 Google Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,18 @@
 
 'use strict';
 
-/* eslint-disable no-console */
-
 /**
  * Logs messages via a UI butter.
  */
 class Logger {
-  constructor(selector) {
+  /**
+   * @param {!Element} element
+   */
+  constructor(element) {
     /** @type {!Element} */
-    this.el = document.querySelector(selector);
+    this.el = element;
+    /** @private {?number} */
+    this._id = null;
   }
 
   /**
@@ -46,14 +49,18 @@ class Logger {
     }
   }
 
+  /**
+   * @param {string} msg
+   */
   warn(msg) {
     this.log('Warning: ' + msg);
-    console.warn(msg);
   }
 
+  /**
+   * @param {string} msg
+   */
   error(msg) {
     this.log(msg);
-    console.error(msg);
   }
 
   /**

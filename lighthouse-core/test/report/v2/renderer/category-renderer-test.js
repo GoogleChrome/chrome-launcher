@@ -20,6 +20,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const jsdom = require('jsdom');
+const Util = require('../../../../report/v2/renderer/util.js');
 const URL = require('../../../../lib/url-shim');
 const DOM = require('../../../../report/v2/renderer/dom.js');
 const DetailsRenderer = require('../../../../report/v2/renderer/details-renderer.js');
@@ -33,6 +34,8 @@ describe('CategoryRenderer', () => {
 
   before(() => {
     global.URL = URL;
+    global.Util = Util;
+
     const document = jsdom.jsdom(TEMPLATE_FILE);
     const dom = new DOM(document);
     const detailsRenderer = new DetailsRenderer(dom);
@@ -41,6 +44,7 @@ describe('CategoryRenderer', () => {
 
   after(() => {
     global.URL = undefined;
+    global.Util = undefined;
   });
 
   it('renders an audit', () => {

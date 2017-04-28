@@ -27,15 +27,49 @@ limitations under the License.
 <body class="lh-root">
   <noscript>Lighthouse report requires JavaScript. Please enable.</noscript>
   <div hidden>%%LIGHTHOUSE_TEMPLATES%%</div>
+
+  <main><!-- report populated here --></main>
+
+  <div id="lh-log"></div>
+
   <script>%%LIGHTHOUSE_JAVASCRIPT%%</script>
   <script>window.__LIGHTHOUSE_JSON__ = %%LIGHTHOUSE_JSON%%;</script>
   <script>
-    const dom = new DOM(document);
-    const detailsRenderer = new DetailsRenderer(dom);
-    const categoryRenderer = new CategoryRenderer(dom, detailsRenderer);
-    const renderer = new ReportRenderer(dom, categoryRenderer);
-    const reportElem = renderer.renderReport(window.__LIGHTHOUSE_JSON__);
-    document.body.appendChild(reportElem);
+    window.addEventListener('DOMContentLoaded', _ => {
+      const dom = new DOM(document);
+      const detailsRenderer = new DetailsRenderer(dom);
+      const categoryRenderer = new CategoryRenderer(dom, detailsRenderer);
+      const features = new ReportUIFeatures(dom);
+      const renderer = new ReportRenderer(dom, categoryRenderer, features);
+
+      const container = document.querySelector('main');
+      renderer.renderReport(window.__LIGHTHOUSE_JSON__, container);
+    });
+
+    document.addEventListener('lh-analytics', e => {
+      if (window.ga) {
+        ga(e.detail.cmd, e.detail.fields);
+      }
+    });
+
+    document.addEventListener('lh-log', e => {
+      const logger = new Logger(document.querySelector('#lh-log'));
+
+      switch (e.detail.cmd) {
+        case 'log':
+          logger.log(e.detail.msg);
+          break;
+        case 'warn':
+          logger.warn(e.detail.msg);
+          break;
+        case 'error':
+          logger.error(e.detail.msg);
+          break;
+        case 'hide':
+          logger.hide();
+          break;
+      }
+    });
   </script>
 </body>
 </html>

@@ -20,7 +20,7 @@
  * Generate a filenamePrefix of hostname_YYYY-MM-DD_HH-MM-SS
  * Date/time uses the local timezone, however Node has unreliable ICU
  * support, so we must construct a YYYY-MM-DD date format manually. :/
- * @param {!Object} results
+ * @param {!{url: string, generatedTime: string}} results
  * @returns string
  */
 function getFilenamePrefix(results) {

@@ -20,8 +20,12 @@ const fs = require('fs');
 
 const REPORT_TEMPLATE = fs.readFileSync(__dirname + '/report-template.html', 'utf8');
 const REPORT_JAVASCRIPT = [
+  fs.readFileSync(__dirname + '/renderer/util.js', 'utf8'),
   fs.readFileSync(__dirname + '/renderer/dom.js', 'utf8'),
   fs.readFileSync(__dirname + '/renderer/details-renderer.js', 'utf8'),
+  fs.readFileSync(__dirname + '/../../lib/file-namer.js', 'utf8'),
+  fs.readFileSync(__dirname + '/renderer/logger.js', 'utf8'),
+  fs.readFileSync(__dirname + '/renderer/report-features.js', 'utf8'),
   fs.readFileSync(__dirname + '/renderer/category-renderer.js', 'utf8'),
   fs.readFileSync(__dirname + '/renderer/report-renderer.js', 'utf8'),
 ].join(';\n');

@@ -32,7 +32,7 @@ gulp.task('compile-report', () => {
   return gulp.src([
     // externs
     'closure/third_party/commonjs.js',
-
+    'lib/filer-namer.js',
     'report/v2/renderer/*.js',
   ])
 

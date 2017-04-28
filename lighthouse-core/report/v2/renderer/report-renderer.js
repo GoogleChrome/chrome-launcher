@@ -22,30 +22,47 @@
  * Dummy text for ensuring report robustness: </script> pre$`post %%LIGHTHOUSE_JSON%%
  */
 
-/* globals self */
+/* globals self, Util */
 
 class ReportRenderer {
   /**
    * @param {!DOM} dom
    * @param {!CategoryRenderer} categoryRenderer
+   * @param {ReportUIFeatures=} uiFeatures
    */
-  constructor(dom, categoryRenderer) {
+  constructor(dom, categoryRenderer, uiFeatures = null) {
     /** @private {!DOM} */
     this._dom = dom;
     /** @private {!CategoryRenderer} */
     this._categoryRenderer = categoryRenderer;
+    /** @private {!Document|!Element} */
+    this._templateContext = this._dom.document();
+    /** @private {ReportUIFeatures} */
+    this._uiFeatures = uiFeatures;
   }
 
   /**
    * @param {!ReportRenderer.ReportJSON} report
-   * @return {!Element}
+   * @param {!Element} container Parent element to render the report into.
    */
-  renderReport(report) {
+  renderReport(report, container) {
+    container.textContent = ''; // Remove previous report.
+
+    let element;
     try {
-      return this._renderReport(report);
+      element = container.appendChild(this._renderReport(report));
+
+      // Hook in JS features and page-level event listeners after the report
+      // is in the document.
+      if (this._uiFeatures) {
+        this._uiFeatures.initFeatures(report);
+      }
     } catch (/** @type {!Error} */ e) {
-      return this._renderException(e);
+      container.textContent = '';
+      element = container.appendChild(this._renderException(e));
     }
+
+    return /** @type {!Element} **/ (element);
   }
 
   /**
@@ -54,6 +71,7 @@ class ReportRenderer {
    * @param {!Document|!Element} context
    */
   setTemplateContext(context) {
+    this._templateContext = context;
     this._categoryRenderer.setTemplateContext(context);
   }
 
@@ -69,17 +87,91 @@ class ReportRenderer {
 
   /**
    * @param {!ReportRenderer.ReportJSON} report
+   * @return {!DocumentFragment}
+   */
+  _renderReportHeader(report) {
+    const header = this._dom.cloneTemplate('#tmpl-lh-heading', this._templateContext);
+    this._dom.find('.lh-config__timestamp', header).textContent =
+        Util.formatDateTime(report.generatedTime);
+    const url = this._dom.find('.lh-metadata__url', header);
+    url.href = report.url;
+    url.textContent = report.url;
+
+    const env = this._dom.find('.lh-env__items', header);
+    report.runtimeConfig.environment.forEach(runtime => {
+      const item = this._dom.cloneTemplate('#tmpl-lh-env__items', env);
+      this._dom.find('.lh-env__name', item).textContent = runtime.name;
+      this._dom.find('.lh-env__description', item).textContent = runtime.description;
+      this._dom.find('.lh-env__enabled', item).textContent =
+          runtime.enabled ? 'Enabled' : 'Disabled';
+      env.appendChild(item);
+    });
+
+    return header;
+  }
+
+  /**
+   * @param {!ReportRenderer.ReportJSON} report
+   * @return {!DocumentFragment}
+   */
+  _renderReportFooter(report) {
+    const footer = this._dom.cloneTemplate('#tmpl-lh-footer', this._templateContext);
+    this._dom.find('.lh-footer__version', footer).textContent = report.lighthouseVersion;
+    this._dom.find('.lh-footer__timestamp', footer).textContent =
+        Util.formatDateTime(report.generatedTime);
+    return footer;
+  }
+
+  /**
+   * @param {!ReportRenderer.ReportJSON} report
+   * @return {!DocumentFragment}
+   */
+  _renderReportNav(report) {
+    const leftNav = this._dom.cloneTemplate('#tmpl-lh-leftnav', this._templateContext);
+
+    this._dom.find('.leftnav__header__version', leftNav).textContent =
+        `Version: ${report.lighthouseVersion}`;
+
+    const nav = this._dom.find('.lh-leftnav', leftNav);
+    for (const category of report.reportCategories) {
+      const itemsTmpl = this._dom.cloneTemplate('#tmpl-lh-leftnav__items', leftNav);
+
+      const navItem = this._dom.find('.lh-leftnav__item', itemsTmpl);
+      navItem.href = `#${category.id}`;
+
+      this._dom.find('.leftnav-item__category', navItem).textContent = category.name;
+      const score = this._dom.find('.leftnav-item__score', navItem);
+      score.classList.add(`lh-score__value--${Util.calculateRating(category.score)}`);
+      score.textContent = Math.round(Util.formatNumber(category.score));
+      nav.appendChild(navItem);
+    }
+    return leftNav;
+  }
+
+  /**
+   * @param {!ReportRenderer.ReportJSON} report
    * @return {!Element}
    */
   _renderReport(report) {
-    const element = this._dom.createElement('div', 'lh-report');
-    const scoreHeader = element.appendChild(
+    const container = this._dom.createElement('div', 'lh-container');
+
+    container.appendChild(this._renderReportHeader(report)); // sticky header goes at the top.
+    container.appendChild(this._renderReportNav(report));
+
+    const reportSection = container.appendChild(this._dom.createElement('div', 'lh-report'));
+
+    const scoreHeader = reportSection.appendChild(
         this._dom.createElement('div', 'lh-scores-header'));
+
+    const categories = reportSection.appendChild(this._dom.createElement('div', 'lh-categories'));
     for (const category of report.reportCategories) {
       scoreHeader.appendChild(this._categoryRenderer.renderScoreGauge(category));
-      element.appendChild(this._categoryRenderer.render(category));
+      categories.appendChild(this._categoryRenderer.render(category));
     }
-    return element;
+
+    reportSection.appendChild(this._renderReportFooter(report));
+
+    return container;
   }
 }
 
@@ -126,7 +218,11 @@ ReportRenderer.CategoryJSON; // eslint-disable-line no-unused-expressions
  *     generatedTime: string,
  *     initialUrl: string,
  *     url: string,
- *     reportCategories: !Array<!ReportRenderer.CategoryJSON>
+ *     reportCategories: !Array<!ReportRenderer.CategoryJSON>,
+ *     runtimeConfig: {
+ *       blockedUrlPatterns: !Array<string>,
+ *       environment: !Array<{description: string, enabled: boolean, name: string}>
+ *     }
  * }}
  */
 ReportRenderer.ReportJSON; // eslint-disable-line no-unused-expressions
