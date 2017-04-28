@@ -189,7 +189,7 @@ summary {
 }
 
 .lh-score__value--binary {
-  text-indent: -500px;
+  text-indent: -5000px;
 }
 
 /* No icon for audits with number scores. */
