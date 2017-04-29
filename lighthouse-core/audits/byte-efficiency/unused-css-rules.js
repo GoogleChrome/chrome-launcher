@@ -16,12 +16,12 @@
  */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const URL = require('../../lib/url-shim');
 
 const PREVIEW_LENGTH = 100;
 
-class UnusedCSSRules extends Audit {
+class UnusedCSSRules extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -171,7 +171,7 @@ class UnusedCSSRules extends Audit {
     const styles = artifacts.Styles;
     const usage = artifacts.CSSUsage;
     const pageUrl = artifacts.URL.finalUrl;
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
+    const networkRecords = artifacts.networkRecords[ByteEfficiencyAudit.DEFAULT_PASS];
 
     const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
     UnusedCSSRules.countUnusedRules(usage, indexedSheets);

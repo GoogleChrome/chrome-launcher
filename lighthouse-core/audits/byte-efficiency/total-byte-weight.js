@@ -19,7 +19,7 @@
   */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const Formatter = require('../../report/formatter');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
 const URL = require('../../lib/url-shim');
@@ -30,7 +30,7 @@ const OPTIMAL_VALUE = 1600 * 1024;
 const SCORING_POINT_OF_DIMINISHING_RETURNS = 2500 * 1024;
 const SCORING_MEDIAN = 4000 * 1024;
 
-class TotalByteWeight extends Audit {
+class TotalByteWeight extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -45,7 +45,7 @@ class TotalByteWeight extends Audit {
           'Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) ' +
           'and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. ' +
           'Try to find ways to reduce the size of required files.',
-      scoringMode: Audit.SCORING_MODES.NUMERIC,
+      scoringMode: ByteEfficiencyAudit.SCORING_MODES.NUMERIC,
       requiredArtifacts: ['networkRecords']
     };
   }
@@ -55,7 +55,7 @@ class TotalByteWeight extends Audit {
    * @return {!Promise<!AuditResult>}
    */
   static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
+    const networkRecords = artifacts.networkRecords[ByteEfficiencyAudit.DEFAULT_PASS];
     return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
       let totalBytes = 0;
       const results = networkRecords.reduce((prev, record) => {
@@ -88,7 +88,7 @@ class TotalByteWeight extends Audit {
       return {
         rawValue: totalBytes,
         optimalValue: this.meta.optimalValue,
-        displayValue: `Total size was ${Audit.bytesToKbString(totalBytes)}`,
+        displayValue: `Total size was ${ByteEfficiencyAudit.bytesToKbString(totalBytes)}`,
         score: Math.round(Math.max(0, Math.min(score, 100))),
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.TABLE,

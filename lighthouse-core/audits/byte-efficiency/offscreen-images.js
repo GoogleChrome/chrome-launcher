@@ -20,7 +20,7 @@
   */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const TTIAudit = require('../time-to-interactive');
 const URL = require('../../lib/url-shim');
 
@@ -30,7 +30,7 @@ const ALLOWABLE_OFFSCREEN_Y = 200;
 const IGNORE_THRESHOLD_IN_BYTES = 2048;
 const IGNORE_THRESHOLD_IN_PERCENT = 75;
 
-class OffscreenImages extends Audit {
+class OffscreenImages extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */

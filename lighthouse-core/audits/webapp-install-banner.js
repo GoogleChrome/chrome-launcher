@@ -6,7 +6,7 @@
 
 'use strict';
 
-const Audit = require('./multi-check-audit');
+const MultiCheckAudit = require('./multi-check-audit');
 const SWAudit = require('./service-worker');
 
 /**
@@ -29,7 +29,7 @@ const SWAudit = require('./service-worker');
  *   * it doesn't consider the site engagement score (naturally)
  */
 
-class WebappInstallBanner extends Audit {
+class WebappInstallBanner extends MultiCheckAudit {
 
   /**
    * @return {!AuditMeta}

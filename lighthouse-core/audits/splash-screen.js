@@ -6,7 +6,7 @@
 
 'use strict';
 
-const Audit = require('./multi-check-audit');
+const MultiCheckAudit = require('./multi-check-audit');
 
 /**
  * @fileoverview
@@ -21,7 +21,7 @@ const Audit = require('./multi-check-audit');
  *   * manifest contains icon that's a png and size >= 512px
  */
 
-class SplashScreen extends Audit {
+class SplashScreen extends MultiCheckAudit {
 
   /**
    * @return {!AuditMeta}

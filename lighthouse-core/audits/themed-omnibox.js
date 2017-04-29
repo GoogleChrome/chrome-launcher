@@ -6,7 +6,7 @@
 
 'use strict';
 
-const Audit = require('./multi-check-audit');
+const MultiCheckAudit = require('./multi-check-audit');
 const validColor = require('../lib/web-inspector').Color.parse;
 
 /**
@@ -19,7 +19,7 @@ const validColor = require('../lib/web-inspector').Color.parse;
  *   * HTML has a valid theme-color meta
  */
 
-class ThemedOmnibox extends Audit {
+class ThemedOmnibox extends MultiCheckAudit {
 
   /**
    * @return {!AuditMeta}

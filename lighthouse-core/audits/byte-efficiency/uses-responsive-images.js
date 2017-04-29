@@ -24,13 +24,13 @@
   */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const URL = require('../../lib/url-shim');
 
 const IGNORE_THRESHOLD_IN_BYTES = 2048;
 const WASTEFUL_THRESHOLD_IN_BYTES = 25 * 1024;
 
-class UsesResponsiveImages extends Audit {
+class UsesResponsiveImages extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */

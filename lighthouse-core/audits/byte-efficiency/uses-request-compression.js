@@ -20,14 +20,14 @@
  */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const URL = require('../../lib/url-shim');
 
 const IGNORE_THRESHOLD_IN_BYTES = 1400;
 const IGNORE_THRESHOLD_IN_PERCENT = 0.1;
 const TOTAL_WASTED_BYTES_THRESHOLD = 10 * 1024; // 10KB
 
-class ResponsesAreCompressed extends Audit {
+class ResponsesAreCompressed extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */

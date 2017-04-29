@@ -24,7 +24,7 @@
  */
 'use strict';
 
-const Audit = require('./byte-efficiency-audit');
+const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const URL = require('../../lib/url-shim');
 
 const IGNORE_THRESHOLD_IN_BYTES = 2048;
@@ -32,7 +32,7 @@ const TOTAL_WASTED_BYTES_THRESHOLD = 1000 * 1024;
 const JPEG_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES = 25 * 1024;
 const WEBP_ALREADY_OPTIMIZED_THRESHOLD_IN_BYTES = 100 * 1024;
 
-class UsesOptimizedImages extends Audit {
+class UsesOptimizedImages extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */
