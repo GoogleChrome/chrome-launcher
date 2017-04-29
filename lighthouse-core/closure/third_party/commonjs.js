@@ -15,11 +15,12 @@
  */
 
 /**
+ * Read-only externs for module checks. Will fail if written to.
  * @externs
  */
 
 /** @const */
 const module = {};
 
-/** @type {*} */
-module.exports;
+/** @const */
+module.exports = {};

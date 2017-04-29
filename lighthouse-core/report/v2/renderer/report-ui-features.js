@@ -20,7 +20,7 @@
  * the report.
  */
 
-/* globals self URL Blob CustomEvent */
+/* globals self URL Blob CustomEvent getFilenamePrefix */
 
 class ReportUIFeatures {
 
@@ -64,7 +64,7 @@ class ReportUIFeatures {
    * Fires a custom DOM event on target.
    * @param {string} name Name of the event.
    * @param {!Node=} target DOM node to fire the event on.
-   * @param {Object<{detail: Object<string, *>}>=} detail Custom data to include.
+   * @param {*=} detail Custom data to include.
    */
   _fireEventOn(name, target = this._document, detail) {
     const event = new CustomEvent(name, detail ? {detail} : null);
@@ -262,7 +262,7 @@ class ReportUIFeatures {
    * @param {!Blob|!File} blob The file to save.
    */
   _saveFile(blob) {
-    const filename = self.getFilenamePrefix({
+    const filename = getFilenamePrefix({
       url: this.json.url,
       generatedTime: this.json.generatedTime
     });
@@ -286,7 +286,4 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = ReportUIFeatures;
 } else {
   self.ReportUIFeatures = ReportUIFeatures;
-
-  /** @type {function({url: string, generatedTime: string}): string} */
-  self.getFilenamePrefix; // eslint-disable-line no-unused-expressions
 }

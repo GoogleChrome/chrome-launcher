@@ -28,7 +28,7 @@ class ReportRenderer {
   /**
    * @param {!DOM} dom
    * @param {!CategoryRenderer} categoryRenderer
-   * @param {ReportUIFeatures=} uiFeatures
+   * @param {?ReportUIFeatures=} uiFeatures
    */
   constructor(dom, categoryRenderer, uiFeatures = null) {
     /** @private {!DOM} */

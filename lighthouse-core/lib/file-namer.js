@@ -16,15 +16,16 @@
  */
 'use strict';
 
+/* global URL */
+
 /**
  * Generate a filenamePrefix of hostname_YYYY-MM-DD_HH-MM-SS
  * Date/time uses the local timezone, however Node has unreliable ICU
  * support, so we must construct a YYYY-MM-DD date format manually. :/
- * @param {!{url: string, generatedTime: string}} results
- * @returns string
+ * @param {{url: string, generatedTime: string}} results
+ * @return {string}
  */
 function getFilenamePrefix(results) {
-  // eslint-disable-next-line no-undef
   const hostname = new (URLConstructor || URL)(results.url).hostname;
   const date = (results.generatedTime && new Date(results.generatedTime)) || new Date();
 
@@ -44,7 +45,5 @@ let URLConstructor;
 if (typeof module !== 'undefined' && module.exports) {
   URLConstructor = require('./url-shim');
 
-  module.exports = {
-    getFilenamePrefix
-  };
+  module.exports = {getFilenamePrefix};
 }
