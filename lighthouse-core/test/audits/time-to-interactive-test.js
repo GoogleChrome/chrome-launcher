@@ -35,7 +35,7 @@ describe('Performance: time-to-interactive audit', () => {
     return TimeToInteractive.audit(artifacts).then(output => {
       assert.equal(output.rawValue, 1105.8, output.debugString);
       assert.equal(output.displayValue, '1105.8ms');
-      assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, 20.724);
+      assert.equal(output.extendedInfo.value.expectedLatencyAtTTI, 20.495);
       assert.equal(output.extendedInfo.value.timings.fMP, 1099.523);
       assert.equal(output.extendedInfo.value.timings.timeToInteractive, 1105.798);
       assert.equal(output.extendedInfo.value.timings.visuallyReady, 1105.798);

@@ -24,6 +24,7 @@ if (typeof global.window === 'undefined') {
 // The ideal input response latency, the time between the input task and the
 // first frame of the response.
 const BASE_RESPONSE_LATENCY = 16;
+const SCHEDULABLE_TASK_TITLE = 'TaskQueueManager::ProcessTaskFromWorkQueue';
 
 // we need gl-matrix and jszip for traceviewer
 // since it has internal forks for isNode and they get mixed up during
@@ -205,23 +206,12 @@ class TraceProcessor {
    * @return {{durations: !Array<number>, clippedLength: number}}
    */
   static getMainThreadTopLevelEventDurations(model, trace, startTime, endTime) {
-    // Find the main thread via the first TracingStartedInPage event in the trace
-    const startEvent = trace.traceEvents.find(event => {
-      return event.name === 'TracingStartedInPage';
-    });
-    const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);
+    const slices = TraceProcessor.getMainThreadTopLevelEvents(model, trace, startTime, endTime);
 
     // Find durations of all slices in range of interest.
-    // TODO(bckenny): filter for top level slices ourselves?
     const durations = [];
     let clippedLength = 0;
-    mainThread.sliceGroup.topLevelSlices.forEach(slice => {
-      // Discard slices outside range.
-
-      if (slice.end <= startTime || slice.start >= endTime) {
-        return;
-      }
-
+    slices.forEach(slice => {
       // Clip any at edges of range.
       let duration = slice.duration;
       let sliceStart = slice.start;
@@ -243,6 +233,26 @@ class TraceProcessor {
       durations,
       clippedLength
     };
+  }
+
+  /**
+   * Provides the top level events on the main thread.
+   * @param {!traceviewer.Model} model
+   * @param {{traceEvents: !Array<!Object>}} trace
+   * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
+   * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
+   * @return {!Array<{start: number, end: number, duration: number}>}
+   */
+  static getMainThreadTopLevelEvents(model, trace, startTime = -Infinity, endTime = Infinity) {
+    // Find the main thread via the first TracingStartedInPage event in the trace
+    const startEvent = trace.traceEvents.find(event => event.name === 'TracingStartedInPage');
+    const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);
+
+    return mainThread.sliceGroup.slices.filter(slice => {
+      return slice.title === SCHEDULABLE_TASK_TITLE &&
+          slice.end > startTime &&
+          slice.start < endTime;
+    });
   }
 
   /**

@@ -17,7 +17,6 @@
 
 const UnusedImages =
     require('../../../audits/byte-efficiency/offscreen-images.js');
-const TTIAudit = require('../../../audits/time-to-interactive.js');
 const assert = require('assert');
 
 /* eslint-env mocha */
@@ -53,19 +52,13 @@ function generateImage(size, coords, networkRecord, src = 'https://google.com/lo
   return image;
 }
 
+function generateInteractiveFunc(desiredTimeInSeconds) {
+  return () => Promise.resolve({
+    timestamp: desiredTimeInSeconds * 1000000
+  });
+}
+
 describe('OffscreenImages audit', () => {
-  const _ttiAuditOriginal = TTIAudit.audit;
-  before(() => {
-    const desiredTTIInSeconds = 2;
-    const timeToInteractive = desiredTTIInSeconds * 1000000; // trace timestamps are in microseconds
-    const extendedInfo = {value: {timestamps: {timeToInteractive}}};
-    TTIAudit.audit = () => Promise.resolve({extendedInfo});
-  });
-
-  after(() => {
-    TTIAudit.audit = _ttiAuditOriginal;
-  });
-
   const DEFAULT_DIMENSIONS = {innerWidth: 1920, innerHeight: 1080};
 
   it('handles images without network record', () => {
@@ -74,6 +67,8 @@ describe('OffscreenImages audit', () => {
       ImageUsage: [
         generateImage(generateSize(100, 100), [0, 0]),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 0);
     });
@@ -89,6 +84,8 @@ describe('OffscreenImages audit', () => {
         generateImage(generateSize(100, 100), [0, 1080], generateRecord(100), urlB),
         generateImage(generateSize(400, 400), [1720, 1080], generateRecord(3), urlC),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 0);
     });
@@ -110,6 +107,8 @@ describe('OffscreenImages audit', () => {
         // half offscreen to the top, should not warn
         generateImage(generateSize(1000, 1000), [0, -500], generateRecord(100), url('E')),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 4);
     });
@@ -121,6 +120,8 @@ describe('OffscreenImages audit', () => {
       ImageUsage: [
         generateImage(generateSize(0, 0), [0, 0], generateRecord(100)),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 1);
     });
@@ -136,6 +137,8 @@ describe('OffscreenImages audit', () => {
         generateImage(generateSize(50, 50), [0, 1500], generateRecord(200), urlB),
         generateImage(generateSize(400, 400), [0, 1500], generateRecord(90), urlB),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 1);
     });
@@ -148,6 +151,8 @@ describe('OffscreenImages audit', () => {
         // offscreen to the right
         generateImage(generateSize(200, 200), [3000, 0], generateRecord(100, 3)),
       ],
+      traces: {},
+      requestFirstInteractive: generateInteractiveFunc(2),
     }).then(auditResult => {
       assert.equal(auditResult.results.length, 0);
     });

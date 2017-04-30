@@ -20,18 +20,17 @@
 /** @fileoverview
  *  This audit evaluates if a page's load performance is fast enough for it to be considered a PWA.
  *  We are doublechecking that the network requests were throttled (or slow on their own)
- *  Afterwards, we report if the TTI is less than 10 seconds.
+ *  Afterwards, we report if the TTFI is less than 10 seconds.
  */
 
 const Audit = require('./audit');
-const TTIMetric = require('./time-to-interactive');
 const Emulation = require('../lib/emulation');
 
 const Formatter = require('../report/formatter');
 
-// Maximum TTI to be considered "fast" for PWA baseline checklist
+// Maximum TTFI to be considered "fast" for PWA baseline checklist
 //   https://developers.google.com/web/progressive-web-apps/checklist
-const MAXIMUM_TTI = 10 * 1000;
+const MAXIMUM_TTFI = 10 * 1000;
 
 class LoadFastEnough4Pwa extends Audit {
   /**
@@ -63,20 +62,21 @@ class LoadFastEnough4Pwa extends Audit {
     const areLatenciesAll3G = allRequestLatencies.every(val =>
         val === undefined || val > latency3gMin);
 
-    return TTIMetric.audit(artifacts).then(ttiResult => {
-      const timeToInteractive = ttiResult.extendedInfo.value.timings.timeToInteractive;
-      const isFast = timeToInteractive < MAXIMUM_TTI;
+    const trace = artifacts.traces[Audit.DEFAULT_PASS];
+    return artifacts.requestFirstInteractive(trace).then(firstInteractive => {
+      const timeToFirstInteractive = firstInteractive.timeInMs;
+      const isFast = timeToFirstInteractive < MAXIMUM_TTFI;
 
       const extendedInfo = {
         formatter: Formatter.SUPPORTED_FORMATS.NULL,
-        value: {areLatenciesAll3G, allRequestLatencies, isFast, timeToInteractive}
+        value: {areLatenciesAll3G, allRequestLatencies, isFast, timeToFirstInteractive}
       };
 
       if (!areLatenciesAll3G) {
         return {
           rawValue: false,
           // eslint-disable-next-line max-len
-          debugString: `The Time To Interactive was found at ${ttiResult.displayValue}, however, the network request latencies were not sufficiently realistic, so the performance measurements cannot be trusted.`,
+          debugString: `First Interactive was found at ${timeToFirstInteractive.toLocaleString()}, however, the network request latencies were not sufficiently realistic, so the performance measurements cannot be trusted.`,
           extendedInfo
         };
       }
@@ -85,7 +85,7 @@ class LoadFastEnough4Pwa extends Audit {
         return {
           rawValue: false,
            // eslint-disable-next-line max-len
-          debugString: `Under 3G conditions, the Time To Interactive was at ${ttiResult.displayValue}. More details in the "Performance" section.`,
+          debugString: `Under 3G conditions, First Interactive was at ${timeToFirstInteractive.toLocaleString()}. More details in the "Performance" section.`,
           extendedInfo
         };
       }

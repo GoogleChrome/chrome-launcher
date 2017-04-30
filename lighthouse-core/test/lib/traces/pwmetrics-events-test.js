@@ -26,7 +26,7 @@ const dbwResults = require('../../fixtures/dbw_tester-perf-results.json');
 /* eslint-env mocha */
 describe('metrics events class', () => {
   it('exposes metric definitions', () => {
-    assert.equal(Metrics.metricsDefinitions.length, 12, '12 metrics not exposed');
+    assert.ok(Metrics.metricsDefinitions.length > 5, 'metrics not exposed');
   });
 
   it('generates fake trace events', () => {
