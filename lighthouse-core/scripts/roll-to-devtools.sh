@@ -6,14 +6,26 @@
 # Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 ##
 
-chromium_dir="$HOME/chromium/src"
-frontend_dir="$chromium_dir/third_party/WebKit/Source/devtools/front_end"
+# usage:
 
-if [ ! -d "$frontend_dir" ]; then
+#   yarn devtools
+
+# with a custom devtools front_end location:
+#   yarn devtools -- node_modules/temp-devtoolsfrontend/front_end/
+
+chromium_dir="$HOME/chromium/src"
+
+if [[ -n "$1" ]]; then
+  frontend_dir="$1"
+else 
+  frontend_dir="$chromium_dir/third_party/WebKit/Source/devtools/front_end"
+fi
+
+if [[ ! -d "$frontend_dir" || ! -a "$frontend_dir/Runtime.js" ]]; then
   echo -e "\033[31m✖ Error!\033[39m"
-  echo "This script requires your Chromium checkout is located here:"
-  echo "    $chromium_dir"
-  exit 0
+  echo "This script requires a devtools frontend folder. We didn't find one here:"
+  echo "    $frontend_dir"
+  exit 1
 else
   echo -e "\033[96m ✓\033[39m Chromium folder in place."
 fi
@@ -24,7 +36,6 @@ fe_lh_dir="$frontend_dir/audits2/lighthouse"
 lh_bg_js="lighthouse-extension/dist/scripts/lighthouse-background.js"
 lh_worker_dir="$frontend_dir/audits2_worker/lighthouse"
 
-
 # copy report files
 cp -pPR $v2dir/{report-styles.css,templates.html,renderer} "$fe_lh_dir"
 echo -e "\033[32m ✓\033[39m Report renderer files copied."
@@ -32,8 +43,3 @@ echo -e "\033[32m ✓\033[39m Report renderer files copied."
 # copy lighthouse-background (potentially stale)
 cp -pPR "$lh_bg_js" "$lh_worker_dir/lighthouse-background.js"
 echo -e "\033[96m ✓\033[39m (Potentially stale) lighthouse-background copied."
-
-# browserify a fresh lighthouse-background and copy again
-gulp --cwd "lighthouse-extension" browserify-lighthouse
-cp -pPR "$lh_bg_js" "$lh_worker_dir/lighthouse-background.js"
-echo -e "\033[32m ✓\033[39m Fresh lighthouse-background copied."

@@ -32,6 +32,7 @@
     "unit": "bash lighthouse-core/scripts/run-mocha.sh --default",
     "closure": "cd lighthouse-core && node closure/closure-type-checking.js",
     "devtools": "bash lighthouse-core/scripts/roll-to-devtools.sh",
+    "compile-devtools": "bash lighthouse-core/scripts/compile-against-devtools.sh",
     "watch": "bash lighthouse-core/scripts/run-mocha.sh --watch",
     "chrome": "node ./lighthouse-cli/manual-chrome-launcher.js",
     "fast": "yarn start -- --disable-device-emulation --disable-cpu-throttling --disable-network-throttling",

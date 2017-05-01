@@ -313,6 +313,11 @@ yarn watch
 ## run linting and unit tests separately
 yarn lint
 yarn unit
+
+## run closure compiler (on whitelisted files)
+yarn closure
+## import your report renderer into devtools-frontend and run devtools closure compiler
+yarn compile-devtools
 ```
 
 ## Lighthouse as trace processor
