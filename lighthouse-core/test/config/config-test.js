@@ -73,55 +73,29 @@ describe('Config', () => {
     const unlikelyPassName = 'unlikelyPassName';
     const configJson = {
       passes: [{
-        recordNetwork: true,
         passName: unlikelyPassName,
         gatherers: []
       }, {
-        recordNetwork: true,
         passName: unlikelyPassName,
         gatherers: []
       }],
       audits: []
     };
 
-    return new Promise((resolve, reject) => {
-      const warningListener = function(args) {
-        const warningMsg = args[1];
-        if (new RegExp(`overwrite.+${unlikelyPassName}`).test(warningMsg)) {
-          log.events.removeListener('warning', warningListener);
-          resolve();
-        }
-      };
-      log.events.addListener('warning', warningListener);
-
-      const _ = new Config(configJson);
-    });
+    assert.throws(_ => new Config(configJson), /unique/);
   });
 
   it('warns when traced twice with no passNames specified', () => {
     const configJson = {
       passes: [{
-        recordNetwork: true,
         gatherers: []
       }, {
-        recordNetwork: true,
         gatherers: []
       }],
       audits: []
     };
 
-    return new Promise((resolve, reject) => {
-      const warningListener = function(args) {
-        const warningMsg = args[1];
-        if (new RegExp(`overwrite.+${Audit.DEFAULT_PASS}`).test(warningMsg)) {
-          log.events.removeListener('warning', warningListener);
-          resolve();
-        }
-      };
-      log.events.addListener('warning', warningListener);
-
-      const _ = new Config(configJson);
-    });
+    assert.throws(_ => new Config(configJson), /requires a passName/);
   });
 
   it('throws for unknown gatherers', () => {
@@ -299,7 +273,7 @@ describe('Config', () => {
       },
       passes: [
         {recordTrace: true, gatherers: []},
-        {recordNetwork: true, gatherers: ['accessibility']},
+        {passName: 'a11y', gatherers: ['accessibility']},
       ],
       audits: [
         'accessibility/color-contrast',
@@ -421,7 +395,7 @@ describe('Config', () => {
     it('should merge passes', () => {
       const configA = {
         passes: [
-          {passName: 'passA', recordNetwork: true, gatherers: ['a']},
+          {passName: 'passA', gatherers: ['a']},
           {passName: 'passB', gatherers: ['b']},
           {gatherers: ['c']}
         ]

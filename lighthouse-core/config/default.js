@@ -3,7 +3,6 @@ module.exports = {
   "settings": {},
   "passes": [{
     "passName": "defaultPass",
-    "recordNetwork": true,
     "recordTrace": true,
     "pauseBeforeTraceEndMs": 5000,
     "useThrottling": true,
@@ -19,7 +18,6 @@ module.exports = {
   },
   {
     "passName": "offlinePass",
-    "recordNetwork": true,
     "useThrottling": false,
     "gatherers": [
       "service-worker",
@@ -35,7 +33,6 @@ module.exports = {
     ]
   }, {
     "passName": "dbw",
-    "recordNetwork": true,
     "useThrottling": false,
     "gatherers": [
       "chrome-console-messages",

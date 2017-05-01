@@ -129,17 +129,22 @@ function validatePasses(passes, audits, rootPath) {
     });
   });
 
-  // Log if multiple passes require trace or network recording and could overwrite one another.
+  // Passes must have unique `passName`s. Throw otherwise.
   const usedNames = new Set();
+  let defaultUsed = false;
   passes.forEach((pass, index) => {
-    if (!pass.recordNetwork && !pass.recordTrace) {
-      return;
+    let passName = pass.passName;
+    if (!passName) {
+      if (defaultUsed) {
+        throw new Error(`passes[${index}] requires a passName`);
+      }
+
+      passName = Audit.DEFAULT_PASS;
+      defaultUsed = true;
     }
 
-    const passName = pass.passName || Audit.DEFAULT_PASS;
     if (usedNames.has(passName)) {
-      log.warn('config', `passes[${index}] may overwrite trace or network ` +
-          `data of earlier pass without a unique passName (repeated name: ${passName}.`);
+      throw new Error(`Passes must have unique names (repeated passName: ${passName}.`);
     }
     usedNames.add(passName);
   });

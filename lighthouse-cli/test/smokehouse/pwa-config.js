@@ -21,7 +21,6 @@
  */
 module.exports = {
   passes: [{
-    recordNetwork: true,
     recordTrace: true,
     gatherers: [
       'url',
@@ -33,13 +32,13 @@ module.exports = {
   },
   {
     passName: 'offlinePass',
-    recordNetwork: true,
     gatherers: [
       'service-worker',
       'offline'
     ]
   },
   {
+    passName: 'domstats',
     gatherers: [
       'dobetterweb/domstats',
       'http-redirect'

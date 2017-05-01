@@ -443,7 +443,6 @@ describe('Runner', () => {
     const config = new Config({
       passes: [{
         passName: 'firstPass',
-        recordNetwork: true,
         gatherers: ['viewport-dimensions']
       }],
 
