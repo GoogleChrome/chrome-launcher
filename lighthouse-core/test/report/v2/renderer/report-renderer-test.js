@@ -83,16 +83,6 @@ describe('ReportRenderer V2', () => {
       assert.ok(container.contains(newReport), 'new report appended to container');
     });
 
-    it('should render an exception for invalid input', () => {
-      const container = renderer._dom._document.body;
-      const output = renderer.renderReport({
-        get reportCategories() {
-          throw new Error();
-        }
-      }, container);
-      assert.ok(output.classList.contains('lh-exception'));
-    });
-
     it('renders a header', () => {
       const header = renderer._renderReportHeader(sampleResults);
       assert.ok(header.querySelector('.lh-export'), 'contains export button');

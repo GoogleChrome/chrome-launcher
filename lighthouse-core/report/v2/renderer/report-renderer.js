@@ -47,19 +47,12 @@ class ReportRenderer {
    */
   renderReport(report, container) {
     container.textContent = ''; // Remove previous report.
+    const element = container.appendChild(this._renderReport(report));
 
-    let element;
-    try {
-      element = container.appendChild(this._renderReport(report));
-
-      // Hook in JS features and page-level event listeners after the report
-      // is in the document.
-      if (this._uiFeatures) {
-        this._uiFeatures.initFeatures(report);
-      }
-    } catch (/** @type {!Error} */ e) {
-      container.textContent = '';
-      element = container.appendChild(this._renderException(e));
+    // Hook in JS features and page-level event listeners after the report
+    // is in the document.
+    if (this._uiFeatures) {
+      this._uiFeatures.initFeatures(report);
     }
 
     return /** @type {!Element} **/ (element);
@@ -73,16 +66,6 @@ class ReportRenderer {
   setTemplateContext(context) {
     this._templateContext = context;
     this._categoryRenderer.setTemplateContext(context);
-  }
-
-  /**
-   * @param {!Error} e
-   * @return {!Element}
-   */
-  _renderException(e) {
-    const element = this._dom.createElement('div', 'lh-exception');
-    element.textContent = String(e.stack);
-    return element;
   }
 
   /**
