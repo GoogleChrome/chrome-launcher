@@ -28,13 +28,14 @@ class Speedline extends ComputedArtifact {
   /**
    * @return {!Promise}
    */
-  compute_(trace) {
+  compute_(trace, computedArtifacts) {
     // speedline() may throw without a promise, so we resolve immediately
     // to get in a promise chain.
-    return Promise.resolve().then(_ => {
-      return speedline(trace.traceEvents);
-    }).then(speedlineResults => {
-      return speedlineResults;
+    return computedArtifacts.requestTraceOfTab(trace).then(traceOfTab => {
+      // Force use of nav start as reference point for speedline
+      // See https://github.com/GoogleChrome/lighthouse/issues/2095
+      const navStart = traceOfTab.timestamps.navigationStart * 1000;
+      return speedline(trace.traceEvents, {timeOrigin: navStart});
     });
   }
 }
