@@ -109,6 +109,7 @@ class GatherRunner {
       .then(_ => driver.beginEmulation(options.flags))
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cacheNatives())
+      .then(_ => driver.dismissJavaScriptDialogs())
       .then(_ => resetStorage && driver.cleanAndDisableBrowserCaches())
       .then(_ => resetStorage && driver.clearDataForOrigin(options.url))
       .then(_ => driver.blockUrlPatterns(options.flags.blockedUrlPatterns || []))
