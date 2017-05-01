@@ -131,7 +131,7 @@ gulp.task('browserify-lighthouse', () => {
         bundle = bundle.require(gatherer, {expose: gatherer.replace(driverPath, './')});
       });
       computedArtifacts.forEach(artifact => {
-        bundle = bundle.require(artifact, {expose: artifact.replace(driverPath, './')});
+        bundle = bundle.require(artifact, {expose: artifact.replace(corePath, './')});
       });
 
       // Inject the new browserified contents back into our gulp pipeline
