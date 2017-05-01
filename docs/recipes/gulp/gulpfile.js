@@ -22,7 +22,7 @@ const lighthouse = require('lighthouse');
 const ChromeLauncher = require('lighthouse/lighthouse-cli/chrome-launcher').ChromeLauncher;
 const perfConfig = require('lighthouse/lighthouse-core/config/perf.json');
 const PORT = 8080;
-let launcher;
+let chromeLauncher;
 
 /**
  * Start server
@@ -40,18 +40,8 @@ const startServer = function() {
  */
 const stopServer = function() {
   connect.serverClose();
-  launcher.kill();
-};
-
-/**
- * Launch chrome
- */
-const launchChrome = function() {
-  launcher = new ChromeLauncher();
-  return launcher.isDebuggerReady()
-    .catch(() => {
-      return launcher.run();
-    });
+  chromeLauncher.kill();
+  chromeLauncher = null;
 };
 
 /**
@@ -85,7 +75,9 @@ const handleError = function(e) {
 };
 
 gulp.task('lighthouse', function() {
-  return launchChrome().then(_ => {
+  chromeLauncher = new ChromeLauncher();
+
+  return chromeLauncher.run().then(_ => {
     startServer();
     return runLighthouse()
       .then(handleOk)

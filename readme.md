@@ -147,27 +147,21 @@ The example below shows how to setup and run Lighthouse programmatically as a No
 assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`).
 
 ```javascript
-const Lighthouse = require('lighthouse');
+const lighthouse = require('lighthouse');
 const ChromeLauncher = require('lighthouse/lighthouse-cli/chrome-launcher.js').ChromeLauncher;
 const Printer = require('lighthouse/lighthouse-cli/printer');
 
 function launchChromeAndRunLighthouse(url, flags, config) {
   const launcher = new ChromeLauncher({port: 9222, autoSelectChrome: true});
 
-  return launcher.isDebuggerReady()
-    .catch(() => {
-      if (flags.skipAutolaunch) {
-        return;
-      }
-      return launcher.run(); // Launch Chrome.
-    })
-    .then(() => Lighthouse(url, flags, config)) // Run Lighthouse.
+  return launcher.run() // Launch Chrome.
+    .then(() => lighthouse(url, flags, config)) // Run Lighthouse.
     .then(results => launcher.kill().then(() => results)) // Kill Chrome and return results.
     .catch(err => {
       // Kill Chrome if there's an error.
       return launcher.kill().then(() => {
         throw err;
-      }, console.error);
+      });
     });
 }
 
