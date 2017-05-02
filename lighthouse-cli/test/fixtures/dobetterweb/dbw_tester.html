@@ -119,6 +119,7 @@
   property the e.stack inside the gatherer won't be in the correct format
   https://github.com/GoogleChrome/lighthouse/issues/1194 -->
 <script>window.Error = function(error) { this.stack = 'stacktrace'; };</script>
+<script>window.confirm('Is DBW Mega Tester the best site?')</script>
 <script>
 function stampTemplate(id, location) {
   const template = document.querySelector('#' + id);
