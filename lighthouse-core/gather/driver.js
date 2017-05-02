@@ -684,7 +684,7 @@ class Driver {
 
   /**
    * @param {!string} method
-   * @param {?Object} params
+   * @param {!Object<string, *>=} params
    */
   recordNetworkEvent(method, params) {
     if (!this._networkRecorder) return;

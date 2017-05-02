@@ -24,7 +24,7 @@ class NetworkRecorder extends EventEmitter {
   /**
    * Creates an instance of NetworkRecorder.
    * @param {!Array} recordArray
-   * @param {?Driver} driver
+   * @param {!Driver=} driver
    */
   constructor(recordArray, driver) {
     super();
@@ -152,7 +152,7 @@ class NetworkRecorder extends EventEmitter {
   /**
    * Routes network events to their handlers, so we can construct networkRecords
    * @param {!string} method
-   * @param {?Object} params
+   * @param {!Object<string, *>=} params
    */
   dispatch(method, params) {
     switch (method) {
@@ -167,11 +167,16 @@ class NetworkRecorder extends EventEmitter {
     }
   }
 
-  static recordsFromLogs(logs) {
+  /**
+   * Construct network records from a log of devtools protocol messages.
+   * @param {!DevtoolsLog} log
+   * @return {!Array<!WebInspector.NetworkRequest>}
+   */
+  static recordsFromLogs(log) {
     const records = [];
     const nr = new NetworkRecorder(records);
-    logs.forEach(networkEvent => {
-      nr.dispatch(networkEvent.method, networkEvent.params);
+    log.forEach(event => {
+      nr.dispatch(event.method, event.params);
     });
     return records;
   }

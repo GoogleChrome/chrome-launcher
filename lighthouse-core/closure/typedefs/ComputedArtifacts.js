@@ -30,9 +30,6 @@
   }} */
 let TraceOfTabArtifact;
 
-// @typedef <Array<!WebInspector.NetworkRequest>
-let NetworkRequests;
-
 /**
  * @constructor
  * @struct
@@ -43,7 +40,7 @@ function ComputedArtifacts() {}
 /** @type {function(!Array): !Promise<!Object>} */
 ComputedArtifacts.prototype.requestCriticalRequestChains;
 
-/** @type {function(!Array): !Promise<!NetworkRequests>} */
+/** @type {function(!DevtoolsLog): !Promise<!Array<!WebInspector.NetworkRequest>>} */
 ComputedArtifacts.prototype.requestNetworkRecords;
 
 /** @type {function(ManifestNode<(!Manifest|undefined)>): !Promise<{isParseFailure: boolean, parseFailureReason: string, allChecks: !Array<{passing: boolean, failureText: string}>}>} */

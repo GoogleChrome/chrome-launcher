@@ -20,6 +20,9 @@
  * @externs
  */
 
+/** @typedef {!Array<{method: string, params: (!Object<string, *>|undefined)}>} */
+let DevtoolsLog;
+
 /**
  * @constructor
  * @struct
@@ -84,3 +87,6 @@ Artifacts.prototype.CacheContents;
 
 /** @type {boolean|number} */
 Artifacts.prototype.GeolocationOnStart;
+
+/** @type {!Object<string, !DevtoolsLog>} */
+Artifacts.prototype.devtoolsLogs;
