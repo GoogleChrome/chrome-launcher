@@ -120,7 +120,7 @@ NOTE: specifying an output path with multiple formats ignores your specified ext
 
  - `chrome-debug`
  - open and login to your site
- - `lighthouse http://mysite.com`
+ - in a separate terminal tab `lighthouse http://mysite.com`
 
 ## Testing on a mobile device
 
