@@ -17,7 +17,6 @@
 
 const assert = require('assert');
 const Util = require('../../../../report/v2/renderer/util.js');
-const sampleResults = require('../../../results/sample_v2.json');
 
 /* eslint-env mocha */
 
@@ -29,8 +28,8 @@ describe('util helpers', () => {
   });
 
   it('formats a date', () => {
-    const timestamp = Util.formatDateTime(sampleResults.generatedTime);
-    assert.ok(timestamp.includes('Apr 5, 2017'));
+    const timestamp = Util.formatDateTime('2017-04-28T23:07:51.189Z');
+    assert.ok(timestamp.includes('Apr 28, 2017'));
   });
 
   it('calculates a score ratings', () => {

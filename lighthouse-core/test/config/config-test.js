@@ -265,6 +265,39 @@ describe('Config', () => {
     }), 'missing an audit id at pwa[0]');
   });
 
+  it('throws when an accessibility audit does not have a group', () => {
+    return assert.throws(_ => new Config({
+      audits: ['accessibility/color-contrast'],
+      categories: {
+        accessibility: {
+          audits: [
+            {id: 'color-contrast'}
+          ]
+        }
+      }
+    }), /does not have a group/);
+  });
+
+  it('throws when an audit references an unknown group', () => {
+    return assert.throws(_ => new Config({
+      groups: {
+        'group-a': {
+          title: 'Group A',
+          description: 'The best group around.',
+        },
+      },
+      audits: ['first-meaningful-paint'],
+      categories: {
+        pwa: {
+          audits: [
+            {id: 'first-meaningful-paint', group: 'group-a'},
+            {id: 'first-meaningful-paint', group: 'missing-group'},
+          ]
+        }
+      }
+    }), /unknown group missing-group/);
+  });
+
   it('filters the config', () => {
     const config = new Config({
       settings: {

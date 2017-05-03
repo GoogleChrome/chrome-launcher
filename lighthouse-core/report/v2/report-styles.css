@@ -241,13 +241,14 @@ summary {
   margin-top: calc(var(--default-padding) / 2);
 }
 
-.lh-score__header {
-  flex: 1;
-  margin-top: 2px;
+.lh-score__snippet {
+  align-items: center;
+  justify-content: space-between;
+  /*outline: none;*/
 }
 
-.lh-score__header[open] .lh-toggle-arrow {
-  transform: rotateZ(90deg);
+.lh-score__snippet::-moz-list-bullet {
+  display: none;
 }
 
 .lh-toggle-arrow {
@@ -263,18 +264,27 @@ summary {
   border: none;
 }
 
-.lh-score__snippet {
+/* Expandable Details (Audit Groups, Audits) */
+
+.lh-expandable-details {
+  flex: 1;
+  margin-top: 2px;
+}
+
+.lh-expandable-details__summary {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /*outline: none;*/
+  cursor: pointer;
 }
 
-.lh-score__snippet::-moz-list-bullet {
-  display: none;
+.lh-expandable-details__header {
+  flex: 1;
 }
 
-.lh-score__snippet::-webkit-details-marker {
+.lh-expandable-details[open] > .lh-expandable-details__summary > .lh-toggle-arrow {
+  transform: rotateZ(90deg);
+}
+
+.lh-expandable-details__summary::-webkit-details-marker {
   display: none;
 }
 
@@ -291,6 +301,22 @@ summary {
 .lh-audit > .lh-score {
   font-size: 16px;
   font-size: var(--header-font-size);
+}
+
+/* Audit Group */
+
+.lh-audit-group {
+  margin-top: var(--default-padding);
+}
+
+.lh-audit-group__header {
+  font-size: 18px;
+}
+
+.lh-audit-group__description {
+  font-size: 16px;
+  color: var(--secondary-text-color);
+  margin-top: calc(var(--default-padding) / 2);
 }
 
 .lh-debug {
@@ -334,8 +360,8 @@ summary {
   border: none;
 }
 
-.lh-category > .lh-audit,
-.lh-category > .lh-passed-audits > .lh-audit {
+.lh-category .lh-audit,
+.lh-category .lh-audit-group {
   margin-left: calc(var(--lh-category-score-width) + var(--lh-score-margin));
 }
 

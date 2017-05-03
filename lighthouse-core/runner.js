@@ -160,6 +160,7 @@ class Runner {
           runtimeConfig: Runner.getRuntimeConfig(opts.flags),
           score,
           reportCategories,
+          reportGroups: config.groups,
           aggregations
         };
       });

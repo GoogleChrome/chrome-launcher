@@ -150,7 +150,7 @@ function validatePasses(passes, audits, rootPath) {
   });
 }
 
-function validateCategories(categories, audits, auditResults) {
+function validateCategories(categories, audits, auditResults, groups) {
   if (!categories) {
     return;
   }
@@ -166,6 +166,14 @@ function validateCategories(categories, audits, auditResults) {
 
       if (!auditIds.includes(audit.id)) {
         throw new Error(`could not find ${audit.id} audit for category ${categoryId}`);
+      }
+
+      if (categoryId === 'accessibility' && !audit.group) {
+        throw new Error(`${audit.id} accessibility audit does not have a group`);
+      }
+
+      if (audit.group && !groups[audit.group]) {
+        throw new Error(`${audit.id} references unknown group ${audit.group}`);
       }
     });
   });
@@ -321,10 +329,11 @@ class Config {
     this._audits = Config.requireAudits(configJSON.audits, this._configDir);
     this._artifacts = expandArtifacts(configJSON.artifacts);
     this._categories = configJSON.categories;
+    this._groups = configJSON.groups;
 
     // validatePasses must follow after audits are required
     validatePasses(configJSON.passes, this._audits, this._configDir);
-    validateCategories(configJSON.categories, this._audits, this._auditResults);
+    validateCategories(configJSON.categories, this._audits, this._auditResults, this._groups);
   }
 
   /**
@@ -581,6 +590,11 @@ class Config {
   /** @type {Object<{audits: !Array<{id: string, weight: number}>}>} */
   get categories() {
     return this._categories;
+  }
+
+  /** @type {Object<string, {title: string, description: string}>|undefined} */
+  get groups() {
+    return this._groups;
   }
 }
 
