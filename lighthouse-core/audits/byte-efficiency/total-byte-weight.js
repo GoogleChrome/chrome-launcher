@@ -38,7 +38,7 @@ class TotalByteWeight extends ByteEfficiencyAudit {
     return {
       category: 'Network',
       name: 'total-byte-weight',
-      optimalValue: this.bytesToKbString(OPTIMAL_VALUE),
+      optimalValue: `< ${this.bytesToKbString(OPTIMAL_VALUE)}`,
       description: 'Avoids enormous network payloads',
       informative: true,
       helpText:
