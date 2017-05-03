@@ -304,12 +304,31 @@ describe('Config', () => {
 
     assert.ok(config.audits.length, 3);
     assert.equal(config.passes.length, 2);
+    assert.ok(config.passes[0].recordTrace, 'preserves recordTrace pass');
     assert.ok(!config.categories['unused-category'], 'removes unused categories');
     assert.equal(config.categories['needed-category'].audits.length, 2);
     assert.equal(config.categories['other-category'].audits.length, 1);
   });
 
-  it('filtering works with extension', () => {
+  it('filtering filters out traces when not needed', () => {
+    const warnings = [];
+    const saveWarning = evt => warnings.push(evt);
+    log.events.addListener('warning', saveWarning);
+    const config = new Config({
+      extends: true,
+      settings: {
+        onlyCategories: ['accessibility'],
+      },
+    });
+
+    log.events.removeListener('warning', saveWarning);
+    assert.ok(config.audits.length, 'inherited audits by extension');
+    assert.equal(config.passes.length, 1, 'filtered out passes');
+    assert.equal(warnings.length, 1, 'warned about dropping trace');
+    assert.equal(config.passes[0].recordTrace, false, 'turns off tracing if not needed');
+  });
+
+  it('filters works with extension', () => {
     const config = new Config({
       extends: true,
       settings: {
