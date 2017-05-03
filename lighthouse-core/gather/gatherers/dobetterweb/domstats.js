@@ -20,7 +20,7 @@
  * and total number of nodes used on the page.
  */
 
-/* global document */
+/* global document ShadowRoot */
 
 'use strict';
 
@@ -34,17 +34,22 @@ const Gatherer = require('../gatherer');
  */
 /* istanbul ignore next */
 function createSelectorsLabel(element) {
-  let name = element.localName;
+  let name = element.localName || '';
   const idAttr = element.getAttribute && element.getAttribute('id');
   if (idAttr) {
     name += `#${idAttr}`;
   }
   // svg elements return SVGAnimatedString for .className, which is an object.
   // Stringify classList instead.
-  const className = element.classList.toString();
-  if (className) {
-    name += `.${className.trim().replace(/\s+/g, '.')}`;
+  if (element.classList) {
+    const className = element.classList.toString();
+    if (className) {
+      name += `.${className.trim().replace(/\s+/g, '.')}`;
+    }
+  } else if (ShadowRoot.prototype.isPrototypeOf(element)) {
+    name += '#shadow-root';
   }
+
   return name;
 }
 
@@ -59,9 +64,15 @@ function elementPathInDOM(element) {
   while (node) {
     // Anchor elements have a .host property. Be sure we've found a shadow root
     // host and not an anchor.
-    const shadowHost = node.parentNode && node.parentNode.host &&
-                       node.parentNode.localName !== 'a';
-    node = shadowHost ? node.parentNode.host : node.parentElement;
+    if (ShadowRoot.prototype.isPrototypeOf(node)) {
+      const isShadowHost = node.host && node.localName !== 'a';
+      node = isShadowHost ? node.host : node.parentElement;
+    } else {
+      const isShadowHost = node.parentNode && node.parentNode.host &&
+                           node.parentNode.localName !== 'a';
+      node = isShadowHost ? node.parentNode.host : node.parentElement;
+    }
+
     if (node) {
       path.unshift(createSelectorsLabel(node));
     }

@@ -48,7 +48,7 @@ class DOMSize extends Audit {
       category: 'Performance',
       name: 'dom-size',
       description: 'Avoids an excessive DOM size',
-      optimalValue: DOMSize.MAX_DOM_NODES.toLocaleString() + ' nodes',
+      optimalValue: `< ${DOMSize.MAX_DOM_NODES.toLocaleString()} nodes`,
       helpText: 'Browser engineers recommend pages contain fewer than ' +
         `~${DOMSize.MAX_DOM_NODES.toLocaleString()} DOM nodes. The sweet spot is a tree depth < ` +
         `${MAX_DOM_TREE_DEPTH} elements and fewer than ${MAX_DOM_TREE_WIDTH} ` +
