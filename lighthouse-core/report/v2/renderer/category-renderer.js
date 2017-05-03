@@ -237,9 +237,12 @@ class CategoryRenderer {
     element.id = category.id;
     element.appendChild(this._renderCategoryScore(category));
 
-    const auditsGroupedByGroup = category.audits.reduce((indexed, audit) => {
+    const auditsGroupedByGroup = /** @type {!Object<string,
+        {passed: !Array<!ReportRenderer.AuditJSON>,
+        failed: !Array<!ReportRenderer.AuditJSON>}>} */ ({});
+    category.audits.forEach(audit => {
       const groupId = audit.group;
-      const groups = indexed[groupId] || {passed: [], failed: []};
+      const groups = auditsGroupedByGroup[groupId] || {passed: [], failed: []};
 
       if (audit.score === 100) {
         groups.passed.push(audit);
@@ -247,11 +250,10 @@ class CategoryRenderer {
         groups.failed.push(audit);
       }
 
-      indexed[groupId] = groups;
-      return indexed;
-    }, {});
+      auditsGroupedByGroup[groupId] = groups;
+    });
 
-    const passedElements = [];
+    const passedElements = /** @type {!Array<!Element>} */ ([]);
     Object.keys(auditsGroupedByGroup).forEach(groupId => {
       const group = groupDefinitions[groupId];
       const groups = auditsGroupedByGroup[groupId];

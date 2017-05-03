@@ -51,7 +51,7 @@ gulp.task('compile-report', () => {
     // new_type_inf: true,
     language_in: 'ECMASCRIPT6_STRICT',
     language_out: 'ECMASCRIPT5_STRICT',
-    warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
+    warning_level: 'VERBOSE',
     jscomp_error: [
       'checkTypes',
       'missingProperties',
