@@ -211,6 +211,7 @@ ReportRenderer.GroupJSON; // eslint-disable-line no-unused-expressions
  *     generatedTime: string,
  *     initialUrl: string,
  *     url: string,
+ *     artifacts: {traces: !Object},
  *     reportCategories: !Array<!ReportRenderer.CategoryJSON>,
  *     reportGroups: !Object<string, !ReportRenderer.GroupJSON>,
  *     runtimeConfig: {
