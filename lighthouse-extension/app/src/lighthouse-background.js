@@ -114,7 +114,6 @@ window.runLighthouseForConnection = function(connection, url, options, categoryI
     .then(result => {
       lighthouseIsRunning = false;
       updateBadgeUI();
-      filterOutArtifacts(result);
       return result;
     })
     .catch(err => {
@@ -138,6 +137,7 @@ window.runLighthouseInExtension = function(options, categoryIDs) {
   return connection.getCurrentTabURL()
     .then(url => window.runLighthouseForConnection(connection, url, options, categoryIDs))
     .then(results => {
+      filterOutArtifacts(results);
       // return enableOtherChromeExtensions(true).then(_ => {
       const blobURL = window.createReportPageAsBlob(results, 'extension');
       chrome.tabs.create({url: blobURL});
@@ -170,7 +170,6 @@ window.runLighthouseInWorker = function(port, url, options, categoryIDs) {
  */
 window.createReportPageAsBlob = function(results, reportContext) {
   performance.mark('report-start');
-
   const reportGenerator = new ReportGenerator();
   let html;
   try {
