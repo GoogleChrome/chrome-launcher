@@ -172,6 +172,7 @@ if (typeof module !== 'undefined' && module.exports) {
  *     group: string,
  *     result: {
  *       description: string,
+ *       informative: boolean,
  *       debugString: string,
  *       displayValue: string,
  *       helpText: string,

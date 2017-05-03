@@ -61,6 +61,11 @@ class CategoryRenderer {
       header.appendChild(this._detailsRenderer.render(audit.result.details));
     }
 
+    const scoreEl = this._dom.find('.lh-score', tmpl);
+    if (audit.result.informative) {
+      scoreEl.classList.add('lh-score--informative');
+    }
+
     return this._populateScore(tmpl, audit.score, scoringMode, title, description);
   }
 

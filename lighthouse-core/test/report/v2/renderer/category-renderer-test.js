@@ -75,6 +75,15 @@ describe('CategoryRenderer', () => {
     assert.ok(!audit2.querySelector('.lh-debug'));
   });
 
+  it('renders an informative audit', () => {
+    const auditDOM = renderer._renderAudit({
+      id: 'informative', score: 0,
+      result: {description: 'It informs', helpText: '', informative: true},
+    });
+
+    assert.ok(auditDOM.querySelector('.lh-score--informative'));
+  });
+
   it('renders a category', () => {
     const category = sampleResults.reportCategories[0];
     const categoryDOM = renderer.render(category, sampleResults.reportGroups);

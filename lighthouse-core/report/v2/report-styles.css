@@ -25,6 +25,7 @@
   /*--accent-color: #3879d9;*/
   --fail-color: #df332f;
   --pass-color: #2b882f;
+  --informative-color: #0c50c7;
   --average-color: #ef6c00; /* md orange 800 */
   --warning-color: #757575; /* md grey 600 */
 
@@ -186,6 +187,16 @@ summary {
   bottom: 0;
   background-color: #000;
   border-radius: inherit;
+}
+
+.lh-score--informative .lh-score__value {
+  background: var(--informative-color);
+  border-radius: 50%;
+}
+
+.lh-score--informative .lh-score__value::after {
+  background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>info</title><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="white"/></svg>') no-repeat 50% 50%;
+  background-size: calc(var(--lh-score-icon-background-size) * 2);
 }
 
 .lh-score__value--binary {
