@@ -1,6 +1,8 @@
-# @fileoverview This script restarts travis builds that have timed out due to flakiness
-# in the smoketests. It looks for builds from the past 3 days that have timeouts within. For each
-# specific job that timed out, it restarts 'em.
+# @fileoverview This script restarts travis builds that have either:
+#   1) timed out due to flakiness
+#   2) failed due to no screenshots collected in the trace.
+# It looks for builds from the past 3 days, and within each build it finds the job(s) that failed
+# or timed out, and restarts 'em.
 
 # step 1. generate github token and and use in .netrc
 #   https://help.github.com/articles/creating-an-access-token-for-command-line-use/
@@ -35,7 +37,7 @@ def restart_builds
   repository = Travis::Repository.find('GoogleChrome/lighthouse')
   repository.each_build do |build|
     # failed builds are failed. errored = timed out, or another problem.
-    next unless build.errored?
+    next unless build.errored? or build.failed?
 
     # only consider builds from the last 3 days
     next if build.started_at.nil?
@@ -51,16 +53,23 @@ def restart_builds
     # skip old builds
     next if build.started_at < Time.now.to_date.prev_day(3).to_time
 
-    puts "😱  Build #{build.number} errored #{to_pretty(build.started_at)}. Looking at jobs..."
+    puts "😱  Build #{build.number} #{build.state} #{to_pretty(build.started_at)}. Looking at jobs..."
 
     build.jobs.each do |job|
+      if job.failed? and job.log.body.include? "No screenshots found in trace"
+        puts "  👺  Job #{job.number} failed because of screenshots 🖼 "
+        puts "      Restarting job #{job.number}"
+        job.restart
+        next
+      end
+
       # skip non-timeout builds
       next unless job.errored?
       # skip builds finished under 10 minute timeout
       next if job.duration < 600
 
       duration = Time.at(job.duration).utc.strftime('%Mm %Ss')
-      puts "  👺  Job #{job.number} finished #{to_pretty(job.finished_at)}, took #{duration}"
+      puts "  👺  Job #{job.number} finished #{to_pretty(job.finished_at)}, took #{duration} 🕒"
       puts "      Restarting job #{job.number}"
       # restart the job
       job.restart
