@@ -93,6 +93,10 @@ gulp.task('compile-report', () => {
     formatting: 'PRETTY_PRINT',
     preserve_type_annotations: true,
   }))
+  .on('error', err => {
+    gutil.log(err.message);
+    return process.exit(1);
+  })
   .pipe(gulp.dest('../'))
   .on('end', () => {
     gutil.log('Closure compilation successful.');
