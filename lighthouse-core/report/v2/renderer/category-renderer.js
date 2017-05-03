@@ -220,7 +220,7 @@ class CategoryRenderer {
 
   /**
    * @param {!ReportRenderer.CategoryJSON} category
-   * @param {!Object<string, !ReportRenderer.GroupJSON>} groups
+   * @param {!Object<string, !ReportRenderer.GroupJSON>} groupDefinitions
    * @return {!Element}
    */
   _renderAccessibilityCategory(category, groupDefinitions) {
