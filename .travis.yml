@@ -35,6 +35,7 @@ script:
   - yarn closure
   - yarn smoke
   - yarn smokehouse
+  - yarn compile-devtools
 after_success:
   - yarn coveralls
 after_failure:
