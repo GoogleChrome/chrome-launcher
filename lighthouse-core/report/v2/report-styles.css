@@ -36,7 +36,7 @@
   --report-content-width: calc(var(--report-width) + var(--report-menu-width));
 
   --lh-score-highlight-bg: #fafafa;
-  --lh-score-icon-background-size: 17px;
+  --lh-score-icon-background-size: 24px;
   --lh-score-margin: var(--default-padding);
   --lh-audit-score-width: 35px;
   --lh-category-score-width: 50px;
@@ -172,10 +172,9 @@ summary {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--warning-color);
-  color: #fff;
   border-radius: 2px;
   position: relative;
+  font-weight: bold;
 }
 
 .lh-score__value::after {
@@ -185,18 +184,17 @@ summary {
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: #000;
   border-radius: inherit;
 }
 
 .lh-score--informative .lh-score__value {
-  background: var(--informative-color);
+  color: var(--informative-color);
   border-radius: 50%;
 }
 
 .lh-score--informative .lh-score__value::after {
-  background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>info</title><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="white"/></svg>') no-repeat 50% 50%;
-  background-size: calc(var(--lh-score-icon-background-size) * 2);
+  background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>info</title><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="#0c50c7"/></svg>') no-repeat 50% 50%;
+  background-size: var(--lh-score-icon-background-size);
 }
 
 .lh-score__value--binary {
@@ -209,23 +207,22 @@ summary {
 }
 
 .lh-score__value--pass {
-  background: var(--pass-color);
+  color: var(--pass-color);
 }
 
 .lh-score__value--pass::after {
-  background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>pass</title><path d="M9.17 2.33L4.5 7 2.83 5.33 1.5 6.66l3 3 6-6z" fill="white" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
+  background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>pass</title><path d="M9.17 2.33L4.5 7 2.83 5.33 1.5 6.66l3 3 6-6z" fill="#2b882f" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
   background-size: var(--lh-score-icon-background-size);
 }
 
 .lh-score__value--average {
-  background: var(--average-color);
+  color: var(--average-color);
 }
 
 .lh-score__value--average::after {
   background: none;
   content: '!';
-  background-color: var(--average-color);
-  color: #fff;
+  color: var(--average-color);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -234,11 +231,11 @@ summary {
 }
 
 .lh-score__value--fail {
-  background: var(--fail-color);
+  color: var(--fail-color);
 }
 
 .lh-score__value--fail::after {
-  background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>fail</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="white"/></svg>') no-repeat 50% 50%;
+  background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>fail</title><path d="M8.33 2.33l1.33 1.33-2.335 2.335L9.66 8.33 8.33 9.66 5.995 7.325 3.66 9.66 2.33 8.33l2.335-2.335L2.33 3.66l1.33-1.33 2.335 2.335z" fill="#df332f"/></svg>') no-repeat 50% 50%;
   background-size: var(--lh-score-icon-background-size);
 }
 
@@ -307,6 +304,12 @@ summary {
 
 .lh-audit {
   margin-top: var(--default-padding);
+  padding-bottom: var(--default-padding);
+  border-bottom: 1px solid var(--report-border-color);
+}
+
+.lh-audit:last-of-type {
+  border-bottom: none;
 }
 
 .lh-audit > .lh-score {
@@ -318,6 +321,12 @@ summary {
 
 .lh-audit-group {
   margin-top: var(--default-padding);
+  padding-bottom: var(--default-padding);
+  border-bottom: 1px solid var(--report-border-color);
+}
+
+.lh-audit-group:last-of-type {
+  border-bottom: none;
 }
 
 .lh-audit-group__header {
@@ -378,10 +387,22 @@ summary {
 
 .lh-category > .lh-score {
   font-size: 20px;
+  border-bottom: 1px solid var(--report-border-color);
+  padding-bottom: 24px;
+  margin: 0 calc(var(--default-padding) * -2);
 }
 
-.lh-category > .lh-score .lh-score__value {
-  width: var(--lh-category-score-width);
+.lh-category > .lh-score .lh-score__value,
+.lh-category > .lh-score .lh-score__gauge .lh-gauge__label {
+  display: none;
+}
+
+.lh-category .lh-score__gauge {
+  margin: 10px var(--lh-score-margin);
+}
+
+.lh-category .lh-score__gauge .lh-gauge {
+  --circle-size: 60px;
 }
 
 /* Category snippet shouldnt have pointer cursor. */

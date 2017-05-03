@@ -73,7 +73,7 @@ describe('ReportRenderer V2', () => {
       assert.ok(output.querySelector('.lh-header'), 'has a header');
       assert.ok(output.querySelector('.lh-report'), 'has report body');
       assert.equal(output.querySelectorAll('.lh-gauge').length,
-          sampleResults.reportCategories.length, 'renders category gauges');
+          sampleResults.reportCategories.length * 2, 'renders category gauges');
     });
 
     it('renders additional reports by replacing the existing one', () => {

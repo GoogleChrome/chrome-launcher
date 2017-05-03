@@ -56,7 +56,6 @@ class CategoryRenderer {
 
     // Append audit details to header section so the entire audit is within a <details>.
     const header = /** @type {!HTMLDetailsElement} */ (this._dom.find('.lh-score__header', tmpl));
-    header.open = audit.score < 100; // expand failed audits
     if (audit.result.details) {
       header.appendChild(this._detailsRenderer.render(audit.result.details));
     }
@@ -98,6 +97,11 @@ class CategoryRenderer {
   _renderCategoryScore(category) {
     const tmpl = this._dom.cloneTemplate('#tmpl-lh-category-score', this._templateContext);
     const score = Math.round(category.score);
+
+    const gaugeContainerEl = this._dom.find('.lh-score__gauge', tmpl);
+    const gaugeEl = this.renderScoreGauge(category);
+    gaugeContainerEl.appendChild(gaugeEl);
+
     return this._populateScore(tmpl, score, 'numeric', category.name, category.description);
   }
 
