@@ -37,9 +37,9 @@
 
   --lh-score-highlight-bg: #fafafa;
   --lh-score-icon-background-size: 24px;
-  --lh-score-margin: var(--default-padding);
+  --lh-score-margin: calc(var(--default-padding) / 2);
   --lh-audit-score-width: 35px;
-  --lh-category-score-width: 50px;
+  --lh-category-score-width: 60px;
 }
 
 .lh-root * {
@@ -166,7 +166,6 @@ summary {
 
 .lh-score__value {
   flex: none;
-  padding: 5px;
   margin-right: var(--lh-score-margin);
   width: var(--lh-audit-score-width);
   display: flex;
@@ -239,10 +238,6 @@ summary {
   background-size: var(--lh-score-icon-background-size);
 }
 
-.lh-score__title {
-  margin-bottom: calc(var(--default-padding) / 2);
-}
-
 .lh-score__description {
   font-size: smaller;
   color: var(--secondary-text-color);
@@ -276,7 +271,6 @@ summary {
 
 .lh-expandable-details {
   flex: 1;
-  margin-top: 2px;
 }
 
 .lh-expandable-details__summary {
@@ -305,7 +299,7 @@ summary {
 .lh-audit {
   margin-top: var(--default-padding);
   padding-bottom: var(--default-padding);
-  border-bottom: 1px solid var(--report-border-color);
+  border-bottom: 1px solid var(--report-secondary-border-color);
 }
 
 .lh-audit:last-of-type {
@@ -322,7 +316,7 @@ summary {
 .lh-audit-group {
   margin-top: var(--default-padding);
   padding-bottom: var(--default-padding);
-  border-bottom: 1px solid var(--report-border-color);
+  border-bottom: 1px solid var(--report-secondary-border-color);
 }
 
 .lh-audit-group:last-of-type {
@@ -351,8 +345,6 @@ summary {
   display: flex;
   max-width: var(--report-content-width);
   margin: 0 auto;
-  /*border-right: 1px solid var(--report-border-color);*/
-  /*border-left: 1px solid var(--report-border-color);*/
 }
 
 .lh-report {
@@ -380,16 +372,21 @@ summary {
   border: none;
 }
 
-.lh-category .lh-audit,
-.lh-category .lh-audit-group {
+.lh-category .lh-audit {
   margin-left: calc(var(--lh-category-score-width) + var(--lh-score-margin));
+}
+
+.lh-category .lh-audit-group {
+  margin-left: calc(var(--lh-category-score-width) + var(--default-padding));
+}
+
+.lh-category .lh-audit-group .lh-audit {
+  margin-left: var(--default-padding);
 }
 
 .lh-category > .lh-score {
   font-size: 20px;
-  border-bottom: 1px solid var(--report-border-color);
   padding-bottom: 24px;
-  margin: 0 calc(var(--default-padding) * -2);
 }
 
 .lh-category > .lh-score .lh-score__value,
@@ -398,7 +395,7 @@ summary {
 }
 
 .lh-category .lh-score__gauge {
-  margin: 10px var(--lh-score-margin);
+  margin: calc(var(--default-padding) / 2) var(--default-padding) 0 0;
 }
 
 .lh-category .lh-score__gauge .lh-gauge {
@@ -415,8 +412,14 @@ summary {
   font-weight: 400;
 }
 
+.lh-passed-audits[open] summary.lh-passed-audits-summary {
+  margin-bottom: calc(var(--default-padding) * 2);
+}
+
 summary.lh-passed-audits-summary {
-  margin: var(--default-padding);
+  margin: calc(var(--default-padding) * 2) var(--default-padding);
+  margin-left: calc(var(--lh-category-score-width) + var(--default-padding));
+  margin-bottom: 0;
   font-size: 15px;
   display: flex;
   align-items: center;
