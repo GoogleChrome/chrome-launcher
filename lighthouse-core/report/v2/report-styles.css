@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-.lh-root {
+.lh-vars {
   --text-font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   --body-font-size: 13px;
   --header-font-size: 16px;
@@ -396,6 +396,8 @@ summary {
 
 .lh-category .lh-score__gauge {
   margin: calc(var(--default-padding) / 2) var(--default-padding) 0 0;
+  flex-basis: var(--circle-size);
+  flex-shrink: 0;
 }
 
 .lh-category .lh-score__gauge .lh-gauge {
