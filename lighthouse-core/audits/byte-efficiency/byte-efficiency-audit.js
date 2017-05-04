@@ -69,8 +69,7 @@ class UnusedBytes extends Audit {
   }
 
   /**
-   * @param {!{debugString: string=, passes: boolean=, tableHeadings: !Object,
-   *    results: !Array<!Object>}} result
+   * @param {!Audit.HeadingsResult} result
    * @param {number} networkThroughput
    * @return {!AuditResult}
    */
@@ -96,6 +95,9 @@ class UnusedBytes extends Audit {
       displayValue = `Potential savings of ${wastedKbDisplay} (~${wastedMsDisplay})`;
     }
 
+    const v1TableHeadings = Audit.makeV1TableHeadings(result.headings);
+    const v2TableDetails = Audit.makeV2TableDetails(result.headings, results);
+
     return {
       debugString,
       displayValue,
@@ -104,8 +106,9 @@ class UnusedBytes extends Audit {
           !!result.passes,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {results, tableHeadings: result.tableHeadings}
-      }
+        value: {results, tableHeadings: v1TableHeadings}
+      },
+      details: v2TableDetails
     };
   }
 

@@ -164,8 +164,7 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {{results: !Array<Object>, tableHeadings: Object,
-   *     passes: boolean=, debugString: string=}}
+   * @return {{results: !Array<Object>, headings: !Audit.Headings}}
    */
   static audit_(artifacts) {
     const styles = artifacts.Styles;
@@ -179,14 +178,17 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
       return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
     }).filter(sheet => sheet && sheet.wastedBytes > 1024);
 
+
+    const headings = [
+      {key: 'url', itemType: 'url', text: 'URL'},
+      {key: 'numUnused', itemType: 'url', text: 'Unused Rules'},
+      {key: 'totalKb', itemType: 'text', text: 'Original'},
+      {key: 'potentialSavings', itemType: 'text', text: 'Potential Savings'},
+    ];
+
     return {
       results,
-      tableHeadings: {
-        url: 'URL',
-        numUnused: 'Unused Rules',
-        totalKb: 'Original',
-        potentialSavings: 'Potential Savings',
-      }
+      headings
     };
   }
 }

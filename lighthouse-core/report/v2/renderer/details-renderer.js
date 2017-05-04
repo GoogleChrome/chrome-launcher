@@ -34,8 +34,14 @@ class DetailsRenderer {
     switch (details.type) {
       case 'text':
         return this._renderText(details);
+      case 'url':
+        return this._renderURL(details);
+      case 'thumbnail':
+        return this._renderThumbnail(details);
       case 'cards':
         return this._renderCards(/** @type {!DetailsRenderer.CardsDetailsJSON} */ (details));
+      case 'table':
+        return this._renderTable(/** @type {!DetailsRenderer.TableDetailsJSON} */ (details));
       case 'list':
         return this._renderList(/** @type {!DetailsRenderer.ListDetailsJSON} */ (details));
       default:
@@ -50,6 +56,34 @@ class DetailsRenderer {
   _renderText(text) {
     const element = this._dom.createElement('div', 'lh-text');
     element.textContent = text.text;
+    return element;
+  }
+
+  /**
+   * @param {!DetailsRenderer.DetailsJSON} text
+   * @return {!Element}
+   */
+  _renderURL(text) {
+    const element = this._renderText(text);
+    element.classList.add('lh-text__url');
+    return element;
+  }
+
+  /**
+   * Create small thumbnail with scaled down image asset.
+   * If the supplied details doesn't have an image/* mimeType, then an empty span is returned.
+   * @param {!DetailsRenderer.ThumbnailDetails} value
+   * @return {!Element}
+   */
+  _renderThumbnail(value) {
+    if (/^image/.test(value.mimeType) === false) {
+      return this._dom.createElement('span');
+    }
+
+    const element = this._dom.createElement('img', 'lh-thumbnail');
+    element.src = value.url;
+    element.alt = '';
+    element.title = value.url;
     return element;
   }
 
@@ -70,6 +104,37 @@ class DetailsRenderer {
       itemsElem.appendChild(this.render(item));
     }
     element.appendChild(itemsElem);
+    return element;
+  }
+
+
+  /**
+   * @param {!DetailsRenderer.TableDetailsJSON} details
+   * @return {!Element}
+   */
+  _renderTable(details) {
+    if (!details.items.length) return this._dom.createElement('span');
+
+    const element = this._dom.createElement('details', 'lh-details');
+    if (details.header) {
+      element.appendChild(this._dom.createElement('summary')).textContent = details.header;
+    }
+
+    const tableElem = this._dom.createChildOf(element, 'table', 'lh-table');
+    const theadElem = this._dom.createChildOf(tableElem, 'thead');
+    const theadTrElem = this._dom.createChildOf(theadElem, 'tr');
+
+    for (const heading of details.itemHeaders) {
+      this._dom.createChildOf(theadTrElem, 'th').appendChild(this.render(heading));
+    }
+
+    const tbodyElem = this._dom.createChildOf(tableElem, 'tbody');
+    for (const row of details.items) {
+      const rowElem = this._dom.createChildOf(tbodyElem, 'tr');
+      for (const columnItem of row) {
+        this._dom.createChildOf(rowElem, 'td').appendChild(this.render(columnItem));
+      }
+    }
     return element;
   }
 
@@ -134,3 +199,21 @@ DetailsRenderer.ListDetailsJSON; // eslint-disable-line no-unused-expressions
  * }}
  */
 DetailsRenderer.CardsDetailsJSON; // eslint-disable-line no-unused-expressions
+
+/** @typedef {{
+ *     type: string,
+ *     header: ({text: string}|undefined),
+ *     items: !Array<!Array<!DetailsRenderer.DetailsJSON>>,
+ *     itemHeaders: !Array<!DetailsRenderer.DetailsJSON>
+ * }}
+ */
+DetailsRenderer.TableDetailsJSON; // eslint-disable-line no-unused-expressions
+
+
+/** @typedef {{
+ *     type: string,
+ *     url: ({text: string}|undefined),
+ *     mimeType: ({text: string}|undefined)
+ * }}
+ */
+DetailsRenderer.ThumbnailDetails; // eslint-disable-line no-unused-expressions

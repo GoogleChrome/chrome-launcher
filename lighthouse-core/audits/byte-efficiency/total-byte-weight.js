@@ -84,6 +84,15 @@ class TotalByteWeight extends ByteEfficiencyAudit {
           SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
       const score = 100 * distribution.computeComplementaryPercentile(totalBytes);
 
+      const headings = [
+        {key: 'url', itemType: 'url', text: 'URL'},
+        {key: 'totalKb', itemType: 'text', text: 'Total Size'},
+        {key: 'totalMs', itemType: 'text', text: 'Transfer Time'},
+      ];
+
+      const v1TableHeadings = ByteEfficiencyAudit.makeV1TableHeadings(headings);
+      const v2TableDetails = ByteEfficiencyAudit.makeV2TableDetails(headings, results);
+
       return {
         rawValue: totalBytes,
         optimalValue: this.meta.optimalValue,
@@ -93,13 +102,10 @@ class TotalByteWeight extends ByteEfficiencyAudit {
           formatter: Formatter.SUPPORTED_FORMATS.TABLE,
           value: {
             results,
-            tableHeadings: {
-              url: 'URL',
-              totalKb: 'Total Size',
-              totalMs: 'Transfer Time',
-            }
+            tableHeadings: v1TableHeadings
           }
-        }
+        },
+        details: v2TableDetails
       };
     });
   }

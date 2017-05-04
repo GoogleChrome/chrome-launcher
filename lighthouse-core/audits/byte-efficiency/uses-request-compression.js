@@ -47,7 +47,7 @@ class ResponsesAreCompressed extends ByteEfficiencyAudit {
   /**
    * @param {!Artifacts} artifacts
    * @param {number} networkThroughput
-   * @return {!AuditResult}
+   * @return {!Audit.HeadingsResult}
    */
   static audit_(artifacts) {
     const uncompressedResponses = artifacts.ResponseCompression;
@@ -90,15 +90,17 @@ class ResponsesAreCompressed extends ByteEfficiencyAudit {
     });
 
     let debugString;
+    const headings = [
+      {key: 'url', itemType: 'url', text: 'Uncompressed resource URL'},
+      {key: 'totalKb', itemType: 'text', text: 'Original'},
+      {key: 'potentialSavings', itemType: 'text', text: 'GZIP Savings'},
+    ];
+
     return {
       passes: totalWastedBytes < TOTAL_WASTED_BYTES_THRESHOLD,
       debugString,
       results,
-      tableHeadings: {
-        url: 'Uncompressed resource URL',
-        totalKb: 'Original',
-        potentialSavings: 'GZIP Savings',
-      }
+      headings,
     };
   }
 }
