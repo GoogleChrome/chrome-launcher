@@ -64,6 +64,15 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
     });
   });
 
+  it('ignores resources coming from cache', () => {
+    const mockNetworkRecords = [
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, _fromDiskCache: true},
+    ];
+    return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
+      assert.equal(result.rawValue, true);
+      assert.strictEqual(result.debugString, undefined);
+    });
+  });
 
   it('passes a good TTI value and WITH throttling', () => {
     // latencies are very long

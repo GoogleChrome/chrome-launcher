@@ -53,7 +53,12 @@ class LoadFastEnough4Pwa extends Audit {
   static audit(artifacts) {
     const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
     const allRequestLatencies = networkRecords.map(record => {
-      if (!record._timing) return undefined;
+      // Ignore requests that don't have timing data or resources that have
+      // previously been requested and are coming from the cache.
+      if (!record._timing || record._fromDiskCache) {
+        return undefined;
+      }
+
       // Use DevTools' definition of Waiting latency: https://github.com/ChromeDevTools/devtools-frontend/blob/66595b8a73a9c873ea7714205b828866630e9e82/front_end/network/RequestTimingView.js#L164
       return record._timing.receiveHeadersEnd - record._timing.sendEnd;
     });
