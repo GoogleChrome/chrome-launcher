@@ -55,7 +55,7 @@ class LoadFastEnough4Pwa extends Audit {
     const allRequestLatencies = networkRecords.map(record => {
       // Ignore requests that don't have timing data or resources that have
       // previously been requested and are coming from the cache.
-      if (!record._timing || record._fromDiskCache) {
+      if (!record._timing || record._fromDiskCache || record._fromMemoryCache) {
         return undefined;
       }
 
