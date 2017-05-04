@@ -29,11 +29,12 @@
 
 const http = require('http');
 const parse = require('url').parse;
-const opn = require('opn');
+
 const log = require('../../lighthouse-core/lib/log');
 const lighthouse = require('../../lighthouse-core');
 const ExperimentDatabase = require('./experiment-database/database');
 const PerfXReportGenerator = require('./report/perf-x-report-generator');
+const opn = require('../shim-modules').opn;
 
 let database;
 let fallbackReportId;
