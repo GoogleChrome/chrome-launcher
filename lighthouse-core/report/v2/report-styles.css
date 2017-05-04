@@ -27,7 +27,7 @@
   --pass-color: #2b882f;
   --informative-color: #0c50c7;
   --average-color: #ef6c00; /* md orange 800 */
-  --warning-color: #757575; /* md grey 600 */
+  --warning-color: #ffab00; /* md amber a700 */
 
   --report-border-color: #ccc;
   --report-secondary-border-color: #ebebeb;
@@ -74,6 +74,10 @@ summary {
 
 .lh-details[open] summary {
   margin-bottom: var(--default-padding);
+}
+
+.lh-details.flex .lh-code {
+  max-width: 70%;
 }
 
 /* Report header */
@@ -339,6 +343,19 @@ summary {
   color: var(--fail-color);
 }
 
+.lh-debug::before {
+  display: inline-block;
+  content: '';
+  background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>warn</title><path d="M0 0h24v24H0z" fill="none"/><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="#FFAB00"/></svg>') no-repeat 50% 50%;
+  background-size: contain;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  margin-right: calc(var(--default-padding) / 2);
+  top: 5px;
+}
+
+
 /* Report */
 
 .lh-container {
@@ -354,6 +371,17 @@ summary {
 
 .lh-exception {
   font-size: large;
+}
+
+.lh-text__url {
+  white-space: nowrap;
+}
+
+.lh-code {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre-line;
+  margin-top: 0;
 }
 
 .lh-scores-header {

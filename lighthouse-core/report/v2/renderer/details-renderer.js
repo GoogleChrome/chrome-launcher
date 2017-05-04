@@ -42,6 +42,8 @@ class DetailsRenderer {
         return this._renderCards(/** @type {!DetailsRenderer.CardsDetailsJSON} */ (details));
       case 'table':
         return this._renderTable(/** @type {!DetailsRenderer.TableDetailsJSON} */ (details));
+      case 'code':
+        return this._renderCode(details);
       case 'list':
         return this._renderList(/** @type {!DetailsRenderer.ListDetailsJSON} */ (details));
       default:
@@ -53,9 +55,9 @@ class DetailsRenderer {
    * @param {!DetailsRenderer.DetailsJSON} text
    * @return {!Element}
    */
-  _renderText(text) {
-    const element = this._dom.createElement('div', 'lh-text');
-    element.textContent = text.text;
+  _renderURL(text) {
+    const element = this._renderText(text);
+    element.classList.add('lh-text__url');
     return element;
   }
 
@@ -63,9 +65,9 @@ class DetailsRenderer {
    * @param {!DetailsRenderer.DetailsJSON} text
    * @return {!Element}
    */
-  _renderURL(text) {
-    const element = this._renderText(text);
-    element.classList.add('lh-text__url');
+  _renderText(text) {
+    const element = this._dom.createElement('div', 'lh-text');
+    element.textContent = text.text;
     return element;
   }
 
@@ -166,6 +168,16 @@ class DetailsRenderer {
 
     element.appendChild(cardsParent);
     return element;
+  }
+
+  /**
+   * @param {!DetailsRenderer.DetailsJSON} details
+   * @return {!Element}
+   */
+  _renderCode(details) {
+    const pre = this._dom.createElement('pre', 'lh-code');
+    pre.textContent = details.text;
+    return pre;
   }
 }
 
