@@ -2,20 +2,16 @@
 
 _Some incomplete notes_
 
-## Components
+![Lighthouse Architecture](https://raw.githubusercontent.com/GoogleChrome/lighthouse/master/assets/architecture.jpg)
+
+## Components & Terminology
 
 * **Driver** - Interfaces with [Chrome Debugging Protocol](https://developer.chrome.com/devtools/docs/debugger-protocol)  ([API viewer](https://chromedevtools.github.io/debugger-protocol-viewer/))
-* **Gatherers** - Requesting data from the browser (and maybe post-processing)
-* **Artifacts** - The output of gatherers
-* **Audits** - Non-performance evaluations of capabilities and issues. Includes a raw value and score of that value.
-* **Metrics** - Performance metrics summarizing the UX
-* **Aggregations** - Pulling audit results, grouping into user-facing components (eg. `install_to_homescreen`) and applying weighting and overall scoring.
-
-### Internal module graph
-
-![graph of lighthouse-core module dependencies](https://cloud.githubusercontent.com/assets/39191/19367685/04d4336a-9151-11e6-9ebb-3b87bdb09a4c.png)
-
-`npm install -g js-vd; vd --exclude "node_modules|third_party|fs|path|url|log" lighthouse-core/ > graph.html`
+* **Gatherers** - Uses Driver to collect information about the page. Minimal post-processing.
+  * **Artifacts** - output of a gatherer
+* **Audits** - Using the Artifacts as input, Audits evaluate a test and assign pass/fail/scoring.
+  * **Computed Artifacts** - Generated on-demand from artifacts, these add additional meaning, and are often shared amongst multiple audits.
+* **Categories** - Grouping audit results into a user-facing section of the report (eg. `Best Practices`). Applies weighting and overall scoring to the section.
 
 ## Protocol
 
@@ -34,10 +30,6 @@ driver.sendCommand('Security.enable');
 ```
 
 * _Debugging the protocol_: Read [Better debugging of the Protocol](https://github.com/GoogleChrome/lighthouse/issues/184).
-
-## Gatherers
-
-* _Reading the DOM:_ We prefer reading the DOM right from the browser (See #77). The driver exposes a `querySelector` method that can be used along with a `getAttribute` method to read values.
 
 ## Audits
 
