@@ -66,8 +66,7 @@ class LoadFastEnough4Pwa extends Audit {
 
       const latency3gMin = Emulation.settings.TYPICAL_MOBILE_THROTTLING_METRICS.latency - 10;
       const areLatenciesAll3G = allRequestLatencies.every(val =>
-        val === undefined || val > latency3gMin);
-
+          val === undefined || val > latency3gMin);
 
       const trace = artifacts.traces[Audit.DEFAULT_PASS];
       return artifacts.requestFirstInteractive(trace).then(firstInteractive => {
@@ -92,7 +91,7 @@ class LoadFastEnough4Pwa extends Audit {
           return {
             rawValue: false,
             // eslint-disable-next-line max-len
-            debugString: `Under 3G conditions, the Time To Interactive was at ${ttiResult.displayValue}. More details in the "Performance" section.`,
+            debugString: `Under 3G conditions, First Interactive was at ${timeToFirstInteractive.toLocaleString()}. More details in the "Performance" section.`,
             extendedInfo
           };
         }

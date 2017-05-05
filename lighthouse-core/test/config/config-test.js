@@ -83,25 +83,7 @@ describe('Config', () => {
       audits: []
     };
 
-<<<<<<< HEAD
-    return new Promise((resolve, reject) => {
-      const warningListener = function(args) {
-        const warningMsg = args[1];
-        const isMatch = new RegExp(`overwrite.+${unlikelyPassName}`).test(warningMsg);
-        if (isMatch) {
-          log.events.removeListener('warning', warningListener);
-          resolve();
-        } else {
-          reject(isMatch);
-        }
-      };
-      log.events.addListener('warning', warningListener);
-
-      const _ = new Config(configJson);
-    });
-=======
     assert.throws(_ => new Config(configJson), /unique/);
->>>>>>> master
   });
 
   it('warns when traced twice with no passNames specified', () => {
@@ -325,11 +307,7 @@ describe('Config', () => {
       },
       passes: [
         {recordTrace: true, gatherers: []},
-<<<<<<< HEAD
-        {gatherers: ['accessibility']},
-=======
         {passName: 'a11y', gatherers: ['accessibility']},
->>>>>>> master
       ],
       audits: [
         'accessibility/color-contrast',

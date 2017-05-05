@@ -179,7 +179,6 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
         return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
       }).filter(sheet => sheet && sheet.wastedBytes > 1024);
 
-
       const headings = [
         {key: 'url', itemType: 'url', text: 'URL'},
         {key: 'numUnused', itemType: 'url', text: 'Unused Rules'},

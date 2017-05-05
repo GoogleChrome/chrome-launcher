@@ -255,8 +255,6 @@ class GatherRunner {
       const devtoolsLog = driver.endDevtoolsLog();
       const networkRecords = NetworkRecorder.recordsFromLogs(devtoolsLog);
       GatherRunner.assertPageLoaded(options.url, driver, networkRecords);
-      // Expose devtoolsLog & networkRecords to gatherers
-      passData.networkRecords = networkRecords;
       log.verbose('statusEnd', status);
 
       // Expose devtoolsLog and networkRecords to gatherers
@@ -360,7 +358,6 @@ class GatherRunner {
             .then(_ => GatherRunner.pass(runOptions, gathererResults))
             .then(_ => GatherRunner.afterPass(runOptions, gathererResults))
             .then(passData => {
-              // If requested by config, merge trace -> tracingData
               const passName = config.passName || Audit.DEFAULT_PASS;
 
               // networkRecords are discarded and not added onto artifacts.
@@ -370,8 +367,6 @@ class GatherRunner {
               if (config.recordTrace) {
                 tracingData.traces[passName] = passData.trace;
               }
-
-              tracingData.networkRecords[passName] = passData.networkRecords;
 
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;
