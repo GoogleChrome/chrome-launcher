@@ -22,40 +22,45 @@ const assert = require('assert');
 
 describe('Security: HTTPS audit', () => {
   function getArtifacts(networkRecords) {
-    return {networkRecords: {defaultPass: networkRecords}};
+    return {
+      devtoolsLogs: {[Audit.DEFAULT_PASS]: []},
+      requestNetworkRecords: () => Promise.resolve(networkRecords)
+    };
   }
 
   it('fails when there is more than one insecure record', () => {
-    const result = Audit.audit(getArtifacts([
+    return Audit.audit(getArtifacts([
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
       {url: 'http://insecure.com/image.jpeg', scheme: 'http', domain: 'insecure.com'},
       {url: 'http://insecure.com/image2.jpeg', scheme: 'http', domain: 'insecure.com'},
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
-    ]));
-    assert.strictEqual(result.rawValue, false);
-    assert.ok(result.displayValue.includes('requests found'));
-    assert.strictEqual(result.extendedInfo.value.length, 2);
+    ])).then(result => {
+      assert.strictEqual(result.rawValue, false);
+      assert.ok(result.displayValue.includes('requests found'));
+      assert.strictEqual(result.extendedInfo.value.length, 2);
+    });
   });
 
   it('fails when there is one insecure record', () => {
-    const result = Audit.audit(getArtifacts([
+    return Audit.audit(getArtifacts([
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
       {url: 'http://insecure.com/image.jpeg', scheme: 'http', domain: 'insecure.com'},
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
-    ]));
-    assert.strictEqual(result.rawValue, false);
-    assert.ok(result.displayValue.includes('request found'));
-    assert.deepEqual(result.extendedInfo.value[0], {url: 'insecure.com/image.jpeg'});
+    ])).then(result => {
+      assert.strictEqual(result.rawValue, false);
+      assert.ok(result.displayValue.includes('request found'));
+      assert.deepEqual(result.extendedInfo.value[0], {url: 'insecure.com/image.jpeg'});
+    });
   });
 
   it('passes when all records are secure', () => {
-    const result = Audit.audit(getArtifacts([
+    return Audit.audit(getArtifacts([
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
       {url: 'http://localhost/image.jpeg', scheme: 'http', domain: 'localhost'},
       {url: 'https://google.com/', scheme: 'https', domain: 'google.com'},
-    ]));
-
-    assert.strictEqual(result.rawValue, true);
+    ])).then(result => {
+      assert.strictEqual(result.rawValue, true);
+    });
   });
 
   describe('#isSecureRecord', () => {

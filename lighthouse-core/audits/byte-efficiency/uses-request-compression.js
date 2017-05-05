@@ -39,7 +39,7 @@ class ResponsesAreCompressed extends ByteEfficiencyAudit {
       helpText: 'Text-based responses should be served with compression (gzip, deflate or brotli)' +
         ' to minimize total network bytes.' +
         ' [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer).',
-      requiredArtifacts: ['ResponseCompression', 'networkRecords']
+      requiredArtifacts: ['ResponseCompression', 'devtoolsLogs']
     };
   }
 

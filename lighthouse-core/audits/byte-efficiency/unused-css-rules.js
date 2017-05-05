@@ -34,7 +34,7 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
       helpText: 'Remove unused rules from stylesheets to reduce unnecessary ' +
           'bytes consumed by network activity. ' +
           '[Learn more](https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery)',
-      requiredArtifacts: ['CSSUsage', 'Styles', 'URL', 'networkRecords']
+      requiredArtifacts: ['CSSUsage', 'Styles', 'URL', 'devtoolsLogs']
     };
   }
 
@@ -171,23 +171,25 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
     const styles = artifacts.Styles;
     const usage = artifacts.CSSUsage;
     const pageUrl = artifacts.URL.finalUrl;
-    const networkRecords = artifacts.networkRecords[ByteEfficiencyAudit.DEFAULT_PASS];
 
-    const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
-    UnusedCSSRules.countUnusedRules(usage, indexedSheets);
-    const results = Object.keys(indexedSheets).map(sheetId => {
-      return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
-    }).filter(sheet => sheet && sheet.wastedBytes > 1024);
+    const devtoolsLogs = artifacts.devtoolsLogs[ByteEfficiencyAudit.DEFAULT_PASS];
+    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
+      const indexedSheets = UnusedCSSRules.indexStylesheetsById(styles, networkRecords);
+      UnusedCSSRules.countUnusedRules(usage, indexedSheets);
+      const results = Object.keys(indexedSheets).map(sheetId => {
+        return UnusedCSSRules.mapSheetToResult(indexedSheets[sheetId], pageUrl);
+      }).filter(sheet => sheet && sheet.wastedBytes > 1024);
 
-    return {
-      results,
-      tableHeadings: {
-        url: 'URL',
-        numUnused: 'Unused Rules',
-        totalKb: 'Original',
-        potentialSavings: 'Potential Savings',
-      }
-    };
+      return {
+        results,
+        tableHeadings: {
+          url: 'URL',
+          numUnused: 'Unused Rules',
+          totalKb: 'Original',
+          potentialSavings: 'Potential Savings',
+        }
+      };
+    });
   }
 }
 

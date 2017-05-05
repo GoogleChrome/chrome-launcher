@@ -38,7 +38,7 @@ class UsesHTTP2Audit extends Audit {
       description: 'Uses HTTP/2 for its own resources',
       helpText: 'HTTP/2 offers many benefits over HTTP/1.1, including binary headers, ' +
           'multiplexing, and server push. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/http2).',
-      requiredArtifacts: ['URL', 'networkRecords']
+      requiredArtifacts: ['URL', 'devtoolsLogs']
     };
   }
 
@@ -47,40 +47,42 @@ class UsesHTTP2Audit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    const finalHost = new URL(artifacts.URL.finalUrl).host;
+    const devtoolsLogs = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
+    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
+      const finalHost = new URL(artifacts.URL.finalUrl).host;
 
-    // Filter requests that are on the same host as the page and not over h2.
-    const resources = networkRecords.filter(record => {
-      const requestHost = new URL(record._url).host;
-      const sameHost = requestHost === finalHost;
-      const notH2 = /HTTP\/[01][\.\d]?/i.test(record.protocol);
-      return sameHost && notH2;
-    }).map(record => {
+      // Filter requests that are on the same host as the page and not over h2.
+      const resources = networkRecords.filter(record => {
+        const requestHost = new URL(record._url).host;
+        const sameHost = requestHost === finalHost;
+        const notH2 = /HTTP\/[01][\.\d]?/i.test(record.protocol);
+        return sameHost && notH2;
+      }).map(record => {
+        return {
+          protocol: record.protocol,
+          url: record.url // .url is a getter and not copied over for the assign.
+        };
+      });
+
+      let displayValue = '';
+      if (resources.length > 1) {
+        displayValue = `${resources.length} requests were not handled over h2`;
+      } else if (resources.length === 1) {
+        displayValue = `${resources.length} request was not handled over h2`;
+      }
+
       return {
-        protocol: record.protocol,
-        url: record.url // .url is a getter and not copied over for the assign.
+        rawValue: resources.length === 0,
+        displayValue: displayValue,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+          value: {
+            results: resources,
+            tableHeadings: {url: 'URL', protocol: 'Protocol'}
+          }
+        }
       };
     });
-
-    let displayValue = '';
-    if (resources.length > 1) {
-      displayValue = `${resources.length} requests were not handled over h2`;
-    } else if (resources.length === 1) {
-      displayValue = `${resources.length} request was not handled over h2`;
-    }
-
-    return {
-      rawValue: resources.length === 0,
-      displayValue: displayValue,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {
-          results: resources,
-          tableHeadings: {url: 'URL', protocol: 'Protocol'}
-        }
-      }
-    };
   }
 }
 

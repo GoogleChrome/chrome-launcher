@@ -384,7 +384,6 @@ describe('GatherRunner', function() {
     };
 
     const config = {
-      recordNetwork: true,
       gatherers: [{}]
     };
 
@@ -409,7 +408,6 @@ describe('GatherRunner', function() {
     });
 
     const config = {
-      recordNetwork: true,
       gatherers: [
         new TestGatherer()
       ]
@@ -444,7 +442,6 @@ describe('GatherRunner', function() {
 
     const passes = [{
       blankDuration: 0,
-      recordNetwork: true,
       recordTrace: true,
       passName: 'firstPass',
       gatherers: [
@@ -472,6 +469,29 @@ describe('GatherRunner', function() {
   it('respects trace names', () => {
     const passes = [{
       blankDuration: 0,
+      recordTrace: true,
+      passName: 'firstPass',
+      gatherers: [new TestGatherer()]
+    }, {
+      blankDuration: 0,
+      recordTrace: true,
+      passName: 'secondPass',
+      gatherers: [new TestGatherer()]
+    }];
+    const options = {driver: fakeDriver, url: 'https://example.com', flags: {}, config: {}};
+
+    return GatherRunner.run(passes, options)
+      .then(artifacts => {
+        assert.ok(artifacts.traces.firstPass);
+        assert.ok(artifacts.devtoolsLogs.firstPass);
+        assert.ok(artifacts.traces.secondPass);
+        assert.ok(artifacts.devtoolsLogs.secondPass);
+      });
+  });
+
+  it('doesn\'t leave networkRecords as an artifact', () => {
+    const passes = [{
+      blankDuration: 0,
       recordNetwork: true,
       recordTrace: true,
       passName: 'firstPass',
@@ -487,12 +507,12 @@ describe('GatherRunner', function() {
 
     return GatherRunner.run(passes, options)
       .then(artifacts => {
-        assert.ok(artifacts.traces.firstPass);
-        assert.ok(artifacts.networkRecords.firstPass);
-        assert.ok(artifacts.traces.secondPass);
-        assert.ok(artifacts.networkRecords.secondPass);
+        // todo, trash these
+        assert.equal(artifacts.networkRecords['firstPass'], undefined);
+        assert.equal(artifacts.networkRecords['secondPass'], undefined);
       });
   });
+
 
   it('loads gatherers from custom paths', () => {
     const root = path.resolve(__dirname, '../fixtures');
@@ -783,7 +803,6 @@ describe('GatherRunner', function() {
     it('rejects if a gatherer does not provide an artifact', () => {
       const passes = [{
         blankDuration: 0,
-        recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
         gatherers: [
@@ -802,7 +821,6 @@ describe('GatherRunner', function() {
     it('rejects when domain name can\'t be resolved', () => {
       const passes = [{
         blankDuration: 0,
-        recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
         gatherers: []
@@ -833,7 +851,6 @@ describe('GatherRunner', function() {
     it('resolves when domain name can\'t be resolved but is offline', () => {
       const passes = [{
         blankDuration: 0,
-        recordNetwork: true,
         recordTrace: true,
         passName: 'firstPass',
         gatherers: []

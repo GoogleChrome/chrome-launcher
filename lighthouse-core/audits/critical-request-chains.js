@@ -36,7 +36,7 @@ class CriticalRequestChains extends Audit {
           'the length of chains, reducing the download size of resources, or ' +
           'deferring the download of unnecessary resources. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/critical-request-chains).',
-      requiredArtifacts: ['networkRecords']
+      requiredArtifacts: ['devtoolsLogs']
     };
   }
 
@@ -98,43 +98,45 @@ class CriticalRequestChains extends Audit {
    * @return {!AuditResult} The score from the audit, ranging from 0-100.
    */
   static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    return artifacts.requestCriticalRequestChains(networkRecords).then(chains => {
-      let chainCount = 0;
-      function walk(node, depth) {
-        const children = Object.keys(node);
+    const devtoolsLogs = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
+    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
+      return artifacts.requestCriticalRequestChains(networkRecords).then(chains => {
+        let chainCount = 0;
+        function walk(node, depth) {
+          const children = Object.keys(node);
 
-        // Since a leaf node indicates the end of a chain, we can inspect the number
-        // of child nodes, and, if the count is zero, increment the count.
-        if (children.length === 0) {
-          chainCount++;
-        }
-
-        children.forEach(id => {
-          const child = node[id];
-          walk(child.children, depth + 1);
-        }, '');
-      }
-
-      // Account for initial navigation
-      const initialNavKey = Object.keys(chains)[0];
-      const initialNavChildren = initialNavKey && chains[initialNavKey].children;
-      if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
-        walk(initialNavChildren, 0);
-      }
-
-      return {
-        rawValue: chainCount <= this.meta.optimalValue,
-        displayValue: chainCount,
-        optimalValue: this.meta.optimalValue,
-        extendedInfo: {
-          formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
-          value: {
-            chains,
-            longestChain: CriticalRequestChains._getLongestChain(chains)
+          // Since a leaf node indicates the end of a chain, we can inspect the number
+          // of child nodes, and, if the count is zero, increment the count.
+          if (children.length === 0) {
+            chainCount++;
           }
+
+          children.forEach(id => {
+            const child = node[id];
+            walk(child.children, depth + 1);
+          }, '');
         }
-      };
+
+        // Account for initial navigation
+        const initialNavKey = Object.keys(chains)[0];
+        const initialNavChildren = initialNavKey && chains[initialNavKey].children;
+        if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
+          walk(initialNavChildren, 0);
+        }
+
+        return {
+          rawValue: chainCount <= this.meta.optimalValue,
+          displayValue: chainCount,
+          optimalValue: this.meta.optimalValue,
+          extendedInfo: {
+            formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
+            value: {
+              chains,
+              longestChain: CriticalRequestChains._getLongestChain(chains)
+            }
+          }
+        };
+      });
     });
   }
 }

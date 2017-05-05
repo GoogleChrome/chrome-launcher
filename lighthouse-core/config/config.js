@@ -18,7 +18,6 @@
 
 const defaultConfigPath = './default.js';
 const defaultConfig = require('./default.js');
-const recordsFromLogs = require('../lib/network-recorder').recordsFromLogs;
 
 const GatherRunner = require('../gather/gather-runner');
 const log = require('../lib/log');
@@ -129,17 +128,13 @@ function validatePasses(passes, audits, rootPath) {
     });
   });
 
-  // Log if multiple passes require trace or network recording and could overwrite one another.
+  // Passes should have unique passName's. Warn otherwise.
   const usedNames = new Set();
   passes.forEach((pass, index) => {
-    if (!pass.recordNetwork && !pass.recordTrace) {
-      return;
-    }
-
     const passName = pass.passName || Audit.DEFAULT_PASS;
     if (usedNames.has(passName)) {
-      log.warn('config', `passes[${index}] may overwrite trace or network ` +
-          `data of earlier pass without a unique passName (repeated name: ${passName}.`);
+      log.warn('config', `passes[${index}] may overwrite trace ` +
+          ` of earlier pass without a unique passName (repeated name: ${passName}.`);
     }
     usedNames.add(passName);
   });
@@ -217,20 +212,10 @@ function expandArtifacts(artifacts) {
     });
   }
 
-  if (artifacts.performanceLog) {
-    if (typeof artifacts.performanceLog === 'string') {
-      // Support older format of a single performance log.
-      const log = require(artifacts.performanceLog);
-      artifacts.networkRecords = {
-        [Audit.DEFAULT_PASS]: recordsFromLogs(log)
-      };
-    } else {
-      artifacts.networkRecords = {};
-      Object.keys(artifacts.performanceLog).forEach(key => {
-        const log = require(artifacts.performanceLog[key]);
-        artifacts.networkRecords[key] = recordsFromLogs(log);
-      });
-    }
+  if (artifacts.devtoolsLogs) {
+    Object.keys(artifacts.devtoolsLogs).forEach(key => {
+      artifacts.devtoolsLogs[key] = require(artifacts.devtoolsLogs[key]);
+    });
   }
 
   return artifacts;

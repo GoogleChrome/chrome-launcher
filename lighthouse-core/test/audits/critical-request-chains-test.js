@@ -90,8 +90,11 @@ const EMPTY_REQUEST_CHAIN = {};
 
 const mockArtifacts = (mockChain) => {
   return {
-    networkRecords: {
+    devtoolsLogs: {
       [Audit.DEFAULT_PASS]: []
+    },
+    requestNetworkRecords: () => {
+      return Promise.resolve([]);
     },
     requestCriticalRequestChains: function() {
       return Promise.resolve(mockChain);

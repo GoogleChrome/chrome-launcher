@@ -238,20 +238,20 @@ class GatherRunner {
         // an object with a traceEvents property. Normalize to object form.
         passData.trace = Array.isArray(traceContents) ?
             {traceEvents: traceContents} : traceContents;
-        passData.devtoolsLog = driver.devtoolsLog;
         log.verbose('statusEnd', 'Retrieving trace');
       });
     }
 
     const status = 'Retrieving network records';
     pass = pass.then(_ => {
+      passData.devtoolsLog = driver.devtoolsLog;
       log.log('status', status);
       return driver.endNetworkCollect();
     }).then(networkRecords => {
       GatherRunner.assertPageLoaded(options.url, driver, networkRecords);
-
-      // Network records only given to gatherers if requested by config.
-      config.recordNetwork && (passData.networkRecords = networkRecords);
+      // expose devtoolsLog & networkRecords to gatherers
+      passData.devtoolsLog = driver.devtoolsLog;
+      passData.networkRecords = networkRecords;
       log.verbose('statusEnd', status);
     });
 
@@ -356,10 +356,10 @@ class GatherRunner {
               const passName = config.passName || Audit.DEFAULT_PASS;
               if (config.recordTrace) {
                 tracingData.traces[passName] = passData.trace;
-                tracingData.devtoolsLogs[passName] = passData.devtoolsLog;
               }
-              config.recordNetwork &&
-                  (tracingData.networkRecords[passName] = passData.networkRecords);
+
+              // passData.networkRecords is now discarded and not added onto artifacts
+              tracingData.devtoolsLogs[passName] = passData.devtoolsLog;
 
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;

@@ -30,6 +30,7 @@
     "cli-unit": "bash lighthouse-core/scripts/run-mocha.sh --cli",
     "viewer-unit": "bash lighthouse-core/scripts/run-mocha.sh --viewer",
     "unit": "bash lighthouse-core/scripts/run-mocha.sh --default",
+    "unit-core": "yarn core-unit",
     "closure": "cd lighthouse-core && node closure/closure-type-checking.js",
     "devtools": "bash lighthouse-core/scripts/roll-to-devtools.sh",
     "watch": "bash lighthouse-core/scripts/run-mocha.sh --watch",

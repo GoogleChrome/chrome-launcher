@@ -35,7 +35,8 @@ function generateArtifacts(records) {
     records = records.map(args => generateRequest(...args));
   }
   return {
-    networkRecords: {defaultPass: records},
+    devtoolsLogs: {defaultPass: []},
+    requestNetworkRecords: () => Promise.resolve(records),
     requestNetworkThroughput: () => Promise.resolve(1024)
   };
 }

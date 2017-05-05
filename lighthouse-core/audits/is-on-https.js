@@ -37,7 +37,7 @@ class HTTPS extends Audit {
           'in on the communications between your app and your users, and is a prerequisite for ' +
           'HTTP/2 and many new web platform APIs. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/https).',
-      requiredArtifacts: ['networkRecords']
+      requiredArtifacts: ['devtoolsLogs']
     };
   }
 
@@ -54,31 +54,33 @@ class HTTPS extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    const insecureRecords = networkRecords
-        .filter(record => !HTTPS.isSecureRecord(record))
-        .map(record => ({url: URL.getDisplayName(record.url, {preserveHost: true})}));
+    const devtoolsLogs = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
+    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
+      const insecureRecords = networkRecords
+          .filter(record => !HTTPS.isSecureRecord(record))
+          .map(record => ({url: URL.getDisplayName(record.url, {preserveHost: true})}));
 
-    let displayValue = '';
-    if (insecureRecords.length > 1) {
-      displayValue = `${insecureRecords.length} insecure requests found`;
-    } else if (insecureRecords.length === 1) {
-      displayValue = `${insecureRecords.length} insecure request found`;
-    }
-
-    return {
-      rawValue: insecureRecords.length === 0,
-      displayValue,
-      extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
-        value: insecureRecords
-      },
-      details: {
-        type: 'list',
-        header: {type: 'text', text: 'Insecure URLs:'},
-        items: insecureRecords.map(record => ({type: 'text', text: record.url})),
+      let displayValue = '';
+      if (insecureRecords.length > 1) {
+        displayValue = `${insecureRecords.length} insecure requests found`;
+      } else if (insecureRecords.length === 1) {
+        displayValue = `${insecureRecords.length} insecure request found`;
       }
-    };
+
+      return {
+        rawValue: insecureRecords.length === 0,
+        displayValue,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
+          value: insecureRecords
+        },
+        details: {
+          type: 'list',
+          header: {type: 'text', text: 'Insecure URLs:'},
+          items: insecureRecords.map(record => ({type: 'text', text: record.url})),
+        }
+      };
+    });
   }
 }
 

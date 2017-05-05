@@ -26,34 +26,40 @@ const h2Records = require('../../fixtures/networkRecords-h2push.json');
 
 describe('Resources are fetched over http/2', () => {
   it('fails when some resources were requested via http/1.x', () => {
-    const auditResult = UsesHTTP2Audit.audit({
+    return UsesHTTP2Audit.audit({
       URL: {finalUrl: URL},
-      networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: networkRecords}
-    });
-    assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.displayValue.match('4 requests were not'));
-    assert.equal(auditResult.extendedInfo.value.results.length, 4);
+      devtoolsLogs: {[UsesHTTP2Audit.DEFAULT_PASS]: []},
+      requestNetworkRecords: () => Promise.resolve(networkRecords)
+    }).then(auditResult => {
+      assert.equal(auditResult.rawValue, false);
+      assert.ok(auditResult.displayValue.match('4 requests were not'));
+      assert.equal(auditResult.extendedInfo.value.results.length, 4);
 
-    const headings = auditResult.extendedInfo.value.tableHeadings;
-    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
-                     ['URL', 'Protocol'], 'table headings are correct and in order');
+      const headings = auditResult.extendedInfo.value.tableHeadings;
+      assert.deepEqual(Object.keys(headings).map(key => headings[key]),
+                      ['URL', 'Protocol'], 'table headings are correct and in order');
+    });
   });
 
   it('displayValue is correct when only one resource fails', () => {
     const entryWithHTTP1 = networkRecords.slice(1, 2);
-    const auditResult = UsesHTTP2Audit.audit({
+    return UsesHTTP2Audit.audit({
       URL: {finalUrl: URL},
-      networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: entryWithHTTP1}
+      devtoolsLogs: {[UsesHTTP2Audit.DEFAULT_PASS]: []},
+      requestNetworkRecords: () => Promise.resolve(entryWithHTTP1)
+    }).then(auditResult => {
+      assert.ok(auditResult.displayValue.match('1 request was not'));
     });
-    assert.ok(auditResult.displayValue.match('1 request was not'));
   });
 
   it('passes when all resources were requested via http/2', () => {
-    const auditResult = UsesHTTP2Audit.audit({
+    return UsesHTTP2Audit.audit({
       URL: {finalUrl: URL},
-      networkRecords: {[UsesHTTP2Audit.DEFAULT_PASS]: h2Records}
+      devtoolsLogs: {[UsesHTTP2Audit.DEFAULT_PASS]: []},
+      requestNetworkRecords: () => Promise.resolve(h2Records)
+    }).then(auditResult => {
+      assert.equal(auditResult.rawValue, true);
+      assert.ok(auditResult.displayValue === '');
     });
-    assert.equal(auditResult.rawValue, true);
-    assert.ok(auditResult.displayValue === '');
   });
 });

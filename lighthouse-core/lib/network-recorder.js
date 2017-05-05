@@ -21,6 +21,11 @@ const EventEmitter = require('events').EventEmitter;
 const log = require('../lib/log.js');
 
 class NetworkRecorder extends EventEmitter {
+  /**
+   * Creates an instance of NetworkRecorder.
+   * @param {!Array} recordArray
+   * @param {?Driver} driver
+   */
   constructor(recordArray, driver) {
     super();
 
@@ -144,26 +149,30 @@ class NetworkRecorder extends EventEmitter {
         data.newPriority, data.timestamp);
   }
 
+  /**
+   * Routes network events to their handlers, so we can construct networkRecords
+   * @param {!string} method
+   * @param {?Object} params
+   */
+  dispatch(method, params) {
+    switch (method) {
+      case 'Network.requestWillBeSent': return this.onRequestWillBeSent(params);
+      case 'Network.requestServedFromCache': return this.onRequestServedFromCache(params);
+      case 'Network.responseReceived': return this.onResponseReceived(params);
+      case 'Network.dataReceived': return this.onDataReceived(params);
+      case 'Network.loadingFinished': return this.onLoadingFinished(params);
+      case 'Network.loadingFailed': return this.onLoadingFailed(params);
+      case 'Network.resourceChangedPriority': return this.onResourceChangedPriority(params);
+      default: return;
+    }
+  }
+
   static recordsFromLogs(logs) {
     const records = [];
     const nr = new NetworkRecorder(records);
-    const dispatcher = method => {
-      switch (method) {
-        case 'Network.requestWillBeSent': return nr.onRequestWillBeSent;
-        case 'Network.requestServedFromCache': return nr.onRequestServedFromCache;
-        case 'Network.responseReceived': return nr.onResponseReceived;
-        case 'Network.dataReceived': return nr.onDataReceived;
-        case 'Network.loadingFinished': return nr.onLoadingFinished;
-        case 'Network.loadingFailed': return nr.onLoadingFailed;
-        case 'Network.resourceChangedPriority': return nr.onResourceChangedPriority;
-        default: return () => {};
-      }
-    };
-
     logs.forEach(networkEvent => {
-      dispatcher(networkEvent.method)(networkEvent.params);
+      nr.dispatch(networkEvent.method, networkEvent.params);
     });
-
     return records;
   }
 }

@@ -131,30 +131,33 @@ describe('Best Practices: unused css rules audit', () => {
   });
 
   describe('#audit', () => {
-    const networkRecords = {
-      defaultPass: [
+    const devtoolsLogs = {defaultPass: []};
+    const requestNetworkRecords = () => {
+      return Promise.resolve([
         {
           url: 'file://a.css',
           transferSize: 10 * 1024,
           _resourceType: {_name: 'stylesheet'}
         },
-      ]
+      ]);
     };
 
     it('ignores missing stylesheets', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
+      return UnusedCSSAudit.audit_({
+        devtoolsLogs,
+        requestNetworkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [{styleSheetId: 'a', used: false}],
         Styles: []
+      }).then(result => {
+        assert.equal(result.results.length, 0);
       });
-
-      assert.equal(result.results.length, 0);
     });
 
     it('ignores stylesheets that are 100% used', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
+      return UnusedCSSAudit.audit_({
+        devtoolsLogs,
+        requestNetworkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -171,14 +174,15 @@ describe('Best Practices: unused css rules audit', () => {
             content: '.my.favorite.selector { rule: content; }'
           }
         ]
+      }).then(result => {
+        assert.equal(result.results.length, 0);
       });
-
-      assert.equal(result.results.length, 0);
     });
 
     it('fails when lots of rules are unused', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
+      return UnusedCSSAudit.audit_({
+        devtoolsLogs,
+        requestNetworkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -203,18 +207,19 @@ describe('Best Practices: unused css rules audit', () => {
             content: `${generate('123', 450)}` // will be filtered out
           }
         ]
+      }).then(result => {
+        assert.equal(result.results.length, 2);
+        assert.equal(result.results[0].totalBytes, 10 * 1024);
+        assert.equal(result.results[1].totalBytes, 2050);
+        assert.equal(result.results[0].wastedPercent, 75);
+        assert.equal(result.results[1].wastedPercent, 50);
       });
-
-      assert.equal(result.results.length, 2);
-      assert.equal(result.results[0].totalBytes, 10 * 1024);
-      assert.equal(result.results[1].totalBytes, 2050);
-      assert.equal(result.results[0].wastedPercent, 75);
-      assert.equal(result.results[1].wastedPercent, 50);
     });
 
     it('does not include duplicate sheets', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
+      return UnusedCSSAudit.audit_({
+        devtoolsLogs,
+        requestNetworkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -233,14 +238,15 @@ describe('Best Practices: unused css rules audit', () => {
             content: 'a.other {color: #fff}'
           },
         ]
+      }).then(result => {
+        assert.equal(result.results.length, 1);
       });
-
-      assert.equal(result.results.length, 1);
     });
 
     it('does not include empty or small sheets', () => {
-      const result = UnusedCSSAudit.audit_({
-        networkRecords,
+      return UnusedCSSAudit.audit_({
+        devtoolsLogs,
+        requestNetworkRecords,
         URL: {finalUrl: ''},
         CSSUsage: [
           {styleSheetId: 'a', used: true},
@@ -272,10 +278,10 @@ describe('Best Practices: unused css rules audit', () => {
             content: '       '
           },
         ]
+      }).then(result => {
+        assert.equal(result.results.length, 1);
+        assert.equal(result.results[0].numUnused, 1);
       });
-
-      assert.equal(result.results.length, 1);
-      assert.equal(result.results[0].numUnused, 1);
     });
   });
 });

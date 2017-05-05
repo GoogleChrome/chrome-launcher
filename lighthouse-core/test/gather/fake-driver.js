@@ -68,6 +68,9 @@ module.exports = {
       recordsFromLogs(require('../fixtures/perflog.json'))
     );
   },
+  get devtoolsLog() {
+    return require('../fixtures/perflog.json');
+  },
   getSecurityState() {
     return Promise.resolve({
       schemeIsCryptographic: true

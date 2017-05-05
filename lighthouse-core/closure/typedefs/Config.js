@@ -27,9 +27,6 @@
 var PassConfig = function() {};
 
 /** type {boolean} */
-PassConfig.prototype.recordNetwork;
-
-/** type {boolean} */
 PassConfig.prototype.recordTrace;
 
 /** type {string} */

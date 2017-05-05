@@ -60,11 +60,13 @@ class UnusedBytes extends Audit {
    * @return {!Promise<!AuditResult>}
    */
   static audit(artifacts) {
-    const networkRecords = artifacts.networkRecords[Audit.DEFAULT_PASS];
-    return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
-      return Promise.resolve(this.audit_(artifacts, networkRecords)).then(result => {
-        return this.createAuditResult(result, networkThroughput);
-      });
+    const devtoolsLogs = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
+    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
+      return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput =>
+        Promise.resolve(this.audit_(artifacts, networkRecords)).then(result =>
+          this.createAuditResult(result, networkThroughput)
+        )
+      );
     });
   }
 

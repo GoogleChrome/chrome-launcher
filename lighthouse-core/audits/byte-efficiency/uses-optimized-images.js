@@ -46,7 +46,7 @@ class UsesOptimizedImages extends ByteEfficiencyAudit {
         'The following images could have smaller file sizes when compressed with ' +
         '[WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. ' +
         '[Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization).',
-      requiredArtifacts: ['OptimizedImages', 'networkRecords']
+      requiredArtifacts: ['OptimizedImages', 'devtoolsLogs']
     };
   }
 

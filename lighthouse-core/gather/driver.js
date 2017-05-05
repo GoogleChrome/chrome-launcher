@@ -46,6 +46,7 @@ class Driver {
     this._devtoolsLog = new DevtoolsLog(/^(Page|Network)\./);
     connection.on('notification', event => {
       this._devtoolsLog.record(event);
+      this.recordNetworkEvent(event.method, event.params);
       this._eventEmitter.emit(event.method, event.params);
     });
     this.online = true;
@@ -677,30 +678,25 @@ class Driver {
       this._networkRecorder = new NetworkRecorder(this._networkRecords, this);
       this.enableUrlUpdateIfRedirected(opts);
 
-      this.on('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
-      this.on('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
-      this.on('Network.responseReceived', this._networkRecorder.onResponseReceived);
-      this.on('Network.dataReceived', this._networkRecorder.onDataReceived);
-      this.on('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
-      this.on('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
-      this.on('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
-
       this.sendCommand('Network.enable').then(resolve, reject);
     });
   }
 
+  /**
+   * @param {!string} method
+   * @param {?Object} params
+   */
+  recordNetworkEvent(method, params) {
+    if (!this._networkRecorder) return;
+
+    const regexFilter = /^Network\./;
+    if (!regexFilter.test(method)) return;
+    this._networkRecorder.dispatch(method, params);
+  }
+
   endNetworkCollect() {
     return new Promise((resolve, reject) => {
-      this.off('Network.requestWillBeSent', this._networkRecorder.onRequestWillBeSent);
-      this.off('Network.requestServedFromCache', this._networkRecorder.onRequestServedFromCache);
-      this.off('Network.responseReceived', this._networkRecorder.onResponseReceived);
-      this.off('Network.dataReceived', this._networkRecorder.onDataReceived);
-      this.off('Network.loadingFinished', this._networkRecorder.onLoadingFinished);
-      this.off('Network.loadingFailed', this._networkRecorder.onLoadingFailed);
-      this.off('Network.resourceChangedPriority', this._networkRecorder.onResourceChangedPriority);
-
       resolve(this._networkRecords);
-
       this._networkRecorder = null;
       this._networkRecords = [];
     });
