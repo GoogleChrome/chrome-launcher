@@ -143,27 +143,15 @@ class Metrics {
         }
       },
       {
-        name: 'Time to Interactive (vAlpha non-visual)',
-        id: 'tti-non-visual',
+        name: 'First Interactive (vBeta)',
+        id: 'ttfi',
         getTs: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timestamps.timeToInteractiveB');
+          const ttfiExt = auditResults['first-interactive'].extendedInfo;
+          return safeGet(ttfiExt, 'value.timestamp');
         },
         getTiming: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timings.timeToInteractiveB');
-        }
-      },
-      {
-        name: 'Time to Interactive (vAlpha non-visual, 5s)',
-        id: 'tti-non-visual-5s',
-        getTs: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timestamps.timeToInteractiveC');
-        },
-        getTiming: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timings.timeToInteractiveC');
+          const ttfiExt = auditResults['first-interactive'].extendedInfo;
+          return safeGet(ttfiExt, 'value.timeInMs');
         }
       },
       {

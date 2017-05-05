@@ -199,14 +199,14 @@ describe('TracingProcessor lib', () => {
       }
 
       assert.equal(durations.filter(dur => isNaN(dur)).length, 0, 'NaN found');
-      assert.equal(durations.length, 309);
+      assert.equal(durations.length, 652);
 
       assert.equal(getDurationFromIndex(50), 0.01);
-      assert.equal(getDurationFromIndex(100), 0.05);
-      assert.equal(getDurationFromIndex(200), 0.56);
-      assert.equal(getDurationFromIndex(durations.length - 3), 26.32);
-      assert.equal(getDurationFromIndex(durations.length - 2), 37.61);
-      assert.equal(getDurationFromIndex(durations.length - 1), 40.10);
+      assert.equal(getDurationFromIndex(300), 0.04);
+      assert.equal(getDurationFromIndex(400), 0.07);
+      assert.equal(getDurationFromIndex(durations.length - 3), 26.01);
+      assert.equal(getDurationFromIndex(durations.length - 2), 36.9);
+      assert.equal(getDurationFromIndex(durations.length - 1), 38.53);
     });
   });
 });

@@ -40,6 +40,7 @@
   </main>
   <footer>
     <div id="attachshadow-big" class="test this out">4</div>
+    <div id="attachshadow-big-2" class="root with many children">5</div>
     <div>3</div>
     <div></div>
     <div></div>
@@ -72,6 +73,21 @@
     `;
   }
 
+  function withShadowDOMTest2() {
+    const el3 = document.querySelector('#attachshadow-big-2');
+    el3.attachShadow({mode: 'open'}).innerHTML = `
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+      <div>6</div>
+    `;
+  }
+
   function domTest(numNodes=1500) {
     const frag = new DocumentFragment();
     for (let i = 0; i < numNodes; ++i) {
@@ -88,6 +104,9 @@
   }
   if (params.has('withShadowDOM')) {
     withShadowDOMTest();
+  }
+  if (params.has('ShadowRootWithManyChildren')) {
+    withShadowDOMTest2();
   }
 </script>
 </body>

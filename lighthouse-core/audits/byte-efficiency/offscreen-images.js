@@ -21,7 +21,6 @@
 'use strict';
 
 const ByteEfficiencyAudit = require('./byte-efficiency-audit');
-const TTIAudit = require('../time-to-interactive');
 const URL = require('../../lib/url-shim');
 
 const ALLOWABLE_OFFSCREEN_X = 100;
@@ -84,6 +83,7 @@ class OffscreenImages extends ByteEfficiencyAudit {
     return {
       url,
       preview: {
+        type: 'thumbnail',
         url: image.networkRecord.url,
         mimeType: image.networkRecord.mimeType
       },
@@ -96,12 +96,12 @@ class OffscreenImages extends ByteEfficiencyAudit {
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {{results: !Array<Object>, tableHeadings: Object,
-   *     passes: boolean=, debugString: string=}}
+   * @return {!Audit.HeadingsResult}
    */
   static audit_(artifacts) {
     const images = artifacts.ImageUsage;
     const viewportDimensions = artifacts.ViewportDimensions;
+    const trace = artifacts.traces[ByteEfficiencyAudit.DEFAULT_PASS];
 
     let debugString;
     const resultsMap = images.reduce((results, image) => {
@@ -124,23 +124,26 @@ class OffscreenImages extends ByteEfficiencyAudit {
       return results;
     }, new Map());
 
-    return TTIAudit.audit(artifacts).then(ttiResult => {
-      const ttiTimestamp = ttiResult.extendedInfo.value.timestamps.timeToInteractive / 1000000;
+    return artifacts.requestFirstInteractive(trace).then(firstInteractive => {
+      const ttiTimestamp = firstInteractive.timestamp / 1000000;
       const results = Array.from(resultsMap.values()).filter(item => {
         const isWasteful = item.wastedBytes > IGNORE_THRESHOLD_IN_BYTES &&
             item.wastedPercent > IGNORE_THRESHOLD_IN_PERCENT;
         const loadedEarly = item.requestStartTime < ttiTimestamp;
         return isWasteful && loadedEarly;
       });
+
+      const headings = [
+        {key: 'preview', itemType: 'thumbnail', text: ''},
+        {key: 'url', itemType: 'url', text: 'URL'},
+        {key: 'totalKb', itemType: 'text', text: 'Original'},
+        {key: 'potentialSavings', itemType: 'text', text: 'Potential Savings'},
+      ];
+
       return {
         debugString,
         results,
-        tableHeadings: {
-          preview: '',
-          url: 'URL',
-          totalKb: 'Original',
-          potentialSavings: 'Potential Savings',
-        }
+        headings,
       };
     });
   }

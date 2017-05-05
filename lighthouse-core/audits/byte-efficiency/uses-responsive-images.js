@@ -68,6 +68,7 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
     return {
       url,
       preview: {
+        type: 'thumbnail',
         url: image.networkRecord.url,
         mimeType: image.networkRecord.mimeType
       },
@@ -80,8 +81,7 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
 
   /**
    * @param {!Artifacts} artifacts
-   * @return {{results: !Array<Object>, tableHeadings: Object,
-   *     passes: boolean=, debugString: string=}}
+   * @return {!Audit.HeadingsResult}
    */
   static audit_(artifacts) {
     const images = artifacts.ImageUsage;
@@ -111,16 +111,19 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
 
     const results = Array.from(resultsMap.values())
         .filter(item => item.wastedBytes > IGNORE_THRESHOLD_IN_BYTES);
+
+    const headings = [
+      {key: 'preview', itemType: 'thumbnail', text: ''},
+      {key: 'url', itemType: 'url', text: 'URL'},
+      {key: 'totalKb', itemType: 'text', text: 'Original'},
+      {key: 'potentialSavings', itemType: 'text', text: 'Potential Savings'},
+    ];
+
     return {
       debugString,
       passes: !results.find(item => item.isWasteful),
       results,
-      tableHeadings: {
-        preview: '',
-        url: 'URL',
-        totalKb: 'Original',
-        potentialSavings: 'Potential Savings',
-      }
+      headings,
     };
   }
 }

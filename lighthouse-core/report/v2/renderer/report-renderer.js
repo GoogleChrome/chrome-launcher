@@ -47,19 +47,12 @@ class ReportRenderer {
    */
   renderReport(report, container) {
     container.textContent = ''; // Remove previous report.
+    const element = container.appendChild(this._renderReport(report));
 
-    let element;
-    try {
-      element = container.appendChild(this._renderReport(report));
-
-      // Hook in JS features and page-level event listeners after the report
-      // is in the document.
-      if (this._uiFeatures) {
-        this._uiFeatures.initFeatures(report);
-      }
-    } catch (/** @type {!Error} */ e) {
-      container.textContent = '';
-      element = container.appendChild(this._renderException(e));
+    // Hook in JS features and page-level event listeners after the report
+    // is in the document.
+    if (this._uiFeatures) {
+      this._uiFeatures.initFeatures(report);
     }
 
     return /** @type {!Element} **/ (element);
@@ -76,16 +69,6 @@ class ReportRenderer {
   }
 
   /**
-   * @param {!Error} e
-   * @return {!Element}
-   */
-  _renderException(e) {
-    const element = this._dom.createElement('div', 'lh-exception');
-    element.textContent = String(e.stack);
-    return element;
-  }
-
-  /**
    * @param {!ReportRenderer.ReportJSON} report
    * @return {!DocumentFragment}
    */
@@ -96,6 +79,8 @@ class ReportRenderer {
     const url = this._dom.find('.lh-metadata__url', header);
     url.href = report.url;
     url.textContent = report.url;
+
+    this._dom.find('.lh-env__item__ua', header).textContent = report.userAgent;
 
     const env = this._dom.find('.lh-env__items', header);
     report.runtimeConfig.environment.forEach(runtime => {
@@ -166,7 +151,7 @@ class ReportRenderer {
     const categories = reportSection.appendChild(this._dom.createElement('div', 'lh-categories'));
     for (const category of report.reportCategories) {
       scoreHeader.appendChild(this._categoryRenderer.renderScoreGauge(category));
-      categories.appendChild(this._categoryRenderer.render(category));
+      categories.appendChild(this._categoryRenderer.render(category, report.reportGroups));
     }
 
     reportSection.appendChild(this._renderReportFooter(report));
@@ -186,8 +171,10 @@ if (typeof module !== 'undefined' && module.exports) {
  *     id: string,
  *     weight: number,
  *     score: number,
+ *     group: string,
  *     result: {
  *       description: string,
+ *       informative: boolean,
  *       debugString: string,
  *       displayValue: string,
  *       helpText: string,
@@ -214,11 +201,22 @@ ReportRenderer.CategoryJSON; // eslint-disable-line no-unused-expressions
 
 /**
  * @typedef {{
+ *     title: string,
+ *     description: string,
+ * }}
+ */
+ReportRenderer.GroupJSON; // eslint-disable-line no-unused-expressions
+
+/**
+ * @typedef {{
  *     lighthouseVersion: string,
+ *     userAgent: string,
  *     generatedTime: string,
  *     initialUrl: string,
  *     url: string,
+ *     artifacts: {traces: !Object},
  *     reportCategories: !Array<!ReportRenderer.CategoryJSON>,
+ *     reportGroups: !Object<string, !ReportRenderer.GroupJSON>,
  *     runtimeConfig: {
  *       blockedUrlPatterns: !Array<string>,
  *       environment: !Array<{description: string, enabled: boolean, name: string}>

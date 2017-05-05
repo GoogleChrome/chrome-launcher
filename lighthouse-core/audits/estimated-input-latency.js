@@ -34,7 +34,7 @@ class EstimatedInputLatency extends Audit {
       category: 'Performance',
       name: 'estimated-input-latency',
       description: 'Estimated Input Latency',
-      optimalValue: SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString() + 'ms',
+      optimalValue: `< ${SCORING_POINT_OF_DIMINISHING_RETURNS.toLocaleString()} ms`,
       helpText: 'The score above is an estimate of how long your app takes to respond to user ' +
           'input, in milliseconds. There is a 90% probability that a user encounters this amount ' +
           'of latency, or less. 10% of the time a user can expect additional latency. If your ' +

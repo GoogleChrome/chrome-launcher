@@ -51,7 +51,7 @@ gulp.task('compile-report', () => {
     // new_type_inf: true,
     language_in: 'ECMASCRIPT6_STRICT',
     language_out: 'ECMASCRIPT5_STRICT',
-    warning_level: process.env.CI ? 'QUIET' : 'VERBOSE',
+    warning_level: 'VERBOSE',
     jscomp_error: [
       'checkTypes',
       'missingProperties',
@@ -93,6 +93,10 @@ gulp.task('compile-report', () => {
     formatting: 'PRETTY_PRINT',
     preserve_type_annotations: true,
   }))
+  .on('error', err => {
+    gutil.log(err.message);
+    return process.exit(1);
+  })
   .pipe(gulp.dest('../'))
   .on('end', () => {
     gutil.log('Closure compilation successful.');

@@ -1,29 +1,31 @@
 {
+  "userAgent": "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5 Build/MRA58N) AppleWebKit/537.36(KHTML, like Gecko) Chrome/59.0.3033.0 Mobile Safari/537.36",
   "lighthouseVersion": "1.6.0",
-  "generatedTime": "2017-04-03T21:33:08.927Z",
+  "generatedTime": "2017-04-14T17:24:25.493Z",
   "initialUrl": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "audits": {
     "first-meaningful-paint": {
-      "score": 73,
-      "displayValue": "2946.1ms",
-      "rawValue": 2946.1,
+      "score": 72,
+      "displayValue": "2960.7ms",
+      "rawValue": 2960.7,
       "optimalValue": "1,600ms",
       "extendedInfo": {
         "value": {
           "timestamps": {
-            "navStart": 1082002392677,
-            "fCP": 1082005338812,
-            "fMP": 1082005338817
+            "navStart": 191582574031,
+            "fCP": 191585534700,
+            "fMP": 191585534708
           },
           "timings": {
             "navStart": 0,
-            "fCP": 2946.135,
-            "fMP": 2946.14
+            "fCP": 2960.669,
+            "fMP": 2960.677
           }
         },
         "formatter": "null"
       },
+      "scoringMode": "numeric",
       "name": "first-meaningful-paint",
       "category": "Performance",
       "description": "First meaningful paint",
@@ -31,40 +33,37 @@
     },
     "speed-index-metric": {
       "score": 81,
-      "displayValue": "2960",
-      "rawValue": 2960,
+      "displayValue": "2984",
+      "rawValue": 2984,
       "optimalValue": "1,250",
       "extendedInfo": {
         "formatter": "speedline",
         "value": {
           "timings": {
-            "firstVisualChange": 2960,
-            "visuallyComplete": 2960,
-            "speedIndex": 2960.0629999637604,
-            "perceptualSpeedIndex": 2960.0629999637604
+            "firstVisualChange": 2983,
+            "visuallyComplete": 2983,
+            "speedIndex": 2983.9300000071526,
+            "perceptualSpeedIndex": 2983.9300000071526
           },
           "timestamps": {
-            "firstVisualChange": 1082005348162,
-            "visuallyComplete": 1082005348162,
-            "speedIndex": 1082005348224.9999,
-            "perceptualSpeedIndex": 1082005348224.9999
+            "firstVisualChange": 191585552889,
+            "visuallyComplete": 191585552889,
+            "speedIndex": 191585553819,
+            "perceptualSpeedIndex": 191585553819
           },
           "frames": [
             {
-              "timestamp": 1082002388.162,
+              "timestamp": 191582569.889,
               "progress": 0
             },
             {
-              "timestamp": 1082005348.225,
-              "progress": 100.00000000000001
-            },
-            {
-              "timestamp": 1082005369.923,
+              "timestamp": 191585553.819,
               "progress": 100.00000000000001
             }
           ]
         }
       },
+      "scoringMode": "numeric",
       "name": "speed-index-metric",
       "category": "Performance",
       "description": "Perceptual Speed Index",
@@ -91,62 +90,81 @@
           },
           {
             "percentile": 0.99,
-            "time": 17.454107589940943
+            "time": 16.54259999954222
           },
           {
             "percentile": 1,
-            "time": 22.667000328068752
+            "time": 23.296000000000276
           }
         ],
         "formatter": "null"
       },
+      "scoringMode": "numeric",
       "name": "estimated-input-latency",
       "category": "Performance",
       "description": "Estimated Input Latency",
       "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
     },
+    "first-interactive": {
+      "score": 94,
+      "displayValue": "2,970ms",
+      "rawValue": 2967.1560000042914,
+      "optimalValue": "5,000ms",
+      "extendedInfo": {
+        "value": {
+          "timeInMs": 2967.1560000042914,
+          "timestamp": 191585541187
+        },
+        "formatter": "null"
+      },
+      "scoringMode": "numeric",
+      "name": "first-interactive",
+      "category": "Performance",
+      "description": "First Interactive (alpha)",
+      "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+    },
     "time-to-interactive": {
       "score": 82,
-      "displayValue": "2955.5ms",
-      "rawValue": 2955.5,
+      "displayValue": "2979.8ms",
+      "rawValue": 2979.8,
       "optimalValue": "5,000ms",
       "extendedInfo": {
         "value": {
           "timings": {
-            "onLoad": 2956.185,
-            "fMP": 2946.14,
-            "visuallyReady": 2955.548,
-            "timeToInteractive": 2955.548,
-            "timeToInteractiveB": 2946.1399998664856,
-            "timeToInteractiveC": 2946.1399998664856,
-            "endOfTrace": 8471.488999843597
+            "onLoad": 2968.6350000202656,
+            "fMP": 2960.677,
+            "visuallyReady": 2979.788,
+            "timeToInteractive": 2979.788,
+            "timeToInteractiveB": 2960.677000015974,
+            "timeToInteractiveC": 2960.677000015974,
+            "endOfTrace": 8487.935000002384
           },
           "timestamps": {
-            "onLoad": 1082005348861.9999,
-            "fMP": 1082005338816.9999,
-            "visuallyReady": 1082005348224.9999,
-            "timeToInteractive": 1082005348224.9999,
-            "timeToInteractiveB": 1082005338816.9999,
-            "timeToInteractiveC": 1082005338816.9999,
-            "endOfTrace": 1082010864165.9999
+            "onLoad": 191585542666,
+            "fMP": 191585534708,
+            "visuallyReady": 191585553819,
+            "timeToInteractive": 191585553819,
+            "timeToInteractiveB": 191585534708,
+            "timeToInteractiveC": 191585534708,
+            "endOfTrace": 191591061966
           },
           "latencies": {
             "timeToInteractive": [
               {
                 "estLatency": 16,
-                "startTime": "2955.5"
+                "startTime": "2979.8"
               }
             ],
             "timeToInteractiveB": [
               {
                 "estLatency": 16,
-                "startTime": "2946.1"
+                "startTime": "2960.7"
               }
             ],
             "timeToInteractiveC": [
               {
                 "estLatency": 16,
-                "startTime": "2946.1"
+                "startTime": "2960.7"
               }
             ]
           },
@@ -154,6 +172,7 @@
         },
         "formatter": "null"
       },
+      "scoringMode": "numeric",
       "name": "time-to-interactive",
       "category": "Performance",
       "description": "Time To Interactive (alpha)",
@@ -167,6 +186,7 @@
         "formatter": "user-timings",
         "value": []
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "user-timings",
       "category": "Performance",
@@ -182,121 +202,121 @@
         "formatter": "critical-request-chains",
         "value": {
           "chains": {
-            "40638.1": {
+            "16388.1": {
               "request": {
                 "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                "startTime": 1082002.395084,
-                "endTime": 1082002.590407,
-                "responseReceivedTime": 1082002.547508,
+                "startTime": 191582.576288,
+                "endTime": 191582.775509,
+                "responseReceivedTime": 191582.733,
                 "transferSize": 10248
               },
               "children": {
-                "40638.3": {
+                "16388.3": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                    "startTime": 1082002.586168,
-                    "endTime": 1082002.740939,
-                    "responseReceivedTime": 1082002.740547,
+                    "startTime": 191582.771038,
+                    "endTime": 191582.926087,
+                    "responseReceivedTime": 191582.925667,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "40638.4": {
+                "16388.4": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                    "startTime": 1082002.586587,
-                    "endTime": 1082002.805698,
-                    "responseReceivedTime": 1082002.8049,
+                    "startTime": 191582.771771,
+                    "endTime": 191582.991836,
+                    "responseReceivedTime": 191582.99087,
                     "transferSize": 139
                   },
                   "children": {}
                 },
-                "40638.6": {
+                "16388.6": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                    "startTime": 1082002.587485,
-                    "endTime": 1082002.812608,
-                    "responseReceivedTime": 1082002.812149,
+                    "startTime": 191582.772121,
+                    "endTime": 191582.997624,
+                    "responseReceivedTime": 191582.997119,
                     "transferSize": 1146
                   },
                   "children": {}
                 },
-                "40638.7": {
+                "16388.7": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                    "startTime": 1082002.587933,
-                    "endTime": 1082002.819722,
-                    "responseReceivedTime": 1082002.819379,
+                    "startTime": 191582.772549,
+                    "endTime": 191583.004882,
+                    "responseReceivedTime": 191583.00448,
                     "transferSize": 770
                   },
                   "children": {}
                 },
-                "40638.18": {
+                "16388.18": {
                   "request": {
                     "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                    "startTime": 1082002.597918,
-                    "endTime": 1082002.927074,
-                    "responseReceivedTime": 1082002.754847,
-                    "transferSize": 31677
+                    "startTime": 191582.781848,
+                    "endTime": 191583.112473,
+                    "responseReceivedTime": 191582.94067,
+                    "transferSize": 31674
                   },
                   "children": {}
                 },
-                "40638.8": {
+                "16388.8": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                    "startTime": 1082002.588651,
-                    "endTime": 1082002.948403,
-                    "responseReceivedTime": 1082002.947958,
+                    "startTime": 191582.772856,
+                    "endTime": 191583.133555,
+                    "responseReceivedTime": 191583.133095,
                     "transferSize": 767
                   },
                   "children": {}
                 },
-                "40638.9": {
+                "16388.9": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                    "startTime": 1082002.589104,
-                    "endTime": 1082002.969496,
-                    "responseReceivedTime": 1082002.962466,
+                    "startTime": 191582.773269,
+                    "endTime": 191583.161732,
+                    "responseReceivedTime": 191583.147815,
                     "transferSize": 1630
                   },
                   "children": {}
                 },
-                "40638.17": {
+                "16388.17": {
                   "request": {
                     "url": "http://localhost:10200/zone.js",
-                    "startTime": 1082002.59701,
-                    "endTime": 1082003.313056,
-                    "responseReceivedTime": 1082002.97732,
+                    "startTime": 191582.781488,
+                    "endTime": 191583.49766,
+                    "responseReceivedTime": 191583.15446,
                     "transferSize": 71654
                   },
                   "children": {}
                 },
-                "40638.2": {
+                "16388.2": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                    "startTime": 1082002.584658,
-                    "endTime": 1082004.593418,
-                    "responseReceivedTime": 1082004.593001,
+                    "startTime": 191582.768999,
+                    "endTime": 191584.778365,
+                    "responseReceivedTime": 191584.777996,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "40638.5": {
+                "16388.5": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                    "startTime": 1082002.586894,
-                    "endTime": 1082004.794116,
-                    "responseReceivedTime": 1082004.793675,
+                    "startTime": 191582.77191,
+                    "endTime": 191584.985877,
+                    "responseReceivedTime": 191584.985446,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "40638.21": {
+                "16388.21": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                    "startTime": 1082004.825643,
-                    "endTime": 1082005.037335,
-                    "responseReceivedTime": 1082005.036865,
+                    "startTime": 191585.0145,
+                    "endTime": 191585.229542,
+                    "responseReceivedTime": 191585.229069,
                     "transferSize": 859
                   },
                   "children": {}
@@ -305,17 +325,102 @@
             }
           },
           "longestChain": {
-            "duration": 2642.251000041142,
+            "duration": 2653.253999975277,
             "length": 2,
             "transferSize": 859
           }
         }
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "critical-request-chains",
       "category": "Performance",
       "description": "Critical Request Chains",
       "helpText": "The Critical Request Chains below show you what resources are required for first render of this page. Improve page load by reducing the length of chains, reducing the download size of resources, or deferring the download of unnecessary resources. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/critical-request-chains)."
+    },
+    "total-byte-weight": {
+      "score": 100,
+      "displayValue": "Total size was 129 KB",
+      "rawValue": 131712,
+      "optimalValue": "1,600 KB",
+      "extendedInfo": {
+        "formatter": "table",
+        "value": {
+          "results": [
+            {
+              "url": "/zone.js",
+              "totalBytes": 71654,
+              "totalKb": "70 KB",
+              "totalMs": "340ms"
+            },
+            {
+              "url": "…3.2.1/jquery.min.js",
+              "totalBytes": 31674,
+              "totalKb": "31 KB",
+              "totalMs": "150ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.html",
+              "totalBytes": 10248,
+              "totalKb": "10 KB",
+              "totalMs": "50ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.html",
+              "totalBytes": 10248,
+              "totalKb": "10 KB",
+              "totalMs": "50ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.js",
+              "totalBytes": 1630,
+              "totalKb": "2 KB",
+              "totalMs": "10ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_disabled.css?delay=200",
+              "totalBytes": 1146,
+              "totalKb": "1 KB",
+              "totalMs": "10ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.css?delay=100",
+              "totalBytes": 859,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.css?delay=2200",
+              "totalBytes": 859,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
+              "totalBytes": 859,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
+              "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+              "totalBytes": 859,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            }
+          ],
+          "tableHeadings": {
+            "url": "URL",
+            "totalKb": "Total Size",
+            "totalMs": "Transfer Time"
+          }
+        }
+      },
+      "scoringMode": "numeric",
+      "informative": true,
+      "name": "total-byte-weight",
+      "category": "Network",
+      "description": "Avoids enormous network payloads",
+      "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
     },
     "uses-optimized-images": {
       "score": true,
@@ -334,6 +439,7 @@
           }
         }
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "uses-optimized-images",
       "category": "Images",
@@ -356,6 +462,7 @@
           }
         }
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "uses-responsive-images",
       "category": "Images",
@@ -389,6 +496,7 @@
           }
         ]
       },
+      "scoringMode": "numeric",
       "name": "dom-size",
       "category": "Performance",
       "description": "Avoids an excessive DOM size",
@@ -396,7 +504,7 @@
     },
     "link-blocking-first-paint": {
       "score": false,
-      "displayValue": "4 resources delayed first paint by 2208ms",
+      "displayValue": "4 resources delayed first paint by 2207ms",
       "rawValue": false,
       "extendedInfo": {
         "formatter": "table",
@@ -405,22 +513,22 @@
             {
               "url": "/dobetterweb/dbw_tester.css?delay=100",
               "totalKb": "1 KB",
-              "totalMs": "155ms"
+              "totalMs": "109ms"
             },
             {
               "url": "/dobetterweb/unknown404.css?delay=200",
               "totalKb": "0 KB",
-              "totalMs": "220ms"
+              "totalMs": "205ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.css?delay=2200",
               "totalKb": "1 KB",
-              "totalMs": "2208ms"
+              "totalMs": "2207ms"
             },
             {
               "url": "/dobetterweb/dbw_partial_a.html?delay=200",
               "totalKb": "1 KB",
-              "totalMs": "234ms"
+              "totalMs": "206ms"
             }
           ],
           "tableHeadings": {
@@ -430,6 +538,7 @@
           }
         }
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "link-blocking-first-paint",
       "category": "Performance",
@@ -438,7 +547,7 @@
     },
     "script-blocking-first-paint": {
       "score": false,
-      "displayValue": "1 resource delayed first paint by 380ms",
+      "displayValue": "1 resource delayed first paint by 208ms",
       "rawValue": false,
       "extendedInfo": {
         "formatter": "table",
@@ -447,7 +556,7 @@
             {
               "url": "/dobetterweb/dbw_tester.js",
               "totalKb": "2 KB",
-              "totalMs": "380ms"
+              "totalMs": "208ms"
             }
           ],
           "tableHeadings": {
@@ -457,6 +566,7 @@
           }
         }
       },
+      "scoringMode": "binary",
       "informative": true,
       "name": "script-blocking-first-paint",
       "category": "Performance",
@@ -485,43 +595,1230 @@
     "blockedUrlPatterns": []
   },
   "score": 0,
-  "reportCategories": [],
+  "reportCategories": [
+    {
+      "name": "Performance",
+      "description": "These encapsulate your app's performance.",
+      "audits": [
+        {
+          "id": "first-meaningful-paint",
+          "weight": 5,
+          "result": {
+            "score": 72,
+            "displayValue": "2960.7ms",
+            "rawValue": 2960.7,
+            "optimalValue": "1,600ms",
+            "extendedInfo": {
+              "value": {
+                "timestamps": {
+                  "navStart": 191582574031,
+                  "fCP": 191585534700,
+                  "fMP": 191585534708
+                },
+                "timings": {
+                  "navStart": 0,
+                  "fCP": 2960.669,
+                  "fMP": 2960.677
+                }
+              },
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "first-meaningful-paint",
+            "category": "Performance",
+            "description": "First meaningful paint",
+            "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
+          },
+          "score": 72
+        },
+        {
+          "id": "speed-index-metric",
+          "weight": 1,
+          "result": {
+            "score": 81,
+            "displayValue": "2984",
+            "rawValue": 2984,
+            "optimalValue": "1,250",
+            "extendedInfo": {
+              "formatter": "speedline",
+              "value": {
+                "timings": {
+                  "firstVisualChange": 2983,
+                  "visuallyComplete": 2983,
+                  "speedIndex": 2983.9300000071526,
+                  "perceptualSpeedIndex": 2983.9300000071526
+                },
+                "timestamps": {
+                  "firstVisualChange": 191585552889,
+                  "visuallyComplete": 191585552889,
+                  "speedIndex": 191585553819,
+                  "perceptualSpeedIndex": 191585553819
+                },
+                "frames": [
+                  {
+                    "timestamp": 191582569.889,
+                    "progress": 0
+                  },
+                  {
+                    "timestamp": 191585553.819,
+                    "progress": 100.00000000000001
+                  }
+                ]
+              }
+            },
+            "scoringMode": "numeric",
+            "name": "speed-index-metric",
+            "category": "Performance",
+            "description": "Perceptual Speed Index",
+            "helpText": "Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index)."
+          },
+          "score": 81
+        },
+        {
+          "id": "estimated-input-latency",
+          "weight": 1,
+          "result": {
+            "score": 100,
+            "displayValue": "16ms",
+            "rawValue": 16,
+            "optimalValue": "50ms",
+            "extendedInfo": {
+              "value": [
+                {
+                  "percentile": 0.5,
+                  "time": 16
+                },
+                {
+                  "percentile": 0.75,
+                  "time": 16
+                },
+                {
+                  "percentile": 0.9,
+                  "time": 16
+                },
+                {
+                  "percentile": 0.99,
+                  "time": 16.54259999954222
+                },
+                {
+                  "percentile": 1,
+                  "time": 23.296000000000276
+                }
+              ],
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "estimated-input-latency",
+            "category": "Performance",
+            "description": "Estimated Input Latency",
+            "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
+          },
+          "score": 100
+        },
+        {
+          "id": "time-to-interactive",
+          "weight": 5,
+          "result": {
+            "score": 82,
+            "displayValue": "2979.8ms",
+            "rawValue": 2979.8,
+            "optimalValue": "5,000ms",
+            "extendedInfo": {
+              "value": {
+                "timings": {
+                  "onLoad": 2968.6350000202656,
+                  "fMP": 2960.677,
+                  "visuallyReady": 2979.788,
+                  "timeToInteractive": 2979.788,
+                  "timeToInteractiveB": 2960.677000015974,
+                  "timeToInteractiveC": 2960.677000015974,
+                  "endOfTrace": 8487.935000002384
+                },
+                "timestamps": {
+                  "onLoad": 191585542666,
+                  "fMP": 191585534708,
+                  "visuallyReady": 191585553819,
+                  "timeToInteractive": 191585553819,
+                  "timeToInteractiveB": 191585534708,
+                  "timeToInteractiveC": 191585534708,
+                  "endOfTrace": 191591061966
+                },
+                "latencies": {
+                  "timeToInteractive": [
+                    {
+                      "estLatency": 16,
+                      "startTime": "2979.8"
+                    }
+                  ],
+                  "timeToInteractiveB": [
+                    {
+                      "estLatency": 16,
+                      "startTime": "2960.7"
+                    }
+                  ],
+                  "timeToInteractiveC": [
+                    {
+                      "estLatency": 16,
+                      "startTime": "2960.7"
+                    }
+                  ]
+                },
+                "expectedLatencyAtTTI": 16
+              },
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "time-to-interactive",
+            "category": "Performance",
+            "description": "Time To Interactive (alpha)",
+            "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
+          },
+          "score": 82
+        },
+        {
+          "id": "first-interactive",
+          "weight": 5,
+          "result": {
+            "score": 94,
+            "displayValue": "2,970ms",
+            "rawValue": 2967.1560000042914,
+            "optimalValue": "5,000ms",
+            "extendedInfo": {
+              "value": {
+                "timeInMs": 2967.1560000042914,
+                "timestamp": 191585541187
+              },
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "first-interactive",
+            "category": "Performance",
+            "description": "First Interactive (alpha)",
+            "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+          },
+          "score": 94
+        },
+        {
+          "id": "link-blocking-first-paint",
+          "weight": 0,
+          "result": {
+            "score": false,
+            "displayValue": "4 resources delayed first paint by 2207ms",
+            "rawValue": false,
+            "extendedInfo": {
+              "formatter": "table",
+              "value": {
+                "results": [
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?delay=100",
+                    "totalKb": "1 KB",
+                    "totalMs": "109ms"
+                  },
+                  {
+                    "url": "/dobetterweb/unknown404.css?delay=200",
+                    "totalKb": "0 KB",
+                    "totalMs": "205ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                    "totalKb": "1 KB",
+                    "totalMs": "2207ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_partial_a.html?delay=200",
+                    "totalKb": "1 KB",
+                    "totalMs": "206ms"
+                  }
+                ],
+                "tableHeadings": {
+                  "url": "URL",
+                  "totalKb": "Size (KB)",
+                  "totalMs": "Delayed Paint By (ms)"
+                }
+              }
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "link-blocking-first-paint",
+            "category": "Performance",
+            "description": "Render-blocking stylesheets",
+            "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+          },
+          "score": 0
+        },
+        {
+          "id": "script-blocking-first-paint",
+          "weight": 0,
+          "result": {
+            "score": false,
+            "displayValue": "1 resource delayed first paint by 208ms",
+            "rawValue": false,
+            "extendedInfo": {
+              "formatter": "table",
+              "value": {
+                "results": [
+                  {
+                    "url": "/dobetterweb/dbw_tester.js",
+                    "totalKb": "2 KB",
+                    "totalMs": "208ms"
+                  }
+                ],
+                "tableHeadings": {
+                  "url": "URL",
+                  "totalKb": "Size (KB)",
+                  "totalMs": "Delayed Paint By (ms)"
+                }
+              }
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "script-blocking-first-paint",
+            "category": "Performance",
+            "description": "Render-blocking scripts",
+            "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+          },
+          "score": 0
+        },
+        {
+          "id": "uses-optimized-images",
+          "weight": 0,
+          "result": {
+            "score": true,
+            "displayValue": "",
+            "rawValue": true,
+            "extendedInfo": {
+              "formatter": "table",
+              "value": {
+                "results": [],
+                "tableHeadings": {
+                  "preview": "",
+                  "url": "URL",
+                  "totalKb": "Original",
+                  "webpSavings": "WebP Savings",
+                  "jpegSavings": "JPEG Savings"
+                }
+              }
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "uses-optimized-images",
+            "category": "Images",
+            "description": "Unoptimized images",
+            "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+          },
+          "score": 100
+        },
+        {
+          "id": "uses-responsive-images",
+          "weight": 0,
+          "result": {
+            "score": true,
+            "displayValue": "",
+            "rawValue": true,
+            "extendedInfo": {
+              "formatter": "table",
+              "value": {
+                "results": [],
+                "tableHeadings": {
+                  "preview": "",
+                  "url": "URL",
+                  "totalKb": "Original",
+                  "potentialSavings": "Potential Savings"
+                }
+              }
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "uses-responsive-images",
+            "category": "Images",
+            "description": "Oversized images",
+            "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+          },
+          "score": 100
+        },
+        {
+          "id": "total-byte-weight",
+          "weight": 0,
+          "result": {
+            "score": 100,
+            "displayValue": "Total size was 129 KB",
+            "rawValue": 131712,
+            "optimalValue": "1,600 KB",
+            "extendedInfo": {
+              "formatter": "table",
+              "value": {
+                "results": [
+                  {
+                    "url": "/zone.js",
+                    "totalBytes": 71654,
+                    "totalKb": "70 KB",
+                    "totalMs": "340ms"
+                  },
+                  {
+                    "url": "…3.2.1/jquery.min.js",
+                    "totalBytes": 31674,
+                    "totalKb": "31 KB",
+                    "totalMs": "150ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.html",
+                    "totalBytes": 10248,
+                    "totalKb": "10 KB",
+                    "totalMs": "50ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.html",
+                    "totalBytes": 10248,
+                    "totalKb": "10 KB",
+                    "totalMs": "50ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.js",
+                    "totalBytes": 1630,
+                    "totalKb": "2 KB",
+                    "totalMs": "10ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_disabled.css?delay=200",
+                    "totalBytes": 1146,
+                    "totalKb": "1 KB",
+                    "totalMs": "10ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?delay=100",
+                    "totalBytes": 859,
+                    "totalKb": "1 KB",
+                    "totalMs": "0ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                    "totalBytes": 859,
+                    "totalKb": "1 KB",
+                    "totalMs": "0ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
+                    "totalBytes": 859,
+                    "totalKb": "1 KB",
+                    "totalMs": "0ms"
+                  },
+                  {
+                    "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                    "totalBytes": 859,
+                    "totalKb": "1 KB",
+                    "totalMs": "0ms"
+                  }
+                ],
+                "tableHeadings": {
+                  "url": "URL",
+                  "totalKb": "Total Size",
+                  "totalMs": "Transfer Time"
+                }
+              }
+            },
+            "scoringMode": "numeric",
+            "informative": true,
+            "name": "total-byte-weight",
+            "category": "Network",
+            "description": "Avoids enormous network payloads",
+            "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+          },
+          "score": 100
+        },
+        {
+          "id": "dom-size",
+          "weight": 0,
+          "result": {
+            "score": 100,
+            "displayValue": "34 nodes",
+            "rawValue": 34,
+            "optimalValue": "1,500 nodes",
+            "extendedInfo": {
+              "formatter": "cards",
+              "value": [
+                {
+                  "title": "Total DOM Nodes",
+                  "value": "34",
+                  "target": "< 1,500 nodes"
+                },
+                {
+                  "title": "DOM Depth",
+                  "value": "4",
+                  "snippet": "html >\n  body >\n    div >\n      h2",
+                  "target": "< 32"
+                },
+                {
+                  "title": "Maximum Children",
+                  "value": "21",
+                  "snippet": "Element with most children:\nhead",
+                  "target": "< 60 nodes"
+                }
+              ]
+            },
+            "scoringMode": "numeric",
+            "name": "dom-size",
+            "category": "Performance",
+            "description": "Avoids an excessive DOM size",
+            "helpText": "Browser engineers recommend pages contain fewer than ~1,500 DOM nodes. The sweet spot is a tree depth < 32 elements and fewer than 60 children/parent element. A large DOM can increase memory, cause longer [style calculations](https://developers.google.com/web/fundamentals/performance/rendering/reduce-the-scope-and-complexity-of-style-calculations), and produce costly [layout reflows](https://developers.google.com/speed/articles/reflow). [Learn more](https://developers.google.com/web/fundamentals/performance/rendering/)."
+          },
+          "score": 100
+        },
+        {
+          "id": "critical-request-chains",
+          "weight": 0,
+          "result": {
+            "score": false,
+            "displayValue": "11",
+            "rawValue": false,
+            "optimalValue": 0,
+            "extendedInfo": {
+              "formatter": "critical-request-chains",
+              "value": {
+                "chains": {
+                  "16388.1": {
+                    "request": {
+                      "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
+                      "startTime": 191582.576288,
+                      "endTime": 191582.775509,
+                      "responseReceivedTime": 191582.733,
+                      "transferSize": 10248
+                    },
+                    "children": {
+                      "16388.3": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
+                          "startTime": 191582.771038,
+                          "endTime": 191582.926087,
+                          "responseReceivedTime": 191582.925667,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "16388.4": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
+                          "startTime": 191582.771771,
+                          "endTime": 191582.991836,
+                          "responseReceivedTime": 191582.99087,
+                          "transferSize": 139
+                        },
+                        "children": {}
+                      },
+                      "16388.6": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
+                          "startTime": 191582.772121,
+                          "endTime": 191582.997624,
+                          "responseReceivedTime": 191582.997119,
+                          "transferSize": 1146
+                        },
+                        "children": {}
+                      },
+                      "16388.7": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
+                          "startTime": 191582.772549,
+                          "endTime": 191583.004882,
+                          "responseReceivedTime": 191583.00448,
+                          "transferSize": 770
+                        },
+                        "children": {}
+                      },
+                      "16388.18": {
+                        "request": {
+                          "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                          "startTime": 191582.781848,
+                          "endTime": 191583.112473,
+                          "responseReceivedTime": 191582.94067,
+                          "transferSize": 31674
+                        },
+                        "children": {}
+                      },
+                      "16388.8": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
+                          "startTime": 191582.772856,
+                          "endTime": 191583.133555,
+                          "responseReceivedTime": 191583.133095,
+                          "transferSize": 767
+                        },
+                        "children": {}
+                      },
+                      "16388.9": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
+                          "startTime": 191582.773269,
+                          "endTime": 191583.161732,
+                          "responseReceivedTime": 191583.147815,
+                          "transferSize": 1630
+                        },
+                        "children": {}
+                      },
+                      "16388.17": {
+                        "request": {
+                          "url": "http://localhost:10200/zone.js",
+                          "startTime": 191582.781488,
+                          "endTime": 191583.49766,
+                          "responseReceivedTime": 191583.15446,
+                          "transferSize": 71654
+                        },
+                        "children": {}
+                      },
+                      "16388.2": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                          "startTime": 191582.768999,
+                          "endTime": 191584.778365,
+                          "responseReceivedTime": 191584.777996,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "16388.5": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
+                          "startTime": 191582.77191,
+                          "endTime": 191584.985877,
+                          "responseReceivedTime": 191584.985446,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "16388.21": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
+                          "startTime": 191585.0145,
+                          "endTime": 191585.229542,
+                          "responseReceivedTime": 191585.229069,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      }
+                    }
+                  }
+                },
+                "longestChain": {
+                  "duration": 2653.253999975277,
+                  "length": 2,
+                  "transferSize": 859
+                }
+              }
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "critical-request-chains",
+            "category": "Performance",
+            "description": "Critical Request Chains",
+            "helpText": "The Critical Request Chains below show you what resources are required for first render of this page. Improve page load by reducing the length of chains, reducing the download size of resources, or deferring the download of unnecessary resources. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/critical-request-chains)."
+          },
+          "score": 0
+        },
+        {
+          "id": "user-timings",
+          "weight": 0,
+          "result": {
+            "score": true,
+            "displayValue": "0",
+            "rawValue": true,
+            "extendedInfo": {
+              "formatter": "user-timings",
+              "value": []
+            },
+            "scoringMode": "binary",
+            "informative": true,
+            "name": "user-timings",
+            "category": "Performance",
+            "description": "User Timing marks and measures",
+            "helpText": "Consider instrumenting your app with the User Timing API to create custom, real-world measurements of key user experiences. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/user-timing)."
+          },
+          "score": 100
+        }
+      ],
+      "id": "performance",
+      "score": 83.58823529411765
+    }
+  ],
   "aggregations": [
     {
-      "name": "Performance metrics",
-      "description": "",
-      "scored": false,
-      "total": null,
+      "name": "Performance",
+      "description": "These encapsulate your app's performance.",
       "categorizable": false,
+      "scored": false,
+      "total": 0.8358823529411765,
       "score": [
         {
-          "overall": 0.84,
+          "name": "Performance",
+          "description": "These encapsulate your app's performance.",
+          "overall": 0.8358823529411765,
           "subItems": [
-            "first-meaningful-paint",
-            "speed-index-metric",
-            "estimated-input-latency",
-            "time-to-interactive"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Performance diagnostics",
-      "description": "",
-      "scored": false,
-      "total": null,
-      "categorizable": false,
-      "score": [
-        {
-          "overall": 0.5714285714285714,
-          "subItems": [
-            "uses-optimized-images",
-            "uses-responsive-images",
-            "critical-request-chains",
-            "link-blocking-first-paint",
-            "script-blocking-first-paint",
-            "dom-size",
-            "user-timings"
+            {
+              "score": 72,
+              "displayValue": "2960.7ms",
+              "rawValue": 2960.7,
+              "optimalValue": "1,600ms",
+              "extendedInfo": {
+                "value": {
+                  "timestamps": {
+                    "navStart": 191582574031,
+                    "fCP": 191585534700,
+                    "fMP": 191585534708
+                  },
+                  "timings": {
+                    "navStart": 0,
+                    "fCP": 2960.669,
+                    "fMP": 2960.677
+                  }
+                },
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "first-meaningful-paint",
+              "category": "Performance",
+              "description": "First meaningful paint",
+              "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
+            },
+            {
+              "score": 81,
+              "displayValue": "2984",
+              "rawValue": 2984,
+              "optimalValue": "1,250",
+              "extendedInfo": {
+                "formatter": "speedline",
+                "value": {
+                  "timings": {
+                    "firstVisualChange": 2983,
+                    "visuallyComplete": 2983,
+                    "speedIndex": 2983.9300000071526,
+                    "perceptualSpeedIndex": 2983.9300000071526
+                  },
+                  "timestamps": {
+                    "firstVisualChange": 191585552889,
+                    "visuallyComplete": 191585552889,
+                    "speedIndex": 191585553819,
+                    "perceptualSpeedIndex": 191585553819
+                  },
+                  "frames": [
+                    {
+                      "timestamp": 191582569.889,
+                      "progress": 0
+                    },
+                    {
+                      "timestamp": 191585553.819,
+                      "progress": 100.00000000000001
+                    }
+                  ]
+                }
+              },
+              "scoringMode": "numeric",
+              "name": "speed-index-metric",
+              "category": "Performance",
+              "description": "Perceptual Speed Index",
+              "helpText": "Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index)."
+            },
+            {
+              "score": 100,
+              "displayValue": "16ms",
+              "rawValue": 16,
+              "optimalValue": "50ms",
+              "extendedInfo": {
+                "value": [
+                  {
+                    "percentile": 0.5,
+                    "time": 16
+                  },
+                  {
+                    "percentile": 0.75,
+                    "time": 16
+                  },
+                  {
+                    "percentile": 0.9,
+                    "time": 16
+                  },
+                  {
+                    "percentile": 0.99,
+                    "time": 16.54259999954222
+                  },
+                  {
+                    "percentile": 1,
+                    "time": 23.296000000000276
+                  }
+                ],
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "estimated-input-latency",
+              "category": "Performance",
+              "description": "Estimated Input Latency",
+              "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
+            },
+            {
+              "score": 82,
+              "displayValue": "2979.8ms",
+              "rawValue": 2979.8,
+              "optimalValue": "5,000ms",
+              "extendedInfo": {
+                "value": {
+                  "timings": {
+                    "onLoad": 2968.6350000202656,
+                    "fMP": 2960.677,
+                    "visuallyReady": 2979.788,
+                    "timeToInteractive": 2979.788,
+                    "timeToInteractiveB": 2960.677000015974,
+                    "timeToInteractiveC": 2960.677000015974,
+                    "endOfTrace": 8487.935000002384
+                  },
+                  "timestamps": {
+                    "onLoad": 191585542666,
+                    "fMP": 191585534708,
+                    "visuallyReady": 191585553819,
+                    "timeToInteractive": 191585553819,
+                    "timeToInteractiveB": 191585534708,
+                    "timeToInteractiveC": 191585534708,
+                    "endOfTrace": 191591061966
+                  },
+                  "latencies": {
+                    "timeToInteractive": [
+                      {
+                        "estLatency": 16,
+                        "startTime": "2979.8"
+                      }
+                    ],
+                    "timeToInteractiveB": [
+                      {
+                        "estLatency": 16,
+                        "startTime": "2960.7"
+                      }
+                    ],
+                    "timeToInteractiveC": [
+                      {
+                        "estLatency": 16,
+                        "startTime": "2960.7"
+                      }
+                    ]
+                  },
+                  "expectedLatencyAtTTI": 16
+                },
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "time-to-interactive",
+              "category": "Performance",
+              "description": "Time To Interactive (alpha)",
+              "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
+            },
+            {
+              "score": 94,
+              "displayValue": "2,970ms",
+              "rawValue": 2967.1560000042914,
+              "optimalValue": "5,000ms",
+              "extendedInfo": {
+                "value": {
+                  "timeInMs": 2967.1560000042914,
+                  "timestamp": 191585541187
+                },
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "first-interactive",
+              "category": "Performance",
+              "description": "First Interactive (alpha)",
+              "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+            },
+            {
+              "score": false,
+              "displayValue": "4 resources delayed first paint by 2207ms",
+              "rawValue": false,
+              "extendedInfo": {
+                "formatter": "table",
+                "value": {
+                  "results": [
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?delay=100",
+                      "totalKb": "1 KB",
+                      "totalMs": "109ms"
+                    },
+                    {
+                      "url": "/dobetterweb/unknown404.css?delay=200",
+                      "totalKb": "0 KB",
+                      "totalMs": "205ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                      "totalKb": "1 KB",
+                      "totalMs": "2207ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_partial_a.html?delay=200",
+                      "totalKb": "1 KB",
+                      "totalMs": "206ms"
+                    }
+                  ],
+                  "tableHeadings": {
+                    "url": "URL",
+                    "totalKb": "Size (KB)",
+                    "totalMs": "Delayed Paint By (ms)"
+                  }
+                }
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "link-blocking-first-paint",
+              "category": "Performance",
+              "description": "Render-blocking stylesheets",
+              "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+            },
+            {
+              "score": false,
+              "displayValue": "1 resource delayed first paint by 208ms",
+              "rawValue": false,
+              "extendedInfo": {
+                "formatter": "table",
+                "value": {
+                  "results": [
+                    {
+                      "url": "/dobetterweb/dbw_tester.js",
+                      "totalKb": "2 KB",
+                      "totalMs": "208ms"
+                    }
+                  ],
+                  "tableHeadings": {
+                    "url": "URL",
+                    "totalKb": "Size (KB)",
+                    "totalMs": "Delayed Paint By (ms)"
+                  }
+                }
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "script-blocking-first-paint",
+              "category": "Performance",
+              "description": "Render-blocking scripts",
+              "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+            },
+            {
+              "score": true,
+              "displayValue": "",
+              "rawValue": true,
+              "extendedInfo": {
+                "formatter": "table",
+                "value": {
+                  "results": [],
+                  "tableHeadings": {
+                    "preview": "",
+                    "url": "URL",
+                    "totalKb": "Original",
+                    "webpSavings": "WebP Savings",
+                    "jpegSavings": "JPEG Savings"
+                  }
+                }
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "uses-optimized-images",
+              "category": "Images",
+              "description": "Unoptimized images",
+              "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+            },
+            {
+              "score": true,
+              "displayValue": "",
+              "rawValue": true,
+              "extendedInfo": {
+                "formatter": "table",
+                "value": {
+                  "results": [],
+                  "tableHeadings": {
+                    "preview": "",
+                    "url": "URL",
+                    "totalKb": "Original",
+                    "potentialSavings": "Potential Savings"
+                  }
+                }
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "uses-responsive-images",
+              "category": "Images",
+              "description": "Oversized images",
+              "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+            },
+            {
+              "score": 100,
+              "displayValue": "Total size was 129 KB",
+              "rawValue": 131712,
+              "optimalValue": "1,600 KB",
+              "extendedInfo": {
+                "formatter": "table",
+                "value": {
+                  "results": [
+                    {
+                      "url": "/zone.js",
+                      "totalBytes": 71654,
+                      "totalKb": "70 KB",
+                      "totalMs": "340ms"
+                    },
+                    {
+                      "url": "…3.2.1/jquery.min.js",
+                      "totalBytes": 31674,
+                      "totalKb": "31 KB",
+                      "totalMs": "150ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.html",
+                      "totalBytes": 10248,
+                      "totalKb": "10 KB",
+                      "totalMs": "50ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.html",
+                      "totalBytes": 10248,
+                      "totalKb": "10 KB",
+                      "totalMs": "50ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.js",
+                      "totalBytes": 1630,
+                      "totalKb": "2 KB",
+                      "totalMs": "10ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_disabled.css?delay=200",
+                      "totalBytes": 1146,
+                      "totalKb": "1 KB",
+                      "totalMs": "10ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?delay=100",
+                      "totalBytes": 859,
+                      "totalKb": "1 KB",
+                      "totalMs": "0ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                      "totalBytes": 859,
+                      "totalKb": "1 KB",
+                      "totalMs": "0ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
+                      "totalBytes": 859,
+                      "totalKb": "1 KB",
+                      "totalMs": "0ms"
+                    },
+                    {
+                      "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                      "totalBytes": 859,
+                      "totalKb": "1 KB",
+                      "totalMs": "0ms"
+                    }
+                  ],
+                  "tableHeadings": {
+                    "url": "URL",
+                    "totalKb": "Total Size",
+                    "totalMs": "Transfer Time"
+                  }
+                }
+              },
+              "scoringMode": "numeric",
+              "informative": true,
+              "name": "total-byte-weight",
+              "category": "Network",
+              "description": "Avoids enormous network payloads",
+              "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+            },
+            {
+              "score": 100,
+              "displayValue": "34 nodes",
+              "rawValue": 34,
+              "optimalValue": "1,500 nodes",
+              "extendedInfo": {
+                "formatter": "cards",
+                "value": [
+                  {
+                    "title": "Total DOM Nodes",
+                    "value": "34",
+                    "target": "< 1,500 nodes"
+                  },
+                  {
+                    "title": "DOM Depth",
+                    "value": "4",
+                    "snippet": "html >\n  body >\n    div >\n      h2",
+                    "target": "< 32"
+                  },
+                  {
+                    "title": "Maximum Children",
+                    "value": "21",
+                    "snippet": "Element with most children:\nhead",
+                    "target": "< 60 nodes"
+                  }
+                ]
+              },
+              "scoringMode": "numeric",
+              "name": "dom-size",
+              "category": "Performance",
+              "description": "Avoids an excessive DOM size",
+              "helpText": "Browser engineers recommend pages contain fewer than ~1,500 DOM nodes. The sweet spot is a tree depth < 32 elements and fewer than 60 children/parent element. A large DOM can increase memory, cause longer [style calculations](https://developers.google.com/web/fundamentals/performance/rendering/reduce-the-scope-and-complexity-of-style-calculations), and produce costly [layout reflows](https://developers.google.com/speed/articles/reflow). [Learn more](https://developers.google.com/web/fundamentals/performance/rendering/)."
+            },
+            {
+              "score": false,
+              "displayValue": "11",
+              "rawValue": false,
+              "optimalValue": 0,
+              "extendedInfo": {
+                "formatter": "critical-request-chains",
+                "value": {
+                  "chains": {
+                    "16388.1": {
+                      "request": {
+                        "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
+                        "startTime": 191582.576288,
+                        "endTime": 191582.775509,
+                        "responseReceivedTime": 191582.733,
+                        "transferSize": 10248
+                      },
+                      "children": {
+                        "16388.3": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
+                            "startTime": 191582.771038,
+                            "endTime": 191582.926087,
+                            "responseReceivedTime": 191582.925667,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "16388.4": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
+                            "startTime": 191582.771771,
+                            "endTime": 191582.991836,
+                            "responseReceivedTime": 191582.99087,
+                            "transferSize": 139
+                          },
+                          "children": {}
+                        },
+                        "16388.6": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
+                            "startTime": 191582.772121,
+                            "endTime": 191582.997624,
+                            "responseReceivedTime": 191582.997119,
+                            "transferSize": 1146
+                          },
+                          "children": {}
+                        },
+                        "16388.7": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
+                            "startTime": 191582.772549,
+                            "endTime": 191583.004882,
+                            "responseReceivedTime": 191583.00448,
+                            "transferSize": 770
+                          },
+                          "children": {}
+                        },
+                        "16388.18": {
+                          "request": {
+                            "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                            "startTime": 191582.781848,
+                            "endTime": 191583.112473,
+                            "responseReceivedTime": 191582.94067,
+                            "transferSize": 31674
+                          },
+                          "children": {}
+                        },
+                        "16388.8": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
+                            "startTime": 191582.772856,
+                            "endTime": 191583.133555,
+                            "responseReceivedTime": 191583.133095,
+                            "transferSize": 767
+                          },
+                          "children": {}
+                        },
+                        "16388.9": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
+                            "startTime": 191582.773269,
+                            "endTime": 191583.161732,
+                            "responseReceivedTime": 191583.147815,
+                            "transferSize": 1630
+                          },
+                          "children": {}
+                        },
+                        "16388.17": {
+                          "request": {
+                            "url": "http://localhost:10200/zone.js",
+                            "startTime": 191582.781488,
+                            "endTime": 191583.49766,
+                            "responseReceivedTime": 191583.15446,
+                            "transferSize": 71654
+                          },
+                          "children": {}
+                        },
+                        "16388.2": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                            "startTime": 191582.768999,
+                            "endTime": 191584.778365,
+                            "responseReceivedTime": 191584.777996,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "16388.5": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
+                            "startTime": 191582.77191,
+                            "endTime": 191584.985877,
+                            "responseReceivedTime": 191584.985446,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "16388.21": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
+                            "startTime": 191585.0145,
+                            "endTime": 191585.229542,
+                            "responseReceivedTime": 191585.229069,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        }
+                      }
+                    }
+                  },
+                  "longestChain": {
+                    "duration": 2653.253999975277,
+                    "length": 2,
+                    "transferSize": 859
+                  }
+                }
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "critical-request-chains",
+              "category": "Performance",
+              "description": "Critical Request Chains",
+              "helpText": "The Critical Request Chains below show you what resources are required for first render of this page. Improve page load by reducing the length of chains, reducing the download size of resources, or deferring the download of unnecessary resources. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/critical-request-chains)."
+            },
+            {
+              "score": true,
+              "displayValue": "0",
+              "rawValue": true,
+              "extendedInfo": {
+                "formatter": "user-timings",
+                "value": []
+              },
+              "scoringMode": "binary",
+              "informative": true,
+              "name": "user-timings",
+              "category": "Performance",
+              "description": "User Timing marks and measures",
+              "helpText": "Consider instrumenting your app with the User Timing API to create custom, real-world measurements of key user experiences. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/user-timing)."
+            }
           ]
         }
       ]

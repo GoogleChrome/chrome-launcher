@@ -16,6 +16,36 @@
 				"tts": 4516530
 			},
 			{
+				"pid": 93449,
+				"tid": 1295,
+				"ts": 900000000000,
+				"ph": "X",
+				"cat": "toplevel",
+				"name": "TracingStartedInPage",
+				"args": {
+					"data": {
+						"page": "dummy"
+					}
+				},
+				"dur": 189,
+				"tdur": 186,
+				"tts": 4516530
+			},
+			{
+				"pid": 93449,
+				"tid": 1295,
+				"ts": 900000000000,
+				"ph": "X",
+				"cat": "loading",
+				"name": "navigationStart",
+				"args": {
+					"frame": "dummy"
+				},
+				"dur": 189,
+				"tdur": 186,
+				"tts": 4516530
+			},
+			{
 				"pid": 93267,
 				"tid": 1295,
 				"ts": 900001000000,

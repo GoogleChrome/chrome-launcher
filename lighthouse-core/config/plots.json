@@ -1,6 +1,5 @@
 {
   "passes": [{
-    "recordNetwork": true,
     "recordTrace": true,
     "pauseBeforeTraceEndMs": 5000,
     "useThrottling": true,

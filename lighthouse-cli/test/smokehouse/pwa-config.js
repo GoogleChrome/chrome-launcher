@@ -38,6 +38,7 @@ module.exports = {
     ]
   },
   {
+    passName: 'domstats',
     gatherers: [
       'dobetterweb/domstats',
       'http-redirect'

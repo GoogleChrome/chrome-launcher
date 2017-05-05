@@ -109,6 +109,7 @@ class GatherRunner {
       .then(_ => driver.beginEmulation(options.flags))
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cacheNatives())
+      .then(_ => driver.dismissJavaScriptDialogs())
       .then(_ => resetStorage && driver.cleanAndDisableBrowserCaches())
       .then(_ => resetStorage && driver.clearDataForOrigin(options.url))
       .then(_ => driver.blockUrlPatterns(options.flags.blockedUrlPatterns || []))
@@ -254,6 +255,8 @@ class GatherRunner {
       const devtoolsLog = driver.endDevtoolsLog();
       const networkRecords = NetworkRecorder.recordsFromLogs(devtoolsLog);
       GatherRunner.assertPageLoaded(options.url, driver, networkRecords);
+      // Expose devtoolsLog & networkRecords to gatherers
+      passData.networkRecords = networkRecords;
       log.verbose('statusEnd', status);
 
       // Expose devtoolsLog and networkRecords to gatherers
@@ -357,6 +360,7 @@ class GatherRunner {
             .then(_ => GatherRunner.pass(runOptions, gathererResults))
             .then(_ => GatherRunner.afterPass(runOptions, gathererResults))
             .then(passData => {
+              // If requested by config, merge trace -> tracingData
               const passName = config.passName || Audit.DEFAULT_PASS;
 
               // networkRecords are discarded and not added onto artifacts.
@@ -367,8 +371,7 @@ class GatherRunner {
                 tracingData.traces[passName] = passData.trace;
               }
 
-              // passData.networkRecords is now discarded and not added onto artifacts
-              tracingData.devtoolsLogs[passName] = passData.devtoolsLog;
+              tracingData.networkRecords[passName] = passData.networkRecords;
 
               if (passIndex === 0) {
                 urlAfterRedirects = runOptions.url;

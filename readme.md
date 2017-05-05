@@ -1,4 +1,4 @@
-# Lighthouse  [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse) [![Build Status Windows](https://ci.appveyor.com/api/projects/status/3bdm5qn9r32ha5cg/branch/master?svg=true)](https://ci.appveyor.com/project/paulirish/lighthouse) [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
+# Lighthouse  [![Build Status](https://travis-ci.org/GoogleChrome/lighthouse.svg?branch=master)](https://travis-ci.org/GoogleChrome/lighthouse) [![Coverage Status](https://coveralls.io/repos/github/GoogleChrome/lighthouse/badge.svg?branch=master)](https://coveralls.io/github/GoogleChrome/lighthouse?branch=master)
 
 > Lighthouse analyzes web apps and web pages, collecting modern performance metrics and insights on developer best practices.
 
@@ -120,7 +120,7 @@ NOTE: specifying an output path with multiple formats ignores your specified ext
 
  - `chrome-debug`
  - open and login to your site
- - `lighthouse http://mysite.com`
+ - in a separate terminal tab `lighthouse http://mysite.com`
 
 ## Testing on a mobile device
 
@@ -147,27 +147,21 @@ The example below shows how to setup and run Lighthouse programmatically as a No
 assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`).
 
 ```javascript
-const Lighthouse = require('lighthouse');
+const lighthouse = require('lighthouse');
 const ChromeLauncher = require('lighthouse/lighthouse-cli/chrome-launcher.js').ChromeLauncher;
 const Printer = require('lighthouse/lighthouse-cli/printer');
 
 function launchChromeAndRunLighthouse(url, flags, config) {
   const launcher = new ChromeLauncher({port: 9222, autoSelectChrome: true});
 
-  return launcher.isDebuggerReady()
-    .catch(() => {
-      if (flags.skipAutolaunch) {
-        return;
-      }
-      return launcher.run(); // Launch Chrome.
-    })
-    .then(() => Lighthouse(url, flags, config)) // Run Lighthouse.
+  return launcher.run() // Launch Chrome.
+    .then(() => lighthouse(url, flags, config)) // Run Lighthouse.
     .then(results => launcher.kill().then(() => results)) // Kill Chrome and return results.
     .catch(err => {
       // Kill Chrome if there's an error.
       return launcher.kill().then(() => {
         throw err;
-      }, console.error);
+      });
     });
 }
 
@@ -319,6 +313,11 @@ yarn watch
 ## run linting and unit tests separately
 yarn lint
 yarn unit
+
+## run closure compiler (on whitelisted files)
+yarn closure
+## import your report renderer into devtools-frontend and run devtools closure compiler
+yarn compile-devtools
 ```
 
 ## Lighthouse as trace processor

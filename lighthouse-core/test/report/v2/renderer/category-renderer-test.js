@@ -75,9 +75,18 @@ describe('CategoryRenderer', () => {
     assert.ok(!audit2.querySelector('.lh-debug'));
   });
 
+  it('renders an informative audit', () => {
+    const auditDOM = renderer._renderAudit({
+      id: 'informative', score: 0,
+      result: {description: 'It informs', helpText: '', informative: true},
+    });
+
+    assert.ok(auditDOM.querySelector('.lh-score--informative'));
+  });
+
   it('renders a category', () => {
     const category = sampleResults.reportCategories[0];
-    const categoryDOM = renderer.render(category);
+    const categoryDOM = renderer.render(category, sampleResults.reportGroups);
 
     const score = categoryDOM.querySelector('.lh-score');
     const value = categoryDOM.querySelector('.lh-score  > .lh-score__value');
@@ -95,6 +104,52 @@ describe('CategoryRenderer', () => {
         '.lh-category > .lh-passed-audits > .lh-audit');
     assert.equal(audits.length, category.audits.length, 'renders correct number of audits');
   });
+
+  describe('accessibility category', () => {
+    const category = sampleResults.reportCategories.find(cat => cat.id === 'accessibility');
+
+    it('renders the category header', () => {
+      const categoryDOM = renderer.render(category, sampleResults.reportGroups);
+      const score = categoryDOM.querySelector('.lh-score');
+      const value = categoryDOM.querySelector('.lh-score  > .lh-score__value');
+      const title = score.querySelector('.lh-score__title');
+      const description = score.querySelector('.lh-score__description');
+
+      assert.deepEqual(score, score.firstElementChild, 'first child is a score');
+      assert.ok(value.classList.contains('lh-score__value--numeric'),
+                'category score is numeric');
+      assert.equal(value.textContent, Math.round(category.score), 'category score is rounded');
+      assert.equal(title.textContent, category.name, 'title is set');
+      assert.ok(description.querySelector('a'), 'description contains converted markdown links');
+    });
+
+    it('renders the failed audits grouped by group', () => {
+      const categoryDOM = renderer.render(category, sampleResults.reportGroups);
+
+      const failedAudits = category.audits.filter(audit => audit.score !== 100);
+      const failedAuditTags = new Set(failedAudits.map(audit => audit.group));
+
+      const failedAuditGroups = categoryDOM.querySelectorAll('.lh-category > .lh-audit-group');
+      assert.equal(failedAuditGroups.length, failedAuditTags.size);
+    });
+
+    it('renders the passed audits grouped by group', () => {
+      const categoryDOM = renderer.render(category, sampleResults.reportGroups);
+
+      const passedAudits = category.audits.filter(audit => audit.score === 100);
+      const passedAuditTags = new Set(passedAudits.map(audit => audit.group));
+
+      const passedAuditGroups = categoryDOM.querySelectorAll('.lh-passed-audits .lh-audit-group');
+      assert.equal(passedAuditGroups.length, passedAuditTags.size);
+    });
+
+    it('renders all the audits', () => {
+      const categoryDOM = renderer.render(category, sampleResults.reportGroups);
+      const auditsElements = categoryDOM.querySelectorAll('.lh-audit');
+      assert.equal(auditsElements.length, category.audits.length);
+    });
+  });
+
 
   describe('grouping passed/failed', () => {
     it('separates audits in the DOM', () => {

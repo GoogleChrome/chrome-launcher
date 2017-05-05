@@ -128,19 +128,39 @@ function validatePasses(passes, audits, rootPath) {
     });
   });
 
+<<<<<<< HEAD
   // Passes should have unique passName's. Warn otherwise.
+=======
+  // Passes must have unique `passName`s. Throw otherwise.
+>>>>>>> master
   const usedNames = new Set();
+  let defaultUsed = false;
   passes.forEach((pass, index) => {
+<<<<<<< HEAD
     const passName = pass.passName || Audit.DEFAULT_PASS;
     if (usedNames.has(passName)) {
       log.warn('config', `passes[${index}] may overwrite trace ` +
           ` of earlier pass without a unique passName (repeated name: ${passName}.`);
+=======
+    let passName = pass.passName;
+    if (!passName) {
+      if (defaultUsed) {
+        throw new Error(`passes[${index}] requires a passName`);
+      }
+
+      passName = Audit.DEFAULT_PASS;
+      defaultUsed = true;
+    }
+
+    if (usedNames.has(passName)) {
+      throw new Error(`Passes must have unique names (repeated passName: ${passName}.`);
+>>>>>>> master
     }
     usedNames.add(passName);
   });
 }
 
-function validateCategories(categories, audits, auditResults) {
+function validateCategories(categories, audits, auditResults, groups) {
   if (!categories) {
     return;
   }
@@ -156,6 +176,14 @@ function validateCategories(categories, audits, auditResults) {
 
       if (!auditIds.includes(audit.id)) {
         throw new Error(`could not find ${audit.id} audit for category ${categoryId}`);
+      }
+
+      if (categoryId === 'accessibility' && !audit.group) {
+        throw new Error(`${audit.id} accessibility audit does not have a group`);
+      }
+
+      if (audit.group && !groups[audit.group]) {
+        throw new Error(`${audit.id} references unknown group ${audit.group}`);
       }
     });
   });
@@ -301,10 +329,11 @@ class Config {
     this._audits = Config.requireAudits(configJSON.audits, this._configDir);
     this._artifacts = expandArtifacts(configJSON.artifacts);
     this._categories = configJSON.categories;
+    this._groups = configJSON.groups;
 
     // validatePasses must follow after audits are required
     validatePasses(configJSON.passes, this._audits, this._configDir);
-    validateCategories(configJSON.categories, this._audits, this._auditResults);
+    validateCategories(configJSON.categories, this._audits, this._auditResults, this._groups);
   }
 
   /**
@@ -467,6 +496,7 @@ class Config {
    * @return {!Object} fresh passes object
    */
   static generatePassesNeededByGatherers(oldPasses, requiredGatherers) {
+    const auditsNeedTrace = requiredGatherers.has('traces');
     const passes = JSON.parse(JSON.stringify(oldPasses));
     const filteredPasses = passes.map(pass => {
       // remove any unncessary gatherers from within the passes
@@ -474,6 +504,14 @@ class Config {
         gathererName = GatherRunner.getGathererClass(gathererName).name;
         return requiredGatherers.has(gathererName);
       });
+
+      // disable the trace if no audit requires a trace
+      if (pass.recordTrace && !auditsNeedTrace) {
+        const passName = pass.passName || 'unknown pass';
+        log.warn('config', `Trace not requested by an audit, dropping trace in ${passName}`);
+        pass.recordTrace = false;
+      }
+
       return pass;
     }).filter(pass => {
       // remove any passes lacking concrete gatherers, unless they are dependent on the trace
@@ -552,6 +590,11 @@ class Config {
   /** @type {Object<{audits: !Array<{id: string, weight: number}>}>} */
   get categories() {
     return this._categories;
+  }
+
+  /** @type {Object<string, {title: string, description: string}>|undefined} */
+  get groups() {
+    return this._groups;
   }
 }
 

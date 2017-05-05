@@ -39,7 +39,7 @@ describe('Num DOM nodes audit', () => {
     const auditResult = DOMSize.audit(artifact);
     assert.equal(auditResult.score, 100);
     assert.equal(auditResult.rawValue, numNodes);
-    assert.equal(auditResult.optimalValue, `${DOMSize.MAX_DOM_NODES.toLocaleString()} nodes`);
+    assert.equal(auditResult.optimalValue, `< ${DOMSize.MAX_DOM_NODES.toLocaleString()} nodes`);
     assert.equal(auditResult.displayValue, `${numNodes.toLocaleString()} nodes`);
     assert.equal(auditResult.extendedInfo.value[0].title, 'Total DOM Nodes');
     assert.equal(auditResult.extendedInfo.value[0].value, numNodes.toLocaleString());

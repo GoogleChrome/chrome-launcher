@@ -24,6 +24,8 @@ accept your pull requests.
 
 ## Contributing a patch
 
+If you have a contribution for our [documentation](https://developers.google.com/web/tools/lighthouse/), please submit it in the [WebFundamentals repo](https://github.com/google/WebFundamentals/tree/master/src/content/en/tools/lighthouse).
+
 1. Submit an issue describing your proposed change to the repo in question.
 1. The repo owner will respond to your issue promptly.
 1. If your proposed change is accepted, and you haven't already done so, sign a Contributor License Agreement (see details above).

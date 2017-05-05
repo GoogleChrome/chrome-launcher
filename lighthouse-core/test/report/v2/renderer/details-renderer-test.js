@@ -108,5 +108,19 @@ describe('DetailsRenderer', () => {
       assert.equal(cards[1].getAttribute('title'), 'snippet', 'adds title attribute for snippet');
       assert.ok(!cards[1].querySelector('.lh-scorecard__target'), 'handles missing target');
     });
+
+    it('renders code', () => {
+      const el = renderer.render({
+        type: 'code',
+        text: 'code snippet',
+        lineNumber: 123,
+        source: 'deprecation',
+        url: 'https://example.com/feature'
+      });
+
+      assert.ok(el.localName === 'pre');
+      assert.ok(el.classList.contains('lh-code'));
+      assert.equal(el.textContent, 'code snippet');
+    });
   });
 });

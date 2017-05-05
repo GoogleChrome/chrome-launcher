@@ -35,6 +35,9 @@ module.exports = {
   setThrottling() {
     return Promise.resolve();
   },
+  dismissJavaScriptDialogs() {
+    return Promise.resolve();
+  },
   assertNoSameOriginServiceWorkerClients() {
     return Promise.resolve();
   },
