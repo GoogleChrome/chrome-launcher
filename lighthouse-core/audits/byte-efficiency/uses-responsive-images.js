@@ -38,7 +38,7 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
     return {
       category: 'Images',
       name: 'uses-responsive-images',
-      description: 'Oversized images',
+      description: 'Properly size images',
       informative: true,
       helpText:
         'Image sizes served should be based on the device display size to save network bytes. ' +

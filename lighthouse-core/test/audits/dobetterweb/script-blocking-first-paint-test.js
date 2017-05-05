@@ -49,7 +49,7 @@ describe('Script Block First Paint audit', () => {
         }
       ]
     });
-    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.rawValue, 150);
     assert.ok(auditResult.displayValue.match('2 resources delayed first paint by 150ms'));
     assert.equal(auditResult.extendedInfo.value.results.length, 2);
     assert.ok(auditResult.extendedInfo.value.results[0].url.includes('js/app.js'), 'has a url');
@@ -61,7 +61,7 @@ describe('Script Block First Paint audit', () => {
     const auditResult = ScriptBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: []
     });
-    assert.equal(auditResult.rawValue, true);
+    assert.equal(auditResult.rawValue, 0);
     assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 });

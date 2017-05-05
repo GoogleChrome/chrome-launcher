@@ -588,6 +588,18 @@ module.exports = {
     }]
   }],
   "groups": {
+    "perf-metric": {
+      "title": "Metrics",
+      "description": "These metrics encapsulate your app's performance across a number of dimensions."
+    },
+    "perf-hint": {
+      "title": "Opportunities",
+      "description": "These are opportunities to speed up your application by optimizing the following resources."
+    },
+    "perf-info": {
+      "title": "Diagnostics",
+      "description": "More information about the performance of your application."
+    },
     "a11y-color-contrast": {
       "title": "Color Contrast Is Satisfactory",
       "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
@@ -644,21 +656,21 @@ module.exports = {
       "name": "Performance",
       "description": "These encapsulate your app's performance.",
       "audits": [
-        {"id": "first-meaningful-paint", "weight": 5},
-        {"id": "speed-index-metric", "weight": 1},
-        {"id": "estimated-input-latency", "weight": 1},
-        {"id": "time-to-interactive", "weight": 5},
-        {"id": "first-interactive", "weight": 5},
-        {"id": "link-blocking-first-paint", "weight": 0},
-        {"id": "script-blocking-first-paint", "weight": 0},
+        {"id": "first-meaningful-paint", "weight": 5, "group": "perf-metric"},
+        {"id": "speed-index-metric", "weight": 1, "group": "perf-metric"},
+        {"id": "estimated-input-latency", "weight": 1, "group": "perf-metric"},
+        {"id": "time-to-interactive", "weight": 5, "group": "perf-metric"},
+        {"id": "first-interactive", "weight": 5, "group": "perf-metric"},
+        {"id": "link-blocking-first-paint", "weight": 0, "group": "perf-hint"},
+        {"id": "script-blocking-first-paint", "weight": 0, "group": "perf-hint"},
         // {"id": "unused-css-rules", "weight": 0},
-        {"id": "uses-optimized-images", "weight": 0},
-        {"id": "uses-request-compression", "weight": 0},
-        {"id": "uses-responsive-images", "weight": 0},
-        {"id": "total-byte-weight", "weight": 0},
-        {"id": "dom-size", "weight": 0},
-        {"id": "critical-request-chains", "weight": 0},
-        {"id": "user-timings", "weight": 0}
+        {"id": "uses-optimized-images", "weight": 0, "group": "perf-hint"},
+        {"id": "uses-request-compression", "weight": 0, "group": "perf-hint"},
+        {"id": "uses-responsive-images", "weight": 0, "group": "perf-hint"},
+        {"id": "total-byte-weight", "weight": 0, "group": "perf-info"},
+        {"id": "dom-size", "weight": 0, "group": "perf-info"},
+        {"id": "critical-request-chains", "weight": 0, "group": "perf-info"},
+        {"id": "user-timings", "weight": 0, "group": "perf-info"}
       ]
     },
     "accessibility": {

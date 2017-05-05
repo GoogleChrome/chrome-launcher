@@ -24,6 +24,7 @@
 const Audit = require('../audit');
 const URL = require('../../lib/url-shim');
 const Formatter = require('../../report/formatter');
+const scoreForWastedMs = require('../byte-efficiency/byte-efficiency-audit').scoreForWastedMs;
 
 // Because of the way we detect blocking stylesheets, asynchronously loaded
 // CSS with link[rel=preload] and an onload handler (see https://github.com/filamentgroup/loadCSS)
@@ -40,7 +41,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
     return {
       category: 'Performance',
       name: 'link-blocking-first-paint',
-      description: 'Render-blocking stylesheets',
+      description: 'Reduce render-blocking stylesheets',
       informative: true,
       helpText: 'Link elements are blocking the first paint of your page. Consider ' +
           'inlining critical links and deferring non-critical ones. ' +
@@ -64,7 +65,8 @@ class LinkBlockingFirstPaintAudit extends Audit {
         (item.endTime - item.startTime) * 1000 >= loadThreshold;
     });
 
-    const startTime = filtered.reduce((t, item) => Math.min(t, item.startTime), Number.MAX_VALUE);
+    const startTime = filtered.length === 0 ? 0 :
+        filtered.reduce((t, item) => Math.min(t, item.startTime), Number.MAX_VALUE);
     let endTime = 0;
 
     const results = filtered.map(item => {
@@ -96,10 +98,12 @@ class LinkBlockingFirstPaintAudit extends Audit {
 
     return {
       displayValue,
-      rawValue: results.length === 0,
+      score: scoreForWastedMs(delayTime),
+      rawValue: delayTime,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
         value: {
+          wastedMs: delayTime,
           results,
           tableHeadings: v1TableHeadings
         }

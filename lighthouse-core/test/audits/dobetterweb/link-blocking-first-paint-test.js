@@ -58,7 +58,7 @@ describe('Link Block First Paint audit', () => {
         }
       ]
     });
-    assert.equal(auditResult.rawValue, false);
+    assert.equal(auditResult.rawValue, 500);
     assert.ok(auditResult.displayValue.match('2 resources delayed first paint by 500ms'));
     assert.equal(auditResult.extendedInfo.value.results.length, 2);
     assert.ok(auditResult.extendedInfo.value.results[0].url.includes('css/style.css'), 'has a url');
@@ -70,7 +70,7 @@ describe('Link Block First Paint audit', () => {
     const auditResult = LinkBlockingFirstPaintAudit.audit({
       TagsBlockingFirstPaint: []
     });
-    assert.equal(auditResult.rawValue, true);
+    assert.equal(auditResult.rawValue, 0);
     assert.equal(auditResult.extendedInfo.value.results.length, 0);
   });
 });

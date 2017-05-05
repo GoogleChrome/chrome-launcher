@@ -32,25 +32,39 @@ describe('Byte efficiency base audit', () => {
   });
 
   it('should set the rawValue', () => {
-    const goodResultInferred = ByteEfficiencyAudit.createAuditResult({
+    const result = ByteEfficiencyAudit.createAuditResult({
       headings: [{key: 'value', text: 'Label'}],
       results: [{wastedBytes: 2345, totalBytes: 3000, wastedPercent: 65}],
-    });
+    }, 5000);
 
-    const badResultInferred = ByteEfficiencyAudit.createAuditResult({
+    assert.equal(result.rawValue, 470); // 2345 / 5000 * 1000 ~= 470
+  });
+
+  it('should score the wastedMs', () => {
+    const perfectResult = ByteEfficiencyAudit.createAuditResult({
+      headings: [{key: 'value', text: 'Label'}],
+      results: [{wastedBytes: 400, totalBytes: 4000, wastedPercent: 10}],
+    }, 100000);
+
+    const goodResult = ByteEfficiencyAudit.createAuditResult({
+      headings: [{key: 'value', text: 'Label'}],
+      results: [{wastedBytes: 2345, totalBytes: 3000, wastedPercent: 65}],
+    }, 10000);
+
+    const averageResult = ByteEfficiencyAudit.createAuditResult({
+      headings: [{key: 'value', text: 'Label'}],
+      results: [{wastedBytes: 2345, totalBytes: 3000, wastedPercent: 65}],
+    }, 5000);
+
+    const failingResult = ByteEfficiencyAudit.createAuditResult({
       headings: [{key: 'value', text: 'Label'}],
       results: [{wastedBytes: 45000, totalBytes: 45000, wastedPercent: 100}],
-    });
+    }, 10000);
 
-    const badResultExplicit = ByteEfficiencyAudit.createAuditResult({
-      passes: false,
-      headings: [{key: 'value', text: 'Label'}],
-      results: [{wastedBytes: 2345, totalBytes: 3000, wastedPercent: 65}],
-    });
-
-    assert.equal(goodResultInferred.rawValue, true, 'infers good rawValue');
-    assert.equal(badResultInferred.rawValue, false, 'infers bad rawValue');
-    assert.equal(badResultExplicit.rawValue, false, 'uses bad rawValue');
+    assert.equal(perfectResult.score, 100, 'scores perfect wastedMs');
+    assert.ok(goodResult.score > 75 && goodResult.score < 100, 'scores good wastedMs');
+    assert.ok(averageResult.score > 50 && averageResult.score < 75, 'scores average wastedMs');
+    assert.ok(failingResult.score < 50, 'scores failing wastedMs');
   });
 
   it('should populate Kb', () => {

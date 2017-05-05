@@ -55,7 +55,7 @@ module.exports = [
         score: false
       },
       'link-blocking-first-paint': {
-        score: false,
+        score: 0,
         extendedInfo: {
           value: {
             results: {
@@ -120,7 +120,7 @@ module.exports = [
         score: false
       },
       'script-blocking-first-paint': {
-        score: false,
+        score: 90,
         extendedInfo: {
           value: {
             results: {
@@ -230,7 +230,7 @@ module.exports = [
         score: true
       },
       'link-blocking-first-paint': {
-        score: true
+        score: 100
       },
       'no-console-time': {
         score: true
@@ -251,7 +251,7 @@ module.exports = [
         score: true
       },
       'script-blocking-first-paint': {
-        score: true
+        score: 100
       },
       'uses-passive-event-listeners': {
         score: true

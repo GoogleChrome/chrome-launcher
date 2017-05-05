@@ -1,7 +1,7 @@
 {
   "userAgent": "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5 Build/MRA58N) AppleWebKit/537.36(KHTML, like Gecko) Chrome/59.0.3033.0 Mobile Safari/537.36",
   "lighthouseVersion": "2.0.0-alpha.1",
-  "generatedTime": "2017-05-01T22:31:16.245Z",
+  "generatedTime": "2017-05-04T17:10:12.716Z",
   "initialUrl": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "audits": {
@@ -88,21 +88,21 @@
       "helpText": "Your app should display some content when JavaScript is disabled, even if it's just a warning to the user that JavaScript is required to use the app. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/no-js)."
     },
     "first-meaningful-paint": {
-      "score": 74,
-      "displayValue": "2898.2ms",
-      "rawValue": 2898.2,
-      "optimalValue": "1,600ms",
+      "score": 70,
+      "displayValue": "3041.3ms",
+      "rawValue": 3041.3,
+      "optimalValue": "< 1,600 ms",
       "extendedInfo": {
         "value": {
           "timestamps": {
-            "navStart": 116142036337,
-            "fCP": 116144934531,
-            "fMP": 116144934538
+            "navStart": 177804923477,
+            "fCP": 177807964718,
+            "fMP": 177807964730
           },
           "timings": {
             "navStart": 0,
-            "fCP": 2898.194,
-            "fMP": 2898.201
+            "fCP": 3041.241,
+            "fMP": 3041.253
           }
         },
         "formatter": "null"
@@ -122,22 +122,23 @@
         "value": {
           "areLatenciesAll3G": true,
           "allRequestLatencies": [
-            151.57499999622814,
-            157.12699999858143,
-            213.550999993458,
-            217.45199999713822,
-            228.59500000777214,
-            151.88200000557072,
-            206.05799999611898,
-            156.58999999868698,
-            157.266000009258,
-            2011.1069999984454,
-            2207.6920000108666,
-            158.08399999514248,
-            213.4119999973339
+            150.8799999719483,
+            154.82500000507596,
+            203.930999996373,
+            215.7330000190997,
+            221.29199997289098,
+            221.481999993557,
+            163.90799998771402,
+            158.19600000395462,
+            177.923000010196,
+            2010.1960000174572,
+            2204.622999997808,
+            155.95299997949056,
+            207.00600001146103,
+            154.0190000087024
           ],
           "isFast": true,
-          "timeToInteractive": 2918.407
+          "timeToFirstInteractive": 3050.7450000047684
         }
       },
       "scoringMode": "binary",
@@ -147,32 +148,36 @@
       "helpText": "Satisfied if the _Time To Interactive_ duration is shorter than _10 seconds_, as defined by the [PWA Baseline Checklist](https://developers.google.com/web/progressive-web-apps/checklist). Network throttling is required (specifically: RTT latencies >= 150 RTT are expected)."
     },
     "speed-index-metric": {
-      "score": 82,
-      "displayValue": "2923",
-      "rawValue": 2923,
-      "optimalValue": "1,250",
+      "score": 80,
+      "displayValue": "3051",
+      "rawValue": 3051,
+      "optimalValue": "< 1,250",
       "extendedInfo": {
         "formatter": "speedline",
         "value": {
           "timings": {
-            "firstVisualChange": 2922,
-            "visuallyComplete": 2922,
-            "speedIndex": 2922.946000009775,
-            "perceptualSpeedIndex": 2922.946000009775
+            "firstVisualChange": 3051,
+            "visuallyComplete": 3051,
+            "speedIndex": 3051.097000002861,
+            "perceptualSpeedIndex": 3051.097000002861
           },
           "timestamps": {
-            "firstVisualChange": 116144953798,
-            "visuallyComplete": 116144953798,
-            "speedIndex": 116144954744,
-            "perceptualSpeedIndex": 116144954744
+            "firstVisualChange": 177807974477,
+            "visuallyComplete": 177807974477,
+            "speedIndex": 177807974574,
+            "perceptualSpeedIndex": 177807974574
           },
           "frames": [
             {
-              "timestamp": 116142031.798,
+              "timestamp": 177804923.477,
               "progress": 0
             },
             {
-              "timestamp": 116144954.744,
+              "timestamp": 177807974.574,
+              "progress": 100
+            },
+            {
+              "timestamp": 177808039.717,
               "progress": 100
             }
           ]
@@ -188,7 +193,7 @@
       "score": 100,
       "displayValue": "16ms",
       "rawValue": 16,
-      "optimalValue": "50ms",
+      "optimalValue": "< 50 ms",
       "extendedInfo": {
         "value": [
           {
@@ -205,11 +210,11 @@
           },
           {
             "percentile": 0.99,
-            "time": 16.31384681796759
+            "time": 16.349075434647187
           },
           {
             "percentile": 1,
-            "time": 22.604999995113758
+            "time": 24.238000000002103
           }
         ],
         "formatter": "null"
@@ -220,48 +225,65 @@
       "description": "Estimated Input Latency",
       "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
     },
+    "first-interactive": {
+      "score": 93,
+      "displayValue": "3,050ms",
+      "rawValue": 3050.7450000047684,
+      "extendedInfo": {
+        "value": {
+          "timeInMs": 3050.7450000047684,
+          "timestamp": 177807974222
+        },
+        "formatter": "null"
+      },
+      "scoringMode": "numeric",
+      "name": "first-interactive",
+      "category": "Performance",
+      "description": "First Interactive (beta)",
+      "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+    },
     "time-to-interactive": {
-      "score": 83,
-      "displayValue": "2918.4ms",
-      "rawValue": 2918.4,
-      "optimalValue": "5,000ms",
+      "score": 81,
+      "displayValue": "3051.1ms",
+      "rawValue": 3051.1,
+      "optimalValue": "< 5,000 ms",
       "extendedInfo": {
         "value": {
           "timings": {
-            "onLoad": 2905.877000004053,
-            "fMP": 2898.201,
-            "visuallyReady": 2918.407,
-            "timeToInteractive": 2918.407,
-            "timeToInteractiveB": 2898.201000005007,
-            "timeToInteractiveC": 2898.201000005007,
-            "endOfTrace": 8424.498999997973
+            "onLoad": 3053.918000012636,
+            "fMP": 3041.253,
+            "visuallyReady": 3051.097,
+            "timeToInteractive": 3051.097,
+            "timeToInteractiveB": 3041.2529999911785,
+            "timeToInteractiveC": 3041.2529999911785,
+            "endOfTrace": 8754.877000004053
           },
           "timestamps": {
-            "onLoad": 116144942214,
-            "fMP": 116144934538,
-            "visuallyReady": 116144954744,
-            "timeToInteractive": 116144954744,
-            "timeToInteractiveB": 116144934538,
-            "timeToInteractiveC": 116144934538,
-            "endOfTrace": 116150460836
+            "onLoad": 177807977395,
+            "fMP": 177807964730,
+            "visuallyReady": 177807974574,
+            "timeToInteractive": 177807974574,
+            "timeToInteractiveB": 177807964730,
+            "timeToInteractiveC": 177807964730,
+            "endOfTrace": 177813678354
           },
           "latencies": {
             "timeToInteractive": [
               {
                 "estLatency": 16,
-                "startTime": "2918.4"
+                "startTime": "3051.1"
               }
             ],
             "timeToInteractiveB": [
               {
                 "estLatency": 16,
-                "startTime": "2898.2"
+                "startTime": "3041.3"
               }
             ],
             "timeToInteractiveC": [
               {
                 "estLatency": 16,
-                "startTime": "2898.2"
+                "startTime": "3041.3"
               }
             ]
           },
@@ -299,121 +321,121 @@
         "formatter": "critical-request-chains",
         "value": {
           "chains": {
-            "80262.1": {
+            "75268.1": {
               "request": {
                 "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                "startTime": 116142.038233,
-                "endTime": 116142.233289,
-                "responseReceivedTime": 116142.190414,
-                "transferSize": 10248
+                "startTime": 177804.925661,
+                "endTime": 177805.123481,
+                "responseReceivedTime": 177805.080619,
+                "transferSize": 10317
               },
               "children": {
-                "80262.3": {
+                "75268.3": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                    "startTime": 116142.226583,
-                    "endTime": 116142.384611,
-                    "responseReceivedTime": 116142.384137,
+                    "startTime": 177805.117895,
+                    "endTime": 177805.274093,
+                    "responseReceivedTime": 177805.273648,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "80262.4": {
+                "75268.4": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                    "startTime": 116142.227322,
-                    "endTime": 116142.442419,
-                    "responseReceivedTime": 116142.441297,
+                    "startTime": 177805.118221,
+                    "endTime": 177805.324375,
+                    "responseReceivedTime": 177805.323597,
                     "transferSize": 139
                   },
                   "children": {}
                 },
-                "80262.6": {
+                "75268.6": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                    "startTime": 116142.228163,
-                    "endTime": 116142.448269,
-                    "responseReceivedTime": 116142.447848,
+                    "startTime": 177805.119508,
+                    "endTime": 177805.338533,
+                    "responseReceivedTime": 177805.338083,
                     "transferSize": 1146
                   },
                   "children": {}
                 },
-                "80262.7": {
+                "75268.7": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                    "startTime": 116142.228645,
-                    "endTime": 116142.462447,
-                    "responseReceivedTime": 116142.462127,
+                    "startTime": 177805.119977,
+                    "endTime": 177805.345399,
+                    "responseReceivedTime": 177805.345063,
                     "transferSize": 770
                   },
                   "children": {}
                 },
-                "80262.18": {
-                  "request": {
-                    "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                    "startTime": 116142.238476,
-                    "endTime": 116142.577254,
-                    "responseReceivedTime": 116142.40497,
-                    "transferSize": 31677
-                  },
-                  "children": {}
-                },
-                "80262.8": {
+                "75268.8": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                    "startTime": 116142.22909,
-                    "endTime": 116142.59131,
-                    "responseReceivedTime": 116142.590948,
+                    "startTime": 177805.12127,
+                    "endTime": 177805.496218,
+                    "responseReceivedTime": 177805.495865,
                     "transferSize": 767
                   },
                   "children": {}
                 },
-                "80262.9": {
+                "75268.9": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                    "startTime": 116142.229566,
-                    "endTime": 116142.612633,
-                    "responseReceivedTime": 116142.598539,
+                    "startTime": 177805.122028,
+                    "endTime": 177805.509764,
+                    "responseReceivedTime": 177805.48814,
                     "transferSize": 1630
                   },
                   "children": {}
                 },
-                "80262.17": {
+                "75268.18": {
+                  "request": {
+                    "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                    "startTime": 177805.129849,
+                    "endTime": 177805.524424,
+                    "responseReceivedTime": 177805.331196,
+                    "transferSize": 31674
+                  },
+                  "children": {}
+                },
+                "75268.17": {
                   "request": {
                     "url": "http://localhost:10200/zone.js",
-                    "startTime": 116142.237713,
-                    "endTime": 116142.948478,
-                    "responseReceivedTime": 116142.605779,
+                    "startTime": 177805.129377,
+                    "endTime": 177805.86017,
+                    "responseReceivedTime": 177805.516777,
                     "transferSize": 71654
                   },
                   "children": {}
                 },
-                "80262.2": {
+                "75268.2": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                    "startTime": 116142.224327,
-                    "endTime": 116144.23631,
-                    "responseReceivedTime": 116144.235911,
+                    "startTime": 177805.115359,
+                    "endTime": 177807.12637,
+                    "responseReceivedTime": 177807.126014,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "80262.5": {
+                "75268.5": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                    "startTime": 116142.227873,
-                    "endTime": 116144.436661,
-                    "responseReceivedTime": 116144.436096,
+                    "startTime": 177805.11908,
+                    "endTime": 177807.32654,
+                    "responseReceivedTime": 177807.326161,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "80262.21": {
+                "75268.21": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                    "startTime": 116144.465445,
-                    "endTime": 116144.679699,
-                    "responseReceivedTime": 116144.679311,
+                    "startTime": 177807.426194,
+                    "endTime": 177807.63423,
+                    "responseReceivedTime": 177807.633715,
                     "transferSize": 859
                   },
                   "children": {}
@@ -422,7 +444,7 @@
             }
           },
           "longestChain": {
-            "duration": 2641.466000000946,
+            "duration": 2708.5690000094473,
             "length": 2,
             "transferSize": 859
           }
@@ -545,20 +567,20 @@
             "source": "deprecation",
             "level": "warning",
             "text": "Calling Element.createShadowRoot() for an element which already hosts a shadow root is deprecated. See https://www.chromestatus.com/features/4668884095336448 for more details.",
-            "timestamp": 1493677874895.61,
+            "timestamp": 1493917811116.72,
             "lineNumber": 45,
             "stackTrace": {
               "callFrames": [
                 {
                   "functionName": "",
-                  "scriptId": "105",
+                  "scriptId": "107",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                   "lineNumber": 45,
                   "columnNumber": 6
                 },
                 {
                   "functionName": "",
-                  "scriptId": "105",
+                  "scriptId": "107",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                   "lineNumber": 48,
                   "columnNumber": 2
@@ -567,56 +589,56 @@
             }
           },
           {
-            "label": "line: 291",
+            "label": "line: 292",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "code": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
             "source": "deprecation",
             "level": "warning",
             "text": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
-            "timestamp": 1493677874915.5,
-            "lineNumber": 291,
+            "timestamp": 1493917811174.34,
+            "lineNumber": 292,
             "stackTrace": {
               "callFrames": [
                 {
                   "functionName": "deprecationsTest",
-                  "scriptId": "107",
+                  "scriptId": "110",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                  "lineNumber": 291,
+                  "lineNumber": 292,
                   "columnNumber": 6
                 },
                 {
                   "functionName": "",
-                  "scriptId": "107",
+                  "scriptId": "110",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                  "lineNumber": 311,
+                  "lineNumber": 312,
                   "columnNumber": 2
                 }
               ]
             }
           },
           {
-            "label": "line: 294",
+            "label": "line: 295",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "code": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
             "source": "deprecation",
             "level": "warning",
             "text": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
-            "timestamp": 1493677874917.84,
-            "lineNumber": 294,
+            "timestamp": 1493917811178.06,
+            "lineNumber": 295,
             "stackTrace": {
               "callFrames": [
                 {
                   "functionName": "deprecationsTest",
-                  "scriptId": "107",
+                  "scriptId": "110",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                  "lineNumber": 294,
+                  "lineNumber": 295,
                   "columnNumber": 8
                 },
                 {
                   "functionName": "",
-                  "scriptId": "107",
+                  "scriptId": "110",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                  "lineNumber": 311,
+                  "lineNumber": 312,
                   "columnNumber": 2
                 }
               ]
@@ -629,7 +651,7 @@
             "source": "deprecation",
             "level": "warning",
             "text": "/deep/ combinator is deprecated and will be a no-op in M60, around August 2017. See https://www.chromestatus.com/features/4964279606312960 for more details.",
-            "timestamp": 1493677874953.48
+            "timestamp": 1493917811228.05
           }
         ]
       },
@@ -792,12 +814,13 @@
           "id": "color-contrast",
           "impact": "critical",
           "tags": [
+            "cat.color",
             "wcag2aa",
             "wcag143"
           ],
           "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
           "help": "Elements must have sufficient color contrast",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/color-contrast?application=axeAPI",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/color-contrast?application=axeAPI",
           "nodes": [
             {
               "any": [
@@ -806,9 +829,10 @@
                   "data": {
                     "fgColor": "#ffc0cb",
                     "bgColor": "#eeeeee",
-                    "contrastRatio": "1.33",
+                    "contrastRatio": 1.32,
                     "fontSize": "18.0pt",
-                    "fontWeight": "bold"
+                    "fontWeight": "bold",
+                    "missingData": []
                   },
                   "relatedNodes": [
                     {
@@ -819,7 +843,7 @@
                     }
                   ],
                   "impact": "critical",
-                  "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                  "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
                 }
               ],
               "all": [],
@@ -829,7 +853,7 @@
               "target": [
                 "body > div > h2"
               ],
-              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
             },
             {
               "any": [
@@ -838,9 +862,10 @@
                   "data": {
                     "fgColor": "#ffc0cb",
                     "bgColor": "#eeeeee",
-                    "contrastRatio": "1.33",
+                    "contrastRatio": 1.32,
                     "fontSize": "12.0pt",
-                    "fontWeight": "normal"
+                    "fontWeight": "normal",
+                    "missingData": []
                   },
                   "relatedNodes": [
                     {
@@ -851,7 +876,7 @@
                     }
                   ],
                   "impact": "critical",
-                  "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                  "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
                 }
               ],
               "all": [],
@@ -861,7 +886,7 @@
               "target": [
                 "body > div > span"
               ],
-              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+              "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
             }
           ]
         }
@@ -947,12 +972,13 @@
           "id": "html-has-lang",
           "impact": "serious",
           "tags": [
+            "cat.language",
             "wcag2a",
             "wcag311"
           ],
           "description": "Ensures every HTML document has a lang attribute",
           "help": "<html> element must have a lang attribute",
-          "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/html-has-lang?application=axeAPI",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/html-has-lang?application=axeAPI",
           "nodes": [
             {
               "any": [
@@ -1206,8 +1232,8 @@
     "total-byte-weight": {
       "score": 100,
       "displayValue": "Total size was 129 KB",
-      "rawValue": 131715,
-      "optimalValue": "1,600 KB",
+      "rawValue": 132075,
+      "optimalValue": "< 1,600 KB",
       "extendedInfo": {
         "formatter": "table",
         "value": {
@@ -1220,19 +1246,19 @@
             },
             {
               "url": "…3.2.1/jquery.min.js",
-              "totalBytes": 31677,
+              "totalBytes": 31674,
               "totalKb": "31 KB",
               "totalMs": "150ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10248,
+              "totalBytes": 10317,
               "totalKb": "10 KB",
               "totalMs": "50ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10248,
+              "totalBytes": 10317,
               "totalKb": "10 KB",
               "totalMs": "50ms"
             },
@@ -1255,6 +1281,12 @@
               "totalMs": "0ms"
             },
             {
+              "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+              "totalBytes": 859,
+              "totalKb": "1 KB",
+              "totalMs": "0ms"
+            },
+            {
               "url": "/dobetterweb/dbw_tester.css?delay=2200",
               "totalBytes": 859,
               "totalKb": "1 KB",
@@ -1262,12 +1294,6 @@
             },
             {
               "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-              "totalBytes": 859,
-              "totalKb": "1 KB",
-              "totalMs": "0ms"
-            },
-            {
-              "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
               "totalBytes": 859,
               "totalKb": "1 KB",
               "totalMs": "0ms"
@@ -1288,12 +1314,14 @@
       "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
     },
     "offscreen-images": {
-      "score": true,
+      "score": 100,
       "displayValue": "",
-      "rawValue": true,
+      "rawValue": 0,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 0,
+          "wastedKb": 0,
           "results": [],
           "tableHeadings": {
             "preview": "",
@@ -1311,12 +1339,14 @@
       "helpText": "Images that are not above the fold should be lazily loaded after the page is interactive. Consider using the [IntersectionObserver](https://developers.google.com/web/updates/2016/04/intersectionobserver) API."
     },
     "uses-optimized-images": {
-      "score": true,
+      "score": 100,
       "displayValue": "",
-      "rawValue": true,
+      "rawValue": 0,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 0,
+          "wastedKb": 0,
           "results": [],
           "tableHeadings": {
             "preview": "",
@@ -1335,12 +1365,14 @@
       "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
     },
     "uses-request-compression": {
-      "score": false,
-      "displayValue": "Potential savings of 61 KB (~300ms)",
-      "rawValue": false,
+      "score": 65,
+      "displayValue": "Potential savings of 62 KB (~300ms)",
+      "rawValue": 300,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 300,
+          "wastedKb": 62,
           "results": [
             {
               "url": "/zone.js",
@@ -1355,9 +1387,9 @@
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10127,
-              "wastedBytes": 6750,
-              "wastedPercent": 66.6535005431026,
+              "totalBytes": 10196,
+              "wastedBytes": 6792,
+              "wastedPercent": 66.61435857198902,
               "potentialSavings": "7 KB _67%_",
               "wastedKb": "7 KB",
               "wastedMs": "30ms",
@@ -1373,18 +1405,21 @@
         }
       },
       "scoringMode": "binary",
+      "informative": true,
       "name": "uses-request-compression",
       "category": "Performance",
       "description": "Compression enabled for server responses",
       "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
     },
     "uses-responsive-images": {
-      "score": true,
+      "score": 100,
       "displayValue": "",
-      "rawValue": true,
+      "rawValue": 0,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 0,
+          "wastedKb": 0,
           "results": [],
           "tableHeadings": {
             "preview": "",
@@ -1414,15 +1449,15 @@
     },
     "dom-size": {
       "score": 100,
-      "displayValue": "34 nodes",
-      "rawValue": 34,
-      "optimalValue": "1,500 nodes",
+      "displayValue": "35 nodes",
+      "rawValue": 35,
+      "optimalValue": "< 1,500 nodes",
       "extendedInfo": {
         "formatter": "cards",
         "value": [
           {
             "title": "Total DOM Nodes",
-            "value": "34",
+            "value": "35",
             "target": "< 1,500 nodes"
           },
           {
@@ -1453,7 +1488,7 @@
         "items": [
           {
             "title": "Total DOM Nodes",
-            "value": "34",
+            "value": "35",
             "target": "< 1,500 nodes"
           },
           {
@@ -1504,23 +1539,23 @@
         "formatter": "url-list",
         "value": [
           {
-            "label": "line: 252, col: 25",
+            "label": "line: 253, col: 25",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "args": [
               null
             ],
-            "line": 252,
+            "line": 253,
             "col": 25,
             "isEval": false,
             "isExtension": false
           },
           {
-            "label": "line: 256, col: 41",
+            "label": "line: 257, col: 41",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "args": [
               null
             ],
-            "line": 256,
+            "line": 257,
             "col": 41,
             "isEval": false,
             "isExtension": false
@@ -1535,7 +1570,7 @@
     },
     "link-blocking-first-paint": {
       "score": false,
-      "displayValue": "4 resources delayed first paint by 2205ms",
+      "displayValue": "4 resources delayed first paint by 2212ms",
       "rawValue": false,
       "extendedInfo": {
         "formatter": "table",
@@ -1544,22 +1579,22 @@
             {
               "url": "/dobetterweb/dbw_tester.css?delay=100",
               "totalKb": "1 KB",
-              "totalMs": "110ms"
+              "totalMs": "108ms"
             },
             {
               "url": "/dobetterweb/unknown404.css?delay=200",
               "totalKb": "0 KB",
-              "totalMs": "206ms"
+              "totalMs": "214ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.css?delay=2200",
               "totalKb": "1 KB",
-              "totalMs": "2205ms"
+              "totalMs": "2212ms"
             },
             {
               "url": "/dobetterweb/dbw_partial_a.html?delay=200",
               "totalKb": "1 KB",
-              "totalMs": "208ms"
+              "totalMs": "215ms"
             }
           ],
           "tableHeadings": {
@@ -1589,7 +1624,7 @@
               "args": [
                 "arg1"
               ],
-              "line": 141,
+              "line": 142,
               "col": 11,
               "isEval": false,
               "isExtension": false
@@ -1599,13 +1634,13 @@
               "args": [
                 "arg2"
               ],
-              "line": 144,
+              "line": 145,
               "col": 13,
               "isEval": false,
               "isExtension": false
             },
             {
-              "url": "consoleTimeTest (http://localhost:10200/dobetterweb/dbw_tester.html:149:3)",
+              "url": "consoleTimeTest (http://localhost:10200/dobetterweb/dbw_tester.html:150:3)",
               "args": [
                 "arg3"
               ],
@@ -1647,7 +1682,7 @@
             {
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "args": [],
-              "line": 131,
+              "line": 132,
               "col": 17,
               "isEval": false,
               "isExtension": false
@@ -1655,13 +1690,13 @@
             {
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "args": [],
-              "line": 134,
+              "line": 135,
               "col": 18,
               "isEval": false,
               "isExtension": false
             },
             {
-              "url": "dateNowTest (http://localhost:10200/dobetterweb/dbw_tester.html:135:3)",
+              "url": "dateNowTest (http://localhost:10200/dobetterweb/dbw_tester.html:136:3)",
               "args": [],
               "line": 1,
               "col": 6,
@@ -1669,7 +1704,7 @@
               "isExtension": false
             },
             {
-              "url": "dateNowTest (http://localhost:10200/dobetterweb/dbw_tester.html:136:29)",
+              "url": "dateNowTest (http://localhost:10200/dobetterweb/dbw_tester.html:137:29)",
               "args": [],
               "line": 2,
               "col": 6,
@@ -1698,21 +1733,10 @@
         "formatter": "url-list",
         "value": [
           {
-            "label": "line: 153, col: 12",
-            "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-            "args": [
-              "Hi"
-            ],
-            "line": 153,
-            "col": 12,
-            "isEval": false,
-            "isExtension": false
-          },
-          {
             "label": "line: 154, col: 12",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "args": [
-              "There"
+              "Hi"
             ],
             "line": 154,
             "col": 12,
@@ -1723,9 +1747,20 @@
             "label": "line: 155, col: 12",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "args": [
-              "2.0!"
+              "There"
             ],
             "line": 155,
+            "col": 12,
+            "isEval": false,
+            "isExtension": false
+          },
+          {
+            "label": "line: 156, col: 12",
+            "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
+            "args": [
+              "2.0!"
+            ],
+            "line": 156,
             "col": 12,
             "isEval": false,
             "isExtension": false
@@ -1747,20 +1782,20 @@
         "value": {
           "results": [
             {
-              "line": 174,
+              "line": 175,
               "col": 61,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "DOMNodeInserted",
               "pre": "body.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-              "label": "line: 174, col: 61"
+              "label": "line: 175, col: 61"
             },
             {
-              "line": 180,
+              "line": 181,
               "col": 50,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "DOMNodeInserted",
               "pre": "section#touchmove-section.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted on element');\n  })\n\n",
-              "label": "line: 180, col: 50"
+              "label": "line: 181, col: 50"
             },
             {
               "line": 31,
@@ -1771,28 +1806,28 @@
               "label": "line: 31, col: 56"
             },
             {
-              "line": 164,
+              "line": 165,
               "col": 56,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "DOMNodeInserted",
               "pre": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-              "label": "line: 164, col: 56"
+              "label": "line: 165, col: 56"
             },
             {
-              "line": 169,
+              "line": 170,
               "col": 55,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "DOMNodeRemoved",
               "pre": "document.addEventListener('DOMNodeRemoved', function (e) {\n    console.log('DOMNodeRemoved');\n  })\n\n",
-              "label": "line: 169, col: 55"
+              "label": "line: 170, col: 55"
             },
             {
-              "line": 185,
+              "line": 186,
               "col": 54,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "DOMNodeInserted",
               "pre": "window.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-              "label": "line: 185, col: 54"
+              "label": "line: 186, col: 54"
             }
           ],
           "tableHeadings": {
@@ -1893,10 +1928,10 @@
         "formatter": "url-list",
         "value": [
           {
-            "label": "line: 262, col: 16",
+            "label": "line: 263, col: 16",
             "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
             "args": [],
-            "line": 262,
+            "line": 263,
             "col": 16,
             "isEval": false,
             "isExtension": false
@@ -1911,7 +1946,7 @@
     },
     "script-blocking-first-paint": {
       "score": false,
-      "displayValue": "1 resource delayed first paint by 209ms",
+      "displayValue": "1 resource delayed first paint by 215ms",
       "rawValue": false,
       "extendedInfo": {
         "formatter": "table",
@@ -1920,7 +1955,7 @@
             {
               "url": "/dobetterweb/dbw_tester.js",
               "totalKb": "2 KB",
-              "totalMs": "209ms"
+              "totalMs": "215ms"
             }
           ],
           "tableHeadings": {
@@ -1939,7 +1974,7 @@
     },
     "uses-http2": {
       "score": false,
-      "displayValue": "12 requests were not handled over h2",
+      "displayValue": "13 requests were not handled over h2",
       "rawValue": false,
       "extendedInfo": {
         "formatter": "table",
@@ -1992,6 +2027,10 @@
             {
               "protocol": "http/1.1",
               "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+            },
+            {
+              "protocol": "http/1.1",
+              "url": "http://localhost:10200/favicon.ico"
             }
           ],
           "tableHeadings": {
@@ -2015,12 +2054,12 @@
         "value": {
           "results": [
             {
-              "line": 223,
+              "line": 224,
               "col": 44,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "touchmove",
               "pre": "section#touchmove-section.addEventListener('touchmove', function (e) {\n    console.log('touchmove');\n  })\n\n",
-              "label": "line: 223, col: 44"
+              "label": "line: 224, col: 44"
             },
             {
               "line": 38,
@@ -2031,20 +2070,20 @@
               "label": "line: 38, col: 38"
             },
             {
-              "line": 197,
+              "line": 198,
               "col": 44,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "wheel",
               "pre": "window.addEventListener('wheel', function (e) {\n    console.log('wheel');\n  })\n\n",
-              "label": "line: 197, col: 44"
+              "label": "line: 198, col: 44"
             },
             {
-              "line": 207,
+              "line": 208,
               "col": 49,
               "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
               "type": "mousewheel",
               "pre": "window.addEventListener('mousewheel', function (e) {\n    console.log('mousewheel');\n  })\n\n",
-              "label": "line: 207, col: 49"
+              "label": "line: 208, col: 49"
             }
           ],
           "tableHeadings": {
@@ -2197,22 +2236,23 @@
               "value": {
                 "areLatenciesAll3G": true,
                 "allRequestLatencies": [
-                  151.57499999622814,
-                  157.12699999858143,
-                  213.550999993458,
-                  217.45199999713822,
-                  228.59500000777214,
-                  151.88200000557072,
-                  206.05799999611898,
-                  156.58999999868698,
-                  157.266000009258,
-                  2011.1069999984454,
-                  2207.6920000108666,
-                  158.08399999514248,
-                  213.4119999973339
+                  150.8799999719483,
+                  154.82500000507596,
+                  203.930999996373,
+                  215.7330000190997,
+                  221.29199997289098,
+                  221.481999993557,
+                  163.90799998771402,
+                  158.19600000395462,
+                  177.923000010196,
+                  2010.1960000174572,
+                  2204.622999997808,
+                  155.95299997949056,
+                  207.00600001146103,
+                  154.0190000087024
                 ],
                 "isFast": true,
-                "timeToInteractive": 2918.407
+                "timeToFirstInteractive": 3050.7450000047684
               }
             },
             "scoringMode": "binary",
@@ -2356,22 +2396,23 @@
         {
           "id": "first-meaningful-paint",
           "weight": 5,
+          "group": "perf-metric",
           "result": {
-            "score": 74,
-            "displayValue": "2898.2ms",
-            "rawValue": 2898.2,
-            "optimalValue": "1,600ms",
+            "score": 70,
+            "displayValue": "3041.3ms",
+            "rawValue": 3041.3,
+            "optimalValue": "< 1,600 ms",
             "extendedInfo": {
               "value": {
                 "timestamps": {
-                  "navStart": 116142036337,
-                  "fCP": 116144934531,
-                  "fMP": 116144934538
+                  "navStart": 177804923477,
+                  "fCP": 177807964718,
+                  "fMP": 177807964730
                 },
                 "timings": {
                   "navStart": 0,
-                  "fCP": 2898.194,
-                  "fMP": 2898.201
+                  "fCP": 3041.241,
+                  "fMP": 3041.253
                 }
               },
               "formatter": "null"
@@ -2382,38 +2423,43 @@
             "description": "First meaningful paint",
             "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
           },
-          "score": 74
+          "score": 70
         },
         {
           "id": "speed-index-metric",
           "weight": 1,
+          "group": "perf-metric",
           "result": {
-            "score": 82,
-            "displayValue": "2923",
-            "rawValue": 2923,
-            "optimalValue": "1,250",
+            "score": 80,
+            "displayValue": "3051",
+            "rawValue": 3051,
+            "optimalValue": "< 1,250",
             "extendedInfo": {
               "formatter": "speedline",
               "value": {
                 "timings": {
-                  "firstVisualChange": 2922,
-                  "visuallyComplete": 2922,
-                  "speedIndex": 2922.946000009775,
-                  "perceptualSpeedIndex": 2922.946000009775
+                  "firstVisualChange": 3051,
+                  "visuallyComplete": 3051,
+                  "speedIndex": 3051.097000002861,
+                  "perceptualSpeedIndex": 3051.097000002861
                 },
                 "timestamps": {
-                  "firstVisualChange": 116144953798,
-                  "visuallyComplete": 116144953798,
-                  "speedIndex": 116144954744,
-                  "perceptualSpeedIndex": 116144954744
+                  "firstVisualChange": 177807974477,
+                  "visuallyComplete": 177807974477,
+                  "speedIndex": 177807974574,
+                  "perceptualSpeedIndex": 177807974574
                 },
                 "frames": [
                   {
-                    "timestamp": 116142031.798,
+                    "timestamp": 177804923.477,
                     "progress": 0
                   },
                   {
-                    "timestamp": 116144954.744,
+                    "timestamp": 177807974.574,
+                    "progress": 100
+                  },
+                  {
+                    "timestamp": 177808039.717,
                     "progress": 100
                   }
                 ]
@@ -2425,16 +2471,17 @@
             "description": "Perceptual Speed Index",
             "helpText": "Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index)."
           },
-          "score": 82
+          "score": 80
         },
         {
           "id": "estimated-input-latency",
           "weight": 1,
+          "group": "perf-metric",
           "result": {
             "score": 100,
             "displayValue": "16ms",
             "rawValue": 16,
-            "optimalValue": "50ms",
+            "optimalValue": "< 50 ms",
             "extendedInfo": {
               "value": [
                 {
@@ -2451,11 +2498,11 @@
                 },
                 {
                   "percentile": 0.99,
-                  "time": 16.31384681796759
+                  "time": 16.349075434647187
                 },
                 {
                   "percentile": 1,
-                  "time": 22.604999995113758
+                  "time": 24.238000000002103
                 }
               ],
               "formatter": "null"
@@ -2471,48 +2518,49 @@
         {
           "id": "time-to-interactive",
           "weight": 5,
+          "group": "perf-metric",
           "result": {
-            "score": 83,
-            "displayValue": "2918.4ms",
-            "rawValue": 2918.4,
-            "optimalValue": "5,000ms",
+            "score": 81,
+            "displayValue": "3051.1ms",
+            "rawValue": 3051.1,
+            "optimalValue": "< 5,000 ms",
             "extendedInfo": {
               "value": {
                 "timings": {
-                  "onLoad": 2905.877000004053,
-                  "fMP": 2898.201,
-                  "visuallyReady": 2918.407,
-                  "timeToInteractive": 2918.407,
-                  "timeToInteractiveB": 2898.201000005007,
-                  "timeToInteractiveC": 2898.201000005007,
-                  "endOfTrace": 8424.498999997973
+                  "onLoad": 3053.918000012636,
+                  "fMP": 3041.253,
+                  "visuallyReady": 3051.097,
+                  "timeToInteractive": 3051.097,
+                  "timeToInteractiveB": 3041.2529999911785,
+                  "timeToInteractiveC": 3041.2529999911785,
+                  "endOfTrace": 8754.877000004053
                 },
                 "timestamps": {
-                  "onLoad": 116144942214,
-                  "fMP": 116144934538,
-                  "visuallyReady": 116144954744,
-                  "timeToInteractive": 116144954744,
-                  "timeToInteractiveB": 116144934538,
-                  "timeToInteractiveC": 116144934538,
-                  "endOfTrace": 116150460836
+                  "onLoad": 177807977395,
+                  "fMP": 177807964730,
+                  "visuallyReady": 177807974574,
+                  "timeToInteractive": 177807974574,
+                  "timeToInteractiveB": 177807964730,
+                  "timeToInteractiveC": 177807964730,
+                  "endOfTrace": 177813678354
                 },
                 "latencies": {
                   "timeToInteractive": [
                     {
                       "estLatency": 16,
-                      "startTime": "2918.4"
+                      "startTime": "3051.1"
                     }
                   ],
                   "timeToInteractiveB": [
                     {
                       "estLatency": 16,
-                      "startTime": "2898.2"
+                      "startTime": "3041.3"
                     }
                   ],
                   "timeToInteractiveC": [
                     {
                       "estLatency": 16,
-                      "startTime": "2898.2"
+                      "startTime": "3041.3"
                     }
                   ]
                 },
@@ -2526,14 +2574,38 @@
             "description": "Time To Interactive (alpha)",
             "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
           },
-          "score": 83
+          "score": 81
+        },
+        {
+          "id": "first-interactive",
+          "weight": 5,
+          "group": "perf-metric",
+          "result": {
+            "score": 93,
+            "displayValue": "3,050ms",
+            "rawValue": 3050.7450000047684,
+            "extendedInfo": {
+              "value": {
+                "timeInMs": 3050.7450000047684,
+                "timestamp": 177807974222
+              },
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "first-interactive",
+            "category": "Performance",
+            "description": "First Interactive (beta)",
+            "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+          },
+          "score": 93
         },
         {
           "id": "link-blocking-first-paint",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
             "score": false,
-            "displayValue": "4 resources delayed first paint by 2205ms",
+            "displayValue": "4 resources delayed first paint by 2212ms",
             "rawValue": false,
             "extendedInfo": {
               "formatter": "table",
@@ -2542,22 +2614,22 @@
                   {
                     "url": "/dobetterweb/dbw_tester.css?delay=100",
                     "totalKb": "1 KB",
-                    "totalMs": "110ms"
+                    "totalMs": "108ms"
                   },
                   {
                     "url": "/dobetterweb/unknown404.css?delay=200",
                     "totalKb": "0 KB",
-                    "totalMs": "206ms"
+                    "totalMs": "214ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.css?delay=2200",
                     "totalKb": "1 KB",
-                    "totalMs": "2205ms"
+                    "totalMs": "2212ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_partial_a.html?delay=200",
                     "totalKb": "1 KB",
-                    "totalMs": "208ms"
+                    "totalMs": "215ms"
                   }
                 ],
                 "tableHeadings": {
@@ -2579,9 +2651,10 @@
         {
           "id": "script-blocking-first-paint",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
             "score": false,
-            "displayValue": "1 resource delayed first paint by 209ms",
+            "displayValue": "1 resource delayed first paint by 215ms",
             "rawValue": false,
             "extendedInfo": {
               "formatter": "table",
@@ -2590,7 +2663,7 @@
                   {
                     "url": "/dobetterweb/dbw_tester.js",
                     "totalKb": "2 KB",
-                    "totalMs": "209ms"
+                    "totalMs": "215ms"
                   }
                 ],
                 "tableHeadings": {
@@ -2612,13 +2685,16 @@
         {
           "id": "uses-optimized-images",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": true,
+            "score": 100,
             "displayValue": "",
-            "rawValue": true,
+            "rawValue": 0,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 0,
+                "wastedKb": 0,
                 "results": [],
                 "tableHeadings": {
                   "preview": "",
@@ -2641,13 +2717,16 @@
         {
           "id": "uses-request-compression",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": false,
-            "displayValue": "Potential savings of 61 KB (~300ms)",
-            "rawValue": false,
+            "score": 65,
+            "displayValue": "Potential savings of 62 KB (~300ms)",
+            "rawValue": 300,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 300,
+                "wastedKb": 62,
                 "results": [
                   {
                     "url": "/zone.js",
@@ -2662,9 +2741,9 @@
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10127,
-                    "wastedBytes": 6750,
-                    "wastedPercent": 66.6535005431026,
+                    "totalBytes": 10196,
+                    "wastedBytes": 6792,
+                    "wastedPercent": 66.61435857198902,
                     "potentialSavings": "7 KB _67%_",
                     "wastedKb": "7 KB",
                     "wastedMs": "30ms",
@@ -2680,23 +2759,27 @@
               }
             },
             "scoringMode": "binary",
+            "informative": true,
             "name": "uses-request-compression",
             "category": "Performance",
             "description": "Compression enabled for server responses",
             "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
           },
-          "score": 0
+          "score": 65
         },
         {
           "id": "uses-responsive-images",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": true,
+            "score": 100,
             "displayValue": "",
-            "rawValue": true,
+            "rawValue": 0,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 0,
+                "wastedKb": 0,
                 "results": [],
                 "tableHeadings": {
                   "preview": "",
@@ -2718,11 +2801,12 @@
         {
           "id": "total-byte-weight",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": 100,
             "displayValue": "Total size was 129 KB",
-            "rawValue": 131715,
-            "optimalValue": "1,600 KB",
+            "rawValue": 132075,
+            "optimalValue": "< 1,600 KB",
             "extendedInfo": {
               "formatter": "table",
               "value": {
@@ -2735,19 +2819,19 @@
                   },
                   {
                     "url": "…3.2.1/jquery.min.js",
-                    "totalBytes": 31677,
+                    "totalBytes": 31674,
                     "totalKb": "31 KB",
                     "totalMs": "150ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10248,
+                    "totalBytes": 10317,
                     "totalKb": "10 KB",
                     "totalMs": "50ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10248,
+                    "totalBytes": 10317,
                     "totalKb": "10 KB",
                     "totalMs": "50ms"
                   },
@@ -2770,6 +2854,12 @@
                     "totalMs": "0ms"
                   },
                   {
+                    "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                    "totalBytes": 859,
+                    "totalKb": "1 KB",
+                    "totalMs": "0ms"
+                  },
+                  {
                     "url": "/dobetterweb/dbw_tester.css?delay=2200",
                     "totalBytes": 859,
                     "totalKb": "1 KB",
@@ -2777,12 +2867,6 @@
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                    "totalBytes": 859,
-                    "totalKb": "1 KB",
-                    "totalMs": "0ms"
-                  },
-                  {
-                    "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
                     "totalBytes": 859,
                     "totalKb": "1 KB",
                     "totalMs": "0ms"
@@ -2807,17 +2891,18 @@
         {
           "id": "dom-size",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": 100,
-            "displayValue": "34 nodes",
-            "rawValue": 34,
-            "optimalValue": "1,500 nodes",
+            "displayValue": "35 nodes",
+            "rawValue": 35,
+            "optimalValue": "< 1,500 nodes",
             "extendedInfo": {
               "formatter": "cards",
               "value": [
                 {
                   "title": "Total DOM Nodes",
-                  "value": "34",
+                  "value": "35",
                   "target": "< 1,500 nodes"
                 },
                 {
@@ -2848,7 +2933,7 @@
               "items": [
                 {
                   "title": "Total DOM Nodes",
-                  "value": "34",
+                  "value": "35",
                   "target": "< 1,500 nodes"
                 },
                 {
@@ -2871,6 +2956,7 @@
         {
           "id": "critical-request-chains",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": false,
             "displayValue": "11",
@@ -2880,121 +2966,121 @@
               "formatter": "critical-request-chains",
               "value": {
                 "chains": {
-                  "80262.1": {
+                  "75268.1": {
                     "request": {
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                      "startTime": 116142.038233,
-                      "endTime": 116142.233289,
-                      "responseReceivedTime": 116142.190414,
-                      "transferSize": 10248
+                      "startTime": 177804.925661,
+                      "endTime": 177805.123481,
+                      "responseReceivedTime": 177805.080619,
+                      "transferSize": 10317
                     },
                     "children": {
-                      "80262.3": {
+                      "75268.3": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                          "startTime": 116142.226583,
-                          "endTime": 116142.384611,
-                          "responseReceivedTime": 116142.384137,
+                          "startTime": 177805.117895,
+                          "endTime": 177805.274093,
+                          "responseReceivedTime": 177805.273648,
                           "transferSize": 859
                         },
                         "children": {}
                       },
-                      "80262.4": {
+                      "75268.4": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                          "startTime": 116142.227322,
-                          "endTime": 116142.442419,
-                          "responseReceivedTime": 116142.441297,
+                          "startTime": 177805.118221,
+                          "endTime": 177805.324375,
+                          "responseReceivedTime": 177805.323597,
                           "transferSize": 139
                         },
                         "children": {}
                       },
-                      "80262.6": {
+                      "75268.6": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                          "startTime": 116142.228163,
-                          "endTime": 116142.448269,
-                          "responseReceivedTime": 116142.447848,
+                          "startTime": 177805.119508,
+                          "endTime": 177805.338533,
+                          "responseReceivedTime": 177805.338083,
                           "transferSize": 1146
                         },
                         "children": {}
                       },
-                      "80262.7": {
+                      "75268.7": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                          "startTime": 116142.228645,
-                          "endTime": 116142.462447,
-                          "responseReceivedTime": 116142.462127,
+                          "startTime": 177805.119977,
+                          "endTime": 177805.345399,
+                          "responseReceivedTime": 177805.345063,
                           "transferSize": 770
                         },
                         "children": {}
                       },
-                      "80262.18": {
-                        "request": {
-                          "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                          "startTime": 116142.238476,
-                          "endTime": 116142.577254,
-                          "responseReceivedTime": 116142.40497,
-                          "transferSize": 31677
-                        },
-                        "children": {}
-                      },
-                      "80262.8": {
+                      "75268.8": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                          "startTime": 116142.22909,
-                          "endTime": 116142.59131,
-                          "responseReceivedTime": 116142.590948,
+                          "startTime": 177805.12127,
+                          "endTime": 177805.496218,
+                          "responseReceivedTime": 177805.495865,
                           "transferSize": 767
                         },
                         "children": {}
                       },
-                      "80262.9": {
+                      "75268.9": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                          "startTime": 116142.229566,
-                          "endTime": 116142.612633,
-                          "responseReceivedTime": 116142.598539,
+                          "startTime": 177805.122028,
+                          "endTime": 177805.509764,
+                          "responseReceivedTime": 177805.48814,
                           "transferSize": 1630
                         },
                         "children": {}
                       },
-                      "80262.17": {
+                      "75268.18": {
+                        "request": {
+                          "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                          "startTime": 177805.129849,
+                          "endTime": 177805.524424,
+                          "responseReceivedTime": 177805.331196,
+                          "transferSize": 31674
+                        },
+                        "children": {}
+                      },
+                      "75268.17": {
                         "request": {
                           "url": "http://localhost:10200/zone.js",
-                          "startTime": 116142.237713,
-                          "endTime": 116142.948478,
-                          "responseReceivedTime": 116142.605779,
+                          "startTime": 177805.129377,
+                          "endTime": 177805.86017,
+                          "responseReceivedTime": 177805.516777,
                           "transferSize": 71654
                         },
                         "children": {}
                       },
-                      "80262.2": {
+                      "75268.2": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                          "startTime": 116142.224327,
-                          "endTime": 116144.23631,
-                          "responseReceivedTime": 116144.235911,
+                          "startTime": 177805.115359,
+                          "endTime": 177807.12637,
+                          "responseReceivedTime": 177807.126014,
                           "transferSize": 859
                         },
                         "children": {}
                       },
-                      "80262.5": {
+                      "75268.5": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                          "startTime": 116142.227873,
-                          "endTime": 116144.436661,
-                          "responseReceivedTime": 116144.436096,
+                          "startTime": 177805.11908,
+                          "endTime": 177807.32654,
+                          "responseReceivedTime": 177807.326161,
                           "transferSize": 859
                         },
                         "children": {}
                       },
-                      "80262.21": {
+                      "75268.21": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                          "startTime": 116144.465445,
-                          "endTime": 116144.679699,
-                          "responseReceivedTime": 116144.679311,
+                          "startTime": 177807.426194,
+                          "endTime": 177807.63423,
+                          "responseReceivedTime": 177807.633715,
                           "transferSize": 859
                         },
                         "children": {}
@@ -3003,7 +3089,7 @@
                   }
                 },
                 "longestChain": {
-                  "duration": 2641.466000000946,
+                  "duration": 2708.5690000094473,
                   "length": 2,
                   "transferSize": 859
                 }
@@ -3021,6 +3107,7 @@
         {
           "id": "user-timings",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": true,
             "displayValue": "0",
@@ -3040,7 +3127,7 @@
         }
       ],
       "id": "performance",
-      "score": 80.58333333333333
+      "score": 82.3529411764706
     },
     {
       "name": "Accessibility",
@@ -3269,12 +3356,13 @@
                 "id": "color-contrast",
                 "impact": "critical",
                 "tags": [
+                  "cat.color",
                   "wcag2aa",
                   "wcag143"
                 ],
                 "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
                 "help": "Elements must have sufficient color contrast",
-                "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/color-contrast?application=axeAPI",
+                "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/color-contrast?application=axeAPI",
                 "nodes": [
                   {
                     "any": [
@@ -3283,9 +3371,10 @@
                         "data": {
                           "fgColor": "#ffc0cb",
                           "bgColor": "#eeeeee",
-                          "contrastRatio": "1.33",
+                          "contrastRatio": 1.32,
                           "fontSize": "18.0pt",
-                          "fontWeight": "bold"
+                          "fontWeight": "bold",
+                          "missingData": []
                         },
                         "relatedNodes": [
                           {
@@ -3296,7 +3385,7 @@
                           }
                         ],
                         "impact": "critical",
-                        "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                        "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
                       }
                     ],
                     "all": [],
@@ -3306,7 +3395,7 @@
                     "target": [
                       "body > div > h2"
                     ],
-                    "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                    "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
                   },
                   {
                     "any": [
@@ -3315,9 +3404,10 @@
                         "data": {
                           "fgColor": "#ffc0cb",
                           "bgColor": "#eeeeee",
-                          "contrastRatio": "1.33",
+                          "contrastRatio": 1.32,
                           "fontSize": "12.0pt",
-                          "fontWeight": "normal"
+                          "fontWeight": "normal",
+                          "missingData": []
                         },
                         "relatedNodes": [
                           {
@@ -3328,7 +3418,7 @@
                           }
                         ],
                         "impact": "critical",
-                        "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                        "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
                       }
                     ],
                     "all": [],
@@ -3338,7 +3428,7 @@
                     "target": [
                       "body > div > span"
                     ],
-                    "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                    "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
                   }
                 ]
               }
@@ -3460,12 +3550,13 @@
                 "id": "html-has-lang",
                 "impact": "serious",
                 "tags": [
+                  "cat.language",
                   "wcag2a",
                   "wcag311"
                 ],
                 "description": "Ensures every HTML document has a lang attribute",
                 "help": "<html> element must have a lang attribute",
-                "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/html-has-lang?application=axeAPI",
+                "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/html-has-lang?application=axeAPI",
                 "nodes": [
                   {
                     "any": [
@@ -3901,7 +3992,7 @@
           "weight": 1,
           "result": {
             "score": false,
-            "displayValue": "12 requests were not handled over h2",
+            "displayValue": "13 requests were not handled over h2",
             "rawValue": false,
             "extendedInfo": {
               "formatter": "table",
@@ -3954,6 +4045,10 @@
                   {
                     "protocol": "http/1.1",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+                  },
+                  {
+                    "protocol": "http/1.1",
+                    "url": "http://localhost:10200/favicon.ico"
                   }
                 ],
                 "tableHeadings": {
@@ -4052,12 +4147,12 @@
               "value": {
                 "results": [
                   {
-                    "line": 223,
+                    "line": 224,
                     "col": 44,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "touchmove",
                     "pre": "section#touchmove-section.addEventListener('touchmove', function (e) {\n    console.log('touchmove');\n  })\n\n",
-                    "label": "line: 223, col: 44"
+                    "label": "line: 224, col: 44"
                   },
                   {
                     "line": 38,
@@ -4068,20 +4163,20 @@
                     "label": "line: 38, col: 38"
                   },
                   {
-                    "line": 197,
+                    "line": 198,
                     "col": 44,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "wheel",
                     "pre": "window.addEventListener('wheel', function (e) {\n    console.log('wheel');\n  })\n\n",
-                    "label": "line: 197, col: 44"
+                    "label": "line: 198, col: 44"
                   },
                   {
-                    "line": 207,
+                    "line": 208,
                     "col": 49,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "mousewheel",
                     "pre": "window.addEventListener('mousewheel', function (e) {\n    console.log('mousewheel');\n  })\n\n",
-                    "label": "line: 207, col: 49"
+                    "label": "line: 208, col: 49"
                   }
                 ],
                 "tableHeadings": {
@@ -4112,20 +4207,20 @@
               "value": {
                 "results": [
                   {
-                    "line": 174,
+                    "line": 175,
                     "col": 61,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "DOMNodeInserted",
                     "pre": "body.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                    "label": "line: 174, col: 61"
+                    "label": "line: 175, col: 61"
                   },
                   {
-                    "line": 180,
+                    "line": 181,
                     "col": 50,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "DOMNodeInserted",
                     "pre": "section#touchmove-section.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted on element');\n  })\n\n",
-                    "label": "line: 180, col: 50"
+                    "label": "line: 181, col: 50"
                   },
                   {
                     "line": 31,
@@ -4136,28 +4231,28 @@
                     "label": "line: 31, col: 56"
                   },
                   {
-                    "line": 164,
+                    "line": 165,
                     "col": 56,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "DOMNodeInserted",
                     "pre": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                    "label": "line: 164, col: 56"
+                    "label": "line: 165, col: 56"
                   },
                   {
-                    "line": 169,
+                    "line": 170,
                     "col": 55,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "DOMNodeRemoved",
                     "pre": "document.addEventListener('DOMNodeRemoved', function (e) {\n    console.log('DOMNodeRemoved');\n  })\n\n",
-                    "label": "line: 169, col: 55"
+                    "label": "line: 170, col: 55"
                   },
                   {
-                    "line": 185,
+                    "line": 186,
                     "col": 54,
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "type": "DOMNodeInserted",
                     "pre": "window.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                    "label": "line: 185, col: 54"
+                    "label": "line: 186, col: 54"
                   }
                 ],
                 "tableHeadings": {
@@ -4187,21 +4282,10 @@
               "formatter": "url-list",
               "value": [
                 {
-                  "label": "line: 153, col: 12",
-                  "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                  "args": [
-                    "Hi"
-                  ],
-                  "line": 153,
-                  "col": 12,
-                  "isEval": false,
-                  "isExtension": false
-                },
-                {
                   "label": "line: 154, col: 12",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "args": [
-                    "There"
+                    "Hi"
                   ],
                   "line": 154,
                   "col": 12,
@@ -4212,9 +4296,20 @@
                   "label": "line: 155, col: 12",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "args": [
-                    "2.0!"
+                    "There"
                   ],
                   "line": 155,
+                  "col": 12,
+                  "isEval": false,
+                  "isExtension": false
+                },
+                {
+                  "label": "line: 156, col: 12",
+                  "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
+                  "args": [
+                    "2.0!"
+                  ],
+                  "line": 156,
                   "col": 12,
                   "isEval": false,
                   "isExtension": false
@@ -4270,23 +4365,23 @@
               "formatter": "url-list",
               "value": [
                 {
-                  "label": "line: 252, col: 25",
+                  "label": "line: 253, col: 25",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "args": [
                     null
                   ],
-                  "line": 252,
+                  "line": 253,
                   "col": 25,
                   "isEval": false,
                   "isExtension": false
                 },
                 {
-                  "label": "line: 256, col: 41",
+                  "label": "line: 257, col: 41",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "args": [
                     null
                   ],
-                  "line": 256,
+                  "line": 257,
                   "col": 41,
                   "isEval": false,
                   "isExtension": false
@@ -4312,10 +4407,10 @@
               "formatter": "url-list",
               "value": [
                 {
-                  "label": "line: 262, col: 16",
+                  "label": "line: 263, col: 16",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "args": [],
-                  "line": 262,
+                  "line": 263,
                   "col": 16,
                   "isEval": false,
                   "isExtension": false
@@ -4347,20 +4442,20 @@
                   "source": "deprecation",
                   "level": "warning",
                   "text": "Calling Element.createShadowRoot() for an element which already hosts a shadow root is deprecated. See https://www.chromestatus.com/features/4668884095336448 for more details.",
-                  "timestamp": 1493677874895.61,
+                  "timestamp": 1493917811116.72,
                   "lineNumber": 45,
                   "stackTrace": {
                     "callFrames": [
                       {
                         "functionName": "",
-                        "scriptId": "105",
+                        "scriptId": "107",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                         "lineNumber": 45,
                         "columnNumber": 6
                       },
                       {
                         "functionName": "",
-                        "scriptId": "105",
+                        "scriptId": "107",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                         "lineNumber": 48,
                         "columnNumber": 2
@@ -4369,56 +4464,56 @@
                   }
                 },
                 {
-                  "label": "line: 291",
+                  "label": "line: 292",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "code": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
                   "source": "deprecation",
                   "level": "warning",
                   "text": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
-                  "timestamp": 1493677874915.5,
-                  "lineNumber": 291,
+                  "timestamp": 1493917811174.34,
+                  "lineNumber": 292,
                   "stackTrace": {
                     "callFrames": [
                       {
                         "functionName": "deprecationsTest",
-                        "scriptId": "107",
+                        "scriptId": "110",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "lineNumber": 291,
+                        "lineNumber": 292,
                         "columnNumber": 6
                       },
                       {
                         "functionName": "",
-                        "scriptId": "107",
+                        "scriptId": "110",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "lineNumber": 311,
+                        "lineNumber": 312,
                         "columnNumber": 2
                       }
                     ]
                   }
                 },
                 {
-                  "label": "line: 294",
+                  "label": "line: 295",
                   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                   "code": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
                   "source": "deprecation",
                   "level": "warning",
                   "text": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
-                  "timestamp": 1493677874917.84,
-                  "lineNumber": 294,
+                  "timestamp": 1493917811178.06,
+                  "lineNumber": 295,
                   "stackTrace": {
                     "callFrames": [
                       {
                         "functionName": "deprecationsTest",
-                        "scriptId": "107",
+                        "scriptId": "110",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "lineNumber": 294,
+                        "lineNumber": 295,
                         "columnNumber": 8
                       },
                       {
                         "functionName": "",
-                        "scriptId": "107",
+                        "scriptId": "110",
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "lineNumber": 311,
+                        "lineNumber": 312,
                         "columnNumber": 2
                       }
                     ]
@@ -4431,7 +4526,7 @@
                   "source": "deprecation",
                   "level": "warning",
                   "text": "/deep/ combinator is deprecated and will be a no-op in M60, around August 2017. See https://www.chromestatus.com/features/4964279606312960 for more details.",
-                  "timestamp": 1493677874953.48
+                  "timestamp": 1493917811228.05
                 }
               ]
             },
@@ -4464,6 +4559,18 @@
     }
   ],
   "reportGroups": {
+    "perf-metric": {
+      "title": "Metrics",
+      "description": "These metrics encapsulate your app's performance across a number of dimensions."
+    },
+    "perf-hint": {
+      "title": "Unoptimized Resources",
+      "description": "These are opportunities to speed up your application by optimizing the following resources."
+    },
+    "perf-info": {
+      "title": "Diagnostics",
+      "description": "More information about the performance of your application."
+    },
     "a11y-color-contrast": {
       "title": "Color Contrast Is Satisfactory",
       "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
@@ -4590,22 +4697,23 @@
                 "value": {
                   "areLatenciesAll3G": true,
                   "allRequestLatencies": [
-                    151.57499999622814,
-                    157.12699999858143,
-                    213.550999993458,
-                    217.45199999713822,
-                    228.59500000777214,
-                    151.88200000557072,
-                    206.05799999611898,
-                    156.58999999868698,
-                    157.266000009258,
-                    2011.1069999984454,
-                    2207.6920000108666,
-                    158.08399999514248,
-                    213.4119999973339
+                    150.8799999719483,
+                    154.82500000507596,
+                    203.930999996373,
+                    215.7330000190997,
+                    221.29199997289098,
+                    221.481999993557,
+                    163.90799998771402,
+                    158.19600000395462,
+                    177.923000010196,
+                    2010.1960000174572,
+                    2204.622999997808,
+                    155.95299997949056,
+                    207.00600001146103,
+                    154.0190000087024
                   ],
                   "isFast": true,
-                  "timeToInteractive": 2918.407
+                  "timeToFirstInteractive": 3050.7450000047684
                 }
               },
               "scoringMode": "binary",
@@ -4720,29 +4828,29 @@
       "description": "These encapsulate your app's performance.",
       "categorizable": false,
       "scored": false,
-      "total": 0.8058333333333333,
+      "total": 0.823529411764706,
       "score": [
         {
           "name": "Performance",
           "description": "These encapsulate your app's performance.",
-          "overall": 0.8058333333333333,
+          "overall": 0.823529411764706,
           "subItems": [
             {
-              "score": 74,
-              "displayValue": "2898.2ms",
-              "rawValue": 2898.2,
-              "optimalValue": "1,600ms",
+              "score": 70,
+              "displayValue": "3041.3ms",
+              "rawValue": 3041.3,
+              "optimalValue": "< 1,600 ms",
               "extendedInfo": {
                 "value": {
                   "timestamps": {
-                    "navStart": 116142036337,
-                    "fCP": 116144934531,
-                    "fMP": 116144934538
+                    "navStart": 177804923477,
+                    "fCP": 177807964718,
+                    "fMP": 177807964730
                   },
                   "timings": {
                     "navStart": 0,
-                    "fCP": 2898.194,
-                    "fMP": 2898.201
+                    "fCP": 3041.241,
+                    "fMP": 3041.253
                   }
                 },
                 "formatter": "null"
@@ -4754,32 +4862,36 @@
               "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
             },
             {
-              "score": 82,
-              "displayValue": "2923",
-              "rawValue": 2923,
-              "optimalValue": "1,250",
+              "score": 80,
+              "displayValue": "3051",
+              "rawValue": 3051,
+              "optimalValue": "< 1,250",
               "extendedInfo": {
                 "formatter": "speedline",
                 "value": {
                   "timings": {
-                    "firstVisualChange": 2922,
-                    "visuallyComplete": 2922,
-                    "speedIndex": 2922.946000009775,
-                    "perceptualSpeedIndex": 2922.946000009775
+                    "firstVisualChange": 3051,
+                    "visuallyComplete": 3051,
+                    "speedIndex": 3051.097000002861,
+                    "perceptualSpeedIndex": 3051.097000002861
                   },
                   "timestamps": {
-                    "firstVisualChange": 116144953798,
-                    "visuallyComplete": 116144953798,
-                    "speedIndex": 116144954744,
-                    "perceptualSpeedIndex": 116144954744
+                    "firstVisualChange": 177807974477,
+                    "visuallyComplete": 177807974477,
+                    "speedIndex": 177807974574,
+                    "perceptualSpeedIndex": 177807974574
                   },
                   "frames": [
                     {
-                      "timestamp": 116142031.798,
+                      "timestamp": 177804923.477,
                       "progress": 0
                     },
                     {
-                      "timestamp": 116144954.744,
+                      "timestamp": 177807974.574,
+                      "progress": 100
+                    },
+                    {
+                      "timestamp": 177808039.717,
                       "progress": 100
                     }
                   ]
@@ -4795,7 +4907,7 @@
               "score": 100,
               "displayValue": "16ms",
               "rawValue": 16,
-              "optimalValue": "50ms",
+              "optimalValue": "< 50 ms",
               "extendedInfo": {
                 "value": [
                   {
@@ -4812,11 +4924,11 @@
                   },
                   {
                     "percentile": 0.99,
-                    "time": 16.31384681796759
+                    "time": 16.349075434647187
                   },
                   {
                     "percentile": 1,
-                    "time": 22.604999995113758
+                    "time": 24.238000000002103
                   }
                 ],
                 "formatter": "null"
@@ -4828,47 +4940,47 @@
               "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
             },
             {
-              "score": 83,
-              "displayValue": "2918.4ms",
-              "rawValue": 2918.4,
-              "optimalValue": "5,000ms",
+              "score": 81,
+              "displayValue": "3051.1ms",
+              "rawValue": 3051.1,
+              "optimalValue": "< 5,000 ms",
               "extendedInfo": {
                 "value": {
                   "timings": {
-                    "onLoad": 2905.877000004053,
-                    "fMP": 2898.201,
-                    "visuallyReady": 2918.407,
-                    "timeToInteractive": 2918.407,
-                    "timeToInteractiveB": 2898.201000005007,
-                    "timeToInteractiveC": 2898.201000005007,
-                    "endOfTrace": 8424.498999997973
+                    "onLoad": 3053.918000012636,
+                    "fMP": 3041.253,
+                    "visuallyReady": 3051.097,
+                    "timeToInteractive": 3051.097,
+                    "timeToInteractiveB": 3041.2529999911785,
+                    "timeToInteractiveC": 3041.2529999911785,
+                    "endOfTrace": 8754.877000004053
                   },
                   "timestamps": {
-                    "onLoad": 116144942214,
-                    "fMP": 116144934538,
-                    "visuallyReady": 116144954744,
-                    "timeToInteractive": 116144954744,
-                    "timeToInteractiveB": 116144934538,
-                    "timeToInteractiveC": 116144934538,
-                    "endOfTrace": 116150460836
+                    "onLoad": 177807977395,
+                    "fMP": 177807964730,
+                    "visuallyReady": 177807974574,
+                    "timeToInteractive": 177807974574,
+                    "timeToInteractiveB": 177807964730,
+                    "timeToInteractiveC": 177807964730,
+                    "endOfTrace": 177813678354
                   },
                   "latencies": {
                     "timeToInteractive": [
                       {
                         "estLatency": 16,
-                        "startTime": "2918.4"
+                        "startTime": "3051.1"
                       }
                     ],
                     "timeToInteractiveB": [
                       {
                         "estLatency": 16,
-                        "startTime": "2898.2"
+                        "startTime": "3041.3"
                       }
                     ],
                     "timeToInteractiveC": [
                       {
                         "estLatency": 16,
-                        "startTime": "2898.2"
+                        "startTime": "3041.3"
                       }
                     ]
                   },
@@ -4883,8 +4995,25 @@
               "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
             },
             {
+              "score": 93,
+              "displayValue": "3,050ms",
+              "rawValue": 3050.7450000047684,
+              "extendedInfo": {
+                "value": {
+                  "timeInMs": 3050.7450000047684,
+                  "timestamp": 177807974222
+                },
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "first-interactive",
+              "category": "Performance",
+              "description": "First Interactive (beta)",
+              "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
+            },
+            {
               "score": false,
-              "displayValue": "4 resources delayed first paint by 2205ms",
+              "displayValue": "4 resources delayed first paint by 2212ms",
               "rawValue": false,
               "extendedInfo": {
                 "formatter": "table",
@@ -4893,22 +5022,22 @@
                     {
                       "url": "/dobetterweb/dbw_tester.css?delay=100",
                       "totalKb": "1 KB",
-                      "totalMs": "110ms"
+                      "totalMs": "108ms"
                     },
                     {
                       "url": "/dobetterweb/unknown404.css?delay=200",
                       "totalKb": "0 KB",
-                      "totalMs": "206ms"
+                      "totalMs": "214ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.css?delay=2200",
                       "totalKb": "1 KB",
-                      "totalMs": "2205ms"
+                      "totalMs": "2212ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_partial_a.html?delay=200",
                       "totalKb": "1 KB",
-                      "totalMs": "208ms"
+                      "totalMs": "215ms"
                     }
                   ],
                   "tableHeadings": {
@@ -4927,7 +5056,7 @@
             },
             {
               "score": false,
-              "displayValue": "1 resource delayed first paint by 209ms",
+              "displayValue": "1 resource delayed first paint by 215ms",
               "rawValue": false,
               "extendedInfo": {
                 "formatter": "table",
@@ -4936,7 +5065,7 @@
                     {
                       "url": "/dobetterweb/dbw_tester.js",
                       "totalKb": "2 KB",
-                      "totalMs": "209ms"
+                      "totalMs": "215ms"
                     }
                   ],
                   "tableHeadings": {
@@ -4954,12 +5083,14 @@
               "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
             },
             {
-              "score": true,
+              "score": 100,
               "displayValue": "",
-              "rawValue": true,
+              "rawValue": 0,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 0,
+                  "wastedKb": 0,
                   "results": [],
                   "tableHeadings": {
                     "preview": "",
@@ -4978,12 +5109,14 @@
               "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
             },
             {
-              "score": false,
-              "displayValue": "Potential savings of 61 KB (~300ms)",
-              "rawValue": false,
+              "score": 65,
+              "displayValue": "Potential savings of 62 KB (~300ms)",
+              "rawValue": 300,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 300,
+                  "wastedKb": 62,
                   "results": [
                     {
                       "url": "/zone.js",
@@ -4998,9 +5131,9 @@
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10127,
-                      "wastedBytes": 6750,
-                      "wastedPercent": 66.6535005431026,
+                      "totalBytes": 10196,
+                      "wastedBytes": 6792,
+                      "wastedPercent": 66.61435857198902,
                       "potentialSavings": "7 KB _67%_",
                       "wastedKb": "7 KB",
                       "wastedMs": "30ms",
@@ -5016,18 +5149,21 @@
                 }
               },
               "scoringMode": "binary",
+              "informative": true,
               "name": "uses-request-compression",
               "category": "Performance",
               "description": "Compression enabled for server responses",
               "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
             },
             {
-              "score": true,
+              "score": 100,
               "displayValue": "",
-              "rawValue": true,
+              "rawValue": 0,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 0,
+                  "wastedKb": 0,
                   "results": [],
                   "tableHeadings": {
                     "preview": "",
@@ -5047,8 +5183,8 @@
             {
               "score": 100,
               "displayValue": "Total size was 129 KB",
-              "rawValue": 131715,
-              "optimalValue": "1,600 KB",
+              "rawValue": 132075,
+              "optimalValue": "< 1,600 KB",
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
@@ -5061,19 +5197,19 @@
                     },
                     {
                       "url": "…3.2.1/jquery.min.js",
-                      "totalBytes": 31677,
+                      "totalBytes": 31674,
                       "totalKb": "31 KB",
                       "totalMs": "150ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10248,
+                      "totalBytes": 10317,
                       "totalKb": "10 KB",
                       "totalMs": "50ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10248,
+                      "totalBytes": 10317,
                       "totalKb": "10 KB",
                       "totalMs": "50ms"
                     },
@@ -5096,6 +5232,12 @@
                       "totalMs": "0ms"
                     },
                     {
+                      "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                      "totalBytes": 859,
+                      "totalKb": "1 KB",
+                      "totalMs": "0ms"
+                    },
+                    {
                       "url": "/dobetterweb/dbw_tester.css?delay=2200",
                       "totalBytes": 859,
                       "totalKb": "1 KB",
@@ -5103,12 +5245,6 @@
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                      "totalBytes": 859,
-                      "totalKb": "1 KB",
-                      "totalMs": "0ms"
-                    },
-                    {
-                      "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
                       "totalBytes": 859,
                       "totalKb": "1 KB",
                       "totalMs": "0ms"
@@ -5130,15 +5266,15 @@
             },
             {
               "score": 100,
-              "displayValue": "34 nodes",
-              "rawValue": 34,
-              "optimalValue": "1,500 nodes",
+              "displayValue": "35 nodes",
+              "rawValue": 35,
+              "optimalValue": "< 1,500 nodes",
               "extendedInfo": {
                 "formatter": "cards",
                 "value": [
                   {
                     "title": "Total DOM Nodes",
-                    "value": "34",
+                    "value": "35",
                     "target": "< 1,500 nodes"
                   },
                   {
@@ -5169,7 +5305,7 @@
                 "items": [
                   {
                     "title": "Total DOM Nodes",
-                    "value": "34",
+                    "value": "35",
                     "target": "< 1,500 nodes"
                   },
                   {
@@ -5196,121 +5332,121 @@
                 "formatter": "critical-request-chains",
                 "value": {
                   "chains": {
-                    "80262.1": {
+                    "75268.1": {
                       "request": {
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "startTime": 116142.038233,
-                        "endTime": 116142.233289,
-                        "responseReceivedTime": 116142.190414,
-                        "transferSize": 10248
+                        "startTime": 177804.925661,
+                        "endTime": 177805.123481,
+                        "responseReceivedTime": 177805.080619,
+                        "transferSize": 10317
                       },
                       "children": {
-                        "80262.3": {
+                        "75268.3": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                            "startTime": 116142.226583,
-                            "endTime": 116142.384611,
-                            "responseReceivedTime": 116142.384137,
+                            "startTime": 177805.117895,
+                            "endTime": 177805.274093,
+                            "responseReceivedTime": 177805.273648,
                             "transferSize": 859
                           },
                           "children": {}
                         },
-                        "80262.4": {
+                        "75268.4": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                            "startTime": 116142.227322,
-                            "endTime": 116142.442419,
-                            "responseReceivedTime": 116142.441297,
+                            "startTime": 177805.118221,
+                            "endTime": 177805.324375,
+                            "responseReceivedTime": 177805.323597,
                             "transferSize": 139
                           },
                           "children": {}
                         },
-                        "80262.6": {
+                        "75268.6": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                            "startTime": 116142.228163,
-                            "endTime": 116142.448269,
-                            "responseReceivedTime": 116142.447848,
+                            "startTime": 177805.119508,
+                            "endTime": 177805.338533,
+                            "responseReceivedTime": 177805.338083,
                             "transferSize": 1146
                           },
                           "children": {}
                         },
-                        "80262.7": {
+                        "75268.7": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                            "startTime": 116142.228645,
-                            "endTime": 116142.462447,
-                            "responseReceivedTime": 116142.462127,
+                            "startTime": 177805.119977,
+                            "endTime": 177805.345399,
+                            "responseReceivedTime": 177805.345063,
                             "transferSize": 770
                           },
                           "children": {}
                         },
-                        "80262.18": {
-                          "request": {
-                            "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                            "startTime": 116142.238476,
-                            "endTime": 116142.577254,
-                            "responseReceivedTime": 116142.40497,
-                            "transferSize": 31677
-                          },
-                          "children": {}
-                        },
-                        "80262.8": {
+                        "75268.8": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                            "startTime": 116142.22909,
-                            "endTime": 116142.59131,
-                            "responseReceivedTime": 116142.590948,
+                            "startTime": 177805.12127,
+                            "endTime": 177805.496218,
+                            "responseReceivedTime": 177805.495865,
                             "transferSize": 767
                           },
                           "children": {}
                         },
-                        "80262.9": {
+                        "75268.9": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                            "startTime": 116142.229566,
-                            "endTime": 116142.612633,
-                            "responseReceivedTime": 116142.598539,
+                            "startTime": 177805.122028,
+                            "endTime": 177805.509764,
+                            "responseReceivedTime": 177805.48814,
                             "transferSize": 1630
                           },
                           "children": {}
                         },
-                        "80262.17": {
+                        "75268.18": {
+                          "request": {
+                            "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                            "startTime": 177805.129849,
+                            "endTime": 177805.524424,
+                            "responseReceivedTime": 177805.331196,
+                            "transferSize": 31674
+                          },
+                          "children": {}
+                        },
+                        "75268.17": {
                           "request": {
                             "url": "http://localhost:10200/zone.js",
-                            "startTime": 116142.237713,
-                            "endTime": 116142.948478,
-                            "responseReceivedTime": 116142.605779,
+                            "startTime": 177805.129377,
+                            "endTime": 177805.86017,
+                            "responseReceivedTime": 177805.516777,
                             "transferSize": 71654
                           },
                           "children": {}
                         },
-                        "80262.2": {
+                        "75268.2": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                            "startTime": 116142.224327,
-                            "endTime": 116144.23631,
-                            "responseReceivedTime": 116144.235911,
+                            "startTime": 177805.115359,
+                            "endTime": 177807.12637,
+                            "responseReceivedTime": 177807.126014,
                             "transferSize": 859
                           },
                           "children": {}
                         },
-                        "80262.5": {
+                        "75268.5": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                            "startTime": 116142.227873,
-                            "endTime": 116144.436661,
-                            "responseReceivedTime": 116144.436096,
+                            "startTime": 177805.11908,
+                            "endTime": 177807.32654,
+                            "responseReceivedTime": 177807.326161,
                             "transferSize": 859
                           },
                           "children": {}
                         },
-                        "80262.21": {
+                        "75268.21": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                            "startTime": 116144.465445,
-                            "endTime": 116144.679699,
-                            "responseReceivedTime": 116144.679311,
+                            "startTime": 177807.426194,
+                            "endTime": 177807.63423,
+                            "responseReceivedTime": 177807.633715,
                             "transferSize": 859
                           },
                           "children": {}
@@ -5319,7 +5455,7 @@
                     }
                   },
                   "longestChain": {
-                    "duration": 2641.466000000946,
+                    "duration": 2708.5690000094473,
                     "length": 2,
                     "transferSize": 859
                   }
@@ -5516,12 +5652,13 @@
                   "id": "color-contrast",
                   "impact": "critical",
                   "tags": [
+                    "cat.color",
                     "wcag2aa",
                     "wcag143"
                   ],
                   "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
                   "help": "Elements must have sufficient color contrast",
-                  "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/color-contrast?application=axeAPI",
+                  "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/color-contrast?application=axeAPI",
                   "nodes": [
                     {
                       "any": [
@@ -5530,9 +5667,10 @@
                           "data": {
                             "fgColor": "#ffc0cb",
                             "bgColor": "#eeeeee",
-                            "contrastRatio": "1.33",
+                            "contrastRatio": 1.32,
                             "fontSize": "18.0pt",
-                            "fontWeight": "bold"
+                            "fontWeight": "bold",
+                            "missingData": []
                           },
                           "relatedNodes": [
                             {
@@ -5543,7 +5681,7 @@
                             }
                           ],
                           "impact": "critical",
-                          "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                          "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
                         }
                       ],
                       "all": [],
@@ -5553,7 +5691,7 @@
                       "target": [
                         "body > div > h2"
                       ],
-                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
+                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 18.0pt, font weight: bold)"
                     },
                     {
                       "any": [
@@ -5562,9 +5700,10 @@
                           "data": {
                             "fgColor": "#ffc0cb",
                             "bgColor": "#eeeeee",
-                            "contrastRatio": "1.33",
+                            "contrastRatio": 1.32,
                             "fontSize": "12.0pt",
-                            "fontWeight": "normal"
+                            "fontWeight": "normal",
+                            "missingData": []
                           },
                           "relatedNodes": [
                             {
@@ -5575,7 +5714,7 @@
                             }
                           ],
                           "impact": "critical",
-                          "message": "Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                          "message": "Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
                         }
                       ],
                       "all": [],
@@ -5585,7 +5724,7 @@
                       "target": [
                         "body > div > span"
                       ],
-                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.33 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
+                      "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 1.32 (foreground color: #ffc0cb, background color: #eeeeee, font size: 12.0pt, font weight: normal)"
                     }
                   ]
                 }
@@ -5671,12 +5810,13 @@
                   "id": "html-has-lang",
                   "impact": "serious",
                   "tags": [
+                    "cat.language",
                     "wcag2a",
                     "wcag311"
                   ],
                   "description": "Ensures every HTML document has a lang attribute",
                   "help": "<html> element must have a lang attribute",
-                  "helpUrl": "https://dequeuniversity.com/rules/axe/2.1/html-has-lang?application=axeAPI",
+                  "helpUrl": "https://dequeuniversity.com/rules/axe/2.2/html-has-lang?application=axeAPI",
                   "nodes": [
                     {
                       "any": [
@@ -5998,7 +6138,7 @@
             },
             {
               "score": false,
-              "displayValue": "12 requests were not handled over h2",
+              "displayValue": "13 requests were not handled over h2",
               "rawValue": false,
               "extendedInfo": {
                 "formatter": "table",
@@ -6051,6 +6191,10 @@
                     {
                       "protocol": "http/1.1",
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+                    },
+                    {
+                      "protocol": "http/1.1",
+                      "url": "http://localhost:10200/favicon.ico"
                     }
                   ],
                   "tableHeadings": {
@@ -6139,12 +6283,12 @@
                 "value": {
                   "results": [
                     {
-                      "line": 223,
+                      "line": 224,
                       "col": 44,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "touchmove",
                       "pre": "section#touchmove-section.addEventListener('touchmove', function (e) {\n    console.log('touchmove');\n  })\n\n",
-                      "label": "line: 223, col: 44"
+                      "label": "line: 224, col: 44"
                     },
                     {
                       "line": 38,
@@ -6155,20 +6299,20 @@
                       "label": "line: 38, col: 38"
                     },
                     {
-                      "line": 197,
+                      "line": 198,
                       "col": 44,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "wheel",
                       "pre": "window.addEventListener('wheel', function (e) {\n    console.log('wheel');\n  })\n\n",
-                      "label": "line: 197, col: 44"
+                      "label": "line: 198, col: 44"
                     },
                     {
-                      "line": 207,
+                      "line": 208,
                       "col": 49,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "mousewheel",
                       "pre": "window.addEventListener('mousewheel', function (e) {\n    console.log('mousewheel');\n  })\n\n",
-                      "label": "line: 207, col: 49"
+                      "label": "line: 208, col: 49"
                     }
                   ],
                   "tableHeadings": {
@@ -6194,20 +6338,20 @@
                 "value": {
                   "results": [
                     {
-                      "line": 174,
+                      "line": 175,
                       "col": 61,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "DOMNodeInserted",
                       "pre": "body.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                      "label": "line: 174, col: 61"
+                      "label": "line: 175, col: 61"
                     },
                     {
-                      "line": 180,
+                      "line": 181,
                       "col": 50,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "DOMNodeInserted",
                       "pre": "section#touchmove-section.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted on element');\n  })\n\n",
-                      "label": "line: 180, col: 50"
+                      "label": "line: 181, col: 50"
                     },
                     {
                       "line": 31,
@@ -6218,28 +6362,28 @@
                       "label": "line: 31, col: 56"
                     },
                     {
-                      "line": 164,
+                      "line": 165,
                       "col": 56,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "DOMNodeInserted",
                       "pre": "document.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                      "label": "line: 164, col: 56"
+                      "label": "line: 165, col: 56"
                     },
                     {
-                      "line": 169,
+                      "line": 170,
                       "col": 55,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "DOMNodeRemoved",
                       "pre": "document.addEventListener('DOMNodeRemoved', function (e) {\n    console.log('DOMNodeRemoved');\n  })\n\n",
-                      "label": "line: 169, col: 55"
+                      "label": "line: 170, col: 55"
                     },
                     {
-                      "line": 185,
+                      "line": 186,
                       "col": 54,
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                       "type": "DOMNodeInserted",
                       "pre": "window.addEventListener('DOMNodeInserted', function (e) {\n    console.log('DOMNodeInserted');\n  })\n\n",
-                      "label": "line: 185, col: 54"
+                      "label": "line: 186, col: 54"
                     }
                   ],
                   "tableHeadings": {
@@ -6264,21 +6408,10 @@
                 "formatter": "url-list",
                 "value": [
                   {
-                    "label": "line: 153, col: 12",
-                    "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                    "args": [
-                      "Hi"
-                    ],
-                    "line": 153,
-                    "col": 12,
-                    "isEval": false,
-                    "isExtension": false
-                  },
-                  {
                     "label": "line: 154, col: 12",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "args": [
-                      "There"
+                      "Hi"
                     ],
                     "line": 154,
                     "col": 12,
@@ -6289,9 +6422,20 @@
                     "label": "line: 155, col: 12",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "args": [
-                      "2.0!"
+                      "There"
                     ],
                     "line": 155,
+                    "col": 12,
+                    "isEval": false,
+                    "isExtension": false
+                  },
+                  {
+                    "label": "line: 156, col: 12",
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
+                    "args": [
+                      "2.0!"
+                    ],
+                    "line": 156,
                     "col": 12,
                     "isEval": false,
                     "isExtension": false
@@ -6337,23 +6481,23 @@
                 "formatter": "url-list",
                 "value": [
                   {
-                    "label": "line: 252, col: 25",
+                    "label": "line: 253, col: 25",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "args": [
                       null
                     ],
-                    "line": 252,
+                    "line": 253,
                     "col": 25,
                     "isEval": false,
                     "isExtension": false
                   },
                   {
-                    "label": "line: 256, col: 41",
+                    "label": "line: 257, col: 41",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "args": [
                       null
                     ],
-                    "line": 256,
+                    "line": 257,
                     "col": 41,
                     "isEval": false,
                     "isExtension": false
@@ -6374,10 +6518,10 @@
                 "formatter": "url-list",
                 "value": [
                   {
-                    "label": "line: 262, col: 16",
+                    "label": "line: 263, col: 16",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "args": [],
-                    "line": 262,
+                    "line": 263,
                     "col": 16,
                     "isEval": false,
                     "isExtension": false
@@ -6404,20 +6548,20 @@
                     "source": "deprecation",
                     "level": "warning",
                     "text": "Calling Element.createShadowRoot() for an element which already hosts a shadow root is deprecated. See https://www.chromestatus.com/features/4668884095336448 for more details.",
-                    "timestamp": 1493677874895.61,
+                    "timestamp": 1493917811116.72,
                     "lineNumber": 45,
                     "stackTrace": {
                       "callFrames": [
                         {
                           "functionName": "",
-                          "scriptId": "105",
+                          "scriptId": "107",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                           "lineNumber": 45,
                           "columnNumber": 6
                         },
                         {
                           "functionName": "",
-                          "scriptId": "105",
+                          "scriptId": "107",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
                           "lineNumber": 48,
                           "columnNumber": 2
@@ -6426,56 +6570,56 @@
                     }
                   },
                   {
-                    "label": "line: 291",
+                    "label": "line: 292",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "code": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
                     "source": "deprecation",
                     "level": "warning",
                     "text": "Synchronous XMLHttpRequest on the main thread is deprecated because of its detrimental effects to the end user's experience. For more help, check https://xhr.spec.whatwg.org/.",
-                    "timestamp": 1493677874915.5,
-                    "lineNumber": 291,
+                    "timestamp": 1493917811174.34,
+                    "lineNumber": 292,
                     "stackTrace": {
                       "callFrames": [
                         {
                           "functionName": "deprecationsTest",
-                          "scriptId": "107",
+                          "scriptId": "110",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                          "lineNumber": 291,
+                          "lineNumber": 292,
                           "columnNumber": 6
                         },
                         {
                           "functionName": "",
-                          "scriptId": "107",
+                          "scriptId": "110",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                          "lineNumber": 311,
+                          "lineNumber": 312,
                           "columnNumber": 2
                         }
                       ]
                     }
                   },
                   {
-                    "label": "line: 294",
+                    "label": "line: 295",
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
                     "code": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
                     "source": "deprecation",
                     "level": "warning",
                     "text": "'window.webkitStorageInfo' is deprecated. Please use 'navigator.webkitTemporaryStorage' or 'navigator.webkitPersistentStorage' instead.",
-                    "timestamp": 1493677874917.84,
-                    "lineNumber": 294,
+                    "timestamp": 1493917811178.06,
+                    "lineNumber": 295,
                     "stackTrace": {
                       "callFrames": [
                         {
                           "functionName": "deprecationsTest",
-                          "scriptId": "107",
+                          "scriptId": "110",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                          "lineNumber": 294,
+                          "lineNumber": 295,
                           "columnNumber": 8
                         },
                         {
                           "functionName": "",
-                          "scriptId": "107",
+                          "scriptId": "110",
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                          "lineNumber": 311,
+                          "lineNumber": 312,
                           "columnNumber": 2
                         }
                       ]
@@ -6488,7 +6632,7 @@
                     "source": "deprecation",
                     "level": "warning",
                     "text": "/deep/ combinator is deprecated and will be a no-op in M60, around August 2017. See https://www.chromestatus.com/features/4964279606312960 for more details.",
-                    "timestamp": 1493677874953.48
+                    "timestamp": 1493917811228.05
                   }
                 ]
               },

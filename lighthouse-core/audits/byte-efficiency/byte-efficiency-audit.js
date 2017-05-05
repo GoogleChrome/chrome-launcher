@@ -20,13 +20,26 @@ const Audit = require('../audit');
 const Formatter = require('../../report/formatter');
 
 const KB_IN_BYTES = 1024;
-const WASTEFUL_THRESHOLD_IN_BYTES = 20 * KB_IN_BYTES;
+
+const WASTED_MS_FOR_AVERAGE = 300;
+const WASTED_MS_FOR_POOR = 750;
 
 /**
  * @overview Used as the base for all byte efficiency audits. Computes total bytes
  *    and estimated time saved. Subclass and override `audit_` to return results.
  */
 class UnusedBytes extends Audit {
+  /**
+   * @param {number} wastedMs
+   * @return {number}
+   */
+  static scoreForWastedMs(wastedMs) {
+    if (wastedMs === 0) return 100;
+    else if (wastedMs < WASTED_MS_FOR_AVERAGE) return 90;
+    else if (wastedMs < WASTED_MS_FOR_POOR) return 65;
+    else return 0;
+  }
+
   /**
    * @param {number} bytes
    * @return {string}
@@ -89,6 +102,8 @@ class UnusedBytes extends Audit {
         .sort((itemA, itemB) => itemB.wastedBytes - itemA.wastedBytes);
 
     const wastedBytes = results.reduce((sum, item) => sum + item.wastedBytes, 0);
+    const wastedKb = Math.round(wastedBytes / KB_IN_BYTES);
+    const wastedMs = Math.round(wastedBytes / networkThroughput * 100) * 10;
 
     let displayValue = result.displayValue || '';
     if (typeof result.displayValue === 'undefined' && wastedBytes) {
@@ -103,12 +118,16 @@ class UnusedBytes extends Audit {
     return {
       debugString,
       displayValue,
-      rawValue: typeof result.passes === 'undefined' ?
-          wastedBytes < WASTEFUL_THRESHOLD_IN_BYTES :
-          !!result.passes,
+      rawValue: wastedMs,
+      score: UnusedBytes.scoreForWastedMs(wastedMs),
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {results, tableHeadings: v1TableHeadings}
+        value: {
+          wastedMs,
+          wastedKb,
+          results,
+          tableHeadings: v1TableHeadings,
+        },
       },
       details: v2TableDetails
     };

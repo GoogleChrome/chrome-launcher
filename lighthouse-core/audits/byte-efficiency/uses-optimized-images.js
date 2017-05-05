@@ -40,7 +40,7 @@ class UsesOptimizedImages extends ByteEfficiencyAudit {
     return {
       category: 'Images',
       name: 'uses-optimized-images',
-      description: 'Unoptimized images',
+      description: 'Optimize images',
       informative: true,
       helpText: 'Images should be optimized to save network bytes. ' +
         'The following images could have smaller file sizes when compressed with ' +

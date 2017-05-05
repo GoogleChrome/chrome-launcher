@@ -33,7 +33,7 @@ class ScriptBlockingFirstPaint extends Audit {
     return {
       category: 'Performance',
       name: 'script-blocking-first-paint',
-      description: 'Render-blocking scripts',
+      description: 'Reduce render-blocking scripts',
       informative: true,
       helpText: 'Script elements are blocking the first paint of your page. Consider inlining ' +
           'critical scripts and deferring non-critical ones. ' +
