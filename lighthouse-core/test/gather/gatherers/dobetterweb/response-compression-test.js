@@ -20,14 +20,16 @@
 const ResponseCompression =
     require('../../../../gather/gatherers/dobetterweb/response-compression');
 const assert = require('assert');
+const mockDriver = require('../../fake-driver.js');
 
 let options;
-let optimizedResponses;
+let responseCompression;
 const traceData = {
   networkRecords: [
     {
       _url: 'http://google.com/index.js',
       _mimeType: 'text/javascript',
+      _requestId: 0,
       _resourceSize: 9,
       _resourceType: {
         _isTextType: true,
@@ -41,6 +43,7 @@ const traceData = {
     {
       _url: 'http://google.com/index.css',
       _mimeType: 'text/css',
+      _requestId: 1,
       _resourceSize: 6,
       _resourceType: {
         _isTextType: true,
@@ -51,6 +54,7 @@ const traceData = {
     {
       _url: 'http://google.com/index.json',
       _mimeType: 'application/json',
+      _requestId: 2,
       _resourceSize: 7,
       _resourceType: {
         _isTextType: true,
@@ -61,6 +65,7 @@ const traceData = {
     {
       _url: 'http://google.com/index.jpg',
       _mimeType: 'images/jpg',
+      _requestId: 3,
       _resourceSize: 10,
       _resourceType: {
         _isTextType: false,
@@ -74,14 +79,21 @@ const traceData = {
 describe('Optimized responses', () => {
   // Reset the Gatherer before each test.
   beforeEach(() => {
-    optimizedResponses = new ResponseCompression();
+    responseCompression = new ResponseCompression();
+    const driver = Object.assign({}, mockDriver, {
+      getRequestContent(id) {
+        return Promise.resolve(traceData.networkRecords[id].content);
+      },
+    });
+
     options = {
       url: 'http://google.com/',
+      driver,
     };
   });
 
   it('returns only text and non encoded responses', () => {
-    return optimizedResponses.afterPass(options, createNetworkRequests(traceData))
+    return responseCompression.afterPass(options, createNetworkRequests(traceData))
       .then(artifact => {
         assert.equal(artifact.length, 2);
         assert.ok(/index\.css$/.test(artifact[0].url));
@@ -90,7 +102,7 @@ describe('Optimized responses', () => {
   });
 
   it('computes sizes', () => {
-    return optimizedResponses.afterPass(options, createNetworkRequests(traceData))
+    return responseCompression.afterPass(options, createNetworkRequests(traceData))
       .then(artifact => {
         assert.equal(artifact.length, 2);
         assert.equal(artifact[0].resourceSize, 6);
@@ -98,14 +110,14 @@ describe('Optimized responses', () => {
       });
   });
 
- // Change into SDK.networkRequest when examples are ready
+  // Change into SDK.networkRequest when examples are ready
   function createNetworkRequests(traceData) {
     traceData.networkRecords = traceData.networkRecords.map(record => {
       record.url = record._url;
       record.mimeType = record._mimeType;
       record.resourceSize = record._resourceSize;
       record.responseHeaders = record._responseHeaders;
-      record.requestContent = () => Promise.resolve(record.content);
+      record.requestId = record._requestId;
       record.resourceType = () => {
         return Object.assign(
           {

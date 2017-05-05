@@ -44,13 +44,28 @@ class Driver {
     this._connection = connection;
     // currently only used by WPT where just Page and Network are needed
     this._devtoolsLog = new DevtoolsLog(/^(Page|Network)\./);
-    connection.on('notification', event => {
-      this._devtoolsLog.record(event);
-      this.recordNetworkEvent(event.method, event.params);
-      this._eventEmitter.emit(event.method, event.params);
-    });
     this.online = true;
     this._domainEnabledCounts = new Map();
+
+    /**
+     * Used for monitoring network status events during gotoURL.
+     * @private {?NetworkRecorder}
+     */
+    this._networkStatusMonitor = null;
+
+    /**
+     * Used for monitoring url redirects during gotoURL.
+     * @private {?string}
+     */
+    this._monitoredUrl = null;
+
+    connection.on('notification', event => {
+      this._devtoolsLog.record(event);
+      if (this._networkStatusMonitor) {
+        this._networkStatusMonitor.dispatch(event.method, event.params);
+      }
+      this._eventEmitter.emit(event.method, event.params);
+    });
   }
 
   static get traceCategories() {
@@ -71,13 +86,6 @@ class Driver {
       // 'disabled-by-default-v8.cpu_profiler.hires',
       'disabled-by-default-devtools.screenshot'
     ];
-  }
-
-  /**
-   * @return {!Array<{method: string, params: !Object}>}
-   */
-  get devtoolsLog() {
-    return this._devtoolsLog.messages;
   }
 
   /**
@@ -347,25 +355,6 @@ class Driver {
   }
 
   /**
-   * If our main document URL redirects, we will update options.url accordingly
-   * As such, options.url will always represent the post-redirected URL.
-   * options.initialUrl is the pre-redirect URL that things started with
-   * @param {!Object} opts
-   */
-  enableUrlUpdateIfRedirected(opts) {
-    this._networkRecorder.on('requestloaded', redirectRequest => {
-      // Quit if this is not a redirected request
-      if (!redirectRequest.redirectSource) {
-        return;
-      }
-      const earlierRequest = redirectRequest.redirectSource;
-      if (earlierRequest.url === opts.url) {
-        opts.url = redirectRequest.url;
-      }
-    });
-  }
-
-  /**
    * Returns a promise that resolves when the network has been idle for
    * `pauseAfterLoadMs` ms and a method to cancel internal network listeners and
    * timeout.
@@ -380,7 +369,7 @@ class Driver {
     const promise = new Promise((resolve, reject) => {
       const onIdle = () => {
         // eslint-disable-next-line no-use-before-define
-        this._networkRecorder.once('networkbusy', onBusy);
+        this._networkStatusMonitor.once('networkbusy', onBusy);
         idleTimeout = setTimeout(_ => {
           cancel();
           resolve();
@@ -388,17 +377,17 @@ class Driver {
       };
 
       const onBusy = () => {
-        this._networkRecorder.once('networkidle', onIdle);
+        this._networkStatusMonitor.once('networkidle', onIdle);
         clearTimeout(idleTimeout);
       };
 
       cancel = () => {
         clearTimeout(idleTimeout);
-        this._networkRecorder.removeListener('networkbusy', onBusy);
-        this._networkRecorder.removeListener('networkidle', onIdle);
+        this._networkStatusMonitor.removeListener('networkbusy', onBusy);
+        this._networkStatusMonitor.removeListener('networkidle', onIdle);
       };
 
-      if (this._networkRecorder.isIdle()) {
+      if (this._networkStatusMonitor.isIdle()) {
         onIdle();
       } else {
         onBusy();
@@ -490,14 +479,55 @@ class Driver {
   }
 
   /**
-   * Navigate to the given URL. Use of this method directly isn't advised: if
+   * Set up listener for network quiet events and URL redirects. Passed in URL
+   * will be monitored for redirects, with the final loaded URL passed back in
+   * _endNetworkStatusMonitoring.
+   * @param {string} startingUrl
+   * @return {!Promise}
+   * @private
+   */
+  _beginNetworkStatusMonitoring(startingUrl) {
+    this._networkStatusMonitor = new NetworkRecorder([]);
+
+    // Update startingUrl if it's ever redirected.
+    this._monitoredUrl = startingUrl;
+    this._networkStatusMonitor.on('requestloaded', redirectRequest => {
+      // Ignore if this is not a redirected request.
+      if (!redirectRequest.redirectSource) {
+        return;
+      }
+      const earlierRequest = redirectRequest.redirectSource;
+      if (earlierRequest.url === this._monitoredUrl) {
+        this._monitoredUrl = redirectRequest.url;
+      }
+    });
+
+    return this.sendCommand('Network.enable');
+  }
+
+  /**
+   * End network status listening. Returns the final, possibly redirected,
+   * loaded URL starting with the one passed into _endNetworkStatusMonitoring.
+   * @return {string}
+   * @private
+   */
+  _endNetworkStatusMonitoring() {
+    this._networkStatusMonitor = null;
+    const finalUrl = this._monitoredUrl;
+    this._monitoredUrl = null;
+    return finalUrl;
+  }
+
+  /**
+   * Navigate to the given URL. Direct use of this method isn't advised: if
    * the current page is already at the given URL, navigation will not occur and
    * so the returned promise will only resolve after the MAX_WAIT_FOR_FULLY_LOADED
    * timeout. See https://github.com/GoogleChrome/lighthouse/pull/185 for one
    * possible workaround.
+   * Resolves on the url of the loaded page, taking into account any redirects.
    * @param {string} url
    * @param {!Object} options
-   * @return {!Promise}
+   * @return {!Promise<string>}
    */
   gotoURL(url, options = {}) {
     const waitForLoad = options.waitForLoad || false;
@@ -506,16 +536,18 @@ class Driver {
     const maxWaitMs = (options.flags && options.flags.maxWaitForLoad) ||
         Driver.MAX_WAIT_FOR_FULLY_LOADED;
 
-    return this.sendCommand('Page.enable')
+    return this._beginNetworkStatusMonitoring(url)
+      .then(_ => this.sendCommand('Page.enable'))
       .then(_ => this.sendCommand('Emulation.setScriptExecutionDisabled', {value: disableJS}))
       .then(_ => this.sendCommand('Page.navigate', {url}))
-      .then(_ => waitForLoad && this._waitForFullyLoaded(pauseAfterLoadMs, maxWaitMs));
+      .then(_ => waitForLoad && this._waitForFullyLoaded(pauseAfterLoadMs, maxWaitMs))
+      .then(_ => this._endNetworkStatusMonitoring());
   }
 
   /**
-  * @param {string} objectId Object ID for the resolved DOM node
-  * @param {string} propName Name of the property
-  * @return {!Promise<string>} The property value, or null, if property not found
+   * @param {string} objectId Object ID for the resolved DOM node
+   * @param {string} propName Name of the property
+   * @return {!Promise<string>} The property value, or null, if property not found
   */
   getObjectProperty(objectId, propName) {
     return new Promise((resolve, reject) => {
@@ -536,6 +568,18 @@ class Driver {
         }
       }).catch(reject);
     });
+  }
+
+  /**
+   * Return the body of the response with the given ID.
+   * @param {string} requestId
+   * @return {string}
+   */
+  getRequestContent(requestId) {
+    return this.sendCommand('Network.getResponseBody', {
+      requestId,
+    // Ignoring result.base64Encoded, which indicates if body is already encoded
+    }).then(result => result.body);
   }
 
   /**
@@ -618,9 +662,6 @@ class Driver {
       throw new Error('DOM domain enabled when starting trace');
     }
 
-    this._devtoolsLog.reset();
-    this._devtoolsLog.beginRecording();
-
     // Enable Page domain to wait for Page.loadEventFired
     return this.sendCommand('Page.enable')
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
@@ -633,7 +674,6 @@ class Driver {
     return new Promise((resolve, reject) => {
       // When the tracing has ended this will fire with a stream handle.
       this.once('Tracing.tracingComplete', streamHandle => {
-        this._devtoolsLog.endRecording();
         this._readTraceFromStream(streamHandle)
             .then(traceContents => resolve(traceContents), reject);
       });
@@ -672,34 +712,21 @@ class Driver {
     });
   }
 
-  beginNetworkCollect(opts) {
-    return new Promise((resolve, reject) => {
-      this._networkRecords = [];
-      this._networkRecorder = new NetworkRecorder(this._networkRecords, this);
-      this.enableUrlUpdateIfRedirected(opts);
-
-      this.sendCommand('Network.enable').then(resolve, reject);
-    });
+  /**
+   * Begin recording devtools protocol messages.
+   */
+  beginDevtoolsLog() {
+    this._devtoolsLog.reset();
+    this._devtoolsLog.beginRecording();
   }
 
   /**
-   * @param {!string} method
-   * @param {!Object<string, *>=} params
+   * Stop recording to devtoolsLog and return log contents.
+   * @return {!Array<{method: string, params: (!Object<string, *>|undefined)}>}
    */
-  recordNetworkEvent(method, params) {
-    if (!this._networkRecorder) return;
-
-    const regexFilter = /^Network\./;
-    if (!regexFilter.test(method)) return;
-    this._networkRecorder.dispatch(method, params);
-  }
-
-  endNetworkCollect() {
-    return new Promise((resolve, reject) => {
-      resolve(this._networkRecords);
-      this._networkRecorder = null;
-      this._networkRecords = [];
-    });
+  endDevtoolsLog() {
+    this._devtoolsLog.endRecording();
+    return this._devtoolsLog.messages;
   }
 
   enableRuntimeEvents() {

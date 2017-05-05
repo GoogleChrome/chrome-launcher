@@ -19,6 +19,7 @@
 const log = require('../lib/log.js');
 const Audit = require('../audits/audit');
 const URL = require('../lib/url-shim');
+const NetworkRecorder = require('../lib/network-recorder.js');
 
 /**
  * @typedef {!Object<string, !Array<!Promise<*>>>}
@@ -44,15 +45,15 @@ let GathererResults; // eslint-disable-line no-unused-vars
  * 2. For each pass in the config:
  *   A. GatherRunner.beforePass()
  *     i. navigate to about:blank
- *     ii. all gatherer's beforePass()
+ *     ii. all gatherers' beforePass()
  *   B. GatherRunner.pass()
- *     i. GatherRunner.loadPage()
- *       b. beginTrace (if requested) & beginNetworkCollect
- *       c. navigate to options.url (and wait for onload)
- *     ii. all gatherer's pass()
+ *     i. beginTrace (if requested) & beginDevtoolsLog
+ *     ii. GatherRunner.loadPage()
+ *       a. navigate to options.url (and wait for onload)
+ *     iii. all gatherers' pass()
  *   C. GatherRunner.afterPass()
- *     i. endTrace (if requested) & endNetworkCollect & endThrottling
- *     ii. all gatherer's afterPass()
+ *     i. endTrace (if requested) & endDevtoolsLog & endThrottling
+ *     ii. all gatherers' afterPass()
  *
  * 3. Teardown
  *   A. GatherRunner.disposeDriver()
@@ -76,23 +77,22 @@ class GatherRunner {
   }
 
   /**
-   * Loads options.url with specified options.
+   * Loads options.url with specified options. If the main document URL
+   * redirects, options.url will be updated accordingly. As such, options.url
+   * will always represent the post-redirected URL. options.initialUrl is the
+   * pre-redirect starting URL.
    * @param {!Driver} driver
    * @param {!Object} options
    * @return {!Promise}
    */
   static loadPage(driver, options) {
-    return Promise.resolve()
-      // Begin tracing only if requested by config.
-      .then(_ => options.config.recordTrace && driver.beginTrace(options.flags))
-      // Network is always recorded for internal use, even if not saved as artifact.
-      .then(_ => driver.beginNetworkCollect(options))
-      // Navigate.
-      .then(_ => driver.gotoURL(options.url, {
-        waitForLoad: true,
-        disableJavaScript: !!options.disableJavaScript,
-        flags: options.flags,
-      }));
+    return driver.gotoURL(options.url, {
+      waitForLoad: true,
+      disableJavaScript: !!options.disableJavaScript,
+      flags: options.flags,
+    }).then(finalUrl => {
+      options.url = finalUrl;
+    });
   }
 
   /**
@@ -199,9 +199,15 @@ class GatherRunner {
     const status = 'Loading page & waiting for onload';
     log.log('status', status, gatherernames);
 
-    const pass = GatherRunner.loadPage(driver, options).then(_ => {
-      log.log('statusEnd', status);
-    });
+    // Always record devtoolsLog.
+    driver.beginDevtoolsLog();
+
+    const pass = Promise.resolve()
+      // Begin tracing only if requested by config.
+      .then(_ => config.recordTrace && driver.beginTrace(options.flags))
+      // Navigate.
+      .then(_ => GatherRunner.loadPage(driver, options))
+      .then(_ => log.log('statusEnd', status));
 
     return gatherers.reduce((chain, gatherer) => {
       return chain.then(_ => {
@@ -242,17 +248,17 @@ class GatherRunner {
       });
     }
 
-    const status = 'Retrieving network records';
     pass = pass.then(_ => {
-      passData.devtoolsLog = driver.devtoolsLog;
+      const status = 'Retrieving devtoolsLog and network records';
       log.log('status', status);
-      return driver.endNetworkCollect();
-    }).then(networkRecords => {
+      const devtoolsLog = driver.endDevtoolsLog();
+      const networkRecords = NetworkRecorder.recordsFromLogs(devtoolsLog);
       GatherRunner.assertPageLoaded(options.url, driver, networkRecords);
-      // expose devtoolsLog & networkRecords to gatherers
-      passData.devtoolsLog = driver.devtoolsLog;
-      passData.networkRecords = networkRecords;
       log.verbose('statusEnd', status);
+
+      // Expose devtoolsLog and networkRecords to gatherers
+      passData.devtoolsLog = devtoolsLog;
+      passData.networkRecords = networkRecords;
     });
 
     // Disable throttling so the afterPass analysis isn't throttled
@@ -351,9 +357,12 @@ class GatherRunner {
             .then(_ => GatherRunner.pass(runOptions, gathererResults))
             .then(_ => GatherRunner.afterPass(runOptions, gathererResults))
             .then(passData => {
-              // If requested by config, merge trace and network data for this
-              // pass into tracingData.
               const passName = config.passName || Audit.DEFAULT_PASS;
+
+              // networkRecords are discarded and not added onto artifacts.
+              tracingData.devtoolsLogs[passName] = passData.devtoolsLog;
+
+              // If requested by config, add trace to pass's tracingData
               if (config.recordTrace) {
                 tracingData.traces[passName] = passData.trace;
               }

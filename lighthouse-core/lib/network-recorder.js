@@ -24,13 +24,12 @@ class NetworkRecorder extends EventEmitter {
   /**
    * Creates an instance of NetworkRecorder.
    * @param {!Array} recordArray
-   * @param {!Driver=} driver
    */
-  constructor(recordArray, driver) {
+  constructor(recordArray) {
     super();
 
     this._records = recordArray;
-    this.networkManager = NetworkManager.createWithFakeTarget(driver);
+    this.networkManager = NetworkManager.createWithFakeTarget();
 
     this.startedRequestCount = 0;
     this.finishedRequestCount = 0;
@@ -39,14 +38,6 @@ class NetworkRecorder extends EventEmitter {
         this.onRequestStarted.bind(this));
     this.networkManager.addEventListener(this.EventTypes.RequestFinished,
         this.onRequestFinished.bind(this));
-
-    this.onRequestWillBeSent = this.onRequestWillBeSent.bind(this);
-    this.onRequestServedFromCache = this.onRequestServedFromCache.bind(this);
-    this.onResponseReceived = this.onResponseReceived.bind(this);
-    this.onDataReceived = this.onDataReceived.bind(this);
-    this.onLoadingFinished = this.onLoadingFinished.bind(this);
-    this.onLoadingFailed = this.onLoadingFailed.bind(this);
-    this.onResourceChangedPriority = this.onResourceChangedPriority.bind(this);
   }
 
   get EventTypes() {
@@ -155,6 +146,10 @@ class NetworkRecorder extends EventEmitter {
    * @param {!Object<string, *>=} params
    */
   dispatch(method, params) {
+    if (!method.startsWith('Network.')) {
+      return;
+    }
+
     switch (method) {
       case 'Network.requestWillBeSent': return this.onRequestWillBeSent(params);
       case 'Network.requestServedFromCache': return this.onRequestServedFromCache(params);
@@ -169,14 +164,14 @@ class NetworkRecorder extends EventEmitter {
 
   /**
    * Construct network records from a log of devtools protocol messages.
-   * @param {!DevtoolsLog} log
+   * @param {!DevtoolsLog} devtoolsLog
    * @return {!Array<!WebInspector.NetworkRequest>}
    */
-  static recordsFromLogs(log) {
+  static recordsFromLogs(devtoolsLog) {
     const records = [];
     const nr = new NetworkRecorder(records);
-    log.forEach(event => {
-      nr.dispatch(event.method, event.params);
+    devtoolsLog.forEach(message => {
+      nr.dispatch(message.method, message.params);
     });
     return records;
   }

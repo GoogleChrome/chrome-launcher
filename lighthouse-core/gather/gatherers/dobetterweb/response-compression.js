@@ -47,7 +47,7 @@ class ResponseCompression extends Gatherer {
 
       if (!isContentEncoded) {
         unoptimizedResponses.push({
-          record: record,
+          requestId: record.requestId,
           url: record.url,
           mimeType: record.mimeType,
           resourceSize: record.resourceSize,
@@ -62,8 +62,9 @@ class ResponseCompression extends Gatherer {
     const networkRecords = traceData.networkRecords;
     const textRecords = ResponseCompression.filterUnoptimizedResponses(networkRecords);
 
+    const driver = options.driver;
     return Promise.all(textRecords.map(record => {
-      return record.record.requestContent().then(content => {
+      return driver.getRequestContent(record.requestId).then(content => {
         // if we don't have any content gzipSize is set to 0
         if (!content) {
           record.gzipSize = 0;
