@@ -95,9 +95,12 @@ describe('ReportRenderer V2', () => {
       assert.equal(url.textContent, sampleResults.url);
       assert.equal(url.href, sampleResults.url);
 
+      const userAgent = header.querySelector('.lh-env__item__ua');
+      assert.equal(userAgent.textContent, sampleResults.userAgent, 'user agent populated');
+
       // Check runtime settings were populated.
       const enables = header.querySelectorAll('.lh-env__enabled');
-      const names = header.querySelectorAll('.lh-env__name');
+      const names = Array.from(header.querySelectorAll('.lh-env__name')).slice(1);
       const descriptions = header.querySelectorAll('.lh-env__description');
       sampleResults.runtimeConfig.environment.forEach((env, i) => {
         assert.equal(enables[i].textContent, env.enabled ? 'Enabled' : 'Disabled');
