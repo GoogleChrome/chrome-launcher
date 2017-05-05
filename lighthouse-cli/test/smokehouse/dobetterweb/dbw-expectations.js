@@ -102,16 +102,16 @@ module.exports = [
           }
         }
       },
-      'no-old-flexbox': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 7
-            }
-          }
-        }
-      },
+      // 'no-old-flexbox': {
+      //   score: false,
+      //   extendedInfo: {
+      //     value: {
+      //       results: {
+      //         length: 7
+      //       }
+      //     }
+      //   }
+      // },
       'no-websql': {
         score: false,
         debugString: 'Found database "mydb", version: 1.0.'
@@ -244,9 +244,9 @@ module.exports = [
       'no-mutation-events': {
         score: true
       },
-      'no-old-flexbox': {
-        score: true
-      },
+      // 'no-old-flexbox': {
+      //   score: true
+      // },
       'no-websql': {
         score: true
       },

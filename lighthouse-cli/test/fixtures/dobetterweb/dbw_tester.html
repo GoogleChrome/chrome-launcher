@@ -309,7 +309,7 @@ if (location.search === '') {
   notificationOnStartTest();
   linksBlockingFirstPaintTest();
   noRelOpenLinksTest();
-  oldCSSFlexboxTest();
+  // oldCSSFlexboxTest();
   deprecationsTest();
 } else {
   if (params.has('documentWrite')) {
@@ -342,9 +342,9 @@ if (location.search === '') {
   if (params.has('relnoopener')) {
     noRelOpenLinksTest();
   }
-  if (params.has('oldcssflexbox')) {
-    oldCSSFlexboxTest();
-  }
+  // if (params.has('oldcssflexbox')) {
+  //   oldCSSFlexboxTest();
+  // }
   if (params.has('deprecations')) {
     deprecationsTest();
   }
