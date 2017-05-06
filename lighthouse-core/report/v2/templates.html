@@ -123,7 +123,8 @@
     .lh-header {
       display: flex;
       height: var(--report-header-height);
-      width: var(--report-width);
+      left: 0;
+      right: 0;
       max-width: 100%; /* support text-overflow on url */
       border-bottom: 1px solid var(--report-secondary-border-color);
       position: fixed;
@@ -259,6 +260,13 @@
     }
     .lh-config__settings-toggle summary::-webkit-details-marker {
       display: none;
+    }
+    @media screen and (min-width: 1130px) {
+      .lh-header {
+        width: var(--report-width);
+        right: initial;
+        left: initial;
+      }
     }
     @media screen and (max-width: 767px) {
       .lh-export__dropdown {
