@@ -52,12 +52,20 @@ class GeolocationOnStart extends Audit {
       }, err);
     });
 
+
+    const headings = [
+      {key: 'url', itemType: 'url', text: 'URL'},
+      {key: 'label', itemType: 'text', text: 'Location'},
+    ];
+    const details = Audit.makeV2TableDetails(headings, results);
+
     return {
       rawValue: results.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: results
-      }
+      },
+      details,
     };
   }
 

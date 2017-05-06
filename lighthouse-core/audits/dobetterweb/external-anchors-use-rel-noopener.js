@@ -61,6 +61,9 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
       })
       .map(anchor => {
         return {
+          href: anchor.href || 'Unknown',
+          target: anchor.target || '',
+          rel: anchor.rel || '',
           url: '<a' +
               (anchor.href ? ` href="${anchor.href}"` : '') +
               (anchor.target ? ` target="${anchor.target}"` : '') +
@@ -68,12 +71,21 @@ class ExternalAnchorsUseRelNoopenerAudit extends Audit {
         };
       });
 
+    const headings = [
+      {key: 'href', itemType: 'url', text: 'URL'},
+      {key: 'target', itemType: 'text', text: 'Target'},
+      {key: 'rel', itemType: 'text', text: 'Rel'},
+    ];
+
+    const details = Audit.makeV2TableDetails(headings, failingAnchors);
+
     return {
       rawValue: failingAnchors.length === 0,
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
         value: failingAnchors
       },
+      details,
       debugString
     };
   }

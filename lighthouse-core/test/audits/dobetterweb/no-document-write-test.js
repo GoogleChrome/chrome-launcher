@@ -30,6 +30,7 @@ describe('Page does not use document.write()', () => {
     });
     assert.equal(auditResult.rawValue, true);
     assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.details.items.length, 0);
   });
 
   it('fails when document.write() is used', () => {
@@ -43,5 +44,6 @@ describe('Page does not use document.write()', () => {
     });
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.equal(auditResult.details.items.length, 3);
   });
 });

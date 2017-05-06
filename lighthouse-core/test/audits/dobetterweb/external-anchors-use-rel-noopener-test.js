@@ -34,6 +34,7 @@ describe('External anchors use rel="noopener"', () => {
     });
     assert.equal(auditResult.rawValue, true);
     assert.equal(auditResult.extendedInfo.value.length, 0);
+    assert.equal(auditResult.details.items.length, 0);
   });
 
   it('fails when links are from different hosts than the page host', () => {
@@ -46,6 +47,7 @@ describe('External anchors use rel="noopener"', () => {
     });
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 2);
+    assert.equal(auditResult.details.items.length, 2);
   });
 
   it('handles links with no href attribute', () => {
@@ -59,6 +61,7 @@ describe('External anchors use rel="noopener"', () => {
     });
     assert.equal(auditResult.rawValue, false);
     assert.equal(auditResult.extendedInfo.value.length, 3);
+    assert.equal(auditResult.details.items.length, 3);
     assert.ok(auditResult.debugString, 'includes debugString');
   });
 });

@@ -77,7 +77,7 @@ class Audit {
     const tableRows = results.map(item => {
       return headings.map(heading => {
         const value = item[heading.key];
-        if (typeof value === 'object' && value.type) return value;
+        if (typeof value === 'object' && value && value.type) return value;
 
         return {
           type: heading.itemType,
