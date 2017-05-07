@@ -4,9 +4,11 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "test": "mocha --reporter dot test/**/*-test.js"
   },
   "devDependencies": {
+    "mocha": "^3.2.0",
     "typescript": "2.2.1"
   },
   "dependencies": {
