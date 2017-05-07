@@ -19,23 +19,25 @@
 /* eslint-env mocha */
 const assert = require('assert');
 const childProcess = require('child_process');
+const path = require('path');
+const indexPath = path.resolve(__dirname, '../../index.js');
 
 describe('CLI Tests', function() {
   it('fails if a url is not provided', () => {
-    assert.throws(() => childProcess.execSync('node lighthouse-cli/index.js', {stdio: 'pipe'}),
+    assert.throws(() => childProcess.execSync(`node ${indexPath}`, {stdio: 'pipe'}),
           /Please provide a url/);
   });
 
   it('should list all audits without a url and exit immediately after', () => {
     const output = JSON.parse(childProcess.execSync(
-          'node lighthouse-cli/index.js --list-all-audits').toString());
+          `node ${indexPath} --list-all-audits`).toString());
     assert.ok(Array.isArray(output.audits));
     assert.ok(output.audits.length > 0);
   });
 
   it('accepts just the list-trace-categories flag and exit immediately after', () => {
     const output = JSON.parse(childProcess.execSync(
-          'node lighthouse-cli/index.js --list-trace-categories').toString());
+          `node ${indexPath} --list-trace-categories`).toString());
     assert.ok(Array.isArray(output.traceCategories));
     assert.ok(output.traceCategories.length > 0);
   });
