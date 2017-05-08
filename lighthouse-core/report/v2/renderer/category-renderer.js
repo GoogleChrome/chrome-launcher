@@ -164,16 +164,12 @@ class CategoryRenderer {
   }
 
   /**
-   * @param {!Array<!ReportRenderer.AuditJSON>} audits
+   * Renders the group container for a group of audits. Individual audit elements can be added
+   * directly to the returned element.
    * @param {!ReportRenderer.GroupJSON} group
-   * @param {function(!ReportRenderer.AuditJSON): !Element=} renderAudit
    * @return {!Element}
    */
-  _renderAuditGroup(audits, group, renderAudit) {
-    if (!renderAudit) {
-      renderAudit = this._renderAudit.bind(this);
-    }
-
+  _renderAuditGroup(group) {
     const auditGroupElem = this._dom.createElement('details',
           'lh-audit-group lh-expandable-details');
     const auditGroupHeader = this._dom.createElement('div',
@@ -193,7 +189,6 @@ class CategoryRenderer {
 
     auditGroupElem.appendChild(auditGroupSummary);
     auditGroupElem.appendChild(auditGroupDescription);
-    audits.forEach(audit => auditGroupElem.appendChild(renderAudit(audit)));
     return auditGroupElem;
   }
 
@@ -300,7 +295,8 @@ class CategoryRenderer {
     element.appendChild(this._renderCategoryScore(category));
 
     const metricAudits = category.audits.filter(audit => audit.group === 'perf-metric');
-    const metricAuditsEl = this._renderAuditGroup(metricAudits, groups['perf-metric']);
+    const metricAuditsEl = this._renderAuditGroup(groups['perf-metric']);
+    metricAudits.forEach(item => metricAuditsEl.appendChild(this._renderAudit(item)));
     metricAuditsEl.open = true;
     element.appendChild(metricAuditsEl);
 
@@ -308,12 +304,10 @@ class CategoryRenderer {
         .filter(audit => audit.group === 'perf-hint' && audit.score < 100)
         .sort((auditA, auditB) => auditB.result.rawValue - auditA.result.rawValue);
     if (hintAudits.length) {
-      let maxWaste = 0;
-      hintAudits.forEach(audit => maxWaste = Math.max(maxWaste, audit.result.rawValue));
-
+      const maxWaste = Math.max(...hintAudits.map(audit => audit.result.rawValue));
       const scale = Math.ceil(maxWaste / 1000) * 1000;
-      const hintAuditsEl = this._renderAuditGroup(hintAudits, groups['perf-hint'],
-          audit => this._renderPerfHintAudit(audit, scale));
+      const hintAuditsEl = this._renderAuditGroup(groups['perf-hint']);
+      hintAudits.forEach(item => hintAuditsEl.appendChild(this._renderPerfHintAudit(item, scale)));
       hintAuditsEl.open = true;
       element.appendChild(hintAuditsEl);
     }
@@ -321,7 +315,8 @@ class CategoryRenderer {
     const infoAudits = category.audits
         .filter(audit => audit.group === 'perf-info' && audit.score < 100);
     if (infoAudits.length) {
-      const infoAuditsEl = this._renderAuditGroup(infoAudits, groups['perf-info']);
+      const infoAuditsEl = this._renderAuditGroup(groups['perf-info']);
+      infoAudits.forEach(item => infoAuditsEl.appendChild(this._renderAudit(item)));
       infoAuditsEl.open = true;
       element.appendChild(infoAuditsEl);
     }
@@ -368,13 +363,15 @@ class CategoryRenderer {
       const group = groupDefinitions[groupId];
       const groups = auditsGroupedByGroup[groupId];
       if (groups.failed.length) {
-        const auditGroupElem = this._renderAuditGroup(groups.failed, group);
+        const auditGroupElem = this._renderAuditGroup(group);
+        groups.failed.forEach(item => auditGroupElem.appendChild(this._renderAudit(item)));
         auditGroupElem.open = true;
         element.appendChild(auditGroupElem);
       }
 
       if (groups.passed.length) {
-        const auditGroupElem = this._renderAuditGroup(groups.passed, group);
+        const auditGroupElem = this._renderAuditGroup(group);
+        groups.passed.forEach(item => auditGroupElem.appendChild(this._renderAudit(item)));
         passedElements.push(auditGroupElem);
       }
     });
