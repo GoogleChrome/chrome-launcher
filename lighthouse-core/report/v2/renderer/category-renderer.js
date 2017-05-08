@@ -123,6 +123,7 @@ class CategoryRenderer {
   _renderPerfHintAudit(audit, scale) {
     const extendedInfo = /** @type {!CategoryRenderer.PerfHintExtendedInfo}
         */ (audit.result.extendedInfo);
+    const tooltipAttrs = {title: audit.result.displayValue};
 
     const element = this._dom.createElement('details', [
       'lh-perf-hint',
@@ -135,12 +136,13 @@ class CategoryRenderer {
     const titleEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__title');
     titleEl.textContent = audit.result.description;
 
-    const sparklineContainerEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__sparkline');
+    const sparklineContainerEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__sparkline',
+        tooltipAttrs);
     const sparklineEl = this._dom.createChildOf(sparklineContainerEl, 'div', 'lh-sparkline');
     const sparklineBarEl = this._dom.createChildOf(sparklineEl, 'div', 'lh-sparkline__bar');
     sparklineBarEl.style.width = audit.result.rawValue / scale * 100 + '%';
 
-    const statsEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__stats');
+    const statsEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__stats', tooltipAttrs);
     const statsMsEl = this._dom.createChildOf(statsEl, 'div', 'lh-perf-hint__primary-stat');
     statsMsEl.textContent = audit.result.rawValue.toLocaleString() + ' ms';
 
