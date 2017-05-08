@@ -150,7 +150,7 @@ mkdirp@0.5.1:
   dependencies:
     minimist "0.0.8"
 
-mocha@^3.3.0:
+mocha@^3.2.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-3.3.0.tgz#d29b7428d3f52c82e2e65df1ecb7064e1aabbfb5"
   dependencies:
