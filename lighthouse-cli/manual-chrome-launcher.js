@@ -14,18 +14,18 @@ require('./compiled-check.js')('chrome-launcher.js');
 
 const args = process.argv.slice(2);
 
-let additionalFlags;
+let chromeFlags;
 let startingUrl;
 
 if (args.length) {
-  additionalFlags = args.filter(flag => flag.startsWith('--'));
+  chromeFlags = args.filter(flag => flag.startsWith('--'));
   startingUrl = args.find(flag => !flag.startsWith('--'));
 }
 
-const ChromeLauncher = require('./chrome-launcher.js').ChromeLauncher;
+const {ChromeLauncher} = require('./chrome-launcher');
 const chromeInstance = new ChromeLauncher({
   startingUrl,
-  additionalFlags,
+  chromeFlags,
 });
 
 chromeInstance.prepare();

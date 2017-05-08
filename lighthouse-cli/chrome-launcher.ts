@@ -40,14 +40,14 @@ export class ChromeLauncher {
   errFile?: number
   pidFile: string
   startingUrl: string
-  additionalFlags: Array<string>
+  chromeFlags: Array<string>
   chrome?: childProcess.ChildProcess
   port: number
 
   // We can not use default args here due to support node pre 6.
   constructor(opts?: {
       startingUrl?: string,
-      additionalFlags?: Array<string>,
+      chromeFlags?: Array<string>,
       autoSelectChrome?: Boolean,
       port?: number}) {
 
@@ -56,7 +56,7 @@ export class ChromeLauncher {
         // choose the first one (default)
         this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
         this.startingUrl = defaults(opts.startingUrl, 'about:blank');
-        this.additionalFlags = defaults(opts.additionalFlags, []);
+        this.chromeFlags = defaults(opts.chromeFlags, []);
         this.port = defaults(opts.port, 9222);
   }
 
@@ -88,7 +88,7 @@ export class ChromeLauncher {
       flags.push('--disable-setuid-sandbox');
     }
 
-    flags.push(...this.additionalFlags);
+    flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
 
     return flags;

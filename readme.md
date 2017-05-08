@@ -44,43 +44,55 @@ $ lighthouse --help
 lighthouse <url>
 
 Logging:
-  --verbose  Displays verbose logging                                                      [boolean]
-  --quiet    Displays no progress or debug logs                                            [boolean]
+  --verbose  Displays verbose logging                                                                                                      [boolean]
+  --quiet    Displays no progress, debug logs or errors                                                                                    [boolean]
 
 Configuration:
-  --disable-device-emulation    Disable device emulation                                   [boolean]
-  --disable-cpu-throttling      Disable cpu throttling                                     [boolean]
-  --disable-network-throttling  Disable network throttling                                 [boolean]
-  --save-assets                 Save the trace contents & screenshots to disk              [boolean]
-  --save-artifacts              Save all gathered artifacts to disk                        [boolean]
-  --list-all-audits             Prints a list of all available audits and exits            [boolean]
-  --list-trace-categories       Prints a list of all required trace categories and exits   [boolean]
-  --config-path                 The path to the config JSON.
-  --perf                        Use a performance-test-only configuration                  [boolean]
-  --port                        The port to use for the debugging protocol. Use 0 for a
-                                random port.                                         [default: 9222]
-  --max-wait-for-load           The timeout (in milliseconds) to wait before the page is
-                                considered done loading and the run should continue.
-                                WARNING: Very high values can lead to large traces and
-                                instability.                                        [default: 25000]
+  --save-assets                  Save the trace contents & screenshots to disk                                                             [boolean]
+  --save-artifacts               Save all gathered artifacts to disk                                                                       [boolean]
+  --list-all-audits              Prints a list of all available audits and exits                                                           [boolean]
+  --list-trace-categories        Prints a list of all required trace categories and exits                                                  [boolean]
+  --additional-trace-categories  Additional categories to capture with the trace (comma-delimited).
+  --config-path                  The path to the config JSON.
+  --chrome-flags                 Custom flags to pass to Chrome (space-delimited). For a full list of flags, see
+                                 http://peter.sh/experiments/chromium-command-line-switches/.                                          [default: ""]
+  --perf                         Use a performance-test-only configuration                                                                 [boolean]
+  --port                         The port to use for the debugging protocol. Use 0 for a random port                                 [default: 9222]
+  --max-wait-for-load            The timeout (in milliseconds) to wait before the page is considered done loading and the run should continue.
+                                 WARNING: Very high values can lead to large traces and instability                                 [default: 25000]
 
 Output:
-  --output       Reporter for the results, supports multiple values
-                                    [choices: "json", "html"]                      [default: "html"]
-  --output-path  The file path to output the results. Use 'stdout' to write to
-                 stdout.
+  --output       Reporter for the results, supports multiple values                           [choices: "json", "html", "domhtml"] [default: "html"]
+  --output-path  The file path to output the results. Use 'stdout' to write to stdout.
                  If using JSON output, default is stdout.
-                 If using HTML output, default is a file in the working
-                 directory with a name based on the test URL and date.
+                 If using HTML output, default is a file in the working directory with a name based on the test URL and date.
                  If using multiple outputs, --output-path is ignored.
-                 Example: --output-path=./lighthouse-results.html                [default: "stdout"]
+                 Example: --output-path=./lighthouse-results.html
+  --view         Open HTML report in your browser                                                                                          [boolean]
 
 Options:
-  --help             Show help                                                             [boolean]
-  --version          Show version number                                                   [boolean]
-  --skip-autolaunch  Skip autolaunch of Chrome when accessing port 9222 fails              [boolean]
-  --select-chrome    Interactively choose version of Chrome to use when multiple
-                     installations are found                                               [boolean]
+  --help                        Show help                                                                                                  [boolean]
+  --version                     Show version number                                                                                        [boolean]
+  --disable-storage-reset       Disable clearing the browser cache and other storage APIs before a run                                     [boolean]
+  --disable-device-emulation    Disable Nexus 5X emulation                                                                                 [boolean]
+  --disable-cpu-throttling      Disable CPU throttling                                                                    [boolean] [default: false]
+  --disable-network-throttling  Disable network throttling                                                                                 [boolean]
+  --skip-autolaunch             Skip autolaunch of Chrome when already running instance is not found                                       [boolean]
+  --select-chrome               Interactively choose version of Chrome to use when multiple installations are found                        [boolean]
+  --interactive                 Open Lighthouse in interactive mode                                                                        [boolean]
+
+Examples:
+  lighthouse <url> --view                                                   Opens the HTML report in a browser after the run completes
+  lighthouse <url> --config-path=./myconfig.js                              Runs Lighthouse with your own configuration: custom audits, report
+                                                                            generation, etc.
+  lighthouse <url> --output=json --output-path=./report.json --save-assets  Save trace, screenshots, and named JSON report.
+  lighthouse <url> --disable-device-emulation --disable-network-throttling  Disable device emulation
+  lighthouse <url> --chrome-flags="--window-size=412,732"                   Launch Chrome with a specific window size
+  lighthouse <url> --quiet --chrome-flags="--headless"                      Launch Headless Chrome, turn off logging
+
+For more information on Lighthouse, see https://developers.google.com/web/tools/lighthouse/.
+
+
 ```
 
 ##### Output Examples
