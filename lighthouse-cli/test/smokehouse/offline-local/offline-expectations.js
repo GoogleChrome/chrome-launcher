@@ -112,8 +112,8 @@ module.exports = [
         displayValue: '0'
       },
       'critical-request-chains': {
-        score: false,
-        displayValue: '1'
+        score: true,
+        displayValue: '0'
       },
       'webapp-install-banner': {
         score: false

@@ -38,6 +38,10 @@ class CriticalRequestChains extends ComputedArtifact {
     if (resourceTypeCategory === WebInspector.resourceTypes.XHR._category) {
       return false;
     }
+    // Images are also non-critical.
+    if (resourceTypeCategory === WebInspector.resourceTypes.Image._category) {
+      return false;
+    }
 
     // Treat favicons as non-critical resources
     if (request.mimeType === 'image/x-icon' ||
