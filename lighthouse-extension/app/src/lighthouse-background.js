@@ -23,7 +23,7 @@ const Config = require('../../../lighthouse-core/config/config');
 const defaultConfig = require('../../../lighthouse-core/config/default.js');
 const log = require('../../../lighthouse-core/lib/log');
 
-const ReportGenerator = require('../../../lighthouse-core/report/report-generator');
+const ReportGeneratorV2 = require('../../../lighthouse-core/report/v2/report-generator');
 
 const STORAGE_KEY = 'lighthouse_audits';
 const SETTINGS_KEY = 'lighthouse_settings';
@@ -168,15 +168,10 @@ window.runLighthouseInWorker = function(port, url, options, categoryIDs) {
  * @param {!string} reportContext Where the report is going
  * @return {!string} Blob URL of the report (or error page) HTML
  */
-window.createReportPageAsBlob = function(results, reportContext) {
+window.createReportPageAsBlob = function(results) {
   performance.mark('report-start');
-  const reportGenerator = new ReportGenerator();
-  let html;
-  try {
-    html = reportGenerator.generateHTML(results, reportContext);
-  } catch (err) {
-    html = reportGenerator.renderException(err, results);
-  }
+  const html = new ReportGeneratorV2().generateReportHtml(results);
+
   const blob = new Blob([html], {type: 'text/html'});
   const blobURL = window.URL.createObjectURL(blob);
 

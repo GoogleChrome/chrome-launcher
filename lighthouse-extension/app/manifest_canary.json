@@ -1,0 +1,32 @@
+{
+  "name": "__MSG_appName__",
+  "version": "2.0.0.3",
+  "minimum_chrome_version": "56",
+  "manifest_version": 2,
+  "description": "__MSG_appDescription__",
+  "icons": {
+    "16": "images/lh_logo_canary_bg.png",
+    "128": "images/lh_logo_canary_bg.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "scripts/chromereload.js",
+      "scripts/lighthouse-background.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "activeTab",
+    "debugger",
+    "storage"
+  ],
+  "browser_action": {
+    "default_icon": {
+      "38": "images/lh_logo_canary_icon.png"
+    },
+    "default_title": "Lighthouse",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'none'"
+}

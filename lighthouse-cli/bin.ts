@@ -132,7 +132,7 @@ Example: --output-path=./lighthouse-results.html`,
         // default values
         .default('chrome-flags', '')
         .default('disable-cpu-throttling', false)
-        .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.html])
+        .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.domhtml])
         .default('port', 9222)
         .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
         .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
