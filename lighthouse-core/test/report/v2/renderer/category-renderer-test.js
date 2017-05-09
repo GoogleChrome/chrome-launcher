@@ -152,6 +152,21 @@ describe('CategoryRenderer', () => {
       assert.ok(/Potential savings/.test(hintSparklineElement.title), 'did not render tooltip');
     });
 
+    it('renders the performance hints with no extended info', () => {
+      const buggyAudit = {
+        score: 0,
+        group: 'perf-hint',
+        result: {debugString: 'Yikes!', description: 'Bug'},
+      };
+
+      const fakeAudits = category.audits.concat(buggyAudit);
+      const fakeCategory = Object.assign({}, category, {audits: fakeAudits});
+      const categoryDOM = renderer.render(fakeCategory, sampleResults.reportGroups);
+
+      const debugEl = categoryDOM.querySelector('.lh-perf-hint .lh-debug');
+      assert.ok(debugEl, 'did not render debug');
+    });
+
     it('renders the failing diagnostics', () => {
       const categoryDOM = renderer.render(category, sampleResults.reportGroups);
       const diagnosticSection = categoryDOM.querySelectorAll('.lh-category > .lh-audit-group')[2];

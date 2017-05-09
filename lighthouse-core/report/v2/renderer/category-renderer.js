@@ -136,6 +136,12 @@ class CategoryRenderer {
     const titleEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__title');
     titleEl.textContent = audit.result.description;
 
+    if (!extendedInfo || typeof audit.result.rawValue !== 'number') {
+      const debugStrEl = this._dom.createChildOf(summary, 'div', 'lh-debug');
+      debugStrEl.textContent = audit.result.debugString || 'Report error: no extended information';
+      return element;
+    }
+
     const sparklineContainerEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__sparkline',
         tooltipAttrs);
     const sparklineEl = this._dom.createChildOf(sparklineContainerEl, 'div', 'lh-sparkline');
