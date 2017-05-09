@@ -33,7 +33,7 @@ describe('Manifest gatherer', () => {
   it('returns an artifact', () => {
     return manifestGather.afterPass({
       driver: {
-        sendCommand() {
+        getAppManifest() {
           return Promise.resolve({
             data: '{}',
             errors: [],
@@ -50,11 +50,10 @@ describe('Manifest gatherer', () => {
   it('throws an error when unable to retrieve the manifest', () => {
     return manifestGather.afterPass({
       driver: {
-        sendCommand() {
-          return Promise.resolve({
-            errors: [],
-            url: EXAMPLE_MANIFEST_URL
-          });
+        getAppManifest() {
+          return Promise.reject(
+            new Error(`Unable to retrieve manifest at ${EXAMPLE_MANIFEST_URL}.`)
+          );
         }
       }
     }).then(
@@ -65,12 +64,8 @@ describe('Manifest gatherer', () => {
   it('returns null when the page had no manifest', () => {
     return manifestGather.afterPass({
       driver: {
-        sendCommand() {
-          return Promise.resolve({
-            data: '',
-            errors: [],
-            url: ''
-          });
+        getAppManifest() {
+          return Promise.reject('No web app manifest found.');
         }
       }
     }).then(artifact => {
@@ -84,7 +79,7 @@ describe('Manifest gatherer', () => {
     });
     return manifestGather.afterPass({
       driver: {
-        sendCommand() {
+        getAppManifest() {
           return Promise.resolve({
             errors: [],
             data,

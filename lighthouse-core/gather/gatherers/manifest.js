@@ -34,21 +34,16 @@ class Manifest extends Gatherer {
    * @return {!Promise<?Manifest>}
    */
   afterPass(options) {
-    return options.driver.sendCommand('Page.getAppManifest')
+    return options.driver.getAppManifest()
       .then(response => {
-        // We're not reading `response.errors` however it may contain critical and noncritical
-        // errors from Blink's manifest parser:
-        //   https://chromedevtools.github.io/debugger-protocol-viewer/tot/Page/#type-AppManifestError
-        if (!response.data) {
-          if (response.url) {
-            throw new Error(`Unable to retrieve manifest at ${response.url}`);
-          }
-
-          // If both the data and the url are empty strings, the page had no manifest.
+        return manifestParser(response.data, response.url, options.url);
+      })
+      .catch(err => {
+        if (err === 'No web app manifest found.') {
           return null;
         }
 
-        return manifestParser(response.data, response.url, options.url);
+        return Promise.reject(err);
       });
   }
 }

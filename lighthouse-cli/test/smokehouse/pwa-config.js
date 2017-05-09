@@ -34,7 +34,8 @@ module.exports = {
     passName: 'offlinePass',
     gatherers: [
       'service-worker',
-      'offline'
+      'offline',
+      'start-url'
     ]
   },
   {

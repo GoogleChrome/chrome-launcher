@@ -30,9 +30,8 @@ class Offline extends Gatherer {
         record._fetchedViaServiceWorker;
     }).pop(); // Take the last record that matches.
 
-    return options.driver.goOnline(options).then(_ => {
-      return navigationRecord ? navigationRecord.statusCode : -1;
-    });
+    return options.driver.goOnline(options)
+      .then(_ => navigationRecord ? navigationRecord.statusCode : -1);
   }
 }
 

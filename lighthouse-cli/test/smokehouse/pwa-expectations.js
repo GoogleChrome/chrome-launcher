@@ -78,7 +78,7 @@ module.exports = [
         score: false
       },
       'webapp-install-banner': {
-        score: true
+        score: false
       },
       'splash-screen': {
         score: true
