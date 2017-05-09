@@ -55,12 +55,11 @@ class ComputedArtifact {
       return Promise.resolve(this._cache.get(artifact));
     }
 
-    return Promise.resolve()
-      .then(_ => this.compute_(artifact, this._allComputedArtifacts))
-      .then(computedArtifact => {
-        this._cache.set(artifact, computedArtifact);
-        return computedArtifact;
-      });
+    const artifactPromise = Promise.resolve()
+      .then(_ => this.compute_(artifact, this._allComputedArtifacts));
+    this._cache.set(artifact, artifactPromise);
+
+    return artifactPromise;
   }
 }
 
