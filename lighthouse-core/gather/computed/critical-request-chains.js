@@ -34,7 +34,7 @@ class CriticalRequestChains extends ComputedArtifact {
    */
   isCritical(request) {
     const resourceTypeCategory = request._resourceType && request._resourceType._category;
-    
+
     // XHRs are fetched at High priority, but we exclude them, as they are unlikely to be critical
     // Images are also non-critical.
     const nonCriticalResourceTypes = [
