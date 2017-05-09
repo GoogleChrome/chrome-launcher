@@ -33,6 +33,4 @@ function getRandomPort(): Promise<number> {
   });
 }
 
-export {
-  getRandomPort
-};
+export {getRandomPort};

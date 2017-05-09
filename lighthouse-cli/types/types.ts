@@ -4,10 +4,7 @@ interface AuditResult {
   debugString?: string;
   score?: boolean|number;
   optimalValue: number|string;
-  extendedInfo?: {
-    value: string;
-    formatter: string;
-  };
+  extendedInfo?: {value: string; formatter: string;};
 }
 
 interface AuditResults {
@@ -25,10 +22,7 @@ interface AuditFullResult {
   name: string;
   category: string;
   helpText?: string;
-  extendedInfo?: {
-    value: string;
-    formatter: string;
-  };
+  extendedInfo?: {value: string; formatter: string;};
 }
 
 interface AuditFullResults {
@@ -39,7 +33,7 @@ interface AggregationResultItem {
   overall: number;
   name: string;
   scored: boolean;
-  subItems: Array<AuditFullResult | string>;
+  subItems: Array<AuditFullResult|string>;
 }
 
 interface Aggregation {
