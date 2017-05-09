@@ -32,16 +32,17 @@ const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 
 export class ChromeLauncher {
-  prepared: Boolean = false
-  pollInterval: number = 500
-  autoSelectChrome: Boolean
-  TMP_PROFILE_DIR: string
-  outFile?: number
-  errFile?: number
-  pidFile: string
-  startingUrl: string
-  chromeFlags: Array<string>chrome?: childProcess.ChildProcess
-  port: number
+  prepared: Boolean = false;
+  pollInterval: number = 500;
+  autoSelectChrome: Boolean;
+  TMP_PROFILE_DIR: string;
+  outFile?: number;
+  errFile?: number;
+  pidFile: string;
+  startingUrl: string;
+  chromeFlags: Array<string>;
+  chrome?: childProcess.ChildProcess;
+  port: number;
 
   // We can not use default args here due to support node pre 6.
   constructor(opts?: {
@@ -141,24 +142,23 @@ export class ChromeLauncher {
   }
 
   spawn(execPath: string): Promise<any[]> {
-    return new Promise(resolve => {
-             if (this.chrome) {
-               log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-               return resolve(this.chrome.pid);
-             }
+    const spawnPromise = new Promise(resolve => {
+      if (this.chrome) {
+        log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
+        return resolve(this.chrome.pid);
+      }
 
-             const chrome = spawn(
-                 execPath, this.flags(),
-                 {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
-             this.chrome = chrome;
+      const chrome = spawn(
+          execPath, this.flags(), {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
+      this.chrome = chrome;
 
-             fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
-             log.verbose(
-                 'ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-             resolve(chrome.pid);
-           })
-        .then(pid => Promise.all([pid, this.waitUntilReady()]));
+      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
+      resolve(chrome.pid);
+    });
+
+    return spawnPromise.then(pid => Promise.all([pid, this.waitUntilReady()]));
   }
 
   cleanup(client?: net.Socket) {

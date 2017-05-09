@@ -50,6 +50,8 @@ export function darwin() {
         });
       });
 
+  // Retains one per line to maintain readability.
+  // clang-format off
   const priorities: Priorities = [
     {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`), weight: 50},
     {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`), weight: 51},
@@ -58,6 +60,7 @@ export function darwin() {
     {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
     {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1}
   ];
+  // clang-format on
 
   return sort(installations, priorities);
 }

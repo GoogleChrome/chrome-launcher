@@ -45,7 +45,6 @@ updateNotifier({pkg}).notify(); // Tell user if there's a newer version of LH.
 interface LighthouseError extends Error {
   code?: string
 }
-;
 
 const cliFlags =
     yargs.help('help')
@@ -207,8 +206,9 @@ function initPort(flags: {port: number}): Promise<undefined> {
  * port. If none is found and the `skipAutolaunch` flag is not true, launches
  * a debuggable instance.
  */
-function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, selectChrome: boolean,
-                               chromeFlags: string}): Promise<ChromeLauncher> {
+function getDebuggableChrome(flags: {
+  skipAutolaunch: boolean, port: number, selectChrome: boolean,
+  chromeFlags: string}): Promise<ChromeLauncher> {
   const chromeLauncher = new ChromeLauncher({
     port: flags.port,
     chromeFlags: flags.chromeFlags.split(' '),
@@ -321,37 +321,40 @@ function saveResults(results: Results,
   });
 }
 
-export async function runLighthouse(url: string,
-                       flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
-                         outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
-                         chromeFlags: string, maxWaitForLoad: number, view: boolean},
-                       config: Object | null): Promise<{}|void> {
-                           let chromeLauncher: ChromeLauncher|undefined = undefined;
+export async function runLighthouse(
+  url: string,
+  flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
+    outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
+    chromeFlags: string, maxWaitForLoad: number, view: boolean},
+    config: Object | null): Promise<{}|void> {
+      let chromeLauncher: ChromeLauncher|undefined = undefined;
 
-                           try {
-                             await initPort(flags) const chromeLauncher =
-                                 await getDebuggableChrome(flags) const results =
-                                     await lighthouse(url, flags, config);
+      try {
+        await initPort(flags);
+        const chromeLauncher = await getDebuggableChrome(flags);
+        const results = await lighthouse(url, flags, config);
 
-                             const artifacts = results.artifacts;
-                             delete results.artifacts;
+        const artifacts = results.artifacts;
+        delete results.artifacts;
 
-                             await saveResults(results, artifacts!, flags);
-                             if (flags.interactive) {
-                               await performanceXServer.hostExperiment(
-                                   {url, flags, config}, results);
-                             }
+        await saveResults(results, artifacts!, flags);
+        if (flags.interactive) {
+          await performanceXServer.hostExperiment({url, flags, config}, results);
+        }
 
-                             return await chromeLauncher.kill();
-                           } catch (err) {
-                             if (typeof chromeLauncher !== 'undefined') {
-                               await chromeLauncher!.kill();
-                             }
+        return await chromeLauncher.kill();
+      } catch (err) {
+        if (typeof chromeLauncher !== 'undefined') {
+          await chromeLauncher!.kill();
+        }
 
-                             return handleError(err);
-                           }
-                         }
+        return handleError(err);
+      }
+    }
 
-                         export function run() {
-                           return runLighthouse(url, cliFlags, config);
-                         }
+    // This will be reenabled once flags are extracted to standalone interface.
+    // clang-format off
+export function run() {
+  return runLighthouse(url, cliFlags, config);
+}
+    // clang-format on
