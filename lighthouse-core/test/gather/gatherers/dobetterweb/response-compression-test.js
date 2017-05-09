@@ -39,6 +39,7 @@ const traceData = {
         value: 'gzip',
       }],
       content: 'aaabbbccc',
+      finished: true,
     },
     {
       _url: 'http://google.com/index.css',
@@ -50,6 +51,7 @@ const traceData = {
       },
       _responseHeaders: [],
       content: 'abcabc',
+      finished: true,
     },
     {
       _url: 'http://google.com/index.json',
@@ -61,6 +63,19 @@ const traceData = {
       },
       _responseHeaders: [],
       content: '1234567',
+      finished: true,
+    },
+    {
+      _url: 'http://google.com/other.json',
+      _mimeType: 'application/json',
+      _requestId: 2,
+      _resourceSize: 7,
+      _resourceType: {
+        _isTextType: true,
+      },
+      _responseHeaders: [],
+      content: '1234567',
+      finished: false, // ignore for not finishing
     },
     {
       _url: 'http://google.com/index.jpg',
@@ -72,6 +87,7 @@ const traceData = {
       },
       _responseHeaders: [],
       content: 'aaaaaaaaaa',
+      finished: true,
     }
   ]
 };

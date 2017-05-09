@@ -56,10 +56,10 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
   it('fails a good TTI value with no throttling', () => {
     // latencies are very short
     const mockNetworkRecords = [
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}},
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 75}},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 75}, finished: true},
       { },
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true},
     ];
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, false);
@@ -81,10 +81,11 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
   it('passes a good TTI value and WITH throttling', () => {
     // latencies are very long
     const mockNetworkRecords = [
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}},
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 175}},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 175}, finished: true},
       { },
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: -1}, finished: false}, // ignored for not finishing
     ];
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, true);

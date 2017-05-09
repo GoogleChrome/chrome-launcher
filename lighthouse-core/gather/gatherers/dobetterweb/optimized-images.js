@@ -73,7 +73,7 @@ class OptimizedImages extends Gatherer {
   static filterImageRequests(pageUrl, networkRecords) {
     const seenUrls = new Set();
     return networkRecords.reduce((prev, record) => {
-      if (seenUrls.has(record._url)) {
+      if (seenUrls.has(record._url) || !record.finished) {
         return prev;
       }
 

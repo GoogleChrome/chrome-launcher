@@ -29,6 +29,7 @@ const traceData = {
       _transferSize: 10,
       _startTime: 10,
       _endTime: 10,
+      finished: true,
       _initiator: {type: 'parser'}
     },
     {
@@ -37,6 +38,7 @@ const traceData = {
       _transferSize: 11,
       _startTime: 11,
       _endTime: 11,
+      finished: true,
       _initiator: {type: 'other'}
     },
     {
@@ -45,6 +47,7 @@ const traceData = {
       _transferSize: 24,
       _startTime: 24,
       _endTime: 24,
+      finished: true,
       _initiator: {type: 'script'}
     },
     {
@@ -53,6 +56,7 @@ const traceData = {
       _transferSize: 12,
       _startTime: 12,
       _endTime: 22,
+      finished: true,
       _initiator: {type: 'parser'}
     },
     {
@@ -61,6 +65,7 @@ const traceData = {
       _transferSize: 13,
       _startTime: 13,
       _endTime: 13,
+      finished: true,
       _initiator: {type: 'script'}
     },
     {
@@ -69,6 +74,7 @@ const traceData = {
       _transferSize: 16,
       _startTime: 16,
       _endTime: 16,
+      finished: true,
       _initiator: {type: 'script'}
     },
     {
@@ -77,7 +83,17 @@ const traceData = {
       _transferSize: 16,
       _startTime: 16,
       _endTime: 16,
+      finished: true,
       _initiator: {type: 'script'}
+    },
+    {
+      _url: 'http://google.com/js/also-ignored.js',
+      _mimeType: 'text/javascript',
+      _transferSize: 12,
+      _startTime: 12,
+      _endTime: 22,
+      finished: false,
+      _initiator: {type: 'parser'}
     },
   ]
 };

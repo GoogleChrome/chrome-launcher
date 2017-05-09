@@ -33,6 +33,7 @@ function mockTracingData(prioritiesList, edges) {
         _resourceType: {
           _category: 'fake'
         },
+        finished: true,
         priority: () => priority,
         initiatorRequest: () => null
       }));
@@ -59,7 +60,7 @@ function constructEmptyRequest() {
     responseReceivedTime: undefined,
     startTime: undefined,
     url: undefined,
-    transferSize: undefined
+    transferSize: undefined,
   };
 }
 

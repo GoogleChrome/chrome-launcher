@@ -125,7 +125,7 @@ class ImageUsage extends Gatherer {
   afterPass(options, traceData) {
     const driver = this.driver = options.driver;
     const indexedNetworkRecords = traceData.networkRecords.reduce((map, record) => {
-      if (/^image/.test(record._mimeType)) {
+      if (/^image/.test(record._mimeType) && record.finished) {
         map[record._url] = {
           url: record.url,
           resourceSize: record.resourceSize,

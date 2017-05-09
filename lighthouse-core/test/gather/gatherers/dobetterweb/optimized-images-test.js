@@ -33,36 +33,49 @@ const traceData = {
       _url: 'http://google.com/image.jpg',
       _mimeType: 'image/jpeg',
       _resourceSize: 10,
+      finished: true,
     },
     {
       _url: 'http://google.com/transparent.png',
       _mimeType: 'image/png',
       _resourceSize: 11,
+      finished: true,
     },
     {
       _url: 'http://google.com/image.bmp',
       _mimeType: 'image/bmp',
       _resourceSize: 12,
+      finished: true,
     },
     {
       _url: 'http://google.com/image.bmp',
       _mimeType: 'image/bmp',
       _resourceSize: 12,
+      finished: true,
     },
     {
       _url: 'http://google.com/vector.svg',
       _mimeType: 'image/svg+xml',
       _resourceSize: 13,
+      finished: true,
     },
     {
       _url: 'http://gmail.com/image.jpg',
       _mimeType: 'image/jpeg',
       _resourceSize: 15,
+      finished: true,
     },
     {
       _url: 'data: image/jpeg ; base64 ,SgVcAT32587935321...',
       _mimeType: 'image/jpeg',
       _resourceSize: 14,
+      finished: true,
+    },
+    {
+      _url: 'http://google.com/big-image.bmp',
+      _mimeType: 'image/bmp',
+      _resourceSize: 12,
+      finished: false, // ignore for not finishing
     },
   ]
 };

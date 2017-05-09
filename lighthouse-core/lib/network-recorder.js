@@ -57,8 +57,9 @@ class NetworkRecorder extends EventEmitter {
    * web socket and normal request creation.
    * @private
    */
-  onRequestStarted() {
+  onRequestStarted(request) {
     this.startedRequestCount++;
+    this._records.push(request.data);
 
     const activeCount = this.activeRequestCount();
     log.verbose('NetworkRecorder', `Request started. ${activeCount} requests in progress` +
@@ -80,7 +81,6 @@ class NetworkRecorder extends EventEmitter {
    */
   onRequestFinished(request) {
     this.finishedRequestCount++;
-    this._records.push(request.data);
     this.emit('requestloaded', request.data);
 
     const activeCount = this.activeRequestCount();

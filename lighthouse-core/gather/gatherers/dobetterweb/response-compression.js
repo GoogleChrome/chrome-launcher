@@ -36,7 +36,7 @@ class ResponseCompression extends Gatherer {
 
     networkRecords.forEach(record => {
       const isTextBasedResource = record.resourceType() && record.resourceType().isTextType();
-      if (!isTextBasedResource || !record.resourceSize) {
+      if (!isTextBasedResource || !record.resourceSize || !record.finished) {
         return;
       }
 

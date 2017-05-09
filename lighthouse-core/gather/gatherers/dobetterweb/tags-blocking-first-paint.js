@@ -93,6 +93,10 @@ function collectTagsThatBlockFirstPaint() {
 
 function filteredAndIndexedByUrl(networkRecords) {
   return networkRecords.reduce((prev, record) => {
+    if (!record.finished) {
+      return prev;
+    }
+
     const isParserGenerated = record._initiator.type === 'parser';
     // A stylesheet only blocks script if it was initiated by the parser
     // https://html.spec.whatwg.org/multipage/semantics.html#interactions-of-styling-and-scripting

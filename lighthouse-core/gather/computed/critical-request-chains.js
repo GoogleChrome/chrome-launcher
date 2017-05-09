@@ -55,6 +55,8 @@ class CriticalRequestChains extends ComputedArtifact {
   }
 
   compute_(networkRecords) {
+    networkRecords = networkRecords.filter(req => req.finished);
+
     // Build a map of requestID -> Node.
     const requestIdToRequests = new Map();
     for (const request of networkRecords) {
