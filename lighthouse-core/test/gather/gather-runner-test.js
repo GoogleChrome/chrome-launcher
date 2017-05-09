@@ -58,7 +58,7 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn, blo
     cacheNatives() {
       return Promise.resolve();
     }
-    cleanAndDisableBrowserCaches() {}
+    cleanBrowserCaches() {}
     clearDataForOrigin() {}
     getUserAgent() {
       return Promise.resolve('Fake user agent');
@@ -242,10 +242,10 @@ describe('GatherRunner', function() {
     });
   });
 
-  it('clears the network cache and origin storage', () => {
+  it('clears origin storage', () => {
     const asyncFunc = () => Promise.resolve();
     const tests = {
-      calledDisableNetworkCache: false,
+      calledCleanBrowserCaches: false,
       calledClearStorage: false,
     };
     const createCheck = variable => () => {
@@ -259,22 +259,50 @@ describe('GatherRunner', function() {
       dismissJavaScriptDialogs: asyncFunc,
       enableRuntimeEvents: asyncFunc,
       cacheNatives: asyncFunc,
-      cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
+      cleanBrowserCaches: createCheck('calledCleanBrowserCaches'),
       clearDataForOrigin: createCheck('calledClearStorage'),
       blockUrlPatterns: asyncFunc,
       getUserAgent: asyncFunc,
     };
 
     return GatherRunner.setupDriver(driver, {}, {flags: {}}).then(_ => {
-      assert.equal(tests.calledDisableNetworkCache, true);
+      assert.equal(tests.calledCleanBrowserCaches, false);
       assert.equal(tests.calledClearStorage, true);
     });
   });
 
-  it('does not clear the cache & storage when disable-storage-reset flag is set', () => {
+  it('clears the disk & memory cache on a perf run', () => {
     const asyncFunc = () => Promise.resolve();
     const tests = {
-      calledDisableNetworkCache: false,
+      calledCleanBrowserCaches: false
+    };
+    const createCheck = variable => () => {
+      tests[variable] = true;
+      return Promise.resolve();
+    };
+    const driver = {
+      beginDevtoolsLog: asyncFunc,
+      beginTrace: asyncFunc,
+      gotoURL: asyncFunc,
+      cleanBrowserCaches: createCheck('calledCleanBrowserCaches')
+    };
+    const config = {
+      recordTrace: true,
+      useThrottling: true,
+      gatherers: []
+    };
+    const flags = {
+      disableStorageReset: false
+    };
+    return GatherRunner.pass({driver, config, flags}, {TestGatherer: []}).then(_ => {
+      assert.equal(tests.calledCleanBrowserCaches, true);
+    });
+  });
+
+  it('does not clear origin storage with flag --disable-storage-reset', () => {
+    const asyncFunc = () => Promise.resolve();
+    const tests = {
+      calledCleanBrowserCaches: false,
       calledClearStorage: false,
     };
     const createCheck = variable => () => {
@@ -288,7 +316,7 @@ describe('GatherRunner', function() {
       dismissJavaScriptDialogs: asyncFunc,
       enableRuntimeEvents: asyncFunc,
       cacheNatives: asyncFunc,
-      cleanAndDisableBrowserCaches: createCheck('calledDisableNetworkCache'),
+      cleanBrowserCaches: createCheck('calledCleanBrowserCaches'),
       clearDataForOrigin: createCheck('calledClearStorage'),
       blockUrlPatterns: asyncFunc,
       getUserAgent: asyncFunc,
@@ -297,7 +325,7 @@ describe('GatherRunner', function() {
     return GatherRunner.setupDriver(driver, {}, {
       flags: {disableStorageReset: true}
     }).then(_ => {
-      assert.equal(tests.calledDisableNetworkCache, false);
+      assert.equal(tests.calledCleanBrowserCaches, false);
       assert.equal(tests.calledClearStorage, false);
     });
   });
@@ -357,8 +385,9 @@ describe('GatherRunner', function() {
         new TestGatherer()
       ]
     };
+    const flags = {};
 
-    return GatherRunner.pass({driver, config}, {TestGatherer: []}).then(_ => {
+    return GatherRunner.pass({driver, config, flags}, {TestGatherer: []}).then(_ => {
       assert.equal(calledTrace, true);
     });
   });
@@ -405,8 +434,9 @@ describe('GatherRunner', function() {
         new TestGatherer()
       ]
     };
+    const flags = {};
 
-    return GatherRunner.pass({driver, config}, {TestGatherer: []}).then(_ => {
+    return GatherRunner.pass({driver, config, flags}, {TestGatherer: []}).then(_ => {
       assert.equal(calledDevtoolsLogCollect, true);
     });
   });

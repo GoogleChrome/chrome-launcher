@@ -795,19 +795,12 @@ class Driver {
         .then(_ => this.online = true);
   }
 
-  cleanAndDisableBrowserCaches() {
-    return Promise.all([
-      this.clearBrowserCache(),
-      this.disableBrowserCache()
-    ]);
-  }
-
-  clearBrowserCache() {
-    return this.sendCommand('Network.clearBrowserCache');
-  }
-
-  disableBrowserCache() {
-    return this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true});
+  cleanBrowserCaches() {
+    // Wipe entire disk cache
+    return this.sendCommand('Network.clearBrowserCache')
+      // Toggle 'Disable Cache' to evict the memory cache
+      .then(_ => this.sendCommand('Network.setCacheDisabled', {cacheDisabled: true}))
+      .then(_ => this.sendCommand('Network.setCacheDisabled', {cacheDisabled: false}));
   }
 
   clearDataForOrigin(url) {

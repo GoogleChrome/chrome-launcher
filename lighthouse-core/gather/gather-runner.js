@@ -38,7 +38,7 @@ let GathererResults; // eslint-disable-line no-unused-vars
  *     ii. beginEmulation
  *     iii. enableRuntimeEvents
  *     iv. evaluateScriptOnLoad rescue native Promise from potential polyfill
- *     v. cleanAndDisableBrowserCaches
+ *     v. cleanBrowserCaches
  *     vi. clearDataForOrigin
  *
  * 2. For each pass in the config:
@@ -47,10 +47,12 @@ let GathererResults; // eslint-disable-line no-unused-vars
  *     ii. Enable network request blocking for specified patterns
  *     iii. all gatherers' beforePass()
  *   B. GatherRunner.pass()
- *     i. beginTrace (if requested) & beginDevtoolsLog
- *     ii. GatherRunner.loadPage()
+ *     i. cleanBrowserCaches() (if it's a perf run)
+ *     ii. beginDevtoolsLog()
+ *     iii. beginTrace (if requested)
+ *     iv. GatherRunner.loadPage()
  *       a. navigate to options.url (and wait for onload)
- *     iii. all gatherers' pass()
+ *     v. all gatherers' pass()
  *   C. GatherRunner.afterPass()
  *     i. endTrace (if requested) & endDevtoolsLog & endThrottling
  *     ii. all gatherers' afterPass()
@@ -110,7 +112,6 @@ class GatherRunner {
       .then(_ => driver.enableRuntimeEvents())
       .then(_ => driver.cacheNatives())
       .then(_ => driver.dismissJavaScriptDialogs())
-      .then(_ => resetStorage && driver.cleanAndDisableBrowserCaches())
       .then(_ => resetStorage && driver.clearDataForOrigin(options.url))
       .then(_ => gathererResults.UserAgent = [driver.getUserAgent()]);
   }
@@ -201,16 +202,20 @@ class GatherRunner {
     const config = options.config;
     const gatherers = config.gatherers;
 
+    const recordTrace = config.recordTrace;
+    const isPerfRun = !options.flags.disableStorageReset && recordTrace && config.useThrottling;
+
     const gatherernames = gatherers.map(g => g.name).join(', ');
     const status = 'Loading page & waiting for onload';
     log.log('status', status, gatherernames);
 
-    // Always record devtoolsLog.
-    driver.beginDevtoolsLog();
-
     const pass = Promise.resolve()
-      // Begin tracing only if requested by config.
-      .then(_ => config.recordTrace && driver.beginTrace(options.flags))
+      // Clear disk & memory cache if it's a perf run
+      .then(_ => isPerfRun && driver.cleanBrowserCaches())
+      // Always record devtoolsLog
+      .then(_ => driver.beginDevtoolsLog())
+      // Begin tracing if requested by config.
+      .then(_ => recordTrace && driver.beginTrace(options.flags))
       // Navigate.
       .then(_ => GatherRunner.loadPage(driver, options))
       .then(_ => log.log('statusEnd', status));

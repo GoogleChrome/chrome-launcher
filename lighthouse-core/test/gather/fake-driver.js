@@ -50,7 +50,7 @@ module.exports = {
   evaluateScriptOnLoad() {
     return Promise.resolve();
   },
-  cleanAndDisableBrowserCaches() {},
+  cleanBrowserCaches() {},
   clearDataForOrigin() {},
   cacheNatives() {
     return Promise.resolve();
