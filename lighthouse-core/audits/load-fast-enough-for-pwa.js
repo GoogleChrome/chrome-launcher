@@ -25,7 +25,6 @@
 
 const Audit = require('./audit');
 const Emulation = require('../lib/emulation');
-
 const Formatter = require('../report/formatter');
 
 // Maximum TTFI to be considered "fast" for PWA baseline checklist
@@ -41,7 +40,7 @@ class LoadFastEnough4Pwa extends Audit {
       category: 'PWA',
       name: 'load-fast-enough-for-pwa',
       description: 'Page load is fast enough on 3G',
-      helpText: 'Satisfied if the _Time To Interactive_ duration is shorter than _10 seconds_, as defined by the [PWA Baseline Checklist](https://developers.google.com/web/progressive-web-apps/checklist). Network throttling is required (specifically: RTT latencies >= 150 RTT are expected).',
+      helpText: 'Satisfied if the Time To Interactive duration is shorter than 10 seconds, as defined by the [PWA Baseline Checklist](https://developers.google.com/web/progressive-web-apps/checklist). Network throttling is required (specifically: RTT latencies >= 150 RTT are expected).',
       requiredArtifacts: ['traces', 'devtoolsLogs']
     };
   }
@@ -56,17 +55,23 @@ class LoadFastEnough4Pwa extends Audit {
       const allRequestLatencies = networkRecords.map(record => {
         // Ignore requests that don't have timing data or resources that have
         // previously been requested and are coming from the cache.
-        if (!record._timing || record._fromDiskCache || record._fromMemoryCache) {
+        const fromCache = record._fromDiskCache || record._fromMemoryCache;
+        if (!record._timing || fromCache) {
           return undefined;
         }
 
         // Use DevTools' definition of Waiting latency: https://github.com/ChromeDevTools/devtools-frontend/blob/66595b8a73a9c873ea7714205b828866630e9e82/front_end/network/RequestTimingView.js#L164
-        return record._timing.receiveHeadersEnd - record._timing.sendEnd;
+        const latency = record._timing.receiveHeadersEnd - record._timing.sendEnd;
+
+        return {
+          url: record._url,
+          latency: latency.toLocaleString(undefined, {maximumFractionDigits: 2})
+        };
       });
 
       const latency3gMin = Emulation.settings.TYPICAL_MOBILE_THROTTLING_METRICS.latency - 10;
       const areLatenciesAll3G = allRequestLatencies.every(val =>
-          val === undefined || val > latency3gMin);
+          val === undefined || val.latency > latency3gMin);
 
       const trace = artifacts.traces[Audit.DEFAULT_PASS];
       return artifacts.requestFirstInteractive(trace).then(firstInteractive => {
@@ -78,12 +83,21 @@ class LoadFastEnough4Pwa extends Audit {
           value: {areLatenciesAll3G, allRequestLatencies, isFast, timeToFirstInteractive}
         };
 
+        // Filter records that don't have latencies.
+        const recordsWithLatencies = allRequestLatencies.filter(val => val !== undefined);
+
+        const details = Audit.makeV2TableDetails([
+          {key: 'url', itemType: 'url', text: 'URL'},
+          {key: 'latency', itemType: 'text', text: 'Latency (ms)'},
+        ], recordsWithLatencies);
+
         if (!areLatenciesAll3G) {
           return {
             rawValue: false,
             // eslint-disable-next-line max-len
             debugString: `First Interactive was found at ${timeToFirstInteractive.toLocaleString()}, however, the network request latencies were not sufficiently realistic, so the performance measurements cannot be trusted.`,
-            extendedInfo
+            extendedInfo,
+            details
           };
         }
 

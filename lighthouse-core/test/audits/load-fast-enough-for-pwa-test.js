@@ -64,6 +64,7 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, false);
       assert.ok(result.debugString.includes('network request latencies'));
+      assert.ok(result.details, 'contains details when latencies were not realistic');
     });
   });
 
@@ -88,6 +89,7 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, true);
       assert.strictEqual(result.debugString, undefined);
+      assert.ok(!result.details, 'does not contain details when latencies are realistic');
     });
   });
 });
