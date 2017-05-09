@@ -69,9 +69,10 @@ setTimeout(() => {
   <!-- FAIL(offscreen): image is offscreen -->
   <img style="position: absolute; top: -10000px;" src="lighthouse-unoptimized.jpg">
 
+  <!-- Image is cross-origin, which are disabled for now -->
   <!-- FAIL(optimized): image is not optimized -->
   <!-- PASS(responsive): image is used at full size -->
-  <img src="http://localhost:10503/byte-efficiency/lighthouse-unoptimized.jpg">
+  <!--<img src="http://localhost:10503/byte-efficiency/lighthouse-unoptimized.jpg">-->
 
   <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
   <!-- FAIL(responsive): image is 25% used at DPR 2 -->

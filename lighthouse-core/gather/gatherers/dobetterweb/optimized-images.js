@@ -100,26 +100,23 @@ class OptimizedImages extends Gatherer {
   /**
    * @param {!Object} driver
    * @param {{url: string, isBase64DataUri: boolean, resourceSize: number}} networkRecord
-   * @return {!Promise<{originalSize: number, jpegSize: number, webpSize: number}>}
+   * @return {!Promise<?{originalSize: number, jpegSize: number, webpSize: number}>}
    */
   calculateImageStats(driver, networkRecord) {
-    let uriPromise = Promise.resolve(networkRecord.url);
-
-    // For cross-origin images, circumvent canvas CORS policy by getting image directly from protocol
     if (!networkRecord.isSameOrigin && !networkRecord.isBase64DataUri) {
-      const requestId = networkRecord.requestId;
-      uriPromise = driver.sendCommand('Network.getResponseBody', {requestId}).then(resp => {
-        if (!resp.base64Encoded) {
-          throw new Error('Unable to fetch cross-origin image body');
-        }
-
-        return `data:${networkRecord.mimeType};base64,${resp.body}`;
-      });
+      // Processing of cross-origin images is buggy and very slow, disable for now
+      // See https://github.com/GoogleChrome/lighthouse/issues/1853
+      // See https://github.com/GoogleChrome/lighthouse/issues/2146
+      return Promise.resolve(null);
     }
 
-    return uriPromise.then(uri => {
+    return Promise.resolve(networkRecord.url).then(uri => {
       const script = `(${getOptimizedNumBytes.toString()})(${JSON.stringify(uri)})`;
       return driver.evaluateAsync(script).then(stats => {
+        if (!stats) {
+          return null;
+        }
+
         const isBase64DataUri = networkRecord.isBase64DataUri;
         const base64Length = networkRecord.url.length - networkRecord.url.indexOf(',') - 1;
         return {
@@ -141,7 +138,13 @@ class OptimizedImages extends Gatherer {
       return promise.then(results => {
         return this.calculateImageStats(driver, record)
           .catch(err => ({failed: true, err}))
-          .then(stats => results.concat(Object.assign(stats, record)));
+          .then(stats => {
+            if (!stats) {
+              return results;
+            }
+
+            return results.concat(Object.assign(stats, record));
+          });
       });
     }, Promise.resolve([]));
   }

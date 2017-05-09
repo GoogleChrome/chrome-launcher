@@ -50,7 +50,7 @@ module.exports = [
         extendedInfo: {
           value: {
             results: {
-              length: 5
+              length: 4
             }
           }
         }

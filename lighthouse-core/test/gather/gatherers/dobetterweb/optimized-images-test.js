@@ -86,12 +86,13 @@ describe('Optimized images', () => {
 
   it('returns all images', () => {
     return optimizedImages.afterPass(options, traceData).then(artifact => {
-      assert.equal(artifact.length, 5);
+      assert.equal(artifact.length, 4);
       assert.ok(/image.jpg/.test(artifact[0].url));
       assert.ok(/transparent.png/.test(artifact[1].url));
       assert.ok(/image.bmp/.test(artifact[2].url));
-      assert.ok(/gmail.*image.jpg/.test(artifact[3].url));
-      assert.ok(/data: image/.test(artifact[4].url));
+      // skip cross-origin for now
+      // assert.ok(/gmail.*image.jpg/.test(artifact[3].url));
+      assert.ok(/data: image/.test(artifact[3].url));
     });
   });
 
@@ -103,12 +104,13 @@ describe('Optimized images', () => {
     };
 
     return optimizedImages.afterPass(options, traceData).then(artifact => {
-      assert.equal(artifact.length, 5);
+      assert.equal(artifact.length, 4);
       checkSizes(artifact[0], 10, 60, 80);
       checkSizes(artifact[1], 11, 60, 80);
       checkSizes(artifact[2], 12, 60, 80);
-      checkSizes(artifact[3], 15, 60, 80); // uses base64 data
-      checkSizes(artifact[4], 20, 80, 100); // uses base64 data
+      // skip cross-origin for now
+      // checkSizes(artifact[3], 15, 60, 80);
+      checkSizes(artifact[3], 20, 80, 100); // uses base64 data
     });
   });
 
@@ -126,7 +128,7 @@ describe('Optimized images', () => {
     return optimizedImages.afterPass(options, traceData).then(artifact => {
       const failed = artifact.find(record => record.failed);
 
-      assert.equal(artifact.length, 5);
+      assert.equal(artifact.length, 4);
       assert.ok(failed, 'passed along failure');
       assert.ok(/whoops/.test(failed.err.message), 'passed along error message');
     });
