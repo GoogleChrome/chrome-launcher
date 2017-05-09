@@ -23,8 +23,13 @@
  *   'html': An HTML report
  *   'domhtml': An HTML report rendered client-side with DOM elements
  */
-enum OutputMode { json, html, domhtml };
-type Mode = 'json' | 'html' | 'domhtml';
+enum OutputMode {
+  json,
+  html,
+  domhtml
+}
+;
+type Mode = 'json'|'html'|'domhtml';
 
 import {Results} from './types/types';
 
@@ -115,16 +120,19 @@ function write(results: Results, mode: Mode, path: string): Promise<Results> {
       return writeToStdout(output).then(_ => resolve(results));
     }
 
-    return writeFile(outputPath, output, (<any>OutputMode)[mode]).then(_ => {
-      resolve(results);
-    }).catch(err => reject(err));
+    return writeFile(outputPath, output, (<any>OutputMode)[mode])
+        .then(_ => {
+          resolve(results);
+        })
+        .catch(err => reject(err));
   });
 }
 
-function GetValidOutputOptions():Array<Mode> {
-  return [OutputMode[OutputMode.json] as Mode,
-          OutputMode[OutputMode.html] as Mode,
-          OutputMode[OutputMode.domhtml] as Mode];
+function GetValidOutputOptions(): Array<Mode> {
+  return [
+    OutputMode[OutputMode.json] as Mode, OutputMode[OutputMode.html] as Mode,
+    OutputMode[OutputMode.domhtml] as Mode
+  ];
 }
 
 export {

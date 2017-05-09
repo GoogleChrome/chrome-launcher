@@ -44,117 +44,110 @@ updateNotifier({pkg}).notify(); // Tell user if there's a newer version of LH.
 
 interface LighthouseError extends Error {
   code?: string
-};
+}
 
-const cliFlags = yargs
-  .help('help')
-  .version(() => pkg.version)
-  .showHelpOnFail(false, 'Specify --help for available options')
+const cliFlags =
+    yargs.help('help')
+        .version(() => pkg.version)
+        .showHelpOnFail(false, 'Specify --help for available options')
 
-  .usage('lighthouse <url>')
-  .example('lighthouse <url> --view', 'Opens the HTML report in a browser after the run completes')
-  .example('lighthouse <url> --config-path=./myconfig.js', 'Runs Lighthouse with your own configuration: custom audits, report generation, etc.')
-  .example('lighthouse <url> --output=json --output-path=./report.json --save-assets', 'Save trace, screenshots, and named JSON report.')
-  .example('lighthouse <url> --disable-device-emulation --disable-network-throttling', 'Disable device emulation')
-  .example('lighthouse <url> --chrome-flags="--window-size=412,732"', 'Launch Chrome with a specific window size')
-  .example('lighthouse <url> --quiet --chrome-flags="--headless"', 'Launch Headless Chrome, turn off logging')
+        .usage('lighthouse <url>')
+        .example(
+            'lighthouse <url> --view', 'Opens the HTML report in a browser after the run completes')
+        .example(
+            'lighthouse <url> --config-path=./myconfig.js',
+            'Runs Lighthouse with your own configuration: custom audits, report generation, etc.')
+        .example(
+            'lighthouse <url> --output=json --output-path=./report.json --save-assets',
+            'Save trace, screenshots, and named JSON report.')
+        .example(
+            'lighthouse <url> --disable-device-emulation --disable-network-throttling',
+            'Disable device emulation')
+        .example(
+            'lighthouse <url> --chrome-flags="--window-size=412,732"',
+            'Launch Chrome with a specific window size')
+        .example(
+            'lighthouse <url> --quiet --chrome-flags="--headless"',
+            'Launch Headless Chrome, turn off logging')
 
-  // List of options
-  .group([
-    'verbose',
-    'quiet'
-  ], 'Logging:')
-  .describe({
-    verbose: 'Displays verbose logging',
-    quiet: 'Displays no progress, debug logs or errors'
-  })
+        // List of options
+        .group(['verbose', 'quiet'], 'Logging:')
+        .describe({
+          verbose: 'Displays verbose logging',
+          quiet: 'Displays no progress, debug logs or errors'
+        })
 
-  .group([
-    'save-assets',
-    'save-artifacts',
-    'list-all-audits',
-    'list-trace-categories',
-    'additional-trace-categories',
-    'config-path',
-    'chrome-flags',
-    'perf',
-    'port',
-    'max-wait-for-load'
-  ], 'Configuration:')
-  .describe({
-    'disable-storage-reset': 'Disable clearing the browser cache and other storage APIs before a run',
-    'disable-device-emulation': 'Disable Nexus 5X emulation',
-    'disable-cpu-throttling': 'Disable CPU throttling',
-    'disable-network-throttling': 'Disable network throttling',
-    'save-assets': 'Save the trace contents & screenshots to disk',
-    'save-artifacts': 'Save all gathered artifacts to disk',
-    'list-all-audits': 'Prints a list of all available audits and exits',
-    'list-trace-categories': 'Prints a list of all required trace categories and exits',
-    'additional-trace-categories': 'Additional categories to capture with the trace (comma-delimited).',
-    'config-path': 'The path to the config JSON.',
-    'chrome-flags': 'Custom flags to pass to Chrome (space-delimited). For a full list of flags, see http://peter.sh/experiments/chromium-command-line-switches/.',
-    'perf': 'Use a performance-test-only configuration',
-    'port': 'The port to use for the debugging protocol. Use 0 for a random port',
-    'max-wait-for-load': 'The timeout (in milliseconds) to wait before the page is considered done loading and the run should continue. WARNING: Very high values can lead to large traces and instability',
-    'skip-autolaunch': 'Skip autolaunch of Chrome when already running instance is not found',
-    'select-chrome': 'Interactively choose version of Chrome to use when multiple installations are found',
-    'interactive': 'Open Lighthouse in interactive mode'
-  })
+        .group(
+            [
+              'save-assets', 'save-artifacts', 'list-all-audits', 'list-trace-categories',
+              'additional-trace-categories', 'config-path', 'chrome-flags', 'perf', 'port',
+              'max-wait-for-load'
+            ],
+            'Configuration:')
+        .describe({
+          'disable-storage-reset':
+              'Disable clearing the browser cache and other storage APIs before a run',
+          'disable-device-emulation': 'Disable Nexus 5X emulation',
+          'disable-cpu-throttling': 'Disable CPU throttling',
+          'disable-network-throttling': 'Disable network throttling',
+          'save-assets': 'Save the trace contents & screenshots to disk',
+          'save-artifacts': 'Save all gathered artifacts to disk',
+          'list-all-audits': 'Prints a list of all available audits and exits',
+          'list-trace-categories': 'Prints a list of all required trace categories and exits',
+          'additional-trace-categories':
+              'Additional categories to capture with the trace (comma-delimited).',
+          'config-path': 'The path to the config JSON.',
+          'chrome-flags':
+              'Custom flags to pass to Chrome (space-delimited). For a full list of flags, see http://peter.sh/experiments/chromium-command-line-switches/.',
+          'perf': 'Use a performance-test-only configuration',
+          'port': 'The port to use for the debugging protocol. Use 0 for a random port',
+          'max-wait-for-load':
+              'The timeout (in milliseconds) to wait before the page is considered done loading and the run should continue. WARNING: Very high values can lead to large traces and instability',
+          'skip-autolaunch': 'Skip autolaunch of Chrome when already running instance is not found',
+          'select-chrome':
+              'Interactively choose version of Chrome to use when multiple installations are found',
+          'interactive': 'Open Lighthouse in interactive mode'
+        })
 
-  .group([
-    'output',
-    'output-path',
-    'view'
-  ], 'Output:')
-  .describe({
-    'output': `Reporter for the results, supports multiple values`,
-    'output-path': `The file path to output the results. Use 'stdout' to write to stdout.
+        .group(['output', 'output-path', 'view'], 'Output:')
+        .describe({
+          'output': `Reporter for the results, supports multiple values`,
+          'output-path': `The file path to output the results. Use 'stdout' to write to stdout.
 If using JSON output, default is stdout.
 If using HTML output, default is a file in the working directory with a name based on the test URL and date.
 If using multiple outputs, --output-path is ignored.
 Example: --output-path=./lighthouse-results.html`,
-    'view': 'Open HTML report in your browser'
-  })
+          'view': 'Open HTML report in your browser'
+        })
 
-  // boolean values
-  .boolean([
-    'disable-storage-reset',
-    'disable-device-emulation',
-    'disable-cpu-throttling',
-    'disable-network-throttling',
-    'save-assets',
-    'save-artifacts',
-    'list-all-audits',
-    'list-trace-categories',
-    'perf',
-    'view',
-    'skip-autolaunch',
-    'select-chrome',
-    'verbose',
-    'quiet',
-    'help',
-    'interactive'
-  ])
-  .choices('output', Printer.GetValidOutputOptions())
+        // boolean values
+        .boolean([
+          'disable-storage-reset', 'disable-device-emulation', 'disable-cpu-throttling',
+          'disable-network-throttling', 'save-assets', 'save-artifacts', 'list-all-audits',
+          'list-trace-categories', 'perf', 'view', 'skip-autolaunch', 'select-chrome', 'verbose',
+          'quiet', 'help', 'interactive'
+        ])
+        .choices('output', Printer.GetValidOutputOptions())
 
-  // default values
-  .default('chrome-flags', '')
-  .default('disable-cpu-throttling', false)
-  .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.html])
-  .default('port', 9222)
-  .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
-  .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
-    // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
-    // or --list-trace-categories. If not, stop the program and ask for a url
-    if (!argv.listAllAudits && !argv.listTraceCategories && argv._.length === 0) {
-      throw new Error('Please provide a url');
-    }
+        // default values
+        .default('chrome-flags', '')
+        .default('disable-cpu-throttling', false)
+        .default('output', Printer.GetValidOutputOptions()[Printer.OutputMode.html])
+        .default('port', 9222)
+        .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
+        .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
+          // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
+          // or --list-trace-categories. If not, stop the program and ask for a url
+          if (!argv.listAllAudits && !argv.listTraceCategories && argv._.length === 0) {
+            throw new Error('Please provide a url');
+          }
 
-    return true;
-  })
-  .epilogue('For more information on Lighthouse, see https://developers.google.com/web/tools/lighthouse/.')
-  .wrap(yargs.terminalWidth())
-  .argv;
+          return true;
+        })
+        .epilogue(
+            'For more information on Lighthouse, see https://developers.google.com/web/tools/lighthouse/.')
+        .wrap(yargs.terminalWidth())
+        .argv;
 
 // Process terminating command
 if (cliFlags.listAllAudits) {
@@ -168,7 +161,7 @@ if (cliFlags.listTraceCategories) {
 
 const url = cliFlags._[0];
 
-let config: Object | null = null;
+let config: Object|null = null;
 if (cliFlags.configPath) {
   // Resolve the config file path relative to where cli was called.
   cliFlags.configPath = path.resolve(process.cwd(), cliFlags.configPath);
@@ -195,16 +188,16 @@ if (cliFlags.output === Printer.OutputMode[Printer.OutputMode.json] && !cliFlags
  */
 function initPort(flags: {port: number}): Promise<undefined> {
   return Promise.resolve().then(() => {
-    if (flags.port !== 0) {
-      log.verbose('Lighthouse CLI', `Using supplied port ${flags.port}`);
-      return;
-    }
+  if (flags.port !== 0) {
+    log.verbose('Lighthouse CLI', `Using supplied port ${flags.port}`);
+    return;
+  }
 
-    log.verbose('Lighthouse CLI', 'Generating random port.');
-    return randomPort.getRandomPort().then(portNumber => {
-      flags.port = portNumber;
-      log.verbose('Lighthouse CLI', `Using generated port ${flags.port}.`);
-    });
+  log.verbose('Lighthouse CLI', 'Generating random port.');
+  return randomPort.getRandomPort().then(portNumber => {
+    flags.port = portNumber;
+    log.verbose('Lighthouse CLI', `Using generated port ${flags.port}.`);
+  });
   })
 }
 
@@ -213,8 +206,9 @@ function initPort(flags: {port: number}): Promise<undefined> {
  * port. If none is found and the `skipAutolaunch` flag is not true, launches
  * a debuggable instance.
  */
-function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, selectChrome: boolean,
-                               chromeFlags: string}): Promise<ChromeLauncher> {
+function getDebuggableChrome(flags: {
+  skipAutolaunch: boolean, port: number, selectChrome: boolean,
+  chromeFlags: string}): Promise<ChromeLauncher> {
   const chromeLauncher = new ChromeLauncher({
     port: flags.port,
     chromeFlags: flags.chromeFlags.split(' '),
@@ -227,26 +221,25 @@ function getDebuggableChrome(flags: {skipAutolaunch: boolean, port: number, sele
   });
 
   return chromeLauncher
-    // Check if there is an existing instance of Chrome ready to talk.
-    .isDebuggerReady()
-    .catch(() => {
-      if (flags.skipAutolaunch) {
-        return;
-      }
+      // Check if there is an existing instance of Chrome ready to talk.
+      .isDebuggerReady()
+      .catch(() => {
+        if (flags.skipAutolaunch) {
+          return;
+        }
 
-      // If not, create one.
-      log.log('Lighthouse CLI', 'Launching Chrome...');
-      return chromeLauncher.run();
-    })
-    .then(() => chromeLauncher);
+        // If not, create one.
+        log.log('Lighthouse CLI', 'Launching Chrome...');
+        return chromeLauncher.run();
+      })
+      .then(() => chromeLauncher);
 }
 
 function showConnectionError() {
   console.error('Unable to connect to Chrome');
   console.error(
-    'If you\'re using lighthouse with --skip-autolaunch, ' +
-    'make sure you\'re running some other Chrome with a debugger.'
-  );
+      'If you\'re using lighthouse with --skip-autolaunch, ' +
+      'make sure you\'re running some other Chrome with a debugger.');
   process.exit(_RUNTIME_ERROR_CODE);
 }
 
@@ -283,79 +276,85 @@ function handleError(err: LighthouseError) {
 function saveResults(results: Results,
                      artifacts: Object,
                      flags: {output: any, outputPath: string, saveArtifacts: boolean, saveAssets: boolean, view: boolean}) {
-    let promise = Promise.resolve(results);
-    const cwd = process.cwd();
-    // Use the output path as the prefix for all generated files.
-    // If no output path is set, generate a file prefix using the URL and date.
-    const configuredPath = !flags.outputPath || flags.outputPath === 'stdout' ?
-        getFilenamePrefix(results) : flags.outputPath.replace(/\.\w{2,4}$/, '');
-    const resolvedPath = path.resolve(cwd, configuredPath);
+  let promise = Promise.resolve(results);
+  const cwd = process.cwd();
+  // Use the output path as the prefix for all generated files.
+  // If no output path is set, generate a file prefix using the URL and date.
+  const configuredPath = !flags.outputPath || flags.outputPath === 'stdout' ?
+      getFilenamePrefix(results) :
+      flags.outputPath.replace(/\.\w{2,4}$/, '');
+  const resolvedPath = path.resolve(cwd, configuredPath);
 
-    if (flags.saveArtifacts) {
-      assetSaver.saveArtifacts(artifacts, resolvedPath);
-    }
+  if (flags.saveArtifacts) {
+    assetSaver.saveArtifacts(artifacts, resolvedPath);
+  }
 
-    if (flags.saveAssets) {
-      promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
-    }
+  if (flags.saveAssets) {
+    promise = promise.then(_ => assetSaver.saveAssets(artifacts, results.audits, resolvedPath));
+  }
 
-    const typeToExtension = (type: string) => type === 'domhtml' ? 'dom.html' : type;
-    return promise.then(_ => {
-      if (Array.isArray(flags.output)) {
-        return flags.output.reduce((innerPromise, outputType) => {
-          const outputPath = `${resolvedPath}.report.${typeToExtension(outputType)}`;
-          return innerPromise.then((_: Results) => Printer.write(results, outputType, outputPath));
-        }, Promise.resolve(results));
-      } else {
-        const outputPath = flags.outputPath ||
-            `${resolvedPath}.report.${typeToExtension(flags.output)}`;
-        return Printer.write(results, flags.output, outputPath).then(results => {
-          if (flags.output === Printer.OutputMode[Printer.OutputMode.html] ||
-              flags.output === Printer.OutputMode[Printer.OutputMode.domhtml]) {
-            if (flags.view) {
-              opn(outputPath, {wait: false});
-            } else {
-              log.log('CLI', 'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
-            }
+  const typeToExtension = (type: string) => type === 'domhtml' ? 'dom.html' : type;
+  return promise.then(_ => {
+    if (Array.isArray(flags.output)) {
+      return flags.output.reduce((innerPromise, outputType) => {
+        const outputPath = `${resolvedPath}.report.${typeToExtension(outputType)}`;
+        return innerPromise.then((_: Results) => Printer.write(results, outputType, outputPath));
+      }, Promise.resolve(results));
+    } else {
+      const outputPath =
+          flags.outputPath || `${resolvedPath}.report.${typeToExtension(flags.output)}`;
+      return Printer.write(results, flags.output, outputPath).then(results => {
+        if (flags.output === Printer.OutputMode[Printer.OutputMode.html] ||
+            flags.output === Printer.OutputMode[Printer.OutputMode.domhtml]) {
+          if (flags.view) {
+            opn(outputPath, {wait: false});
+          } else {
+            log.log(
+                'CLI',
+                'Protip: Run lighthouse with `--view` to immediately open the HTML report in your browser');
           }
+        }
 
-          return results;
-        });
-      }
-    });
+        return results;
+      });
+    }
+  });
 }
 
-export async function runLighthouse(url: string,
-                       flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
-                         outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
-                         chromeFlags: string, maxWaitForLoad: number, view: boolean},
-                       config: Object | null): Promise<{}|void> {
+export async function runLighthouse(
+  url: string,
+  flags: {port: number, skipAutolaunch: boolean, selectChrome: boolean, output: any,
+    outputPath: string, interactive: boolean, saveArtifacts: boolean, saveAssets: boolean
+    chromeFlags: string, maxWaitForLoad: number, view: boolean},
+    config: Object | null): Promise<{}|void> {
+      let chromeLauncher: ChromeLauncher|undefined = undefined;
 
-  let chromeLauncher: ChromeLauncher | undefined = undefined;
+      try {
+        await initPort(flags);
+        const chromeLauncher = await getDebuggableChrome(flags);
+        const results = await lighthouse(url, flags, config);
 
-  try {
-    await initPort(flags)
-    const chromeLauncher = await getDebuggableChrome(flags)
-    const results = await lighthouse(url, flags, config);
+        const artifacts = results.artifacts;
+        delete results.artifacts;
 
-    const artifacts = results.artifacts;
-    delete results.artifacts;
+        await saveResults(results, artifacts!, flags);
+        if (flags.interactive) {
+          await performanceXServer.hostExperiment({url, flags, config}, results);
+        }
 
-    await saveResults(results, artifacts!, flags);
-    if (flags.interactive) {
-      await performanceXServer.hostExperiment({url, flags, config}, results);
+        return await chromeLauncher.kill();
+      } catch (err) {
+        if (typeof chromeLauncher !== 'undefined') {
+          await chromeLauncher!.kill();
+        }
+
+        return handleError(err);
+      }
     }
 
-    return await chromeLauncher.kill();
-  } catch (err) {
-    if (typeof chromeLauncher !== 'undefined') {
-      await chromeLauncher!.kill();
-    }
-
-    return handleError(err);
-  }
- }
-
+    // This will be reenabled once flags are extracted to standalone interface.
+    // clang-format off
 export function run() {
   return runLighthouse(url, cliFlags, config);
 }
+    // clang-format on

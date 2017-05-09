@@ -13,24 +13,21 @@
 
 let opn;
 try {
-	opn = require('opn');
+  opn = require('opn');
 } catch (e) {
-	opn = function shimOpn() {
-		console.error('module `opn` not installed. Not opening browser.');
-	};
+  opn = function shimOpn() {
+    console.error('module `opn` not installed. Not opening browser.');
+  };
 }
 
 let updateNotifier;
 try {
-	updateNotifier = require('update-notifier');
+  updateNotifier = require('update-notifier');
 } catch (e) {
-	updateNotifier = function shimUpdateNotifier() {
-		console.error('module `update-notifier` not installed. Not checking for new version.');
-		return {notify: () => false};
-	};
+  updateNotifier = function shimUpdateNotifier() {
+    console.error('module `update-notifier` not installed. Not checking for new version.');
+    return {notify: () => false};
+  };
 }
 
-export {
-	opn,
-	updateNotifier
-};
+export {opn, updateNotifier};
