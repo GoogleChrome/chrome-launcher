@@ -77,7 +77,7 @@ function getMockedEmulationDriver(emulationFn, netThrottleFn, cpuThrottleFn, blo
         case 'Emulation.setDeviceMetricsOverride':
           fn = emulationFn;
           break;
-        case 'Network.addBlockedURL':
+        case 'Network.setBlockedURLs':
           fn = blockUrlFn;
           break;
         default:
@@ -303,25 +303,37 @@ describe('GatherRunner', function() {
   });
 
   it('tells the driver to block given URL patterns when blockedUrlPatterns is given', () => {
-    const receivedUrlPatterns = [];
-    const urlPatterns = ['http://*.evil.com', '.jpg', '.woff2'];
+    let receivedUrlPatterns = null;
     const driver = getMockedEmulationDriver(null, null, null, params => {
-      receivedUrlPatterns.push(params.url);
+      receivedUrlPatterns = params.urls;
     });
 
-    return GatherRunner.setupDriver(driver, {}, {flags: {blockedUrlPatterns: urlPatterns.slice()}})
-      .then(() => assert.deepStrictEqual(receivedUrlPatterns.sort(), urlPatterns.sort()));
+    return GatherRunner.beforePass({
+      driver,
+      flags: {
+        blockedUrlPatterns: ['http://*.evil.com', '.jpg', '.woff2'],
+      },
+      config: {
+        blockedUrlPatterns: ['*.jpeg'],
+        gatherers: [],
+      },
+    }).then(() => assert.deepStrictEqual(
+      receivedUrlPatterns.sort(),
+      ['*.jpeg', '.jpg', '.woff2', 'http://*.evil.com']
+    ));
   });
 
   it('does not throw when blockedUrlPatterns is not given', () => {
-    const receivedUrlPatterns = [];
+    let receivedUrlPatterns = null;
     const driver = getMockedEmulationDriver(null, null, null, params => {
-      receivedUrlPatterns.push(params.url);
+      receivedUrlPatterns = params.urls;
     });
 
-    return GatherRunner.setupDriver(driver, {}, {flags: {}})
-      .then(() => assert.equal(receivedUrlPatterns.length, 0))
-      .catch(() => assert.ok(false));
+    return GatherRunner.beforePass({
+      driver,
+      flags: {},
+      config: {gatherers: []},
+    }).then(() => assert.deepStrictEqual(receivedUrlPatterns, []));
   });
 
   it('tells the driver to begin tracing', () => {

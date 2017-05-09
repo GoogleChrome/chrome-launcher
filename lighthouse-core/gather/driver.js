@@ -874,9 +874,18 @@ class Driver {
     return collectUsage;
   }
 
-  blockUrlPatterns(urlPatterns) {
-    const promiseArr = urlPatterns.map(url => this.sendCommand('Network.addBlockedURL', {url}));
-    return Promise.all(promiseArr);
+  /**
+   * @param {!Array<string>} urls URL patterns to block. Wildcards ('*') are allowed.
+   * @return {!Promise}
+   */
+  blockUrlPatterns(urls) {
+    return this.sendCommand('Network.setBlockedURLs', {urls})
+      .catch(err => {
+        // TODO: remove this handler once m59 hits stable
+        if (!/wasn't found/.test(err.message)) {
+          throw err;
+        }
+      });
   }
 
   /**
