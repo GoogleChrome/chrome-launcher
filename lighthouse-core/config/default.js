@@ -68,6 +68,7 @@ module.exports = {
     "load-fast-enough-for-pwa",
     "speed-index-metric",
     "estimated-input-latency",
+    "time-to-firstbyte",
     "first-interactive",
     "time-to-interactive",
     "user-timings",
@@ -173,6 +174,10 @@ module.exports = {
         },
         "estimated-input-latency": {
           "expectedValue": 100,
+          "weight": 1
+        },
+        "time-to-firstbyte": {
+          "expectedValue": true,
           "weight": 1
         },
         "time-to-interactive": {
@@ -670,10 +675,12 @@ module.exports = {
         {"id": "uses-optimized-images", "weight": 0, "group": "perf-hint"},
         {"id": "uses-request-compression", "weight": 0, "group": "perf-hint"},
         {"id": "uses-responsive-images", "weight": 0, "group": "perf-hint"},
+        {"id": "time-to-firstbyte", "weight": 0, "group": "perf-hint"},
         {"id": "total-byte-weight", "weight": 0, "group": "perf-info"},
         {"id": "dom-size", "weight": 0, "group": "perf-info"},
         {"id": "critical-request-chains", "weight": 0, "group": "perf-info"},
         {"id": "user-timings", "weight": 0, "group": "perf-info"}
+
       ]
     },
     "accessibility": {
