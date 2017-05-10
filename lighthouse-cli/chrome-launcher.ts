@@ -32,9 +32,9 @@ const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 
 export class ChromeLauncher {
-  prepared: Boolean = false;
+  prepared = false;
   pollInterval: number = 500;
-  autoSelectChrome: Boolean;
+  autoSelectChrome: boolean;
   TMP_PROFILE_DIR: string;
   outFile?: number;
   errFile?: number;
@@ -44,15 +44,12 @@ export class ChromeLauncher {
   chrome?: childProcess.ChildProcess;
   port: number;
 
-  // We can not use default args here due to support node pre 6.
-  constructor(opts?: {
+  constructor(opts: {
     startingUrl?: string,
     chromeFlags?: Array<string>,
-    autoSelectChrome?: Boolean,
+    autoSelectChrome?: boolean,
     port?: number
-  }) {
-    opts = opts || {};
-
+  } = {}) {
     // choose the first one (default)
     this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
@@ -141,7 +138,7 @@ export class ChromeLauncher {
         .then(execPath => this.spawn(execPath));
   }
 
-  spawn(execPath: string): Promise<any[]> {
+  spawn(execPath: string) {
     const spawnPromise = new Promise(resolve => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
@@ -186,7 +183,7 @@ export class ChromeLauncher {
   }
 
   // resolves when debugger is ready, rejects after 10 polls
-  waitUntilReady(): Promise<{}> {
+  waitUntilReady() {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
@@ -215,7 +212,7 @@ export class ChromeLauncher {
     });
   }
 
-  kill(): Promise<{}> {
+  kill() {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
@@ -241,7 +238,7 @@ export class ChromeLauncher {
     });
   }
 
-  destroyTmp(): Promise<{}> {
+  destroyTmp() {
     return new Promise(resolve => {
       if (!this.TMP_PROFILE_DIR) {
         return resolve();
@@ -264,7 +261,7 @@ export class ChromeLauncher {
   }
 };
 
-function defaults(val: any, def: any) {
+function defaults<T>(val: T | undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
 
