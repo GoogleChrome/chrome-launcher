@@ -25,7 +25,7 @@ const URL = require('../lib/url-shim');
 const log = require('../lib/log.js');
 const DevtoolsLog = require('./devtools-log');
 
-const PAUSE_AFTER_LOAD = 500;
+const PAUSE_AFTER_LOAD = 5000;
 
 const _uniq = arr => Array.from(new Set(arr));
 

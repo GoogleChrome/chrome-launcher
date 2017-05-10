@@ -155,6 +155,18 @@ class Metrics {
         }
       },
       {
+        name: 'Time to Consistently Interactive (vBeta)',
+        id: 'ttci',
+        getTs: auditResults => {
+          const ttiExt = auditResults['consistently-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timestamp');
+        },
+        getTiming: auditResults => {
+          const ttiExt = auditResults['consistently-interactive'].extendedInfo;
+          return safeGet(ttiExt, 'value.timeInMs');
+        }
+      },
+      {
         name: 'End of Trace',
         id: 'eot',
         getTs: auditResults => {

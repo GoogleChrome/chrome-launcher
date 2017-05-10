@@ -43,7 +43,7 @@ describe('FirstInteractive computed artifact:', () => {
 
   it('should compute firstInteractive', () => {
     return computedArtifacts.requestFirstInteractive(acceptableTrace).then(output => {
-      assert.equal(Math.round(output.timeInMs), 1052);
+      assert.equal(Math.round(output.timeInMs), 1587);
       assert.ok(output.timestamp, 'output is missing timestamp');
     });
   });
