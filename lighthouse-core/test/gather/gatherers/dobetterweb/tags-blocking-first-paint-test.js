@@ -30,6 +30,7 @@ const traceData = {
       _startTime: 10,
       _endTime: 10,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'parser'}
     },
     {
@@ -39,6 +40,7 @@ const traceData = {
       _startTime: 11,
       _endTime: 11,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'other'}
     },
     {
@@ -48,6 +50,7 @@ const traceData = {
       _startTime: 24,
       _endTime: 24,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'script'}
     },
     {
@@ -57,6 +60,7 @@ const traceData = {
       _startTime: 12,
       _endTime: 22,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'parser'}
     },
     {
@@ -66,6 +70,7 @@ const traceData = {
       _startTime: 13,
       _endTime: 13,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'script'}
     },
     {
@@ -75,6 +80,7 @@ const traceData = {
       _startTime: 16,
       _endTime: 16,
       finished: true,
+      isLinkPreload: true,
       _initiator: {type: 'script'}
     },
     {
@@ -84,6 +90,7 @@ const traceData = {
       _startTime: 16,
       _endTime: 16,
       finished: true,
+      isLinkPreload: false,
       _initiator: {type: 'script'}
     },
     {
@@ -93,6 +100,7 @@ const traceData = {
       _startTime: 12,
       _endTime: 22,
       finished: false,
+      isLinkPreload: false,
       _initiator: {type: 'parser'}
     },
   ]
@@ -109,21 +117,25 @@ describe('First paint blocking tags', () => {
       ._filteredAndIndexedByUrl(traceData.networkRecords);
     return assert.deepEqual(actual, {
       'http://google.com/css/style.css': {
+        isLinkPreload: false,
         transferSize: 10,
         startTime: 10,
         endTime: 10
       },
       'http://google.com/wc/select.html': {
+        isLinkPreload: false,
         transferSize: 11,
         startTime: 11,
         endTime: 11
       },
       'http://google.com/js/app.js': {
+        isLinkPreload: false,
         transferSize: 12,
         startTime: 12,
         endTime: 22
       },
       'http://google.com/wc/import.html': {
+        isLinkPreload: false,
         transferSize: 13,
         startTime: 13,
         endTime: 13

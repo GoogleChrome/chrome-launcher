@@ -373,7 +373,7 @@ describe('Config', () => {
 
     assert.ok(config.audits.length, 'inherited audits by extension');
     assert.equal(config.audits.length, origConfig.categories.performance.audits.length + 1);
-    assert.equal(config.passes.length, 2, 'filtered out passes');
+    assert.equal(config.passes.length, 1, 'filtered out passes');
   });
 
   it('warns for invalid filters', () => {
@@ -531,7 +531,7 @@ describe('Config', () => {
       const totalAuditCount = origConfig.audits.length;
       const config = Config.generateNewFilteredConfig(origConfig, ['performance']);
       assert.equal(Object.keys(config.categories).length, 1, 'other categories are present');
-      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.equal(config.passes.length, 1, 'incorrect # of passes');
       assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
     });
 
@@ -546,7 +546,7 @@ describe('Config', () => {
       const totalAuditCount = origConfig.audits.length;
       const config = Config.generateNewFilteredConfig(origConfig, ['best-practices']);
       assert.equal(Object.keys(config.categories).length, 1, 'other categories are present');
-      assert.equal(config.passes.length, 2, 'incorrect # of passes');
+      assert.equal(config.passes.length, 1, 'incorrect # of passes');
       assert.ok(config.audits.length < totalAuditCount, 'audit filtering probably failed');
     });
 
@@ -565,7 +565,8 @@ describe('Config', () => {
     });
 
     it('should combine audits and categories additively', () => {
-      const config = Config.generateNewFilteredConfig(origConfig, ['performance'], ['is-on-https']);
+      const config = Config.generateNewFilteredConfig(origConfig, ['performance'],
+          ['works-offline']);
       const selectedCategory = origConfig.categories.performance;
       const auditCount = Object.keys(selectedCategory.audits).length + 1;
       assert.equal(config.passes.length, 2, 'incorrect # of passes');

@@ -158,9 +158,8 @@ class OptimizedImages extends Gatherer {
     const networkRecords = traceData.networkRecords;
     const imageRecords = OptimizedImages.filterImageRequests(options.url, networkRecords);
 
-    return options.driver.sendCommand('Network.enable')
+    return Promise.resolve()
       .then(_ => this.computeOptimizedImages(options.driver, imageRecords))
-      .then(results => options.driver.sendCommand('Network.disable').then(_ => results))
       .then(results => {
         const successfulResults = results.filter(result => !result.failed);
         if (results.length && !successfulResults.length) {
