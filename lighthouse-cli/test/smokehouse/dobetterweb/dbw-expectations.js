@@ -58,9 +58,8 @@ module.exports = [
         score: 0,
         extendedInfo: {
           value: {
-            results: {
-              length: 4
-            }
+            // TODO: fix flaky test https://github.com/GoogleChrome/lighthouse/issues/2201
+            // results: 4
           }
         }
       },
@@ -100,7 +99,8 @@ module.exports = [
         score: false
       },
       'script-blocking-first-paint': {
-        score: 90,
+        // TODO: re-enable score assertions when we have more flexible assertions like < 100
+        // score: 90,
         extendedInfo: {
           value: {
             results: {
