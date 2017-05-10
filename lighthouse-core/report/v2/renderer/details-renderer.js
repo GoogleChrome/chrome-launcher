@@ -127,14 +127,17 @@ class DetailsRenderer {
     const theadTrElem = this._dom.createChildOf(theadElem, 'tr');
 
     for (const heading of details.itemHeaders) {
-      this._dom.createChildOf(theadTrElem, 'th').appendChild(this.render(heading));
+      const itemType = heading.itemType || 'text';
+      const classes = `lh-table-column--${itemType}`;
+      this._dom.createChildOf(theadTrElem, 'th', classes).appendChild(this.render(heading));
     }
 
     const tbodyElem = this._dom.createChildOf(tableElem, 'tbody');
     for (const row of details.items) {
       const rowElem = this._dom.createChildOf(tbodyElem, 'tr');
       for (const columnItem of row) {
-        this._dom.createChildOf(rowElem, 'td').appendChild(this.render(columnItem));
+        const classes = `lh-table-column--${columnItem.type}`;
+        this._dom.createChildOf(rowElem, 'td', classes).appendChild(this.render(columnItem));
       }
     }
     return element;
@@ -212,11 +215,20 @@ DetailsRenderer.ListDetailsJSON; // eslint-disable-line no-unused-expressions
  */
 DetailsRenderer.CardsDetailsJSON; // eslint-disable-line no-unused-expressions
 
+/**
+ * @typedef {{
+ *     type: string,
+ *     itemType: (string|undefined),
+ *     text: (string|undefined)
+ * }}
+ */
+DetailsRenderer.TableHeaderJSON; // eslint-disable-line no-unused-expressions
+
 /** @typedef {{
  *     type: string,
  *     header: ({text: string}|undefined),
  *     items: !Array<!Array<!DetailsRenderer.DetailsJSON>>,
- *     itemHeaders: !Array<!DetailsRenderer.DetailsJSON>
+ *     itemHeaders: !Array<!DetailsRenderer.TableHeaderJSON>
  * }}
  */
 DetailsRenderer.TableDetailsJSON; // eslint-disable-line no-unused-expressions

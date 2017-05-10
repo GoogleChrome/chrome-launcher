@@ -122,5 +122,50 @@ describe('DetailsRenderer', () => {
       assert.ok(el.classList.contains('lh-code'));
       assert.equal(el.textContent, 'code snippet');
     });
+
+    it('renders thumbnails', () => {
+      const el = renderer.render({
+        type: 'thumbnail',
+        url: 'http://example.com/my-image.jpg',
+        mimeType: 'image/jpeg',
+      });
+
+      assert.ok(el.localName === 'img');
+      assert.ok(el.classList.contains('lh-thumbnail'));
+      assert.equal(el.src, 'http://example.com/my-image.jpg');
+    });
+
+    it('renders tables', () => {
+      const el = renderer.render({
+        type: 'table',
+        header: 'View Items',
+        itemHeaders: [
+          {type: 'text', text: 'First'},
+          {type: 'text', text: 'Second'},
+          {type: 'text', text: 'Preview', itemType: 'thumbnail'},
+        ],
+        items: [
+          [
+            {type: 'text', text: 'value A.1'},
+            {type: 'text', text: 'value A.2'},
+            {type: 'thumbnail', url: 'http://example.com/image.jpg', mimeType: 'image/jpeg'},
+          ],
+          [
+            {type: 'text', text: 'value B.1'},
+            {type: 'text', text: 'value B.2'},
+            {type: 'thumbnail', url: 'unknown'},
+          ],
+        ],
+      });
+
+      assert.equal(el.localName, 'details');
+      assert.ok(el.querySelector('table'), 'did not render table');
+      assert.ok(el.querySelector('img'), 'did not render recursive items');
+      assert.equal(el.querySelectorAll('th').length, 3, 'did not render header items');
+      assert.equal(el.querySelectorAll('td').length, 6, 'did not render table cells');
+      assert.equal(el.querySelectorAll('.lh-table-column--text').length, 6, '--text not set');
+      assert.equal(el.querySelectorAll('.lh-table-column--thumbnail').length, 3,
+          '--thumbnail not set');
+    });
   });
 });

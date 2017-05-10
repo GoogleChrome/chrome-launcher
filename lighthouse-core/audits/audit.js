@@ -95,6 +95,7 @@ class Audit {
   static makeV2TableHeaders(headings) {
     return headings.map(heading => ({
       type: 'text',
+      itemType: heading.itemType,
       text: heading.text
     }));
   }

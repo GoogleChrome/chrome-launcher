@@ -38,6 +38,10 @@
   --lh-score-highlight-bg: #fafafa;
   --lh-score-icon-background-size: 24px;
   --lh-score-margin: calc(var(--default-padding) / 2);
+
+  --lh-table-header-bg: #ccc;
+  --lh-table-higlight-bg: #fafafa;
+
   --lh-sparkline-height: 10px;
   --lh-audit-score-width: 35px;
   --lh-category-score-width: 60px;
@@ -602,6 +606,38 @@ summary.lh-passed-audits-summary::-webkit-details-marker {
 
 .lh-table {
   --image-preview-size: 24px;
+  border: 1px solid var(--report-secondary-border-color);
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.lh-table thead {
+  background: var(--lh-table-header-bg);
+}
+
+.lh-table tbody tr:nth-child(even) {
+  background-color: var(--lh-table-higlight-bg);
+}
+
+.lh-table th,
+.lh-table td {
+  padding: 10px;
+  overflow: auto;
+}
+
+.lh-table-column--text {
+  text-align: right;
+}
+
+.lh-table-column--thumbnail {
+  width: calc(var(--image-preview-size) * 2);
+}
+
+.lh-table-column--url {
+  text-align: left;
+  min-width: 250px;
+  white-space: nowrap;
 }
 
 .lh-thumbnail {
