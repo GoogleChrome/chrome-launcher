@@ -22,18 +22,10 @@
 
 'use strict';
 
-const URL = require('../../lib/url-shim');
-const Audit = require('../audit');
-const EventHelpers = require('../../lib/event-helpers');
+const ViolationAudit = require('../violation-audit');
 const Formatter = require('../../report/formatter');
 
-class PassiveEventsAudit extends Audit {
-
-  static get SCROLL_BLOCKING_EVENTS() {
-    // See https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
-    return ['wheel', 'mousewheel', 'touchstart', 'touchmove'];
-  }
-
+class PassiveEventsAudit extends ViolationAudit {
   /**
    * @return {!AuditMeta}
    */
@@ -45,7 +37,7 @@ class PassiveEventsAudit extends Audit {
       helpText: 'Consider marking your touch and wheel event listeners as `passive` ' +
           'to improve your page\'s scroll performance. ' +
           '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/passive-event-listeners).',
-      requiredArtifacts: ['URL', 'EventListeners']
+      requiredArtifacts: ['ChromeConsoleMessages']
     };
   }
 
@@ -54,38 +46,21 @@ class PassiveEventsAudit extends Audit {
    * @return {!AuditResult}
    */
   static audit(artifacts) {
-    let debugString;
-    const listeners = artifacts.EventListeners;
+    const results = ViolationAudit.getViolationResults(artifacts, /passive event listener/);
 
-    // Flags all touch and wheel listeners that 1) are from same host
-    // 2) are not passive 3) do not call preventDefault()
-    const results = listeners.filter(loc => {
-      const isScrollBlocking = this.SCROLL_BLOCKING_EVENTS.includes(loc.type);
-      const mentionsPreventDefault = loc.handler.description.match(
-            /\.preventDefault\(\s*\)/g);
-      let sameHost = URL.hostsMatch(artifacts.URL.finalUrl, loc.url);
-
-      if (!URL.isValid(loc.url)) {
-        sameHost = true;
-        debugString = URL.INVALID_URL_DEBUG_STRING;
-      }
-
-      return sameHost && isScrollBlocking && !loc.passive &&
-             !mentionsPreventDefault;
-    }).map(EventHelpers.addFormattedCodeSnippet);
-
-    const groupedResults = EventHelpers.groupCodeSnippetsByLocation(results);
+    const headings = [
+      {key: 'url', itemType: 'url', text: 'URL'},
+      {key: 'label', itemType: 'text', text: 'Location'},
+    ];
+    const details = ViolationAudit.makeV2TableDetails(headings, results);
 
     return {
-      rawValue: groupedResults.length === 0,
+      rawValue: results.length === 0,
       extendedInfo: {
-        formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-        value: {
-          results: groupedResults,
-          tableHeadings: {url: 'URL', lineCol: 'Line/Col', type: 'Type', pre: 'Snippet'}
-        }
+        formatter: Formatter.SUPPORTED_FORMATS.URL_LIST,
+        value: results,
       },
-      debugString
+      details,
     };
   }
 }

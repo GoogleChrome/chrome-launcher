@@ -39,6 +39,8 @@
 
 <!-- PASS: preload that's activated later does not block rendering. -->
 <link rel="preload" href="./dbw_tester.css?delay=2000&async=true" as="style" onload="this.rel = 'stylesheet'">
+<!-- PASS: async stylesheet that loads after FCP -->
+<link rel="stylesheet" href="./dbw_tester.css?delay=3000&async=true" disabled onload="this.disabled = false">
 
 <!-- FAIL: block rendering -->
 <script src="./dbw_tester.js"></script>

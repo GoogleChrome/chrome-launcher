@@ -26,15 +26,15 @@ const Gatherer = require('../gatherer');
 class EventListeners extends Gatherer {
 
   listenForScriptParsedEvents() {
-    return this.driver.sendCommand('Debugger.enable').then(_ => {
-      this.driver.on('Debugger.scriptParsed', script => {
-        this._parsedScripts.set(script.scriptId, script);
-      });
-    });
+    this._listener = script => {
+      this._parsedScripts.set(script.scriptId, script);
+    };
+    this.driver.on('Debugger.scriptParsed', this._listener);
+    return this.driver.sendCommand('Debugger.enable');
   }
 
   unlistenForScriptParsedEvents() {
-    this.driver.off('Debugger.scriptParsed', this.listenForScriptParsedEvents);
+    this.driver.off('Debugger.scriptParsed', this._listener);
     return this.driver.sendCommand('Debugger.disable');
   }
 
@@ -118,18 +118,16 @@ class EventListeners extends Gatherer {
     })).then(nestedListeners => [].concat(...nestedListeners));
   }
 
-  beforePass(options) {
-    this.driver = options.driver;
-    this._parsedScripts = new Map();
-    return this.listenForScriptParsedEvents();
-  }
-
   /**
    * @param {!Object} options
    * @return {!Promise<!Array<!Object>>}
    */
   afterPass(options) {
-    return this.unlistenForScriptParsedEvents()
+    this.driver = options.driver;
+    this._parsedScripts = new Map();
+    return Promise.resolve()
+      .then(() => this.listenForScriptParsedEvents())
+      .then(() => this.unlistenForScriptParsedEvents())
       .then(_ => options.driver.querySelectorAll('body, body /deep/ *')) // drill into shadow trees
       .then(nodes => {
         nodes.push('document', 'window');

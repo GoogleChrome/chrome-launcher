@@ -32,7 +32,7 @@ module.exports = [
         extendedInfo: {
           value: {
             results: {
-              length: 13
+              length: 14
             }
           }
         }
@@ -60,26 +60,6 @@ module.exports = [
           value: {
             results: {
               length: 4
-            }
-          }
-        }
-      },
-      'no-console-time': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 3
-            }
-          }
-        }
-      },
-      'no-datenow': {
-        score: false,
-        extendedInfo: {
-          value: {
-            results: {
-              length: 5
             }
           }
         }
@@ -135,9 +115,7 @@ module.exports = [
           value: {
             // Note: This would normally be 7 but M56 defaults document-level
             // listeners to passive. See https://www.chromestatus.com/features/5093566007214080
-            results: {
-              length: 4
-            }
+            length: 4
           }
         }
       },
@@ -231,12 +209,6 @@ module.exports = [
       },
       'link-blocking-first-paint': {
         score: 100
-      },
-      'no-console-time': {
-        score: true
-      },
-      'no-datenow': {
-        score: true
       },
       'no-document-write': {
         score: true

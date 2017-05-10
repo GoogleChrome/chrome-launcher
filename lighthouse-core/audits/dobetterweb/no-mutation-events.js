@@ -69,7 +69,7 @@ class NoMutationEventsAudit extends Audit {
       const isMutationEvent = this.MUTATION_EVENTS.includes(loc.type);
       let sameHost = URL.hostsMatch(artifacts.URL.finalUrl, loc.url);
 
-      if (!URL.isValid(loc.url)) {
+      if (!URL.isValid(loc.url) && isMutationEvent) {
         sameHost = true;
         debugString = URL.INVALID_URL_DEBUG_STRING;
       }

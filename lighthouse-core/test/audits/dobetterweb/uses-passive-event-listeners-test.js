@@ -17,73 +17,31 @@
 
 const PassiveEventsAudit = require('../../../audits/dobetterweb/uses-passive-event-listeners.js');
 const assert = require('assert');
-const fixtureData = require('../../fixtures/page-level-event-listeners.json');
-
-const URL = 'https://example.com';
 
 /* eslint-env mocha */
 
 describe('Page uses passive events listeners where applicable', () => {
   it('fails when scroll blocking listeners should be passive', () => {
+    const text = 'Use passive event listeners when you do not use preventDefault';
+
     const auditResult = PassiveEventsAudit.audit({
-      EventListeners: fixtureData,
-      URL: {finalUrl: URL}
+      ChromeConsoleMessages: [
+        {entry: {source: 'violation', url: 'https://example.com/', text}},
+        {entry: {source: 'violation', url: 'https://example2.com/two', text}},
+        {entry: {source: 'violation', url: 'http://abc.com/', text: 'No document.write'}},
+        {entry: {source: 'deprecation', url: 'https://example.com/two'}},
+      ],
     });
+
     assert.equal(auditResult.rawValue, false);
-
-    for (let i = 0; i < auditResult.extendedInfo.value.results.length; ++i) {
-      const val = auditResult.extendedInfo.value.results[i];
-      assert.ok(!val.passive, 'results should all be non-passive listeners');
-      assert.ok(PassiveEventsAudit.SCROLL_BLOCKING_EVENTS.includes(val.type),
-          'results should not contain other types of events');
-    }
-    assert.equal(auditResult.extendedInfo.value.results.length, 6);
-    assert.equal(auditResult.extendedInfo.value.results[0].url, fixtureData[0].url);
-    assert.ok(auditResult.extendedInfo.value.results[0].pre.match(/addEventListener/));
-
-    const headings = auditResult.extendedInfo.value.tableHeadings;
-    assert.deepEqual(Object.keys(headings).map(key => headings[key]),
-                     ['URL', 'Line/Col', 'Type', 'Snippet'],
-                     'table headings are correct and in order');
+    assert.equal(auditResult.extendedInfo.value.length, 2);
   });
 
   it('passes scroll blocking listeners should be passive', () => {
     const auditResult = PassiveEventsAudit.audit({
-      EventListeners: [],
-      URL: {finalUrl: URL}
+      ChromeConsoleMessages: [],
     });
     assert.equal(auditResult.rawValue, true);
-    assert.equal(auditResult.extendedInfo.value.results.length, 0);
-  });
-
-  it('fails when listener is missing a url property', () => {
-    const auditResult = PassiveEventsAudit.audit({
-      EventListeners: fixtureData,
-      URL: {finalUrl: URL},
-    });
-    assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.extendedInfo.value.results[1].url === undefined);
-    assert.equal(auditResult.extendedInfo.value.results.length, 6);
-  });
-
-  it('fails when listener has a bad url property', () => {
-    const auditResult = PassiveEventsAudit.audit({
-      EventListeners: [
-        {
-          objectName: 'Window',
-          type: 'wheel',
-          useCapture: false,
-          passive: false,
-          url: 'eval(<context>):54:21',
-          handler: {description: 'x = 1;'},
-          line: 54,
-          col: 21,
-        },
-      ],
-      URL: {finalUrl: URL},
-    });
-    assert.equal(auditResult.rawValue, false);
-    assert.ok(auditResult.extendedInfo.value.results[0].url === 'eval(<context>):54:21');
-    assert.equal(auditResult.extendedInfo.value.results.length, 1);
+    assert.equal(auditResult.extendedInfo.value.length, 0);
   });
 });

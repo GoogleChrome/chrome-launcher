@@ -36,13 +36,19 @@ class ChromeConsoleMessages extends Gatherer {
   }
 
   beforePass(options) {
-    options.driver.on('Log.entryAdded', this._onConsoleEntryAdded);
-    return options.driver.sendCommand('Log.enable');
+    const driver = options.driver;
+    driver.on('Log.entryAdded', this._onConsoleEntryAdded);
+    return driver.sendCommand('Log.enable')
+      .then(() => driver.sendCommand('Log.startViolationsReport', {
+        config: [{name: 'discouragedAPIUse', threshold: -1}]
+      }));
   }
 
   afterPass(options) {
-    options.driver.off('Log.entryAdded', this._onConsoleEntryAdded);
-    return options.driver.sendCommand('Log.disable')
+    return Promise.resolve()
+        .then(_ => options.driver.sendCommand('Log.stopViolationsReport'))
+        .then(_ => options.driver.off('Log.entryAdded', this._onConsoleEntryAdded))
+        .then(_ => options.driver.sendCommand('Log.disable'))
         .then(_ => this._logEntries);
   }
 }

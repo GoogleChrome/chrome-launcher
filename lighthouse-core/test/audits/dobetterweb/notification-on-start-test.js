@@ -22,10 +22,13 @@ const assert = require('assert');
 
 describe('UX: notification audit', () => {
   it('fails when notification has been automatically requested', () => {
+    const text = 'Do not request notification permission without a user action.';
     const auditResult = NotificationOnStart.audit({
-      NotificationOnStart: [
-        {url: 'http://different.com/two', line: 2, col: 2},
-        {url: 'http://example2.com/two', line: 2, col: 22}
+      ChromeConsoleMessages: [
+        {entry: {source: 'violation', url: 'https://example.com/', text}},
+        {entry: {source: 'violation', url: 'https://example2.com/two', text}},
+        {entry: {source: 'violation', url: 'http://abc.com/', text: 'No document.write'}},
+        {entry: {source: 'deprecation', url: 'https://example.com/two'}},
       ],
     });
     assert.equal(auditResult.rawValue, false);
@@ -35,7 +38,7 @@ describe('UX: notification audit', () => {
 
   it('passes when notification has not been automatically requested', () => {
     const auditResult = NotificationOnStart.audit({
-      NotificationOnStart: []
+      ChromeConsoleMessages: []
     });
     assert.equal(auditResult.rawValue, true);
     assert.equal(auditResult.extendedInfo.value.length, 0);

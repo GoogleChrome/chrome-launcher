@@ -12,8 +12,18 @@ module.exports = {
       "viewport-dimensions",
       "theme-color",
       "manifest",
+      "chrome-console-messages",
       "image-usage",
-      "accessibility"
+      // "css-usage",
+      "accessibility",
+      "dobetterweb/all-event-listeners",
+      "dobetterweb/anchors-with-no-rel-noopener",
+      "dobetterweb/appcache",
+      "dobetterweb/domstats",
+      "dobetterweb/optimized-images",
+      "dobetterweb/response-compression",
+      "dobetterweb/tags-blocking-first-paint",
+      "dobetterweb/websql",
     ]
   },
   {
@@ -33,27 +43,6 @@ module.exports = {
     "gatherers": [
       "http-redirect",
       "html-without-javascript",
-    ]
-  }, {
-    "passName": "dbw",
-    "useThrottling": false,
-    "gatherers": [
-      "chrome-console-messages",
-      // "styles",
-      // "css-usage",
-      "dobetterweb/all-event-listeners",
-      "dobetterweb/anchors-with-no-rel-noopener",
-      "dobetterweb/appcache",
-      "dobetterweb/console-time-usage",
-      "dobetterweb/datenow",
-      "dobetterweb/document-write",
-      "dobetterweb/geolocation-on-start",
-      "dobetterweb/notification-on-start",
-      "dobetterweb/domstats",
-      "dobetterweb/optimized-images",
-      "dobetterweb/response-compression",
-      "dobetterweb/tags-blocking-first-paint",
-      "dobetterweb/websql"
     ]
   }],
 
@@ -125,8 +114,6 @@ module.exports = {
     "dobetterweb/external-anchors-use-rel-noopener",
     "dobetterweb/geolocation-on-start",
     "dobetterweb/link-blocking-first-paint",
-    "dobetterweb/no-console-time",
-    "dobetterweb/no-datenow",
     "dobetterweb/no-document-write",
     "dobetterweb/no-mutation-events",
     // "dobetterweb/no-old-flexbox",

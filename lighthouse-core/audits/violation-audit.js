@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2016 Google Inc. All rights reserved.
+ * Copyright 2017 Google Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * @fileoverview Tests whether the page is using document.write().
- */
-
 'use strict';
 
-const Gatherer = require('../gatherer');
+const Audit = require('./audit');
 
-class DocWriteUse extends Gatherer {
-
-  beforePass(options) {
-    this.collectUsage = options.driver.captureFunctionCallSites('document.write');
-  }
-
+class ViolationAudit extends Audit {
   /**
-   * @return {!Promise<!Array<{url: string, line: number, col: number}>>}
+   * @param {!Artifacts} artifacts
+   * @param {!RegExp} pattern
+   * @return {!Array}
    */
-  afterPass() {
-    return this.collectUsage();
+  static getViolationResults(artifacts, pattern) {
+    return artifacts.ChromeConsoleMessages
+        .map(message => message.entry)
+        .filter(entry => entry.source === 'violation' && pattern.test(entry.text))
+        .map(entry => Object.assign({label: `line: ${entry.lineNumber}`}, entry));
   }
 }
 
-module.exports = DocWriteUse;
+module.exports = ViolationAudit;
