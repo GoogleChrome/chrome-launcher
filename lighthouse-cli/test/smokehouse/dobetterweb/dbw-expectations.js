@@ -58,8 +58,9 @@ module.exports = [
         score: 0,
         extendedInfo: {
           value: {
-            // TODO: fix flaky test https://github.com/GoogleChrome/lighthouse/issues/2201
-            // results: 4
+            results: {
+              length: 4
+            }
           }
         }
       },
