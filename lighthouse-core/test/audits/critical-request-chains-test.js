@@ -15,6 +15,8 @@
  */
 'use strict';
 
+/* eslint-env mocha */
+
 const Audit = require('../../audits/critical-request-chains.js');
 const assert = require('assert');
 
@@ -91,17 +93,18 @@ const mockArtifacts = (mockChain) => {
   };
 };
 
-/* eslint-env mocha */
 describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain result for failing example', () => {
     return Audit.audit(mockArtifacts(FAILING_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 2);
       assert.equal(output.rawValue, false);
+      assert.ok(output.details);
     });
   });
 
   it('calculates the correct chain result for passing example', () => {
     return Audit.audit(mockArtifacts(PASSING_REQUEST_CHAIN)).then(output => {
+      assert.equal(output.details.longestChain.duration, 1000);
       assert.equal(output.displayValue, 0);
       assert.equal(output.rawValue, true);
     });

@@ -62,7 +62,7 @@ class Deprecations extends Audit {
 
     const deprecationsV2 = entries.filter(log => log.entry.source === 'deprecation').map(log => {
       // CSS deprecations can have missing URLs and lineNumbers. See https://crbug.com/680832.
-      const url = URL.isValid(log.entry.url) ? URL.getDisplayName(log.entry.url) : '';
+      const url = URL.isValid(log.entry.url) ? URL.getURLDisplayName(log.entry.url) : '';
       return {
         type: 'code',
         text: log.entry.text,

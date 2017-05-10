@@ -77,7 +77,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
       endTime = Math.max(item.endTime, endTime);
 
       return {
-        url: URL.getDisplayName(item.tag.url),
+        url: URL.getURLDisplayName(item.tag.url),
         totalKb: `${Math.round(item.transferSize / 1024)} KB`,
         totalMs: `${Math.round((item.endTime - startTime) * 1000)}ms`
       };

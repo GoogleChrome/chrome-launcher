@@ -29,6 +29,8 @@ class CategoryRenderer {
     this._detailsRenderer = detailsRenderer;
     /** @private {!Document|!Element} */
     this._templateContext = this._dom.document();
+
+    this._detailsRenderer.setTemplateContext(this._templateContext);
   }
 
   /**
@@ -216,6 +218,7 @@ class CategoryRenderer {
    */
   setTemplateContext(context) {
     this._templateContext = context;
+    this._detailsRenderer.setTemplateContext(context);
   }
 
   /**

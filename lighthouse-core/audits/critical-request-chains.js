@@ -124,6 +124,8 @@ class CriticalRequestChains extends Audit {
           walk(initialNavChildren, 0);
         }
 
+        const longestChain = CriticalRequestChains._getLongestChain(chains);
+
         return {
           rawValue: chainCount <= this.meta.optimalValue,
           displayValue: chainCount,
@@ -132,8 +134,14 @@ class CriticalRequestChains extends Audit {
             formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
             value: {
               chains,
-              longestChain: CriticalRequestChains._getLongestChain(chains)
+              longestChain
             }
+          },
+          details: {
+            type: 'criticalrequestchain',
+            header: {type: 'text', text: 'View critical network waterfall:'},
+            chains,
+            longestChain
           }
         };
       });

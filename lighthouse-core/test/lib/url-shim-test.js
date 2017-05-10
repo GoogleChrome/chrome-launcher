@@ -82,51 +82,51 @@ describe('URL Shim', () => {
     assert.equal(URL.originsMatch(urlA, urlB), false);
   });
 
-  describe('getDisplayName', () => {
+  describe('getURLDisplayName', () => {
     it('respects numPathParts option', () => {
       const url = 'http://example.com/a/deep/nested/file.css';
-      const result = URL.getDisplayName(url, {numPathParts: 3});
+      const result = URL.getURLDisplayName(url, {numPathParts: 3});
       assert.equal(result, '\u2026deep/nested/file.css');
     });
 
     it('respects preserveQuery option', () => {
       const url = 'http://example.com/file.css?aQueryString=true';
-      const result = URL.getDisplayName(url, {preserveQuery: false});
+      const result = URL.getURLDisplayName(url, {preserveQuery: false});
       assert.equal(result, '/file.css');
     });
 
     it('respects preserveHost option', () => {
       const url = 'http://example.com/file.css';
-      const result = URL.getDisplayName(url, {preserveHost: true});
+      const result = URL.getURLDisplayName(url, {preserveHost: true});
       assert.equal(result, 'example.com/file.css');
     });
 
     it('Elides hashes', () => {
       const url = 'http://example.com/file-f303dec6eec305a4fab8025577db3c2feb418148ac75ba378281399fb1ba670b.css';
-      const result = URL.getDisplayName(url);
+      const result = URL.getURLDisplayName(url);
       assert.equal(result, '/file-f303dec\u2026.css');
     });
 
     it('Elides hashes in the middle', () => {
       const url = 'http://example.com/file-f303dec6eec305a4fab80378281399fb1ba670b-somethingmore.css';
-      const result = URL.getDisplayName(url);
+      const result = URL.getURLDisplayName(url);
       assert.equal(result, '/file-f303dec\u2026-somethingmore.css');
     });
 
     it('Elides query strings when can first parameter', () => {
       const url = 'http://example.com/file.css?aQueryString=true&other_long_query_stuff=false&some_other_super_long_query';
-      const result = URL.getDisplayName(url);
+      const result = URL.getURLDisplayName(url);
       assert.equal(result, '/file.css?aQueryString=\u2026');
     });
 
     it('Elides query strings when cannot preserve first parameter', () => {
       const url = 'http://example.com/file.css?superDuperNoGoodVeryLongExtraSpecialOnlyTheBestEnourmousQueryString=true';
-      const result = URL.getDisplayName(url);
+      const result = URL.getURLDisplayName(url);
       assert.equal(result, '/file.css?\u2026');
     });
 
     it('Elides long names', () => {
-      const result = URL.getDisplayName(superLongName);
+      const result = URL.getURLDisplayName(superLongName);
       const expected = '/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichWe\u2026.js';
       assert.equal(result, expected);
     });
@@ -134,20 +134,20 @@ describe('URL Shim', () => {
     it('Elides long names with hash', () => {
       const url = superLongName.slice(0, -3) +
           '-f303dec6eec305a4fab8025577db3c2feb418148ac75ba378281399fb1ba670b.css';
-      const result = URL.getDisplayName(url);
+      const result = URL.getURLDisplayName(url);
       const expected = '/thisIsASuperLongURLThatWillTriggerFilenameTruncationWhichW\u2026.css';
       assert.equal(result, expected);
     });
 
     it('Elides path parts properly', () => {
-      assert.equal(URL.getDisplayName('http://example.com/file.css'), '/file.css');
-      assert.equal(URL.getDisplayName('http://t.co//file.css'), '//file.css');
-      assert.equal(URL.getDisplayName('http://t.co/a/file.css'), '/a/file.css');
-      assert.equal(URL.getDisplayName('http://t.co/a/b/file.css'), '\u2026b/file.css');
+      assert.equal(URL.getURLDisplayName('http://example.com/file.css'), '/file.css');
+      assert.equal(URL.getURLDisplayName('http://t.co//file.css'), '//file.css');
+      assert.equal(URL.getURLDisplayName('http://t.co/a/file.css'), '/a/file.css');
+      assert.equal(URL.getURLDisplayName('http://t.co/a/b/file.css'), '\u2026b/file.css');
     });
 
     it('Elides path parts properly when used with preserveHost', () => {
-      const getResult = path => URL.getDisplayName(`http://g.co${path}`, {preserveHost: true});
+      const getResult = path => URL.getURLDisplayName(`http://g.co${path}`, {preserveHost: true});
       assert.equal(getResult('/file.css'), 'g.co/file.css');
       assert.equal(getResult('/img/logo.jpg'), 'g.co/img/logo.jpg');
       assert.equal(getResult('//logo.jpg'), 'g.co//logo.jpg');

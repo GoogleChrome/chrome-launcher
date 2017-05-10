@@ -141,7 +141,7 @@ class UnusedCSSRules extends ByteEfficiencyAudit {
       const contentPreview = UnusedCSSRules.determineContentPreview(stylesheetInfo.content);
       url = '*inline*```' + contentPreview + '```';
     } else {
-      url = URL.getDisplayName(url);
+      url = URL.getURLDisplayName(url);
     }
 
     // If we don't know for sure how many bytes this sheet used on the network,

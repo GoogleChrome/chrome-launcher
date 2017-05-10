@@ -64,7 +64,7 @@ class TTFBMetric extends Audit {
         if (networkRecord) {
           const ttfb = TTFBMetric.caclulateTTFB(networkRecord);
           results.push({
-            url: URL.getDisplayName(networkRecord._url),
+            url: URL.getURLDisplayName(networkRecord._url),
             ttfb: `${Math.round(ttfb).toLocaleString()} ms`,
             rawTTFB: ttfb
           });

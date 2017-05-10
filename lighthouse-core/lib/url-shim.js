@@ -23,7 +23,7 @@
 
 /* global self */
 
-const ELLIPSIS = '\u2026';
+const Util = require('../report/v2/renderer/util.js');
 
 // TODO: Add back node require('url').URL parsing when bug is resolved:
 // https://github.com/GoogleChrome/lighthouse/issues/1186
@@ -77,63 +77,8 @@ URL.originsMatch = function originsMatch(urlA, urlB) {
  * @param {{numPathParts: number, preserveQuery: boolean, preserveHost: boolean}=} options
  * @return {string}
  */
-URL.getDisplayName = function getDisplayName(url, options) {
-  options = Object.assign({
-    numPathParts: 2,
-    preserveQuery: true,
-    preserveHost: false,
-  }, options);
-
-  const parsed = new URL(url);
-
-  let name;
-
-  if (parsed.protocol === 'about:' || parsed.protocol === 'data:') {
-    // Handle 'about:*' and 'data:*' URLs specially since they have no path.
-    name = parsed.href;
-  } else {
-    name = parsed.pathname;
-    const parts = name.split('/').filter(part => part.length);
-    if (options.numPathParts && parts.length > options.numPathParts) {
-      name = ELLIPSIS + parts.slice(-1 * options.numPathParts).join('/');
-    }
-
-    if (options.preserveHost) {
-      name = `${parsed.host}/${name.replace(/^\//, '')}`;
-    }
-    if (options.preserveQuery) {
-      name = `${name}${parsed.search}`;
-    }
-  }
-
-  const MAX_LENGTH = 64;
-  // Always elide hash
-  name = name.replace(/([a-f0-9]{7})[a-f0-9]{13}[a-f0-9]*/g, `$1${ELLIPSIS}`);
-
-  // Elide query params first
-  if (name.length > MAX_LENGTH && name.includes('?')) {
-    // Try to leave the first query parameter intact
-    name = name.replace(/\?([^=]*)(=)?.*/, `?$1$2${ELLIPSIS}`);
-
-    // Remove it all if it's still too long
-    if (name.length > MAX_LENGTH) {
-      name = name.replace(/\?.*/, `?${ELLIPSIS}`);
-    }
-  }
-
-  // Elide too long names next
-  if (name.length > MAX_LENGTH) {
-    const dotIndex = name.lastIndexOf('.');
-    if (dotIndex >= 0) {
-      name = name.slice(0, MAX_LENGTH - 1 - (name.length - dotIndex)) +
-          // Show file extension
-          `${ELLIPSIS}${name.slice(dotIndex)}`;
-    } else {
-      name = name.slice(0, MAX_LENGTH - 1) + ELLIPSIS;
-    }
-  }
-
-  return name;
+URL.getURLDisplayName = function getURLDisplayName(url, options) {
+  return Util.getURLDisplayName(new URL(url), options);
 };
 
 // There is fancy URL rewriting logic for the chrome://settings page that we need to work around.

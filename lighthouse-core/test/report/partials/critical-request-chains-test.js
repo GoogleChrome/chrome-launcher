@@ -88,7 +88,7 @@ describe('CRC partial generation', () => {
     Handlebars.registerHelper(handlebarHelpers);
     const template = Handlebars.compile(partialHtml);
     const output = template(extendedInfo).split('\n').join('');
-    const filename = URL.getDisplayName(superLongName);
+    const filename = URL.getURLDisplayName(superLongName);
     const filenameRegExp = new RegExp(filename, 'im');
     const expectedTreeOne = new RegExp([
       '<div class="cnc-node" title="https://example.com/">',

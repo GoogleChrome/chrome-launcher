@@ -68,7 +68,7 @@ class NoOldFlexboxAudit extends Audit {
         if (!URL.isValid(url) || url === pageUrl) {
           url = 'inline';
         } else {
-          url = URL.getDisplayName(url);
+          url = URL.getURLDisplayName(url);
         }
 
         urlList.push({

@@ -15,7 +15,7 @@
 #     https://github.com/ChromeDevTools/devtools-frontend/blob/master/front_end/audits2/module.json#L20
 
 # (Currently this doesnt include logger or report-features)
-files_to_include="\"lighthouse\/renderer\/util.js\", \"lighthouse\/renderer\/dom.js\", \"lighthouse\/renderer\/category-renderer.js\", \"lighthouse\/renderer\/details-renderer.js\", \"lighthouse\/renderer\/report-renderer.js\","
+files_to_include="\"lighthouse\/renderer\/util.js\", \"lighthouse\/renderer\/dom.js\", \"lighthouse\/renderer\/category-renderer.js\", \"lighthouse\/renderer\/crc-details-renderer.js\", \"lighthouse\/renderer\/details-renderer.js\", \"lighthouse\/renderer\/report-renderer.js\","
 
 # -----------------------------
 

@@ -387,7 +387,7 @@ const handlebarHelpers = {
    */
   parseURL: (resourceURL, opts) => {
     const parsedURL = {
-      file: URL.getDisplayName(resourceURL),
+      file: URL.getURLDisplayName(resourceURL),
       hostname: new URL(resourceURL).hostname
     };
 
