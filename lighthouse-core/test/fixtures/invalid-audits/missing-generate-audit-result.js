@@ -23,6 +23,7 @@ class MissingRequiredArtifacts {
       category: 'Custom',
       name: 'missing-required-artifacts',
       description: 'Missing required artifacts',
+      helpText: '',
       requiredArtifacts: ['HTML']
     };
   }

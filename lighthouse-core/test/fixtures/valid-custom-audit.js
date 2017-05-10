@@ -25,6 +25,7 @@ class ValidCustomAudit extends LighthouseAudit {
       name: 'valid-audit',
       category: 'Custom',
       description: 'Valid Audit',
+      helpText: 'Valid-sounding helpText',
       requiredArtifacts: ['HTML']
     };
   }

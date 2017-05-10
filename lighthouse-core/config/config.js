@@ -199,6 +199,12 @@ function assertValidAudit(auditDefinition, auditPath) {
     );
   }
 
+  if (typeof auditDefinition.meta.helpText !== 'string') {
+    throw new Error(
+      `${auditName} has no meta.helpText property, or the property is not a string.`
+    );
+  }
+
   if (!Array.isArray(auditDefinition.meta.requiredArtifacts)) {
     throw new Error(
       `${auditName} has no meta.requiredArtifacts property, or the property is not an array.`

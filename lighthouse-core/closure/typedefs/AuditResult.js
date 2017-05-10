@@ -100,7 +100,7 @@ AuditFullResult.prototype.category;
 /** @type {string} */
 AuditFullResult.prototype.description;
 
-/** @type {(string|undefined)} */
+/** @type {string} */
 AuditFullResult.prototype.helpText;
 
 /** @type {(Object|undefined)} */

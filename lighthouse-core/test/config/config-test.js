@@ -48,6 +48,7 @@ describe('Config', () => {
           name: 'MyAudit',
           category: 'mine',
           description: 'My audit',
+          helpText: '',
           requiredArtifacts: []
         };
       }
@@ -234,6 +235,10 @@ describe('Config', () => {
     assert.throws(_ => new Config({
       audits: [basePath + '/missing-description']
     }), /meta.description property/);
+
+    assert.throws(_ => new Config({
+      audits: [basePath + '/missing-help-text']
+    }), /meta.helpText property/);
 
     assert.throws(_ => new Config({
       audits: [basePath + '/missing-required-artifacts']
