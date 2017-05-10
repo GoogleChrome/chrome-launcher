@@ -56,7 +56,7 @@ class UnusedBytes extends Audit {
   static toSavingsString(bytes = 0, percent = 0) {
     const kbDisplay = this.bytesToKbString(bytes);
     const percentDisplay = Math.round(percent).toLocaleString() + '%';
-    return `${kbDisplay} _${percentDisplay}_`;
+    return `${kbDisplay} (${percentDisplay})`;
   }
 
   /**
