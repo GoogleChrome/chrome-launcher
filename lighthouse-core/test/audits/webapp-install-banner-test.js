@@ -146,7 +146,7 @@ describe('PWA: webapp install banner audit', () => {
 
     return WebappInstallBannerAudit.audit(artifacts).then(result => {
       assert.strictEqual(result.rawValue, false);
-      assert.ok(result.debugString.includes('Start url'), result.debugString);
+      assert.ok(result.debugString.includes('start_url'), result.debugString);
       const failures = result.extendedInfo.value.failures;
       assert.strictEqual(failures.length, 1, failures);
     });
