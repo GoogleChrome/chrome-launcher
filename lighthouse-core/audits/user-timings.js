@@ -123,14 +123,43 @@ class UserTimings extends Audit {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     return artifacts.requestTraceOfTab(trace).then(tabTrace => {
       const userTimings = this.filterTrace(tabTrace).filter(UserTimings.excludeBlacklisted);
+      const tableRows = userTimings.map(item => {
+        const time = item.isMark ? item.startTime : item.duration;
+        return {
+          name: item.name,
+          timingType: item.isMark ? 'Mark' : 'Measure',
+          time: time.toLocaleString() + ' ms',
+          timeAsNumber: time,
+        };
+      }).sort((itemA, itemB) => {
+        if (itemA.timingType === itemB.timingType) {
+          // If both items are the same type, sort in ascending order by time
+          return itemA.timeAsNumber - itemB.timeAsNumber;
+        } else if (itemA.timingType === 'Measure') {
+          // Put measures before marks
+          return -1;
+        } else {
+          return 1;
+        }
+      });
+
+      const headings = [
+        {key: 'name', itemType: 'text', text: 'Name'},
+        {key: 'timingType', itemType: 'text', text: 'Type'},
+        {key: 'time', itemType: 'text', text: 'Time'},
+      ];
+
+      const details = Audit.makeV2TableDetails(headings, tableRows);
 
       return {
-        rawValue: true,
+        // mark the audit as failed if there are user timings to display
+        rawValue: userTimings.length === 0,
         displayValue: userTimings.length,
         extendedInfo: {
           formatter: Formatter.SUPPORTED_FORMATS.USER_TIMINGS,
           value: userTimings
-        }
+        },
+        details,
       };
     });
   }

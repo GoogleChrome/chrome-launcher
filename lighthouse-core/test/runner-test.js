@@ -95,7 +95,7 @@ describe('Runner', () => {
     return Runner.run({}, {url, config}).then(results => {
       const audits = results.audits;
       assert.equal(audits['user-timings'].displayValue, 2);
-      assert.equal(audits['user-timings'].rawValue, true);
+      assert.equal(audits['user-timings'].rawValue, false);
     });
   });
 

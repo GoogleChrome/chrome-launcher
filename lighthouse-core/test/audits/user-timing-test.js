@@ -39,7 +39,7 @@ describe('Performance: user-timings audit', () => {
       });
       assert.equal(blackListedUTs.length, 0, 'Blacklisted usertimings included in results');
 
-      assert.equal(auditResult.rawValue, true);
+      assert.equal(auditResult.rawValue, false);
       assert.equal(auditResult.displayValue, 2);
 
       assert.equal(auditResult.extendedInfo.value[0].isMark, true);
@@ -51,6 +51,10 @@ describe('Performance: user-timings audit', () => {
       assert.equal(Math.floor(auditResult.extendedInfo.value[1].startTime), 0);
       assert.equal(Math.floor(auditResult.extendedInfo.value[1].endTime), 1000);
       assert.equal(Math.floor(auditResult.extendedInfo.value[1].duration), 1000);
+
+      assert.equal(auditResult.details.items[0][0].text, 'measure_test');
+      assert.equal(auditResult.details.items[0][1].text, 'Measure');
+      assert.equal(auditResult.details.items[0][2].text, '1,000.965 ms');
     });
   });
 });
