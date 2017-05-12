@@ -85,7 +85,6 @@ const DETAILS = {
 };
 
 describe('DetailsRenderer', () => {
-  let renderer;
   let dom;
 
   before(() => {
@@ -93,7 +92,6 @@ describe('DetailsRenderer', () => {
     global.Util = Util;
     const document = jsdom.jsdom(TEMPLATE_FILE);
     dom = new DOM(document);
-    renderer = new CriticalRequestChainRenderer(dom, dom.document());
   });
 
   after(() => {
@@ -102,7 +100,7 @@ describe('DetailsRenderer', () => {
   });
 
   it('renders tree structure', () => {
-    const el = renderer.render(DETAILS);
+    const el = CriticalRequestChainRenderer.render(dom, dom.document(), DETAILS);
     const details = el.querySelector('.lh-details');
     const chains = details.querySelectorAll('.crc-node');
     assert.equal(chains.length, 4, 'generates correct number of chain nodes');

@@ -46,7 +46,7 @@ class DetailsRenderer {
       case 'url':
         return this._renderURL(details);
       case 'thumbnail':
-        return this._renderThumbnail(details);
+        return this._renderThumbnail(/** @type {!DetailsRenderer.ThumbnailDetails} */ (details));
       case 'cards':
         return this._renderCards(/** @type {!DetailsRenderer.CardsDetailsJSON} */ (details));
       case 'table':
@@ -55,9 +55,8 @@ class DetailsRenderer {
         return this._renderCode(details);
       case 'node':
         return this.renderNode(/** @type {!DetailsRenderer.NodeDetailsJSON} */(details));
-      case 'criticalrequestchain': // eslint-disable-line no-case-declarations
-        const crcRenderer = new CriticalRequestChainRenderer(this._dom, this._templateContext);
-        return crcRenderer.render(
+      case 'criticalrequestchain':
+        return CriticalRequestChainRenderer.render(this._dom, this._templateContext,
             /** @type {!CriticalRequestChainRenderer.CRCDetailsJSON} */ (details));
       case 'list':
         return this._renderList(/** @type {!DetailsRenderer.ListDetailsJSON} */ (details));

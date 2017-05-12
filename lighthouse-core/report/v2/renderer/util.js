@@ -86,8 +86,11 @@ class Util {
    * @param {{numPathParts: (number|undefined), preserveQuery: (boolean|undefined), preserveHost: (boolean|undefined)}=} options
    * @return {string}
    */
-  static getURLDisplayName(parsedUrl,
-      {numPathParts = 2, preserveQuery = true, preserveHost = false} = {}) {
+  static getURLDisplayName(parsedUrl, options = {}) {
+    const numPathParts = options.numPathParts !== undefined ? options.numPathParts : 2;
+    const preserveQuery = options.preserveQuery !== undefined ? options.preserveQuery : true;
+    const preserveHost = options.preserveHost || false;
+
     let name;
 
     if (parsedUrl.protocol === 'about:' || parsedUrl.protocol === 'data:') {
