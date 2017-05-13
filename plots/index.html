@@ -19,9 +19,20 @@ limitations under the License.
 
 <head>
   <script src="https://cdn.plot.ly/plotly-1.25.2.min.js"></script>
+  <style>
+    nav { display: flex; justify-content: center; font-size: 17px; font-family: "Open Sans", verdana, arial, sans-serif; padding: 5px 0 23px; border-bottom: 1px solid black; }
+    nav a { padding: 0 5px; }
+  </style>
 </head>
 
 <body>
+  <script src="./out/generatedResults.js"></script>
+  <nav>
+    View results:
+    <a>grouped by metric</a>
+    <a href="./metrics-per-site.html">grouped by site</a>
+  </nav>
+
   <script src="./out/generatedResults.js"></script>
   <script src="./chart.js"></script>
 </body>
