@@ -72,11 +72,11 @@ export function darwin() {
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 export function linux() {
-  let installations: Array<string> = [];
+  let installations: string[] = [];
 
   // 1. Look into LIGHTHOUSE_CHROMIUM_PATH env variable
   if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
-    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH);
+    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH as string);
   }
 
   // 2. Look into the directories where .desktop are saved on gnome based distro's
@@ -95,7 +95,8 @@ export function linux() {
   ];
   executables.forEach((executable: string) => {
     try {
-      const chromePath = execFileSync('which', [executable]).toString().split(newLineRegex)[0];
+      const chromePath =
+          execFileSync('which', [executable]).toString().split(newLineRegex)[0] as string;
 
       if (canAccess(chromePath)) {
         installations.push(chromePath);
@@ -141,22 +142,22 @@ export function win32() {
   return installations;
 }
 
-function sort(installations: Array<string>, priorities: Priorities) {
+function sort(installations: string[], priorities: Priorities) {
   const defaultPriority = 10;
   return installations
       // assign priorities
       .map((inst: string) => {
         for (const pair of priorities) {
           if (pair.regex.test(inst)) {
-            return [inst, pair.weight];
+            return {path: inst, weight: pair.weight};
           }
         }
-        return [inst, defaultPriority];
+        return {path: inst, weight: defaultPriority};
       })
       // sort based on priorities
-      .sort((a, b) => (<any>b)[1] - (<any>a)[1])
+      .sort((a, b) => (b.weight - a.weight))
       // remove priority flag
-      .map(pair => pair[0]);
+      .map(pair => pair.path);
 }
 
 function canAccess(file: string): Boolean {
