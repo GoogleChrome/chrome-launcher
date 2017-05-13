@@ -10,6 +10,8 @@
     "first-meaningful-paint",
     "speed-index-metric",
     "estimated-input-latency",
-    "time-to-interactive"
+    "time-to-interactive",
+    "first-interactive",
+    "consistently-interactive"
   ]
 }

@@ -81,11 +81,17 @@ function analyzeSite(sitePath) {
  */
 function readResult(lighthouseReportPath) {
   const data = JSON.parse(fs.readFileSync(lighthouseReportPath));
-  return Metrics.metricsDefinitions.map(metric => ({
+  const metrics = Metrics.metricsDefinitions.map(metric => ({
     name: metric.name,
     id: metric.id,
     timing: metric.getTiming(data.audits)
   }));
+  const timings = Object.keys(constants.TIMING_NAME_MAP).map(timingName => ({
+    name: constants.TIMING_NAME_MAP[timingName],
+    id: 'timing' + timingName,
+    timing: data.timing[timingName]
+  }));
+  return [...metrics, ...timings];
 }
 
 /**
@@ -95,7 +101,10 @@ function readResult(lighthouseReportPath) {
  * @return {!ResultsByMetric}
  */
 function groupByMetrics(results) {
-  return Metrics.metricsDefinitions.map(metric => metric.name).reduce((acc, metricName, index) => {
+  const metricNames = Metrics.metricsDefinitions.map(metric => metric.name)
+      .concat(Object.keys(constants.TIMING_NAME_MAP).map(key => constants.TIMING_NAME_MAP[key]));
+
+  return metricNames.reduce((acc, metricName, index) => {
     acc[metricName] = results.map(siteResult => ({
       site: siteResult.site,
       metrics: siteResult.results.map(runResult => ({
