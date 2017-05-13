@@ -10,11 +10,12 @@
     "format": "clang-format -i -style=file *.ts"
   },
   "devDependencies": {
+    "clang-format": "^1.0.50",
     "mocha": "^3.2.0",
-    "typescript": "2.2.1",
-    "clang-format": "^1.0.50"
+    "typescript": "2.2.1"
   },
   "dependencies": {
+    "@types/mkdirp": "^0.3.29",
     "@types/node": "6.0.66"
   }
 }
