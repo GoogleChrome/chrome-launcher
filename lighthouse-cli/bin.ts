@@ -16,14 +16,12 @@
  */
 'use strict';
 
-const _SIGINT = 'SIGINT';
-const _SIGINT_EXIT_CODE = 130;
 const _RUNTIME_ERROR_CODE = 1;
 const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const getFilenamePrefix = require('../lighthouse-core/lib/file-namer.js').getFilenamePrefix;
-import {ChromeLauncher} from '../chrome-launcher/chrome-launcher';
+import {launch, LaunchedChrome} from '../chrome-launcher/chrome-launcher';
 import * as Commands from './commands/commands';
 import {getFlags, Flags} from './cli-flags';
 const lighthouse = require('../lighthouse-core');
@@ -104,31 +102,9 @@ function initPort(flags: Flags): Promise<undefined> {
  * port. If none is found and the `skipAutolaunch` flag is not true, launches
  * a debuggable instance.
  */
-function getDebuggableChrome(flags: Flags): Promise<ChromeLauncher> {
-  const chromeLauncher = new ChromeLauncher({
-    port: flags.port,
-    chromeFlags: flags.chromeFlags.split(' '),
-    autoSelectChrome: !flags.selectChrome,
-  });
-
-  // Kill spawned Chrome process in case of ctrl-C.
-  process.on(_SIGINT, () => {
-    chromeLauncher.kill().then(() => process.exit(_SIGINT_EXIT_CODE), handleError);
-  });
-
-  return chromeLauncher
-      // Check if there is an existing instance of Chrome ready to talk.
-      .isDebuggerReady()
-      .catch(() => {
-        if (flags.skipAutolaunch) {
-          return;
-        }
-
-        // If not, create one.
-        log.log('Lighthouse CLI', 'Launching Chrome...');
-        return chromeLauncher.run();
-      })
-      .then(() => chromeLauncher);
+async function getDebuggableChrome(flags: Flags) {
+  return await launch(
+      {port: flags.port, chromeFlags: flags.chromeFlags.split(' '), handleSIGINT: true});
 }
 
 function showConnectionError() {
@@ -217,11 +193,11 @@ function saveResults(results: Results, artifacts: Object, flags: Flags) {
 
 export async function runLighthouse(
     url: string, flags: Flags, config: Object|null): Promise<{}|void> {
-  let chromeLauncher: ChromeLauncher|undefined = undefined;
+  let launchedChrome: LaunchedChrome|undefined;
 
   try {
     await initPort(flags);
-    const chromeLauncher = await getDebuggableChrome(flags);
+    launchedChrome = await getDebuggableChrome(flags);
     const results = await lighthouse(url, flags, config);
 
     const artifacts = results.artifacts;
@@ -232,10 +208,10 @@ export async function runLighthouse(
       await performanceXServer.hostExperiment({url, flags, config}, results);
     }
 
-    return await chromeLauncher.kill();
+    return await launchedChrome.kill();
   } catch (err) {
-    if (typeof chromeLauncher !== 'undefined') {
-      await chromeLauncher!.kill();
+    if (typeof launchedChrome !== 'undefined') {
+      await launchedChrome!.kill();
     }
 
     return handleError(err);

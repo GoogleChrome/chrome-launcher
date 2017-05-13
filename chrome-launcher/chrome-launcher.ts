@@ -22,13 +22,14 @@ import * as fs from 'fs';
 import * as chromeFinder from './chrome-finder';
 import {DEFAULT_FLAGS} from './flags';
 import {defaults, delay, makeUnixTmpDir, makeWin32TmpDir} from './utils';
-
 import * as net from 'net';
 const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
+const _SIGINT = 'SIGINT';
+const _SIGINT_EXIT_CODE = 130;
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32';
 
@@ -37,10 +38,24 @@ export interface Options {
   chromeFlags?: Array<string>;
   autoSelectChrome?: boolean;
   port?: number;
+  handleSIGINT?: boolean;
 }
 
-export async function launch(opts?: Options) {
+export interface LaunchedChrome { kill: () => Promise<{}>; }
+
+export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
+  opts.handleSIGINT = defaults(opts.handleSIGINT, true);
+
   const instance = new ChromeLauncher(opts);
+
+  // Kill spawned Chrome process in case of ctrl-C.
+  if (opts.handleSIGINT) {
+    process.on(_SIGINT, async () => {
+      await instance.kill();
+      process.exit(_SIGINT_EXIT_CODE);
+    });
+  }
+
   await instance.launch();
 
   return {kill: instance.kill};
@@ -114,6 +129,17 @@ class ChromeLauncher {
   }
 
   async launch() {
+    if (this.port !== 0) {
+      // If an explict port is passed first look for an open connection...
+      try {
+        return await this.isDebuggerReady();
+      } catch (err) {
+        log.log(
+            'ChromeLauncher',
+            `No debugging port found on port ${this.port}, launching a new Chrome.`);
+      }
+    }
+
     if (!this.prepared) {
       this.prepare();
     }
