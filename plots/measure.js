@@ -27,7 +27,7 @@ const constants = require('./constants.js');
 const utils = require('./utils.js');
 const config = require('../lighthouse-core/config/plots.json');
 const lighthouse = require('../lighthouse-core/index.js');
-const ChromeLauncher = require('../chrome-launcher/chrome-launcher.js').ChromeLauncher;
+const ChromeLauncher = require('../chrome-launcher/chrome-launcher.js');
 const Printer = require('../lighthouse-cli/printer');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 
@@ -132,18 +132,11 @@ function main() {
     return;
   }
 
-  const launcher = new ChromeLauncher();
-  launcher
-    .isDebuggerReady()
-    .catch(() => launcher.run())
-    .then(() => runAnalysis())
-    .then(() => launcher.kill())
-    .catch(err => launcher.kill().then(
-      () => {
-        throw err;
-      },
-      console.error
-    ));
+  const launcher = ChromeLauncher.launch();
+
+  return launcher.then(() => runAnalysis())
+  .catch(err => console.error(err))
+  .then(() => launcher.kill());
 }
 
 main();
