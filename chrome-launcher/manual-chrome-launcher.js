@@ -30,4 +30,3 @@ const chromeInstance = new ChromeLauncher({
 
 chromeInstance.prepare();
 chromeInstance.run();
-

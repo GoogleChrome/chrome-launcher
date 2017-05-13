@@ -30,7 +30,8 @@ before_script:
   - ./lighthouse-core/scripts/download-chrome.sh
   - yarn build-all
 script:
-  - yarn test-formatting
+  - yarn test-cli-formatting
+  - yarn test-launcher-formatting
   - yarn lint
   - yarn unit
   - yarn closure

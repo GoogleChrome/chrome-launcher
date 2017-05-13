@@ -27,7 +27,7 @@ const constants = require('./constants.js');
 const utils = require('./utils.js');
 const config = require('../lighthouse-core/config/plots.json');
 const lighthouse = require('../lighthouse-core/index.js');
-const ChromeLauncher = require('../lighthouse-cli/chrome-launcher.js').ChromeLauncher;
+const ChromeLauncher = require('../chrome-launcher/chrome-launcher.js').ChromeLauncher;
 const Printer = require('../lighthouse-cli/printer');
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 

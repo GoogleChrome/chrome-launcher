@@ -29,6 +29,11 @@ closure-error.log
 lighthouse-cli/*.map
 lighthouse-cli/*.js
 
+!chrome-launcher/manual-chrome-launcher.js
+!chrome-launcher/compiled-check.js
+chrome-launcher/*.map
+chrome-launcher/*.js
+
 lighthouse-cli/commands/*.map
 lighthouse-cli/commands/*.js
 

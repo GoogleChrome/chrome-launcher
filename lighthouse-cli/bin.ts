@@ -23,7 +23,7 @@ const _PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 
 const assetSaver = require('../lighthouse-core/lib/asset-saver.js');
 const getFilenamePrefix = require('../lighthouse-core/lib/file-namer.js').getFilenamePrefix;
-import {ChromeLauncher} from './chrome-launcher';
+import {ChromeLauncher} from '../chrome-launcher/chrome-launcher';
 import * as Commands from './commands/commands';
 import {getFlags, Flags} from './cli-flags';
 const lighthouse = require('../lighthouse-core');

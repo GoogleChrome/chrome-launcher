@@ -22,6 +22,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chromeFinder from './chrome-finder';
 import {ask} from './ask';
+import {DEFAULT_FLAGS} from './flags';
 
 const mkdirp = require('mkdirp');
 import * as net from 'net';
@@ -57,29 +58,12 @@ export class ChromeLauncher {
     this.port = defaults(opts.port, 9222);
   }
 
-  flags() {
-    const flags = [
+  get flags() {
+    const flags = DEFAULT_FLAGS.concat([
       `--remote-debugging-port=${this.port}`,
-      // Disable built-in Google Translate service
-      '--disable-translate',
-      // Disable all chrome extensions entirely
-      '--disable-extensions',
-      // Disable various background network services, including extension updating,
-      //   safe browsing service, upgrade detector, translate, UMA
-      '--disable-background-networking',
-      // Disable fetching safebrowsing lists, likely redundant due to disable-background-networking
-      '--safebrowsing-disable-auto-update',
-      // Disable syncing to a Google account
-      '--disable-sync',
-      // Disable reporting to UMA, but allows for collection
-      '--metrics-recording-only',
-      // Disable installation of default apps on first run
-      '--disable-default-apps',
-      // Skip first run wizards
-      '--no-first-run',
       // Place Chrome profile in a custom location we'll rm -rf later
       `--user-data-dir=${this.TMP_PROFILE_DIR}`
-    ];
+    ]);
 
     if (process.platform === 'linux') {
       flags.push('--disable-setuid-sandbox');
@@ -146,7 +130,7 @@ export class ChromeLauncher {
       }
 
       const chrome = spawn(
-          execPath, this.flags(), {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
+          execPath, this.flags, {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
       this.chrome = chrome;
 
       fs.writeFileSync(this.pidFile, chrome.pid.toString());
