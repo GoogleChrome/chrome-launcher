@@ -30,8 +30,23 @@ const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 
-export class ChromeLauncher {
 type SupportedPlatforms = 'darwin'|'linux'|'win32';
+
+export interface Options {
+  startingUrl?: string;
+  chromeFlags?: Array<string>;
+  autoSelectChrome?: boolean;
+  port?: number;
+}
+
+export async function launch(opts?: Options) {
+  const instance = new ChromeLauncher(opts);
+  await instance.launch();
+
+  return {kill: instance.kill};
+}
+
+class ChromeLauncher {
   prepared = false;
   pollInterval: number = 500;
   autoSelectChrome: boolean;
@@ -44,12 +59,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
   chrome?: childProcess.ChildProcess;
   port: number;
 
-  constructor(opts: {
-    startingUrl?: string,
-    chromeFlags?: Array<string>,
-    autoSelectChrome?: boolean,
-    port?: number
-  } = {}) {
+  constructor(opts: Options = {}) {
     // choose the first one (default)
     this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
@@ -57,7 +67,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     this.port = defaults(opts.port, 9222);
   }
 
-  get flags() {
+  private get flags() {
     const flags = DEFAULT_FLAGS.concat([
       `--remote-debugging-port=${this.port}`,
       // Place Chrome profile in a custom location we'll rm -rf later
@@ -103,7 +113,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     this.prepared = true;
   }
 
-  run() {
+  async launch() {
     if (!this.prepared) {
       this.prepare();
     }
@@ -117,7 +127,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     return await this.spawn(chromePath);
   }
 
-  spawn(execPath: string) {
+  private spawn(execPath: string) {
     const spawnPromise = new Promise(resolve => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
@@ -137,7 +147,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     return spawnPromise.then(pid => Promise.all([pid, this.waitUntilReady()]));
   }
 
-  cleanup(client?: net.Socket) {
+  private cleanup(client?: net.Socket) {
     if (client) {
       client.removeAllListeners();
       client.end();
@@ -147,7 +157,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
   }
 
   // resolves if ready, rejects otherwise
-  isDebuggerReady(): Promise<{}> {
+  private isDebuggerReady(): Promise<{}> {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(this.port);
       client.once('error', err => {
@@ -162,7 +172,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
   }
 
   // resolves when debugger is ready, rejects after 10 polls
-  waitUntilReady() {
+  private waitUntilReady() {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
@@ -217,7 +227,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     });
   }
 
-  destroyTmp() {
+  private destroyTmp() {
     return new Promise(resolve => {
       if (!this.TMP_PROFILE_DIR) {
         return resolve();
