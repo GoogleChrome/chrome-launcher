@@ -33,6 +33,7 @@ const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 
 export class ChromeLauncher {
+type SupportedPlatforms = 'darwin'|'linux'|'win32';
   prepared = false;
   pollInterval: number = 500;
   autoSelectChrome: boolean;
@@ -75,8 +76,10 @@ export class ChromeLauncher {
     return flags;
   }
 
-  prepare() {
-    switch (process.platform) {
+  private prepare() {
+    const platform = process.platform as SupportedPlatforms;
+
+    switch (platform) {
       case 'darwin':
       case 'linux':
         this.TMP_PROFILE_DIR = unixTmpDir();
@@ -87,7 +90,7 @@ export class ChromeLauncher {
         break;
 
       default:
-        throw new Error('Platform ' + process.platform + ' is not supported');
+        throw new Error(`Platform ${platform} is not supported`);
     }
 
     this.outFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-out.log`, 'a');
@@ -107,19 +110,13 @@ export class ChromeLauncher {
       this.prepare();
     }
 
-    return Promise.resolve()
-        .then(() => {
-          const installations = (<any>chromeFinder)[process.platform]();
+    const installations = await chromeFinder[process.platform as SupportedPlatforms]();
+    if (installations.length === 0) {
+      throw new Error('No Chrome Installations Found');
+    }
 
-          if (installations.length < 1) {
-            return Promise.reject(new Error('No Chrome Installations Found'));
-          } else if (installations.length === 1 || this.autoSelectChrome) {
-            return installations[0];
-          }
-
-          return ask('Choose a Chrome installation to use with Lighthouse', installations);
-        })
-        .then(execPath => this.spawn(execPath));
+    const chromePath = installations[0];
+    return await this.spawn(chromePath);
   }
 
   spawn(execPath: string) {
