@@ -19,12 +19,10 @@
 
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as chromeFinder from './chrome-finder';
-import {ask} from './ask';
 import {DEFAULT_FLAGS} from './flags';
+import {defaults, delay, makeUnixTmpDir, makeWin32TmpDir} from './utils';
 
-const mkdirp = require('mkdirp');
 import * as net from 'net';
 const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
@@ -82,11 +80,11 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     switch (platform) {
       case 'darwin':
       case 'linux':
-        this.TMP_PROFILE_DIR = unixTmpDir();
+        this.TMP_PROFILE_DIR = makeUnixTmpDir();
         break;
 
       case 'win32':
-        this.TMP_PROFILE_DIR = win32TmpDir();
+        this.TMP_PROFILE_DIR = makeWin32TmpDir();
         break;
 
       default:
@@ -241,25 +239,3 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
     });
   }
 };
-
-function defaults<T>(val: T | undefined, def: T): T {
-  return typeof val === 'undefined' ? def : val;
-}
-
-function delay(time: number) {
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-function unixTmpDir() {
-  return execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
-}
-
-function win32TmpDir() {
-  const winTmpPath = process.env.TEMP || process.env.TMP ||
-      (process.env.SystemRoot || process.env.windir) + '\\temp';
-  const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);
-  const tmpdir = path.join(winTmpPath, 'lighthouse.' + randomNumber);
-
-  mkdirp.sync(tmpdir);
-  return tmpdir;
-}
