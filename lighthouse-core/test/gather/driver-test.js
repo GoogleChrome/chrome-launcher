@@ -176,8 +176,8 @@ describe('Browser Driver', () => {
 
     const loadOptions = {
       waitForLoad: true,
-      flags: {
-        pauseAfterLoad: 1
+      config: {
+        networkQuietThresholdMs: 1
       }
     };
 

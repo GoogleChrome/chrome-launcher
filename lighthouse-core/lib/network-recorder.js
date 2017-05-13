@@ -52,6 +52,10 @@ class NetworkRecorder extends EventEmitter {
     return this.activeRequestCount() === 0;
   }
 
+  is2Idle() {
+    return this.activeRequestCount() <= 2;
+  }
+
   /**
    * Listener for the NetworkManager's RequestStarted event, which includes both
    * web socket and normal request creation.
@@ -69,6 +73,11 @@ class NetworkRecorder extends EventEmitter {
     // idle to busy.
     if (activeCount === 1) {
       this.emit('networkbusy');
+    }
+
+    // If exactly three requests in progress, we've transitioned from 2-idle to 2-busy.
+    if (activeCount === 3) {
+      this.emit('network-2-busy');
     }
   }
 
@@ -91,6 +100,10 @@ class NetworkRecorder extends EventEmitter {
     // to idle.
     if (this.isIdle()) {
       this.emit('networkidle');
+    }
+
+    if (this.is2Idle()) {
+      this.emit('network-2-idle');
     }
   }
 
