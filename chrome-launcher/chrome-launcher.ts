@@ -64,7 +64,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
   await instance.launch();
 
-  return {pid: instance.pid!, port: instance.port, kill: instance.kill};
+  return {pid: instance.pid!, port: instance.port, kill: async () => instance.kill()};
 }
 
 export class Launcher {
