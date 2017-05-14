@@ -42,7 +42,11 @@ export interface Options {
   handleSIGINT?: boolean;
 }
 
-export interface LaunchedChrome { kill: () => Promise<{}>; }
+export interface LaunchedChrome {
+  pid: number;
+  port: number;
+  kill: () => Promise<{}>;
+}
 
 export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
@@ -59,7 +63,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
   await instance.launch();
 
-  return {kill: instance.kill};
+  return {pid: instance.pid!, port: instance.port, kill: instance.kill};
 }
 
 class ChromeLauncher {
@@ -73,6 +77,7 @@ class ChromeLauncher {
   chromeFlags: Array<string>;
   chrome?: childProcess.ChildProcess;
   port: number;
+  pid?: number;
 
   constructor(opts: Options = {}) {
     // choose the first one (default)
@@ -140,11 +145,13 @@ class ChromeLauncher {
     }
 
     const chromePath = installations[0];
-    return await this.spawn(chromePath);
+    this.pid = await this.spawn(chromePath);
+    return Promise.resolve();
   }
 
-  private spawn(execPath: string) {
-    const spawnPromise = new Promise(async (resolve) => {
+  private async spawn(execPath: string) {
+    // Typescript is losing track of the return type without the explict typing.
+    const spawnPromise: Promise<number> = new Promise(async (resolve) => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
         return resolve(this.chrome.pid);
@@ -169,7 +176,9 @@ class ChromeLauncher {
       resolve(chrome.pid);
     });
 
-    return spawnPromise.then(pid => Promise.all([pid, this.waitUntilReady()]));
+    const pid = await spawnPromise;
+    await this.waitUntilReady();
+    return pid;
   }
 
   private cleanup(client?: net.Socket) {
