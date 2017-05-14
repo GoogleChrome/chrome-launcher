@@ -29,11 +29,23 @@ export async function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export function makeUnixTmpDir() {
+export function makeTmpDir() {
+  switch (process.platform) {
+    case 'darwin':
+    case 'linux':
+      return makeUnixTmpDir();
+    case 'win32':
+      return makeWin32TmpDir();
+    default:
+      throw new Error(`Platform ${process.platform} is not supported`);
+  }
+}
+
+function makeUnixTmpDir() {
   return execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
 }
 
-export function makeWin32TmpDir() {
+function makeWin32TmpDir() {
   const winTmpPath = process.env.TEMP || process.env.TMP ||
       (process.env.SystemRoot || process.env.windir) + '\\temp';
   const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);

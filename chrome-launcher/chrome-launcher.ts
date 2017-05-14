@@ -21,7 +21,7 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as chromeFinder from './chrome-finder';
 import {DEFAULT_FLAGS} from './flags';
-import {defaults, delay, makeUnixTmpDir, makeWin32TmpDir} from './utils';
+import {makeTmpDir, defaults, delay} from './utils';
 import * as net from 'net';
 const rimraf = require('rimraf');
 const log = require('../lighthouse-core/lib/log');
@@ -30,6 +30,7 @@ const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';
 const _SIGINT = 'SIGINT';
 const _SIGINT_EXIT_CODE = 130;
+const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32']);
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32';
 
@@ -101,20 +102,11 @@ class ChromeLauncher {
 
   private prepare() {
     const platform = process.platform as SupportedPlatforms;
-
-    switch (platform) {
-      case 'darwin':
-      case 'linux':
-        this.TMP_PROFILE_DIR = makeUnixTmpDir();
-        break;
-
-      case 'win32':
-        this.TMP_PROFILE_DIR = makeWin32TmpDir();
-        break;
-
-      default:
-        throw new Error(`Platform ${platform} is not supported`);
+    if (!_SUPPORTED_PLATFORMS.has(platform)) {
+      throw new Error(`Platform ${platform} is not supported`);
     }
+
+    this.TMP_PROFILE_DIR = makeTmpDir();
 
     this.outFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-out.log`, 'a');
     this.errFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-err.log`, 'a');
