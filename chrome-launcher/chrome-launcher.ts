@@ -80,7 +80,7 @@ class ChromeLauncher {
     this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(opts.chromeFlags, []);
-    this.port = defaults(opts.port, 9222);
+    this.port = defaults(opts.port, 0);
   }
 
   private get flags() {
