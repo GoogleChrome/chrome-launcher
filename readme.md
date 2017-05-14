@@ -160,18 +160,19 @@ assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`
 
 ```javascript
 const lighthouse = require('lighthouse');
-const ChromeLauncher = require('lighthouse/lighthouse-cli/chrome-launcher.js').ChromeLauncher;
+const ChromeLauncher = require('lighthouse/chrome-laucher/chrome-launcher.js');
 const Printer = require('lighthouse/lighthouse-cli/printer');
 
 function launchChromeAndRunLighthouse(url, flags, config) {
-  const launcher = new ChromeLauncher({port: 9222, autoSelectChrome: true});
+  const launchedChrome = ChromeLauncher.launch();
 
-  return launcher.run() // Launch Chrome.
+  launchedChrome
     .then(() => lighthouse(url, flags, config)) // Run Lighthouse.
-    .then(results => launcher.kill().then(() => results)) // Kill Chrome and return results.
+    .then(results => launchedChrome.kill())
+    .then(() => results) // Kill Chrome and return results.
     .catch(err => {
       // Kill Chrome if there's an error.
-      return launcher.kill().then(() => {
+      return launchedChrome.kill().then(() => {
         throw err;
       });
     });
