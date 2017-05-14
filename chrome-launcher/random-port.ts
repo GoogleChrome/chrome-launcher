@@ -21,7 +21,7 @@ import {createServer} from 'http';
 /**
  * Return a random, unused port.
  */
-function getRandomPort(): Promise<number> {
+export function getRandomPort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = createServer();
     server.listen(0);
@@ -32,5 +32,3 @@ function getRandomPort(): Promise<number> {
     server.once('error', reject);
   });
 }
-
-export {getRandomPort};

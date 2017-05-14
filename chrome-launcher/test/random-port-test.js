@@ -18,7 +18,7 @@
 /* eslint-env mocha */
 
 const assert = require('assert');
-const getRandomPort = require('../../random-port').getRandomPort;
+const getRandomPort = require('../random-port').getRandomPort;
 
 describe('Random port generation', () => {
   it('generates a valid random port number', () => {
