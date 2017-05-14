@@ -20,6 +20,7 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as chromeFinder from './chrome-finder';
+import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay} from './utils';
 import * as net from 'net';
@@ -143,10 +144,19 @@ class ChromeLauncher {
   }
 
   private spawn(execPath: string) {
-    const spawnPromise = new Promise(resolve => {
+    const spawnPromise = new Promise(async (resolve) => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
         return resolve(this.chrome.pid);
+      }
+
+
+      // If a zero value port is set, it means the launcher
+      // is responsible for generating the port number.
+      // We do this here so that we can know the port before
+      // we pass it into chrome.
+      if (this.port === 0) {
+        this.port = await getRandomPort();
       }
 
       const chrome = spawn(
