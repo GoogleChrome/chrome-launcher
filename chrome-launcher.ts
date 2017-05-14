@@ -37,7 +37,6 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32';
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
-  autoSelectChrome?: boolean;
   port?: number;
   handleSIGINT?: boolean;
 }
@@ -65,7 +64,6 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 class ChromeLauncher {
   private tmpDirandPidFileReady = false;
   pollInterval: number = 500;
-  autoSelectChrome: boolean;
   TMP_PROFILE_DIR: string;
   outFile?: number;
   errFile?: number;
@@ -77,7 +75,6 @@ class ChromeLauncher {
 
   constructor(opts: Options = {}) {
     // choose the first one (default)
-    this.autoSelectChrome = defaults(opts.autoSelectChrome, true);
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(opts.chromeFlags, []);
     this.port = defaults(opts.port, 0);
