@@ -52,7 +52,7 @@ export interface LaunchedChrome {
 export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
-  const instance = new ChromeLauncher(opts);
+  const instance = new Launcher(opts);
 
   // Kill spawned Chrome process in case of ctrl-C.
   if (opts.handleSIGINT) {
@@ -67,7 +67,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   return {pid: instance.pid!, port: instance.port, kill: instance.kill};
 }
 
-class ChromeLauncher {
+export class Launcher {
   private tmpDirandPidFileReady = false;
   pollInterval: number = 500;
   TMP_PROFILE_DIR: string;
