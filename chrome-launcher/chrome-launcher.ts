@@ -40,6 +40,7 @@ export interface Options {
   chromeFlags?: Array<string>;
   port?: number;
   handleSIGINT?: boolean;
+  chromePath?: string;
 }
 
 export interface LaunchedChrome {
@@ -74,6 +75,7 @@ class ChromeLauncher {
   errFile?: number;
   pidFile: string;
   startingUrl: string;
+  chromePath?: string;
   chromeFlags: Array<string>;
   chrome?: childProcess.ChildProcess;
   port: number;
@@ -84,6 +86,7 @@ class ChromeLauncher {
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(opts.chromeFlags, []);
     this.port = defaults(opts.port, 0);
+    this.chromePath = opts.chromePath;
   }
 
   private get flags() {
@@ -139,13 +142,16 @@ class ChromeLauncher {
       this.prepare();
     }
 
-    const installations = await chromeFinder[process.platform as SupportedPlatforms]();
-    if (installations.length === 0) {
-      throw new Error('No Chrome Installations Found');
+    if (this.chromePath === undefined) {
+      const installations = await chromeFinder[process.platform as SupportedPlatforms]();
+      if (installations.length === 0) {
+        throw new Error('No Chrome Installations Found');
+      }
+
+      this.chromePath = installations[0];
     }
 
-    const chromePath = installations[0];
-    this.pid = await this.spawn(chromePath);
+    this.pid = await this.spawn(this.chromePath);
     return Promise.resolve();
   }
 
