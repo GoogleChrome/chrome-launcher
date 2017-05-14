@@ -30,7 +30,6 @@ import * as path from 'path';
 const perfOnlyConfig = require('../lighthouse-core/config/perf.json');
 const performanceXServer = require('./performance-experiment/server');
 import * as Printer from './printer';
-import * as randomPort from './random-port';
 import {Results} from './types/types';
 const pkg = require('../package.json');
 
@@ -77,24 +76,6 @@ log.setLevel(cliFlags.logLevel);
 
 if (cliFlags.output === Printer.OutputMode[Printer.OutputMode.json] && !cliFlags.outputPath) {
   cliFlags.outputPath = 'stdout';
-}
-
-/**
- * If the requested port is 0, set it to a random, unused port.
- */
-function initPort(flags: Flags): Promise<undefined> {
-  return Promise.resolve().then(() => {
-    if (flags.port !== 0) {
-      log.verbose('Lighthouse CLI', `Using supplied port ${flags.port}`);
-      return;
-    }
-
-    log.verbose('Lighthouse CLI', 'Generating random port.');
-    return randomPort.getRandomPort().then(portNumber => {
-      flags.port = portNumber;
-      log.verbose('Lighthouse CLI', `Using generated port ${flags.port}.`);
-    });
-  });
 }
 
 /**
@@ -196,7 +177,6 @@ export async function runLighthouse(
   let launchedChrome: LaunchedChrome|undefined;
 
   try {
-    await initPort(flags);
     launchedChrome = await getDebuggableChrome(flags);
     flags.port = launchedChrome.port;
     const results = await lighthouse(url, flags, config);
