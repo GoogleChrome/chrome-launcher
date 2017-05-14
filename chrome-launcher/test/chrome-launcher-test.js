@@ -18,17 +18,17 @@
 
 require('../compiled-check.js')('chrome-launcher.js');
 
-const ChromeLauncher = require('../chrome-launcher.js').ChromeLauncher;
+const ChromeLauncher = require('../chrome-launcher.js').Launcher;
 const log = require('../../lighthouse-core/lib/log');
 const assert = require('assert');
 
 /* eslint-env mocha */
 
-describe('ChromeLauncher', () => {
+describe('Launcher', () => {
   it('doesn\'t fail when killed twice', () => {
     log.setLevel('error');
     const chromeInstance = new ChromeLauncher();
-    return chromeInstance.run().then(() => {
+    return chromeInstance.launch().then(() => {
       log.setLevel();
       return Promise.all([chromeInstance.kill(), chromeInstance.kill()]);
     });
@@ -38,10 +38,10 @@ describe('ChromeLauncher', () => {
     log.setLevel('error');
     const chromeInstance = new ChromeLauncher();
     let pid;
-    return chromeInstance.run()
+    return chromeInstance.launch()
         .then(() => {
           pid = chromeInstance.chrome.pid;
-          return chromeInstance.run();
+          return chromeInstance.launch();
         })
         .then(() => {
           log.setLevel();
