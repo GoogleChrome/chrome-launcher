@@ -69,15 +69,15 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
 export class Launcher {
   private tmpDirandPidFileReady = false;
-  pollInterval: number = 500;
-  TMP_PROFILE_DIR: string;
-  outFile?: number;
-  errFile?: number;
-  pidFile: string;
-  startingUrl: string;
-  chromePath?: string;
-  chromeFlags: Array<string>;
-  chrome?: childProcess.ChildProcess;
+  private pollInterval: number = 500;
+  private pidFile: string;
+  private startingUrl: string;
+  private TMP_PROFILE_DIR: string;
+  private outFile?: number;
+  private errFile?: number;
+  private chromePath?: string;
+  private chromeFlags: string[];
+  private chrome?: childProcess.ChildProcess;
   port: number;
   pid?: number;
 
