@@ -63,7 +63,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 }
 
 class ChromeLauncher {
-  prepared = false;
+  private tmpDirandPidFileReady = false;
   pollInterval: number = 500;
   autoSelectChrome: boolean;
   TMP_PROFILE_DIR: string;
@@ -117,7 +117,7 @@ class ChromeLauncher {
 
     log.verbose('ChromeLauncher', `created ${this.TMP_PROFILE_DIR}`);
 
-    this.prepared = true;
+    this.tmpDirandPidFileReady = true;
   }
 
   async launch() {
@@ -132,7 +132,7 @@ class ChromeLauncher {
       }
     }
 
-    if (!this.prepared) {
+    if (!this.tmpDirandPidFileReady) {
       this.prepare();
     }
 
