@@ -198,6 +198,7 @@ export async function runLighthouse(
   try {
     await initPort(flags);
     launchedChrome = await getDebuggableChrome(flags);
+    flags.port = launchedChrome.port;
     const results = await lighthouse(url, flags, config);
 
     const artifacts = results.artifacts;

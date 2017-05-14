@@ -115,7 +115,7 @@ Example: --output-path=./lighthouse-results.html`,
       .default('chrome-flags', '')
       .default('disable-cpu-throttling', false)
       .default('output', GetValidOutputOptions()[OutputMode.domhtml])
-      .default('port', 9222)
+      .default('port', 0)
       .default('max-wait-for-load', Driver.MAX_WAIT_FOR_FULLY_LOADED)
       .check((argv: {listAllAudits?: boolean, listTraceCategories?: boolean, _: Array<any>}) => {
         // Make sure lighthouse has been passed a url, or at least one of --list-all-audits
