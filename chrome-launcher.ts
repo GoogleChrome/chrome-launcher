@@ -64,7 +64,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
   await instance.launch();
 
-  return {pid: instance.pid!, port: instance.port, kill: async () => instance.kill()};
+  return {pid: instance.pid!, port: instance.port!, kill: async () => instance.kill()};
 }
 
 export class Launcher {
@@ -78,14 +78,15 @@ export class Launcher {
   private chromePath?: string;
   private chromeFlags: string[];
   private chrome?: childProcess.ChildProcess;
-  port: number;
+  private requestedPort?: number;
+  port?: number;
   pid?: number;
 
   constructor(opts: Options = {}) {
     // choose the first one (default)
     this.startingUrl = defaults(opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(opts.chromeFlags, []);
-    this.port = defaults(opts.port, 0);
+    this.requestedPort = defaults(opts.port, 0);
     this.chromePath = opts.chromePath;
   }
 
@@ -127,7 +128,9 @@ export class Launcher {
   }
 
   async launch() {
-    if (this.port !== 0) {
+    if (this.requestedPort !== 0) {
+      this.port = this.requestedPort;
+
       // If an explict port is passed first look for an open connection...
       try {
         return await this.isDebuggerReady();
@@ -168,7 +171,7 @@ export class Launcher {
       // is responsible for generating the port number.
       // We do this here so that we can know the port before
       // we pass it into chrome.
-      if (this.port === 0) {
+      if (this.requestedPort === 0) {
         this.port = await getRandomPort();
       }
 
@@ -199,7 +202,7 @@ export class Launcher {
   // resolves if ready, rejects otherwise
   private isDebuggerReady(): Promise<{}> {
     return new Promise((resolve, reject) => {
-      const client = net.createConnection(this.port);
+      const client = net.createConnection(this.port!);
       client.once('error', err => {
         this.cleanup(client);
         reject(err);
