@@ -62,6 +62,13 @@ class SpeedIndexMetric extends Audit {
         throw new Error('Error in Speedline calculating Speed Index (speedIndex of 0).');
       }
 
+      let visuallyReadyInMs = undefined;
+      speedline.frames.forEach(frame => {
+        if (frame.getPerceptualProgress() >= 85 && typeof visuallyReadyInMs === 'undefined') {
+          visuallyReadyInMs = frame.getTimeStamp() - speedline.beginning;
+        }
+      });
+
       // Use the CDF of a log-normal distribution for scoring.
       //  10th Percentile = 2,240
       //  25th Percentile = 3,430
@@ -79,12 +86,14 @@ class SpeedIndexMetric extends Audit {
       const extendedInfo = {
         timings: {
           firstVisualChange: speedline.first,
+          visuallyReady: visuallyReadyInMs,
           visuallyComplete: speedline.complete,
           speedIndex: speedline.speedIndex,
           perceptualSpeedIndex: speedline.perceptualSpeedIndex
         },
         timestamps: {
           firstVisualChange: (speedline.first + speedline.beginning) * 1000,
+          visuallyReady: (visuallyReadyInMs + speedline.beginning) * 1000,
           visuallyComplete: (speedline.complete + speedline.beginning) * 1000,
           speedIndex: (speedline.speedIndex + speedline.beginning) * 1000,
           perceptualSpeedIndex: (speedline.perceptualSpeedIndex + speedline.beginning) * 1000

@@ -1,26 +1,30 @@
 {
   "userAgent": "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5 Build/MRA58N) AppleWebKit/537.36(KHTML, like Gecko) Chrome/59.0.3033.0 Mobile Safari/537.36",
-  "lighthouseVersion": "2.0.0-alpha.1",
-  "generatedTime": "2017-05-01T17:20:14.542Z",
+  "lighthouseVersion": "2.0.0-alpha.4",
+  "generatedTime": "2017-05-11T17:17:14.282Z",
   "initialUrl": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
   "audits": {
     "first-meaningful-paint": {
-      "score": 73,
-      "displayValue": "2911.4ms",
-      "rawValue": 2911.4,
-      "optimalValue": "1,600ms",
+      "score": 67,
+      "displayValue": "3218.1ms",
+      "rawValue": 3218.1,
+      "optimalValue": "< 1,600 ms",
       "extendedInfo": {
         "value": {
           "timestamps": {
-            "navStart": 97474719073,
-            "fCP": 97477630440,
-            "fMP": 97477630447
+            "navStart": 360903135559,
+            "fCP": 360906353680,
+            "fMP": 360906353689,
+            "onLoad": 360906539771,
+            "endOfTrace": 360916726147
           },
           "timings": {
             "navStart": 0,
-            "fCP": 2911.367,
-            "fMP": 2911.374
+            "fCP": 3218.121,
+            "fMP": 3218.13,
+            "onLoad": 3404.212,
+            "endOfTrace": 13590.588
           }
         },
         "formatter": "null"
@@ -32,32 +36,38 @@
       "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
     },
     "speed-index-metric": {
-      "score": 81,
-      "displayValue": "2935",
-      "rawValue": 2935,
-      "optimalValue": "1,250",
+      "score": 78,
+      "displayValue": "3226",
+      "rawValue": 3226,
+      "optimalValue": "< 1,250",
       "extendedInfo": {
         "formatter": "speedline",
         "value": {
           "timings": {
-            "firstVisualChange": 2935,
-            "visuallyComplete": 2935,
-            "speedIndex": 2935.2249999940395,
-            "perceptualSpeedIndex": 2935.2249999940395
+            "firstVisualChange": 3226,
+            "visuallyReady": 3226.121999979019,
+            "visuallyComplete": 3226,
+            "speedIndex": 3226.121999979019,
+            "perceptualSpeedIndex": 3226.121999979019
           },
           "timestamps": {
-            "firstVisualChange": 97477648871,
-            "visuallyComplete": 97477648871,
-            "speedIndex": 97477649096,
-            "perceptualSpeedIndex": 97477649096
+            "firstVisualChange": 360906361559,
+            "visuallyReady": 360906361681,
+            "visuallyComplete": 360906361559,
+            "speedIndex": 360906361681,
+            "perceptualSpeedIndex": 360906361681
           },
           "frames": [
             {
-              "timestamp": 97474713.871,
+              "timestamp": 360903135.559,
               "progress": 0
             },
             {
-              "timestamp": 97477649.096,
+              "timestamp": 360906361.681,
+              "progress": 100
+            },
+            {
+              "timestamp": 360906538.904,
               "progress": 100
             }
           ]
@@ -73,7 +83,7 @@
       "score": 100,
       "displayValue": "16ms",
       "rawValue": 16,
-      "optimalValue": "50ms",
+      "optimalValue": "< 50 ms",
       "extendedInfo": {
         "value": [
           {
@@ -90,11 +100,11 @@
           },
           {
             "percentile": 0.99,
-            "time": 16
+            "time": 89.41036000000713
           },
           {
             "percentile": 1,
-            "time": 22.790999993087098
+            "time": 193.1729999999934
           }
         ],
         "formatter": "null"
@@ -105,52 +115,14 @@
       "description": "Estimated Input Latency",
       "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
     },
-    "consistently-interactive": {
-      "score": 94,
-      "displayValue": "2,920ms",
-      "rawValue": 2918.1649999916553,
-      "optimalValue": "5,000ms",
-      "extendedInfo": {
-        "value": {
-          "cpuQuietPeriod": {
-            "start": 97477637.23799999,
-            "end": 97487654.825
-          },
-          "networkQuietPeriod": {
-            "start": 97475643.806,
-            "end": 97487654.825
-          },
-          "cpuQuietPeriods": [
-            {
-              "start": 97477637.23799999,
-              "end": 97487654.825
-            }
-          ],
-          "networkQuietPeriods": [
-            {
-              "start": 97475643.806,
-              "end": 97487654.825
-            }
-          ],
-          "timestamp": 97477637.23799999,
-          "timeInMs": 2918.1649999916553
-        },
-        "formatter": "null"
-      },
-      "scoringMode": "numeric",
-      "name": "consistently-interactive",
-      "category": "Performance",
-      "description": "Consistently Interactive (beta)",
-      "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
-    },
     "first-interactive": {
-      "score": 94,
-      "displayValue": "2,920ms",
-      "rawValue": 2918.164999991059,
+      "score": 91,
+      "displayValue": "3,400ms",
+      "rawValue": 3402.6619999628065,
       "extendedInfo": {
         "value": {
-          "timeInMs": 2918.164999991059,
-          "timestamp": 97477637237.99998
+          "timeInMs": 3402.6619999628065,
+          "timestamp": 360906538220.99994
         },
         "formatter": "null"
       },
@@ -160,52 +132,109 @@
       "description": "First Interactive (beta)",
       "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
     },
+    "consistently-interactive": {
+      "score": 91,
+      "displayValue": "3,400ms",
+      "rawValue": 3402.661999938965,
+      "extendedInfo": {
+        "value": {
+          "cpuQuietPeriod": {
+            "start": 360906538.22099996,
+            "end": 360916726.147
+          },
+          "networkQuietPeriod": {
+            "start": 360906260.27099997,
+            "end": 360916726.147
+          },
+          "cpuQuietPeriods": [
+            {
+              "start": 360906538.22099996,
+              "end": 360916726.147
+            }
+          ],
+          "networkQuietPeriods": [
+            {
+              "start": 360906260.27099997,
+              "end": 360916726.147
+            }
+          ],
+          "timestamp": 360906538220.99994,
+          "timeInMs": 3402.661999938965
+        },
+        "formatter": "null"
+      },
+      "scoringMode": "numeric",
+      "name": "consistently-interactive",
+      "category": "Performance",
+      "description": "Consistently Interactive (beta)",
+      "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
+    },
     "time-to-interactive": {
-      "score": 83,
-      "displayValue": "2930ms",
-      "rawValue": 2930,
-      "optimalValue": "5,000ms",
+      "score": 76,
+      "displayValue": "3326.1ms",
+      "rawValue": 3326.1,
+      "optimalValue": "< 5,000 ms",
       "extendedInfo": {
         "value": {
           "timings": {
-            "onLoad": 2918.143999993801,
-            "fMP": 2911.374,
-            "visuallyReady": 2930.023,
-            "timeToInteractive": 2930.023,
-            "timeToInteractiveB": 2911.3739999979734,
-            "timeToInteractiveC": 2911.3739999979734,
-            "endOfTrace": 12935.752000004053
+            "onLoad": 3404.2120000123978,
+            "fMP": 3218.13,
+            "visuallyReady": 3226.122,
+            "timeToInteractive": 3326.122,
+            "timeToInteractiveB": 3368.1299999952316,
+            "timeToInteractiveC": 3218.1299999952316,
+            "endOfTrace": 13590.587999999523
           },
           "timestamps": {
-            "onLoad": 97477637217,
-            "fMP": 97477630447,
-            "visuallyReady": 97477649096,
-            "timeToInteractive": 97477649096,
-            "timeToInteractiveB": 97477630447,
-            "timeToInteractiveC": 97477630447,
-            "endOfTrace": 97487654825
+            "onLoad": 360906539771,
+            "fMP": 360906353689,
+            "visuallyReady": 360906361681,
+            "timeToInteractive": 360906461681,
+            "timeToInteractiveB": 360906503689,
+            "timeToInteractiveC": 360906353689,
+            "endOfTrace": 360916726147
           },
           "latencies": {
             "timeToInteractive": [
               {
-                "estLatency": 16,
-                "startTime": "2930.0"
+                "estLatency": 142.53999998378708,
+                "startTime": "3226.1"
+              },
+              {
+                "estLatency": 92.53999998378708,
+                "startTime": "3276.1"
+              },
+              {
+                "estLatency": 42.539999983787084,
+                "startTime": "3326.1"
               }
             ],
             "timeToInteractiveB": [
               {
-                "estLatency": 16,
-                "startTime": "2911.4"
+                "estLatency": 143.17299999999972,
+                "startTime": "3218.1"
+              },
+              {
+                "estLatency": 100.53199996757462,
+                "startTime": "3268.1"
+              },
+              {
+                "estLatency": 50.53199996757462,
+                "startTime": "3318.1"
+              },
+              {
+                "estLatency": 16.42571428339819,
+                "startTime": "3368.1"
               }
             ],
             "timeToInteractiveC": [
               {
                 "estLatency": 16,
-                "startTime": "2911.4"
+                "startTime": "3218.1"
               }
             ]
           },
-          "expectedLatencyAtTTI": 16
+          "expectedLatencyAtTTI": 42.54
         },
         "formatter": "null"
       },
@@ -232,128 +261,138 @@
     },
     "critical-request-chains": {
       "score": false,
-      "displayValue": "11",
+      "displayValue": "12",
       "rawValue": false,
       "optimalValue": 0,
       "extendedInfo": {
         "formatter": "critical-request-chains",
         "value": {
           "chains": {
-            "56558.1": {
+            "53431.1": {
               "request": {
                 "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                "startTime": 97474.721204,
-                "endTime": 97474.920719,
-                "responseReceivedTime": 97474.87803,
-                "transferSize": 10248
+                "startTime": 360903.137836,
+                "endTime": 360903.341978,
+                "responseReceivedTime": 360903.299006,
+                "transferSize": 10511
               },
               "children": {
-                "56558.3": {
+                "53431.2": {
                   "request": {
-                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                    "startTime": 97474.912176,
-                    "endTime": 97475.064202,
-                    "responseReceivedTime": 97475.063783,
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                    "startTime": 360903.334926,
+                    "endTime": 360905.373365,
+                    "responseReceivedTime": 360905.372944,
                     "transferSize": 859
                   },
                   "children": {}
                 },
-                "56558.4": {
+                "53431.3": {
+                  "request": {
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
+                    "startTime": 360903.337748,
+                    "endTime": 360903.492647,
+                    "responseReceivedTime": 360903.492073,
+                    "transferSize": 859
+                  },
+                  "children": {}
+                },
+                "53431.4": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                    "startTime": 97474.912743,
-                    "endTime": 97475.136436,
-                    "responseReceivedTime": 97475.135316,
+                    "startTime": 360903.337965,
+                    "endTime": 360903.557522,
+                    "responseReceivedTime": 360903.556451,
                     "transferSize": 139
                   },
                   "children": {}
                 },
-                "56558.6": {
+                "53431.5": {
                   "request": {
-                    "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                    "startTime": 97474.913846,
-                    "endTime": 97475.142785,
-                    "responseReceivedTime": 97475.142385,
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
+                    "startTime": 360903.338157,
+                    "endTime": 360905.574069,
+                    "responseReceivedTime": 360905.573613,
+                    "transferSize": 859
+                  },
+                  "children": {}
+                },
+                "53431.6": {
+                  "request": {
+                    "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
+                    "startTime": 360903.338392,
+                    "endTime": 360903.570907,
+                    "responseReceivedTime": 360903.570548,
                     "transferSize": 1146
                   },
                   "children": {}
                 },
-                "56558.7": {
+                "53431.7": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                    "startTime": 97474.914545,
-                    "endTime": 97475.150054,
-                    "responseReceivedTime": 97475.149634,
+                    "startTime": 360903.339044,
+                    "endTime": 360903.706811,
+                    "responseReceivedTime": 360903.706456,
                     "transferSize": 770
                   },
                   "children": {}
                 },
-                "56558.18": {
+                "53431.8": {
                   "request": {
-                    "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                    "startTime": 97474.923571,
-                    "endTime": 97475.250793,
-                    "responseReceivedTime": 97475.078126,
-                    "transferSize": 31671
-                  },
-                  "children": {}
-                },
-                "56558.8": {
-                  "request": {
-                    "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                    "startTime": 97474.915097,
-                    "endTime": 97475.27159,
-                    "responseReceivedTime": 97475.27117,
+                    "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200&isasync",
+                    "startTime": 360903.339465,
+                    "endTime": 360903.764529,
+                    "responseReceivedTime": 360903.764156,
                     "transferSize": 767
                   },
                   "children": {}
                 },
-                "56558.9": {
+                "53431.9": {
+                  "request": {
+                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=3000&async=true",
+                    "startTime": 360903.339704,
+                    "endTime": 360906.367565,
+                    "responseReceivedTime": 360906.367106,
+                    "transferSize": 859
+                  },
+                  "children": {}
+                },
+                "53431.10": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                    "startTime": 97474.915832,
-                    "endTime": 97475.307023,
-                    "responseReceivedTime": 97475.292842,
+                    "startTime": 360903.340348,
+                    "endTime": 360903.749569,
+                    "responseReceivedTime": 360903.735216,
                     "transferSize": 1630
                   },
                   "children": {}
                 },
-                "56558.17": {
+                "53431.18": {
                   "request": {
                     "url": "http://localhost:10200/zone.js",
-                    "startTime": 97474.923069,
-                    "endTime": 97475.643806,
-                    "responseReceivedTime": 97475.299911,
+                    "startTime": 360903.349782,
+                    "endTime": 360904.20042,
+                    "responseReceivedTime": 360903.863811,
                     "transferSize": 71654
                   },
                   "children": {}
                 },
-                "56558.2": {
+                "53431.19": {
                   "request": {
-                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                    "startTime": 97474.910331,
-                    "endTime": 97476.916449,
-                    "responseReceivedTime": 97476.916083,
-                    "transferSize": 859
+                    "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                    "startTime": 360903.350326,
+                    "endTime": 360903.743462,
+                    "responseReceivedTime": 360903.577709,
+                    "transferSize": 31671
                   },
                   "children": {}
                 },
-                "56558.5": {
-                  "request": {
-                    "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                    "startTime": 97474.91353,
-                    "endTime": 97477.124557,
-                    "responseReceivedTime": 97477.124185,
-                    "transferSize": 859
-                  },
-                  "children": {}
-                },
-                "56558.21": {
+                "53431.22": {
                   "request": {
                     "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                    "startTime": 97477.154674,
-                    "endTime": 97477.367462,
-                    "responseReceivedTime": 97477.367121,
+                    "startTime": 360906.043217,
+                    "endTime": 360906.260271,
+                    "responseReceivedTime": 360906.259792,
                     "transferSize": 859
                   },
                   "children": {}
@@ -362,7 +401,7 @@
             }
           },
           "longestChain": {
-            "duration": 2646.257999993395,
+            "duration": 3229.7290000133216,
             "length": 2,
             "transferSize": 859
           }
@@ -377,9 +416,9 @@
     },
     "total-byte-weight": {
       "score": 100,
-      "displayValue": "Total size was 129 KB",
-      "rawValue": 131709,
-      "optimalValue": "1,600 KB",
+      "displayValue": "Total size was 130 KB",
+      "rawValue": 133319,
+      "optimalValue": "< 1,600 KB",
       "extendedInfo": {
         "formatter": "table",
         "value": {
@@ -388,23 +427,23 @@
               "url": "/zone.js",
               "totalBytes": 71654,
               "totalKb": "70 KB",
-              "totalMs": "340ms"
+              "totalMs": "330ms"
             },
             {
               "url": "…3.2.1/jquery.min.js",
               "totalBytes": 31671,
               "totalKb": "31 KB",
-              "totalMs": "150ms"
+              "totalMs": "140ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10248,
+              "totalBytes": 10511,
               "totalKb": "10 KB",
               "totalMs": "50ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10248,
+              "totalBytes": 10511,
               "totalKb": "10 KB",
               "totalMs": "50ms"
             },
@@ -415,7 +454,7 @@
               "totalMs": "10ms"
             },
             {
-              "url": "/dobetterweb/dbw_disabled.css?delay=200",
+              "url": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
               "totalBytes": 1146,
               "totalKb": "1 KB",
               "totalMs": "10ms"
@@ -427,7 +466,7 @@
               "totalMs": "0ms"
             },
             {
-              "url": "/dobetterweb/dbw_tester.css?delay=2200",
+              "url": "/dobetterweb/dbw_tester.css?delay=3000&async=true",
               "totalBytes": 859,
               "totalKb": "1 KB",
               "totalMs": "0ms"
@@ -439,7 +478,7 @@
               "totalMs": "0ms"
             },
             {
-              "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+              "url": "/dobetterweb/dbw_tester.css?delay=2200",
               "totalBytes": 859,
               "totalKb": "1 KB",
               "totalMs": "0ms"
@@ -453,26 +492,190 @@
         }
       },
       "scoringMode": "numeric",
-      "informative": true,
       "name": "total-byte-weight",
       "category": "Network",
       "description": "Avoids enormous network payloads",
-      "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+      "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files.",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Total Size"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Transfer Time"
+          }
+        ],
+        "items": [
+          [
+            {
+              "type": "url",
+              "text": "/zone.js"
+            },
+            {
+              "type": "text",
+              "text": "70 KB"
+            },
+            {
+              "type": "text",
+              "text": "330ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "…3.2.1/jquery.min.js"
+            },
+            {
+              "type": "text",
+              "text": "31 KB"
+            },
+            {
+              "type": "text",
+              "text": "140ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.html"
+            },
+            {
+              "type": "text",
+              "text": "10 KB"
+            },
+            {
+              "type": "text",
+              "text": "50ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.html"
+            },
+            {
+              "type": "text",
+              "text": "10 KB"
+            },
+            {
+              "type": "text",
+              "text": "50ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.js"
+            },
+            {
+              "type": "text",
+              "text": "2 KB"
+            },
+            {
+              "type": "text",
+              "text": "10ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "10ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?delay=100"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "0ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?delay=3000&async=true"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "0ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "0ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?delay=2200"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "0ms"
+            }
+          ]
+        ]
+      }
     },
     "uses-optimized-images": {
-      "score": true,
+      "score": 100,
       "displayValue": "",
-      "rawValue": true,
+      "rawValue": 0,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 0,
+          "wastedKb": 0,
           "results": [],
           "tableHeadings": {
             "preview": "",
             "url": "URL",
             "totalKb": "Original",
-            "webpSavings": "WebP Savings",
-            "jpegSavings": "JPEG Savings"
+            "webpSavings": "Savings as WebP",
+            "jpegSavings": "Savings as JPEG"
           }
         }
       },
@@ -480,34 +683,68 @@
       "informative": true,
       "name": "uses-optimized-images",
       "category": "Images",
-      "description": "Unoptimized images",
-      "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+      "description": "Optimize images",
+      "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization).",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "thumbnail",
+            "text": ""
+          },
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Original"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Savings as WebP"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Savings as JPEG"
+          }
+        ],
+        "items": []
+      }
     },
     "uses-request-compression": {
-      "score": false,
-      "displayValue": "Potential savings of 61 KB (~300ms)",
-      "rawValue": false,
+      "score": 90,
+      "displayValue": "Potential savings of 62 KB (~290ms)",
+      "rawValue": 290,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 290,
+          "wastedKb": 62,
           "results": [
             {
               "url": "/zone.js",
               "totalBytes": 71501,
               "wastedBytes": 56204,
               "wastedPercent": 78.6058936238654,
-              "potentialSavings": "55 KB _79%_",
+              "potentialSavings": "55 KB (79%)",
               "wastedKb": "55 KB",
               "wastedMs": "260ms",
               "totalKb": "70 KB",
-              "totalMs": "340ms"
+              "totalMs": "330ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.html",
-              "totalBytes": 10127,
-              "wastedBytes": 6750,
-              "wastedPercent": 66.6535005431026,
-              "potentialSavings": "7 KB _67%_",
+              "totalBytes": 10390,
+              "wastedBytes": 6935,
+              "wastedPercent": 66.74687199230029,
+              "potentialSavings": "7 KB (67%)",
               "wastedKb": "7 KB",
               "wastedMs": "30ms",
               "totalKb": "10 KB",
@@ -522,18 +759,72 @@
         }
       },
       "scoringMode": "binary",
+      "informative": true,
       "name": "uses-request-compression",
       "category": "Performance",
-      "description": "Compression enabled for server responses",
-      "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
+      "description": "Enable text compression",
+      "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer).",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "Uncompressed resource URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Original"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "GZIP Savings"
+          }
+        ],
+        "items": [
+          [
+            {
+              "type": "url",
+              "text": "/zone.js"
+            },
+            {
+              "type": "text",
+              "text": "70 KB"
+            },
+            {
+              "type": "text",
+              "text": "55 KB (79%)"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.html"
+            },
+            {
+              "type": "text",
+              "text": "10 KB"
+            },
+            {
+              "type": "text",
+              "text": "7 KB (67%)"
+            }
+          ]
+        ]
+      }
     },
     "uses-responsive-images": {
-      "score": true,
+      "score": 100,
       "displayValue": "",
-      "rawValue": true,
+      "rawValue": 0,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 0,
+          "wastedKb": 0,
           "results": [],
           "tableHeadings": {
             "preview": "",
@@ -547,20 +838,47 @@
       "informative": true,
       "name": "uses-responsive-images",
       "category": "Images",
-      "description": "Oversized images",
-      "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+      "description": "Properly size images",
+      "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints).",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "thumbnail",
+            "text": ""
+          },
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Original"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Potential Savings"
+          }
+        ],
+        "items": []
+      }
     },
     "dom-size": {
       "score": 100,
-      "displayValue": "34 nodes",
-      "rawValue": 34,
-      "optimalValue": "1,500 nodes",
+      "displayValue": "35 nodes",
+      "rawValue": 35,
+      "optimalValue": "< 1,500 nodes",
       "extendedInfo": {
         "formatter": "cards",
         "value": [
           {
             "title": "Total DOM Nodes",
-            "value": "34",
+            "value": "35",
             "target": "< 1,500 nodes"
           },
           {
@@ -571,7 +889,7 @@
           },
           {
             "title": "Maximum Children",
-            "value": "21",
+            "value": "22",
             "snippet": "Element with most children:\nhead",
             "target": "< 60 nodes"
           }
@@ -591,7 +909,7 @@
         "items": [
           {
             "title": "Total DOM Nodes",
-            "value": "34",
+            "value": "35",
             "target": "< 1,500 nodes"
           },
           {
@@ -602,7 +920,7 @@
           },
           {
             "title": "Maximum Children",
-            "value": "21",
+            "value": "22",
             "snippet": "Element with most children:\nhead",
             "target": "< 60 nodes"
           }
@@ -610,32 +928,33 @@
       }
     },
     "link-blocking-first-paint": {
-      "score": false,
-      "displayValue": "4 resources delayed first paint by 2209ms",
-      "rawValue": false,
+      "score": 0,
+      "displayValue": "4 resources delayed first paint by 2236ms",
+      "rawValue": 2236,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 2236,
           "results": [
             {
               "url": "/dobetterweb/dbw_tester.css?delay=100",
               "totalKb": "1 KB",
-              "totalMs": "107ms"
+              "totalMs": "155ms"
             },
             {
               "url": "/dobetterweb/unknown404.css?delay=200",
               "totalKb": "0 KB",
-              "totalMs": "207ms"
+              "totalMs": "220ms"
             },
             {
               "url": "/dobetterweb/dbw_tester.css?delay=2200",
               "totalKb": "1 KB",
-              "totalMs": "2209ms"
+              "totalMs": "2236ms"
             },
             {
               "url": "/dobetterweb/dbw_partial_a.html?delay=200",
               "totalKb": "1 KB",
-              "totalMs": "208ms"
+              "totalMs": "369ms"
             }
           ],
           "tableHeadings": {
@@ -649,21 +968,101 @@
       "informative": true,
       "name": "link-blocking-first-paint",
       "category": "Performance",
-      "description": "Render-blocking stylesheets",
-      "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+      "description": "Reduce render-blocking stylesheets",
+      "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Size (KB)"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Delayed Paint By (ms)"
+          }
+        ],
+        "items": [
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?delay=100"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "155ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/unknown404.css?delay=200"
+            },
+            {
+              "type": "text",
+              "text": "0 KB"
+            },
+            {
+              "type": "text",
+              "text": "220ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.css?delay=2200"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "2236ms"
+            }
+          ],
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_partial_a.html?delay=200"
+            },
+            {
+              "type": "text",
+              "text": "1 KB"
+            },
+            {
+              "type": "text",
+              "text": "369ms"
+            }
+          ]
+        ]
+      }
     },
     "script-blocking-first-paint": {
-      "score": false,
-      "displayValue": "1 resource delayed first paint by 209ms",
-      "rawValue": false,
+      "score": 65,
+      "displayValue": "1 resource delayed first paint by 409ms",
+      "rawValue": 409,
       "extendedInfo": {
         "formatter": "table",
         "value": {
+          "wastedMs": 409,
           "results": [
             {
               "url": "/dobetterweb/dbw_tester.js",
               "totalKb": "2 KB",
-              "totalMs": "209ms"
+              "totalMs": "409ms"
             }
           ],
           "tableHeadings": {
@@ -677,8 +1076,45 @@
       "informative": true,
       "name": "script-blocking-first-paint",
       "category": "Performance",
-      "description": "Render-blocking scripts",
-      "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+      "description": "Reduce render-blocking scripts",
+      "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+      "details": {
+        "type": "table",
+        "header": "View Details",
+        "itemHeaders": [
+          {
+            "type": "text",
+            "itemType": "url",
+            "text": "URL"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Size (KB)"
+          },
+          {
+            "type": "text",
+            "itemType": "text",
+            "text": "Delayed Paint By (ms)"
+          }
+        ],
+        "items": [
+          [
+            {
+              "type": "url",
+              "text": "/dobetterweb/dbw_tester.js"
+            },
+            {
+              "type": "text",
+              "text": "2 KB"
+            },
+            {
+              "type": "text",
+              "text": "409ms"
+            }
+          ]
+        ]
+      }
     }
   },
   "runtimeConfig": {
@@ -710,22 +1146,27 @@
         {
           "id": "first-meaningful-paint",
           "weight": 5,
+          "group": "perf-metric",
           "result": {
-            "score": 73,
-            "displayValue": "2911.4ms",
-            "rawValue": 2911.4,
-            "optimalValue": "1,600ms",
+            "score": 67,
+            "displayValue": "3218.1ms",
+            "rawValue": 3218.1,
+            "optimalValue": "< 1,600 ms",
             "extendedInfo": {
               "value": {
                 "timestamps": {
-                  "navStart": 97474719073,
-                  "fCP": 97477630440,
-                  "fMP": 97477630447
+                  "navStart": 360903135559,
+                  "fCP": 360906353680,
+                  "fMP": 360906353689,
+                  "onLoad": 360906539771,
+                  "endOfTrace": 360916726147
                 },
                 "timings": {
                   "navStart": 0,
-                  "fCP": 2911.367,
-                  "fMP": 2911.374
+                  "fCP": 3218.121,
+                  "fMP": 3218.13,
+                  "onLoad": 3404.212,
+                  "endOfTrace": 13590.588
                 }
               },
               "formatter": "null"
@@ -736,38 +1177,45 @@
             "description": "First meaningful paint",
             "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
           },
-          "score": 73
+          "score": 67
         },
         {
           "id": "speed-index-metric",
           "weight": 1,
+          "group": "perf-metric",
           "result": {
-            "score": 81,
-            "displayValue": "2935",
-            "rawValue": 2935,
-            "optimalValue": "1,250",
+            "score": 78,
+            "displayValue": "3226",
+            "rawValue": 3226,
+            "optimalValue": "< 1,250",
             "extendedInfo": {
               "formatter": "speedline",
               "value": {
                 "timings": {
-                  "firstVisualChange": 2935,
-                  "visuallyComplete": 2935,
-                  "speedIndex": 2935.2249999940395,
-                  "perceptualSpeedIndex": 2935.2249999940395
+                  "firstVisualChange": 3226,
+                  "visuallyReady": 3226.121999979019,
+                  "visuallyComplete": 3226,
+                  "speedIndex": 3226.121999979019,
+                  "perceptualSpeedIndex": 3226.121999979019
                 },
                 "timestamps": {
-                  "firstVisualChange": 97477648871,
-                  "visuallyComplete": 97477648871,
-                  "speedIndex": 97477649096,
-                  "perceptualSpeedIndex": 97477649096
+                  "firstVisualChange": 360906361559,
+                  "visuallyReady": 360906361681,
+                  "visuallyComplete": 360906361559,
+                  "speedIndex": 360906361681,
+                  "perceptualSpeedIndex": 360906361681
                 },
                 "frames": [
                   {
-                    "timestamp": 97474713.871,
+                    "timestamp": 360903135.559,
                     "progress": 0
                   },
                   {
-                    "timestamp": 97477649.096,
+                    "timestamp": 360906361.681,
+                    "progress": 100
+                  },
+                  {
+                    "timestamp": 360906538.904,
                     "progress": 100
                   }
                 ]
@@ -779,16 +1227,17 @@
             "description": "Perceptual Speed Index",
             "helpText": "Speed Index shows how quickly the contents of a page are visibly populated. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/speed-index)."
           },
-          "score": 81
+          "score": 78
         },
         {
           "id": "estimated-input-latency",
           "weight": 1,
+          "group": "perf-metric",
           "result": {
             "score": 100,
             "displayValue": "16ms",
             "rawValue": 16,
-            "optimalValue": "50ms",
+            "optimalValue": "< 50 ms",
             "extendedInfo": {
               "value": [
                 {
@@ -805,11 +1254,11 @@
                 },
                 {
                   "percentile": 0.99,
-                  "time": 16
+                  "time": 89.41036000000713
                 },
                 {
                   "percentile": 1,
-                  "time": 22.790999993087098
+                  "time": 193.1729999999934
                 }
               ],
               "formatter": "null"
@@ -825,52 +1274,73 @@
         {
           "id": "time-to-interactive",
           "weight": 5,
+          "group": "perf-metric",
           "result": {
-            "score": 83,
-            "displayValue": "2930ms",
-            "rawValue": 2930,
-            "optimalValue": "5,000ms",
+            "score": 76,
+            "displayValue": "3326.1ms",
+            "rawValue": 3326.1,
+            "optimalValue": "< 5,000 ms",
             "extendedInfo": {
               "value": {
                 "timings": {
-                  "onLoad": 2918.143999993801,
-                  "fMP": 2911.374,
-                  "visuallyReady": 2930.023,
-                  "timeToInteractive": 2930.023,
-                  "timeToInteractiveB": 2911.3739999979734,
-                  "timeToInteractiveC": 2911.3739999979734,
-                  "endOfTrace": 12935.752000004053
+                  "onLoad": 3404.2120000123978,
+                  "fMP": 3218.13,
+                  "visuallyReady": 3226.122,
+                  "timeToInteractive": 3326.122,
+                  "timeToInteractiveB": 3368.1299999952316,
+                  "timeToInteractiveC": 3218.1299999952316,
+                  "endOfTrace": 13590.587999999523
                 },
                 "timestamps": {
-                  "onLoad": 97477637217,
-                  "fMP": 97477630447,
-                  "visuallyReady": 97477649096,
-                  "timeToInteractive": 97477649096,
-                  "timeToInteractiveB": 97477630447,
-                  "timeToInteractiveC": 97477630447,
-                  "endOfTrace": 97487654825
+                  "onLoad": 360906539771,
+                  "fMP": 360906353689,
+                  "visuallyReady": 360906361681,
+                  "timeToInteractive": 360906461681,
+                  "timeToInteractiveB": 360906503689,
+                  "timeToInteractiveC": 360906353689,
+                  "endOfTrace": 360916726147
                 },
                 "latencies": {
                   "timeToInteractive": [
                     {
-                      "estLatency": 16,
-                      "startTime": "2930.0"
+                      "estLatency": 142.53999998378708,
+                      "startTime": "3226.1"
+                    },
+                    {
+                      "estLatency": 92.53999998378708,
+                      "startTime": "3276.1"
+                    },
+                    {
+                      "estLatency": 42.539999983787084,
+                      "startTime": "3326.1"
                     }
                   ],
                   "timeToInteractiveB": [
                     {
-                      "estLatency": 16,
-                      "startTime": "2911.4"
+                      "estLatency": 143.17299999999972,
+                      "startTime": "3218.1"
+                    },
+                    {
+                      "estLatency": 100.53199996757462,
+                      "startTime": "3268.1"
+                    },
+                    {
+                      "estLatency": 50.53199996757462,
+                      "startTime": "3318.1"
+                    },
+                    {
+                      "estLatency": 16.42571428339819,
+                      "startTime": "3368.1"
                     }
                   ],
                   "timeToInteractiveC": [
                     {
                       "estLatency": 16,
-                      "startTime": "2911.4"
+                      "startTime": "3218.1"
                     }
                   ]
                 },
-                "expectedLatencyAtTTI": 16
+                "expectedLatencyAtTTI": 42.54
               },
               "formatter": "null"
             },
@@ -880,62 +1350,20 @@
             "description": "Time To Interactive (alpha)",
             "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
           },
-          "score": 83
-        },
-        {
-          "id": "consistently-interactive",
-          "weight": 5,
-          "result": {
-            "score": 94,
-            "displayValue": "2,920ms",
-            "rawValue": 2918.1649999916553,
-            "optimalValue": "5,000ms",
-            "extendedInfo": {
-              "value": {
-                "cpuQuietPeriod": {
-                  "start": 97477637.23799999,
-                  "end": 97487654.825
-                },
-                "networkQuietPeriod": {
-                  "start": 97475643.806,
-                  "end": 97487654.825
-                },
-                "cpuQuietPeriods": [
-                  {
-                    "start": 97477637.23799999,
-                    "end": 97487654.825
-                  }
-                ],
-                "networkQuietPeriods": [
-                  {
-                    "start": 97475643.806,
-                    "end": 97487654.825
-                  }
-                ],
-                "timestamp": 97477637.23799999,
-                "timeInMs": 2918.1649999916553
-              },
-              "formatter": "null"
-            },
-            "scoringMode": "numeric",
-            "name": "consistently-interactive",
-            "category": "Performance",
-            "description": "Consistently Interactive (beta)",
-            "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
-          },
-          "score": 94
+          "score": 76
         },
         {
           "id": "first-interactive",
           "weight": 5,
+          "group": "perf-metric",
           "result": {
-            "score": 94,
-            "displayValue": "2,920ms",
-            "rawValue": 2918.164999991059,
+            "score": 91,
+            "displayValue": "3,400ms",
+            "rawValue": 3402.6619999628065,
             "extendedInfo": {
               "value": {
-                "timeInMs": 2918.164999991059,
-                "timestamp": 97477637237.99998
+                "timeInMs": 3402.6619999628065,
+                "timestamp": 360906538220.99994
               },
               "formatter": "null"
             },
@@ -945,38 +1373,83 @@
             "description": "First Interactive (beta)",
             "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
           },
-          "score": 94
+          "score": 91
+        },
+        {
+          "id": "consistently-interactive",
+          "weight": 5,
+          "group": "perf-metric",
+          "result": {
+            "score": 91,
+            "displayValue": "3,400ms",
+            "rawValue": 3402.661999938965,
+            "extendedInfo": {
+              "value": {
+                "cpuQuietPeriod": {
+                  "start": 360906538.22099996,
+                  "end": 360916726.147
+                },
+                "networkQuietPeriod": {
+                  "start": 360906260.27099997,
+                  "end": 360916726.147
+                },
+                "cpuQuietPeriods": [
+                  {
+                    "start": 360906538.22099996,
+                    "end": 360916726.147
+                  }
+                ],
+                "networkQuietPeriods": [
+                  {
+                    "start": 360906260.27099997,
+                    "end": 360916726.147
+                  }
+                ],
+                "timestamp": 360906538220.99994,
+                "timeInMs": 3402.661999938965
+              },
+              "formatter": "null"
+            },
+            "scoringMode": "numeric",
+            "name": "consistently-interactive",
+            "category": "Performance",
+            "description": "Consistently Interactive (beta)",
+            "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
+          },
+          "score": 91
         },
         {
           "id": "link-blocking-first-paint",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": false,
-            "displayValue": "4 resources delayed first paint by 2209ms",
-            "rawValue": false,
+            "score": 0,
+            "displayValue": "4 resources delayed first paint by 2236ms",
+            "rawValue": 2236,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 2236,
                 "results": [
                   {
                     "url": "/dobetterweb/dbw_tester.css?delay=100",
                     "totalKb": "1 KB",
-                    "totalMs": "107ms"
+                    "totalMs": "155ms"
                   },
                   {
                     "url": "/dobetterweb/unknown404.css?delay=200",
                     "totalKb": "0 KB",
-                    "totalMs": "207ms"
+                    "totalMs": "220ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.css?delay=2200",
                     "totalKb": "1 KB",
-                    "totalMs": "2209ms"
+                    "totalMs": "2236ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_partial_a.html?delay=200",
                     "totalKb": "1 KB",
-                    "totalMs": "208ms"
+                    "totalMs": "369ms"
                   }
                 ],
                 "tableHeadings": {
@@ -990,26 +1463,107 @@
             "informative": true,
             "name": "link-blocking-first-paint",
             "category": "Performance",
-            "description": "Render-blocking stylesheets",
-            "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+            "description": "Reduce render-blocking stylesheets",
+            "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Size (KB)"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Delayed Paint By (ms)"
+                }
+              ],
+              "items": [
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?delay=100"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "155ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/unknown404.css?delay=200"
+                  },
+                  {
+                    "type": "text",
+                    "text": "0 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "220ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?delay=2200"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2236ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_partial_a.html?delay=200"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "369ms"
+                  }
+                ]
+              ]
+            }
           },
           "score": 0
         },
         {
           "id": "script-blocking-first-paint",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": false,
-            "displayValue": "1 resource delayed first paint by 209ms",
-            "rawValue": false,
+            "score": 65,
+            "displayValue": "1 resource delayed first paint by 409ms",
+            "rawValue": 409,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 409,
                 "results": [
                   {
                     "url": "/dobetterweb/dbw_tester.js",
                     "totalKb": "2 KB",
-                    "totalMs": "209ms"
+                    "totalMs": "409ms"
                   }
                 ],
                 "tableHeadings": {
@@ -1023,28 +1577,68 @@
             "informative": true,
             "name": "script-blocking-first-paint",
             "category": "Performance",
-            "description": "Render-blocking scripts",
-            "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+            "description": "Reduce render-blocking scripts",
+            "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Size (KB)"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Delayed Paint By (ms)"
+                }
+              ],
+              "items": [
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.js"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "409ms"
+                  }
+                ]
+              ]
+            }
           },
-          "score": 0
+          "score": 65
         },
         {
           "id": "uses-optimized-images",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": true,
+            "score": 100,
             "displayValue": "",
-            "rawValue": true,
+            "rawValue": 0,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 0,
+                "wastedKb": 0,
                 "results": [],
                 "tableHeadings": {
                   "preview": "",
                   "url": "URL",
                   "totalKb": "Original",
-                  "webpSavings": "WebP Savings",
-                  "jpegSavings": "JPEG Savings"
+                  "webpSavings": "Savings as WebP",
+                  "jpegSavings": "Savings as JPEG"
                 }
               }
             },
@@ -1052,39 +1646,74 @@
             "informative": true,
             "name": "uses-optimized-images",
             "category": "Images",
-            "description": "Unoptimized images",
-            "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+            "description": "Optimize images",
+            "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization).",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "thumbnail",
+                  "text": ""
+                },
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Original"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Savings as WebP"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Savings as JPEG"
+                }
+              ],
+              "items": []
+            }
           },
           "score": 100
         },
         {
           "id": "uses-request-compression",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": false,
-            "displayValue": "Potential savings of 61 KB (~300ms)",
-            "rawValue": false,
+            "score": 90,
+            "displayValue": "Potential savings of 62 KB (~290ms)",
+            "rawValue": 290,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 290,
+                "wastedKb": 62,
                 "results": [
                   {
                     "url": "/zone.js",
                     "totalBytes": 71501,
                     "wastedBytes": 56204,
                     "wastedPercent": 78.6058936238654,
-                    "potentialSavings": "55 KB _79%_",
+                    "potentialSavings": "55 KB (79%)",
                     "wastedKb": "55 KB",
                     "wastedMs": "260ms",
                     "totalKb": "70 KB",
-                    "totalMs": "340ms"
+                    "totalMs": "330ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10127,
-                    "wastedBytes": 6750,
-                    "wastedPercent": 66.6535005431026,
-                    "potentialSavings": "7 KB _67%_",
+                    "totalBytes": 10390,
+                    "wastedBytes": 6935,
+                    "wastedPercent": 66.74687199230029,
+                    "potentialSavings": "7 KB (67%)",
                     "wastedKb": "7 KB",
                     "wastedMs": "30ms",
                     "totalKb": "10 KB",
@@ -1099,23 +1728,78 @@
               }
             },
             "scoringMode": "binary",
+            "informative": true,
             "name": "uses-request-compression",
             "category": "Performance",
-            "description": "Compression enabled for server responses",
-            "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
+            "description": "Enable text compression",
+            "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer).",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "Uncompressed resource URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Original"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "GZIP Savings"
+                }
+              ],
+              "items": [
+                [
+                  {
+                    "type": "url",
+                    "text": "/zone.js"
+                  },
+                  {
+                    "type": "text",
+                    "text": "70 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "55 KB (79%)"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.html"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "7 KB (67%)"
+                  }
+                ]
+              ]
+            }
           },
-          "score": 0
+          "score": 90
         },
         {
           "id": "uses-responsive-images",
           "weight": 0,
+          "group": "perf-hint",
           "result": {
-            "score": true,
+            "score": 100,
             "displayValue": "",
-            "rawValue": true,
+            "rawValue": 0,
             "extendedInfo": {
               "formatter": "table",
               "value": {
+                "wastedMs": 0,
+                "wastedKb": 0,
                 "results": [],
                 "tableHeadings": {
                   "preview": "",
@@ -1129,19 +1813,47 @@
             "informative": true,
             "name": "uses-responsive-images",
             "category": "Images",
-            "description": "Oversized images",
-            "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+            "description": "Properly size images",
+            "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints).",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "thumbnail",
+                  "text": ""
+                },
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Original"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Potential Savings"
+                }
+              ],
+              "items": []
+            }
           },
           "score": 100
         },
         {
           "id": "total-byte-weight",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": 100,
-            "displayValue": "Total size was 129 KB",
-            "rawValue": 131709,
-            "optimalValue": "1,600 KB",
+            "displayValue": "Total size was 130 KB",
+            "rawValue": 133319,
+            "optimalValue": "< 1,600 KB",
             "extendedInfo": {
               "formatter": "table",
               "value": {
@@ -1150,23 +1862,23 @@
                     "url": "/zone.js",
                     "totalBytes": 71654,
                     "totalKb": "70 KB",
-                    "totalMs": "340ms"
+                    "totalMs": "330ms"
                   },
                   {
                     "url": "…3.2.1/jquery.min.js",
                     "totalBytes": 31671,
                     "totalKb": "31 KB",
-                    "totalMs": "150ms"
+                    "totalMs": "140ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10248,
+                    "totalBytes": 10511,
                     "totalKb": "10 KB",
                     "totalMs": "50ms"
                   },
                   {
                     "url": "/dobetterweb/dbw_tester.html",
-                    "totalBytes": 10248,
+                    "totalBytes": 10511,
                     "totalKb": "10 KB",
                     "totalMs": "50ms"
                   },
@@ -1177,7 +1889,7 @@
                     "totalMs": "10ms"
                   },
                   {
-                    "url": "/dobetterweb/dbw_disabled.css?delay=200",
+                    "url": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
                     "totalBytes": 1146,
                     "totalKb": "1 KB",
                     "totalMs": "10ms"
@@ -1189,7 +1901,7 @@
                     "totalMs": "0ms"
                   },
                   {
-                    "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                    "url": "/dobetterweb/dbw_tester.css?delay=3000&async=true",
                     "totalBytes": 859,
                     "totalKb": "1 KB",
                     "totalMs": "0ms"
@@ -1201,7 +1913,7 @@
                     "totalMs": "0ms"
                   },
                   {
-                    "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                    "url": "/dobetterweb/dbw_tester.css?delay=2200",
                     "totalBytes": 859,
                     "totalKb": "1 KB",
                     "totalMs": "0ms"
@@ -1215,28 +1927,191 @@
               }
             },
             "scoringMode": "numeric",
-            "informative": true,
             "name": "total-byte-weight",
             "category": "Network",
             "description": "Avoids enormous network payloads",
-            "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+            "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files.",
+            "details": {
+              "type": "table",
+              "header": "View Details",
+              "itemHeaders": [
+                {
+                  "type": "text",
+                  "itemType": "url",
+                  "text": "URL"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Total Size"
+                },
+                {
+                  "type": "text",
+                  "itemType": "text",
+                  "text": "Transfer Time"
+                }
+              ],
+              "items": [
+                [
+                  {
+                    "type": "url",
+                    "text": "/zone.js"
+                  },
+                  {
+                    "type": "text",
+                    "text": "70 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "330ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "…3.2.1/jquery.min.js"
+                  },
+                  {
+                    "type": "text",
+                    "text": "31 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "140ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.html"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "50ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.html"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "50ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.js"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "10ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?delay=100"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "0ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?delay=3000&async=true"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "0ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "0ms"
+                  }
+                ],
+                [
+                  {
+                    "type": "url",
+                    "text": "/dobetterweb/dbw_tester.css?delay=2200"
+                  },
+                  {
+                    "type": "text",
+                    "text": "1 KB"
+                  },
+                  {
+                    "type": "text",
+                    "text": "0ms"
+                  }
+                ]
+              ]
+            }
           },
           "score": 100
         },
         {
           "id": "dom-size",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": 100,
-            "displayValue": "34 nodes",
-            "rawValue": 34,
-            "optimalValue": "1,500 nodes",
+            "displayValue": "35 nodes",
+            "rawValue": 35,
+            "optimalValue": "< 1,500 nodes",
             "extendedInfo": {
               "formatter": "cards",
               "value": [
                 {
                   "title": "Total DOM Nodes",
-                  "value": "34",
+                  "value": "35",
                   "target": "< 1,500 nodes"
                 },
                 {
@@ -1247,7 +2122,7 @@
                 },
                 {
                   "title": "Maximum Children",
-                  "value": "21",
+                  "value": "22",
                   "snippet": "Element with most children:\nhead",
                   "target": "< 60 nodes"
                 }
@@ -1267,7 +2142,7 @@
               "items": [
                 {
                   "title": "Total DOM Nodes",
-                  "value": "34",
+                  "value": "35",
                   "target": "< 1,500 nodes"
                 },
                 {
@@ -1278,7 +2153,7 @@
                 },
                 {
                   "title": "Maximum Children",
-                  "value": "21",
+                  "value": "22",
                   "snippet": "Element with most children:\nhead",
                   "target": "< 60 nodes"
                 }
@@ -1290,130 +2165,141 @@
         {
           "id": "critical-request-chains",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": false,
-            "displayValue": "11",
+            "displayValue": "12",
             "rawValue": false,
             "optimalValue": 0,
             "extendedInfo": {
               "formatter": "critical-request-chains",
               "value": {
                 "chains": {
-                  "56558.1": {
+                  "53431.1": {
                     "request": {
                       "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                      "startTime": 97474.721204,
-                      "endTime": 97474.920719,
-                      "responseReceivedTime": 97474.87803,
-                      "transferSize": 10248
+                      "startTime": 360903.137836,
+                      "endTime": 360903.341978,
+                      "responseReceivedTime": 360903.299006,
+                      "transferSize": 10511
                     },
                     "children": {
-                      "56558.3": {
+                      "53431.2": {
                         "request": {
-                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                          "startTime": 97474.912176,
-                          "endTime": 97475.064202,
-                          "responseReceivedTime": 97475.063783,
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                          "startTime": 360903.334926,
+                          "endTime": 360905.373365,
+                          "responseReceivedTime": 360905.372944,
                           "transferSize": 859
                         },
                         "children": {}
                       },
-                      "56558.4": {
+                      "53431.3": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
+                          "startTime": 360903.337748,
+                          "endTime": 360903.492647,
+                          "responseReceivedTime": 360903.492073,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "53431.4": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                          "startTime": 97474.912743,
-                          "endTime": 97475.136436,
-                          "responseReceivedTime": 97475.135316,
+                          "startTime": 360903.337965,
+                          "endTime": 360903.557522,
+                          "responseReceivedTime": 360903.556451,
                           "transferSize": 139
                         },
                         "children": {}
                       },
-                      "56558.6": {
+                      "53431.5": {
                         "request": {
-                          "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                          "startTime": 97474.913846,
-                          "endTime": 97475.142785,
-                          "responseReceivedTime": 97475.142385,
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
+                          "startTime": 360903.338157,
+                          "endTime": 360905.574069,
+                          "responseReceivedTime": 360905.573613,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "53431.6": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
+                          "startTime": 360903.338392,
+                          "endTime": 360903.570907,
+                          "responseReceivedTime": 360903.570548,
                           "transferSize": 1146
                         },
                         "children": {}
                       },
-                      "56558.7": {
+                      "53431.7": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                          "startTime": 97474.914545,
-                          "endTime": 97475.150054,
-                          "responseReceivedTime": 97475.149634,
+                          "startTime": 360903.339044,
+                          "endTime": 360903.706811,
+                          "responseReceivedTime": 360903.706456,
                           "transferSize": 770
                         },
                         "children": {}
                       },
-                      "56558.18": {
+                      "53431.8": {
                         "request": {
-                          "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                          "startTime": 97474.923571,
-                          "endTime": 97475.250793,
-                          "responseReceivedTime": 97475.078126,
-                          "transferSize": 31671
-                        },
-                        "children": {}
-                      },
-                      "56558.8": {
-                        "request": {
-                          "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                          "startTime": 97474.915097,
-                          "endTime": 97475.27159,
-                          "responseReceivedTime": 97475.27117,
+                          "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200&isasync",
+                          "startTime": 360903.339465,
+                          "endTime": 360903.764529,
+                          "responseReceivedTime": 360903.764156,
                           "transferSize": 767
                         },
                         "children": {}
                       },
-                      "56558.9": {
+                      "53431.9": {
+                        "request": {
+                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=3000&async=true",
+                          "startTime": 360903.339704,
+                          "endTime": 360906.367565,
+                          "responseReceivedTime": 360906.367106,
+                          "transferSize": 859
+                        },
+                        "children": {}
+                      },
+                      "53431.10": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                          "startTime": 97474.915832,
-                          "endTime": 97475.307023,
-                          "responseReceivedTime": 97475.292842,
+                          "startTime": 360903.340348,
+                          "endTime": 360903.749569,
+                          "responseReceivedTime": 360903.735216,
                           "transferSize": 1630
                         },
                         "children": {}
                       },
-                      "56558.17": {
+                      "53431.18": {
                         "request": {
                           "url": "http://localhost:10200/zone.js",
-                          "startTime": 97474.923069,
-                          "endTime": 97475.643806,
-                          "responseReceivedTime": 97475.299911,
+                          "startTime": 360903.349782,
+                          "endTime": 360904.20042,
+                          "responseReceivedTime": 360903.863811,
                           "transferSize": 71654
                         },
                         "children": {}
                       },
-                      "56558.2": {
+                      "53431.19": {
                         "request": {
-                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                          "startTime": 97474.910331,
-                          "endTime": 97476.916449,
-                          "responseReceivedTime": 97476.916083,
-                          "transferSize": 859
+                          "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                          "startTime": 360903.350326,
+                          "endTime": 360903.743462,
+                          "responseReceivedTime": 360903.577709,
+                          "transferSize": 31671
                         },
                         "children": {}
                       },
-                      "56558.5": {
-                        "request": {
-                          "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                          "startTime": 97474.91353,
-                          "endTime": 97477.124557,
-                          "responseReceivedTime": 97477.124185,
-                          "transferSize": 859
-                        },
-                        "children": {}
-                      },
-                      "56558.21": {
+                      "53431.22": {
                         "request": {
                           "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                          "startTime": 97477.154674,
-                          "endTime": 97477.367462,
-                          "responseReceivedTime": 97477.367121,
+                          "startTime": 360906.043217,
+                          "endTime": 360906.260271,
+                          "responseReceivedTime": 360906.259792,
                           "transferSize": 859
                         },
                         "children": {}
@@ -1422,7 +2308,7 @@
                   }
                 },
                 "longestChain": {
-                  "duration": 2646.257999993395,
+                  "duration": 3229.7290000133216,
                   "length": 2,
                   "transferSize": 859
                 }
@@ -1440,6 +2326,7 @@
         {
           "id": "user-timings",
           "weight": 0,
+          "group": "perf-info",
           "result": {
             "score": true,
             "displayValue": "0",
@@ -1459,38 +2346,88 @@
         }
       ],
       "id": "performance",
-      "score": 86.4090909090909
+      "score": 81.95454545454545
     }
   ],
+  "reportGroups": {
+    "perf-metric": {
+      "title": "Metrics",
+      "description": "These metrics encapsulate your app's performance across a number of dimensions."
+    },
+    "perf-hint": {
+      "title": "Opportunities",
+      "description": "These are opportunities to speed up your application by optimizing the following resources."
+    },
+    "perf-info": {
+      "title": "Diagnostics",
+      "description": "More information about the performance of your application."
+    },
+    "a11y-color-contrast": {
+      "title": "Color Contrast Is Satisfactory",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-describe-contents": {
+      "title": "Elements Describe Contents Well",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-well-structured": {
+      "title": "Elements Are Well Structured",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-aria": {
+      "title": "ARIA Attributes Follow Best Practices",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-correct-attributes": {
+      "title": "Elements Use Attributes Correctly",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-element-names": {
+      "title": "Elements Have Discernable Names",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-language": {
+      "title": "Page Specifies Valid Language",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "a11y-meta": {
+      "title": "Meta Tags Used Properly",
+      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+    }
+  },
   "aggregations": [
     {
       "name": "Performance",
       "description": "These encapsulate your app's performance.",
       "categorizable": false,
       "scored": false,
-      "total": 0.864090909090909,
+      "total": 0.8195454545454546,
       "score": [
         {
           "name": "Performance",
           "description": "These encapsulate your app's performance.",
-          "overall": 0.864090909090909,
+          "overall": 0.8195454545454546,
           "subItems": [
             {
-              "score": 73,
-              "displayValue": "2911.4ms",
-              "rawValue": 2911.4,
-              "optimalValue": "1,600ms",
+              "score": 67,
+              "displayValue": "3218.1ms",
+              "rawValue": 3218.1,
+              "optimalValue": "< 1,600 ms",
               "extendedInfo": {
                 "value": {
                   "timestamps": {
-                    "navStart": 97474719073,
-                    "fCP": 97477630440,
-                    "fMP": 97477630447
+                    "navStart": 360903135559,
+                    "fCP": 360906353680,
+                    "fMP": 360906353689,
+                    "onLoad": 360906539771,
+                    "endOfTrace": 360916726147
                   },
                   "timings": {
                     "navStart": 0,
-                    "fCP": 2911.367,
-                    "fMP": 2911.374
+                    "fCP": 3218.121,
+                    "fMP": 3218.13,
+                    "onLoad": 3404.212,
+                    "endOfTrace": 13590.588
                   }
                 },
                 "formatter": "null"
@@ -1502,32 +2439,38 @@
               "helpText": "First meaningful paint measures when the primary content of a page is visible. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/first-meaningful-paint)."
             },
             {
-              "score": 81,
-              "displayValue": "2935",
-              "rawValue": 2935,
-              "optimalValue": "1,250",
+              "score": 78,
+              "displayValue": "3226",
+              "rawValue": 3226,
+              "optimalValue": "< 1,250",
               "extendedInfo": {
                 "formatter": "speedline",
                 "value": {
                   "timings": {
-                    "firstVisualChange": 2935,
-                    "visuallyComplete": 2935,
-                    "speedIndex": 2935.2249999940395,
-                    "perceptualSpeedIndex": 2935.2249999940395
+                    "firstVisualChange": 3226,
+                    "visuallyReady": 3226.121999979019,
+                    "visuallyComplete": 3226,
+                    "speedIndex": 3226.121999979019,
+                    "perceptualSpeedIndex": 3226.121999979019
                   },
                   "timestamps": {
-                    "firstVisualChange": 97477648871,
-                    "visuallyComplete": 97477648871,
-                    "speedIndex": 97477649096,
-                    "perceptualSpeedIndex": 97477649096
+                    "firstVisualChange": 360906361559,
+                    "visuallyReady": 360906361681,
+                    "visuallyComplete": 360906361559,
+                    "speedIndex": 360906361681,
+                    "perceptualSpeedIndex": 360906361681
                   },
                   "frames": [
                     {
-                      "timestamp": 97474713.871,
+                      "timestamp": 360903135.559,
                       "progress": 0
                     },
                     {
-                      "timestamp": 97477649.096,
+                      "timestamp": 360906361.681,
+                      "progress": 100
+                    },
+                    {
+                      "timestamp": 360906538.904,
                       "progress": 100
                     }
                   ]
@@ -1543,7 +2486,7 @@
               "score": 100,
               "displayValue": "16ms",
               "rawValue": 16,
-              "optimalValue": "50ms",
+              "optimalValue": "< 50 ms",
               "extendedInfo": {
                 "value": [
                   {
@@ -1560,11 +2503,11 @@
                   },
                   {
                     "percentile": 0.99,
-                    "time": 16
+                    "time": 89.41036000000713
                   },
                   {
                     "percentile": 1,
-                    "time": 22.790999993087098
+                    "time": 193.1729999999934
                   }
                 ],
                 "formatter": "null"
@@ -1576,51 +2519,71 @@
               "helpText": "The score above is an estimate of how long your app takes to respond to user input, in milliseconds. There is a 90% probability that a user encounters this amount of latency, or less. 10% of the time a user can expect additional latency. If your score is higher than Lighthouse's target score, users may perceive your app as laggy. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/estimated-input-latency)."
             },
             {
-              "score": 83,
-              "displayValue": "2930ms",
-              "rawValue": 2930,
-              "optimalValue": "5,000ms",
+              "score": 76,
+              "displayValue": "3326.1ms",
+              "rawValue": 3326.1,
+              "optimalValue": "< 5,000 ms",
               "extendedInfo": {
                 "value": {
                   "timings": {
-                    "onLoad": 2918.143999993801,
-                    "fMP": 2911.374,
-                    "visuallyReady": 2930.023,
-                    "timeToInteractive": 2930.023,
-                    "timeToInteractiveB": 2911.3739999979734,
-                    "timeToInteractiveC": 2911.3739999979734,
-                    "endOfTrace": 12935.752000004053
+                    "onLoad": 3404.2120000123978,
+                    "fMP": 3218.13,
+                    "visuallyReady": 3226.122,
+                    "timeToInteractive": 3326.122,
+                    "timeToInteractiveB": 3368.1299999952316,
+                    "timeToInteractiveC": 3218.1299999952316,
+                    "endOfTrace": 13590.587999999523
                   },
                   "timestamps": {
-                    "onLoad": 97477637217,
-                    "fMP": 97477630447,
-                    "visuallyReady": 97477649096,
-                    "timeToInteractive": 97477649096,
-                    "timeToInteractiveB": 97477630447,
-                    "timeToInteractiveC": 97477630447,
-                    "endOfTrace": 97487654825
+                    "onLoad": 360906539771,
+                    "fMP": 360906353689,
+                    "visuallyReady": 360906361681,
+                    "timeToInteractive": 360906461681,
+                    "timeToInteractiveB": 360906503689,
+                    "timeToInteractiveC": 360906353689,
+                    "endOfTrace": 360916726147
                   },
                   "latencies": {
                     "timeToInteractive": [
                       {
-                        "estLatency": 16,
-                        "startTime": "2930.0"
+                        "estLatency": 142.53999998378708,
+                        "startTime": "3226.1"
+                      },
+                      {
+                        "estLatency": 92.53999998378708,
+                        "startTime": "3276.1"
+                      },
+                      {
+                        "estLatency": 42.539999983787084,
+                        "startTime": "3326.1"
                       }
                     ],
                     "timeToInteractiveB": [
                       {
-                        "estLatency": 16,
-                        "startTime": "2911.4"
+                        "estLatency": 143.17299999999972,
+                        "startTime": "3218.1"
+                      },
+                      {
+                        "estLatency": 100.53199996757462,
+                        "startTime": "3268.1"
+                      },
+                      {
+                        "estLatency": 50.53199996757462,
+                        "startTime": "3318.1"
+                      },
+                      {
+                        "estLatency": 16.42571428339819,
+                        "startTime": "3368.1"
                       }
                     ],
                     "timeToInteractiveC": [
                       {
                         "estLatency": 16,
-                        "startTime": "2911.4"
+                        "startTime": "3218.1"
                       }
                     ]
                   },
-                  "expectedLatencyAtTTI": 16
+                  "expectedLatencyAtTTI": 42.54
                 },
                 "formatter": "null"
               },
@@ -1631,51 +2594,13 @@
               "helpText": "Time to Interactive identifies the time at which your app appears to be ready enough to interact with. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/time-to-interactive)."
             },
             {
-              "score": 94,
-              "displayValue": "2,920ms",
-              "rawValue": 2918.1649999916553,
-              "optimalValue": "5,000ms",
+              "score": 91,
+              "displayValue": "3,400ms",
+              "rawValue": 3402.6619999628065,
               "extendedInfo": {
                 "value": {
-                  "cpuQuietPeriod": {
-                    "start": 97477637.23799999,
-                    "end": 97487654.825
-                  },
-                  "networkQuietPeriod": {
-                    "start": 97475643.806,
-                    "end": 97487654.825
-                  },
-                  "cpuQuietPeriods": [
-                    {
-                      "start": 97477637.23799999,
-                      "end": 97487654.825
-                    }
-                  ],
-                  "networkQuietPeriods": [
-                    {
-                      "start": 97475643.806,
-                      "end": 97487654.825
-                    }
-                  ],
-                  "timestamp": 97477637.23799999,
-                  "timeInMs": 2918.1649999916553
-                },
-                "formatter": "null"
-              },
-              "scoringMode": "numeric",
-              "name": "consistently-interactive",
-              "category": "Performance",
-              "description": "Consistently Interactive (beta)",
-              "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
-            },
-            {
-              "score": 94,
-              "displayValue": "2,920ms",
-              "rawValue": 2918.164999991059,
-              "extendedInfo": {
-                "value": {
-                  "timeInMs": 2918.164999991059,
-                  "timestamp": 97477637237.99998
+                  "timeInMs": 3402.6619999628065,
+                  "timestamp": 360906538220.99994
                 },
                 "formatter": "null"
               },
@@ -1686,32 +2611,70 @@
               "helpText": "The first point at which necessary scripts of the page have loaded and the CPU is idle enough to handle most user input."
             },
             {
-              "score": false,
-              "displayValue": "4 resources delayed first paint by 2209ms",
-              "rawValue": false,
+              "score": 91,
+              "displayValue": "3,400ms",
+              "rawValue": 3402.661999938965,
+              "extendedInfo": {
+                "value": {
+                  "cpuQuietPeriod": {
+                    "start": 360906538.22099996,
+                    "end": 360916726.147
+                  },
+                  "networkQuietPeriod": {
+                    "start": 360906260.27099997,
+                    "end": 360916726.147
+                  },
+                  "cpuQuietPeriods": [
+                    {
+                      "start": 360906538.22099996,
+                      "end": 360916726.147
+                    }
+                  ],
+                  "networkQuietPeriods": [
+                    {
+                      "start": 360906260.27099997,
+                      "end": 360916726.147
+                    }
+                  ],
+                  "timestamp": 360906538220.99994,
+                  "timeInMs": 3402.661999938965
+                },
+                "formatter": "null"
+              },
+              "scoringMode": "numeric",
+              "name": "consistently-interactive",
+              "category": "Performance",
+              "description": "Consistently Interactive (beta)",
+              "helpText": "The point at which most network resources have finished loading and the CPU is idle for a prolonged period."
+            },
+            {
+              "score": 0,
+              "displayValue": "4 resources delayed first paint by 2236ms",
+              "rawValue": 2236,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 2236,
                   "results": [
                     {
                       "url": "/dobetterweb/dbw_tester.css?delay=100",
                       "totalKb": "1 KB",
-                      "totalMs": "107ms"
+                      "totalMs": "155ms"
                     },
                     {
                       "url": "/dobetterweb/unknown404.css?delay=200",
                       "totalKb": "0 KB",
-                      "totalMs": "207ms"
+                      "totalMs": "220ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.css?delay=2200",
                       "totalKb": "1 KB",
-                      "totalMs": "2209ms"
+                      "totalMs": "2236ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_partial_a.html?delay=200",
                       "totalKb": "1 KB",
-                      "totalMs": "208ms"
+                      "totalMs": "369ms"
                     }
                   ],
                   "tableHeadings": {
@@ -1725,21 +2688,101 @@
               "informative": true,
               "name": "link-blocking-first-paint",
               "category": "Performance",
-              "description": "Render-blocking stylesheets",
-              "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+              "description": "Reduce render-blocking stylesheets",
+              "helpText": "Link elements are blocking the first paint of your page. Consider inlining critical links and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Size (KB)"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Delayed Paint By (ms)"
+                  }
+                ],
+                "items": [
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?delay=100"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "155ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/unknown404.css?delay=200"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "220ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?delay=2200"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2236ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_partial_a.html?delay=200"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "369ms"
+                    }
+                  ]
+                ]
+              }
             },
             {
-              "score": false,
-              "displayValue": "1 resource delayed first paint by 209ms",
-              "rawValue": false,
+              "score": 65,
+              "displayValue": "1 resource delayed first paint by 409ms",
+              "rawValue": 409,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 409,
                   "results": [
                     {
                       "url": "/dobetterweb/dbw_tester.js",
                       "totalKb": "2 KB",
-                      "totalMs": "209ms"
+                      "totalMs": "409ms"
                     }
                   ],
                   "tableHeadings": {
@@ -1753,23 +2796,62 @@
               "informative": true,
               "name": "script-blocking-first-paint",
               "category": "Performance",
-              "description": "Render-blocking scripts",
-              "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources)."
+              "description": "Reduce render-blocking scripts",
+              "helpText": "Script elements are blocking the first paint of your page. Consider inlining critical scripts and deferring non-critical ones. [Learn more](https://developers.google.com/web/tools/lighthouse/audits/blocking-resources).",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Size (KB)"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Delayed Paint By (ms)"
+                  }
+                ],
+                "items": [
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.js"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "409ms"
+                    }
+                  ]
+                ]
+              }
             },
             {
-              "score": true,
+              "score": 100,
               "displayValue": "",
-              "rawValue": true,
+              "rawValue": 0,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 0,
+                  "wastedKb": 0,
                   "results": [],
                   "tableHeadings": {
                     "preview": "",
                     "url": "URL",
                     "totalKb": "Original",
-                    "webpSavings": "WebP Savings",
-                    "jpegSavings": "JPEG Savings"
+                    "webpSavings": "Savings as WebP",
+                    "jpegSavings": "Savings as JPEG"
                   }
                 }
               },
@@ -1777,34 +2859,68 @@
               "informative": true,
               "name": "uses-optimized-images",
               "category": "Images",
-              "description": "Unoptimized images",
-              "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization)."
+              "description": "Optimize images",
+              "helpText": "Images should be optimized to save network bytes. The following images could have smaller file sizes when compressed with [WebP](https://developers.google.com/speed/webp/) or JPEG at 80 quality. [Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization).",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "thumbnail",
+                    "text": ""
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Original"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Savings as WebP"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Savings as JPEG"
+                  }
+                ],
+                "items": []
+              }
             },
             {
-              "score": false,
-              "displayValue": "Potential savings of 61 KB (~300ms)",
-              "rawValue": false,
+              "score": 90,
+              "displayValue": "Potential savings of 62 KB (~290ms)",
+              "rawValue": 290,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 290,
+                  "wastedKb": 62,
                   "results": [
                     {
                       "url": "/zone.js",
                       "totalBytes": 71501,
                       "wastedBytes": 56204,
                       "wastedPercent": 78.6058936238654,
-                      "potentialSavings": "55 KB _79%_",
+                      "potentialSavings": "55 KB (79%)",
                       "wastedKb": "55 KB",
                       "wastedMs": "260ms",
                       "totalKb": "70 KB",
-                      "totalMs": "340ms"
+                      "totalMs": "330ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10127,
-                      "wastedBytes": 6750,
-                      "wastedPercent": 66.6535005431026,
-                      "potentialSavings": "7 KB _67%_",
+                      "totalBytes": 10390,
+                      "wastedBytes": 6935,
+                      "wastedPercent": 66.74687199230029,
+                      "potentialSavings": "7 KB (67%)",
                       "wastedKb": "7 KB",
                       "wastedMs": "30ms",
                       "totalKb": "10 KB",
@@ -1819,18 +2935,72 @@
                 }
               },
               "scoringMode": "binary",
+              "informative": true,
               "name": "uses-request-compression",
               "category": "Performance",
-              "description": "Compression enabled for server responses",
-              "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer)."
+              "description": "Enable text compression",
+              "helpText": "Text-based responses should be served with compression (gzip, deflate or brotli) to minimize total network bytes. [Learn more](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer).",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "Uncompressed resource URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Original"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "GZIP Savings"
+                  }
+                ],
+                "items": [
+                  [
+                    {
+                      "type": "url",
+                      "text": "/zone.js"
+                    },
+                    {
+                      "type": "text",
+                      "text": "70 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "55 KB (79%)"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.html"
+                    },
+                    {
+                      "type": "text",
+                      "text": "10 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "7 KB (67%)"
+                    }
+                  ]
+                ]
+              }
             },
             {
-              "score": true,
+              "score": 100,
               "displayValue": "",
-              "rawValue": true,
+              "rawValue": 0,
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
+                  "wastedMs": 0,
+                  "wastedKb": 0,
                   "results": [],
                   "tableHeadings": {
                     "preview": "",
@@ -1844,14 +3014,41 @@
               "informative": true,
               "name": "uses-responsive-images",
               "category": "Images",
-              "description": "Oversized images",
-              "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints)."
+              "description": "Properly size images",
+              "helpText": "Image sizes served should be based on the device display size to save network bytes. Learn more about [responsive images](https://developers.google.com/web/fundamentals/design-and-ui/media/images) and [client hints](https://developers.google.com/web/updates/2015/09/automating-resource-selection-with-client-hints).",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "thumbnail",
+                    "text": ""
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Original"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Potential Savings"
+                  }
+                ],
+                "items": []
+              }
             },
             {
               "score": 100,
-              "displayValue": "Total size was 129 KB",
-              "rawValue": 131709,
-              "optimalValue": "1,600 KB",
+              "displayValue": "Total size was 130 KB",
+              "rawValue": 133319,
+              "optimalValue": "< 1,600 KB",
               "extendedInfo": {
                 "formatter": "table",
                 "value": {
@@ -1860,23 +3057,23 @@
                       "url": "/zone.js",
                       "totalBytes": 71654,
                       "totalKb": "70 KB",
-                      "totalMs": "340ms"
+                      "totalMs": "330ms"
                     },
                     {
                       "url": "…3.2.1/jquery.min.js",
                       "totalBytes": 31671,
                       "totalKb": "31 KB",
-                      "totalMs": "150ms"
+                      "totalMs": "140ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10248,
+                      "totalBytes": 10511,
                       "totalKb": "10 KB",
                       "totalMs": "50ms"
                     },
                     {
                       "url": "/dobetterweb/dbw_tester.html",
-                      "totalBytes": 10248,
+                      "totalBytes": 10511,
                       "totalKb": "10 KB",
                       "totalMs": "50ms"
                     },
@@ -1887,7 +3084,7 @@
                       "totalMs": "10ms"
                     },
                     {
-                      "url": "/dobetterweb/dbw_disabled.css?delay=200",
+                      "url": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
                       "totalBytes": 1146,
                       "totalKb": "1 KB",
                       "totalMs": "10ms"
@@ -1899,7 +3096,7 @@
                       "totalMs": "0ms"
                     },
                     {
-                      "url": "/dobetterweb/dbw_tester.css?delay=2200",
+                      "url": "/dobetterweb/dbw_tester.css?delay=3000&async=true",
                       "totalBytes": 859,
                       "totalKb": "1 KB",
                       "totalMs": "0ms"
@@ -1911,7 +3108,7 @@
                       "totalMs": "0ms"
                     },
                     {
-                      "url": "/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                      "url": "/dobetterweb/dbw_tester.css?delay=2200",
                       "totalBytes": 859,
                       "totalKb": "1 KB",
                       "totalMs": "0ms"
@@ -1925,23 +3122,185 @@
                 }
               },
               "scoringMode": "numeric",
-              "informative": true,
               "name": "total-byte-weight",
               "category": "Network",
               "description": "Avoids enormous network payloads",
-              "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+              "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files.",
+              "details": {
+                "type": "table",
+                "header": "View Details",
+                "itemHeaders": [
+                  {
+                    "type": "text",
+                    "itemType": "url",
+                    "text": "URL"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Total Size"
+                  },
+                  {
+                    "type": "text",
+                    "itemType": "text",
+                    "text": "Transfer Time"
+                  }
+                ],
+                "items": [
+                  [
+                    {
+                      "type": "url",
+                      "text": "/zone.js"
+                    },
+                    {
+                      "type": "text",
+                      "text": "70 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "330ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "…3.2.1/jquery.min.js"
+                    },
+                    {
+                      "type": "text",
+                      "text": "31 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "140ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.html"
+                    },
+                    {
+                      "type": "text",
+                      "text": "10 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "50ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.html"
+                    },
+                    {
+                      "type": "text",
+                      "text": "10 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "50ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.js"
+                    },
+                    {
+                      "type": "text",
+                      "text": "2 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "10ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_disabled.css?delay=200&isdisabled"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "10ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?delay=100"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?delay=3000&async=true"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?scriptActivated&delay=200"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0ms"
+                    }
+                  ],
+                  [
+                    {
+                      "type": "url",
+                      "text": "/dobetterweb/dbw_tester.css?delay=2200"
+                    },
+                    {
+                      "type": "text",
+                      "text": "1 KB"
+                    },
+                    {
+                      "type": "text",
+                      "text": "0ms"
+                    }
+                  ]
+                ]
+              }
             },
             {
               "score": 100,
-              "displayValue": "34 nodes",
-              "rawValue": 34,
-              "optimalValue": "1,500 nodes",
+              "displayValue": "35 nodes",
+              "rawValue": 35,
+              "optimalValue": "< 1,500 nodes",
               "extendedInfo": {
                 "formatter": "cards",
                 "value": [
                   {
                     "title": "Total DOM Nodes",
-                    "value": "34",
+                    "value": "35",
                     "target": "< 1,500 nodes"
                   },
                   {
@@ -1952,7 +3311,7 @@
                   },
                   {
                     "title": "Maximum Children",
-                    "value": "21",
+                    "value": "22",
                     "snippet": "Element with most children:\nhead",
                     "target": "< 60 nodes"
                   }
@@ -1972,7 +3331,7 @@
                 "items": [
                   {
                     "title": "Total DOM Nodes",
-                    "value": "34",
+                    "value": "35",
                     "target": "< 1,500 nodes"
                   },
                   {
@@ -1983,7 +3342,7 @@
                   },
                   {
                     "title": "Maximum Children",
-                    "value": "21",
+                    "value": "22",
                     "snippet": "Element with most children:\nhead",
                     "target": "< 60 nodes"
                   }
@@ -1992,128 +3351,138 @@
             },
             {
               "score": false,
-              "displayValue": "11",
+              "displayValue": "12",
               "rawValue": false,
               "optimalValue": 0,
               "extendedInfo": {
                 "formatter": "critical-request-chains",
                 "value": {
                   "chains": {
-                    "56558.1": {
+                    "53431.1": {
                       "request": {
                         "url": "http://localhost:10200/dobetterweb/dbw_tester.html",
-                        "startTime": 97474.721204,
-                        "endTime": 97474.920719,
-                        "responseReceivedTime": 97474.87803,
-                        "transferSize": 10248
+                        "startTime": 360903.137836,
+                        "endTime": 360903.341978,
+                        "responseReceivedTime": 360903.299006,
+                        "transferSize": 10511
                       },
                       "children": {
-                        "56558.3": {
+                        "53431.2": {
                           "request": {
-                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
-                            "startTime": 97474.912176,
-                            "endTime": 97475.064202,
-                            "responseReceivedTime": 97475.063783,
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
+                            "startTime": 360903.334926,
+                            "endTime": 360905.373365,
+                            "responseReceivedTime": 360905.372944,
                             "transferSize": 859
                           },
                           "children": {}
                         },
-                        "56558.4": {
+                        "53431.3": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=100",
+                            "startTime": 360903.337748,
+                            "endTime": 360903.492647,
+                            "responseReceivedTime": 360903.492073,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "53431.4": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/unknown404.css?delay=200",
-                            "startTime": 97474.912743,
-                            "endTime": 97475.136436,
-                            "responseReceivedTime": 97475.135316,
+                            "startTime": 360903.337965,
+                            "endTime": 360903.557522,
+                            "responseReceivedTime": 360903.556451,
                             "transferSize": 139
                           },
                           "children": {}
                         },
-                        "56558.6": {
+                        "53431.5": {
                           "request": {
-                            "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200",
-                            "startTime": 97474.913846,
-                            "endTime": 97475.142785,
-                            "responseReceivedTime": 97475.142385,
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
+                            "startTime": 360903.338157,
+                            "endTime": 360905.574069,
+                            "responseReceivedTime": 360905.573613,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "53431.6": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_disabled.css?delay=200&isdisabled",
+                            "startTime": 360903.338392,
+                            "endTime": 360903.570907,
+                            "responseReceivedTime": 360903.570548,
                             "transferSize": 1146
                           },
                           "children": {}
                         },
-                        "56558.7": {
+                        "53431.7": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_partial_a.html?delay=200",
-                            "startTime": 97474.914545,
-                            "endTime": 97475.150054,
-                            "responseReceivedTime": 97475.149634,
+                            "startTime": 360903.339044,
+                            "endTime": 360903.706811,
+                            "responseReceivedTime": 360903.706456,
                             "transferSize": 770
                           },
                           "children": {}
                         },
-                        "56558.18": {
+                        "53431.8": {
                           "request": {
-                            "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
-                            "startTime": 97474.923571,
-                            "endTime": 97475.250793,
-                            "responseReceivedTime": 97475.078126,
-                            "transferSize": 31671
-                          },
-                          "children": {}
-                        },
-                        "56558.8": {
-                          "request": {
-                            "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200",
-                            "startTime": 97474.915097,
-                            "endTime": 97475.27159,
-                            "responseReceivedTime": 97475.27117,
+                            "url": "http://localhost:10200/dobetterweb/dbw_partial_b.html?delay=200&isasync",
+                            "startTime": 360903.339465,
+                            "endTime": 360903.764529,
+                            "responseReceivedTime": 360903.764156,
                             "transferSize": 767
                           },
                           "children": {}
                         },
-                        "56558.9": {
+                        "53431.9": {
+                          "request": {
+                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=3000&async=true",
+                            "startTime": 360903.339704,
+                            "endTime": 360906.367565,
+                            "responseReceivedTime": 360906.367106,
+                            "transferSize": 859
+                          },
+                          "children": {}
+                        },
+                        "53431.10": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.js",
-                            "startTime": 97474.915832,
-                            "endTime": 97475.307023,
-                            "responseReceivedTime": 97475.292842,
+                            "startTime": 360903.340348,
+                            "endTime": 360903.749569,
+                            "responseReceivedTime": 360903.735216,
                             "transferSize": 1630
                           },
                           "children": {}
                         },
-                        "56558.17": {
+                        "53431.18": {
                           "request": {
                             "url": "http://localhost:10200/zone.js",
-                            "startTime": 97474.923069,
-                            "endTime": 97475.643806,
-                            "responseReceivedTime": 97475.299911,
+                            "startTime": 360903.349782,
+                            "endTime": 360904.20042,
+                            "responseReceivedTime": 360903.863811,
                             "transferSize": 71654
                           },
                           "children": {}
                         },
-                        "56558.2": {
+                        "53431.19": {
                           "request": {
-                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2000&async=true",
-                            "startTime": 97474.910331,
-                            "endTime": 97476.916449,
-                            "responseReceivedTime": 97476.916083,
-                            "transferSize": 859
+                            "url": "http://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js",
+                            "startTime": 360903.350326,
+                            "endTime": 360903.743462,
+                            "responseReceivedTime": 360903.577709,
+                            "transferSize": 31671
                           },
                           "children": {}
                         },
-                        "56558.5": {
-                          "request": {
-                            "url": "http://localhost:10200/dobetterweb/dbw_tester.css?delay=2200",
-                            "startTime": 97474.91353,
-                            "endTime": 97477.124557,
-                            "responseReceivedTime": 97477.124185,
-                            "transferSize": 859
-                          },
-                          "children": {}
-                        },
-                        "56558.21": {
+                        "53431.22": {
                           "request": {
                             "url": "http://localhost:10200/dobetterweb/dbw_tester.css?scriptActivated&delay=200",
-                            "startTime": 97477.154674,
-                            "endTime": 97477.367462,
-                            "responseReceivedTime": 97477.367121,
+                            "startTime": 360906.043217,
+                            "endTime": 360906.260271,
+                            "responseReceivedTime": 360906.259792,
                             "transferSize": 859
                           },
                           "children": {}
@@ -2122,7 +3491,7 @@
                     }
                   },
                   "longestChain": {
-                    "duration": 2646.257999993395,
+                    "duration": 3229.7290000133216,
                     "length": 2,
                     "transferSize": 859
                   }

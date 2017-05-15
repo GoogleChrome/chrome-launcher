@@ -64,11 +64,7 @@ class FirstMeaningfulPaint extends Audit {
         throw new Error('No `navigationStart` event found in trace');
       }
 
-      const result = this.calculateScore({
-        navigationStart: tabTrace.navigationStartEvt,
-        firstMeaningfulPaint: tabTrace.firstMeaningfulPaintEvt,
-        firstContentfulPaint: tabTrace.firstContentfulPaintEvt
-      });
+      const result = this.calculateScore(tabTrace);
 
       return {
         score: result.score,
@@ -84,35 +80,40 @@ class FirstMeaningfulPaint extends Audit {
     });
   }
 
-  static calculateScore(evts) {
-    const getTs = evt => evt && evt.ts;
-    const getTiming = evt => {
-      if (!evt) {
-        return undefined;
-      }
-      const timing = (evt.ts - evts.navigationStart.ts) / 1000;
-      return parseFloat(timing.toFixed(3));
-    };
-
+  static calculateScore(traceOfTab) {
     // Expose the raw, unchanged monotonic timestamps from the trace, along with timing durations
     const extendedInfo = {
       timestamps: {
-        navStart: getTs(evts.navigationStart),
-        fCP: getTs(evts.firstContentfulPaint),
-        fMP: getTs(evts.firstMeaningfulPaint)
+        navStart: traceOfTab.timestamps.navigationStart * 1000,
+        fCP: traceOfTab.timestamps.firstContentfulPaint * 1000,
+        fMP: traceOfTab.timestamps.firstMeaningfulPaint * 1000,
+        onLoad: traceOfTab.timestamps.onLoad * 1000,
+        endOfTrace: traceOfTab.timestamps.traceEnd * 1000,
       },
       timings: {
         navStart: 0,
-        fCP: getTiming(evts.firstContentfulPaint),
-        fMP: getTiming(evts.firstMeaningfulPaint)
+        fCP: traceOfTab.timings.firstContentfulPaint,
+        fMP: traceOfTab.timings.firstMeaningfulPaint,
+        onLoad: traceOfTab.timings.onLoad,
+        endOfTrace: traceOfTab.timings.traceEnd,
       }
     };
+
+    Object.keys(extendedInfo.timings).forEach(key => {
+      const val = extendedInfo.timings[key];
+      if (typeof val !== 'number' || Number.isNaN(val)) {
+        extendedInfo.timings[key] = undefined;
+        extendedInfo.timestamps[key] = undefined;
+      } else {
+        extendedInfo.timings[key] = parseFloat(extendedInfo.timings[key].toFixed(3));
+      }
+    });
 
     // Use the CDF of a log-normal distribution for scoring.
     //   < 1100ms: score≈100
     //   4000ms: score=50
     //   >= 14000ms: score≈0
-    const firstMeaningfulPaint = getTiming(evts.firstMeaningfulPaint);
+    const firstMeaningfulPaint = traceOfTab.timings.firstMeaningfulPaint;
     const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
     let score = 100 * distribution.computeComplementaryPercentile(firstMeaningfulPaint);

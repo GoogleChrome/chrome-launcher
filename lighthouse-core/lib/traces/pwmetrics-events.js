@@ -110,11 +110,11 @@ class Metrics {
         name: 'Visually Complete 85%',
         id: 'vc85',
         getTs: auditResults => {
-          const siExt = auditResults['time-to-interactive'].extendedInfo;
+          const siExt = auditResults['speed-index-metric'].extendedInfo;
           return safeGet(siExt, 'value.timestamps.visuallyReady');
         },
         getTiming: auditResults => {
-          const siExt = auditResults['time-to-interactive'].extendedInfo;
+          const siExt = auditResults['speed-index-metric'].extendedInfo;
           return safeGet(siExt, 'value.timings.visuallyReady');
         }
       },
@@ -170,11 +170,11 @@ class Metrics {
         name: 'End of Trace',
         id: 'eot',
         getTs: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          const ttiExt = auditResults['first-meaningful-paint'].extendedInfo;
           return safeGet(ttiExt, 'value.timestamps.endOfTrace');
         },
         getTiming: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          const ttiExt = auditResults['first-meaningful-paint'].extendedInfo;
           return safeGet(ttiExt, 'value.timings.endOfTrace');
         }
       },
@@ -182,11 +182,11 @@ class Metrics {
         name: 'On Load',
         id: 'onload',
         getTs: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          const ttiExt = auditResults['first-meaningful-paint'].extendedInfo;
           return safeGet(ttiExt, 'value.timestamps.onLoad');
         },
         getTiming: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
+          const ttiExt = auditResults['first-meaningful-paint'].extendedInfo;
           return safeGet(ttiExt, 'value.timings.onLoad');
         }
       }
