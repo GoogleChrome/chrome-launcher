@@ -16,7 +16,7 @@
  */
 'use strict';
 
-/* global window, document */
+/* global window, document, Node */
 
 const Gatherer = require('./gatherer');
 const fs = require('fs');
@@ -28,6 +28,7 @@ const axeLibSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'ut
 /* istanbul ignore next */
 function runA11yChecks() {
   return window.axe.run(document, {
+    elementRef: true,
     runOnly: {
       type: 'tag',
       values: [
@@ -43,7 +44,55 @@ function runA11yChecks() {
       'blink': {enabled: false},
       'server-side-image-map': {enabled: false}
     }
+  }).then(axeResult => {
+    // Augment the node objects with outerHTML snippet & custom path string
+    axeResult.violations.forEach(v => v.nodes.forEach(node => {
+      node.path = getNodePath(node.element);
+      node.snippet = getOuterHTMLSnippet(node.element);
+      // avoid circular JSON concerns
+      node.element = node.any = node.all = node.none = undefined;
+    }));
+
+    // We only need violations, and circular references are possible outside of violations
+    axeResult = {violations: axeResult.violations};
+    return axeResult;
   });
+
+  // Adapted from DevTools' SDK.DOMNode.prototype.path
+  //   https://github.com/ChromeDevTools/devtools-frontend/blob/7a2e162ddefd/front_end/sdk/DOMModel.js#L530-L552
+  // TODO: Doesn't handle frames or shadow roots...
+  function getNodePath(node) {
+    function getNodeIndex(node) {
+      let index = 0;
+      while (node = node.previousSibling) {
+        // skip empty text nodes
+        if (node.nodeType === Node.TEXT_NODE &&
+          node.textContent.trim().length === 0) continue;
+        index++;
+      }
+      return index;
+    }
+
+    const path = [];
+    while (node && node.parentNode) {
+      const index = getNodeIndex(node);
+      path.push([index, node.nodeName]);
+      node = node.parentNode;
+    }
+    path.reverse();
+    return path.join(',');
+  }
+
+  /**
+   * Gets the opening tag text of the given node.
+   * @param {!Node}
+   * @return {string}
+   */
+  function getOuterHTMLSnippet(node) {
+    const reOpeningTag = /^.*?\>/;
+    const match = node.outerHTML.match(reOpeningTag);
+    return match && match[0];
+  }
 }
 
 class Accessibility extends Gatherer {
@@ -58,15 +107,15 @@ class Accessibility extends Gatherer {
       return (${runA11yChecks.toString()}());
     })()`;
 
-    return driver
-      .evaluateAsync(expression)
-      .then(returnedValue => {
-        if (!returnedValue || !Array.isArray(returnedValue.violations)) {
-          throw new Error('Unable to parse axe results' + returnedValue);
-        }
-
-        return returnedValue;
-      });
+    return driver.evaluateAsync(expression).then(returnedValue => {
+      if (!returnedValue) {
+        throw new Error('No axe-core results returned');
+      }
+      if (!Array.isArray(returnedValue.violations)) {
+        throw new Error('Unable to parse axe results' + returnedValue);
+      }
+      return returnedValue;
+    });
   }
 }
 

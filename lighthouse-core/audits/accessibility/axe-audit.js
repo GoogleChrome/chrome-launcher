@@ -35,11 +35,29 @@ class AxeAudit extends Audit {
     const violations = artifacts.Accessibility.violations;
     const rule = violations.find(result => result.id === this.meta.name);
 
+    let nodeDetails = [];
+    if (rule && rule.nodes) {
+      nodeDetails = rule.nodes.map(node => ({
+        type: 'node',
+        selector: node.target,
+        path: node.path,
+        snippet: node.snippet
+      }));
+    }
+
     return {
       rawValue: typeof rule === 'undefined',
       extendedInfo: {
         formatter: Formatter.SUPPORTED_FORMATS.ACCESSIBILITY,
         value: rule
+      },
+      details: {
+        type: 'list',
+        header: {
+          type: 'text',
+          text: 'View failing elements'
+        },
+        items: nodeDetails
       }
     };
   }

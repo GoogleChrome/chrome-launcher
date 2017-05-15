@@ -16,6 +16,7 @@
 
 .lh-vars {
   --text-font-family: '.SFNSDisplay-Regular', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+  --monospace-font-family: 'Menlo', 'dejavu sans mono', 'Consolas', 'Lucida Console', monospace;
   --body-font-size: 13px;
   --header-font-size: 16px;
   --body-line-height: 1.5;
@@ -124,9 +125,16 @@ summary {
   padding-left: var(--default-padding);
 }
 
-.lh-list__items > * {
-  border-bottom: 1px solid gray;
+.lh-list__item {
   margin-bottom: 2px;
+}
+
+/* Node */
+.lh-node {
+  display: block;
+  font-family: var(--monospace-font-family);
+  word-break: break-word;
+  color: hsl(174, 100%, 27%);
 }
 
 /* Card */
