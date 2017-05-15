@@ -193,8 +193,10 @@ class ConsistentlyInteractiveMetric extends Audit {
       }
     }
 
-    const culprit = cpuCandidate ? 'Network' : 'CPU';
-    throw new Error(`${culprit} did not quiet for at least 5s before the end of the trace.`);
+    const culprit = cpuCandidate ? 'Network' : 'Main thread';
+    throw new Error(`${culprit} activity continued through the end of the trace recording. ` +
+      'Consistently Interactive requires a minimum of 5 seconds of both main thread idle and ' +
+      'network idle.');
   }
 
   /**

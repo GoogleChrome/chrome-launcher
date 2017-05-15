@@ -77,7 +77,7 @@ describe('Performance: consistently-interactive audit', () => {
 
       assert.throws(() => {
         ConsistentlyInteractive.findOverlappingQuietPeriods(cpu, network, traceOfTab);
-      }, /did not quiet/);
+      }, /activity continued/);
     });
 
     it('should throw when CPU is quiet but network is not', () => {
@@ -96,7 +96,7 @@ describe('Performance: consistently-interactive audit', () => {
 
       assert.throws(() => {
         ConsistentlyInteractive.findOverlappingQuietPeriods(cpu, network, traceOfTab);
-      }, /Network did not quiet/);
+      }, /Network activity continued/);
     });
 
     it('should throw when network is quiet but CPU is not', () => {
@@ -114,7 +114,7 @@ describe('Performance: consistently-interactive audit', () => {
 
       assert.throws(() => {
         ConsistentlyInteractive.findOverlappingQuietPeriods(cpu, network, traceOfTab);
-      }, /CPU did not quiet/);
+      }, /Main thread activity continued/);
     });
 
     it('should handle unfinished network requests', () => {
@@ -132,7 +132,7 @@ describe('Performance: consistently-interactive audit', () => {
 
       assert.throws(() => {
         ConsistentlyInteractive.findOverlappingQuietPeriods(cpu, network, traceOfTab);
-      }, /Network did not quiet/);
+      }, /Network activity continued/);
     });
 
     it('should find first overlapping quiet period', () => {
@@ -162,7 +162,7 @@ describe('Performance: consistently-interactive audit', () => {
         {start: 11500, end: 19000},
         {start: 11500, end: 19000},
         {start: 11500, end: 19500},
-        // quiet period during CPU activity
+        // quiet period during Main thread activity
         {start: 28000, end: 32000},
         {start: 28000, end: 32000},
         {start: 28000, end: 35000},

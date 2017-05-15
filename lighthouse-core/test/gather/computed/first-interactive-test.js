@@ -284,7 +284,7 @@ describe('FirstInteractive computed artifact:', () => {
       const longTasks = [{start: 4000, end: 5700}];
       assert.throws(() => {
         FirstInteractive.findQuietWindow(200, 6000, longTasks);
-      }, /trace was busy/);
+      }, /main thread was busy/);
     });
   });
 });
