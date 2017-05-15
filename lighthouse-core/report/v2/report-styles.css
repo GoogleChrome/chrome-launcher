@@ -372,6 +372,28 @@ summary {
   color: var(--fail-color);
 }
 
+/* Filmstrip */
+
+.lh-filmstrip {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: var(--default-padding);
+}
+
+.lh-filmstrip__frame {
+  text-align: center;
+}
+
+.lh-filmstrip__timestamp {
+  margin-bottom: 5px;
+}
+
+.lh-filmstrip__thumbnail {
+  border: 1px solid var(--report-secondary-border-color);
+  max-height: 100px;
+}
+
 /* Sparkline */
 
 .lh-sparkline {

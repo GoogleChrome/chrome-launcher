@@ -305,6 +305,15 @@ class CategoryRenderer {
 
     const metricAudits = category.audits.filter(audit => audit.group === 'perf-metric');
     const metricAuditsEl = this._renderAuditGroup(groups['perf-metric']);
+
+    const thumbnailAudit = category.audits.find(audit => audit.id === 'screenshot-thumbnails');
+    const thumbnailDetails = thumbnailAudit && thumbnailAudit.result &&
+        thumbnailAudit.result.details;
+    if (thumbnailDetails) {
+      const filmstripEl = this._detailsRenderer.render(thumbnailDetails);
+      metricAuditsEl.appendChild(filmstripEl);
+    }
+
     metricAudits.forEach(item => metricAuditsEl.appendChild(this._renderAudit(item)));
     metricAuditsEl.open = true;
     element.appendChild(metricAuditsEl);
@@ -331,7 +340,8 @@ class CategoryRenderer {
     }
 
     const passedElements = category.audits
-        .filter(audit => audit.group !== 'perf-metric' && audit.score === 100)
+        .filter(audit => (audit.group === 'perf-hint' || audit.group === 'perf-info') &&
+            audit.score === 100)
         .map(audit => this._renderAudit(audit));
 
     if (!passedElements.length) return element;

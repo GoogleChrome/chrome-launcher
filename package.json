@@ -74,6 +74,7 @@
     "devtools-timeline-model": "1.1.6",
     "gl-matrix": "2.3.2",
     "handlebars": "4.0.5",
+    "jpeg-js": "0.1.2",
     "json-stringify-safe": "5.0.1",
     "marked": "0.3.6",
     "metaviewport-parser": "0.0.1",

@@ -47,6 +47,8 @@ class DetailsRenderer {
         return this._renderURL(details);
       case 'thumbnail':
         return this._renderThumbnail(/** @type {!DetailsRenderer.ThumbnailDetails} */ (details));
+      case 'filmstrip':
+        return this._renderFilmstrip(/** @type {!DetailsRenderer.FilmstripDetails} */ (details));
       case 'cards':
         return this._renderCards(/** @type {!DetailsRenderer.CardsDetailsJSON} */ (details));
       case 'table':
@@ -196,6 +198,34 @@ class DetailsRenderer {
   }
 
   /**
+   * @param {!DetailsRenderer.FilmstripDetails} details
+   * @return {!Element}
+   */
+  _renderFilmstrip(details) {
+    const filmstripEl = this._dom.createElement('div', 'lh-filmstrip');
+
+    for (const thumbnail of details.items) {
+      const frameEl = this._dom.createChildOf(filmstripEl, 'div', 'lh-filmstrip__frame');
+
+      let timing = thumbnail.timing.toLocaleString() + ' ms';
+      if (thumbnail.timing > 1000) {
+        timing = Math.round(thumbnail.timing / 100) / 10 + ' s';
+      }
+
+      const timingEl = this._dom.createChildOf(frameEl, 'div', 'lh-filmstrip__timestamp');
+      timingEl.textContent = timing;
+
+      const base64data = thumbnail.data;
+      this._dom.createChildOf(frameEl, 'img', 'lh-filmstrip__thumbnail', {
+        src: `data:image/jpeg;base64,${base64data}`,
+        alt: `Screenshot at ${timing}`,
+      });
+    }
+
+    return filmstripEl;
+  }
+
+  /**
    * @param {!DetailsRenderer.DetailsJSON} details
    * @return {!Element}
    */
@@ -273,3 +303,10 @@ DetailsRenderer.TableDetailsJSON; // eslint-disable-line no-unused-expressions
  * }}
  */
 DetailsRenderer.ThumbnailDetails; // eslint-disable-line no-unused-expressions
+
+/** @typedef {{
+ *     type: string,
+ *     items: !Array<{timing: number, timestamp: number, data: string}>,
+ * }}
+ */
+DetailsRenderer.FilmstripDetails; // eslint-disable-line no-unused-expressions
