@@ -39,7 +39,7 @@ class AxeAudit extends Audit {
     if (rule && rule.nodes) {
       nodeDetails = rule.nodes.map(node => ({
         type: 'node',
-        selector: node.target.join(' '),
+        selector: Array.isArray(node.target) ? node.target.join(' ') : '',
         path: node.path,
         snippet: node.snippet
       }));
