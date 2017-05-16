@@ -70,7 +70,7 @@ class LoadFastEnough4Pwa extends Audit {
         };
       });
 
-      const latency3gMin = Emulation.settings.TYPICAL_MOBILE_THROTTLING_METRICS.latency - 10;
+      const latency3gMin = Emulation.settings.TYPICAL_MOBILE_THROTTLING_METRICS.targetLatency - 10;
       const areLatenciesAll3G = allRequestLatencies.every(val =>
           val === undefined || val.latency > latency3gMin);
 

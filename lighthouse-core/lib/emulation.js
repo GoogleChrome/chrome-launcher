@@ -41,10 +41,25 @@ const NEXUS5X_USERAGENT = {
     '(KHTML, like Gecko) Chrome/59.0.3033.0 Mobile Safari/537.36'
 };
 
+/**
+ * Adjustments needed for DevTools network throttling to simulate
+ * more realistic network conditions.
+ * See: crbug.com/721112
+ */
+const LATENCY_FACTOR = 3.75;
+const THROUGHPUT_FACTOR = 0.9;
+
+const TARGET_LATENCY = 150; // 150ms
+const TARGET_DOWNLOAD_THROUGHPUT = Math.floor(1.6 * 1024 * 1024 / 8); // 1.6Mbps
+const TARGET_UPLOAD_THROUGHPUT = Math.floor(750 * 1024 / 8); // 750Kbps
+
 const TYPICAL_MOBILE_THROTTLING_METRICS = {
-  latency: 150, // 150ms
-  downloadThroughput: Math.floor(1.6 * 1024 * 1024 / 8), // 1.6Mbps
-  uploadThroughput: Math.floor(750 * 1024 / 8), // 750Kbps
+  targetLatency: TARGET_LATENCY,
+  latency: TARGET_LATENCY * LATENCY_FACTOR,
+  targetDownloadThroughput: TARGET_DOWNLOAD_THROUGHPUT,
+  downloadThroughput: TARGET_DOWNLOAD_THROUGHPUT * THROUGHPUT_FACTOR,
+  targetUploadThroughput: TARGET_UPLOAD_THROUGHPUT,
+  uploadThroughput: TARGET_UPLOAD_THROUGHPUT * THROUGHPUT_FACTOR,
   offline: false
 };
 
