@@ -160,7 +160,7 @@ assumes you've installed Lighthouse as a dependency (`yarn add --dev lighthouse`
 
 ```javascript
 const lighthouse = require('lighthouse');
-const ChromeLauncher = require('lighthouse/chrome-laucher/chrome-launcher.js');
+const ChromeLauncher = require('lighthouse/chrome-launcher/chrome-launcher.js');
 const Printer = require('lighthouse/lighthouse-cli/printer');
 
 function launchChromeAndRunLighthouse(url, flags, config) {
@@ -168,8 +168,7 @@ function launchChromeAndRunLighthouse(url, flags, config) {
 
   launchedChrome
     .then(() => lighthouse(url, flags, config)) // Run Lighthouse.
-    .then(results => launchedChrome.kill())
-    .then(() => results) // Kill Chrome and return results.
+    .then(results => launchedChrome.kill().then(() => results)) // Kill Chrome and return results.
     .catch(err => {
       // Kill Chrome if there's an error.
       return launchedChrome.kill().then(() => {
@@ -187,16 +186,6 @@ launchChromeAndRunLighthouse(url, flags, config).then(lighthouseResults => {
   lighthouseResults.artifacts = undefined; // You can save the artifacts separately if so desired
   return Printer.write(lighthouseResults, flags.output);
 }).catch(err => console.error(err));
-```
-
-**Example** - extracting an overall score from all scored audits
-
-```javascript
-function getOverallScore(lighthouseResults) {
-  const scoredAggregations = lighthouseResults.aggregations.filter(a => a.scored);
-  const total = scoredAggregations.reduce((sum, aggregation) => sum + aggregation.total, 0);
-  return (total / scoredAggregations.length) * 100;
-}
 ```
 
 ### Recipes
