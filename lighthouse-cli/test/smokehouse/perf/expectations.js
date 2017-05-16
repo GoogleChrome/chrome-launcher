@@ -34,14 +34,8 @@ module.exports = [
           }
         }
       },
-      'time-to-interactive': {
+      'first-interactive': {
         score: 100,
-        extendedInfo: {
-          value: {
-            timings: {},
-            timestamps: {}
-          }
-        }
       }
     }
   },
