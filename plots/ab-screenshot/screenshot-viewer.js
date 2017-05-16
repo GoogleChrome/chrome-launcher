@@ -292,8 +292,9 @@ function createScreenshotImageElement(screenshot) {
   image.addEventListener('mouseleave', () => {
     shouldHidePopover = true;
     setTimeout(_ => {
-      if (shouldHidePopover)
+      if (shouldHidePopover) {
         imagePopoverElement.classList.add('hidden');
+      }
     }, 200);
   });
   return image;
