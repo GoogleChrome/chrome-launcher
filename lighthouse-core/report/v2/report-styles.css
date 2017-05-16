@@ -136,6 +136,10 @@ summary {
   word-break: break-word;
   color: hsl(174, 100%, 27%);
 }
+span.lh-node:hover {
+    background: hsl(0, 0%, 98%);
+    border-radius: 2px;
+}
 
 /* Card */
 .lh-scorecards {
