@@ -127,6 +127,7 @@ echo "Inform various peoples"
 
 ```sh
 # Pull latest in a clean non-dev clone
+yarn install-all
 
 # Update manifest_canary.json w/ version bumps.
 
