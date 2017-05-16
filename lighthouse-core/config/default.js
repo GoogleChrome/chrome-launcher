@@ -76,6 +76,9 @@ module.exports = {
     "manifest-short-name-length",
     "content-width",
     "deprecations",
+    "manual/pwa-cross-browser",
+    "manual/pwa-page-transitions",
+    "manual/pwa-each-page-has-url",
     "accessibility/accesskeys",
     "accessibility/aria-allowed-attr",
     "accessibility/aria-required-attr",
@@ -136,7 +139,7 @@ module.exports = {
   "aggregations": [{
     "name": "Progressive Web App",
     "id": "pwa",
-    "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
+    "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the baseline [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
     "scored": true,
     "categorizable": true,
     "items": [{
@@ -606,42 +609,48 @@ module.exports = {
     },
     "a11y-color-contrast": {
       "title": "Color Contrast Is Satisfactory",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-describe-contents": {
       "title": "Elements Describe Contents Well",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-well-structured": {
       "title": "Elements Are Well Structured",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-aria": {
       "title": "ARIA Attributes Follow Best Practices",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-correct-attributes": {
       "title": "Elements Use Attributes Correctly",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-element-names": {
       "title": "Elements Have Discernable Names",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-language": {
       "title": "Page Specifies Valid Language",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
     },
     "a11y-meta": {
       "title": "Meta Tags Used Properly",
-      "description": "Screen readers and other assitive technologies require annotations to understand otherwise ambiguous content."
+      "description": "Screen readers and other assistive technologies require annotations to understand otherwise ambiguous content."
+    },
+    "manual-pwa-checks": {
+      "title": "Manual checks to verify",
+      "description": "These audits are required by the baseline " +
+          "[PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist) but are " +
+          "not automatically checked by Lighthouse. They do not affect your score but it's important that you verify them manually."
     },
   },
   "categories": {
     "pwa": {
       "name": "Progressive Web App",
       "weight": 1,
-      "description": "These audits validate the aspects of a Progressive Web App. They are a subset of the [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
+      "description": "These audits validate the aspects of a Progressive Web App, as specified by the baseline [PWA Checklist](https://developers.google.com/web/progressive-web-apps/checklist).",
       "audits": [
         {"id": "service-worker", "weight": 1},
         {"id": "works-offline", "weight": 1},
@@ -653,7 +662,10 @@ module.exports = {
         {"id": "splash-screen", "weight": 1},
         {"id": "themed-omnibox", "weight": 1},
         {"id": "viewport", "weight": 1},
-        {"id": "content-width", "weight": 1}
+        {"id": "content-width", "weight": 1},
+        {"id": "pwa-cross-browser", "weight": 0, "group": "manual-pwa-checks"},
+        {"id": "pwa-page-transitions", "weight": 0, "group": "manual-pwa-checks"},
+        {"id": "pwa-each-page-has-url", "weight": 0, "group": "manual-pwa-checks"}
       ]
     },
     "performance": {

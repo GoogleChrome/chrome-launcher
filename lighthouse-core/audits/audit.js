@@ -147,6 +147,7 @@ class Audit {
       extendedInfo: result.extendedInfo,
       scoringMode: audit.meta.scoringMode || Audit.SCORING_MODES.BINARY,
       informative: audit.meta.informative,
+      manual: audit.meta.manual,
       name: audit.meta.name,
       category: audit.meta.category,
       description: audit.meta.description,

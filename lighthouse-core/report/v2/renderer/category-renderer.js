@@ -66,6 +66,9 @@ class CategoryRenderer {
     if (audit.result.informative) {
       scoreEl.classList.add('lh-score--informative');
     }
+    if (audit.result.manual) {
+      scoreEl.classList.add('lh-score--manual');
+    }
 
     return this._populateScore(tmpl, audit.score, scoringMode, title, description);
   }
@@ -185,7 +188,7 @@ class CategoryRenderer {
     auditGroupHeader.textContent = group.title;
 
     const auditGroupDescription = this._dom.createElement('div', 'lh-audit-group__description');
-    auditGroupDescription.textContent = group.description;
+    auditGroupDescription.appendChild(this._dom.createSpanFromMarkdown(group.description));
 
     const auditGroupSummary = this._dom.createElement('summary',
           'lh-audit-group__summary lh-expandable-details__summary');
@@ -211,6 +214,35 @@ class CategoryRenderer {
     passedSummary.textContent = `View ${elements.length} passed items`;
     elements.forEach(elem => passedElem.appendChild(elem));
     return passedElem;
+  }
+
+  /**
+   * @param {!Array<!ReportRenderer.AuditJSON>} manualAudits
+   * @param {!Object<string, !ReportRenderer.GroupJSON>} groupDefinitions
+   * @param {!Element} element Parent container to add the manual audits to.
+   */
+  _renderManualAudits(manualAudits, groupDefinitions, element) {
+    const auditsGroupedByGroup = /** @type {!Object<string,
+        !Array<!ReportRenderer.AuditJSON>>} */ ({});
+    manualAudits.forEach(audit => {
+      const group = auditsGroupedByGroup[audit.group] || [];
+      group.push(audit);
+      auditsGroupedByGroup[audit.group] = group;
+    });
+
+    Object.keys(auditsGroupedByGroup).forEach(groupId => {
+      const group = groupDefinitions[groupId];
+      const auditGroupElem = this._renderAuditGroup(group);
+
+      this._dom.find('.lh-audit-group__summary', auditGroupElem)
+          .classList.add('lh-audit-group__summary--manual');
+
+      auditsGroupedByGroup[groupId].forEach(audit => {
+        auditGroupElem.appendChild(this._renderAudit(audit));
+      });
+
+      element.appendChild(auditGroupElem);
+    });
   }
 
   /**
@@ -262,34 +294,39 @@ class CategoryRenderer {
       case 'accessibility':
         return this._renderAccessibilityCategory(category, groups);
       default:
-        return this._renderDefaultCategory(category);
+        return this._renderDefaultCategory(category, groups);
     }
   }
 
   /**
    * @param {!ReportRenderer.CategoryJSON} category
+   * @param {!Object<string, !ReportRenderer.GroupJSON>} groupDefinitions
    * @return {!Element}
    */
-  _renderDefaultCategory(category) {
+  _renderDefaultCategory(category, groupDefinitions) {
     const element = this._dom.createElement('div', 'lh-category');
     element.id = category.id;
     element.appendChild(this._renderCategoryScore(category));
 
-    const passedAudits = category.audits.filter(audit => audit.score === 100);
-    const nonPassedAudits = category.audits.filter(audit => !passedAudits.includes(audit));
+    const manualAudits = category.audits.filter(audit => audit.result.manual);
+    const nonManualAudits = category.audits.filter(audit => !manualAudits.includes(audit));
+    const passedAudits = nonManualAudits.filter(audit => audit.score === 100);
+    const nonPassedAudits = nonManualAudits.filter(audit => !passedAudits.includes(audit));
 
     for (const audit of nonPassedAudits) {
       element.appendChild(this._renderAudit(audit));
     }
 
-    // Don't create a passed section if there are no passed.
-    if (!passedAudits.length) {
-      return element;
+    // Create a passed section if there are passing audits.
+    if (passedAudits.length) {
+      const passedElements = passedAudits.map(audit => this._renderAudit(audit));
+      const passedElem = this._renderPassedAuditsSection(passedElements);
+      element.appendChild(passedElem);
     }
 
-    const passedElements = passedAudits.map(audit => this._renderAudit(audit));
-    const passedElem = this._renderPassedAuditsSection(passedElements);
-    element.appendChild(passedElem);
+    // Render manual audits after passing.
+    this._renderManualAudits(manualAudits, groupDefinitions, element);
+
     return element;
   }
 

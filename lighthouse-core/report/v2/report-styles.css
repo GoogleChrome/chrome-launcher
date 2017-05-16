@@ -27,6 +27,7 @@
   --fail-color: #df332f;
   --pass-color: #2b882f;
   --informative-color: #0c50c7;
+  --manual-color: #757575;
   --average-color: #ef6c00; /* md orange 800 */
   --warning-color: #ffab00; /* md amber a700 */
 
@@ -215,6 +216,15 @@ span.lh-node:hover {
 .lh-score--informative .lh-score__value::after {
   background: url('data:image/svg+xml;utf8,<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>info</title><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="#0c50c7"/></svg>') no-repeat 50% 50%;
   background-size: var(--lh-score-icon-background-size);
+}
+
+.lh-score--manual .lh-score__value::after {
+  background: url('data:image/svg+xml;utf8,<svg width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><title>manual</title><path d="M2 5h8v2H2z" fill="#fff" fill-rule="evenodd"/></svg>') no-repeat 50% 50%;
+  background-size: 18px;
+  background-color: var(--manual-color);
+  width: 20px;
+  height:  20px;
+  position: relative;
 }
 
 .lh-score__value--binary {
@@ -453,6 +463,25 @@ span.lh-node:hover {
   font-size: 18px;
 }
 
+.lh-audit-group__summary--manual {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+}
+
+.lh-audit-group__summary--manual .lh-audit-group__header  {
+  font-size: inherit;
+}
+
+.lh-audit-group__summary--manual .lh-toggle-arrow {
+  display: none;
+}
+
+.lh-audit-group__summary--manual::-webkit-details-marker {
+  display: initial;
+  background: var(--manual-color) !important;
+}
+
 .lh-audit-group__description {
   font-size: 16px;
   color: var(--secondary-text-color);
@@ -578,16 +607,16 @@ summary.lh-passed-audits-summary {
   align-items: center;
 }
 
-summary.lh-passed-audits-summary::-webkit-details-marker {
+summary.lh-passed-audits-summary::-webkit-details-marker,
+.lh-audit-group__summary--manual::-webkit-details-marker {
   background: var(--pass-color);
   color: white;
-  position: relative;
-  content: '';
   padding: 3px 3px 3px 6px;
   border-radius: 2px;
 }
 
-.lh-passed-audits[open] summary.lh-passed-audits-summary::-webkit-details-marker {
+.lh-passed-audits[open] summary.lh-passed-audits-summary::-webkit-details-marker,
+.lh-audit-group[open] summary.lh-audit-group__summary--manual::-webkit-details-marker {
   padding: 3px 5px 3px 4px;
 }
 

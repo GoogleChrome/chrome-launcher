@@ -26,6 +26,8 @@ const DOM = require('../../../../report/v2/renderer/dom.js');
 const DetailsRenderer = require('../../../../report/v2/renderer/details-renderer.js');
 const ReportUIFeatures = require('../../../../report/v2/renderer/report-ui-features.js');
 const CategoryRenderer = require('../../../../report/v2/renderer/category-renderer.js');
+const CriticalRequestChainRenderer = require(
+    '../../../../report/v2/renderer/crc-details-renderer.js');
 const ReportRenderer = require('../../../../report/v2/renderer/report-renderer.js');
 const sampleResults = require('../../../results/sample_v2.json');
 
@@ -39,6 +41,7 @@ describe('ReportRenderer V2', () => {
     global.URL = URL;
     global.Util = Util;
     global.ReportUIFeatures = ReportUIFeatures;
+    global.CriticalRequestChainRenderer = CriticalRequestChainRenderer;
 
     // Stub out matchMedia for Node.
     global.matchMedia = function() {
@@ -62,6 +65,7 @@ describe('ReportRenderer V2', () => {
     global.Util = undefined;
     global.ReportUIFeatures = undefined;
     global.matchMedia = undefined;
+    global.CriticalRequestChainRenderer = undefined;
   });
 
   describe('renderReport', () => {
