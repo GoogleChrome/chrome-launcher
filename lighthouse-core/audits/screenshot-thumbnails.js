@@ -17,6 +17,8 @@
 'use strict';
 
 const Audit = require('./audit');
+const TTFI = require('./first-interactive');
+const TTCI = require('./consistently-interactive');
 const jpeg = require('jpeg-js');
 
 const NUMBER_OF_THUMBNAILS = 10;
@@ -81,12 +83,19 @@ class ScreenshotThumbnails extends Audit {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     const cachedThumbnails = new Map();
 
-    return artifacts.requestSpeedline(trace).then(speedline => {
+    return Promise.all([
+      artifacts.requestSpeedline(trace),
+      TTFI.audit(artifacts).catch(() => ({rawValue: 0})),
+      TTCI.audit(artifacts).catch(() => ({rawValue: 0})),
+    ]).then(([speedline, ttfi, ttci]) => {
       const thumbnails = [];
       const analyzedFrames = speedline.frames.filter(frame => !frame.isProgressInterpolated());
+      // Find thumbnails to cover the full range of the trace (max of last visual change and time
+      // to interactive).
+      const timelineEnd = Math.max(speedline.complete, ttfi.rawValue, ttci.rawValue);
 
       for (let i = 1; i <= NUMBER_OF_THUMBNAILS; i++) {
-        const targetTimestamp = speedline.beginning + speedline.complete * i / NUMBER_OF_THUMBNAILS;
+        const targetTimestamp = speedline.beginning + timelineEnd * i / NUMBER_OF_THUMBNAILS;
 
         let frameForTimestamp = null;
         if (i === NUMBER_OF_THUMBNAILS) {
@@ -117,6 +126,7 @@ class ScreenshotThumbnails extends Audit {
         rawValue: thumbnails.length > 0,
         details: {
           type: 'filmstrip',
+          scale: timelineEnd,
           items: thumbnails,
         },
       };

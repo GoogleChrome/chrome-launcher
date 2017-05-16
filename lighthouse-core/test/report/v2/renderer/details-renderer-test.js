@@ -20,6 +20,7 @@ const fs = require('fs');
 const jsdom = require('jsdom');
 const URL = require('../../../../lib/url-shim');
 const DOM = require('../../../../report/v2/renderer/dom.js');
+const Util = require('../../../../report/v2/renderer/util.js');
 const DetailsRenderer = require('../../../../report/v2/renderer/details-renderer.js');
 
 const TEMPLATE_FILE = fs.readFileSync(__dirname + '/../../../../report/v2/templates.html', 'utf8');
@@ -31,6 +32,7 @@ describe('DetailsRenderer', () => {
 
   before(() => {
     global.URL = URL;
+    global.Util = Util;
     const document = jsdom.jsdom(TEMPLATE_FILE);
     const dom = new DOM(document);
     renderer = new DetailsRenderer(dom);
@@ -38,6 +40,7 @@ describe('DetailsRenderer', () => {
 
   after(() => {
     global.URL = undefined;
+    global.Util = undefined;
   });
 
   describe('render', () => {

@@ -673,10 +673,10 @@ module.exports = {
       "description": "These encapsulate your app's performance.",
       "audits": [
         {"id": "first-meaningful-paint", "weight": 5, "group": "perf-metric"},
-        {"id": "speed-index-metric", "weight": 1, "group": "perf-metric"},
-        {"id": "estimated-input-latency", "weight": 1, "group": "perf-metric"},
         {"id": "first-interactive", "weight": 5, "group": "perf-metric"},
         {"id": "consistently-interactive", "weight": 5, "group": "perf-metric"},
+        {"id": "speed-index-metric", "weight": 1, "group": "perf-metric"},
+        {"id": "estimated-input-latency", "weight": 1, "group": "perf-metric"},
         {"id": "link-blocking-first-paint", "weight": 0, "group": "perf-hint"},
         {"id": "script-blocking-first-paint", "weight": 0, "group": "perf-hint"},
         // {"id": "unused-css-rules", "weight": 0},

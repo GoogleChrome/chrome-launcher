@@ -149,8 +149,9 @@ describe('CategoryRenderer', () => {
       const metricsSection = categoryDOM.querySelectorAll('.lh-category > .lh-audit-group')[0];
 
       const metricAudits = category.audits.filter(audit => audit.group === 'perf-metric');
-      const metricsElements = metricsSection.querySelectorAll('.lh-audit');
-      assert.equal(metricsElements.length, metricAudits.length);
+      const timelineElements = metricsSection.querySelectorAll('.lh-timeline-metric');
+      const nontimelineElements = metricsSection.querySelectorAll('.lh-audit');
+      assert.equal(timelineElements.length + nontimelineElements.length, metricAudits.length);
     });
 
     it('renders the failing performance hints', () => {

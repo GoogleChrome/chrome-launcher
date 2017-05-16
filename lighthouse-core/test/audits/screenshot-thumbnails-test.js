@@ -21,15 +21,43 @@ const assert = require('assert');
 
 const Runner = require('../../runner.js');
 const ScreenshotThumbnailsAudit = require('../../audits/screenshot-thumbnails');
+const TTFIAudit = require('../../audits/first-interactive');
+const TTCIAudit = require('../../audits/consistently-interactive');
 const pwaTrace = require('../fixtures/traces/progressive-app-m60.json');
 
 /* eslint-env mocha */
 
 describe('Screenshot thumbnails', () => {
+  let computedArtifacts;
+  let ttfiOrig;
+  let ttciOrig;
+  let ttfiReturn;
+  let ttciReturn;
+
+  before(() => {
+    computedArtifacts = Runner.instantiateComputedArtifacts();
+
+    // Monkey patch TTFI to simulate result
+    ttfiOrig = TTFIAudit.audit;
+    ttciOrig = TTCIAudit.audit;
+    TTFIAudit.audit = () => ttfiReturn || Promise.reject(new Error('oops!'));
+    TTCIAudit.audit = () => ttciReturn || Promise.reject(new Error('oops!'));
+  });
+
+  after(() => {
+    TTFIAudit.audit = ttfiOrig;
+    TTCIAudit.audit = ttciOrig;
+  });
+
+  beforeEach(() => {
+    ttfiReturn = null;
+    ttciReturn = null;
+  });
+
   it('should extract thumbnails from a trace', () => {
     const artifacts = Object.assign({
       traces: {defaultPass: pwaTrace}
-    }, Runner.instantiateComputedArtifacts());
+    }, computedArtifacts);
 
     return ScreenshotThumbnailsAudit.audit(artifacts).then(results => {
       results.details.items.forEach((result, index) => {
@@ -44,6 +72,37 @@ describe('Screenshot thumbnails', () => {
       assert.equal(results.details.items[2].timing, 245);
       assert.equal(results.details.items[9].timing, 818);
       assert.equal(results.details.items[0].timestamp, 225414253815);
+    });
+  });
+
+  it('should scale the timeline to TTFI', () => {
+    const artifacts = Object.assign({
+      traces: {defaultPass: pwaTrace}
+    }, computedArtifacts);
+
+    ttfiReturn = Promise.resolve({rawValue: 4000});
+    return ScreenshotThumbnailsAudit.audit(artifacts).then(results => {
+      assert.equal(results.details.items[0].timing, 400);
+      assert.equal(results.details.items[9].timing, 4000);
+      const extrapolatedFrames = new Set(results.details.items.slice(3).map(f => f.data));
+      assert.ok(results.details.items[9].data.length > 100, 'did not have last frame');
+      assert.ok(extrapolatedFrames.size === 1, 'did not extrapolate last frame');
+    });
+  });
+
+  it('should scale the timeline to TTCI', () => {
+    const artifacts = Object.assign({
+      traces: {defaultPass: pwaTrace}
+    }, computedArtifacts);
+
+    ttfiReturn = Promise.resolve({rawValue: 8000});
+    ttciReturn = Promise.resolve({rawValue: 20000});
+    return ScreenshotThumbnailsAudit.audit(artifacts).then(results => {
+      assert.equal(results.details.items[0].timing, 2000);
+      assert.equal(results.details.items[9].timing, 20000);
+      const extrapolatedFrames = new Set(results.details.items.map(f => f.data));
+      assert.ok(results.details.items[9].data.length > 100, 'did not have last frame');
+      assert.ok(extrapolatedFrames.size === 1, 'did not extrapolate last frame');
     });
   });
 });
