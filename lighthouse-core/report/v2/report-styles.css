@@ -531,7 +531,6 @@ span.lh-node:hover {
 
 .lh-code {
   text-overflow: ellipsis;
-  overflow: hidden;
   white-space: pre-line;
   margin-top: 0;
 }
