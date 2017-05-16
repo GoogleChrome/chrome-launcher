@@ -122,3 +122,28 @@ echo "Generate the release notes, and update the release page"
 # * Tell the world!!! *
 echo "Inform various peoples"
 ```
+
+### Canary release
+
+```sh
+# Pull latest in a clean non-dev clone
+
+# Update manifest_canary.json w/ version bumps.
+
+git c "bump extension canary to 2.0.0.X"
+
+npm version prerelease
+# (it'll commit)
+
+# overwrite extension's manifest w/ manifest_canary.
+
+yarn build-all
+
+cd lighthouse-extension/
+gulp package
+# upload zip to CWS
+
+# verify you build-all'd for the typescript compile
+
+npm publish
+```
