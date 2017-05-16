@@ -56,10 +56,10 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
   it('fails a good TTI value with no throttling', () => {
     // latencies are very short
     const mockNetworkRecords = [
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true},
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 75}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true, _url: 'https://google.com/'},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 75}, finished: true, _url: 'https://google.com/a'},
       { },
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true, _url: 'https://google.com/b'},
     ];
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, false);
@@ -80,12 +80,17 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
 
   it('passes a good TTI value and WITH throttling', () => {
     // latencies are very long
+    const urlA = 'https://google.com';
+    const urlB = 'https://example.com';
     const mockNetworkRecords = [
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true},
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 175}, finished: true},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true, _url: urlA, _startTime: 0},
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true, _url: urlB},
+      // ignored for not having timing
       { },
-      {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true},
-      {_timing: {sendEnd: 0, receiveHeadersEnd: -1}, finished: false}, // ignored for not finishing
+      // ignored for not being the first of the origin
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 100}, finished: true, _url: urlA, _startTime: 100},
+      // ignored for not finishing
+      {_timing: {sendEnd: 0, receiveHeadersEnd: -1}, finished: false},
     ];
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
       assert.equal(result.rawValue, true);

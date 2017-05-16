@@ -82,6 +82,26 @@ describe('URL Shim', () => {
     assert.equal(URL.originsMatch(urlA, urlB), false);
   });
 
+  it('safely gets valid origins', () => {
+    const urlA = 'https://google.com/page?query=string#hash';
+    const urlB = 'https://5321212.fls.net/page?query=string#hash';
+    const urlC = 'http://example.com/deeply/nested/page';
+    assert.equal(URL.getOrigin(urlA), 'https://google.com');
+    assert.equal(URL.getOrigin(urlB), 'https://5321212.fls.net');
+    assert.equal(URL.getOrigin(urlC), 'http://example.com');
+  });
+
+  it('safely gets URLs with no origin', () => {
+    const urlA = 'data:image/jpeg;base64,foobar';
+    const urlB = 'anonymous:90';
+    const urlC = '!!garbage';
+    const urlD = 'file:///opt/lighthouse/index.js';
+    assert.equal(URL.getOrigin(urlA), null);
+    assert.equal(URL.getOrigin(urlB), null);
+    assert.equal(URL.getOrigin(urlC), null);
+    assert.equal(URL.getOrigin(urlD), null);
+  });
+
   describe('getURLDisplayName', () => {
     it('respects numPathParts option', () => {
       const url = 'http://example.com/a/deep/nested/file.css';
