@@ -88,26 +88,25 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
     const DPR = artifacts.ViewportDimensions.devicePixelRatio;
 
     let debugString;
-    const resultsMap = images.reduce((results, image) => {
+    const resultsMap = new Map();
+    images.forEach(image => {
       // TODO: give SVG a free pass until a detail per pixel metric is available
       if (!image.networkRecord || image.networkRecord.mimeType === 'image/svg+xml') {
-        return results;
+        return;
       }
 
       const processed = UsesResponsiveImages.computeWaste(image, DPR);
       if (processed instanceof Error) {
         debugString = processed.message;
-        return results;
+        return;
       }
 
       // Don't warn about an image that was later used appropriately
-      const existing = results.get(processed.preview.url);
+      const existing = resultsMap.get(processed.preview.url);
       if (!existing || existing.wastedBytes > processed.wastedBytes) {
-        results.set(processed.preview.url, processed);
+        resultsMap.set(processed.preview.url, processed);
       }
-
-      return results;
-    }, new Map());
+    });
 
     const results = Array.from(resultsMap.values())
         .filter(item => item.wastedBytes > IGNORE_THRESHOLD_IN_BYTES);
@@ -121,7 +120,6 @@ class UsesResponsiveImages extends ByteEfficiencyAudit {
 
     return {
       debugString,
-      passes: !results.find(item => item.isWasteful),
       results,
       headings,
     };

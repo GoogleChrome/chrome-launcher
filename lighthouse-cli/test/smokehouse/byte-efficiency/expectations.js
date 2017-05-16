@@ -46,12 +46,22 @@ module.exports = [
           }
         }
       },
-      'uses-optimized-images': {
+      'uses-webp-images': {
         // score: 65,
         extendedInfo: {
           value: {
             results: {
               length: 4
+            }
+          }
+        }
+      },
+      'uses-optimized-images': {
+        // score: 65,
+        extendedInfo: {
+          value: {
+            results: {
+              length: 1
             }
           }
         }

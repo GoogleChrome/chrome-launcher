@@ -45,7 +45,7 @@ function generateImage(clientSize, naturalSize, networkRecord, src = 'https://go
 
 describe('Page uses responsive images', () => {
   function testImage(condition, data) {
-    const description = `${data.passes ? 'passes' : 'fails'} when an image is ${condition}`;
+    const description = `identifies when an image is ${condition}`;
     it(description, () => {
       const result = UsesResponsiveImagesAudit.audit_({
         ViewportDimensions: {devicePixelRatio: data.devicePixelRatio || 1},
@@ -58,22 +58,23 @@ describe('Page uses responsive images', () => {
         ]
       });
 
-      assert.equal(result.passes, data.passes);
-      assert.equal(result.results.length, data.listed || !data.passes ? 1 : 0);
+      assert.equal(result.results.length, data.listed ? 1 : 0);
+      if (data.listed) {
+        assert.equal(Math.round(result.results[0].wastedBytes / 1024), data.expectedWaste);
+      }
     });
   }
 
   testImage('larger than displayed size', {
-    passes: false,
-    listed: false,
+    listed: true,
     devicePixelRatio: 2,
     clientSize: [100, 100],
     naturalSize: [300, 300],
-    sizeInKb: 200
+    sizeInKb: 200,
+    expectedWaste: 111, // 200 * 5/9
   });
 
   testImage('smaller than displayed size', {
-    passes: true,
     listed: false,
     devicePixelRatio: 2,
     clientSize: [200, 200],
@@ -82,16 +83,15 @@ describe('Page uses responsive images', () => {
   });
 
   testImage('small in file size', {
-    passes: true,
     listed: true,
     devicePixelRatio: 2,
     clientSize: [100, 100],
     naturalSize: [300, 300],
-    sizeInKb: 10
+    sizeInKb: 10,
+    expectedWaste: 6, // 10 * 5/9
   });
 
   testImage('very small in file size', {
-    passes: true,
     listed: false,
     devicePixelRatio: 2,
     clientSize: [100, 100],
@@ -111,11 +111,10 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, true);
     assert.equal(auditResult.results.length, 0);
   });
 
-  it('passes when all images are not wasteful', () => {
+  it('identifies when images are not wasteful', () => {
     const auditResult = UsesResponsiveImagesAudit.audit_({
       ViewportDimensions: {devicePixelRatio: 2},
       ImageUsage: [
@@ -140,7 +139,6 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, true);
     assert.equal(auditResult.results.length, 2);
   });
 
@@ -156,7 +154,6 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, true);
     assert.equal(auditResult.results.length, 0);
   });
 
@@ -179,7 +176,6 @@ describe('Page uses responsive images', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, true);
     assert.equal(auditResult.results.length, 1);
     assert.equal(auditResult.results[0].wastedPercent, 75, 'correctly computes wastedPercent');
   });

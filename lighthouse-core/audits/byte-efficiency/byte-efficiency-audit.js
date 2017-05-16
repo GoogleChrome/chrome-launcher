@@ -92,11 +92,12 @@ class UnusedBytes extends Audit {
     const debugString = result.debugString;
     const results = result.results
         .map(item => {
+          const wastedPercent = 100 * item.wastedBytes / item.totalBytes;
           item.wastedKb = this.bytesToKbString(item.wastedBytes);
           item.wastedMs = this.bytesToMsString(item.wastedBytes, networkThroughput);
           item.totalKb = this.bytesToKbString(item.totalBytes);
           item.totalMs = this.bytesToMsString(item.totalBytes, networkThroughput);
-          item.potentialSavings = this.toSavingsString(item.wastedBytes, item.wastedPercent);
+          item.potentialSavings = this.toSavingsString(item.wastedBytes, wastedPercent);
           return item;
         })
         .sort((itemA, itemB) => itemB.wastedBytes - itemA.wastedBytes);

@@ -15,42 +15,30 @@
  * limitations under the License.
  */
 /*
- * @fileoverview This audit determines if the images used are sufficiently larger
- * than JPEG compressed images without metadata at quality 85.
+ * @fileoverview This audit determines if the images could be smaller when compressed with WebP.
  */
 'use strict';
 
 const ByteEfficiencyAudit = require('./byte-efficiency-audit');
+const OptimizedImages = require('./uses-optimized-images');
 const URL = require('../../lib/url-shim');
 
-const IGNORE_THRESHOLD_IN_BYTES = 4096;
+const IGNORE_THRESHOLD_IN_BYTES = 8192;
 
-class UsesOptimizedImages extends ByteEfficiencyAudit {
+class UsesWebPImages extends ByteEfficiencyAudit {
   /**
    * @return {!AuditMeta}
    */
   static get meta() {
     return {
       category: 'Images',
-      name: 'uses-optimized-images',
-      description: 'Optimize images',
+      name: 'uses-webp-images',
+      description: 'Serve images as WebP',
       informative: true,
-      helpText: 'Optimized images take less time to download and save cellular data. ' +
-        'The identified images could have smaller file sizes when compressed as JPEG (q=85). ' +
+      helpText: '[WebP](https://developers.google.com/speed/webp/) images take less time to download and save cellular data. ' +
         '[Learn more about image optimization](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization).',
       requiredArtifacts: ['OptimizedImages', 'devtoolsLogs']
     };
-  }
-
-  /**
-   * @param {{originalSize: number, webpSize: number, jpegSize: number}} image
-   * @param {string} type
-   * @return {{bytes: number, percent: number}}
-   */
-  static computeSavings(image, type) {
-    const bytes = image.originalSize - image[type + 'Size'];
-    const percent = 100 * bytes / image.originalSize;
-    return {bytes, percent};
   }
 
   /**
@@ -66,20 +54,19 @@ class UsesOptimizedImages extends ByteEfficiencyAudit {
       if (image.failed) {
         failedImages.push(image);
         return;
-      } else if (/(jpeg|bmp)/.test(image.mimeType) === false ||
-                 image.originalSize < image.jpegSize + IGNORE_THRESHOLD_IN_BYTES) {
+      } else if (image.originalSize < image.webpSize + IGNORE_THRESHOLD_IN_BYTES) {
         return;
       }
 
       const url = URL.getURLDisplayName(image.url);
-      const jpegSavings = UsesOptimizedImages.computeSavings(image, 'jpeg');
+      const webpSavings = OptimizedImages.computeSavings(image, 'webp');
 
       results.push({
         url,
         isCrossOrigin: !image.isSameOrigin,
         preview: {url: image.url, mimeType: image.mimeType, type: 'thumbnail'},
         totalBytes: image.originalSize,
-        wastedBytes: jpegSavings.bytes,
+        wastedBytes: webpSavings.bytes,
       });
     });
 
@@ -104,4 +91,4 @@ class UsesOptimizedImages extends ByteEfficiencyAudit {
   }
 }
 
-module.exports = UsesOptimizedImages;
+module.exports = UsesWebPImages;

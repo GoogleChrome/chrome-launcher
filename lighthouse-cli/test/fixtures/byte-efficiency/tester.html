@@ -65,56 +65,67 @@ setTimeout(() => {
 
 <div class="images">
   <!-- FAIL(optimized): image is not JPEG optimized -->
+  <!-- FAIL(webp): image is not WebP optimized -->
   <!-- PASS(responsive): image is used at full size -->
   <!-- FAIL(offscreen): image is offscreen -->
   <img style="position: absolute; top: -10000px;" src="lighthouse-unoptimized.jpg">
 
   <!-- Image is cross-origin, which are disabled for now -->
   <!-- FAIL(optimized): image is not optimized -->
+  <!-- FAIL(webp): image is not WebP optimized -->
   <!-- PASS(responsive): image is used at full size -->
   <!--<img src="http://localhost:10503/byte-efficiency/lighthouse-unoptimized.jpg">-->
 
-  <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- FAIL(webp): image is not WebP optimized -->
   <!-- FAIL(responsive): image is 25% used at DPR 2 -->
   <!-- PASS(offscreen): image is onscreen -->
   <img style="width: 256px; height: 170px;" src="lighthouse-1024x680.jpg">
 
-  <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- FAIL(webp): image is not WebP optimized -->
   <!-- PASS(responsive): image is fully used at DPR 2 -->
   <!-- PASS(offscreen): image is onscreen -->
   <img style="width: 240px; height: 160px;" src="lighthouse-480x320.jpg">
 
-  <!-- PASS(optimized): image has insignificant WebP savings -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- PASS(webp): image has insigificant WebP savings -->
   <!-- PASS(responsive): image is used at full size -->
   <!-- PASS(offscreen): image is onscreen -->
   <img src="lighthouse-320x212-poor.jpg">
 
-  <!-- PASS(optimized): image is fully optimized -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- PASS(webp): image is WebP optimized -->
   <!-- PASSWARN(responsive): image is 25% used at DPR 2 (but small savings) -->
   <!-- FAIL(offscreen): image is offscreen -->
   <img style="margin-top: 1000px; width: 120px; height: 80px;" src="lighthouse-480x320.webp">
 
   <!-- PASS(optimized): image is vector -->
+  <!-- PASS(webp): image is vector -->
   <!-- PASS(responsive): image is vector -->
   <!-- FAIL(offscreen): image is offscreen -->
   <img style="width: 100px; height: 100px;" src="large.svg">
 
-  <!-- PASS(optimized): image has insignificant WebP savings -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- PASS(webp): image has insigificant WebP savings -->
   <!-- PASS(responsive): image is later used at full size -->
   <!-- PASS(offscreen): image is later used onscreen -->
   <img style="width: 24px; height: 16px;"src="lighthouse-320x212-poor.jpg?duplicate">
 
-  <!-- PASS(optimized): image has insignificant WebP savings -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- PASS(webp): image has insigificant WebP savings -->
   <!-- PASS(responsive): image is used at full size -->
   <!-- PASS(offscreen): image is onscreen -->
   <img class="onscreen" src="lighthouse-320x212-poor.jpg?duplicate">
 
   <!-- PASS(optimized): image is WebP -->
+  <!-- PASS(webp): image is WebP optimized -->
   <!-- FAIL(responsive): image is used at 1/16 size -->
   <!-- PASS(offscreen): image is onscreen -->
   <div class="onscreen" style="width: 120px; height: 80px; background: 50% 50% url(lighthouse-480x320.webp?css);"></div>
 
-  <!-- PASSWARN(optimized): image is JPEG optimized but not WebP -->
+  <!-- PASS(optimized): image is JPEG optimized -->
+  <!-- FAIL(webp): image is not WebP optimized -->
   <!-- PASS(responsive): image is used numerous times in sprite-fashion -->
   <!-- PASS(offscreen): image is onscreen -->
   <div class="onscreen" style="width: 30px; height: 30px; background: 0% 50% url(lighthouse-480x320.jpg?sprite);"></div>

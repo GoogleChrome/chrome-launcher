@@ -41,7 +41,6 @@ describe('Page uses optimized responses', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, false);
     assert.equal(auditResult.results.length, 2);
   });
 
@@ -54,7 +53,6 @@ describe('Page uses optimized responses', () => {
       ],
     });
 
-    assert.equal(auditResult.passes, true);
     assert.equal(auditResult.results.length, 1);
   });
 });
