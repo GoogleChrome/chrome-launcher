@@ -63,6 +63,12 @@ class LoadFastEnough4Pwa extends Audit {
           return;
         }
 
+        // Disregard requests with an invalid start time, (H2 request start times are sometimes less
+        // than issue time and even negative which throws off timing)
+        if (record._startTime < record._issueTime) {
+          return;
+        }
+
         // Use DevTools' definition of Waiting latency: https://github.com/ChromeDevTools/devtools-frontend/blob/66595b8a73a9c873ea7714205b828866630e9e82/front_end/network/RequestTimingView.js#L164
         const latency = record._timing.receiveHeadersEnd - record._timing.sendEnd;
         const latencyInfo = {
