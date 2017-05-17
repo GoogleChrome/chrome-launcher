@@ -32,7 +32,9 @@ plots/
 # generated files
 **/pages/scripts/lighthouse-report.js
 *.report.html
+*.dom.html
 *.screenshots.html
+*.screenshots.json
 *.devtoolslog.json
 *.trace.json
 closure-error.log
