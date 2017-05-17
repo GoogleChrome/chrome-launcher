@@ -132,11 +132,12 @@ function main() {
     return;
   }
 
-  const launcher = ChromeLauncher.launch();
-
-  return launcher.then(() => runAnalysis())
-  .catch(err => console.error(err))
-  .then(() => launcher.kill());
+  return ChromeLauncher.launch({port: 9222})
+    .then(launcher => {
+      return runAnalysis()
+        .catch(err => console.error(err))
+        .then(() => launcher.kill());
+    });
 }
 
 main();
