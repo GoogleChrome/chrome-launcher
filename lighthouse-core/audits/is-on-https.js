@@ -20,7 +20,7 @@ const Audit = require('./audit');
 const Formatter = require('../report/formatter');
 const URL = require('../lib/url-shim');
 
-const SECURE_SCHEMES = ['data', 'https', 'wss'];
+const SECURE_SCHEMES = ['data', 'https', 'wss', 'chrome', 'chrome-extension'];
 const SECURE_DOMAINS = ['localhost', '127.0.0.1'];
 
 class HTTPS extends Audit {
