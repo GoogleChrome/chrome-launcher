@@ -268,9 +268,7 @@ class CategoryRenderer {
     Object.keys(auditsGroupedByGroup).forEach(groupId => {
       const group = groupDefinitions[groupId];
       const auditGroupElem = this._renderAuditGroup(group);
-
-      this._dom.find('.lh-audit-group__summary', auditGroupElem)
-          .classList.add('lh-audit-group__summary--manual');
+      auditGroupElem.classList.add('lh-audit-group--manual');
 
       auditsGroupedByGroup[groupId].forEach(audit => {
         auditGroupElem.appendChild(this._renderAudit(audit));

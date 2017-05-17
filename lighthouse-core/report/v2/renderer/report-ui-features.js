@@ -39,6 +39,7 @@ class ReportUIFeatures {
     /** @type {!Element} **/
     this.exportButton; // eslint-disable-line no-unused-expressions
 
+    this.onMediaQueryChange = this.onMediaQueryChange.bind(this);
     this.onCopy = this.onCopy.bind(this);
     this.onExportButtonClick = this.onExportButtonClick.bind(this);
     this.onExport = this.onExport.bind(this);
@@ -53,6 +54,7 @@ class ReportUIFeatures {
    */
   initFeatures(report) {
     this.json = report;
+    this._setupMediaQueryListeners();
     this._setupExportButton();
     this._setUpCollapseDetailsAfterPrinting();
     this._resetUIState();
@@ -71,6 +73,22 @@ class ReportUIFeatures {
     this._document.dispatchEvent(event);
   }
 
+  _setupMediaQueryListeners() {
+    const mediaQuery = self.matchMedia('(max-width: 600px)');
+    mediaQuery.addListener(this.onMediaQueryChange);
+    // Ensure the handler is called on init
+    this.onMediaQueryChange(mediaQuery);
+  }
+
+  /**
+   * Handle media query change events.
+   * @param {!MediaQueryList} mql
+   */
+  onMediaQueryChange(mql) {
+    const root = this._dom.find('.lh-root', this._document);
+    root.classList.toggle('lh-narrow', mql.matches);
+  }
+
   _setupExportButton() {
     this.exportButton = this._dom.find('.lh-export__button', this._document);
     this.exportButton.addEventListener('click', this.onExportButtonClick);
@@ -80,7 +98,7 @@ class ReportUIFeatures {
   }
 
   /**
-   * Handler copy events.
+   * Handle copy events.
    * @param {!Event} e
    */
   onCopy(e) {

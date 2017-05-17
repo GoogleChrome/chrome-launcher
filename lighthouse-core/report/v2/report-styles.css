@@ -19,8 +19,6 @@
   --monospace-font-family: 'Menlo', 'dejavu sans mono', 'Consolas', 'Lucida Console', monospace;
   --body-font-size: 12px;
   --header-font-size: 14px;
-  --body-font-size: 13px;
-  --header-font-size: 16px;
   --body-line-height: 1.5;
   --default-padding: 12px;
   --section-padding: 16px;
@@ -341,11 +339,14 @@ span.lh-node:hover {
   min-width: calc(var(--lh-filmstrip-thumbnail-width) * 10 + var(--default-padding) * 2);
 }
 
-@media(max-width: 600px) {
-  .lh-timeline-container {
-    width: calc(100vw - var(--section-padding) * 2);
-    overflow-x: scroll;
-  }
+.lh-narrow .lh-timeline-container {
+  width: calc(100vw - var(--section-padding) * 2);
+  overflow-x: scroll;
+}
+
+.lh-devtools .lh-timeline-container {
+  width: 100%;
+  overflow-x: scroll;
 }
 
 /* Perf Timeline Metric */
@@ -540,25 +541,30 @@ span.lh-node:hover {
   border-top: 1px solid var(--report-secondary-border-color);
 }
 
+.lh-category > .lh-audit-group.lh-audit-group--manual {
+  border-top: none;
+  margin-left: var(--default-padding);
+}
+
 .lh-audit-group__header {
   font-size: 18px;
 }
 
-.lh-audit-group__summary--manual {
+.lh-audit-group--manual .lh-audit-group__summary {
   display: flex;
   align-items: center;
   font-size: 15px;
 }
 
-.lh-audit-group__summary--manual .lh-audit-group__header  {
+.lh-audit-group--manual .lh-audit-group__summary .lh-audit-group__header  {
   font-size: inherit;
 }
 
-.lh-audit-group__summary--manual .lh-toggle-arrow {
+.lh-audit-group--manual .lh-audit-group__summary .lh-toggle-arrow {
   display: none;
 }
 
-.lh-audit-group__summary--manual::-webkit-details-marker {
+.lh-audit-group--manual .lh-audit-group__summary::-webkit-details-marker {
   display: initial;
   background: var(--manual-color) !important;
 }
@@ -692,7 +698,7 @@ summary.lh-passed-audits-summary {
 }
 
 summary.lh-passed-audits-summary::-webkit-details-marker,
-.lh-audit-group__summary--manual::-webkit-details-marker {
+.lh-audit-group--manual > summary::-webkit-details-marker {
   background: var(--pass-color);
   color: white;
   padding: 3px 3px 3px 6px;
@@ -700,7 +706,7 @@ summary.lh-passed-audits-summary::-webkit-details-marker,
 }
 
 .lh-passed-audits[open] summary.lh-passed-audits-summary::-webkit-details-marker,
-.lh-audit-group[open] summary.lh-audit-group__summary--manual::-webkit-details-marker {
+.lh-audit-group--manual[open] > summary::-webkit-details-marker {
   padding: 3px 5px 3px 4px;
 }
 
