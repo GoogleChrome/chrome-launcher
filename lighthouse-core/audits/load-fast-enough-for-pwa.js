@@ -32,6 +32,8 @@ const Formatter = require('../report/formatter');
 //   https://developers.google.com/web/progressive-web-apps/checklist
 const MAXIMUM_TTFI = 10 * 1000;
 
+const WHITELISTED_STATUS_CODES = [307];
+
 class LoadFastEnough4Pwa extends Audit {
   /**
    * @return {!AuditMeta}
@@ -55,11 +57,12 @@ class LoadFastEnough4Pwa extends Audit {
     return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
       const firstRequestLatenciesByOrigin = new Map();
       networkRecords.forEach(record => {
-        // Ignore requests that don't have valid origin, timing data, came from the cache, or are
-        // not finished.
+        // Ignore requests that don't have valid origin, timing data, came from the cache, were
+        // redirected by Chrome without going to the network, or are not finished.
         const fromCache = record._fromDiskCache || record._fromMemoryCache;
         const origin = URL.getOrigin(record._url);
-        if (!origin || !record._timing || fromCache || !record.finished) {
+        if (!origin || !record._timing || fromCache ||
+            WHITELISTED_STATUS_CODES.includes(record.statusCode) || !record.finished) {
           return;
         }
 

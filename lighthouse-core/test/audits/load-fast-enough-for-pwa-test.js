@@ -82,6 +82,7 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
     // latencies are very long
     const urlA = 'https://google.com';
     const urlB = 'https://example.com';
+    const urlC = 'https://example-c.com';
     const mockNetworkRecords = [
       {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true, _url: urlA, _startTime: 0},
       {_timing: {sendEnd: 0, receiveHeadersEnd: 250}, finished: true, _url: urlB},
@@ -89,6 +90,9 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
       { },
       // ignored for not being the first of the origin
       {_timing: {sendEnd: 0, receiveHeadersEnd: 100}, finished: true, _url: urlA, _startTime: 100},
+      // ignored for being redirected internally
+      {_timing: {sendEnd: 0, receiveHeadersEnd: 100}, finished: true, _url: urlC, _startTime: 0,
+        statusCode: 307},
       // ignored for not finishing
       {_timing: {sendEnd: 0, receiveHeadersEnd: -1}, finished: false},
     ];
