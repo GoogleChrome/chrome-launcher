@@ -69,12 +69,12 @@ describe('CategoryRenderer', () => {
   it('renders an audit debug str when appropriate', () => {
     const audit1 = renderer._renderAudit({
       scoringMode: 'binary', score: 0,
-      result: {helpText: '', debugString: 'Debug string'},
+      result: {helpText: '', debugString: 'Debug string', description: 'Audit title'},
     });
     assert.ok(audit1.querySelector('.lh-debug'));
 
     const audit2 = renderer._renderAudit({
-      scoringMode: 'binary', score: 0, result: {helpText: ''},
+      scoringMode: 'binary', score: 0, result: {helpText: '', description: 'Audit title'},
     });
     assert.ok(!audit2.querySelector('.lh-debug'));
   });

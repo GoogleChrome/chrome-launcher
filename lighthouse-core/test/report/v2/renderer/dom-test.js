@@ -84,20 +84,20 @@ describe('DOM', () => {
     });
   });
 
-  describe('createSpanFromMarkdown', () => {
+  describe('convertMarkdownLinkSnippets', () => {
     it('correctly converts links', () => {
-      let result = dom.createSpanFromMarkdown(
+      let result = dom.convertMarkdownLinkSnippets(
           'Some [link](https://example.com/foo). [Learn more](http://example.com).');
       assert.equal(result.innerHTML,
           'Some <a rel="noopener" target="_blank" href="https://example.com/foo">link</a>. ' +
           '<a rel="noopener" target="_blank" href="http://example.com/">Learn more</a>.');
 
-      result = dom.createSpanFromMarkdown('[link](https://example.com/foo)');
+      result = dom.convertMarkdownLinkSnippets('[link](https://example.com/foo)');
       assert.equal(result.innerHTML,
           '<a rel="noopener" target="_blank" href="https://example.com/foo">link</a>',
           'just a link');
 
-      result = dom.createSpanFromMarkdown(
+      result = dom.convertMarkdownLinkSnippets(
           '[ Link ](https://example.com/foo) and some text afterwards.');
       assert.equal(result.innerHTML,
           '<a rel="noopener" target="_blank" href="https://example.com/foo"> Link </a> ' +
@@ -107,14 +107,23 @@ describe('DOM', () => {
     it('handles invalid urls', () => {
       const text = 'Text has [bad](https:///) link.';
       assert.throws(() => {
-        dom.createSpanFromMarkdown(text);
+        dom.convertMarkdownLinkSnippets(text);
       });
     });
 
     it('ignores links that do not start with http', () => {
       const text = 'Sentence with [link](/local/path).';
-      const result = dom.createSpanFromMarkdown(text);
+      const result = dom.convertMarkdownLinkSnippets(text);
       assert.equal(result.innerHTML, text);
+    });
+  });
+
+  describe('convertMarkdownCodeSnippets', () => {
+    it('correctly converts links', () => {
+      const result = dom.convertMarkdownCodeSnippets(
+          'Here is some `code`, and then some `more code`, and yet event `more`.');
+      assert.equal(result.innerHTML, 'Here is some <code>code</code>, and then some ' +
+          '<code>more code</code>, and yet event <code>more</code>.');
     });
   });
 });
