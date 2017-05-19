@@ -20,7 +20,6 @@ cache:
     - lighthouse-extension/node_modules
     - lighthouse-viewer/node_modules
 install:
-  - yarn
   - yarn install-all
 before_script:
   - gem install travis-artifacts

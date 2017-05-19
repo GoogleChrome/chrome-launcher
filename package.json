@@ -11,7 +11,7 @@
     "node": ">=6"
   },
   "scripts": {
-    "install-all": "yarn install-launcher && yarn install-cli && yarn install-extension && yarn install-viewer",
+    "install-all": "yarn && yarn install-launcher && yarn install-cli && yarn install-extension && yarn install-viewer",
     "install-launcher": "cd ./chrome-launcher && yarn install && yarn build",
     "install-cli": "cd ./lighthouse-cli && yarn install && yarn build",
     "install-extension": "cd ./lighthouse-extension && yarn install",
