@@ -214,6 +214,7 @@ right corner and signing in to GitHub.
 * [pwmetrics](https://github.com/paulirish/pwmetrics/) - gather performance metrics
 * [lighthouse-hue](https://github.com/ebidel/lighthouse-hue) - Lighthouse score setting the color of Philips Hue lights
 * [lighthouse-batch](https://www.npmjs.com/package/lighthouse-batch) - Run Lighthouse over a number of sites in sequence and generating a summary report including all of their scores.
+* [lighthouse-cron](https://github.com/thearegee/lighthouse-cron) - Cron multiple batch Lighthouse audits and emit results for sending to remote server.
 
 ## Develop
 
