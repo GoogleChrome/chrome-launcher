@@ -84,8 +84,7 @@ if (cliFlags.output === Printer.OutputMode[Printer.OutputMode.json] && !cliFlags
  * a debuggable instance.
  */
 async function getDebuggableChrome(flags: Flags) {
-  return await launch(
-      {port: flags.port, chromeFlags: flags.chromeFlags.split(' '), handleSIGINT: true});
+  return await launch({port: flags.port, chromeFlags: flags.chromeFlags.split(' ')});
 }
 
 function showConnectionError() {
