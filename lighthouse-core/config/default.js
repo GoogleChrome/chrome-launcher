@@ -4,7 +4,7 @@ module.exports = {
   "passes": [{
     "passName": "defaultPass",
     "recordTrace": true,
-    "pauseAfterLoadMs": 5000,
+    "pauseAfterLoadMs": 5250,
     "networkQuietThresholdMs": 5000,
     "pauseAfterNetworkQuietMs": 2500,
     "useThrottling": true,
