@@ -374,6 +374,16 @@ If you'd like to contribute, check the [list of issues](https://github.com/Googl
 Nope. Lighthouse runs locally, auditing a page using a local version of the Chrome browser installed the
 machine. Report results are never processed or beaconed to a remote server.
 
+### Videos
+
+Our session from Google I/O 2017: architecture, writing custom audits, Github/Travis/CI integration, and more:
+
+[![Lighthouse @ Google I/O](https://img.youtube.com/vi/NoRYn6gOtVo/0.jpg)](https://www.youtube.com/watch?v=NoRYn6gOtVo)
+
+_click to watch the video_
+
+---
+
 <p align="center">
   <img src="https://cloud.githubusercontent.com/assets/39191/22478294/23f662f6-e79e-11e6-8de3-ffd7be7bf628.png" alt="Lighthouse logo" height="150">
   <br>
