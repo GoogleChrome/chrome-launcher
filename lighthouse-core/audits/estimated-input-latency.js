@@ -17,6 +17,7 @@
 'use strict';
 
 const Audit = require('./audit');
+const Util = require('../report/v2/renderer/util.js');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const Formatter = require('../report/formatter');
 
@@ -69,7 +70,7 @@ class EstimatedInputLatency extends Audit {
       score: Math.round(score),
       optimalValue: this.meta.optimalValue,
       rawValue,
-      displayValue: `${rawValue}ms`,
+      displayValue: Util.formatMilliseconds(rawValue, 1),
       extendedInfo: {
         value: latencyPercentiles,
         formatter: Formatter.SUPPORTED_FORMATS.NULL

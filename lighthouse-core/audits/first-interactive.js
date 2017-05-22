@@ -9,6 +9,7 @@
 'use strict';
 
 const Audit = require('./audit');
+const Util = require('../report/v2/renderer/util.js');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const Formatter = require('../report/formatter');
 
@@ -55,11 +56,10 @@ class FirstInteractiveMetric extends Audit {
         score = Math.max(0, score);
         score = Math.round(score);
 
-        const displayValue = Math.round(firstInteractive.timeInMs / 10) * 10;
         return {
           score,
           rawValue: firstInteractive.timeInMs,
-          displayValue: `${displayValue.toLocaleString()}ms`,
+          displayValue: Util.formatMilliseconds(firstInteractive.timeInMs),
           extendedInfo: {
             value: firstInteractive,
             formatter: Formatter.SUPPORTED_FORMATS.NULL,

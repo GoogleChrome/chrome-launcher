@@ -8,6 +8,7 @@
 'use strict';
 
 const Audit = require('./audit');
+const Util = require('../report/v2/renderer/util.js');
 const TracingProcessor = require('../lib/traces/tracing-processor');
 const Formatter = require('../report/formatter');
 
@@ -242,11 +243,10 @@ class ConsistentlyInteractiveMetric extends Audit {
         score = Math.max(0, score);
         score = Math.round(score);
 
-        const displayValue = Math.round(timeInMs / 10) * 10;
         return {
           score,
           rawValue: timeInMs,
-          displayValue: `${displayValue.toLocaleString()}ms`,
+          displayValue: Util.formatMilliseconds(timeInMs),
           optimalValue: this.meta.optimalValue,
           extendedInfo: {
             value: extendedInfo,

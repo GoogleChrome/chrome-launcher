@@ -191,7 +191,7 @@ class CategoryRenderer {
 
     const statsEl = this._dom.createChildOf(summary, 'div', 'lh-perf-hint__stats', tooltipAttrs);
     const statsMsEl = this._dom.createChildOf(statsEl, 'div', 'lh-perf-hint__primary-stat');
-    statsMsEl.textContent = audit.result.rawValue.toLocaleString() + ' ms';
+    statsMsEl.textContent = Util.formatMilliseconds(audit.result.rawValue);
 
     this._dom.createChildOf(summary, 'div', 'lh-toggle-arrow', {title: 'See resources'});
 

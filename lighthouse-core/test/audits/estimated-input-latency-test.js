@@ -38,7 +38,7 @@ describe('Performance: estimated-input-latency audit', () => {
     return Audit.audit(artifacts).then(output => {
       assert.equal(output.debugString, undefined);
       assert.equal(output.rawValue, 16.4);
-      assert.equal(output.displayValue, '16.4ms');
+      assert.equal(output.displayValue, '16\xa0ms');
       assert.equal(output.score, 100);
     });
   });
