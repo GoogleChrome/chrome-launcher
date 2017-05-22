@@ -35,10 +35,9 @@ module.exports = {
       "argsIgnorePattern": "(^reject$|^_$)",
       "varsIgnorePattern": "(^_$)"
     }],
-    "quotes": [2, "single"],
     "strict": [2, "global"],
     "prefer-const": 2,
-    curly: [2, "multi-line"],
+    "curly": [2, "multi-line"],
 
     // Disabled rules
     "require-jsdoc": 0,
