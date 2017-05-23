@@ -28,6 +28,8 @@ const NON_BUG_ERROR_MESSAGES = {
   // @see https://chromium.googlesource.com/chromium/src/+/5d1f214db0f7996f3c17cd87093d439ce4c7f8f1/chrome/common/extensions/chrome_extensions_client.cc#232
   'The extensions gallery cannot be scripted': 'The Lighthouse extension cannot audit the ' +
       'Chrome Web Store. If necessary, use the Lighthouse CLI to do so.',
+  'Cannot access a chrome': 'The Lighthouse extension cannot audit ' +
+      'Chrome-specific urls. If necessary, use the Lighthouse CLI to do so.',
   // The user tries to review an error page or has network issues
   'Unable to load the page': 'Unable to load the page. Please verify the url you ' +
       'are trying to review.'
