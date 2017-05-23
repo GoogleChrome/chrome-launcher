@@ -33,19 +33,6 @@ driver.sendCommand('Security.enable');
 
 ## Audits
 
-The return value of each audit takes this shape:
+The return value of each audit [takes this shape](https://github.com/GoogleChrome/lighthouse/blob/b354890076f2c077c5460b2fa56ded546cca72ee/lighthouse-core/closure/typedefs/AuditResult.js#L23-L55).
 
-```js
-Promise.resolve({
-  name: 'audit-name',
-  description: 'whatnot',
-  // value: The score. Typically a boolean, but can be number 0-100
-  value: 0,
-  // rawValue: Could be anything, as long as it can easily be stringified and displayed,
-  //   e.g. 'your score is bad because you wrote ${rawValue}'
-  rawValue: {},
-  // debugString: Some *specific* error string for helping the user figure out why they failed here.
-  //   The reporter can handle *general* feedback on how to fix, e.g. links to the docs
-  debugString: 'Your manifest 404ed',
-});
-```
+The `details` object is parsed in report-renderer.js. View other audits for guidance on how to structure `details`.
