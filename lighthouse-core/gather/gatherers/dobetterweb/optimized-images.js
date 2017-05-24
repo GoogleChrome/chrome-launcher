@@ -51,7 +51,7 @@ function getOptimizedNumBytes(url) {
         canvas.width = img.width;
         context.drawImage(img, 0, 0);
 
-        const jpeg = getTypeStats('image/jpeg', 0.85);
+        const jpeg = getTypeStats('image/jpeg', 0.92);
         const webp = getTypeStats('image/webp', 0.85);
 
         resolve({jpeg, webp});
