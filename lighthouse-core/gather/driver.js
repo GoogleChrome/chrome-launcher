@@ -382,9 +382,8 @@ class Driver {
   }
 
   /**
-   * Returns a promise that resolves when the network has been idle for
-   * `networkQuietThresholdMs` ms and a method to cancel internal network listeners and
-   * timeout.
+   * Returns a promise that resolves when the network has been idle (after DCL) for
+   * `networkQuietThresholdMs` ms and a method to cancel internal network listeners/timeout.
    * @param {number} networkQuietThresholdMs
    * @param {number} pauseAfterNetworkQuietMs
    * @return {{promise: !Promise, cancel: function()}}
@@ -409,17 +408,21 @@ class Driver {
         clearTimeout(idleTimeout);
       };
 
+      const domContentLoadedListener = () => {
+        if (this._networkStatusMonitor.is2Idle()) {
+          onIdle();
+        } else {
+          onBusy();
+        }
+      };
+
+      this.once('Page.domContentEventFired', domContentLoadedListener);
       cancel = () => {
         clearTimeout(idleTimeout);
+        this.off('Page.domContentEventFired', domContentLoadedListener);
         this._networkStatusMonitor.removeListener('network-2-busy', onBusy);
         this._networkStatusMonitor.removeListener('network-2-idle', onIdle);
       };
-
-      if (this._networkStatusMonitor.is2Idle()) {
-        onIdle();
-      } else {
-        onBusy();
-      }
     }).then(() => {
       // Once idle has been determined wait another pauseAfterLoadMs
       return new Promise(resolve => setTimeout(resolve, pauseAfterNetworkQuietMs));
