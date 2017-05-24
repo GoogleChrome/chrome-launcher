@@ -229,14 +229,20 @@ yarn closure
 yarn compile-devtools
 ```
 
+## Lighthouse Integrations
+
+* **[Calibre](https://calibreapp.com)** - Calibre is a web performance monitoring tool running Lighthouse continuously or on-demand via an API. Test using emulated devices and connection speeds from a number of geographical locations. Set budgets and improve performance with actionable guidelines.
+
+* **[Web Page Test](https://www.webpagetest.org)** — An [open source](https://github.com/WPO-Foundation/webpagetest) tool for measuring and analyzing the performance of web pages on real devices. Users can choose to produce a Lighthouse report alongside the analysis of WebPageTest results.
+
 ## Related Projects
 
-* [webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin) - run Lighthouse from a Webpack build.
-* [lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example) - gather performance metrics via Lighthouse and tests them in Mocha
-* [pwmetrics](https://github.com/paulirish/pwmetrics/) - gather performance metrics
-* [lighthouse-hue](https://github.com/ebidel/lighthouse-hue) - set the color of Philips Hue lights based on a Lighthouse score
-* [lighthouse-batch](https://www.npmjs.com/package/lighthouse-batch) - run Lighthouse over a number of sites and generate a summary of their metrics/scores.
-* [lighthouse-cron](https://github.com/thearegee/lighthouse-cron) - Cron multiple batch Lighthouse audits and emit results for sending to remote server.
+* **[webpack-lighthouse-plugin](https://github.com/addyosmani/webpack-lighthouse-plugin)** - run Lighthouse from a Webpack build.
+* **[lighthouse-mocha-example](https://github.com/justinribeiro/lighthouse-mocha-example)** - gather performance metrics via Lighthouse and tests them in Mocha
+* **[pwmetrics](https://github.com/paulirish/pwmetrics/)** - gather performance metrics
+* **[lighthouse-hue](https://github.com/ebidel/lighthouse-hue)** - set the color of Philips Hue lights based on a Lighthouse score
+* **[lighthouse-batch](https://www.npmjs.com/package/lighthouse-batch)** - run Lighthouse over a number of sites and generate a summary of their metrics/scores.
+* **[lighthouse-cron](https://github.com/thearegee/lighthouse-cron)** - Cron multiple batch Lighthouse audits and emit results for sending to remote server.
 
 ## FAQ
 
