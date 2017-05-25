@@ -46,15 +46,16 @@ class Connection {
    * Call protocol methods
    * @param {!string} method
    * @param {!Object} params
+   * @param {{silent: boolean}=} cmdOpts
    * @return {!Promise}
    */
-  sendCommand(method, params = {}) {
+  sendCommand(method, params = {}, cmdOpts = {}) {
     log.formatProtocol('method => browser', {method, params}, 'verbose');
     const id = ++this._lastCommandId;
     const message = JSON.stringify({id, method, params});
     this.sendRawMessage(message);
     return new Promise((resolve, reject) => {
-      this._callbacks.set(id, {resolve, reject, method});
+      this._callbacks.set(id, {resolve, reject, method, options: cmdOpts});
     });
   }
 
@@ -98,7 +99,8 @@ class Connection {
 
       return callback.resolve(Promise.resolve().then(_ => {
         if (object.error) {
-          log.formatProtocol('method <= browser ERR', {method: callback.method}, 'error');
+          const logLevel = callback.options && callback.options.silent ? 'verbose' : 'error';
+          log.formatProtocol('method <= browser ERR', {method: callback.method}, logLevel);
           throw new Error(`Protocol error (${callback.method}): ${object.error.message}`);
         }
 

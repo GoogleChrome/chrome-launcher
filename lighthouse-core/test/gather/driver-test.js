@@ -86,6 +86,8 @@ connection.sendCommand = function(command, params) {
     case 'ServiceWorker.enable':
     case 'ServiceWorker.disable':
       return Promise.resolve();
+    case 'Tracing.end':
+      return Promise.reject(new Error('tracing not started'));
     default:
       throw Error(`Stub not implemented: ${command}`);
   }
@@ -183,6 +185,21 @@ describe('Browser Driver', () => {
 
     return driver.gotoURL(startUrl, loadOptions).then(loadedUrl => {
       assert.equal(loadedUrl, finalUrl);
+    });
+  });
+
+  it('waits for tracingComplete when tracing already started', () => {
+    const fakeConnection = new Connection();
+    const fakeDriver = new Driver(fakeConnection);
+    const commands = [];
+    fakeConnection.sendCommand = evt => {
+      commands.push(evt);
+      return Promise.resolve();
+    };
+
+    fakeDriver.once = createOnceStub({'Tracing.tracingComplete': {}});
+    return fakeDriver.beginTrace().then(() => {
+      assert.deepEqual(commands, ['Page.enable', 'Tracing.end', 'Tracing.start']);
     });
   });
 

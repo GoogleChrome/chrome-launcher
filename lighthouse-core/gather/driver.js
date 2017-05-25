@@ -187,9 +187,10 @@ class Driver {
    * Call protocol methods
    * @param {!string} method
    * @param {!Object} params
+   * @param {{silent: boolean}=} cmdOpts
    * @return {!Promise}
    */
-  sendCommand(method, params) {
+  sendCommand(method, params, cmdOpts) {
     const domainCommand = /^(\w+)\.(enable|disable)$/.exec(method);
     if (domainCommand) {
       const enable = domainCommand[2] === 'enable';
@@ -198,7 +199,7 @@ class Driver {
       }
     }
 
-    return this._connection.sendCommand(method, params);
+    return this._connection.sendCommand(method, params, cmdOpts);
   }
 
   /**
@@ -713,7 +714,21 @@ class Driver {
 
     // Enable Page domain to wait for Page.loadEventFired
     return this.sendCommand('Page.enable')
+      // ensure tracing is stopped before we can start
+      // see https://github.com/GoogleChrome/lighthouse/issues/1091
+      .then(_ => this.endTraceIfStarted())
       .then(_ => this.sendCommand('Tracing.start', tracingOpts));
+  }
+
+  endTraceIfStarted() {
+    return new Promise((resolve) => {
+      const traceCallback = () => resolve();
+      this.once('Tracing.tracingComplete', traceCallback);
+      return this.sendCommand('Tracing.end', undefined, {silent: true}).catch(() => {
+        this.off('Tracing.tracingComplete', traceCallback);
+        traceCallback();
+      });
+    });
   }
 
   endTrace() {
