@@ -344,7 +344,8 @@ class CategoryRenderer {
 
     const manualAudits = category.audits.filter(audit => audit.result.manual);
     const nonManualAudits = category.audits.filter(audit => !manualAudits.includes(audit));
-    const passedAudits = nonManualAudits.filter(audit => audit.score === 100);
+    const passedAudits = nonManualAudits.filter(audit => audit.score === 100 &&
+        !audit.result.debugString);
     const nonPassedAudits = nonManualAudits.filter(audit => !passedAudits.includes(audit));
 
     for (const audit of nonPassedAudits) {

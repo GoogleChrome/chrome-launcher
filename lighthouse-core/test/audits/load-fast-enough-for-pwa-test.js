@@ -53,7 +53,7 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
     });
   });
 
-  it('fails a good TTI value with no throttling', () => {
+  it('warns on a good TTI value with no throttling', () => {
     // latencies are very short
     const mockNetworkRecords = [
       {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true, _url: 'https://google.com/'},
@@ -62,7 +62,7 @@ describe('PWA: load-fast-enough-for-pwa audit', () => {
       {_timing: {sendEnd: 0, receiveHeadersEnd: 50}, finished: true, _url: 'https://google.com/b'},
     ];
     return FastPWAAudit.audit(generateArtifacts(5000, mockNetworkRecords)).then(result => {
-      assert.equal(result.rawValue, false);
+      assert.equal(result.rawValue, true);
       assert.ok(result.debugString.includes('network request latencies'));
       assert.ok(result.details, 'contains details when latencies were not realistic');
     });

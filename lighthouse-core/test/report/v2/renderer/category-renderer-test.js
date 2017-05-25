@@ -110,6 +110,20 @@ describe('CategoryRenderer', () => {
     assert.equal(audits.length, category.audits.length, 'renders correct number of audits');
   });
 
+  it('renders audits with debugString as failed', () => {
+    const auditResult = {
+      description: 'Audit',
+      helpText: 'Learn more',
+      debugString: 'It may not have worked!',
+      score: 100,
+    };
+    const audit = {result: auditResult, score: 100};
+    const category = {name: 'Fake', description: '', score: 100, audits: [audit]};
+    const categoryDOM = renderer.render(category, sampleResults.reportGroups);
+    assert.ok(categoryDOM.querySelector('.lh-category > .lh-audit'), 'did not render as failed');
+    assert.ok(categoryDOM.querySelector('.lh-debug'), 'did not render debug message');
+  });
+
   it('renders manual audits if the category contains them', () => {
     const pwaCategory = sampleResults.reportCategories.find(cat => cat.id === 'pwa');
     const categoryDOM = renderer.render(pwaCategory, sampleResults.reportGroups);

@@ -35,11 +35,11 @@ describe('Offline: works-offline audit', () => {
 
   it('warns if initial url does not match final url', () => {
     const output = Audit.audit({
-      Offline: 200,
+      Offline: 404,
       URL: {initialUrl: URL, finalUrl: `${URL}/features`}
     });
 
-    assert.equal(output.rawValue, true);
+    assert.equal(output.rawValue, false);
     assert.ok(output.debugString);
   });
 
