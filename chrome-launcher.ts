@@ -41,6 +41,7 @@ export interface Options {
   port?: number;
   handleSIGINT?: boolean;
   chromePath?: string;
+  userDataDir?: string;
 }
 
 export interface LaunchedChrome {
@@ -72,7 +73,7 @@ export class Launcher {
   private pollInterval: number = 500;
   private pidFile: string;
   private startingUrl: string;
-  private TMP_PROFILE_DIR: string;
+  private userDataDir?: string;
   private outFile?: number;
   private errFile?: number;
   private chromePath?: string;
@@ -82,19 +83,19 @@ export class Launcher {
   port?: number;
   pid?: number;
 
-  constructor(opts: Options = {}) {
+  constructor(private opts: Options = {}) {
     // choose the first one (default)
-    this.startingUrl = defaults(opts.startingUrl, 'about:blank');
-    this.chromeFlags = defaults(opts.chromeFlags, []);
-    this.requestedPort = defaults(opts.port, 0);
-    this.chromePath = opts.chromePath;
+    this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
+    this.chromeFlags = defaults(this.opts.chromeFlags, []);
+    this.requestedPort = defaults(this.opts.port, 0);
+    this.chromePath = this.opts.chromePath;
   }
 
   private get flags() {
     const flags = DEFAULT_FLAGS.concat([
       `--remote-debugging-port=${this.port}`,
       // Place Chrome profile in a custom location we'll rm -rf later
-      `--user-data-dir=${this.TMP_PROFILE_DIR}`
+      `--user-data-dir=${this.userDataDir}`
     ]);
 
     if (process.platform === 'linux') {
@@ -113,16 +114,16 @@ export class Launcher {
       throw new Error(`Platform ${platform} is not supported`);
     }
 
-    this.TMP_PROFILE_DIR = makeTmpDir();
+    this.userDataDir = this.opts.userDataDir || makeTmpDir();
 
-    this.outFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-out.log`, 'a');
-    this.errFile = fs.openSync(`${this.TMP_PROFILE_DIR}/chrome-err.log`, 'a');
+    this.outFile = fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
+    this.errFile = fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
 
     // fix for Node4
     // you can't pass a fd to fs.writeFileSync
-    this.pidFile = `${this.TMP_PROFILE_DIR}/chrome.pid`;
+    this.pidFile = `${this.userDataDir}/chrome.pid`;
 
-    log.verbose('ChromeLauncher', `created ${this.TMP_PROFILE_DIR}`);
+    log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
 
     this.tmpDirandPidFileReady = true;
   }
@@ -248,7 +249,10 @@ export class Launcher {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
-          this.destroyTmp().then(resolve);
+          // Only clean up the tmp dir if we created it.
+          if (this.opts.userDataDir === undefined) {
+            this.destroyTmp().then(resolve);
+          }
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
@@ -272,11 +276,11 @@ export class Launcher {
 
   private destroyTmp() {
     return new Promise(resolve => {
-      if (!this.TMP_PROFILE_DIR) {
+      if (!this.userDataDir) {
         return resolve();
       }
 
-      log.verbose('ChromeLauncher', `Removing ${this.TMP_PROFILE_DIR}`);
+      log.verbose('ChromeLauncher', `Removing ${this.userDataDir}`);
 
       if (this.outFile) {
         fs.closeSync(this.outFile);
@@ -288,7 +292,7 @@ export class Launcher {
         delete this.errFile;
       }
 
-      rimraf(this.TMP_PROFILE_DIR, () => resolve());
+      rimraf(this.userDataDir, () => resolve());
     });
   }
 };
