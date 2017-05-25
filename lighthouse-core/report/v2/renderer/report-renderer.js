@@ -127,7 +127,7 @@ class ReportRenderer {
       this._dom.find('.leftnav-item__category', navItem).textContent = category.name;
       const score = this._dom.find('.leftnav-item__score', navItem);
       score.classList.add(`lh-score__value--${Util.calculateRating(category.score)}`);
-      score.textContent = Math.round(Util.formatNumber(category.score));
+      score.textContent = Math.round(category.score);
       nav.appendChild(navItem);
     }
     return leftNav;
