@@ -36,8 +36,7 @@ module.exports = [
       //   }
       // },
       'offscreen-images': {
-        // TODO: re-enable score assertions when we have more flexible assertions like < 100
-        // score: 65,
+        score: '<100',
         extendedInfo: {
           value: {
             results: {
@@ -47,7 +46,7 @@ module.exports = [
         }
       },
       'uses-webp-images': {
-        // score: 65,
+        score: '<100',
         extendedInfo: {
           value: {
             results: {
@@ -57,7 +56,7 @@ module.exports = [
         }
       },
       'uses-optimized-images': {
-        // score: 65,
+        score: '<100',
         extendedInfo: {
           value: {
             results: {
@@ -67,7 +66,7 @@ module.exports = [
         }
       },
       'uses-responsive-images': {
-        // score: 90,
+        score: '<100',
         extendedInfo: {
           value: {
             results: {

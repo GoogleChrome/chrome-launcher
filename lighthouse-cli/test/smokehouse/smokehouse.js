@@ -29,6 +29,7 @@ const DEFAULT_EXPECTATIONS_PATH = 'pwa-expectations';
 
 const PROTOCOL_TIMEOUT_EXIT_CODE = 67;
 const RETRIES = 3;
+const NUMERICAL_EXPECTATION_REGEXP = /^(<=?|>=?)(\d+)$/;
 
 
 /**
@@ -105,6 +106,39 @@ function runLighthouse(url, configPath, saveAssetsPath) {
 }
 
 /**
+ * Checks if the actual value matches the expectation. Does not recursively search. This supports
+ *    - Greater than/less than operators, e.g. "<100", ">90"
+ *    - Regular expressions
+ *    - Strict equality
+ *
+ * @param {*} actual
+ * @param {*} expected
+ * @return {boolean}
+ */
+function matchesExpectation(actual, expected) {
+  if (typeof actual === 'number' && NUMERICAL_EXPECTATION_REGEXP.test(expected)) {
+    const parts = expected.match(NUMERICAL_EXPECTATION_REGEXP);
+    const operator = parts[1];
+    const number = parseInt(parts[2]);
+    switch (operator) {
+      case '>':
+        return actual > number;
+      case '>=':
+        return actual >= number;
+      case '<':
+        return actual < number;
+      case '<=':
+        return actual <= number;
+    }
+  } else if (typeof actual === 'string' && expected instanceof RegExp && expected.test(actual)) {
+    return true;
+  } else {
+    // Strict equality check, plus NaN equivalence.
+    return Object.is(actual, expected);
+  }
+}
+
+/**
  * Walk down expected result, comparing to actual result. If a difference is found,
  * the path to the difference is returned, along with the expected primitive value
  * and the value actually found at that location. If no difference is found, returns
@@ -118,12 +152,7 @@ function runLighthouse(url, configPath, saveAssetsPath) {
  * @return {({path: string, actual: *, expected: *}|null)}
  */
 function findDifference(path, actual, expected) {
-  // Strict equality check, plus NaN equivalence.
-  if (Object.is(actual, expected)) {
-    return null;
-  }
-
-  if (typeof actual === 'string' && expected instanceof RegExp && expected.test(actual)) {
+  if (matchesExpectation(actual, expected)) {
     return null;
   }
 
