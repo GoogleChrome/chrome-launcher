@@ -33,8 +33,9 @@ class DuplicateId extends AxeAudit {
       category: 'Accessibility',
       name: 'duplicate-id',
       description: '`[id]` attributes on the page are unique.',
-      helpText: 'Unique `id=""` attributes help ensure assistive technologies do not overlook ' +
-          'elements with the same id.',
+      helpText: 'The value of an id attribute must be unique to prevent ' +
+          'other instances from being overlooked by assistive technologies. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/duplicate-id).',
       requiredArtifacts: ['Accessibility']
     };
   }

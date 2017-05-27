@@ -33,7 +33,8 @@ class FrameTitle extends AxeAudit {
       category: 'Accessibility',
       name: 'frame-title',
       description: '`<frame>` or `<iframe>` elements have a title.',
-      helpText: 'Screen reader users rely on a frame title to describe the contents of the frame.',
+      helpText: 'Screen reader users rely on frame titles to describe the contents of frames. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/frame-title).',
       requiredArtifacts: ['Accessibility']
     };
   }

@@ -33,8 +33,9 @@ class DLItem extends AxeAudit {
       category: 'Accessibility',
       name: 'dlitem',
       description: 'Definition list items are wrapped in `<dl>` elements.',
-      helpText: 'Definition list items (<dt> and/or <dd>) wrapped in parent <dl> elements enable ' +
-          'screen readers to properly announce content.',
+      helpText: 'Definition list items (`<dt>` and `<dd>`) must be wrapped in a ' +
+          'parent `<dl>` element to ensure that screen readers can properly announce them. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/dlitem).',
       requiredArtifacts: ['Accessibility']
     };
   }

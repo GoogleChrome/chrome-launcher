@@ -33,9 +33,10 @@ class AudioCaption extends AxeAudit {
       category: 'Accessibility',
       name: 'audio-caption',
       description: '`<audio>` elements contain a `<track>` element with `[kind="captions"]`.',
-      helpText: 'Captions convey information such as identifying who is speaking, dialogue, and ' +
-          'non-speech information. This can help deaf or hearing impaired users access ' +
-          'meaningful content.',
+      helpText: 'Captions make audio elements usable for deaf or hearing-impaired users, ' +
+          'providing critical information such as who is talking, what they\'re saying, ' +
+          'and other non-speech information. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/audio-caption).',
       requiredArtifacts: ['Accessibility']
     };
   }

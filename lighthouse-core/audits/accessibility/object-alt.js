@@ -34,7 +34,8 @@ class ObjectAlt extends AxeAudit {
       name: 'object-alt',
       description: '`<object>` elements have `[alt]` text.',
       helpText: 'Screen readers cannot translate non-text content. Adding alt text to `<object>` ' +
-          'elements will help a screen reader convey the meaning to a user.',
+          'elements helps screen readers convey meaning to users. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/object-alt).',
       requiredArtifacts: ['Accessibility']
     };
   }

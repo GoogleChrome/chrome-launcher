@@ -36,7 +36,8 @@ class THHasDataCells extends AxeAudit {
           'data cells they describe.',
       helpText: 'Screen readers have features to make navigating tables easier. Ensuring table ' +
           'headers always refer to some set of cells may improve the experience for screen ' +
-          'reader users.',
+          'reader users. ' +
+          '[Learn more](https://dequeuniversity.com/rules/worldspace/2.1/th-has-data-cells).',
       requiredArtifacts: ['Accessibility']
     };
   }

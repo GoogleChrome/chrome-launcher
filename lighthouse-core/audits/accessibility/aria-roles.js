@@ -33,7 +33,9 @@ class AriaRoles extends AxeAudit {
       category: 'Accessibility',
       name: 'aria-roles',
       description: '`[role]` values are valid.',
-      helpText: 'ARIA roles require specific values to perform their accessibility function.',
+      helpText: 'ARIA roles must have valid values in order to perform their ' +
+          'intended accessibility functions. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/aria-roles).',
       requiredArtifacts: ['Accessibility']
     };
   }

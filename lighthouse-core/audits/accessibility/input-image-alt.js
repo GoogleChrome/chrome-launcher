@@ -34,7 +34,8 @@ class InputImageAlt extends AxeAudit {
       name: 'input-image-alt',
       description: '`<input type="image">` elements have `[alt]` text.',
       helpText: 'When an image is being used as an `<input>` button, providing alternative text ' +
-          'can help screen reader users understand the purpose of the button.',
+          'can help screen reader users understand the purpose of the button. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/input-image-alt).',
       requiredArtifacts: ['Accessibility']
     };
   }

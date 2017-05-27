@@ -37,7 +37,8 @@ class TDHeadersAttr extends AxeAudit {
           'to other cells of that same table.',
       helpText: 'Screen readers have features to make navigating tables easier. Ensuring `<td>` ' +
           'cells using the `[headers]` attribute only refer to other cells in the same table may ' +
-          'improve the experience for screen reader users.',
+          'improve the experience for screen reader users. ' +
+          '[Learn more](https://dequeuniversity.com/rules/worldspace/2.1/td-headers-attr).',
       requiredArtifacts: ['Accessibility']
     };
   }

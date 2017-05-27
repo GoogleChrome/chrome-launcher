@@ -34,8 +34,9 @@ class LinkName extends AxeAudit {
       name: 'link-name',
       description: 'Links have a discernable name.',
       helpText: 'Link text (and alternate text for images, when used as links) that is ' +
-          'discernible, not duplicated, and focusable improves the navigating experience for ' +
-          'screen reader users.',
+          'discernible, unique, and focusable improves the navigation experience for ' +
+          'screen reader users. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/link-name).',
       requiredArtifacts: ['Accessibility']
     };
   }

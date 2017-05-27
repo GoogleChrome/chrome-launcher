@@ -33,9 +33,9 @@ class Accesskeys extends AxeAudit {
       category: 'Accessibility',
       name: 'accesskeys',
       description: '`[accesskey]` values are unique.',
-      helpText: '`accesskey` attributes allow the user to quickly activate or focus part ' +
-          'of the page.' +
-          'Using the same `accesskey` more than once could lead to a confusing experience.',
+      helpText: 'Access keys let users quickly focus a part of the page. For proper ' +
+          'navigation, each access key must be unique. ' +
+          '[Learn more](https://dequeuniversity.com/rules/axe/1.1/accesskeys).',
       requiredArtifacts: ['Accessibility']
     };
   }
