@@ -34,7 +34,6 @@ type Mode = 'json'|'html'|'domhtml';
 import {Results} from './types/types';
 
 const fs = require('fs');
-const ReportGenerator = require('../lighthouse-core/report/report-generator');
 const ReportGeneratorV2 = require('../lighthouse-core/report/v2/report-generator');
 const log = require('../lighthouse-core/lib/log');
 
@@ -55,14 +54,8 @@ function checkOutputPath(path: string): string {
  * Creates the results output in a format based on the `mode`.
  */
 function createOutput(results: Results, outputMode: OutputMode): string {
-  const reportGenerator = new ReportGenerator();
-
   // HTML report.
-  if (outputMode === OutputMode.html) {
-    return reportGenerator.generateHTML(results, 'cli');
-  }
-
-  if (outputMode === OutputMode.domhtml) {
+  if (outputMode === OutputMode.domhtml || outputMode === OutputMode.html) {
     return new ReportGeneratorV2().generateReportHtml(results);
   }
 

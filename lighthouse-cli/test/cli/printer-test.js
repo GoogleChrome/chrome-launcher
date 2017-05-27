@@ -45,7 +45,7 @@ describe('Printer', () => {
     const mode = Printer.OutputMode.html;
     const htmlOutput = Printer.createOutput(sampleResults, mode);
     assert.ok(/<!doctype/gim.test(htmlOutput));
-    assert.ok(/<html lang="en" data-report-context="cli"/gim.test(htmlOutput));
+    assert.ok(/<html lang="en"/gim.test(htmlOutput));
   });
 
   it('writes file for results', () => {
