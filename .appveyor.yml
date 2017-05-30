@@ -3,16 +3,20 @@ clone_depth: 10
 version: "{build}"
 
 environment:
+  fast_finish: true
   matrix:
-    - nodejs_version: "6.9.1"
+    - nodejs_version: "6"
       platform: x86
-    - nodejs_version: "7"
-      platform: x86
+    # node 7 is skipped, as appveyor only allows 1 concurrent job
+    # and we want appveyor finishing ASAP. see #2382
+    # - nodejs_version: "7"
+    #   platform: x86
 
 build: off
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm install yarn -g
   - yarn
   - yarn install-all
 
@@ -26,6 +30,7 @@ test_script:
   - node --version
   - npm --version
   - yarn --version
+  - which yarn
   - yarn lint
   - yarn unit
   - yarn smoke
