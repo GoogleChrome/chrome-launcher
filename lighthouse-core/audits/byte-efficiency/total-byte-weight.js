@@ -22,7 +22,6 @@
 const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const Formatter = require('../../report/formatter');
 const TracingProcessor = require('../../lib/traces/tracing-processor');
-const URL = require('../../lib/url-shim');
 
 // Parameters for log-normal CDF scoring. See https://www.desmos.com/calculator/gpmjeykbwr
 // ~75th and ~90th percentiles http://httparchive.org/interesting.php?a=All&l=Feb%201%202017&s=All#bytesTotal
@@ -65,7 +64,7 @@ class TotalByteWeight extends ByteEfficiencyAudit {
           if (record.scheme === 'data' || !record.finished) return;
 
           const result = {
-            url: URL.getURLDisplayName(record.url),
+            url: record.url,
             totalBytes: record.transferSize,
             totalKb: this.bytesToKbString(record.transferSize),
             totalMs: this.bytesToMsString(record.transferSize, networkThroughput),
