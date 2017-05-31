@@ -5,16 +5,19 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "mocha --reporter dot test/**/*-test.js",
+    "test": "mocha -r ts-node/register --reporter dot test/**/*-test.ts",
     "test-formatting": "test/check-formatting.sh",
-    "format": "clang-format -i -style=file *.ts"
+    "format": "clang-format -i -style=file **/*.ts *.ts"
   },
   "devDependencies": {
+    "@types/mocha": "^2.2.41",
     "clang-format": "^1.0.50",
     "mocha": "^3.2.0",
+    "ts-node": "^3.0.4",
     "typescript": "2.2.1"
   },
   "dependencies": {
+    "@types/core-js": "^0.9.41",
     "@types/mkdirp": "^0.3.29",
     "@types/node": "6.0.66"
   }

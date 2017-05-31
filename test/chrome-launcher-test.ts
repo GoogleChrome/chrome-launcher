@@ -16,18 +16,15 @@
 
 'use strict';
 
-require('../compiled-check.js')('chrome-launcher.js');
+import {Launcher} from '../chrome-launcher';
 
-const ChromeLauncher = require('../chrome-launcher.js').Launcher;
 const log = require('../../lighthouse-core/lib/log');
 const assert = require('assert');
-
-/* eslint-env mocha */
 
 describe('Launcher', () => {
   it('doesn\'t fail when killed twice', () => {
     log.setLevel('error');
-    const chromeInstance = new ChromeLauncher();
+    const chromeInstance = new Launcher();
     return chromeInstance.launch().then(() => {
       log.setLevel();
       return Promise.all([chromeInstance.kill(), chromeInstance.kill()]);
@@ -36,16 +33,16 @@ describe('Launcher', () => {
 
   it('doesn\'t launch multiple chrome processes', () => {
     log.setLevel('error');
-    const chromeInstance = new ChromeLauncher();
-    let pid;
+    const chromeInstance = new Launcher();
+    let pid: number;
     return chromeInstance.launch()
         .then(() => {
-          pid = chromeInstance.chrome.pid;
+          pid = chromeInstance.chrome!.pid;
           return chromeInstance.launch();
         })
         .then(() => {
           log.setLevel();
-          assert.strictEqual(pid, chromeInstance.chrome.pid);
+          assert.strictEqual(pid, chromeInstance.chrome!.pid);
           return chromeInstance.kill();
         });
   });
