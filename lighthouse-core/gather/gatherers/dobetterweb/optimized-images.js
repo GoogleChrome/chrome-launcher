@@ -17,7 +17,7 @@
 
  /**
   * @fileoverview Determines optimized jpeg/webp filesizes for all same-origin and dataURI images by
-  *   running the images through canvas in the browser context at quality 0.8.
+  *   running the images through canvas in the browser context.
   */
 'use strict';
 
