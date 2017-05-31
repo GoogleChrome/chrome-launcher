@@ -50,6 +50,8 @@ export interface LaunchedChrome {
   kill: () => Promise<{}>;
 }
 
+export interface ModuleOverrides { fs?: typeof fs, rimraf?: typeof rimraf, }
+
 export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
@@ -73,17 +75,23 @@ export class Launcher {
   private pollInterval: number = 500;
   private pidFile: string;
   private startingUrl: string;
-  private userDataDir?: string;
   private outFile?: number;
   private errFile?: number;
   private chromePath?: string;
   private chromeFlags: string[];
   private requestedPort?: number;
-  chrome?: childProcess.ChildProcess;
+  private chrome?: childProcess.ChildProcess;
+  private fs: typeof fs;
+  private rimraf: typeof rimraf;
+
+  userDataDir?: string;
   port?: number;
   pid?: number;
 
-  constructor(private opts: Options = {}) {
+  constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
+    this.fs = moduleOverrides.fs || fs;
+    this.rimraf = moduleOverrides.rimraf || rimraf;
+
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
@@ -108,16 +116,20 @@ export class Launcher {
     return flags;
   }
 
-  private prepare() {
+  // Wrapper function to enable easy testing.
+  makeTmpDir() {
+    return makeTmpDir();
+  }
+
+  prepare() {
     const platform = process.platform as SupportedPlatforms;
     if (!_SUPPORTED_PLATFORMS.has(platform)) {
       throw new Error(`Platform ${platform} is not supported`);
     }
 
-    this.userDataDir = this.opts.userDataDir || makeTmpDir();
-
-    this.outFile = fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
-    this.errFile = fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
+    this.userDataDir = this.opts.userDataDir || this.makeTmpDir();
+    this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
+    this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
 
     // fix for Node4
     // you can't pass a fd to fs.writeFileSync
@@ -180,7 +192,7 @@ export class Launcher {
           execPath, this.flags, {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
       this.chrome = chrome;
 
-      fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
       log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
       resolve(chrome.pid);
@@ -249,10 +261,7 @@ export class Launcher {
     return new Promise(resolve => {
       if (this.chrome) {
         this.chrome.on('close', () => {
-          // Only clean up the tmp dir if we created it.
-          if (this.opts.userDataDir === undefined) {
-            this.destroyTmp().then(resolve);
-          }
+          this.destroyTmp().then(resolve);
         });
 
         log.log('ChromeLauncher', 'Killing all Chrome Instances');
@@ -274,25 +283,24 @@ export class Launcher {
     });
   }
 
-  private destroyTmp() {
+  destroyTmp() {
     return new Promise(resolve => {
-      if (!this.userDataDir) {
+      // Only clean up the tmp dir if we created it.
+      if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
         return resolve();
       }
 
-      log.verbose('ChromeLauncher', `Removing ${this.userDataDir}`);
-
       if (this.outFile) {
-        fs.closeSync(this.outFile);
+        this.fs.closeSync(this.outFile);
         delete this.outFile;
       }
 
       if (this.errFile) {
-        fs.closeSync(this.errFile);
+        this.fs.closeSync(this.errFile);
         delete this.errFile;
       }
 
-      rimraf(this.userDataDir, () => resolve());
+      this.rimraf(this.userDataDir, () => resolve());
     });
   }
 };
