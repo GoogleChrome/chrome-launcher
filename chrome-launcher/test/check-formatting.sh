@@ -13,3 +13,4 @@ check_formatting ()
 }
 
 check_formatting "*.ts"
+check_formatting "**/*.ts"

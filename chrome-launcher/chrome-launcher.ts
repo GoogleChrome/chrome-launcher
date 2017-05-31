@@ -78,8 +78,8 @@ export class Launcher {
   private errFile?: number;
   private chromePath?: string;
   private chromeFlags: string[];
-  private chrome?: childProcess.ChildProcess;
   private requestedPort?: number;
+  chrome?: childProcess.ChildProcess;
   port?: number;
   pid?: number;
 
