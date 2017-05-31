@@ -96,6 +96,20 @@ URL.getURLDisplayName = function getURLDisplayName(url, options) {
   return Util.getURLDisplayName(new URL(url), options);
 };
 
+/**
+ * Limits data URIs to 100 characters, returns all other strings untouched.
+ * @param {string} url
+ * @return {string}
+ */
+URL.elideDataURI = function elideDataURI(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'data:' ? url.slice(0, 100) : url;
+  } catch (e) {
+    return url;
+  }
+};
+
 // There is fancy URL rewriting logic for the chrome://settings page that we need to work around.
 // Why? Special handling was added by Chrome team to allow a pushState transition between chrome:// pages.
 // As a result, the network URL (chrome://chrome/settings/) doesn't match the final document URL (chrome://settings/).

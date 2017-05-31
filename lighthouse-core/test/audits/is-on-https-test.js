@@ -49,7 +49,7 @@ describe('Security: HTTPS audit', () => {
     ])).then(result => {
       assert.strictEqual(result.rawValue, false);
       assert.ok(result.displayValue.includes('request found'));
-      assert.deepEqual(result.extendedInfo.value[0], {url: 'insecure.com/image.jpeg'});
+      assert.deepEqual(result.extendedInfo.value[0], {url: 'http://insecure.com/image.jpeg'});
     });
   });
 

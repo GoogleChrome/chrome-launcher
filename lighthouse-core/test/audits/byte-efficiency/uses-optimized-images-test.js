@@ -28,7 +28,8 @@ function generateImage(type, originalSize, webpSize, jpegSize) {
   return {
     isBase64DataUri: isData,
     url: isData ?
-      `data:image/${type};base64,reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaly long` :
+      `data:image/${type};base64,reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaly ` +
+      'reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaly long' :
       `http://google.com/image.${type}`,
     mimeType: `image/${type}`,
     originalSize, webpSize, jpegSize

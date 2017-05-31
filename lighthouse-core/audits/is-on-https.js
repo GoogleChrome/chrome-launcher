@@ -58,7 +58,7 @@ class HTTPS extends Audit {
     return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
       const insecureRecords = networkRecords
           .filter(record => !HTTPS.isSecureRecord(record))
-          .map(record => ({url: URL.getURLDisplayName(record.url, {preserveHost: true})}));
+          .map(record => ({url: URL.elideDataURI(record.url)}));
 
       let displayValue = '';
       if (insecureRecords.length > 1) {
@@ -77,7 +77,7 @@ class HTTPS extends Audit {
         details: {
           type: 'list',
           header: {type: 'text', text: 'Insecure URLs:'},
-          items: insecureRecords.map(record => ({type: 'text', text: record.url})),
+          items: insecureRecords.map(record => ({type: 'url', text: record.url})),
         }
       };
     });

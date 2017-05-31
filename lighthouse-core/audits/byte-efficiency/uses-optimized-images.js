@@ -71,7 +71,7 @@ class UsesOptimizedImages extends ByteEfficiencyAudit {
         return;
       }
 
-      const url = URL.getURLDisplayName(image.url);
+      const url = URL.elideDataURI(image.url);
       const jpegSavings = UsesOptimizedImages.computeSavings(image, 'jpeg');
 
       results.push({

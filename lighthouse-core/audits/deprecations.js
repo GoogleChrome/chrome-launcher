@@ -24,7 +24,6 @@
 
 const Audit = require('./audit');
 const Formatter = require('../report/formatter');
-const URL = require('../lib/url-shim');
 
 class Deprecations extends Audit {
   /**
@@ -61,12 +60,10 @@ class Deprecations extends Audit {
         });
 
     const deprecationsV2 = entries.filter(log => log.entry.source === 'deprecation').map(log => {
-      // CSS deprecations can have missing URLs and lineNumbers. See https://crbug.com/680832.
-      const url = URL.isValid(log.entry.url) ? URL.getURLDisplayName(log.entry.url) : '';
       return {
         type: 'code',
         text: log.entry.text,
-        url,
+        url: log.entry.url,
         source: log.entry.source,
         lineNumber: log.entry.lineNumber
       };

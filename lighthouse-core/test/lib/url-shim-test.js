@@ -175,6 +175,30 @@ describe('URL Shim', () => {
     });
   });
 
+  describe('elideDataURI', () => {
+    it('elides long data URIs', () => {
+      let longDataURI = '';
+      for (let i = 0; i < 1000; i++) {
+        longDataURI += 'abcde';
+      }
+
+      const elided = URL.elideDataURI(`data:image/jpeg;base64,${longDataURI}`);
+      assert.ok(elided.length < longDataURI.length, 'did not shorten string');
+    });
+
+    it('returns all other inputs', () => {
+      const urls = [
+        'data:image/jpeg;base64,foobar',
+        'https://example.com/page?query=string#hash',
+        'http://example-2.com',
+        'chrome://settings',
+        'blob://something',
+      ];
+
+      urls.forEach(url => assert.equal(URL.elideDataURI(url), url));
+    });
+  });
+
   describe('equalWithExcludedFragments', () => {
     it('correctly checks equality of URLs regardless of fragment', () => {
       const equalPairs = [

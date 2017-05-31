@@ -22,7 +22,6 @@
 'use strict';
 
 const Audit = require('../audit');
-const URL = require('../../lib/url-shim');
 const Formatter = require('../../report/formatter');
 const scoreForWastedMs = require('../byte-efficiency/byte-efficiency-audit').scoreForWastedMs;
 
@@ -77,7 +76,7 @@ class LinkBlockingFirstPaintAudit extends Audit {
       endTime = Math.max(item.endTime, endTime);
 
       return {
-        url: URL.getURLDisplayName(item.tag.url),
+        url: item.tag.url,
         totalKb: `${Math.round(item.transferSize / 1024)} KB`,
         totalMs: `${Math.round((item.endTime - startTime) * 1000)}ms`
       };

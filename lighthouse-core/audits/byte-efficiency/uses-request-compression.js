@@ -67,7 +67,7 @@ class ResponsesAreCompressed extends ByteEfficiencyAudit {
       }
 
       // remove duplicates
-      const url = URL.getURLDisplayName(record.url);
+      const url = URL.elideDataURI(record.url);
       const isDuplicate = results.find(res => res.url === url &&
         res.totalBytes === record.resourceSize);
       if (isDuplicate) {

@@ -58,7 +58,7 @@ class UsesWebPImages extends ByteEfficiencyAudit {
         return;
       }
 
-      const url = URL.getURLDisplayName(image.url);
+      const url = URL.elideDataURI(image.url);
       const webpSavings = OptimizedImages.computeSavings(image, 'webp');
 
       results.push({
