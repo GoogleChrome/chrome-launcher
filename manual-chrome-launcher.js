@@ -27,4 +27,4 @@ const {launch} = require('./chrome-launcher');
 launch({
   startingUrl,
   chromeFlags,
-}).then(v => console.log(`✨  Chrome debugging port ${v.port}`))
+}).then(v => console.log(`✨  Chrome debugging port: ${v.port}`))
