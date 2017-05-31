@@ -49,9 +49,9 @@ When installed globally via `npm i -g lighthouse` or `yarn global add lighthouse
 `chrome-debug` is added to your `PATH`. This binary launches a standalone Chrome
 instance with an open debugging port.
 
-- Run `chrome-debug`
+- Run `chrome-debug`. This will log the debugging port your instance of Chrome is running on
 - navigate to and log in to your site
-- in a separate terminal tab `lighthouse http://mysite.com`
+- in a separate terminal tab `lighthouse http://mysite.com --port port-number` using the port number your Chrome instance is running on
 
 ## Testing on a mobile device
 
