@@ -20,7 +20,9 @@ const fs = require('fs');
 const path = require('path');
 
 const opn = require('opn');
-const args = require('yargs').argv;
+const args = require('yargs')
+  .default('runs', 1)
+  .argv;
 
 const Metrics = require('../../lighthouse-core/lib/traces/pwmetrics-events');
 
@@ -84,25 +86,58 @@ function aggregate(outPathA, outPathB) {
     if (!utils.isDir(sitePathB)) {
       return;
     }
-    const siteScreenshotsComparison = {
-      siteName: siteDir,
-      runA: analyzeSingleRunScreenshots(sitePathA),
-      runB: analyzeSingleRunScreenshots(sitePathB)
-    };
-    results.push(siteScreenshotsComparison);
+
+    for (let i = 0; i < args.runs; i++) {
+      const runDirA = getRunDir(sitePathA, i);
+      const runDirB = getRunDir(sitePathB, i);
+
+      const runPathA = path.resolve(sitePathA, runDirA);
+      const runPathB = path.resolve(sitePathB, runDirB);
+
+      const lighthouseFileA = path.resolve(runPathA, constants.LIGHTHOUSE_RESULTS_FILENAME);
+      const lighthouseFileB = path.resolve(runPathB, constants.LIGHTHOUSE_RESULTS_FILENAME);
+
+      if (!utils.isFile(lighthouseFileA) || !utils.isFile(lighthouseFileB)) {
+        continue;
+      }
+
+      const siteScreenshotsComparison = {
+        siteName: `${siteDir} runA: ${runDirA} runB: ${runDirB}`,
+        runA: analyzeSingleRunScreenshots(runPathA),
+        runB: analyzeSingleRunScreenshots(runPathB),
+      };
+      results.push(siteScreenshotsComparison);
+    }
   });
 
   return results;
 }
 
 /**
- * Analyzes the screenshots for the first run of a particular site.
  * @param {string} sitePath
+ * @param {number} runIndex
+ * @return {string}
+ */
+function getRunDir(sitePath, runIndex) {
+  return sortAndFilterRunFolders(fs.readdirSync(sitePath))[runIndex];
+}
+
+/**
+ * @param {!Array<string>} folders
+ * @return {!Array<string>}
+ */
+function sortAndFilterRunFolders(folders) {
+  return folders
+    .filter(folder => folder !== '.DS_Store')
+    .sort((a, b) => Number(a) - Number(b));
+}
+
+/**
+ * Analyzes the screenshots for the first run of a particular site.
+ * @param {string} runPath
  * @return {!SingleRunScreenshots}
  */
-function analyzeSingleRunScreenshots(sitePath) {
-  const runDir = sortAndFilterRunFolders(fs.readdirSync(sitePath))[0];
-  const runPath = path.resolve(sitePath, runDir);
+function analyzeSingleRunScreenshots(runPath) {
   const lighthouseResultsPath = path.resolve(runPath, constants.LIGHTHOUSE_RESULTS_FILENAME);
   const lighthouseResults = JSON.parse(fs.readFileSync(lighthouseResultsPath));
 
@@ -150,18 +185,6 @@ function analyzeSingleRunScreenshots(sitePath) {
       .find(metric => metric.id === id)
       .getTs(lighthouseResults.audits) / 1000; // convert to ms
   }
-}
-
-/**
- * @param {!Array<string>} folders
- * @return {!Array<string>}
- */
-function sortAndFilterRunFolders(folders) {
-  return folders
-    .filter(folder => folder !== '.DS_Store')
-    .map(folder => Number(folder))
-    .sort((a, b) => a - b)
-    .map(folder => folder.toString());
 }
 
 /**

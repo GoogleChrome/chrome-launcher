@@ -16,44 +16,25 @@
  */
 'use strict';
 
-const fs = require('fs');
+module.exports = [
+  'https://en.wikipedia.org/wiki/Google',
+  'https://mobile.twitter.com/ChromeDevTools',
+  'https://www.instagram.com/stephencurry30',
+  'https://amazon.com',
+  'https://nytimes.com',
+  'https://www.google.com/search?q=flowers',
 
-/**
- * @param {string} path
- * @return {boolean}
- */
-function isDir(path) {
-  try {
-    return fs.statSync(path).isDirectory();
-  } catch (error) {
-    return false;
-  }
-}
+  'https://flipkart.com',
+  'http://www.espn.com/',
+  'https://www.washingtonpost.com/pwa/',
+  'http://www.npr.org/',
+  'http://www.booking.com/',
+  'https://youtube.com',
+  'https://reddit.com',
+  'https://ebay.com',
+  'https://stackoverflow.com',
+  'https://apple.com',
 
-/**
- * @param {string} path
- * @return {boolean}
- */
-function isFile(path) {
-  try {
-    return fs.statSync(path).isFile();
-  } catch (error) {
-    return false;
-  }
-}
-
-/**
- * @param {!Array} array
- */
-function shuffle(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-module.exports = {
-  isDir,
-  isFile,
-  shuffle,
-};
+  // Could not run nasa on gin3g
+  'https://www.nasa.gov/',
+];
