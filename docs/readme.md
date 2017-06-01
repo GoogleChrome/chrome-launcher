@@ -28,6 +28,20 @@ launchChromeAndRunLighthouse('https://example.com', flags).then(results => {
 });
 ```
 
+### Performance-only Lighthouse run
+
+Many modules consuming Lighthouse are only interested in the performance numbers. 
+Lighthouse ships with a [performance-only config](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/perf.json) that you can use:
+
+```js
+const perfConfig: any = require('lighthouse/lighthouse-core/config/perf.json');
+// ...
+launchChromeAndRunLighthouse(url, flags, perfConfig).then( // ...
+```
+
+You can also craft your own config (e.g. [plots.json](https://github.com/GoogleChrome/lighthouse/blob/master/lighthouse-core/config/plots.json)) for completely custom runs. Also see the [basic custom audit recipe](https://github.com/GoogleChrome/lighthouse/tree/master/docs/recipes/custom-audit).
+
+
 ### Turn on logging
 
 If you want to see log output as Lighthouse runs, include the `log` module
@@ -49,9 +63,9 @@ When installed globally via `npm i -g lighthouse` or `yarn global add lighthouse
 `chrome-debug` is added to your `PATH`. This binary launches a standalone Chrome
 instance with an open debugging port.
 
-- Run `chrome-debug`. This will log the debugging port your instance of Chrome is running on
-- navigate to and log in to your site
-- in a separate terminal tab `lighthouse http://mysite.com --port port-number` using the port number your Chrome instance is running on
+1. Run `chrome-debug`. This will log the debugging port of your Chrome instance
+1. Navigate to your site and log in.
+1. In a separate terminal tab, run `lighthouse http://mysite.com --port port-number` using the port number from chrome-debug.
 
 ## Testing on a mobile device
 
