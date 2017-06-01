@@ -27,7 +27,7 @@ class ViolationAudit extends Audit {
   static getViolationResults(artifacts, pattern) {
     return artifacts.ChromeConsoleMessages
         .map(message => message.entry)
-        .filter(entry => entry.source === 'violation' && pattern.test(entry.text))
+        .filter(entry => entry.url && entry.source === 'violation' && pattern.test(entry.text))
         .map(entry => Object.assign({label: `line: ${entry.lineNumber}`}, entry));
   }
 }
