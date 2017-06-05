@@ -836,7 +836,7 @@
       "name": "total-byte-weight",
       "category": "Network",
       "description": "Avoids enormous network payloads",
-      "helpText": "Network transfer size [costs users real dollars](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
+      "helpText": "Network transfer size [costs users real money](https://whatdoesmysitecost.com/) and is [highly correlated](http://httparchive.org/interesting.php#onLoad) with long load times. Try to find ways to reduce the size of required files."
     },
     "unused-css-rules": {
       "score": true,
