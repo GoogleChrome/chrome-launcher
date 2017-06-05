@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "mocha -r ts-node/register --reporter dot test/**/*-test.ts",
+    "test": "mocha --require ts-node/register --reporter dot test/**/*-test.ts",
     "test-formatting": "test/check-formatting.sh",
     "format": "clang-format -i -style=file **/*.ts *.ts"
   },
