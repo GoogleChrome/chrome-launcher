@@ -39,8 +39,9 @@ class OffscreenImages extends ByteEfficiencyAudit {
       name: 'offscreen-images',
       description: 'Offscreen images',
       informative: true,
-      helpText: 'Images that are not above the fold should be lazily loaded after the page is ' +
-        'interactive. Consider using the [IntersectionObserver](https://developers.google.com/web/updates/2016/04/intersectionobserver) API.',
+      helpText: 'Consider lazy-loading offscreen images to improve page load speed ' +
+        'and time to interactive. ' +
+        '[Learn more](https://developers.google.com/web/tools/lighthouse/audits/offscreen-images).',
       requiredArtifacts: ['ImageUsage', 'ViewportDimensions', 'traces', 'devtoolsLogs']
     };
   }
