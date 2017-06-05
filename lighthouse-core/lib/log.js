@@ -108,11 +108,12 @@ class Log {
    */
   static formatProtocol(prefix, data, level) {
     const columns = (!process || process.browser) ? Infinity : process.stdout.columns;
-    const maxLength = columns - data.method.length - prefix.length - loggingBufferColumns;
+    const method = data.method || '?????';
+    const maxLength = columns - method.length - prefix.length - loggingBufferColumns;
     // IO.read blacklisted here to avoid logging megabytes of trace data
-    const snippet = (data.params && data.method !== 'IO.read') ?
+    const snippet = (data.params && method !== 'IO.read') ?
       JSON.stringify(data.params).substr(0, maxLength) : '';
-    Log._logToStdErr(`${prefix}:${level || ''}`, [data.method, snippet]);
+    Log._logToStdErr(`${prefix}:${level || ''}`, [method, snippet]);
   }
 
   static log(title, ...args) {
