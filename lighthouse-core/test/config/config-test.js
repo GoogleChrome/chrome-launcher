@@ -67,7 +67,7 @@ describe('Config', () => {
 
   it('uses the default config when no config is provided', () => {
     const config = new Config();
-    assert.deepStrictEqual(origConfig.aggregations, config.aggregations);
+    assert.deepStrictEqual(origConfig.categories, config.categories);
     assert.equal(origConfig.audits.length, config.audits.length);
   });
 
@@ -129,7 +129,7 @@ describe('Config', () => {
     assert.equal(configJSON.passes[0].gatherers.length, 2);
   });
 
-  it('contains new copies of auditResults and aggregations', () => {
+  it('contains new copies of auditResults', () => {
     const configJSON = origConfig;
     configJSON.auditResults = [{
       value: 1,
@@ -146,10 +146,7 @@ describe('Config', () => {
 
     const config = new Config(configJSON);
     assert.notEqual(config, configJSON, 'Objects are strictly different');
-    assert.ok(config.aggregations, 'Aggregations array exists');
     assert.ok(config.auditResults, 'Audits array exists');
-    assert.deepStrictEqual(config.aggregations, configJSON.aggregations, 'Aggregations match');
-    assert.notEqual(config.aggregations, configJSON.aggregations, 'Aggregations not same object');
     assert.notEqual(config.auditResults, configJSON.auditResults, 'Audits not same object');
     assert.deepStrictEqual(config.auditResults, configJSON.auditResults, 'Audits match');
   });
@@ -490,15 +487,15 @@ describe('Config', () => {
       assert.deepEqual(merged.audits, ['a', 'b', 'c']);
     });
 
-    it('should merge aggregations', () => {
-      const configA = {aggregations: [{name: 'A'}, {name: 'B'}]};
-      const configB = {aggregations: [{name: 'C'}]};
+    it('should merge categories', () => {
+      const configA = {categories: {A: {name: 'Acat'}, B: {name: 'Bcat'}}};
+      const configB = {categories: {C: {name: 'Ccat'}}};
       const merged = Config.extendConfigJSON(configA, configB);
-      assert.deepEqual(merged.aggregations, [
-        {name: 'A'},
-        {name: 'B'},
-        {name: 'C'},
-      ]);
+      assert.deepStrictEqual(merged.categories, {
+        A: {name: 'Acat'},
+        B: {name: 'Bcat'},
+        C: {name: 'Ccat'},
+      });
     });
 
     it('should merge other values', () => {
@@ -515,12 +512,12 @@ describe('Config', () => {
   });
 
   describe('getCategories', () => {
-    it('returns the IDs & names of the aggregations', () => {
+    it('returns the IDs & names of the categories', () => {
       const categories = Config.getCategories(origConfig);
       assert.equal(Array.isArray(categories), true);
       assert.equal(categories.length, 4, 'Found the correct number of categories');
-      const haveName = categories.every(agg => agg.name.length);
-      const haveID = categories.every(agg => agg.id.length);
+      const haveName = categories.every(cat => cat.name.length);
+      const haveID = categories.every(cat => cat.id.length);
       assert.equal(haveName === haveID === true, true, 'they have IDs and names');
     });
   });
@@ -560,7 +557,7 @@ describe('Config', () => {
       const selectedCategory = origConfig.categories.performance;
       const auditCount = Object.keys(selectedCategory.audits).length;
 
-      assert.equal(config.audits.length, auditCount, '# of audits match aggregation list');
+      assert.equal(config.audits.length, auditCount, '# of audits match category list');
     });
 
     it('should only run specified audits', () => {

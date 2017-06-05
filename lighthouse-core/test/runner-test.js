@@ -300,22 +300,15 @@ describe('Runner', () => {
         displayValue: ''
       }],
 
-      aggregations: [{
-        name: 'Aggregation',
-        description: '',
-        scored: true,
-        categorizable: true,
-        items: [{
-          name: 'name',
-          description: 'description',
-          audits: {
-            'content-width': {
-              expectedValue: true,
-              weight: 1
-            }
-          }
-        }]
-      }]
+      categories: {
+        category: {
+          name: 'Category',
+          description: '',
+          audits: [
+            {id: 'content-width', weight: 1}
+          ]
+        }
+      }
     });
 
     return Runner.run(null, {url, config, driverMock}).then(results => {
@@ -354,36 +347,6 @@ describe('Runner', () => {
       assert.equal(results.reportCategories[0].audits[0].id, 'content-width');
       assert.equal(results.reportCategories[0].audits[0].score, 100);
       assert.equal(results.reportCategories[0].audits[0].result.displayValue, 'display');
-    });
-  });
-
-  it('returns an aggregation', () => {
-    const url = 'https://example.com';
-    const config = new Config({
-      auditResults: [{
-        name: 'content-width',
-        rawValue: true,
-        score: true,
-        displayValue: ''
-      }],
-      categories: {
-        category: {
-          name: 'Category',
-          description: '',
-          audits: [
-            {id: 'content-width', weight: 1}
-          ]
-        }
-      }
-    });
-
-    return Runner.run(null, {url, config, driverMock}).then(results => {
-      assert.ok(results.lighthouseVersion);
-      assert.ok(results.generatedTime);
-      assert.equal(results.initialUrl, url);
-      assert.equal(results.audits['content-width'].name, 'content-width');
-      assert.equal(results.aggregations[0].score[0].overall, 1);
-      assert.equal(results.aggregations[0].score[0].subItems[0].name, 'content-width');
     });
   });
 

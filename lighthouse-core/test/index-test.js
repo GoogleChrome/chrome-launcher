@@ -89,8 +89,7 @@ describe('Module Tests', function() {
       }],
       audits: [
         'fluff'
-      ],
-      aggregations: []
+      ]
     })
       .then(() => {
         throw new Error('Should not have resolved');
@@ -99,7 +98,7 @@ describe('Module Tests', function() {
       });
   });
 
-  it('should return formatted audit results when given no aggregations', function() {
+  it('should return formatted audit results when given no categories', function() {
     const exampleUrl = 'https://example.com/';
     return lighthouse(exampleUrl, {
       output: 'json'
@@ -117,8 +116,8 @@ describe('Module Tests', function() {
       assert.ok(results.generatedTime);
       assert.equal(results.url, exampleUrl);
       assert.equal(results.initialUrl, exampleUrl);
-      assert.ok(Array.isArray(results.aggregations));
-      assert.equal(results.aggregations.length, 0);
+      assert.ok(Array.isArray(results.reportCategories));
+      assert.equal(results.reportCategories.length, 0);
       assert.ok(results.audits.viewport);
       assert.ok(results.timing);
       assert.equal(typeof results.timing.total, 'number');

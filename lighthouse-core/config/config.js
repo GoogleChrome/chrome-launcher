@@ -319,8 +319,6 @@ class Config {
       throw new Error('config.auditResults must be an array');
     }
 
-    this._aggregations = configJSON.aggregations || null;
-
     this._audits = Config.requireAudits(configJSON.audits, this._configDir);
     this._artifacts = expandArtifacts(configJSON.artifacts);
     this._categories = configJSON.categories;
@@ -452,7 +450,7 @@ class Config {
   }
 
   /**
-   * Creates mapping from audit path (used in config.audits) to audit.name (used in config.aggregations)
+   * Creates mapping from audit path (used in config.audits) to audit.name (used in categories)
    * @param {!Object} config Lighthouse config object.
    * @return {Map}
    */
@@ -575,11 +573,6 @@ class Config {
   /** @type {Array<!Artifacts>} */
   get artifacts() {
     return this._artifacts;
-  }
-
-  /** @type {Array<!Aggregation>} */
-  get aggregations() {
-    return this._aggregations;
   }
 
   /** @type {Object<{audits: !Array<{id: string, weight: number}>}>} */

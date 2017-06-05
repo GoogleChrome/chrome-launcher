@@ -57,7 +57,5 @@ module.exports = {
     'themed-omnibox',
     // https://github.com/GoogleChrome/lighthouse/issues/566
     // 'cache-start-url'
-  ],
-
-  aggregations: []
+  ]
 };

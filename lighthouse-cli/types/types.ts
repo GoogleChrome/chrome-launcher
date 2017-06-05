@@ -29,22 +29,8 @@ interface AuditFullResults {
   [metric: string]: AuditFullResult
 }
 
-interface AggregationResultItem {
-  overall: number;
-  name: string;
-  scored: boolean;
-  subItems: Array<AuditFullResult|string>;
-}
-
-interface Aggregation {
-  name: string;
-  score: Array<AggregationResultItem>;
-  total: number;
-}
-
 interface Results {
   url: string;
-  aggregations: Array<Aggregation>;
   audits: AuditFullResults;
   lighthouseVersion: string;
   artifacts?: Object;
@@ -54,8 +40,6 @@ interface Results {
 
 export {
   Results,
-  Aggregation,
-  AggregationResultItem,
   AuditResult,
   AuditResults,
   AuditFullResult,

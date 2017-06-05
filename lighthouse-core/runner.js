@@ -128,7 +128,7 @@ class Runner {
       return Promise.reject(err);
     }
 
-    // Format and aggregate results before returning.
+    // Format and generate JSON report before returning.
     run = run
       .then(runResults => {
         log.log('status', 'Generating results...');
@@ -138,14 +138,12 @@ class Runner {
           return results;
         }, {});
 
-        let aggregations = [];
         let reportCategories = [];
         let score = 0;
         if (config.categories) {
           const reportGenerator = new ReportGeneratorV2();
           const report = reportGenerator.generateReportJson(config, resultsById);
           reportCategories = report.categories;
-          aggregations = report.aggregations;
           score = report.score;
         }
 
@@ -161,7 +159,6 @@ class Runner {
           score,
           reportCategories,
           reportGroups: config.groups,
-          aggregations
         };
       });
 

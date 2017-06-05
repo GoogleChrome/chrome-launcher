@@ -27,12 +27,12 @@ const Config = require('./config/config');
  *
  *   index.js  - the require('lighthouse') hook for Node modules (including the CLI)
  *
- *   runner.js - marshalls the actions that must be taken (Gather / Audit / Aggregate)
+ *   runner.js - marshalls the actions that must be taken (Gather / Audit)
  *               config file is used to determine which of these actions are needed
  *
  *   lighthouse-cli \
  *                   -- index.js  \
- *                                 ----- runner.js ----> [Gather / Audit / Aggregate]
+ *                                 ----- runner.js ----> [Gather / Audit]
  *           lighthouse-extension /
  *
  */
