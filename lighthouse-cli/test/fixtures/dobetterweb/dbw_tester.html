@@ -116,6 +116,16 @@
   <a href="./doesnotexist" target="_blank">internal link is ok</a>
 </template>
 
+<template id="password-inputs-can-be-pasted-into">
+  <!-- FAIL - calls preventDefault on event -->
+  <input type="password" onpaste="event.preventDefault();" />
+  <!-- PASS -->
+  <input type="password" />
+  <!-- FAIL - returns false in event handler -->
+  <input type="password" onpaste="return false;" />
+
+</template>
+
 <!-- Some websites overwrite the original Error object. The captureJSCallUsage function
   relies on the native Error object and prepareStackTrace from V8. When overwriting the stack
   property the e.stack inside the gatherer won't be in the correct format
@@ -282,6 +292,11 @@ function noRelOpenLinksTest() {
   stampTemplate('noopener-links-tmpl', document.head);
 }
 
+function passwordInputsCanBePastedIntoTest() {
+  stampTemplate('password-inputs-can-be-pasted-into', document.body);
+}
+
+
 function deprecationsTest() {
   stampTemplate('deprecations-tmpl', document.head);
 
@@ -316,6 +331,7 @@ if (location.search === '') {
   noRelOpenLinksTest();
   // oldCSSFlexboxTest();
   deprecationsTest();
+  passwordInputsCanBePastedIntoTest();
 } else {
   if (params.has('documentWrite')) {
     documentWriteTest();
@@ -352,6 +368,9 @@ if (location.search === '') {
   // }
   if (params.has('deprecations')) {
     deprecationsTest();
+  }
+  if (params.has('passwordinputs')) {
+    passwordInputsCanBePastedIntoTest();
   }
 }
 </script>

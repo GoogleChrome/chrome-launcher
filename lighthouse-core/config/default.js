@@ -23,9 +23,10 @@ module.exports = {
       "dobetterweb/appcache",
       "dobetterweb/domstats",
       "dobetterweb/optimized-images",
+      "dobetterweb/password-inputs-with-prevented-paste",
       "dobetterweb/response-compression",
       "dobetterweb/tags-blocking-first-paint",
-      "dobetterweb/websql",
+      "dobetterweb/websql"
     ]
   },
   {
@@ -131,6 +132,7 @@ module.exports = {
     // "dobetterweb/no-old-flexbox",
     "dobetterweb/no-websql",
     "dobetterweb/notification-on-start",
+    "dobetterweb/password-inputs-can-be-pasted-into",
     "dobetterweb/script-blocking-first-paint",
     "dobetterweb/uses-http2",
     "dobetterweb/uses-passive-event-listeners"
@@ -313,7 +315,11 @@ module.exports = {
         "notification-on-start": {
           "expectedValue": true,
           "weight": 1
-        }
+        },
+        "password-inputs-can-be-pasted-into": {
+          "expectedValue": true,
+          "weight": 1
+        },
       }
     }, {
       "name": "Avoiding deprecated APIs and browser interventions",
@@ -752,6 +758,7 @@ module.exports = {
         {"id": "notification-on-start", "weight": 1},
         {"id": "deprecations", "weight": 1},
         {"id": "manifest-short-name-length", "weight": 1},
+        {"id": "password-inputs-can-be-pasted-into", "weight": 1},
       ]
     }
   }

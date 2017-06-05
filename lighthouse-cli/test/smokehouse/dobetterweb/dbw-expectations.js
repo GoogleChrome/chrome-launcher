@@ -127,7 +127,15 @@ module.exports = [
             length: 4
           }
         }
-      }
+      },
+      'password-inputs-can-be-pasted-into': {
+        score: false,
+        extendedInfo: {
+          value: {
+            length: 2
+          }
+        }
+      },
     }
   }, {
     initialUrl: 'http://localhost:10200/dobetterweb/domtester.html?smallDOM',
@@ -228,7 +236,10 @@ module.exports = [
       },
       'uses-passive-event-listeners': {
         score: true
-      }
+      },
+      'password-inputs-can-be-pasted-into': {
+        score: true
+      },
     }
   }
 ];
