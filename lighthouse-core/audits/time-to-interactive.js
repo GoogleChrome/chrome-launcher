@@ -63,7 +63,7 @@ class TTIMetric extends Audit {
 
       // Get our expected latency for the time window
       const latencies = TracingProcessor.getRiskToResponsiveness(
-        data.model, data.trace, startTime, endTime, percentiles);
+        data.tabTrace, startTime, endTime, percentiles);
       const estLatency = latencies[0].time;
       foundLatencies.push({
         estLatency: estLatency,
@@ -159,10 +159,9 @@ class TTIMetric extends Audit {
         debugString = `Trace error: ${err.message}`;
         return null;
       }),
-      artifacts.requestTraceOfTab(trace),
-      artifacts.requestTracingModel(trace)
+      artifacts.requestTraceOfTab(trace)
     ];
-    return Promise.all(pending).then(([speedline, tabTrace, model]) => {
+    return Promise.all(pending).then(([speedline, tabTrace]) => {
       // frame monotonic timestamps from speedline are in ms (ts / 1000), so we'll match
       //   https://github.com/pmdartus/speedline/blob/123f512632a/src/frame.js#L86
       const fMPtsInMS = tabTrace.timestamps.firstMeaningfulPaint;
@@ -188,7 +187,7 @@ class TTIMetric extends Audit {
       }
 
       const times = {fmpTiming, visuallyReadyTiming, traceEndTiming};
-      const data = {tabTrace, model, trace};
+      const data = {tabTrace, trace};
       const timeToInteractive = TTIMetric.findTTIAlpha(times, data);
       const timeToInteractiveB = TTIMetric.findTTIAlphaFMPOnly(times, data);
       const timeToInteractiveC = TTIMetric.findTTIAlphaFMPOnly5s(times, data);

@@ -10,13 +10,30 @@
  */
 
 /** @typedef
+ * {{
+ *   navigationStart: number,
+ *   firstPaint: number,
+ *   firstContentfulPaint: number,
+ *   firstMeaningfulPaint: number,
+ *   traceEnd: number,
+ *   onLoad: number,
+ *   domContentLoaded: number,
+ * }}
+ */
+let TraceTimes;
+
+/** @typedef
   {{
+    timings: !TraceTimes,
+    timestamps: !TraceTimes,
     processEvents: !Array<!TraceEvent>,
+    mainThreadEvents: !Array<!TraceEvent>,
     startedInPageEvt: !TraceEvent,
     navigationStartEvt: !TraceEvent,
     firstPaintEvt: TraceEvent,
     firstContentfulPaintEvt: TraceEvent,
-    firstMeaningfulPaintEvt: TraceEvent
+    firstMeaningfulPaintEvt: TraceEvent,
+    onLoadEvt: TraceEvent,
   }} */
 let TraceOfTabArtifact;
 

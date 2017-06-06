@@ -26,7 +26,7 @@ class TraceOfTab extends ComputedArtifact {
 
   /**
    * @param {{traceEvents: !Array}} trace
-   * @return {!{processEvents: !Array<TraceEvent>, startedInPageEvt: TraceEvent, navigationStartEvt: TraceEvent, firstContentfulPaintEvt: TraceEvent, firstMeaningfulPaintEvt: TraceEvent}}
+   * @return {!TraceOfTabArtifact}
   */
   compute_(trace) {
     // Parse the trace for our key events and sort them by timestamp.
@@ -86,6 +86,9 @@ class TraceOfTab extends ComputedArtifact {
       .filter(e => e.pid === startedInPageEvt.pid)
       .sort((event0, event1) => event0.ts - event1.ts);
 
+    const mainThreadEvents = processEvents
+      .filter(e => e.tid === startedInPageEvt.tid);
+
     const traceEnd = trace.traceEvents.reduce((max, evt) => {
       return max.ts > evt.ts ? max : evt;
     });
@@ -95,7 +98,7 @@ class TraceOfTab extends ComputedArtifact {
       firstPaint,
       firstContentfulPaint,
       firstMeaningfulPaint,
-      traceEnd,
+      traceEnd: {ts: traceEnd.ts + (traceEnd.dur || 0)},
       onLoad,
       domContentLoaded,
     };
@@ -112,7 +115,8 @@ class TraceOfTab extends ComputedArtifact {
       timings,
       timestamps,
       processEvents,
-      startedInPageEvt: startedInPageEvt,
+      mainThreadEvents,
+      startedInPageEvt,
       navigationStartEvt: navigationStart,
       firstPaintEvt: firstPaint,
       firstContentfulPaintEvt: firstContentfulPaint,

@@ -207,12 +207,11 @@ class ConsistentlyInteractiveMetric extends Audit {
     const devtoolsLog = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
     const computedArtifacts = [
       artifacts.requestNetworkRecords(devtoolsLog),
-      artifacts.requestTracingModel(trace),
       artifacts.requestTraceOfTab(trace),
     ];
 
     return Promise.all(computedArtifacts)
-      .then(([networkRecords, traceModel, traceOfTab]) => {
+      .then(([networkRecords, traceOfTab]) => {
         if (!traceOfTab.timestamps.firstMeaningfulPaint) {
           throw new Error('No firstMeaningfulPaint found in trace.');
         }
@@ -221,7 +220,7 @@ class ConsistentlyInteractiveMetric extends Audit {
           throw new Error('No domContentLoaded found in trace.');
         }
 
-        const longTasks = TracingProcessor.getMainThreadTopLevelEvents(traceModel, trace)
+        const longTasks = TracingProcessor.getMainThreadTopLevelEvents(traceOfTab)
             .filter(event => event.duration >= 50);
         const quietPeriodInfo = this.findOverlappingQuietPeriods(longTasks, networkRecords,
             traceOfTab);

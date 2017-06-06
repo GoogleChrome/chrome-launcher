@@ -14,7 +14,7 @@ if (typeof global.window === 'undefined') {
 const BASE_RESPONSE_LATENCY = 16;
 const SCHEDULABLE_TASK_TITLE = 'TaskQueueManager::ProcessTaskFromWorkQueue';
 
-// we need gl-matrix and jszip for traceviewer
+// we need gl-matrix for traceviewer
 // since it has internal forks for isNode and they get mixed up during
 // browserify, we require them locally here and global-ize them.
 
@@ -23,15 +23,10 @@ const glMatrixModule = require('gl-matrix');
 Object.keys(glMatrixModule).forEach(exportName => {
   global[exportName] = glMatrixModule[exportName];
 });
-// from catapult/tracing/tracing/extras/importer/jszip.html
-global.JSZip = {};
 global.mannwhitneyu = {};
 global.HTMLImportsLoader = {};
 global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
   if (path === '/gl-matrix-min.js') {
-    return '../../../lib/empty-stub.js';
-  }
-  if (path === '/jszip.min.js') {
     return '../../../lib/empty-stub.js';
   }
   if (path === '/mannwhitneyu.js') {
@@ -41,59 +36,8 @@ global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
 
 require('../../third_party/traceviewer-js/');
 const traceviewer = global.tr;
-if (typeof atob === 'undefined') {
-  // Node doesn't have base64 encode/decode functions available globally so polyfill with buffer
-  traceviewer.b.Base64.atob = input => new Buffer(input).toString('base64');
-  traceviewer.b.Base64.btoa = input => new Buffer(input, 'base64').toString();
-}
 
 class TraceProcessor {
-  get RESPONSE() {
-    return 'Response';
-  }
-
-  get ANIMATION() {
-    return 'Animation';
-  }
-
-  get LOAD() {
-    return 'Load';
-  }
-
-  // Create the importer and import the trace contents to a model.
-  init(trace) {
-    const io = new traceviewer.importer.ImportOptions();
-    io.showImportWarnings = false;
-    io.pruneEmptyContainers = false;
-    io.shiftWorldToZero = true;
-
-    const model = new traceviewer.Model();
-    const importer = new traceviewer.importer.Import(model, io);
-    importer.importTraces([trace]);
-
-    return model;
-  }
-
-  /**
-   * Find a main thread from supplied model with matching processId and
-   * threadId.
-   * @param {!Object} model TraceProcessor Model
-   * @param {number} processId
-   * @param {number} threadId
-   * @return {!Object}
-   * @private
-   */
-  static _findMainThreadFromIds(model, processId, threadId) {
-    const modelHelper = model.getOrCreateHelper(traceviewer.model.helpers.ChromeModelHelper);
-    const renderHelpers = traceviewer.b.dictionaryValues(modelHelper.rendererHelpers);
-    const mainThread = renderHelpers.find(helper => {
-      return helper.mainThread &&
-        helper.pid === processId &&
-        helper.mainThread.tid === threadId;
-    }).mainThread;
-
-    return mainThread;
-  }
 
   /**
    * Calculate duration at specified percentiles for given population of
@@ -166,56 +110,52 @@ class TraceProcessor {
    * Calculates the maximum queueing time (in ms) of high priority tasks for
    * selected percentiles within a window of the main thread.
    * @see https://docs.google.com/document/d/1b9slyaB9yho91YTOkAQfpCdULFkZM9LqsipcX3t7He8/preview
-   * @param {!traceviewer.Model} model
-   * @param {{traceEvents: !Array<!Object>}} trace
-   * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
-   * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
+   * @param {!TraceOfTabArtifact} tabTrace
+   * @param {number=} startTime Optional start time (in ms relative to navstart) of range of interest. Defaults to navstart.
+   * @param {number=} endTime Optional end time (in ms relative to navstart) of range of interest. Defaults to trace end.
    * @param {!Array<number>=} percentiles Optional array of percentiles to compute. Defaults to [0.5, 0.75, 0.9, 0.99, 1].
    * @return {!Array<{percentile: number, time: number}>}
    */
-  static getRiskToResponsiveness(model, trace, startTime, endTime, percentiles) {
-    // Range of responsiveness we care about. Default to bounds of model.
-    startTime = startTime === undefined ? model.bounds.min : startTime;
-    endTime = endTime === undefined ? model.bounds.max : endTime;
+  static getRiskToResponsiveness(
+    tabTrace,
+    startTime = 0,
+    endTime = tabTrace.timings.traceEnd,
+    percentiles = [0.5, 0.75, 0.9, 0.99, 1]
+  ) {
     const totalTime = endTime - startTime;
-    if (percentiles) {
-      percentiles.sort((a, b) => a - b);
-    } else {
-      percentiles = [0.5, 0.75, 0.9, 0.99, 1];
-    }
+    percentiles.sort((a, b) => a - b);
 
-    const ret = TraceProcessor.getMainThreadTopLevelEventDurations(model, trace, startTime,
-        endTime);
+    const ret = TraceProcessor.getMainThreadTopLevelEventDurations(tabTrace, startTime, endTime);
     return TraceProcessor._riskPercentiles(ret.durations, totalTime, percentiles,
         ret.clippedLength);
   }
 
   /**
-   * Provides durations of all main thread top-level events
-   * @param {!traceviewer.Model} model
-   * @param {{traceEvents: !Array<!Object>}} trace
-   * @param {number} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
-   * @param {number} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
+   * Provides durations in ms of all main thread top-level events
+   * @param {!TraceOfTabArtifact} tabTrace
+   * @param {number} startTime Optional start time (in ms relative to navstart) of range of interest. Defaults to navstart.
+   * @param {number} endTime Optional end time (in ms relative to navstart) of range of interest. Defaults to trace end.
    * @return {{durations: !Array<number>, clippedLength: number}}
    */
-  static getMainThreadTopLevelEventDurations(model, trace, startTime, endTime) {
-    const slices = TraceProcessor.getMainThreadTopLevelEvents(model, trace, startTime, endTime);
+  static getMainThreadTopLevelEventDurations(tabTrace, startTime = 0, endTime = Infinity) {
+    const topLevelEvents = TraceProcessor.getMainThreadTopLevelEvents(tabTrace, startTime, endTime);
 
     // Find durations of all slices in range of interest.
     const durations = [];
     let clippedLength = 0;
-    slices.forEach(slice => {
-      // Clip any at edges of range.
-      let duration = slice.duration;
-      let sliceStart = slice.start;
-      if (sliceStart < startTime) {
+
+    topLevelEvents.forEach(event => {
+      let duration = event.duration;
+      let eventStart = event.start;
+      if (eventStart < startTime) {
         // Any part of task before window can be discarded.
-        sliceStart = startTime;
-        duration = slice.end - sliceStart;
+        eventStart = startTime;
+        duration = event.end - startTime;
       }
-      if (slice.end > endTime) {
+
+      if (event.end > endTime) {
         // Any part of task after window must be clipped but accounted for.
-        clippedLength = duration - (endTime - sliceStart);
+        clippedLength = duration - (endTime - eventStart);
       }
 
       durations.push(duration);
@@ -229,23 +169,30 @@ class TraceProcessor {
   }
 
   /**
-   * Provides the top level events on the main thread.
-   * @param {!traceviewer.Model} model
-   * @param {{traceEvents: !Array<!Object>}} trace
-   * @param {number=} startTime Optional start time (in ms) of range of interest. Defaults to trace start.
-   * @param {number=} endTime Optional end time (in ms) of range of interest. Defaults to trace end.
+   * Provides the top level events on the main thread with timestamps in ms relative to navigation
+   * start.
+   * @param {!TraceOfTabArtifact} tabTrace
+   * @param {number=} startTime Optional start time (in ms relative to navstart) of range of interest. Defaults to navstart.
+   * @param {number=} endTime Optional end time (in ms relative to navstart) of range of interest. Defaults to trace end.
    * @return {!Array<{start: number, end: number, duration: number}>}
    */
-  static getMainThreadTopLevelEvents(model, trace, startTime = -Infinity, endTime = Infinity) {
-    // Find the main thread via the first TracingStartedInPage event in the trace
-    const startEvent = trace.traceEvents.find(event => event.name === 'TracingStartedInPage');
-    const mainThread = TraceProcessor._findMainThreadFromIds(model, startEvent.pid, startEvent.tid);
+  static getMainThreadTopLevelEvents(tabTrace, startTime = 0, endTime = Infinity) {
+    const topLevelEvents = [];
+    // note: mainThreadEvents is already sorted by event start
+    for (const event of tabTrace.mainThreadEvents) {
+      if (event.name !== SCHEDULABLE_TASK_TITLE || !event.dur) continue;
 
-    return mainThread.sliceGroup.slices.filter(slice => {
-      return slice.title === SCHEDULABLE_TASK_TITLE &&
-          slice.end > startTime &&
-          slice.start < endTime;
-    });
+      const start = (event.ts - tabTrace.navigationStartEvt.ts) / 1000;
+      const end = (event.ts + event.dur - tabTrace.navigationStartEvt.ts) / 1000;
+      if (start > endTime || end < startTime) continue;
+
+      topLevelEvents.push({
+        start,
+        end,
+        duration: event.dur / 1000,
+      });
+    }
+    return topLevelEvents;
   }
 
   /**

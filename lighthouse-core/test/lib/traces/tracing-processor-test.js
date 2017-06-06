@@ -12,6 +12,8 @@ const assert = require('assert');
 const pwaTrace = require('../../fixtures/traces/progressive-app.json');
 const defaultPercentiles = [0, 0.25, 0.5, 0.75, 0.9, 0.99, 1];
 
+const TraceOfTab = require('../../../gather/computed/trace-of-tab');
+
 /**
  * Create a riskPercentiles result object by matching the values in percentiles
  * and times.
@@ -32,25 +34,6 @@ describe('TracingProcessor lib', () => {
   it('doesn\'t throw when module is loaded', () => {
     assert.doesNotThrow(_ => {
       TracingProcessor = require('../../../lib/traces/tracing-processor');
-    });
-  });
-
-  it('doesn\'t throw when user_timing events have a colon', () => {
-    assert.doesNotThrow(_ => {
-      new TracingProcessor().init([
-        {
-          'pid': 15256,
-          'tid': 1295,
-          'ts': 668545368880,
-          'ph': 'e',
-          'id': 'fake-event',
-          'cat': 'blink.user_timing',
-          'name': 'Zone:ZonePromise',
-          'dur': 64,
-          'tdur': 61,
-          'tts': 881373
-        },
-      ]);
     });
   });
 
@@ -195,12 +178,55 @@ describe('TracingProcessor lib', () => {
     });
   });
 
-  describe('risk to responsiveness', () => {
+  describe('getMainThreadTopLevelEvents', () => {
     it('gets durations of top-level tasks', () => {
-      const tracingProcessor = new TracingProcessor();
-      const model = tracingProcessor.init(pwaTrace);
+      TracingProcessor = require('../../../lib/traces/tracing-processor');
       const trace = {traceEvents: pwaTrace};
-      const ret = TracingProcessor.getMainThreadTopLevelEventDurations(model, trace);
+      const tabTrace = new TraceOfTab().compute_(trace);
+      const ret = TracingProcessor.getMainThreadTopLevelEvents(tabTrace);
+
+      assert.equal(ret.length, 645);
+    });
+
+    it('filters events based on start and end times', () => {
+      TracingProcessor = require('../../../lib/traces/tracing-processor');
+      const baseTime = 20000 * 1000;
+      const name = 'TaskQueueManager::ProcessTaskFromWorkQueue';
+      const tabTrace = {
+        navigationStartEvt: {ts: baseTime},
+        mainThreadEvents: [
+          // 15ms to 25ms
+          {ts: baseTime + 15 * 1000, dur: 10 * 1000, name},
+          // 40ms to 60ms
+          {ts: baseTime + 40 * 1000, dur: 20 * 1000, name},
+          // 1000ms to 2000ms
+          {ts: baseTime + 1000 * 1000, dur: 1000 * 1000, name},
+          // 4000ms to 4020ms
+          {ts: baseTime + 4000 * 1000, dur: 20 * 1000, name},
+        ],
+      };
+
+      const ret = TracingProcessor.getMainThreadTopLevelEvents(
+        tabTrace,
+        50,
+        1500
+      );
+      assert.equal(ret.length, 2);
+      assert.equal(ret[0].start, 40);
+      assert.equal(ret[0].end, 60);
+      assert.equal(ret[0].duration, 20);
+      assert.equal(ret[1].start, 1000);
+      assert.equal(ret[1].end, 2000);
+      assert.equal(ret[1].duration, 1000);
+    });
+  });
+
+  describe('getMainThreadTopLevelEventDurations', () => {
+    it('gets durations of top-level tasks', () => {
+      TracingProcessor = require('../../../lib/traces/tracing-processor');
+      const trace = {traceEvents: pwaTrace};
+      const tabTrace = new TraceOfTab().compute_(trace);
+      const ret = TracingProcessor.getMainThreadTopLevelEventDurations(tabTrace);
       const durations = ret.durations;
 
       function getDurationFromIndex(index) {
@@ -208,7 +234,7 @@ describe('TracingProcessor lib', () => {
       }
 
       assert.equal(durations.filter(dur => isNaN(dur)).length, 0, 'NaN found');
-      assert.equal(durations.length, 652);
+      assert.equal(durations.length, 645);
 
       assert.equal(getDurationFromIndex(50), 0.01);
       assert.equal(getDurationFromIndex(300), 0.04);
@@ -216,6 +242,34 @@ describe('TracingProcessor lib', () => {
       assert.equal(getDurationFromIndex(durations.length - 3), 26.01);
       assert.equal(getDurationFromIndex(durations.length - 2), 36.9);
       assert.equal(getDurationFromIndex(durations.length - 1), 38.53);
+    });
+  });
+
+  describe('risk to responsiveness', () => {
+    let oldFn;
+    // monkeypatch _riskPercentiles to test just getRiskToResponsiveness
+    beforeEach(() => {
+      TracingProcessor = require('../../../lib/traces/tracing-processor');
+      oldFn = TracingProcessor._riskPercentiles;
+      TracingProcessor._riskPercentiles = (durations, totalTime, percentiles, clippedLength) => {
+        return {
+          durations, totalTime, percentiles, clippedLength
+        };
+      };
+    });
+
+    it('compute correct defaults', () => {
+      const trace = {traceEvents: pwaTrace};
+      const tabTrace = new TraceOfTab().compute_(trace);
+      const ret = TracingProcessor.getRiskToResponsiveness(tabTrace);
+      assert.equal(ret.durations.length, 645);
+      assert.equal(Math.round(ret.totalTime), 2143);
+      assert.equal(ret.clippedLength, 0);
+      assert.deepEqual(ret.percentiles, [0.5, 0.75, 0.9, 0.99, 1]);
+    });
+
+    afterEach(() => {
+      TracingProcessor._riskPercentiles = oldFn;
     });
   });
 });

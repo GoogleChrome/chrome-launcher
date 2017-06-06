@@ -164,12 +164,10 @@ class FirstInteractive extends ComputedArtifact {
   }
 
   /**
-   * @param {!Trace} trace
-   * @param {!tr.Model} traceModel
    * @param {!TraceOfTabArtifact} traceOfTab
    * @return {{timeInMs: number, timestamp: number}}
    */
-  computeWithArtifacts(trace, traceModel, traceOfTab) {
+  computeWithArtifacts(traceOfTab) {
     const navStart = traceOfTab.timestamps.navigationStart;
     const FMP = traceOfTab.timings.firstMeaningfulPaint;
     const DCL = traceOfTab.timings.domContentLoaded;
@@ -183,7 +181,7 @@ class FirstInteractive extends ComputedArtifact {
       throw new Error(`No ${FMP ? 'domContentLoaded' : 'firstMeaningfulPaint'} event in trace`);
     }
 
-    const longTasksAfterFMP = TracingProcessor.getMainThreadTopLevelEvents(traceModel, trace, FMP)
+    const longTasksAfterFMP = TracingProcessor.getMainThreadTopLevelEvents(traceOfTab, FMP)
         .filter(evt => evt.duration >= LONG_TASK_THRESHOLD);
     const firstInteractive = FirstInteractive.findQuietWindow(FMP, traceEnd, longTasksAfterFMP);
 
@@ -200,11 +198,8 @@ class FirstInteractive extends ComputedArtifact {
    * @return {{timeInMs: number, timestamp: number}}
    */
   compute_(trace, artifacts) {
-    return Promise.all([
-      artifacts.requestTracingModel(trace),
-      artifacts.requestTraceOfTab(trace),
-    ]).then(([traceModel, traceOfTab]) => {
-      return this.computeWithArtifacts(trace, traceModel, traceOfTab);
+    return artifacts.requestTraceOfTab(trace).then(traceOfTab => {
+      return this.computeWithArtifacts(traceOfTab);
     });
   }
 }

@@ -12,6 +12,9 @@ const assert = require('assert');
 const acceptableTrace = require('../fixtures/traces/progressive-app-m60.json');
 const acceptableDevToolsLog = require('../fixtures/traces/progressive-app-m60.devtools.log.json');
 
+const redirectTrace = require('../fixtures/traces/site-with-redirect.json');
+const redirectDevToolsLog = require('../fixtures/traces/site-with-redirect.devtools.log.json');
+
 function generateNetworkRecords(records, navStart) {
   return records.map(item => {
     return {
@@ -36,8 +39,25 @@ describe('Performance: consistently-interactive audit', () => {
 
     return ConsistentlyInteractive.audit(artifacts).then(output => {
       assert.equal(output.score, 99);
-      assert.equal(Math.round(output.rawValue), 1587);
-      assert.equal(output.displayValue, '1,590\xa0ms');
+      assert.equal(Math.round(output.rawValue), 1582);
+      assert.equal(output.displayValue, '1,580\xa0ms');
+    });
+  });
+
+  it('should compute consistently interactive on pages with redirect', () => {
+    const artifacts = Object.assign({
+      traces: {
+        [ConsistentlyInteractive.DEFAULT_PASS]: redirectTrace
+      },
+      devtoolsLogs: {
+        [ConsistentlyInteractive.DEFAULT_PASS]: redirectDevToolsLog
+      },
+    }, Runner.instantiateComputedArtifacts());
+
+    return ConsistentlyInteractive.audit(artifacts).then(output => {
+      assert.equal(output.score, 95);
+      assert.equal(Math.round(output.rawValue), 2712);
+      assert.equal(output.displayValue, '2,710\xa0ms');
     });
   });
 
