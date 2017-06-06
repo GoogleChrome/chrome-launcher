@@ -20,42 +20,8 @@
  * Config file for running PWA smokehouse audits.
  */
 module.exports = {
-  passes: [{
-    recordTrace: true,
-    gatherers: [
-      'url',
-      'theme-color',
-      'manifest',
-      // https://github.com/GoogleChrome/lighthouse/issues/566
-      // 'cache-contents'
-    ]
-  },
-  {
-    passName: 'offlinePass',
-    gatherers: [
-      'service-worker',
-      'offline',
-      'start-url'
-    ]
-  },
-  {
-    passName: 'domstats',
-    gatherers: [
-      'dobetterweb/domstats',
-      'http-redirect'
-    ]
-  }],
-
-  audits: [
-    'dobetterweb/dom-size',
-    'is-on-https',
-    'redirects-http',
-    'service-worker',
-    'works-offline',
-    'webapp-install-banner',
-    'splash-screen',
-    'themed-omnibox',
-    // https://github.com/GoogleChrome/lighthouse/issues/566
-    // 'cache-start-url'
-  ]
+  extends: 'lighthouse:default',
+  settings: {
+    onlyCategories: ['pwa']
+  }
 };
