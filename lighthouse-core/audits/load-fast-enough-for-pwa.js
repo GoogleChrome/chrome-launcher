@@ -27,6 +27,7 @@ const Audit = require('./audit');
 const URL = require('../lib/url-shim');
 const Emulation = require('../lib/emulation');
 const Formatter = require('../report/formatter');
+const Util = require('../report/v2/renderer/util.js');
 
 // Maximum TTFI to be considered "fast" for PWA baseline checklist
 //   https://developers.google.com/web/progressive-web-apps/checklist
@@ -116,7 +117,7 @@ class LoadFastEnough4Pwa extends Audit {
           return {
             rawValue: false,
             // eslint-disable-next-line max-len
-            debugString: `First Interactive was at ${timeToFirstInteractive.toLocaleString()}. More details in the "Performance" section.`,
+            debugString: `First Interactive was at ${Util.formatMilliseconds(timeToFirstInteractive)}. More details in the "Performance" section.`,
             extendedInfo
           };
         }
@@ -125,7 +126,7 @@ class LoadFastEnough4Pwa extends Audit {
           return {
             rawValue: true,
             // eslint-disable-next-line max-len
-            debugString: `First Interactive was found at ${timeToFirstInteractive.toLocaleString()}, however, the network request latencies were not sufficiently realistic, so the performance measurements cannot be trusted.`,
+            debugString: `First Interactive was found at ${Util.formatMilliseconds(timeToFirstInteractive)}, however, the network request latencies were not sufficiently realistic, so the performance measurements cannot be trusted.`,
             extendedInfo,
             details
           };
