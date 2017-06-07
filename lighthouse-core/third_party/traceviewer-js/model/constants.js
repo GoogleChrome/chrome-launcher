@@ -1,1 +1,0 @@
-"use strict";require("../base/base.js");'use strict';global.tr.exportTo('tr.model',function(){return{BROWSER_PROCESS_PID_REF:-1,OBJECT_DEFAULT_SCOPE:'ptr'};});

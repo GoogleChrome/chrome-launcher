@@ -13,7 +13,7 @@
 'use strict';
 
 const Audit = require('../audit');
-const TracingProcessor = require('../../lib/traces/tracing-processor');
+const statistics = require('../../lib/statistics');
 const Formatter = require('../../report/formatter');
 
 const MAX_DOM_NODES = 1500;
@@ -72,7 +72,7 @@ class DOMSize extends Audit {
     //   <= 1500: score≈100
     //   3000: score=50
     //   >= 5970: score≈0
-    const distribution = TracingProcessor.getLogNormalDistribution(
+    const distribution = statistics.getLogNormalDistribution(
         SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
     let score = 100 * distribution.computeComplementaryPercentile(stats.totalDOMNodes);
 

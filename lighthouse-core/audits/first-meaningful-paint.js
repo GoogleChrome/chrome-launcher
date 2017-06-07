@@ -7,7 +7,7 @@
 
 const Audit = require('./audit');
 const Util = require('../report/v2/renderer/util.js');
-const TracingProcessor = require('../lib/traces/tracing-processor');
+const statistics = require('../lib/statistics');
 const Formatter = require('../report/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
@@ -103,7 +103,7 @@ class FirstMeaningfulPaint extends Audit {
     //   4000ms: score=50
     //   >= 14000ms: score≈0
     const firstMeaningfulPaint = traceOfTab.timings.firstMeaningfulPaint;
-    const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
+    const distribution = statistics.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
     let score = 100 * distribution.computeComplementaryPercentile(firstMeaningfulPaint);
 

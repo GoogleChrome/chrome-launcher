@@ -5,40 +5,12 @@
  */
 'use strict';
 
-if (typeof global.window === 'undefined') {
-  global.window = global;
-}
-
 // The ideal input response latency, the time between the input task and the
 // first frame of the response.
 const BASE_RESPONSE_LATENCY = 16;
 const SCHEDULABLE_TASK_TITLE = 'TaskQueueManager::ProcessTaskFromWorkQueue';
 
-// we need gl-matrix for traceviewer
-// since it has internal forks for isNode and they get mixed up during
-// browserify, we require them locally here and global-ize them.
-
-// from catapult/tracing/tracing/base/math.html
-const glMatrixModule = require('gl-matrix');
-Object.keys(glMatrixModule).forEach(exportName => {
-  global[exportName] = glMatrixModule[exportName];
-});
-global.mannwhitneyu = {};
-global.HTMLImportsLoader = {};
-global.HTMLImportsLoader.hrefToAbsolutePath = function(path) {
-  if (path === '/gl-matrix-min.js') {
-    return '../../../lib/empty-stub.js';
-  }
-  if (path === '/mannwhitneyu.js') {
-    return '../../../lib/empty-stub.js';
-  }
-};
-
-require('../../third_party/traceviewer-js/');
-const traceviewer = global.tr;
-
 class TraceProcessor {
-
   /**
    * Calculate duration at specified percentiles for given population of
    * durations.
@@ -193,33 +165,6 @@ class TraceProcessor {
       });
     }
     return topLevelEvents;
-  }
-
-  /**
-   * Uses traceviewer's statistics package to create a log-normal distribution.
-   * Specified by providing the median value, at which the score will be 0.5,
-   * and the falloff, the initial point of diminishing returns where any
-   * improvement in value will yield increasingly smaller gains in score. Both
-   * values should be in the same units (e.g. milliseconds). See
-   *   https://www.desmos.com/calculator/tx1wcjk8ch
-   * for an interactive view of the relationship between these parameters and
-   * the typical parameterization (location and shape) of the log-normal
-   * distribution.
-   * @param {number} median
-   * @param {number} falloff
-   * @return {!Statistics.LogNormalDistribution}
-   */
-  static getLogNormalDistribution(median, falloff) {
-    const location = Math.log(median);
-
-    // The "falloff" value specified the location of the smaller of the positive
-    // roots of the third derivative of the log-normal CDF. Calculate the shape
-    // parameter in terms of that value and the median.
-    const logRatio = Math.log(falloff / median);
-    const shape = 0.5 * Math.sqrt(1 - 3 * logRatio -
-        Math.sqrt((logRatio - 3) * (logRatio - 3) - 8));
-
-    return new traceviewer.b.Statistics.LogNormalDistribution(location, shape);
   }
 }
 

@@ -1,1 +1,0 @@
-"use strict";require("../base/color_scheme.js");'use strict';global.tr.exportTo('tr.model',function(){var ColorScheme=tr.b.ColorScheme;function EventInfo(title,description,docLinks){this.title=title;this.description=description;this.docLinks=docLinks;this.colorId=ColorScheme.getColorIdForGeneralPurposeString(title);}return{EventInfo:EventInfo};});

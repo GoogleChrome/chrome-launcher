@@ -8,6 +8,7 @@
 const Audit = require('./audit');
 const Util = require('../report/v2/renderer/util.js');
 const TracingProcessor = require('../lib/traces/tracing-processor');
+const statistics = require('../lib/statistics');
 const Formatter = require('../report/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
@@ -51,7 +52,7 @@ class EstimatedInputLatency extends Audit {
     //  Median = 100ms
     //  75th Percentile ≈ 133ms
     //  95th Percentile ≈ 199ms
-    const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
+    const distribution = statistics.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
     const score = 100 * distribution.computeComplementaryPercentile(ninetieth.time);
 

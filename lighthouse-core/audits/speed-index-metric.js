@@ -6,7 +6,7 @@
 'use strict';
 
 const Audit = require('./audit');
-const TracingProcessor = require('../lib/traces/tracing-processor');
+const statistics = require('../lib/statistics');
 const Formatter = require('../report/formatter');
 
 // Parameters (in ms) for log-normal CDF scoring. To see the curve:
@@ -63,7 +63,7 @@ class SpeedIndexMetric extends Audit {
       //  Median = 5,500
       //  75th Percentile = 8,820
       //  95th Percentile = 17,400
-      const distribution = TracingProcessor.getLogNormalDistribution(SCORING_MEDIAN,
+      const distribution = statistics.getLogNormalDistribution(SCORING_MEDIAN,
         SCORING_POINT_OF_DIMINISHING_RETURNS);
       let score = 100 * distribution.computeComplementaryPercentile(speedline.perceptualSpeedIndex);
 

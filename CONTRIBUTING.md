@@ -54,19 +54,6 @@ both why the audit is important and how to fix it.
 
 # For Maintainers
 
-## Updating traceviewer source
-
-```sh
-cd lighthouse-core
-# if not already there, clone catapult and copy license over
-git clone --depth=1 https://github.com/catapult-project/catapult.git third_party/src/catapult
-cp third_party/src/catapult/LICENSE third_party/traceviewer-js/
-# pull for latest
-git -C "./third_party/src/catapult/" pull
-# run our conversion script
-node scripts/build-traceviewer-module.js
-```
-
 ## Release guide
 
 ```sh

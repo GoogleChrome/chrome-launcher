@@ -10,7 +10,7 @@
 
 const ByteEfficiencyAudit = require('./byte-efficiency-audit');
 const Formatter = require('../../report/formatter');
-const TracingProcessor = require('../../lib/traces/tracing-processor');
+const statistics = require('../../lib/statistics');
 
 // Parameters for log-normal CDF scoring. See https://www.desmos.com/calculator/gpmjeykbwr
 // ~75th and ~90th percentiles http://httparchive.org/interesting.php?a=All&l=Feb%201%202017&s=All#bytesTotal
@@ -69,7 +69,7 @@ class TotalByteWeight extends ByteEfficiencyAudit {
         //   <= 1600KB: score≈100
         //   4000KB: score=50
         //   >= 9000KB: score≈0
-        const distribution = TracingProcessor.getLogNormalDistribution(
+        const distribution = statistics.getLogNormalDistribution(
           SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
         const score = 100 * distribution.computeComplementaryPercentile(totalBytes);
 
