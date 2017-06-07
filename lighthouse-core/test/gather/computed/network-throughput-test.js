@@ -25,6 +25,13 @@ describe('NetworkThroughput', () => {
     }, extras);
   }
 
+  it('should return Infinity for no/missing records', () => {
+    assert.equal(compute(undefined), Infinity);
+    assert.equal(compute(null), Infinity);
+    assert.equal(compute([]), Infinity);
+    assert.equal(compute([createRecord(0, 0, {finished: false})]), Infinity);
+  });
+
   it('should compute correctly for a basic waterfall', () => {
     const result = compute([
       createRecord(0, 1),

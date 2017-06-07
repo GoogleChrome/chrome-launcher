@@ -193,6 +193,12 @@ class CategoryRenderer {
     const descriptionEl = this._dom.createChildOf(element, 'div', 'lh-perf-hint__description');
     descriptionEl.appendChild(this._dom.convertMarkdownLinkSnippets(audit.result.helpText));
 
+    if (audit.result.debugString) {
+      const debugStrEl = this._dom.createChildOf(element, 'div', 'lh-debug');
+      debugStrEl.textContent = audit.result.debugString;
+      element.open = true;
+    }
+
     if (audit.result.details) {
       element.appendChild(this._detailsRenderer.render(audit.result.details));
     }

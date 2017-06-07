@@ -78,6 +78,10 @@ class UnusedBytes extends Audit {
    * @return {!AuditResult}
    */
   static createAuditResult(result, networkThroughput) {
+    if (!Number.isFinite(networkThroughput) && result.results.length) {
+      throw new Error('Invalid network timing information');
+    }
+
     const debugString = result.debugString;
     const results = result.results
         .map(item => {

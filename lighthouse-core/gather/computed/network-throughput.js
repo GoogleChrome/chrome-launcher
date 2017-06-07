@@ -15,14 +15,13 @@ class NetworkThroughput extends ComputedArtifact {
   /**
    * Computes the average throughput for the given records in bytes/second.
    * Excludes data URI, failed or otherwise incomplete, and cached requests.
+   * Returns Infinity if there were no analyzable network records.
    *
    * @param {?Array<!WebInspector.NetworkRequest>} networkRecords
    * @return {number}
    */
   compute_(networkRecords) {
-    if (!networkRecords || !networkRecords.length) {
-      return 0;
-    }
+    networkRecords = networkRecords || [];
 
     let totalBytes = 0;
     const timeBoundaries = networkRecords.reduce((boundaries, record) => {
@@ -37,6 +36,10 @@ class NetworkThroughput extends ComputedArtifact {
       boundaries.push({time: record.endTime, isStart: false});
       return boundaries;
     }, []).sort((a, b) => a.time - b.time);
+
+    if (!timeBoundaries.length) {
+      return Infinity;
+    }
 
     let inflight = 0;
     let currentStart = 0;
