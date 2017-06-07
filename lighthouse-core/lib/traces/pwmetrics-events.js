@@ -120,18 +120,6 @@ class Metrics {
         }
       },
       {
-        name: 'Time to Interactive (vAlpha)',
-        id: 'tti',
-        getTs: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timestamps.timeToInteractive');
-        },
-        getTiming: auditResults => {
-          const ttiExt = auditResults['time-to-interactive'].extendedInfo;
-          return safeGet(ttiExt, 'value.timings.timeToInteractive');
-        }
-      },
-      {
         name: 'First Interactive (vBeta)',
         id: 'ttfi',
         getTs: auditResults => {

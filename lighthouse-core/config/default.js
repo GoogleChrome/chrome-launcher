@@ -76,7 +76,6 @@ module.exports = {
     // 'time-to-firstbyte',
     'first-interactive',
     'consistently-interactive',
-    'time-to-interactive',
     'user-timings',
     'critical-request-chains',
     'webapp-install-banner',

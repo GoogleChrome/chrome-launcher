@@ -304,14 +304,14 @@ describe('Config', () => {
       audits: [
         'accessibility/color-contrast',
         'first-meaningful-paint',
-        'time-to-interactive',
+        'first-interactive',
         'estimated-input-latency',
       ],
       categories: {
         'needed-category': {
           audits: [
             {id: 'first-meaningful-paint'},
-            {id: 'time-to-interactive'},
+            {id: 'first-interactive'},
           ],
         },
         'other-category': {
@@ -376,7 +376,7 @@ describe('Config', () => {
       extends: true,
       settings: {
         onlyCategories: ['performance', 'missing-category'],
-        onlyAudits: ['time-to-interactive', 'missing-audit'],
+        onlyAudits: ['first-interactive', 'missing-audit'],
       },
     });
 
