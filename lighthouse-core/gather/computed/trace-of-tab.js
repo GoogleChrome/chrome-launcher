@@ -107,8 +107,8 @@ class TraceOfTab extends ComputedArtifact {
     const timestamps = {};
 
     Object.keys(metrics).forEach(metric => {
-      timestamps[metric] = metrics[metric] && metrics[metric].ts / 1000;
-      timings[metric] = timestamps[metric] - timestamps.navigationStart;
+      timestamps[metric] = metrics[metric] && metrics[metric].ts;
+      timings[metric] = (timestamps[metric] - navigationStart.ts) / 1000;
     });
 
     return {

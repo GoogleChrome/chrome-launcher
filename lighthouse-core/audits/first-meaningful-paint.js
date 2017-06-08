@@ -73,11 +73,11 @@ class FirstMeaningfulPaint extends Audit {
     // Expose the raw, unchanged monotonic timestamps from the trace, along with timing durations
     const extendedInfo = {
       timestamps: {
-        navStart: traceOfTab.timestamps.navigationStart * 1000,
-        fCP: traceOfTab.timestamps.firstContentfulPaint * 1000,
-        fMP: traceOfTab.timestamps.firstMeaningfulPaint * 1000,
-        onLoad: traceOfTab.timestamps.onLoad * 1000,
-        endOfTrace: traceOfTab.timestamps.traceEnd * 1000,
+        navStart: traceOfTab.timestamps.navigationStart,
+        fCP: traceOfTab.timestamps.firstContentfulPaint,
+        fMP: traceOfTab.timestamps.firstMeaningfulPaint,
+        onLoad: traceOfTab.timestamps.onLoad,
+        endOfTrace: traceOfTab.timestamps.traceEnd,
       },
       timings: {
         navStart: 0,

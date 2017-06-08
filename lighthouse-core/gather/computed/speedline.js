@@ -23,7 +23,7 @@ class Speedline extends ComputedArtifact {
     return computedArtifacts.requestTraceOfTab(trace).then(traceOfTab => {
       // Force use of nav start as reference point for speedline
       // See https://github.com/GoogleChrome/lighthouse/issues/2095
-      const navStart = traceOfTab.timestamps.navigationStart * 1000;
+      const navStart = traceOfTab.timestamps.navigationStart;
       return speedline(trace.traceEvents, {
         timeOrigin: navStart,
         fastMode: true,

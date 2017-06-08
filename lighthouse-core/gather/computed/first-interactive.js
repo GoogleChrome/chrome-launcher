@@ -188,7 +188,7 @@ class FirstInteractive extends ComputedArtifact {
     const valueInMs = Math.max(firstInteractive, DCL);
     return {
       timeInMs: valueInMs,
-      timestamp: (valueInMs + navStart) * 1000,
+      timestamp: valueInMs * 1000 + navStart,
     };
   }
 

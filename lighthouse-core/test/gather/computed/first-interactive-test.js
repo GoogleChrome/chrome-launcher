@@ -84,7 +84,7 @@ describe('FirstInteractive computed artifact:', () => {
           traceEnd: 12000,
         },
         timestamps: {
-          navigationStart: 600,
+          navigationStart: 600 * 1000,
         },
       });
 

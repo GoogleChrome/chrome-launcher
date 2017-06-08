@@ -111,8 +111,8 @@ class LinkBlockingFirstPaintAudit extends Audit {
   static audit(artifacts) {
     const trace = artifacts.traces[Audit.DEFAULT_PASS];
     return artifacts.requestTraceOfTab(trace).then(traceOfTab => {
-      const fcp = traceOfTab.timestamps.firstContentfulPaint;
-      return this.computeAuditResultForTags(artifacts, 'LINK', fcp, LOAD_THRESHOLD_IN_MS);
+      const fcpTsInMs = traceOfTab.timestamps.firstContentfulPaint / 1000;
+      return this.computeAuditResultForTags(artifacts, 'LINK', fcpTsInMs, LOAD_THRESHOLD_IN_MS);
     });
   }
 }

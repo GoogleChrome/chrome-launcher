@@ -21,7 +21,7 @@ describe('Link Block First Paint audit', () => {
       media: '',
       rel: 'stylesheet'
     };
-    const timestamps = {firstContentfulPaint: 5600};
+    const timestamps = {firstContentfulPaint: 5600 * 1000};
     return LinkBlockingFirstPaintAudit.audit({
       traces: {},
       requestTraceOfTab: () => Promise.resolve({timestamps}),

@@ -55,7 +55,7 @@ class ConsistentlyInteractiveMetric extends Audit {
    * @return {!Array<!TimePeriod>}
    */
   static _findNetworkQuietPeriods(networkRecords, traceOfTab) {
-    const traceEnd = traceOfTab.timestamps.traceEnd;
+    const traceEndTsInMs = traceOfTab.timestamps.traceEnd / 1000;
 
     // First collect the timestamps of when requests start and end
     const timeBoundaries = [];
@@ -95,7 +95,7 @@ class ConsistentlyInteractiveMetric extends Audit {
 
     // Check if the trace ended in a quiet period
     if (numInflightRequests <= ALLOWED_CONCURRENT_REQUESTS) {
-      quietPeriods.push({start: quietPeriodStart, end: traceEnd});
+      quietPeriods.push({start: quietPeriodStart, end: traceEndTsInMs});
     }
 
     return quietPeriods;
@@ -108,8 +108,8 @@ class ConsistentlyInteractiveMetric extends Audit {
    * @return {!Array<!TimePeriod>}
    */
   static _findCPUQuietPeriods(longTasks, traceOfTab) {
-    const navStartTsInMs = traceOfTab.timestamps.navigationStart;
-    const traceEndTsInMs = traceOfTab.timestamps.traceEnd;
+    const navStartTsInMs = traceOfTab.timestamps.navigationStart / 1000;
+    const traceEndTsInMs = traceOfTab.timestamps.traceEnd / 1000;
     if (longTasks.length === 0) {
       return [{start: 0, end: traceEndTsInMs}];
     }
@@ -149,7 +149,7 @@ class ConsistentlyInteractiveMetric extends Audit {
    *    cpuQuietPeriods: !Array<!TimePeriod>, networkQuietPeriods: !Array<!TimePeriod>}}
    */
   static findOverlappingQuietPeriods(longTasks, networkRecords, traceOfTab) {
-    const FMPTsInMs = traceOfTab.timestamps.firstMeaningfulPaint;
+    const FMPTsInMs = traceOfTab.timestamps.firstMeaningfulPaint / 1000;
 
     const isLongEnoughQuietPeriod = period =>
         period.end > FMPTsInMs + REQUIRED_QUIET_WINDOW &&
@@ -229,10 +229,10 @@ class ConsistentlyInteractiveMetric extends Audit {
 
         const timestamp = Math.max(
           cpuQuietPeriod.start,
-          traceOfTab.timestamps.firstMeaningfulPaint,
-          traceOfTab.timestamps.domContentLoaded
+          traceOfTab.timestamps.firstMeaningfulPaint / 1000,
+          traceOfTab.timestamps.domContentLoaded / 1000
         ) * 1000;
-        const timeInMs = (timestamp - traceOfTab.timestamps.navigationStart * 1000) / 1000;
+        const timeInMs = (timestamp - traceOfTab.timestamps.navigationStart) / 1000;
         const extendedInfo = Object.assign(quietPeriodInfo, {timestamp, timeInMs});
 
         let score = 100 * distribution.computeComplementaryPercentile(timeInMs);
