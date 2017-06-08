@@ -7,7 +7,7 @@
 
 /* eslint-env mocha */
 
-const Audit = require('../../audits/critical-request-chains.js');
+const CriticalRequestChains = require('../../audits/critical-request-chains.js');
 const assert = require('assert');
 
 const FAILING_REQUEST_CHAIN = {
@@ -72,7 +72,7 @@ const EMPTY_REQUEST_CHAIN = {};
 const mockArtifacts = (mockChain) => {
   return {
     devtoolsLogs: {
-      [Audit.DEFAULT_PASS]: []
+      [CriticalRequestChains.DEFAULT_PASS]: []
     },
     requestNetworkRecords: () => {
       return Promise.resolve([]);
@@ -85,7 +85,7 @@ const mockArtifacts = (mockChain) => {
 
 describe('Performance: critical-request-chains audit', () => {
   it('calculates the correct chain result for failing example', () => {
-    return Audit.audit(mockArtifacts(FAILING_REQUEST_CHAIN)).then(output => {
+    return CriticalRequestChains.audit(mockArtifacts(FAILING_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 2);
       assert.equal(output.rawValue, false);
       assert.ok(output.details);
@@ -93,7 +93,7 @@ describe('Performance: critical-request-chains audit', () => {
   });
 
   it('calculates the correct chain result for passing example', () => {
-    return Audit.audit(mockArtifacts(PASSING_REQUEST_CHAIN)).then(output => {
+    return CriticalRequestChains.audit(mockArtifacts(PASSING_REQUEST_CHAIN)).then(output => {
       assert.equal(output.details.longestChain.duration, 1000);
       assert.equal(output.displayValue, 0);
       assert.equal(output.rawValue, true);
@@ -101,14 +101,14 @@ describe('Performance: critical-request-chains audit', () => {
   });
 
   it('calculates the correct chain result for passing example (no 2.)', () => {
-    return Audit.audit(mockArtifacts(PASSING_REQUEST_CHAIN_2)).then(output => {
+    return CriticalRequestChains.audit(mockArtifacts(PASSING_REQUEST_CHAIN_2)).then(output => {
       assert.equal(output.displayValue, 0);
       assert.equal(output.rawValue, true);
     });
   });
 
   it('calculates the correct chain result for empty example', () => {
-    return Audit.audit(mockArtifacts(EMPTY_REQUEST_CHAIN)).then(output => {
+    return CriticalRequestChains.audit(mockArtifacts(EMPTY_REQUEST_CHAIN)).then(output => {
       assert.equal(output.displayValue, 0);
       assert.equal(output.rawValue, true);
     });

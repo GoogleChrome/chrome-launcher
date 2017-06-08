@@ -87,52 +87,50 @@ class CriticalRequestChains extends Audit {
    */
   static audit(artifacts) {
     const devtoolsLogs = artifacts.devtoolsLogs[Audit.DEFAULT_PASS];
-    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
-      return artifacts.requestCriticalRequestChains(networkRecords).then(chains => {
-        let chainCount = 0;
-        function walk(node, depth) {
-          const children = Object.keys(node);
+    return artifacts.requestCriticalRequestChains(devtoolsLogs).then(chains => {
+      let chainCount = 0;
+      function walk(node, depth) {
+        const children = Object.keys(node);
 
-          // Since a leaf node indicates the end of a chain, we can inspect the number
-          // of child nodes, and, if the count is zero, increment the count.
-          if (children.length === 0) {
-            chainCount++;
-          }
-
-          children.forEach(id => {
-            const child = node[id];
-            walk(child.children, depth + 1);
-          }, '');
+        // Since a leaf node indicates the end of a chain, we can inspect the number
+        // of child nodes, and, if the count is zero, increment the count.
+        if (children.length === 0) {
+          chainCount++;
         }
 
-        // Account for initial navigation
-        const initialNavKey = Object.keys(chains)[0];
-        const initialNavChildren = initialNavKey && chains[initialNavKey].children;
-        if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
-          walk(initialNavChildren, 0);
-        }
+        children.forEach(id => {
+          const child = node[id];
+          walk(child.children, depth + 1);
+        }, '');
+      }
 
-        const longestChain = CriticalRequestChains._getLongestChain(chains);
+      // Account for initial navigation
+      const initialNavKey = Object.keys(chains)[0];
+      const initialNavChildren = initialNavKey && chains[initialNavKey].children;
+      if (initialNavChildren && Object.keys(initialNavChildren).length > 0) {
+        walk(initialNavChildren, 0);
+      }
 
-        return {
-          rawValue: chainCount <= this.meta.optimalValue,
-          displayValue: chainCount,
-          optimalValue: this.meta.optimalValue,
-          extendedInfo: {
-            formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
-            value: {
-              chains,
-              longestChain
-            }
-          },
-          details: {
-            type: 'criticalrequestchain',
-            header: {type: 'text', text: 'View critical network waterfall:'},
+      const longestChain = CriticalRequestChains._getLongestChain(chains);
+
+      return {
+        rawValue: chainCount <= this.meta.optimalValue,
+        displayValue: chainCount,
+        optimalValue: this.meta.optimalValue,
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.CRITICAL_REQUEST_CHAINS,
+          value: {
             chains,
             longestChain
           }
-        };
-      });
+        },
+        details: {
+          type: 'criticalrequestchain',
+          header: {type: 'text', text: 'View critical network waterfall:'},
+          chains,
+          longestChain
+        }
+      };
     });
   }
 }

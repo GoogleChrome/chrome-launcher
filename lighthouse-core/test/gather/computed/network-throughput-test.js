@@ -11,7 +11,7 @@ const NetworkThroughput = require('../../../gather/computed/network-throughput')
 const assert = require('assert');
 
 describe('NetworkThroughput', () => {
-  const compute = new NetworkThroughput().compute_;
+  const compute = NetworkThroughput.getThroughput;
   function createRecord(responseReceivedTime, endTime, extras) {
     return Object.assign({
       responseReceivedTime,
@@ -26,8 +26,6 @@ describe('NetworkThroughput', () => {
   }
 
   it('should return Infinity for no/missing records', () => {
-    assert.equal(compute(undefined), Infinity);
-    assert.equal(compute(null), Infinity);
     assert.equal(compute([]), Infinity);
     assert.equal(compute([createRecord(0, 0, {finished: false})]), Infinity);
   });

@@ -1,0 +1,26 @@
+{
+  "33097.1:redirected.0": {
+    "request": {"url":"http://en.wikipedia.org/","startTime":496649.559583,"endTime":496649.560558,"responseReceivedTime":496649.559597,"transferSize":0},
+    "children": {
+      "33097.1:redirected.1": {
+        "request": {"url":"https://en.wikipedia.org/","startTime":496649.561058,"endTime":496649.863606,"responseReceivedTime":496649.860002,"transferSize":992},
+        "children": {
+          "33097.1:redirected.2": {
+            "request": {"url":"https://en.wikipedia.org/wiki/Main_Page","startTime":496649.864273,"endTime":496650.019583,"responseReceivedTime":496650.017331,"transferSize":293},
+            "children": {
+              "33097.1": {
+                "request": {"url":"https://en.m.wikipedia.org/wiki/Main_Page","startTime":496650.020124,"endTime":496650.267975,"responseReceivedTime":496650.232022,"transferSize":8315},
+                "children": {
+                  "33097.3": {
+                    "request": {"url":"https://en.m.wikipedia.org/w/load.php?debug=false&lang=en&modules=mediawiki.ui.button%2Cicon%7Cskins.minerva.base.reset%2Cstyles%7Cskins.minerva.content.styles%7Cskins.minerva.icons.images%7Cskins.minerva.mainPage.styles%7Cskins.minerva.tablet.styles&only=styles&skin=minerva","startTime":496650.292339,"endTime":496650.53995,"responseReceivedTime":496650.45365,"transferSize":9085},
+                    "children": {}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

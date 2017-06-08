@@ -420,12 +420,10 @@ describe('Runner', () => {
       const devtoolsLogs = artifacts.devtoolsLogs['firstPass'];
       assert.equal(Array.isArray(devtoolsLogs), true, 'devtoolsLogs is not an array');
 
-      return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
-        return artifacts.requestCriticalRequestChains(networkRecords).then(chains => {
-          assert.ok(chains['93149.1']);
-          assert.ok(chains['93149.1'].request);
-          assert.ok(chains['93149.1'].children);
-        });
+      return artifacts.requestCriticalRequestChains(devtoolsLogs).then(chains => {
+        assert.ok(chains['93149.1']);
+        assert.ok(chains['93149.1'].request);
+        assert.ok(chains['93149.1'].children);
       });
     });
   });

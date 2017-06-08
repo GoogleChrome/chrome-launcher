@@ -7,15 +7,17 @@
 
 /* eslint-env mocha */
 
-const GathererClass = require('../../../gather/computed/pushed-requests');
+const Runner = require('../../../runner.js');
 const mockNetworkRecords = require('../../fixtures/networkRecords-h2push.json');
 
 const assert = require('assert');
-const Gatherer = new GathererClass();
 
 describe('PushedRequests computed artifact', () => {
   it('filters networkRecords down to the pushed ones', () => {
-    return Gatherer.request(mockNetworkRecords).then(records => {
+    const computedArtifacts = Runner.instantiateComputedArtifacts();
+    computedArtifacts.requestNetworkRecords = _ => Promise.resolve(mockNetworkRecords);
+
+    return computedArtifacts.requestPushedRequests({}).then(records => {
       assert.ok(records.length < mockNetworkRecords.length, 'We filtered out the non-push records');
       assert.equal(records.length, 3, 'There are 3 pushed responses in the recording');
       return;

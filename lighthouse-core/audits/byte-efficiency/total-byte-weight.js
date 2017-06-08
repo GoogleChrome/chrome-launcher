@@ -43,60 +43,61 @@ class TotalByteWeight extends ByteEfficiencyAudit {
    */
   static audit(artifacts) {
     const devtoolsLogs = artifacts.devtoolsLogs[ByteEfficiencyAudit.DEFAULT_PASS];
-    return artifacts.requestNetworkRecords(devtoolsLogs).then(networkRecords => {
-      return artifacts.requestNetworkThroughput(networkRecords).then(networkThroughput => {
-        let totalBytes = 0;
-        let results = [];
-        networkRecords.forEach(record => {
-          // exclude data URIs since their size is reflected in other resources
-          // exclude unfinished requests since they won't have transfer size information
-          if (record.scheme === 'data' || !record.finished) return;
+    return Promise.all([
+      artifacts.requestNetworkRecords(devtoolsLogs),
+      artifacts.requestNetworkThroughput(devtoolsLogs)
+    ]).then(([networkRecords, networkThroughput]) => {
+      let totalBytes = 0;
+      let results = [];
+      networkRecords.forEach(record => {
+        // exclude data URIs since their size is reflected in other resources
+        // exclude unfinished requests since they won't have transfer size information
+        if (record.scheme === 'data' || !record.finished) return;
 
-          const result = {
-            url: record.url,
-            totalBytes: record.transferSize,
-            totalKb: this.bytesToKbString(record.transferSize),
-            totalMs: this.bytesToMsString(record.transferSize, networkThroughput),
-          };
-
-          totalBytes += result.totalBytes;
-          results.push(result);
-        });
-        results = results.sort((itemA, itemB) => itemB.totalBytes - itemA.totalBytes).slice(0, 10);
-
-
-        // Use the CDF of a log-normal distribution for scoring.
-        //   <= 1600KB: score≈100
-        //   4000KB: score=50
-        //   >= 9000KB: score≈0
-        const distribution = statistics.getLogNormalDistribution(
-          SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
-        const score = 100 * distribution.computeComplementaryPercentile(totalBytes);
-
-        const headings = [
-          {key: 'url', itemType: 'url', text: 'URL'},
-          {key: 'totalKb', itemType: 'text', text: 'Total Size'},
-          {key: 'totalMs', itemType: 'text', text: 'Transfer Time'},
-        ];
-
-        const v1TableHeadings = ByteEfficiencyAudit.makeV1TableHeadings(headings);
-        const v2TableDetails = ByteEfficiencyAudit.makeV2TableDetails(headings, results);
-
-        return {
-          rawValue: totalBytes,
-          optimalValue: this.meta.optimalValue,
-          displayValue: `Total size was ${ByteEfficiencyAudit.bytesToKbString(totalBytes)}`,
-          score: Math.round(Math.max(0, Math.min(score, 100))),
-          extendedInfo: {
-            formatter: Formatter.SUPPORTED_FORMATS.TABLE,
-            value: {
-              results,
-              tableHeadings: v1TableHeadings
-            }
-          },
-          details: v2TableDetails
+        const result = {
+          url: record.url,
+          totalBytes: record.transferSize,
+          totalKb: this.bytesToKbString(record.transferSize),
+          totalMs: this.bytesToMsString(record.transferSize, networkThroughput),
         };
+
+        totalBytes += result.totalBytes;
+        results.push(result);
       });
+      results = results.sort((itemA, itemB) => itemB.totalBytes - itemA.totalBytes).slice(0, 10);
+
+
+      // Use the CDF of a log-normal distribution for scoring.
+      //   <= 1600KB: score≈100
+      //   4000KB: score=50
+      //   >= 9000KB: score≈0
+      const distribution = statistics.getLogNormalDistribution(
+        SCORING_MEDIAN, SCORING_POINT_OF_DIMINISHING_RETURNS);
+      const score = 100 * distribution.computeComplementaryPercentile(totalBytes);
+
+      const headings = [
+        {key: 'url', itemType: 'url', text: 'URL'},
+        {key: 'totalKb', itemType: 'text', text: 'Total Size'},
+        {key: 'totalMs', itemType: 'text', text: 'Transfer Time'},
+      ];
+
+      const v1TableHeadings = ByteEfficiencyAudit.makeV1TableHeadings(headings);
+      const v2TableDetails = ByteEfficiencyAudit.makeV2TableDetails(headings, results);
+
+      return {
+        rawValue: totalBytes,
+        optimalValue: this.meta.optimalValue,
+        displayValue: `Total size was ${ByteEfficiencyAudit.bytesToKbString(totalBytes)}`,
+        score: Math.round(Math.max(0, Math.min(score, 100))),
+        extendedInfo: {
+          formatter: Formatter.SUPPORTED_FORMATS.TABLE,
+          value: {
+            results,
+            tableHeadings: v1TableHeadings
+          }
+        },
+        details: v2TableDetails
+      };
     });
   }
 }

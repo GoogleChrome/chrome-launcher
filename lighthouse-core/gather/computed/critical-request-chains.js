@@ -20,7 +20,7 @@ class CriticalRequestChains extends ComputedArtifact {
    * @see https://docs.google.com/document/d/1bCDuq9H1ih9iNjgzyAL0gpwNFiEP4TZS-YLRp_RuMlc
    * @param  {any} request
    */
-  isCritical(request) {
+  static isCritical(request) {
     const resourceTypeCategory = request._resourceType && request._resourceType._category;
 
     // XHRs are fetched at High priority, but we exclude them, as they are unlikely to be critical
@@ -38,7 +38,7 @@ class CriticalRequestChains extends ComputedArtifact {
     return ['VeryHigh', 'High', 'Medium'].includes(request.priority());
   }
 
-  compute_(networkRecords) {
+  static extractChain(networkRecords) {
     networkRecords = networkRecords.filter(req => req.finished);
 
     // Build a map of requestID -> Node.
@@ -49,7 +49,7 @@ class CriticalRequestChains extends ComputedArtifact {
 
     // Get all the critical requests.
     /** @type {!Array<NetworkRequest>} */
-    const criticalRequests = networkRecords.filter(req => this.isCritical(req));
+    const criticalRequests = networkRecords.filter(CriticalRequestChains.isCritical);
 
     const flattenRequest = request => {
       return {
@@ -71,7 +71,7 @@ class CriticalRequestChains extends ComputedArtifact {
       let ancestorRequest = request.initiatorRequest();
       let node = criticalRequestChains;
       while (ancestorRequest) {
-        const ancestorIsCritical = this.isCritical(ancestorRequest);
+        const ancestorIsCritical = CriticalRequestChains.isCritical(ancestorRequest);
 
         // If the parent request isn't a high priority request it won't be in the
         // requestIdToRequests map, and so we can break the chain here. We should also
@@ -123,6 +123,16 @@ class CriticalRequestChains extends ComputedArtifact {
     }
 
     return criticalRequestChains;
+  }
+
+  /**
+   * @param {!DevtoolsLog} devtoolsLog
+   * @param {!ComputedArtifacts} artifacts
+   * @return {!Promise<!Object>}
+   */
+  compute_(devtoolsLog, artifacts) {
+    return artifacts.requestNetworkRecords(devtoolsLog)
+      .then(CriticalRequestChains.extractChain);
   }
 }
 

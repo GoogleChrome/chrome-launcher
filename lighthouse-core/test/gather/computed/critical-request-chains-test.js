@@ -7,9 +7,9 @@
 
 /* eslint-env mocha */
 
-const GathererClass = require('../../../gather/computed/critical-request-chains');
 const assert = require('assert');
-const Gatherer = new GathererClass();
+const CriticalRequestChains = require('../../../gather/computed/critical-request-chains');
+const Runner = require('../../../runner.js');
 
 const HIGH = 'High';
 const VERY_HIGH = 'VeryHigh';
@@ -39,9 +39,8 @@ function mockTracingData(prioritiesList, edges) {
 
 function testGetCriticalChain(data) {
   const networkRecords = mockTracingData(data.priorityList, data.edges);
-  return Gatherer.request(networkRecords).then(criticalChains => {
-    assert.deepEqual(criticalChains, data.expected);
-  });
+  const criticalChains = CriticalRequestChains.extractChain(networkRecords);
+  assert.deepEqual(criticalChains, data.expected);
 }
 
 function constructEmptyRequest() {
@@ -54,7 +53,16 @@ function constructEmptyRequest() {
   };
 }
 
-describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
+describe('CriticalRequestChain gatherer: extractChain function', () => {
+  it('returns correct data for chain from a devtoolsLog', () => {
+    const computedArtifacts = Runner.instantiateComputedArtifacts();
+    const wikiDevtoolsLog = require('../../fixtures/wikipedia-redirect.devtoolslog.json');
+    const wikiChains = require('../../fixtures/wikipedia-redirect.critical-request-chains.json');
+    computedArtifacts.requestCriticalRequestChains(wikiDevtoolsLog).then(chains => {
+      assert.deepEqual(chains, wikiChains);
+    });
+  });
+
   it('returns correct data for chain of four critical requests', () =>
     testGetCriticalChain({
       priorityList: [HIGH, MEDIUM, VERY_HIGH, HIGH],
@@ -257,23 +265,23 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
     // Make a fake redirect
     networkRecords[1].requestId = '1:redirected.0';
     networkRecords[2].requestId = '1';
-    return Gatherer.request(networkRecords).then(criticalChains => {
-      assert.deepEqual(criticalChains, {
-        0: {
-          request: constructEmptyRequest(),
-          children: {
-            '1:redirected.0': {
-              request: constructEmptyRequest(),
-              children: {
-                1: {
-                  request: constructEmptyRequest(),
-                  children: {}
-                }
+
+    const criticalChains = CriticalRequestChains.extractChain(networkRecords);
+    assert.deepEqual(criticalChains, {
+      0: {
+        request: constructEmptyRequest(),
+        children: {
+          '1:redirected.0': {
+            request: constructEmptyRequest(),
+            children: {
+              1: {
+                request: constructEmptyRequest(),
+                children: {}
               }
             }
           }
         }
-      });
+      }
     });
   });
 
@@ -299,13 +307,12 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
       lastPathComponent: 'android-chrome-192x192.png'
     };
 
-    return Gatherer.request(networkRecords).then(criticalChains => {
-      assert.deepEqual(criticalChains, {
-        0: {
-          request: constructEmptyRequest(),
-          children: {}
-        }
-      });
+    const criticalChains = CriticalRequestChains.extractChain(networkRecords);
+    assert.deepEqual(criticalChains, {
+      0: {
+        request: constructEmptyRequest(),
+        children: {}
+      }
     });
   });
 
@@ -314,18 +321,17 @@ describe('CriticalRequestChain gatherer: getCriticalChain function', () => {
 
     // Reverse the records so we force nodes to be made early.
     networkRecords.reverse();
-    return Gatherer.request(networkRecords).then(criticalChains => {
-      assert.deepEqual(criticalChains, {
-        0: {
-          request: constructEmptyRequest(),
-          children: {
-            1: {
-              request: constructEmptyRequest(),
-              children: {}
-            }
+    const criticalChains = CriticalRequestChains.extractChain(networkRecords);
+    assert.deepEqual(criticalChains, {
+      0: {
+        request: constructEmptyRequest(),
+        children: {
+          1: {
+            request: constructEmptyRequest(),
+            children: {}
           }
         }
-      });
+      }
     });
   });
 });

@@ -17,12 +17,10 @@ class NetworkThroughput extends ComputedArtifact {
    * Excludes data URI, failed or otherwise incomplete, and cached requests.
    * Returns Infinity if there were no analyzable network records.
    *
-   * @param {?Array<!WebInspector.NetworkRequest>} networkRecords
+   * @param {!Array<!WebInspector.NetworkRequest>} networkRecords
    * @return {number}
    */
-  compute_(networkRecords) {
-    networkRecords = networkRecords || [];
-
+  static getThroughput(networkRecords) {
     let totalBytes = 0;
     const timeBoundaries = networkRecords.reduce((boundaries, record) => {
       const scheme = record.parsedURL && record.parsedURL.scheme;
@@ -59,6 +57,16 @@ class NetworkThroughput extends ComputedArtifact {
     });
 
     return totalBytes / totalDuration;
+  }
+
+  /**
+   * @param {!DevtoolsLog} devtoolsLog
+   * @param {!ComputedArtifacts} artifacts
+   * @return {!Promise<!Object>}
+   */
+  compute_(devtoolsLog, artifacts) {
+    return artifacts.requestNetworkRecords(devtoolsLog)
+      .then(NetworkThroughput.getThroughput);
   }
 }
 
