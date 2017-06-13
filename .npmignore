@@ -1,0 +1,11 @@
+# folders
+.vscode/
+test/
+
+# dev files
+.appveyor.yml
+.editorconfig
+.eslintignore
+.eslintrc.js
+.travis.yml
+gulpfile.js

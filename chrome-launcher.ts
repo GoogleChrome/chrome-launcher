@@ -13,7 +13,7 @@ import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay} from './utils';
 import * as net from 'net';
 const rimraf = require('rimraf');
-const log = require('../lighthouse-core/lib/log');
+const log = require('lighthouse/lighthouse-core/lib/log');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const isWindows = process.platform === 'win32';

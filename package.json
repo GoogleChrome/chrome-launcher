@@ -1,6 +1,5 @@
 {
   "name": "chrome-launcher",
-  "private": true,
   "main": "chrome-launcher.js",
   "scripts": {
     "build": "tsc",
@@ -19,6 +18,12 @@
   "dependencies": {
     "@types/core-js": "^0.9.41",
     "@types/mkdirp": "^0.3.29",
-    "@types/node": "6.0.66"
-  }
+    "@types/node": "6.0.66",
+    "lighthouse": "2.1"
+  },
+  "version": "0.1.0",
+  "description": "Launch latest Chrome with the devtools-protocol port open",
+  "repository": "https://github.com/GoogleChrome/lighthouse/tree/master/chrome-launcher",
+  "author": "The Chromium Authors",
+  "license": "Apache-2.0"
 }
