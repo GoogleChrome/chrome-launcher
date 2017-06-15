@@ -21,7 +21,7 @@
     "@types/node": "6.0.66",
     "lighthouse": "2.1"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Launch latest Chrome with the devtools-protocol port open",
   "repository": "https://github.com/GoogleChrome/lighthouse/tree/master/chrome-launcher",
   "author": "The Chromium Authors",
