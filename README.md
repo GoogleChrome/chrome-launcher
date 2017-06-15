@@ -2,15 +2,19 @@
 
 Launch Google Chrome with ease from node.
 
+* [Disables many Chrome services](https://github.com/GoogleChrome/lighthouse/blob/master/chrome-launcher/flags.ts) that add noise to automated scenarios
+* Opens up the browser's `remote-debugging-port` on an available port
+* Automagically locates a Chrome binary to launch
+* Uses a fresh Chrome profile for each launch, and cleans itself up on `kill()`
+* Binds `Ctrl-C` (by default) to terminate the Chrome process
+* Exposes a small set of [options](#api) for configurability over these details
+
 ### Installing
 
-```
+```sh
 yarn add chrome-launcher
-```
 
-or
-
-```
+# or with npm:
 npm install chrome-launcher
 ```
 
