@@ -1,6 +1,6 @@
 {
   "name": "chrome-launcher",
-  "main": "chrome-launcher.js",
+  "main": "index.js",
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
