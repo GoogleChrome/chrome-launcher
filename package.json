@@ -4,14 +4,17 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "mocha --require ts-node/register --reporter dot test/**/*-test.ts",
+    "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
+    "coverage": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "test-formatting": "test/check-formatting.sh",
     "format": "clang-format -i -style=file **/*.ts *.ts"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.41",
     "clang-format": "^1.0.50",
+    "coveralls": "^2.13.1",
     "mocha": "^3.2.0",
+    "nyc": "^11.0.2",
     "ts-node": "^3.0.4",
     "typescript": "2.2.1"
   },
