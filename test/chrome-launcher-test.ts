@@ -9,7 +9,7 @@ import {Launcher} from '../chrome-launcher';
 
 import * as assert from 'assert';
 
-const log = require('../../lighthouse-core/lib/log');
+const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
   closeSync: () => {}
