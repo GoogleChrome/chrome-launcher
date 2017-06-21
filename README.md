@@ -25,7 +25,7 @@ npm install chrome-launcher
 
 #### Launch options
 
-```ts
+```js
 {
   // (optional) remote debugging port number to use. If provided port is already busy, launch() will reject
   // Default: an available port is autoselected
@@ -35,7 +35,7 @@ npm install chrome-launcher
   // See all flags here: http://peter.sh/experiments/chromium-command-line-switches/
   // Do note, many flags are set by default: https://github.com/GoogleChrome/lighthouse/blob/master/chrome-launcher/flags.ts
   chromeFlags: Array<string>;
-  
+
   // (optional) Close the Chrome process on `Ctrl-C`
   // Default: true
   handleSIGINT: boolean;
@@ -58,7 +58,7 @@ npm install chrome-launcher
 
 #### `.launch().then(chrome => ...`
 
-```ts
+```js
 // The remote debugging port exposed by the launched chrome
 chrome.port: number;
 
