@@ -97,3 +97,22 @@ chromeLauncher.launch({
   console.log(`Chrome debugging port running on ${chrome.port}`);
 });
 ```
+
+### Continuous Integration
+
+In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, you can install Chrome using Lighthouse's `download-chrome.sh` script:
+
+`curl -L https://raw.githubusercontent.com/GoogleChrome/lighthouse/v2.1.0/lighthouse-core/scripts/download-chrome.sh | bash`
+
+Then in `.travis.yml`, use it like so:
+
+```yaml
+language: node_js
+install:
+  - yarn install
+before_script:
+  - export DISPLAY=:99.0
+  - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
+  - sh -e /etc/init.d/xvfb start
+  - curl -L https://raw.githubusercontent.com/GoogleChrome/lighthouse/v2.1.0/lighthouse-core/scripts/download-chrome.sh | bash
+```
