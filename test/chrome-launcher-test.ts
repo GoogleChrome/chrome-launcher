@@ -6,51 +6,70 @@
 'use strict';
 
 import {Launcher} from '../chrome-launcher';
-
+import {spy, stub} from 'sinon';
 import * as assert from 'assert';
 
 const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
-  closeSync: () => {}
+  closeSync: () => {},
+  writeFileSync: () => {}
 };
 
 describe('Launcher', () => {
-  it('accepts and uses a custom path', async () => {
+  beforeEach(() => {
     log.setLevel('error');
-    let callCount = 0;
-    const rimrafMock = (_: string, done: () => void) => {
-      callCount++;
-      done();
-    };
+  });
 
+  afterEach(() => {
+    log.setLevel('');
+  });
+
+  it('sets default launching flags', async () => {
+    const spawnStub = stub().returns({pid: 'some_pid'});
+
+    const chromeInstance = new Launcher(
+        {userDataDir: 'some_path'},
+        {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
+    stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+
+    chromeInstance.prepare();
+
+    try {
+      await chromeInstance.launch();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+
+    assert.ok(chromeFlags.find(f => f.startsWith('--remote-debugging-port')))
+    assert.ok(chromeFlags.find(f => f.startsWith('--disable-background-networking')))
+    assert.strictEqual(chromeFlags[chromeFlags.length - 1], 'about:blank');
+  });
+
+  it('accepts and uses a custom path', async () => {
+    const rimrafMock = spy();
     const chromeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any, rimraf: rimrafMock as any});
 
     chromeInstance.prepare();
 
     await chromeInstance.destroyTmp();
-    assert.strictEqual(callCount, 0);
+    assert.strictEqual(rimrafMock.callCount, 0);
   });
 
   it('cleans up the tmp dir after closing', async () => {
-    log.setLevel('error');
-    let callCount = 0;
-    const rimrafMock = (_: string, done: () => void) => {
-      callCount++;
-      done();
-    };
+    const rimrafMock = stub().callsFake((_, done) => done());
 
     const chromeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
 
     chromeInstance.prepare();
     await chromeInstance.destroyTmp();
-    assert.strictEqual(callCount, 1);
+    assert.strictEqual(rimrafMock.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
-    log.setLevel('error');
-
     const chromeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
 
     chromeInstance.prepare();
@@ -58,7 +77,6 @@ describe('Launcher', () => {
   });
 
   it('defaults to genering a tmp dir when no data dir is passed', () => {
-    log.setLevel('error');
     const chromeInstance = new Launcher({}, {fs: fsMock as any});
     const originalMakeTmp = chromeInstance.makeTmpDir;
     chromeInstance.makeTmpDir = () => 'tmp_dir'
@@ -70,21 +88,17 @@ describe('Launcher', () => {
   });
 
   it('doesn\'t fail when killed twice', async () => {
-    log.setLevel('error');
     const chromeInstance = new Launcher();
     await chromeInstance.launch();
-    log.setLevel();
     await chromeInstance.kill();
     await chromeInstance.kill();
   });
 
   it('doesn\'t launch multiple chrome processes', async () => {
-    log.setLevel('error');
     const chromeInstance = new Launcher();
     await chromeInstance.launch();
     let pid = chromeInstance.pid!;
     await chromeInstance.launch();
-    log.setLevel();
     assert.strictEqual(pid, chromeInstance.pid);
     await chromeInstance.kill();
   });

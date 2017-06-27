@@ -11,9 +11,11 @@
   },
   "devDependencies": {
     "@types/mocha": "^2.2.41",
+    "@types/sinon": "^2.3.1",
     "clang-format": "^1.0.50",
     "mocha": "^3.2.0",
     "nyc": "^11.0.2",
+    "sinon": "^2.3.5",
     "ts-node": "^3.0.4",
     "typescript": "2.2.1"
   },

@@ -39,7 +39,11 @@ export interface LaunchedChrome {
   kill: () => Promise<{}>;
 }
 
-export interface ModuleOverrides { fs?: typeof fs, rimraf?: typeof rimraf, }
+export interface ModuleOverrides {
+  fs?: typeof fs;
+  rimraf?: typeof rimraf;
+  spawn?: typeof childProcess.spawn;
+}
 
 export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
@@ -72,6 +76,7 @@ export class Launcher {
   private chrome?: childProcess.ChildProcess;
   private fs: typeof fs;
   private rimraf: typeof rimraf;
+  private spawn: typeof childProcess.spawn;
 
   userDataDir?: string;
   port?: number;
@@ -80,6 +85,7 @@ export class Launcher {
   constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
     this.fs = moduleOverrides.fs || fs;
     this.rimraf = moduleOverrides.rimraf || rimraf;
+    this.spawn = moduleOverrides.spawn || spawn;
 
     log.setLevel(defaults(this.opts.logLevel, 'info'));
 
@@ -158,11 +164,11 @@ export class Launcher {
       this.chromePath = installations[0];
     }
 
-    this.pid = await this.spawn(this.chromePath);
+    this.pid = await this.spawnProcess(this.chromePath);
     return Promise.resolve();
   }
 
-  private async spawn(execPath: string) {
+  private async spawnProcess(execPath: string) {
     // Typescript is losing track of the return type without the explict typing.
     const spawnPromise: Promise<number> = new Promise(async (resolve) => {
       if (this.chrome) {
@@ -179,7 +185,7 @@ export class Launcher {
         this.port = await getRandomPort();
       }
 
-      const chrome = spawn(
+      const chrome = this.spawn(
           execPath, this.flags, {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
       this.chrome = chrome;
 
