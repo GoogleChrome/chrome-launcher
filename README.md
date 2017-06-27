@@ -51,6 +51,10 @@ npm install chrome-launcher
   // (optional) Starting URL to open the browser with
   // Default: `about:blank`
   startingUrl: string;
+
+  // (optional) Logging level: verbose, info, error, silent
+  // Default: 'info'
+  logLevel: string;
 };
 ```
 
