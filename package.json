@@ -25,7 +25,7 @@
     "@types/node": "6.0.66",
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "0.5.1",
-    "rimraf": "2.2.8"
+    "rimraf": "^2.6.1"
   },
   "version": "0.3.0",
   "description": "Launch latest Chrome with the devtools-protocol port open",
