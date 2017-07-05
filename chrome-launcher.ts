@@ -185,6 +185,8 @@ export class Launcher {
         this.port = await getRandomPort();
       }
 
+      log.verbose(
+          'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       const chrome = this.spawn(
           execPath, this.flags, {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
       this.chrome = chrome;
