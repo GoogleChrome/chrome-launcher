@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
-'use strict'
+'use strict';
 /**
  * @fileoverview Script to launch a clean Chrome instance on-demand.
+ *
  * Assuming Lighthouse is installed globally or `npm link`ed, use via:
  *     chrome-debug
- * Optionally pass additional flags and/or a URL
+ * Optionally pass additional a port, chrome flags and/or a URL
+ *     chrome-debug --port=9222
  *     chrome-debug http://goat.com
  *     chrome-debug --show-paint-rects
  */
@@ -16,9 +18,12 @@ const args = process.argv.slice(2);
 
 let chromeFlags;
 let startingUrl;
+let port;
 
 if (args.length) {
   chromeFlags = args.filter(flag => flag.startsWith('--'));
+  port = chromeFlags.find(flag => flag.startsWith('--port=')).replace('--port=', '');
+
   startingUrl = args.find(flag => !flag.startsWith('--'));
 }
 
@@ -26,5 +31,6 @@ const {launch} = require('./chrome-launcher');
 
 launch({
   startingUrl,
+  port,
   chromeFlags,
-}).then(v => console.log(`✨  Chrome debugging port: ${v.port}`))
+}).then(v => console.log(`✨  Chrome debugging port: ${v.port}`));
