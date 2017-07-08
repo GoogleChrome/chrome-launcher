@@ -87,7 +87,7 @@ export class Launcher {
     this.rimraf = moduleOverrides.rimraf || rimraf;
     this.spawn = moduleOverrides.spawn || spawn;
 
-    log.setLevel(defaults(this.opts.logLevel, 'info'));
+    log.setLevel(defaults(this.opts.logLevel, 'silent'));
 
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
