@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const execSync = require('child_process').execSync;
 const execFileSync = require('child_process').execFileSync;
+const log = require('lighthouse-logger');
 
 const newLineRegex = /\r?\n/;
 
@@ -22,6 +23,11 @@ export function darwin() {
       '/Versions/A/Support/lsregister';
 
   const installations: Array<string> = [];
+
+  const customChromePath = resolveChromePath();
+  if (customChromePath) {
+    installations.push(customChromePath);
+  }
 
   execSync(
       `${LSREGISTER} -dump` +
@@ -46,25 +52,43 @@ export function darwin() {
     {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
     {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
     {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
-    {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1}
+    {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
+    {regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH), weight: 150},
+    {regex: new RegExp(process.env.CHROME_PATH), weight: 151}
   ];
   // clang-format on
 
   return sort(installations, priorities);
 }
 
+function resolveChromePath() {
+  if (canAccess(process.env.CHROME_PATH)) {
+    return process.env.CHROME_PATH as string;
+  }
+
+  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
+    log.warn(
+        'ChromeLauncher',
+        'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
+    return process.env.LIGHTHOUSE_CHROMIUM_PATH as string;
+  }
+
+  return undefined;
+}
+
 /**
  * Look for linux executables in 3 ways
- * 1. Look into LIGHTHOUSE_CHROMIUM_PATH env variable
+ * 1. Look into CHROME_PATH env variable
  * 2. Look into the directories where .desktop are saved on gnome based distro's
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 export function linux() {
   let installations: string[] = [];
 
-  // 1. Look into LIGHTHOUSE_CHROMIUM_PATH env variable
-  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
-    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH as string);
+  // 1. Look into CHROME_PATH env variable
+  const customChromePath = resolveChromePath();
+  if (customChromePath) {
+    installations.push(customChromePath);
   }
 
   // 2. Look into the directories where .desktop are saved on gnome based distro's
@@ -96,14 +120,15 @@ export function linux() {
 
   if (!installations.length) {
     throw new Error(
-        'The environment variable LIGHTHOUSE_CHROMIUM_PATH must be set to ' +
+        'The environment variable CHROME_PATH must be set to ' +
         'executable of a build of Chromium version 54.0 or later.');
   }
 
   const priorities: Priorities = [
     {regex: /chrome-wrapper$/, weight: 51}, {regex: /google-chrome-stable$/, weight: 50},
     {regex: /google-chrome$/, weight: 49},
-    {regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH), weight: 100}
+    {regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH), weight: 100},
+    {regex: new RegExp(process.env.CHROME_PATH), weight: 101}
   ];
 
   return sort(uniq(installations.filter(Boolean)), priorities);
@@ -117,8 +142,9 @@ export function win32() {
   const prefixes =
       [process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']];
 
-  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
-    installations.push(process.env.LIGHTHOUSE_CHROMIUM_PATH);
+  const customChromePath = resolveChromePath();
+  if (customChromePath) {
+    installations.push(customChromePath);
   }
 
   prefixes.forEach(prefix => suffixes.forEach(suffix => {
