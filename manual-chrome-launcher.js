@@ -13,21 +13,21 @@
  */
 
 require('./compiled-check.js')('chrome-launcher.js');
+const {launch} = require('./chrome-launcher');
 
 const args = process.argv.slice(2);
-
 let chromeFlags;
 let startingUrl;
 let port;
 
 if (args.length) {
   chromeFlags = args.filter(flag => flag.startsWith('--'));
-  port = chromeFlags.find(flag => flag.startsWith('--port=')).replace('--port=', '');
+
+  const portFlag = chromeFlags.find(flag => flag.startsWith('--port='));
+  port = portFlag && portFlag.replace('--port=', '');
 
   startingUrl = args.find(flag => !flag.startsWith('--'));
 }
-
-const {launch} = require('./chrome-launcher');
 
 launch({
   startingUrl,
