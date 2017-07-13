@@ -63,14 +63,14 @@ export function darwin() {
 
 function resolveChromePath() {
   if (canAccess(process.env.CHROME_PATH)) {
-    return process.env.CHROME_PATH as string;
+    return process.env.CHROME_PATH;
   }
 
   if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
     log.warn(
         'ChromeLauncher',
         'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
-    return process.env.LIGHTHOUSE_CHROMIUM_PATH as string;
+    return process.env.LIGHTHOUSE_CHROMIUM_PATH;
   }
 
   return undefined;
@@ -108,7 +108,7 @@ export function linux() {
   executables.forEach((executable: string) => {
     try {
       const chromePath =
-          execFileSync('which', [executable]).toString().split(newLineRegex)[0] as string;
+          execFileSync('which', [executable]).toString().split(newLineRegex)[0];
 
       if (canAccess(chromePath)) {
         installations.push(chromePath);
