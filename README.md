@@ -57,6 +57,10 @@ npm install chrome-launcher
   // (optional) Logging level: verbose, info, error, silent
   // Default: 'info'
   logLevel: string;
+
+  // (optional) Enable extension loading
+  // Default: false
+  enableExtensions: boolean
 };
 ```
 

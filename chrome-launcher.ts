@@ -31,6 +31,7 @@ export interface Options {
   chromePath?: string;
   userDataDir?: string;
   logLevel?: string;
+  enableExtensions?: boolean;
 }
 
 export interface LaunchedChrome {
@@ -71,6 +72,7 @@ export class Launcher {
   private outFile?: number;
   private errFile?: number;
   private chromePath?: string;
+  private enableExtensions?: boolean;
   private chromeFlags: string[];
   private requestedPort?: number;
   private chrome?: childProcess.ChildProcess;
@@ -94,14 +96,19 @@ export class Launcher {
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
     this.requestedPort = defaults(this.opts.port, 0);
     this.chromePath = this.opts.chromePath;
+    this.enableExtensions = defaults(this.opts.enableExtensions, false);
   }
 
   private get flags() {
-    const flags = DEFAULT_FLAGS.concat([
+    let flags = DEFAULT_FLAGS.concat([
       `--remote-debugging-port=${this.port}`,
       // Place Chrome profile in a custom location we'll rm -rf later
       `--user-data-dir=${this.userDataDir}`
     ]);
+
+    if (this.enableExtensions) {
+      flags = flags.filter(flag => flag !== '--disable-extensions');
+    }
 
     if (process.platform === 'linux') {
       flags.push('--disable-setuid-sandbox');
