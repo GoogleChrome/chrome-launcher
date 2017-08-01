@@ -27,7 +27,7 @@
     "mkdirp": "0.5.1",
     "rimraf": "^2.6.1"
   },
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Launch latest Chrome with the devtools-protocol port open",
   "repository": "https://github.com/GoogleChrome/lighthouse/tree/master/chrome-launcher",
   "author": "The Chromium Authors",
