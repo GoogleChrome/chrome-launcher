@@ -122,7 +122,7 @@ install:
   - yarn install
 before_script:
   - export DISPLAY=:99.0
-  - export LIGHTHOUSE_CHROMIUM_PATH="$(pwd)/chrome-linux/chrome"
+  - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - curl -L https://raw.githubusercontent.com/GoogleChrome/lighthouse/v2.1.0/lighthouse-core/scripts/download-chrome.sh | bash
 ```
