@@ -41,9 +41,10 @@ npm install chrome-launcher
   handleSIGINT: boolean;
 
   // (optional) Explicit path of intended Chrome binary
-  // If the `CHROME_PATH` env variable is set, that will be used
-  // Usage of `LIGHTHOUSE_CHROMIUM_PATH` env variable is deprecated
-  // By default, any detected Chrome Canary or Chrome (stable) will be launched
+  // * If this `chromePath` option is defined, it will be used.
+  // * Otherwise, the `CHROME_PATH` env variable will be used if set. (`LIGHTHOUSE_CHROMIUM_PATH` is deprecated)
+  // * Otherwise, a detected Chrome Canary will be used if found
+  // * Otherwise, a detected Chrome (stable) will be used
   chromePath: string;
 
   // (optional) Chrome profile path to use
