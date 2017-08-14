@@ -106,10 +106,12 @@ export function linux() {
     installations = installations.concat(findChromeExecutables(folder));
   });
 
-  // Look for google-chrome-stable & google-chrome executables by using the which command
+  // Look for google-chrome(-stable) & chromium(-browser) executables by using the which command
   const executables = [
     'google-chrome-stable',
     'google-chrome',
+    'chromium-browser',
+    'chromium',
   ];
   executables.forEach((executable: string) => {
     try {
@@ -133,6 +135,8 @@ export function linux() {
     {regex: /chrome-wrapper$/, weight: 51},
     {regex: /google-chrome-stable$/, weight: 50},
     {regex: /google-chrome$/, weight: 49},
+    {regex: /chromium-browser$/, weight: 48},
+    {regex: /chromium$/, weight: 47},
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
