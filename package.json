@@ -7,7 +7,7 @@
     "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
     "coverage": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "test-formatting": "test/check-formatting.sh",
-    "format": "clang-format -i -style=file **/*.ts *.ts"
+    "format": "scripts/format.sh"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.41",
@@ -23,6 +23,7 @@
     "@types/core-js": "^0.9.41",
     "@types/mkdirp": "^0.3.29",
     "@types/node": "6.0.66",
+    "@types/rimraf": "^0.0.28",
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "0.5.1",
     "rimraf": "^2.6.1"

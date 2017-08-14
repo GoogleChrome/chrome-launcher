@@ -9,3 +9,9 @@ test/
 .eslintrc.js
 .travis.yml
 gulpfile.js
+
+# exclude source TypeScript files
+*.ts
+
+# allow TypeScript Declaration Files
+!*.d.ts

@@ -7,12 +7,12 @@
 
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import * as net from 'net';
+import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay} from './utils';
-import * as net from 'net';
-const rimraf = require('rimraf');
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
