@@ -1,3 +1,7 @@
+## 0.6.0 (Thu, 17 Aug 2017)
+43baee69 mute any audio (#3028)
+ae6e9551 Better SIGINT handling (#2959)
+3ab3a117 docs: add changelog to launcher (#2987)
 
 ## 0.5.0 (Mon, 14 Aug 2017)
 * `494f9911` clarify priority of chromePath options
