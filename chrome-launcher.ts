@@ -23,6 +23,8 @@ const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32']);
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32';
 
+const instances = new Set();
+
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
@@ -46,22 +48,35 @@ export interface ModuleOverrides {
   spawn?: typeof childProcess.spawn;
 }
 
+const sigintListener = async () => {
+  for (const instance of instances) {
+    await instance.kill();
+  }
+  process.exit(_SIGINT_EXIT_CODE);
+};
+
 export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
   const instance = new Launcher(opts);
 
   // Kill spawned Chrome process in case of ctrl-C.
-  if (opts.handleSIGINT) {
-    process.on(_SIGINT, async () => {
-      await instance.kill();
-      process.exit(_SIGINT_EXIT_CODE);
-    });
+  if (opts.handleSIGINT && instances.size === 0) {
+    process.on(_SIGINT, sigintListener);
   }
+  instances.add(instance);
 
   await instance.launch();
 
-  return {pid: instance.pid!, port: instance.port!, kill: async () => instance.kill()};
+  const kill = async () => {
+    instances.delete(instance);
+    if (instances.size === 0) {
+      process.removeListener(_SIGINT, sigintListener);
+    }
+    return instance.kill();
+  };
+
+  return {pid: instance.pid!, port: instance.port!, kill};
 }
 
 export class Launcher {
