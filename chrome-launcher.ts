@@ -192,10 +192,10 @@ export class Launcher {
 
   private async spawnProcess(execPath: string) {
     // Typescript is losing track of the return type without the explict typing.
-    const spawnPromise: Promise<number> = new Promise(async (resolve) => {
+    const spawnPromise: Promise<number> = (async () => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-        return resolve(this.chrome.pid);
+        return this.chrome.pid;
       }
 
 
@@ -216,8 +216,8 @@ export class Launcher {
       this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
 
       log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-      resolve(chrome.pid);
-    });
+      return chrome.pid;
+    })();
 
     const pid = await spawnPromise;
     await this.waitUntilReady();

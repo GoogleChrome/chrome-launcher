@@ -122,4 +122,9 @@ describe('Launcher', () => {
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
+
+  it('throws an error when chromePath is empty', (done) => {
+    const chromeInstance = new Launcher({chromePath: ''});
+    chromeInstance.launch().catch(() => done());
+  });
 });
