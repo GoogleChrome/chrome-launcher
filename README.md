@@ -1,5 +1,7 @@
 # Chrome Launcher [![NPM chrome-launcher package](https://img.shields.io/npm/v/chrome-launcher.svg)](https://npmjs.org/package/chrome-launcher)
 
+<img src="https://user-images.githubusercontent.com/39191/29847271-a7ba82f8-8ccf-11e7-8d54-eb88fdf0b6d0.png" align=right height=200>
+
 Launch Google Chrome with ease from node.
 
 * [Disables many Chrome services](https://github.com/GoogleChrome/lighthouse/blob/master/chrome-launcher/flags.ts) that add noise to automated scenarios
