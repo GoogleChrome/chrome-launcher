@@ -1,0 +1,28 @@
+language: node_js
+matrix:
+  include:
+    - node_js: "6.9.1"
+    - node_js: "7"
+    - node_js: "8"
+dist: trusty
+cache:
+  yarn: true
+  directories:
+    - node_modules
+install:
+  - yarn
+before_script:
+  - export DISPLAY=:99.0
+  - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 # wait for xvfb to boot
+  - yarn build
+script:
+  - yarn test-formatting
+  - yarn test
+after_success:
+  - yarn run coverage
+# - (send to coveralls)
+# - (send to codecov)
+addons:
+  chrome: stable
