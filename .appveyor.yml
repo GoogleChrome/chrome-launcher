@@ -22,7 +22,7 @@ install:
 before_test:
   - set "PATH=C:\MinGW\msys\1.0\bin;%PATH%"
   - set "LIGHTHOUSE_CHROMIUM_PATH=%CD%\chrome-win32\chrome.exe"
-  - bash ./lighthouse-core/scripts/download-chrome.sh
+  - bash ./scripts/download-chrome.sh
   - yarn build
 
 test_script:

@@ -1,10 +1,11 @@
-# Chrome Launcher [![NPM chrome-launcher package](https://img.shields.io/npm/v/chrome-launcher.svg)](https://npmjs.org/package/chrome-launcher)
+# Chrome Launcher [![Linux Build Status](https://img.shields.io/travis/GoogleChrome/chrome-launcher/master.svg)](https://travis-ci.org/GoogleChrome/chrome-launcher) [![Windows Build Status](https://img.shields.io/appveyor/ci/paulirish/chrome-launcher/master.svg)](https://ci.appveyor.com/project/paulirish/chrome-launcher/branch/master) [![NPM chrome-launcher package](https://img.shields.io/npm/v/chrome-launcher.svg)](https://npmjs.org/package/chrome-launcher)
+
 
 <img src="https://user-images.githubusercontent.com/39191/29847271-a7ba82f8-8ccf-11e7-8d54-eb88fdf0b6d0.png" align=right height=200>
 
 Launch Google Chrome with ease from node.
 
-* [Disables many Chrome services](https://github.com/GoogleChrome/lighthouse/blob/master/chrome-launcher/flags.ts) that add noise to automated scenarios
+* [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts) that add noise to automated scenarios
 * Opens up the browser's `remote-debugging-port` on an available port
 * Automagically locates a Chrome binary to launch
 * Uses a fresh Chrome profile for each launch, and cleans itself up on `kill()`
@@ -113,9 +114,9 @@ chromeLauncher.launch({
 
 ### Continuous Integration
 
-In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, you can install Chrome using Lighthouse's `download-chrome.sh` script:
+In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, you can install Chrome using the `download-chrome.sh` script:
 
-`curl -L https://raw.githubusercontent.com/GoogleChrome/lighthouse/v2.1.0/lighthouse-core/scripts/download-chrome.sh | bash`
+`curl -L https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/master/scripts/download-chrome.sh | bash`
 
 Then in `.travis.yml`, use it like so:
 
@@ -127,5 +128,5 @@ before_script:
   - export DISPLAY=:99.0
   - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
-  - curl -L https://raw.githubusercontent.com/GoogleChrome/lighthouse/v2.1.0/lighthouse-core/scripts/download-chrome.sh | bash
+  - curl -L https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/master/scripts/download-chrome.sh | bash
 ```
