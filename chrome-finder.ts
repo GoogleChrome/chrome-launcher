@@ -155,11 +155,9 @@ export function win32() {
   const suffixes = [
     '\\Google\\Chrome SxS\\Application\\chrome.exe', '\\Google\\Chrome\\Application\\chrome.exe'
   ];
-  const prefixes = [process.env.LOCALAPPDATA, process.env.PROGRAMFILES];
-  // PROGRAMFILES(X86) is undefined for 32-bit Windows
-  if (process.env['PROGRAMFILES(X86)']) {
-    prefixes.push(process.env['PROGRAMFILES(X86)']);
-  }
+  const prefixes = [
+    process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
+  ].filter(Boolean);
 
   const customChromePath = resolveChromePath();
   if (customChromePath) {
