@@ -299,7 +299,7 @@ export class Launcher {
           this.destroyTmp().then(resolve);
         });
 
-        log.log('ChromeLauncher', 'Killing all Chrome Instances');
+        log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
         try {
           if (isWindows) {
             execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
