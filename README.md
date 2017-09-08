@@ -64,7 +64,15 @@ npm install chrome-launcher
 
   // (optional) Enable extension loading
   // Default: false
-  enableExtensions: boolean
+  enableExtensions: boolean;
+
+  // (optional) Interval in ms, which defines how often launcher checks browser port to be ready.
+  // Default: 500
+  connectionPollInterval: number;
+
+  // (optional) A number of retries, before browser launch considered unsuccessful.
+  // Default: 10
+  maxConnectionRetries: number;
 };
 ```
 
