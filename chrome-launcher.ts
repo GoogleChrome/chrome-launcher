@@ -116,7 +116,7 @@ export class Launcher {
     this.chromePath = this.opts.chromePath;
     this.enableExtensions = defaults(this.opts.enableExtensions, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
-    this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 10);
+    this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
   }
 
   private get flags() {
