@@ -12,7 +12,7 @@ export const DEFAULT_FLAGS = [
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
   // Disable fetching safebrowsing lists. Otherwise requires a 500KB download immediately after launch.
-  // This flag is likely redundant due to disable-background-networking
+  //   This flag is likely redundant due to disable-background-networking
   '--safebrowsing-disable-auto-update',
   // Disable built-in Google Translate service
   '--disable-translate',
@@ -36,9 +36,10 @@ export const DEFAULT_FLAGS = [
   // Reloading a page that came from a POST normally prompts the user.
   '--disable-prompt-on-repost',
   // Disable the a few things considered not appropriate for automation, e.g. infobar animations, password saving UI
+  //   https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview
   '--enable-automation',
   // Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
   '--password-store=basic',
-  // Use mock keychain on mac to prevent blocking permissions dialogs
-  'use-mock-keychain',
+  // Use mock keychain on Mac to prevent blocking permissions dialogs
+  '--use-mock-keychain',
 ];
