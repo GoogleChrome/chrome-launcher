@@ -26,7 +26,7 @@ export const DEFAULT_FLAGS = [
   '--mute-audio',
   // Skip first run wizards
   '--no-first-run',
-  
+
   // Disable timers being throttled in background pages/tabs
   '--disable-background-timer-throttling',
   // Disables client-side phishing detection. Likely redundant due to the safebrowsing disable
