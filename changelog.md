@@ -1,3 +1,11 @@
+## 0.7.0 (Thu, 14 Sept 2017)
+* Project moved to its own repo: https://github.com/GoogleChrome/chrome-launcher
+* `8d0766eb` Retry connection for longer (#21)
+* `52cb50af` only include PROGRAMFILES(X86) if present (#20)
+* `530822b9` log pid to kill (#22)
+* `1d617ab3` add support for `connectionPollInterval ` and `maxConnectionRetries` (#19)
+* `7474971f` Fix errors inside spawnPromise being ignored (https://github.com/GoogleChrome/lighthouse/pull/2939)
+
 ## 0.6.0 (Thu, 17 Aug 2017)
 * `43baee69` mute any audio (#3028)
 * `ae6e9551` Better SIGINT handling (#2959)
