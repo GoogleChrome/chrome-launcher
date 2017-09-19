@@ -12,16 +12,17 @@ import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay} from './utils';
+import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat} from './utils';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
-const isWindows = process.platform === 'win32';
+const isWsl = getPlatform() === 'wsl';
+const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
 const _SIGINT_EXIT_CODE = 130;
-const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32']);
+const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32', 'wsl']);
 
-type SupportedPlatforms = 'darwin'|'linux'|'win32';
+type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set();
 
@@ -123,14 +124,15 @@ export class Launcher {
     let flags = DEFAULT_FLAGS.concat([
       `--remote-debugging-port=${this.port}`,
       // Place Chrome profile in a custom location we'll rm -rf later
-      `--user-data-dir=${this.userDataDir}`
+      // If in WSL, we need to use the Windows format
+      `--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`
     ]);
 
     if (this.enableExtensions) {
       flags = flags.filter(flag => flag !== '--disable-extensions');
     }
 
-    if (process.platform === 'linux') {
+    if (getPlatform() === 'linux') {
       flags.push('--disable-setuid-sandbox');
     }
 
@@ -146,7 +148,7 @@ export class Launcher {
   }
 
   prepare() {
-    const platform = process.platform as SupportedPlatforms;
+    const platform = getPlatform() as SupportedPlatforms;
     if (!_SUPPORTED_PLATFORMS.has(platform)) {
       throw new Error(`Platform ${platform} is not supported`);
     }
@@ -178,17 +180,17 @@ export class Launcher {
       }
     }
 
-    if (!this.tmpDirandPidFileReady) {
-      this.prepare();
-    }
-
     if (this.chromePath === undefined) {
-      const installations = await chromeFinder[process.platform as SupportedPlatforms]();
+      const installations = await chromeFinder[getPlatform() as SupportedPlatforms]();
       if (installations.length === 0) {
         throw new Error('No Chrome Installations Found');
       }
 
       this.chromePath = installations[0];
+    }
+
+    if (!this.tmpDirandPidFileReady) {
+      this.prepare();
     }
 
     this.pid = await this.spawnProcess(this.chromePath);

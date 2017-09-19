@@ -11,6 +11,8 @@ const execSync = require('child_process').execSync;
 const execFileSync = require('child_process').execFileSync;
 const log = require('lighthouse-logger');
 
+import {getLocalAppDataPath} from './utils';
+
 const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
@@ -150,10 +152,20 @@ export function linux() {
   return sort(uniq(installations.filter(Boolean)), priorities);
 }
 
+export function wsl() {
+  // Manually populate the environment variables assuming it's the default config
+  process.env.LOCALAPPDATA = getLocalAppDataPath();
+  process.env.PROGRAMFILES = '/mnt/c/Program Files';
+  process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
+
+  return win32();
+}
+
 export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
-    '\\Google\\Chrome SxS\\Application\\chrome.exe', '\\Google\\Chrome\\Application\\chrome.exe'
+    `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
