@@ -1,3 +1,6 @@
+## 0.8.0 (Wed, 20 Sept 2017)
+* `256399c` Add support for Windows Subsystem for Linux / BashOnWindows (#27)
+
 ## 0.7.0 (Thu, 14 Sept 2017)
 * Project moved to its own repo: https://github.com/GoogleChrome/chrome-launcher
 * `8d0766eb` Retry connection for longer (#21)
