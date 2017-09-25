@@ -122,9 +122,7 @@ chromeLauncher.launch({
 
 ### Continuous Integration
 
-In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, you can install Chrome using the `download-chrome.sh` script:
-
-`curl -L https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/master/scripts/download-chrome.sh | bash`
+In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, Travis can [install Chrome at run time with an addon](https://docs.travis-ci.com/user/chrome).  Alternatively, you can also install Chrome using the [`download-chrome.sh`](https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/v0.8.0/scripts/download-chrome.sh) script.
 
 Then in `.travis.yml`, use it like so:
 
@@ -136,5 +134,8 @@ before_script:
   - export DISPLAY=:99.0
   - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
-  - curl -L https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/master/scripts/download-chrome.sh | bash
+  - sleep 3 # wait for xvfb to boot
+
+addons:
+  chrome: stable
 ```
