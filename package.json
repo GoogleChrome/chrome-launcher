@@ -10,7 +10,11 @@
     "format": "scripts/format.sh"
   },
   "devDependencies": {
+    "@types/core-js": "^0.9.41",
+    "@types/mkdirp": "^0.3.29",
     "@types/mocha": "^2.2.41",
+    "@types/node": "6.0.66",
+    "@types/rimraf": "^0.0.28",
     "@types/sinon": "^2.3.1",
     "clang-format": "^1.0.50",
     "mocha": "^3.2.0",
@@ -20,10 +24,6 @@
     "typescript": "2.2.1"
   },
   "dependencies": {
-    "@types/core-js": "^0.9.41",
-    "@types/mkdirp": "^0.3.29",
-    "@types/node": "6.0.66",
-    "@types/rimraf": "^0.0.28",
     "is-wsl": "^1.1.0",
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "0.5.1",
