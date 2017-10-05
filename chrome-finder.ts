@@ -33,7 +33,7 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
+      ' | grep -E -i \'(google chrome( canary)?|chromium).app$\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -51,8 +51,10 @@ export function darwin() {
   const priorities: Priorities = [
     {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`), weight: 50},
     {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`), weight: 51},
+    {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chromium.app`), weight: 52},
     {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
     {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
+    {regex: /^\/Applications\/.*Chromium.app/, weight: 102},
     {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
     {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
   ];
@@ -165,7 +167,9 @@ export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
     `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
-    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
+    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}chrome-win32${path.sep}chrome.exe`,
+    `${path.sep}Chromium${path.sep}Application${path.sep}chrome.exe`
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
