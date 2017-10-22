@@ -16,6 +16,23 @@ const fsMock = {
   writeFileSync: () => {}
 };
 
+const launchChromeWithOpts = async (opts: object) => {
+  const spawnStub = stub().returns({pid: 'some_pid'});
+
+  const chromeInstance =
+      new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
+  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+
+  chromeInstance.prepare();
+
+  try {
+    await chromeInstance.launch();
+    return Promise.resolve(spawnStub);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+};
+
 describe('Launcher', () => {
   beforeEach(() => {
     log.setLevel('error');
@@ -26,23 +43,8 @@ describe('Launcher', () => {
   });
 
   it('sets default launching flags', async () => {
-    const spawnStub = stub().returns({pid: 'some_pid'});
-
-    const chromeInstance = new Launcher(
-        {userDataDir: 'some_path'},
-        {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
-    stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
-
-    chromeInstance.prepare();
-
-    try {
-      await chromeInstance.launch();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-
+    const spawnStub = await launchChromeWithOpts({userDataDir: 'some_path'});
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
-
     assert.ok(chromeFlags.find(f => f.startsWith('--remote-debugging-port')))
     assert.ok(chromeFlags.find(f => f.startsWith('--disable-background-networking')))
     assert.strictEqual(chromeFlags[chromeFlags.length - 1], 'about:blank');
@@ -103,25 +105,26 @@ describe('Launcher', () => {
     await chromeInstance.kill();
   });
 
-  it('removes --disable-extensions from flags on enableExtensions', async () => {
-    const spawnStub = stub().returns({pid: 'some_pid'});
-
-    const chromeInstance = new Launcher(
-        {enableExtensions: true},
-        {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
-    stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
-
-    chromeInstance.prepare();
-
-    try {
-      await chromeInstance.launch();
-    } catch (err) {
-      return Promise.reject(err);
-    }
-
+  it('removes all default flags', async () => {
+    const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
+
+  it('ensure specific flags are present when passed and defaults are ignored', async () => {
+    const spawnStub = await launchChromeWithOpts({
+      ignoreDefaultFlags: true,
+      chromeFlags: ['--disable-extensions', '--mute-audio', '--no-first-run']
+    });
+    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(chromeFlags.includes('--mute-audio'));
+    assert.ok(chromeFlags.includes('--disable-extensions'));
+
+    // Make sure that default flags are not present
+    assert.ok(!chromeFlags.includes('--disable-background-networking'));
+    assert.ok(!chromeFlags.includes('--disable-default-app'));
+  });
+
 
   it('throws an error when chromePath is empty', (done) => {
     const chromeInstance = new Launcher({chromePath: ''});
