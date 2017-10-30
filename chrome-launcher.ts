@@ -79,7 +79,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     return instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, proc: instance.chrome};
+  return {pid: instance.pid!, port: instance.port!, kill, chromeProcess: instance.chrome};
 }
 
 export class Launcher {
@@ -94,7 +94,7 @@ export class Launcher {
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
-  private chrome?: childProcess.ChildProcess;
+  public chrome?: childProcess.ChildProcess;
   private fs: typeof fs;
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
