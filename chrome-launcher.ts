@@ -3,6 +3,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
+
 'use strict';
 
 import * as childProcess from 'child_process';
@@ -13,6 +14,7 @@ import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat} from './utils';
+import {ChildProcess} from "child_process";
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
@@ -43,6 +45,7 @@ export interface LaunchedChrome {
   pid: number;
   port: number;
   kill: () => Promise<{}>;
+  chromeProcess: ChildProcess | undefined
 }
 
 export interface ModuleOverrides {
