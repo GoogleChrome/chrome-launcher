@@ -33,6 +33,7 @@ export interface Options {
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string;
+  forceDefaultProfile?: boolean;
   logLevel?: string;
   enableExtensions?: boolean;
   connectionPollInterval?: number;
@@ -98,6 +99,7 @@ export class Launcher {
   private fs: typeof fs;
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
+  private forceDefaultProfile: boolean;
 
   userDataDir?: string;
   port?: number;
@@ -118,15 +120,17 @@ export class Launcher {
     this.enableExtensions = defaults(this.opts.enableExtensions, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
+    this.forceDefaultProfile = defaults(this.opts.forceDefaultProfile, false);
   }
 
   private get flags() {
-    let flags = DEFAULT_FLAGS.concat([
-      `--remote-debugging-port=${this.port}`,
+    let flags = DEFAULT_FLAGS.concat([`--remote-debugging-port=${this.port}`]);
+
+    if (!this.forceDefaultProfile) {
       // Place Chrome profile in a custom location we'll rm -rf later
       // If in WSL, we need to use the Windows format
-      `--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`
-    ]);
+      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
+    }
 
     if (this.enableExtensions) {
       flags = flags.filter(flag => flag !== '--disable-extensions');

@@ -50,6 +50,10 @@ npm install chrome-launcher
   // * Otherwise, a detected Chrome (stable) will be used
   chromePath: string;
 
+  // (optional) Use the default Chrome profile instead of creating a new one
+  // Default: false
+  forceDefaultProfile: boolean;
+
   // (optional) Chrome profile path to use
   // By default, a fresh Chrome profile will be created
   userDataDir: string;
