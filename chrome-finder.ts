@@ -229,16 +229,15 @@ function findChromeExecutables(folder: string): Array<string> {
     // Output of the grep & print looks like:
     //    /opt/google/chrome/google-chrome --profile-directory
     //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
-    let execPaths; 
-    
+    let execPaths;
+
     try {
       execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`);
     } catch (e) {
       execPaths = execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`);
     }
 
-    execPaths = execPaths
-                    .toString()
+    execPaths = execPaths.toString()
                     .split(newLineRegex)
                     .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
 
