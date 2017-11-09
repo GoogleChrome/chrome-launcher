@@ -4,6 +4,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
+    "build-docker": "docker build -t chrome-launcher:test -f test/Dockerfile .",
+    "docker-test": "docker run --privileged -t chrome-launcher:test",
     "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
     "coverage": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "test-formatting": "test/check-formatting.sh",
