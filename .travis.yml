@@ -16,11 +16,12 @@ before_script:
   - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # wait for xvfb to boot
-  - yarn build
+  - yarn run build
+  - yarn run build-docker
 script:
-  - yarn test-formatting
-  - yarn test
-  - yarn docker-test
+  - yarn run test-formatting
+  - yarn run test
+  - yarn run docker-test
 after_success:
   - yarn run coverage
 # - (send to coveralls)
