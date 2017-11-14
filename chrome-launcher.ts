@@ -32,7 +32,7 @@ export interface Options {
   port?: number;
   handleSIGINT?: boolean;
   chromePath?: string;
-  userDataDir?: string;
+  userDataDir?: string|boolean;
   logLevel?: string;
   enableExtensions?: boolean;
   connectionPollInterval?: number;
@@ -98,6 +98,7 @@ export class Launcher {
   private fs: typeof fs;
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
+  private useDefaultProfile: boolean;
 
   userDataDir?: string;
   port?: number;
@@ -118,15 +119,28 @@ export class Launcher {
     this.enableExtensions = defaults(this.opts.enableExtensions, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
+
+    if (typeof this.opts.userDataDir === 'boolean') {
+      if (!this.opts.userDataDir) {
+        this.useDefaultProfile = true;
+        this.userDataDir = undefined;
+      } else {
+        throw new Error('userDataDir must be false or a path');
+      }
+    } else {
+      this.useDefaultProfile = false;
+      this.userDataDir = this.opts.userDataDir;
+    }
   }
 
   private get flags() {
-    let flags = DEFAULT_FLAGS.concat([
-      `--remote-debugging-port=${this.port}`,
-      // Place Chrome profile in a custom location we'll rm -rf later
+    let flags = DEFAULT_FLAGS.concat([`--remote-debugging-port=${this.port}`]);
+
+    // Place Chrome profile in a custom location we'll rm -rf later
+    if (!this.useDefaultProfile) {
       // If in WSL, we need to use the Windows format
-      `--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`
-    ]);
+      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
+    }
 
     if (this.enableExtensions) {
       flags = flags.filter(flag => flag !== '--disable-extensions');
@@ -153,7 +167,7 @@ export class Launcher {
       throw new Error(`Platform ${platform} is not supported`);
     }
 
-    this.userDataDir = this.opts.userDataDir || this.makeTmpDir();
+    this.userDataDir = this.userDataDir || this.makeTmpDir();
     this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
     this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
 

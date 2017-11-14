@@ -123,6 +123,25 @@ describe('Launcher', () => {
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
 
+  it('removes --user-data-dir if userDataDir is false', async () => {
+    const spawnStub = stub().returns({pid: 'some_pid'});
+
+    const chromeInstance = new Launcher(
+        {userDataDir: false}, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
+    stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+
+    chromeInstance.prepare();
+
+    try {
+      await chromeInstance.launch();
+    } catch (err) {
+      return Promise.reject(err);
+    }
+
+    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(!chromeFlags.includes('--user-data-dir'));
+  });
+
   it('throws an error when chromePath is empty', (done) => {
     const chromeInstance = new Launcher({chromePath: ''});
     chromeInstance.launch().catch(() => done());
