@@ -71,7 +71,7 @@ npm install chrome-launcher
   connectionPollInterval: number;
 
   // (optional) A number of retries, before browser launch considered unsuccessful.
-  // Default: 10
+  // Default: 50
   maxConnectionRetries: number;
 };
 ```
