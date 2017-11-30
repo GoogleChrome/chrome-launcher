@@ -99,6 +99,7 @@ class Launcher {
         }
         if (utils_1.getPlatform() === 'linux') {
             flags.push('--disable-setuid-sandbox');
+            flags.push('--no-sandbox');
         }
         flags.push(...this.chromeFlags);
         flags.push(this.startingUrl);
