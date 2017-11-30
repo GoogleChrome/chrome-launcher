@@ -72,7 +72,6 @@ function resolveChromePath() {
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 function linux() {
-    console.log('&&& In linux()');
     let installations = [];
     // 1. Look into CHROME_PATH env variable
     const customChromePath = resolveChromePath();
@@ -189,10 +188,13 @@ function findChromeExecutables(folder) {
     const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
 
     // Test which grep options we can use
+    let statement = '';
     console.log(`################### TEST 1 ########################`);
-    console.log(' * using -ER');
+    statement = `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`;
+    console.log(` * using '${statement}'`);
+
     try {
-        console.log(execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
+        console.log(execSync(statement))
     } catch (eNested) {
         console.log(`ERROR`);
         console.log(eNested);
@@ -201,9 +203,11 @@ function findChromeExecutables(folder) {
     console.log('')
     
     console.log(`################### TEST 2 ########################`);
-    console.log(' * using -Er');
+    statement = `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`;
+    console.log(` * using '${statement}'`);
+
     try {
-        console.log(execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
+        console.log(execSync(statement))
     } catch (eNested) {
         console.log(`ERROR`);
         console.log(eNested);
