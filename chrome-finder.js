@@ -72,6 +72,7 @@ function resolveChromePath() {
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 function linux() {
+    console.log('&&& In linux()');
     let installations = [];
     // 1. Look into CHROME_PATH env variable
     const customChromePath = resolveChromePath();
@@ -186,34 +187,41 @@ function uniq(arr) {
 function findChromeExecutables(folder) {
     const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
     const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
+
+    // Test which grep options we can use
+    console.log(`################### TEST 1 ########################`);
+    console.log(' * using -ER');
+    try {
+        console.log(execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
+    } catch (eNested) {
+        console.log(`ERROR`);
+        console.log(eNested);
+    }
+    console.log('')
+    console.log('')
+    
+    console.log(`################### TEST 2 ########################`);
+    console.log(' * using -Er');
+    try {
+        console.log(execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
+    } catch (eNested) {
+        console.log(`ERROR`);
+        console.log(eNested);
+    }
+    console.log('')
+    console.log('')
+
+        
+
+
+
     let installations = [];
     if (canAccess(folder)) {
         // Output of the grep & print looks like:
         //    /opt/google/chrome/google-chrome --profile-directory
         //    /home/user/Downloads/chrome-linux/chrome-wrapper %U 
 
-        // Test which grep options we can use
-        console.log(`################### TEST 1 ########################`);
-        console.log(' * using -ER');
-        try {
-            console.log(execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
-        } catch (eNested) {
-            console.log(`ERROR`);
-            console.log(eNested);
-        }
-        console.log('')
-        console.log('')
-        
-        console.log(`################### TEST 2 ########################`);
-        console.log(' * using -Er');
-        try {
-            console.log(execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
-        } catch (eNested) {
-            console.log(`ERROR`);
-            console.log(eNested);
-        }
-        console.log('')
-        console.log('')
+
         let execPaths;
         try {
             execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
