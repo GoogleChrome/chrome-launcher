@@ -228,11 +228,21 @@ function findChromeExecutables(folder: string): Array<string> {
   if (canAccess(folder)) {
     // Output of the grep & print looks like:
     //    /opt/google/chrome/google-chrome --profile-directory
-    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
-    let execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
-                        .toString()
-                        .split(newLineRegex)
-                        .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
+    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U 
+    let execPaths;
+    try {
+      execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
+        .toString()
+        .split(newLineRegex)
+        .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));  
+    } catch (e) {
+      // for Alpine linux, brutally retry without "-R".
+      execPaths = execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
+        .toString()
+        .split(newLineRegex)
+        .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
+    }  
+
 
     execPaths.forEach((execPath: string) => canAccess(execPath) && installations.push(execPath));
   }
