@@ -198,10 +198,14 @@ function findChromeExecutables(folder) {
     try {
         // This should match a line in the /etc/hosts file
         const testResult = execSync('grep -ER "^127\.0" /etc').toString();
-        if(testResult.indexOf('unrecognized option: R') > -1) grepOptions = '-Er'
+        if (testResult.indexOf('unrecognized option: R') > -1) grepOptions = '-Er';
     } catch (testError) {
         // There was some sort of error
-        console.log(`There was an error testing the grep options... err.name: '${testError.name}', err.message: '${testError.message}'`);
+        if (testError.message.indexOf('Command failed: grep -ER') > -1) {
+            grepOptions = '-Er'
+        } else {
+            console.log(`There was an error testing the grep options... err.name: '${testError.name}', err.message: '${testError.message}'`);
+        }
     }
 
     console.log(`################### DEBUGGING ########################`);
