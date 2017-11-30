@@ -199,6 +199,18 @@ function findChromeExecutables(folder) {
                 .map((execPath) => execPath.replace(argumentsRegex, '$1'));
         }
         catch (e) {
+            console.log(`grep -R probably not supported, falling back to grep -r (e.name -> ${e.name}, e.message -> ${e.message}`);
+
+            console.log(`-----------------------------------------------------------------------`);
+            try {
+                console.log(execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`))
+            } catch (eNested) {
+                console.log(`ERROR`);
+                console.log(eNested);
+            }
+            
+
+            console.log(`-----------------------------------------------------------------------`);
             // for Alpine linux, brutally retry without "-R".
             execPaths = execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
                 .toString()
