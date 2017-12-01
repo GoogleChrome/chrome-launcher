@@ -72,7 +72,7 @@ function resolveChromePath() {
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 function linux() {
-    const debugRoutine = true;
+    const debugRoutine = false;
     let installations = [];
     // 1. Look into CHROME_PATH env variable
     const customChromePath = resolveChromePath();
@@ -192,7 +192,7 @@ function uniq(arr) {
     return Array.from(new Set(arr));
 }
 function findChromeExecutables(folder) {
-    const debugRoutine = true;
+    const debugRoutine = false;
     const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
     const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
 
