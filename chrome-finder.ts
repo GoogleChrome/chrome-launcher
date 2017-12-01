@@ -91,6 +91,7 @@ function resolveChromePath() {
  * 3. Look for google-chrome-stable & google-chrome executables by using the which command
  */
 export function linux() {
+  const debugRoutine = false;
   let installations: string[] = [];
 
   // 1. Look into CHROME_PATH env variable
@@ -127,6 +128,12 @@ export function linux() {
     }
   });
 
+  if (debugRoutine) {
+    console.log(`*****************************************`);
+    console.log(`- installations: '${installations.join()}'`);
+    console.log(`*****************************************`);        
+  } 
+    
   if (!installations.length) {
     throw new Error(
         'The environment variable CHROME_PATH must be set to ' +
@@ -221,21 +228,52 @@ function uniq(arr: Array<any>) {
 }
 
 function findChromeExecutables(folder: string): Array<string> {
-  const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
-  const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
+    const debugRoutine = false;
+    const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
+    const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
+    let installations: Array<string> = [];
+    
+    // The supported options are determined by the Linux distribution
+    // Use a very simple test to check which is supported
+    let grepOptions = '-ER';
+    try {
+        // This should match a line in the /etc/hosts file
+        const testResult = execSync('grep -ER "^127\.0" /etc').toString();
+        if (testResult.indexOf('unrecognized option: R') > -1) grepOptions = '-Er';
+    } catch (testError) {
+        // There was some sort of error
+        if (testError.message.indexOf('Command failed: grep -ER') > -1) {
+            grepOptions = '-Er'
+        } else {
+            console.log(`There was an error testing the grep options... err.name: '${testError.name}', err.message: '${testError.message}'`);
+        }
+    }
 
-  let installations: Array<string> = [];
-  if (canAccess(folder)) {
-    // Output of the grep & print looks like:
-    //    /opt/google/chrome/google-chrome --profile-directory
-    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
-    let execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`)
-                        .toString()
-                        .split(newLineRegex)
-                        .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
+    let statement = `grep ${grepOptions} "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`;
+    if (debugRoutine) {
+        console.log(`################### DEBUGGING ########################`);
+        console.log(` * using '${statement}'`);        
+    }
 
-    execPaths.forEach((execPath: string) => canAccess(execPath) && installations.push(execPath));
-  }
+    if (canAccess(folder)) {
+        // Output of the grep & print looks like:
+        //    /opt/google/chrome/google-chrome --profile-directory
+        //    /home/user/Downloads/chrome-linux/chrome-wrapper %U 
+        let execPaths;
+        
+        execPaths = execSync(statement)
+            .toString()
+            .split(newLineRegex)
+            .map((execPath) => execPath.replace(argumentsRegex, '$1'));
+        
 
-  return installations;
+        execPaths.forEach((execPath) => canAccess(execPath) && installations.push(execPath));
+    }
+
+    if (debugRoutine) {
+        console.log(`- installations: '${installations.join()}'`);
+        console.log(`################### END DEBUGGING ########################`);
+    }
+
+    return installations;
 }
