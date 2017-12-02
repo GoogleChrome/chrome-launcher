@@ -10,7 +10,7 @@ import {execSync} from 'child_process';
 import * as mkdirp from 'mkdirp';
 const isWsl = require('is-wsl');
 
-export function defaults<T>(val: T|undefined, def: T): T {
+export function defaults<T>(val: T | undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
 
