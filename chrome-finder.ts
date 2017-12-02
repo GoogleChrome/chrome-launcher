@@ -231,6 +231,8 @@ function findChromeExecutables(folder: string): Array<string> {
     //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
     let execPaths;
 
+    // Some systems do not support grep -R so fallback to -r.
+    // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
     try {
       execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`);
     } catch (e) {
