@@ -58,7 +58,7 @@ const sigintListener = async () => {
   process.exit(_SIGINT_EXIT_CODE);
 };
 
-export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
+async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
   const instance = new Launcher(opts);
@@ -82,7 +82,7 @@ export async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   return {pid: instance.pid!, port: instance.port!, kill};
 }
 
-export class Launcher {
+class Launcher {
   private tmpDirandPidFileReady = false;
   private pidFile: string;
   private startingUrl: string;
@@ -355,3 +355,6 @@ export class Launcher {
     });
   }
 };
+
+export default Launcher;
+export {Launcher, launch};
