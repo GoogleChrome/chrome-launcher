@@ -52,9 +52,12 @@ export interface ModuleOverrides {
 }
 
 const sigintListener = async () => {
-  for (const instance of instances) {
+  // Since sets are not iterable below es2015 we need
+  // too `.forEach` iterate over the set.
+  // https://github.com/Microsoft/TypeScript/issues/6842
+  instances.forEach(async (instance) => {
     await instance.kill();
-  }
+  });
   process.exit(_SIGINT_EXIT_CODE);
 };
 
