@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2016",
+        "target": "es5",
         "declaration": true,
         "noImplicitAny": true,
         "inlineSourceMap": true,
@@ -9,7 +9,11 @@
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "lib": [
+            "es2015",
+            "es2016.array.include"
+        ]
     },
     "exclude": [
         "node_modules"

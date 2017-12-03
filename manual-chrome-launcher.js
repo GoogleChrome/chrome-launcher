@@ -14,7 +14,7 @@
  */
 
 require('./compiled-check.js')('chrome-launcher.js');
-const {launch} = require('./chrome-launcher');
+const launch = require('./chrome-launcher').launch;
 
 const args = process.argv.slice(2);
 let chromeFlags;
