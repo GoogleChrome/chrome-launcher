@@ -73,6 +73,9 @@ npm install chrome-launcher
   // (optional) A number of retries, before browser launch considered unsuccessful.
   // Default: 50
   maxConnectionRetries: number;
+
+  // (optional) A dict of environmental key value pairs to pass to the spawned chrome process.
+  envVars: {[key: string]: string};
 };
 ```
 

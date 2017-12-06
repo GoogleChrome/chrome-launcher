@@ -37,6 +37,7 @@ export interface Options {
   enableExtensions?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
+  envVars?: {[key: string]: string};
 }
 
 export interface LaunchedChrome {
@@ -99,6 +100,7 @@ class Launcher {
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
+  private envVars: {[key: string]: string};
 
   userDataDir?: string;
   port?: number;
@@ -119,6 +121,7 @@ class Launcher {
     this.enableExtensions = defaults(this.opts.enableExtensions, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
+    this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
 
     if (typeof this.opts.userDataDir === 'boolean') {
       if (!this.opts.userDataDir) {
@@ -231,7 +234,8 @@ class Launcher {
       log.verbose(
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       const chrome = this.spawn(
-          execPath, this.flags, {detached: true, stdio: ['ignore', this.outFile, this.errFile]});
+          execPath, this.flags,
+          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
 
       this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
