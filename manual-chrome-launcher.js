@@ -13,8 +13,8 @@
  *     chrome-debug --enable-extensions
  */
 
-require('./compiled-check.js')('chrome-launcher.js');
-const {launch} = require('./chrome-launcher');
+require('./compiled-check.js')('./dist/chrome-launcher.js');
+const {launch} = require('./dist/chrome-launcher');
 
 const args = process.argv.slice(2);
 let chromeFlags;

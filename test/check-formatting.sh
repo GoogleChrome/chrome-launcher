@@ -12,4 +12,4 @@ check_formatting ()
   fi
 }
 
-check_formatting "`find . -type f \! -path '*node_modules*' \! -name '*.d.ts' -name '*.ts'`"
+check_formatting "`find src -type f -name '*.ts'`"
