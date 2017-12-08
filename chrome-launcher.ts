@@ -96,13 +96,13 @@ class Launcher {
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
-  chrome?: childProcess.ChildProcess;
   private fs: typeof fs;
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
 
-  private userDataDir?: string;
+  chrome?: childProcess.ChildProcess;
+  userDataDir?: string;
   port?: number;
   pid?: number;
 
