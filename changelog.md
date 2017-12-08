@@ -1,3 +1,15 @@
+## 0.10.0 (Fri, Dec 8 2017)
+* `449c5238` Expose launched chrome child process object. (#67)
+* `0978891c` Enable users to pass env vars into spawned chrome. (#66)
+* `0261f43b` Add document covering the various chrome flags
+* `5617473c` Make launcher the default export. (#63)
+* `483acff5` fix: support alpine linux by retrying grep with -r  (#61)
+* `eaa0bb87` docs: update maxConnectionRetries default to 50 (#58)
+
+## 0.9.0 (Mon, 27 Nov 2017)
+* `4cc9c075` New: Add `userDataDir` flag to use default user profile instead (#48)
+* `94137051` Avoid selecting google-emacs (#35)
+
 ## 0.8.0 (Wed, 20 Sept 2017)
 * `256399c` Add support for Windows Subsystem for Linux / BashOnWindows (#27)
 
