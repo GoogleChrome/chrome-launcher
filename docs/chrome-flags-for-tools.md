@@ -103,4 +103,6 @@ These flags are being used in various tools. They also just need to be documente
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
 * [Puppeteer's flags](https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/webpagetest/blob/master/agent/wptdriver/web_browser.cc)
-* [Peter.sh's canonical list of chrome command-line switches](http://peter.sh/experiments/chromium-command-line-switches/)
+
+## All Chrome flags
+* [Peter.sh's canonical list of Chrome command-line switches](http://peter.sh/experiments/chromium-command-line-switches/)
