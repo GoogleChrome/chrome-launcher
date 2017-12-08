@@ -87,11 +87,14 @@ npm install chrome-launcher
 // The remote debugging port exposed by the launched chrome
 chrome.port: number;
 
-// Method kill Chrome (and cleanup the profile folder)
+// Method to kill Chrome (and cleanup the profile folder)
 chrome.kill: () => Promise<{}>;
 
 // The process id
 chrome.pid: number;
+
+// The childProcess object for the launched Chrome
+chrome.process: childProcess
 ```
 
 

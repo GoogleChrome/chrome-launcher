@@ -13,6 +13,7 @@ import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat} from './utils';
+import {ChildProcess} from 'child_process';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
@@ -43,6 +44,7 @@ export interface Options {
 export interface LaunchedChrome {
   pid: number;
   port: number;
+  process: ChildProcess;
   kill: () => Promise<{}>;
 }
 
@@ -80,7 +82,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     return instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill};
+  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
 }
 
 class Launcher {
@@ -95,13 +97,13 @@ class Launcher {
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
-  private chrome?: childProcess.ChildProcess;
   private fs: typeof fs;
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string};
 
+  chrome?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
   pid?: number;
