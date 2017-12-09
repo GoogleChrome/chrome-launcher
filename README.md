@@ -62,9 +62,9 @@ npm install chrome-launcher
   // Default: 'info'
   logLevel: string;
 
-  // (optional) Enable extension loading
+  // (optional) Flags specific in [flags.ts](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts) will not be included.
   // Default: false
-  enableExtensions: boolean;
+  ignoreDefaultFlags: booelan;
 
   // (optional) Interval in ms, which defines how often launcher checks browser port to be ready.
   // Default: 500
