@@ -326,7 +326,7 @@ class Launcher {
           if (isWindows) {
             execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
           } else {
-            process.kill(-this.chrome.pid);
+            execSync(`kill -9 -${this.chrome.pid}`);
           }
         } catch (err) {
           log.warn('ChromeLauncher', `Chrome could not be killed ${err.message}`);
