@@ -16,7 +16,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import {toWinDirFormat} from '../utils';
+import {toWinDirFormat} from '../src/utils';
 
 describe('WSL path format to Windows', () => {
   it('transforms basic path', () => {

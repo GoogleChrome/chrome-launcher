@@ -6,7 +6,7 @@
 
 'use strict';
 
-import {launch} from '../chrome-launcher';
+import {launch} from '../src/';
 import * as assert from 'assert';
 
 const log = require('lighthouse-logger');

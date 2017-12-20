@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher} from '../chrome-launcher';
+import {Launcher} from '../src/';
 import {spy, stub} from 'sinon';
 import * as assert from 'assert';
 

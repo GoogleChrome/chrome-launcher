@@ -10,8 +10,8 @@ test/
 .travis.yml
 gulpfile.js
 
-# exclude source TypeScript files
-*.ts
+# ignore TypeScript source files
+src/
 
-# allow TypeScript Declaration Files
-!*.d.ts
+# allow JS & TypeScript declaration files
+!dist/
