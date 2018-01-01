@@ -50,7 +50,7 @@ export function toWinDirFormat(dir: string = ''): string {
 
 export function getLocalAppDataPath(): string {
   const path = process.env.PATH;
-  const userRegExp = /\/mnt\/([a-z])\/Users\/(.+?)\/AppData\//;
+  const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
   return `/mnt/${results[1]}/Users/${results[2]}/AppData/Local`;
