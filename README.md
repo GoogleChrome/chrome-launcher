@@ -38,7 +38,7 @@ npm install chrome-launcher
 
   // (optional) Additional flags to pass to Chrome, for example: ['--headless', '--disable-gpu']
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
-  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts
+  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts
   chromeFlags: Array<string>;
 
   // (optional) Close the Chrome process on `Ctrl-C`
