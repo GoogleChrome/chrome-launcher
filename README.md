@@ -5,7 +5,7 @@
 
 Launch Google Chrome with ease from node.
 
-* [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts) that add noise to automated scenarios
+* [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts) that add noise to automated scenarios
 * Opens up the browser's `remote-debugging-port` on an available port
 * Automagically locates a Chrome binary to launch
 * Uses a fresh Chrome profile for each launch, and cleans itself up on `kill()`
@@ -38,7 +38,7 @@ npm install chrome-launcher
 
   // (optional) Additional flags to pass to Chrome, for example: ['--headless', '--disable-gpu']
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
-  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts
+  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts
   chromeFlags: Array<string>;
 
   // (optional) Close the Chrome process on `Ctrl-C`
