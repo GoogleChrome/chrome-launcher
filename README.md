@@ -12,6 +12,8 @@ Launch Google Chrome with ease from node.
 * Binds `Ctrl-C` (by default) to terminate the Chrome process
 * Exposes a small set of [options](#api) for configurability over these details
 
+Interacting the page and browser must be done with the [devtools protocol](https://chromedevtools.github.io/devtools-protocol/), typically via [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface/). [Puppeteer](https://github.com/GoogleChrome/puppeteer) is recommended, though it has its own chrome launching mechanism.
+
 ### Installing
 
 ```sh
