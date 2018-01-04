@@ -32,8 +32,8 @@ describe('WSL path format to Windows', () => {
   });
 
   it('getLocalAppDataPath returns a correct path', () => {
-    process.env.PATH = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1/AppData/';
+    const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
     const appDataPath = '/mnt/c/Users/user1/AppData/Local';
-    assert.equal(getLocalAppDataPath(), appDataPath);
+    assert.equal(getLocalAppDataPath(path), appDataPath);
   });
 });

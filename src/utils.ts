@@ -29,7 +29,7 @@ export function makeTmpDir() {
       return makeUnixTmpDir();
     case 'wsl':
       // We populate the user's Windows temp dir so the folder is correctly created later
-      process.env.TEMP = getLocalAppDataPath();
+      process.env.TEMP = getLocalAppDataPath(process.env.PATH);
     case 'win32':
       return makeWin32TmpDir();
     default:
@@ -48,9 +48,8 @@ export function toWinDirFormat(dir: string = ''): string {
       .replace(/\//g, '\\');
 }
 
-export function getLocalAppDataPath(): string {
-  const path = process.env.PATH;
-  const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/]+)\/AppData\//;
+export function getLocalAppDataPath(path: string): string {
+  const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
   return `/mnt/${results[1]}/Users/${results[2]}/AppData/Local`;
