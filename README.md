@@ -5,12 +5,14 @@
 
 Launch Google Chrome with ease from node.
 
-* [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts) that add noise to automated scenarios
+* [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts) that add noise to automated scenarios
 * Opens up the browser's `remote-debugging-port` on an available port
 * Automagically locates a Chrome binary to launch
 * Uses a fresh Chrome profile for each launch, and cleans itself up on `kill()`
 * Binds `Ctrl-C` (by default) to terminate the Chrome process
 * Exposes a small set of [options](#api) for configurability over these details
+
+Once launched, interacting with the browser must be done over the [devtools protocol](https://chromedevtools.github.io/devtools-protocol/), typically via [chrome-remote-interface](https://github.com/cyrus-and/chrome-remote-interface/). For many cases [Puppeteer](https://github.com/GoogleChrome/puppeteer) is recommended, though it has its own chrome launching mechanism.
 
 ### Installing
 
@@ -36,7 +38,7 @@ npm install chrome-launcher
 
   // (optional) Additional flags to pass to Chrome, for example: ['--headless', '--disable-gpu']
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
-  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts
+  // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts
   chromeFlags: Array<string>;
 
   // (optional) Close the Chrome process on `Ctrl-C`
