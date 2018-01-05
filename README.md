@@ -64,7 +64,8 @@ npm install chrome-launcher
   // Default: 'info'
   logLevel: string;
 
-  // (optional) Flags specific in [flags.ts](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts) will not be included.
+  // (optional) Flags specific in [flags.ts](src/flags.ts) will not be included.
+  // Typically used with the defaultFlags() method and chromeFlags option.
   // Default: false
   ignoreDefaultFlags: booelan;
 
@@ -99,6 +100,11 @@ chrome.pid: number;
 chrome.process: childProcess
 ```
 
+### `.defaultFlags()`
+
+Returns an `Array<string>` of the default [flags](docs/chrome-flags-for-tools.md) Chrome is launched with. Typically used along with the `ignoreDefaultFlags` and `chromeFlags` options.
+
+Note: This array will exclude the following flags: `--remote-debugging-port` `--disable-setuid-sandbox` `--user-data-dir`.
 
 ## Examples
 
