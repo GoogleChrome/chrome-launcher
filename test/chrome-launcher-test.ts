@@ -5,7 +5,9 @@
  */
 'use strict';
 
-import {Launcher, Options} from '../chrome-launcher';
+import {Launcher, Options} from '../src/chrome-launcher';
+import {DEFAULT_FLAGS} from '../src/flags';
+
 import {spy, stub} from 'sinon';
 import * as assert from 'assert';
 
@@ -103,6 +105,13 @@ describe('Launcher', () => {
     await chromeInstance.launch();
     assert.strictEqual(pid, chromeInstance.pid);
     await chromeInstance.kill();
+  });
+
+  it('gets all default flags', async () => {
+    const chromeInstance = new Launcher();
+    const flags = chromeInstance.defaultFlags();
+    assert.ok(flags.length);
+    assert.deepStrictEqual(flags, DEFAULT_FLAGS);
   });
 
   it('removes all default flags', async () => {

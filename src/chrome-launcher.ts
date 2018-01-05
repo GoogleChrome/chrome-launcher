@@ -158,6 +158,10 @@ class Launcher {
     return flags;
   }
 
+  defaultFlags() {
+    return DEFAULT_FLAGS;
+  }
+
   // Wrapper function to enable easy testing.
   makeTmpDir() {
     return makeTmpDir();
