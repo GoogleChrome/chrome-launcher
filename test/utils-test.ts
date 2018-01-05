@@ -16,7 +16,7 @@
 'use strict';
 
 import * as assert from 'assert';
-import {toWinDirFormat} from '../src/utils';
+import {toWinDirFormat, getLocalAppDataPath} from '../src/utils';
 
 describe('WSL path format to Windows', () => {
   it('transforms basic path', () => {
@@ -29,5 +29,11 @@ describe('WSL path format to Windows', () => {
     const wsl = '/mnt/d/Users/user1/AppData';
     const windows = 'D:\\Users\\user1\\AppData';
     assert.equal(toWinDirFormat(wsl), windows);
+  });
+
+  it('getLocalAppDataPath returns a correct path', () => {
+    const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
+    const appDataPath = '/mnt/c/Users/user1/AppData/Local';
+    assert.equal(getLocalAppDataPath(path), appDataPath);
   });
 });
