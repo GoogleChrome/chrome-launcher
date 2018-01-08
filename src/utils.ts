@@ -29,7 +29,7 @@ export function makeTmpDir() {
       return makeUnixTmpDir();
     case 'wsl':
       // We populate the user's Windows temp dir so the folder is correctly created later
-      process.env.TEMP = getLocalAppDataPath(process.env.PATH);
+      process.env.TEMP = getLocalAppDataPath(`${process.env.PATH}`);
     case 'win32':
       return makeWin32TmpDir();
     default:
