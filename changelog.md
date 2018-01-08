@@ -1,3 +1,12 @@
+## v0.10.2 (Mon, Jan 8 2018)
+* `ef91605f` Fix TS typing (#82)
+* `baf2205f` tests(travis): test on Node 9, drop testing on Node 7 (#80)
+
+## v0.10.1 (Fri, Jan 5 2018)
+* `a5bc8180` Fix getLocalAppDataPath for wsl (#75)
+* `70a91885` readme: recommend use of cri with chrome-launcher (#78)
+* `d3ee63bd` folder refactor: ts in /src, js in /dist (#69)
+
 ## 0.10.0 (Fri, Dec 8 2017)
 * `449c5238` Expose launched chrome child process object. (#67)
 * `0978891c` Enable users to pass env vars into spawned chrome. (#66)
