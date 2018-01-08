@@ -30,6 +30,7 @@
     "rimraf": "^2.6.1"
   },
   "version": "0.10.1",
+  "types": "./src/index.ts",
   "description": "Launch latest Chrome with the Devtools Protocol port open",
   "repository": "https://github.com/GoogleChrome/chrome-launcher/",
   "author": "The Chromium Authors",
