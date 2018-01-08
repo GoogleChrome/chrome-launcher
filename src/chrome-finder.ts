@@ -58,11 +58,11 @@ export function darwin() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.push({regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH), weight: 150});
+    priorities.push({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 150});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.push({regex: new RegExp(process.env.CHROME_PATH), weight: 151});
+    priorities.push({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 151});
   }
 
   // clang-format on
@@ -70,11 +70,11 @@ export function darwin() {
 }
 
 function resolveChromePath() {
-  if (canAccess(process.env.CHROME_PATH)) {
+  if (canAccess(`${process.env.CHROME_PATH}`)) {
     return process.env.CHROME_PATH;
   }
 
-  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
+  if (canAccess(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`)) {
     log.warn(
         'ChromeLauncher',
         'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
@@ -142,11 +142,11 @@ export function linux() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.push({regex: new RegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH), weight: 100});
+    priorities.push({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 100});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.push({regex: new RegExp(process.env.CHROME_PATH), weight: 101});
+    priorities.push({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 101});
   }
 
   return sort(uniq(installations.filter(Boolean)), priorities);
@@ -154,7 +154,7 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(process.env.PATH);
+  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
   process.env.PROGRAMFILES = '/mnt/c/Program Files';
   process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
 
