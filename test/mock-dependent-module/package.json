@@ -1,0 +1,20 @@
+{
+  "name": "mock-dependent-module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "module.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "type-check": "tsc -p ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+     "chrome-launcher": "0.10.1"
+  },
+  "devDependencies": {
+     "@types/node": "*",
+     "typescript": "^2.6.1"
+  }
+}

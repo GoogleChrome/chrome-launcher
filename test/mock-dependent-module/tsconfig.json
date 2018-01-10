@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "commonjs",
+    "target": "ES2017",
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    // "listFiles": true,
+    "typeRoots": [
+      "@types",
+      "node_modules/@types",
+      "./typings"
+    ],
+    "diagnostics": true
+  },
+  "include": [
+    "./module.js",
+    "./typings/externs.d.ts"
+  ]
+}
