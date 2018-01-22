@@ -83,6 +83,7 @@ Disable PlzNavigate.
 These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
 
 ```sh
+--disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
 --no-default-browser-check
 --process-per-tab
 --new-window
