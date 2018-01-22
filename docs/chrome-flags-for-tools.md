@@ -16,9 +16,6 @@ safe browsing service, upgrade detector, translate, UMA
 Disable fetching safebrowsing lists. Otherwise requires a 500KB download immediately after launch.
 This flag is likely redundant if disable-background-networking is on
 
-### `--disable-translate`
-Disable built-in Google Translate service
-
 ### `--disable-sync`
 Disable syncing to a Google account
 
@@ -97,6 +94,12 @@ These flags are being used in various tools. They also just need to be documente
 --disable-datasaver-prompt
 --disable-domain-reliability
 ```
+
+## Removed flags
+
+### ~`--disable-translate`~
+[Removed now.](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service. 
+
 
 ## Sources
 
