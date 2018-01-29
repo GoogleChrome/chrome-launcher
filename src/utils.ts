@@ -18,6 +18,19 @@ export async function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
+export class ChromeLauncherError extends Error {
+  message: string;
+  code: string;
+  constructor(message: string, code?: string) {
+    super();
+    this.message = message;
+    if (code) {
+      this.code = code;
+    }
+    this.stack = new Error().stack;
+  }
+}
+
 export function getPlatform() {
   return isWsl ? 'wsl' : process.platform;
 }
@@ -33,7 +46,8 @@ export function makeTmpDir() {
     case 'win32':
       return makeWin32TmpDir();
     default:
-      throw new Error(`Platform ${getPlatform()} is not supported`);
+      throw new ChromeLauncherError(
+          `Platform ${getPlatform()} is not supported`, 'ERR_CHROME_UNSUPPORTED_PLATFORM');
   }
 }
 

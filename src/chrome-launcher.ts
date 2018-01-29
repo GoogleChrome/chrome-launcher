@@ -12,7 +12,7 @@ import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat} from './utils';
+import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, ChromeLauncherError} from './utils';
 import {ChildProcess} from 'child_process';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
@@ -130,7 +130,8 @@ class Launcher {
         this.useDefaultProfile = true;
         this.userDataDir = undefined;
       } else {
-        throw new Error('userDataDir must be false or a path');
+        throw new ChromeLauncherError(
+            'userDataDir must be false or a path', 'ERR_CHROME_INVALID_USER_DATA_DIRECTORY');
       }
     } else {
       this.useDefaultProfile = false;
@@ -169,7 +170,8 @@ class Launcher {
   prepare() {
     const platform = getPlatform() as SupportedPlatforms;
     if (!_SUPPORTED_PLATFORMS.has(platform)) {
-      throw new Error(`Platform ${platform} is not supported`);
+      throw new ChromeLauncherError(
+          `Platform ${platform} is not supported`, 'ERR_CHROME_UNSUPPORTED_PLATFORM');
     }
 
     this.userDataDir = this.userDataDir || this.makeTmpDir();
@@ -198,11 +200,10 @@ class Launcher {
             `No debugging port found on port ${this.port}, launching a new Chrome.`);
       }
     }
-
     if (this.chromePath === undefined) {
       const installations = await chromeFinder[getPlatform() as SupportedPlatforms]();
       if (installations.length === 0) {
-        throw new Error('No Chrome Installations Found');
+        throw new ChromeLauncherError('No Chrome Installations Found', 'ERR_CHROME_NOT_INSTALLED');
       }
 
       this.chromePath = installations[0];
