@@ -12,7 +12,7 @@ import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat} from './utils';
+import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
@@ -38,7 +38,7 @@ export interface Options {
   enableExtensions?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
-  envVars?: {[key: string]: string | undefined};
+  envVars?: {[key: string]: string|undefined};
 }
 
 export interface LaunchedChrome {
@@ -101,7 +101,7 @@ class Launcher {
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
-  private envVars: {[key: string]: string | undefined};
+  private envVars: {[key: string]: string|undefined};
 
   chrome?: childProcess.ChildProcess;
   userDataDir?: string;
@@ -130,7 +130,7 @@ class Launcher {
         this.useDefaultProfile = true;
         this.userDataDir = undefined;
       } else {
-        throw new Error('userDataDir must be false or a path');
+        throw new InvalidUserDataDirectoryError();
       }
     } else {
       this.useDefaultProfile = false;
@@ -169,7 +169,7 @@ class Launcher {
   prepare() {
     const platform = getPlatform() as SupportedPlatforms;
     if (!_SUPPORTED_PLATFORMS.has(platform)) {
-      throw new Error(`Platform ${platform} is not supported`);
+      throw new UnsupportedPlatformError();
     }
 
     this.userDataDir = this.userDataDir || this.makeTmpDir();
@@ -198,11 +198,10 @@ class Launcher {
             `No debugging port found on port ${this.port}, launching a new Chrome.`);
       }
     }
-
     if (this.chromePath === undefined) {
       const installations = await chromeFinder[getPlatform() as SupportedPlatforms]();
       if (installations.length === 0) {
-        throw new Error('No Chrome Installations Found');
+        throw new ChromeNotInstalledError();
       }
 
       this.chromePath = installations[0];
@@ -310,7 +309,6 @@ class Launcher {
             });
       };
       poll();
-
     });
   }
 

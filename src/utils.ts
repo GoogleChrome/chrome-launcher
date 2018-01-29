@@ -10,12 +10,48 @@ import {execSync} from 'child_process';
 import * as mkdirp from 'mkdirp';
 const isWsl = require('is-wsl');
 
-export function defaults<T>(val: T | undefined, def: T): T {
+export const enum LaunchErrorCodes {
+  ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
+  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
+  ERR_LAUNCHER_UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
+  ERR_LAUNCHER_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
+}
+
+export function defaults<T>(val: T|undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
 
 export async function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
+}
+
+export class LauncherError extends Error {
+  constructor(public message: string = 'Unexpected error', public code?: string) {
+    super();
+    this.stack = new Error().stack;
+    return this;
+  }
+}
+
+export class ChromePathNotSetError extends LauncherError {
+  message =
+      'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+  code = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
+}
+
+export class InvalidUserDataDirectoryError extends LauncherError {
+  message = 'userDataDir must be false or a path.';
+  code = LaunchErrorCodes.ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY;
+}
+
+export class UnsupportedPlatformError extends LauncherError {
+  message = `Platform ${getPlatform()} is not supported.`;
+  code = LaunchErrorCodes.ERR_LAUNCHER_UNSUPPORTED_PLATFORM;
+}
+
+export class ChromeNotInstalledError extends LauncherError {
+  message = 'No Chrome installations found.';
+  code = LaunchErrorCodes.ERR_LAUNCHER_NOT_INSTALLED;
 }
 
 export function getPlatform() {
@@ -33,7 +69,7 @@ export function makeTmpDir() {
     case 'win32':
       return makeWin32TmpDir();
     default:
-      throw new Error(`Platform ${getPlatform()} is not supported`);
+      throw new UnsupportedPlatformError();
   }
 }
 
