@@ -38,7 +38,7 @@ export interface Options {
   enableExtensions?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
-  envVars?: {[key: string]: string | undefined};
+  envVars?: {[key: string]: string|undefined};
 }
 
 export interface LaunchedChrome {
@@ -101,7 +101,7 @@ class Launcher {
   private rimraf: typeof rimraf;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
-  private envVars: {[key: string]: string | undefined};
+  private envVars: {[key: string]: string|undefined};
 
   chrome?: childProcess.ChildProcess;
   userDataDir?: string;
@@ -309,7 +309,6 @@ class Launcher {
             });
       };
       poll();
-
     });
   }
 

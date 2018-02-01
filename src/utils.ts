@@ -17,7 +17,7 @@ export enum LaunchErrorCodes {
   CHROME_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
 }
 
-export function defaults<T>(val: T | undefined, def: T): T {
+export function defaults<T>(val: T|undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
 
@@ -41,7 +41,8 @@ export class LauncherError extends Error {
 
 export class ChromePathNotSetError implements LauncherError {
   name: string = 'ChromePathNotSetError';
-  message: string = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+  message: string =
+      'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
   code: string = LaunchErrorCodes.PATH_NOT_SET;
 }
 
