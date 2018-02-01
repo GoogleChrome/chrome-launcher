@@ -16,7 +16,7 @@
     "mocha": "^3.2.0",
     "nyc": "^11.0.2",
     "sinon": "^2.3.5",
-    "ts-node": "^3.0.4",
+    "ts-node": "4.1.0",
     "typescript": "2.7.1"
   },
   "dependencies": {
