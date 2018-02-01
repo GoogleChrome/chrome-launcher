@@ -35,31 +35,32 @@ export class LauncherError extends Error {
       this.code = code;
     }
     this.stack = new Error().stack;
+    return this;
   }
 }
 
 export class ChromePathNotSetError implements LauncherError {
-  name: string = 'ChromePathNotSetError'
-  message: string = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.'
-  code: string = LaunchErrorCodes.PATH_NOT_SET
+  name: string = 'ChromePathNotSetError';
+  message: string = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+  code: string = LaunchErrorCodes.PATH_NOT_SET;
 }
 
 export class InvalidUserDataDirectoryError implements LauncherError {
-  name: string = 'InvalidUserDataDirectoryError'
-  message: string = 'userDataDir must be false or a path.'
-  code: string = LaunchErrorCodes.INVALID_USER_DATA_DIRECTORY
+  name: string = 'InvalidUserDataDirectoryError';
+  message: string = 'userDataDir must be false or a path.';
+  code: string = LaunchErrorCodes.INVALID_USER_DATA_DIRECTORY;
 }
 
 export class UnsupportedPlatformError implements LauncherError {
-  name: string = 'UnsupportedPlatformError'
-  message: string = `Platform ${getPlatform()} is not supported.`
-  code: string = LaunchErrorCodes.UNSUPPORTED_PLATFORM
+  name: string = 'UnsupportedPlatformError';
+  message: string = `Platform ${getPlatform()} is not supported.`;
+  code: string = LaunchErrorCodes.UNSUPPORTED_PLATFORM;
 }
 
 export class ChromeNotInstalledError implements LauncherError {
-  name: string = 'ChromeNotInstalledError'
-  message: string = 'No Chrome installations found.'
-  code: string = LaunchErrorCodes.CHROME_NOT_INSTALLED
+  name: string = 'ChromeNotInstalledError';
+  message: string = 'No Chrome installations found.';
+  code: string = LaunchErrorCodes.CHROME_NOT_INSTALLED;
 }
 
 export function getPlatform() {
