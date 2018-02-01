@@ -10,6 +10,13 @@ import {execSync} from 'child_process';
 import * as mkdirp from 'mkdirp';
 const isWsl = require('is-wsl');
 
+export enum LaunchErrorCodes {
+  PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
+  INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
+  UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
+  CHROME_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
+}
+
 export function defaults<T>(val: T | undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
@@ -18,7 +25,7 @@ export async function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export class ChromeLauncherError extends Error {
+export class LauncherError extends Error {
   message: string;
   code: string;
   constructor(message: string, code?: string) {
@@ -29,6 +36,30 @@ export class ChromeLauncherError extends Error {
     }
     this.stack = new Error().stack;
   }
+}
+
+export class ChromePathNotSetError implements LauncherError {
+  name: string = 'ChromePathNotSetError'
+  message: string = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.'
+  code: string = LaunchErrorCodes.PATH_NOT_SET
+}
+
+export class InvalidUserDataDirectoryError implements LauncherError {
+  name: string = 'InvalidUserDataDirectoryError'
+  message: string = 'userDataDir must be false or a path.'
+  code: string = LaunchErrorCodes.INVALID_USER_DATA_DIRECTORY
+}
+
+export class UnsupportedPlatformError implements LauncherError {
+  name: string = 'UnsupportedPlatformError'
+  message: string = `Platform ${getPlatform()} is not supported.`
+  code: string = LaunchErrorCodes.UNSUPPORTED_PLATFORM
+}
+
+export class ChromeNotInstalledError implements LauncherError {
+  name: string = 'ChromeNotInstalledError'
+  message: string = 'No Chrome installations found.'
+  code: string = LaunchErrorCodes.CHROME_NOT_INSTALLED
 }
 
 export function getPlatform() {
@@ -46,8 +77,7 @@ export function makeTmpDir() {
     case 'win32':
       return makeWin32TmpDir();
     default:
-      throw new ChromeLauncherError(
-          `Platform ${getPlatform()} is not supported`, 'ERR_CHROME_UNSUPPORTED_PLATFORM');
+      throw new UnsupportedPlatformError();
   }
 }
 
