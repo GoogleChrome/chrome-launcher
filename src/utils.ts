@@ -11,10 +11,10 @@ import * as mkdirp from 'mkdirp';
 const isWsl = require('is-wsl');
 
 export enum LaunchErrorCodes {
-  PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
-  INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
-  UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
-  CHROME_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
+  ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
+  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
+  ERR_LAUNCHER_UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
+  ERR_LAUNCHER_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
 }
 
 export function defaults<T>(val: T|undefined, def: T): T {
@@ -43,25 +43,25 @@ export class ChromePathNotSetError extends LauncherError {
   name: string = 'ChromePathNotSetError';
   message: string =
       'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
-  code: string = LaunchErrorCodes.PATH_NOT_SET;
+  code: string = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
 export class InvalidUserDataDirectoryError extends LauncherError {
   name: string = 'InvalidUserDataDirectoryError';
   message: string = 'userDataDir must be false or a path.';
-  code: string = LaunchErrorCodes.INVALID_USER_DATA_DIRECTORY;
+  code: string = LaunchErrorCodes.ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY;
 }
 
 export class UnsupportedPlatformError extends LauncherError {
   name: string = 'UnsupportedPlatformError';
   message: string = `Platform ${getPlatform()} is not supported.`;
-  code: string = LaunchErrorCodes.UNSUPPORTED_PLATFORM;
+  code: string = LaunchErrorCodes.ERR_LAUNCHER_UNSUPPORTED_PLATFORM;
 }
 
 export class ChromeNotInstalledError extends LauncherError {
   name: string = 'ChromeNotInstalledError';
   message: string = 'No Chrome installations found.';
-  code: string = LaunchErrorCodes.CHROME_NOT_INSTALLED;
+  code: string = LaunchErrorCodes.ERR_LAUNCHER_NOT_INSTALLED;
 }
 
 export function getPlatform() {
