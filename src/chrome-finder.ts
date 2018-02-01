@@ -11,7 +11,7 @@ const execSync = require('child_process').execSync;
 const execFileSync = require('child_process').execFileSync;
 const log = require('lighthouse-logger');
 
-import {getLocalAppDataPath, ChromeLauncherError} from './utils';
+import {getLocalAppDataPath, ChromePathNotSetError} from './utils';
 
 const newLineRegex = /\r?\n/;
 
@@ -128,10 +128,7 @@ export function linux() {
   });
 
   if (!installations.length) {
-    throw new ChromeLauncherError(
-        'The environment variable CHROME_PATH must be set to ' +
-            'executable of a build of Chromium version 54.0 or later.',
-        'ERR_CHROME_PATH_NOT_SET');
+    throw new ChromePathNotSetError();
   }
 
   const priorities: Priorities = [
