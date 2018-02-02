@@ -40,26 +40,22 @@ export class LauncherError extends Error {
 }
 
 export class ChromePathNotSetError extends LauncherError {
-  name: string = 'ChromePathNotSetError';
   message: string =
       'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
 export class InvalidUserDataDirectoryError extends LauncherError {
-  name: string = 'InvalidUserDataDirectoryError';
   message: string = 'userDataDir must be false or a path.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY;
 }
 
 export class UnsupportedPlatformError extends LauncherError {
-  name: string = 'UnsupportedPlatformError';
   message: string = `Platform ${getPlatform()} is not supported.`;
   code: string = LaunchErrorCodes.ERR_LAUNCHER_UNSUPPORTED_PLATFORM;
 }
 
 export class ChromeNotInstalledError extends LauncherError {
-  name: string = 'ChromeNotInstalledError';
   message: string = 'No Chrome installations found.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_NOT_INSTALLED;
 }
