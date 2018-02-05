@@ -93,13 +93,16 @@ These flags are being used in various tools. They also just need to be documente
 --disable-add-to-shelf
 --disable-datasaver-prompt
 --disable-domain-reliability
+--autoplay-policy=no-user-gesture-required 
 ```
 
 ## Removed flags
 
 ### ~`--disable-translate`~
-[Removed now.](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service. 
+[Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service. 
 
+### ~`--ignore-autoplay-restrictions`~ 
+[Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 
 ## Sources
 
