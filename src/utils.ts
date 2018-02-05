@@ -40,7 +40,8 @@ export class LauncherError extends Error {
 }
 
 export class ChromePathNotSetError extends LauncherError {
-  message = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+  message =
+      'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
