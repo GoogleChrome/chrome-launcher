@@ -10,7 +10,7 @@ import {execSync} from 'child_process';
 import * as mkdirp from 'mkdirp';
 const isWsl = require('is-wsl');
 
-export enum LaunchErrorCodes {
+export const enum LaunchErrorCodes {
   ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
   ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
   ERR_LAUNCHER_UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
