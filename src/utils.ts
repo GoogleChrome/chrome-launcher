@@ -26,8 +26,8 @@ export async function delay(time: number) {
 }
 
 export class LauncherError extends Error {
-  message: string;
-  code: string;
+  public message: string;
+  public code: string;
   constructor(message: string = 'Unexpected error', code?: string) {
     super();
     this.message = message;
@@ -40,23 +40,22 @@ export class LauncherError extends Error {
 }
 
 export class ChromePathNotSetError extends LauncherError {
-  message: string =
-      'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+  message = 'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
 export class InvalidUserDataDirectoryError extends LauncherError {
-  message: string = 'userDataDir must be false or a path.';
+  message = 'userDataDir must be false or a path.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY;
 }
 
 export class UnsupportedPlatformError extends LauncherError {
-  message: string = `Platform ${getPlatform()} is not supported.`;
+  message = `Platform ${getPlatform()} is not supported.`;
   code: string = LaunchErrorCodes.ERR_LAUNCHER_UNSUPPORTED_PLATFORM;
 }
 
 export class ChromeNotInstalledError extends LauncherError {
-  message: string = 'No Chrome installations found.';
+  message = 'No Chrome installations found.';
   code: string = LaunchErrorCodes.ERR_LAUNCHER_NOT_INSTALLED;
 }
 
