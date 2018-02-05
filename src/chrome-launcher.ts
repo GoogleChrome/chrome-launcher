@@ -275,7 +275,7 @@ class Launcher {
   }
 
   // resolves when debugger is ready, rejects after 10 polls
-  public waitUntilReady(): Promise<void> {
+  private waitUntilReady() {
     const launcher = this;
 
     return new Promise((resolve, reject) => {
