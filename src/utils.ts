@@ -28,10 +28,6 @@ export async function delay(time: number) {
 export class LauncherError extends Error {
   constructor(public message: string = 'Unexpected error', public code?: string) {
     super();
-    this.message = message;
-    if (code) {
-      this.code = code;
-    }
     this.stack = new Error().stack;
     return this;
   }
