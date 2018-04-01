@@ -13,6 +13,7 @@ cache:
 install:
   - yarn
 before_script:
+  - dbus-launch --sh-syntax
   - export DISPLAY=:99.0
   - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
   - sh -e /etc/init.d/xvfb start
