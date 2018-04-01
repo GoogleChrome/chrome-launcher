@@ -34,7 +34,7 @@ export interface Options {
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
-  logLevel?: string;
+  logLevel?: 'verbose'|'info'|'error'|'silent';
   enableExtensions?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
@@ -151,10 +151,6 @@ class Launcher {
       flags = flags.filter(flag => flag !== '--disable-extensions');
     }
 
-    if (getPlatform() === 'linux') {
-      flags.push('--disable-setuid-sandbox');
-    }
-
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
 
@@ -216,8 +212,7 @@ class Launcher {
   }
 
   private async spawnProcess(execPath: string) {
-    // Typescript is losing track of the return type without the explict typing.
-    const spawnPromise: Promise<number> = (async () => {
+    const spawnPromise = (async () => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
         return this.chrome.pid;
