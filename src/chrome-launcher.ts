@@ -151,10 +151,6 @@ class Launcher {
       flags = flags.filter(flag => flag !== '--disable-extensions');
     }
 
-    if (getPlatform() === 'linux') {
-      flags.push('--disable-setuid-sandbox');
-    }
-
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
 
