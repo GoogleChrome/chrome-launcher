@@ -22,4 +22,4 @@ COPY . .
 #build everything
 RUN yarn build
 
-ENTRYPOINT [ "/bin/bash", "-c", "yarn test-formatting && yarn test" ]
+ENTRYPOINT [ "/bin/bash", "-c", "yarn test --timeout=100000" ]
