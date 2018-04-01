@@ -58,11 +58,11 @@ export function darwin() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.push({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 150});
+    priorities.unshift({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 150});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.push({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 151});
+    priorities.unshift({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 151});
   }
 
   // clang-format on
@@ -140,11 +140,11 @@ export function linux() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.push({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 100});
+    priorities.unshift({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 100});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.push({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 101});
+    priorities.unshift({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 101});
   }
 
   return sort(uniq(installations.filter(Boolean)), priorities);
