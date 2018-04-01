@@ -12,17 +12,9 @@ import * as assert from 'assert';
 const log = require('lighthouse-logger');
 describe('Launcher', () => {
 
-  beforeEach(() => {
-    log.setLevel('error');
-  });
-
-  afterEach(() => {
-    log.setLevel('');
-  });
-
   it('exposes expected interface when launched', async () => {
     this.timeout = 3500;
-    const chrome = await launch();
+    const chrome = await launch({logLevel: 'verbose'});
     assert.notEqual(chrome.process, undefined);
     assert.notEqual(chrome.pid, undefined);
     assert.notEqual(chrome.port, undefined);
