@@ -216,8 +216,7 @@ class Launcher {
   }
 
   private async spawnProcess(execPath: string) {
-    // Typescript is losing track of the return type without the explict typing.
-    const spawnPromise: Promise<number> = (async () => {
+    const spawnPromise = (async () => {
       if (this.chrome) {
         log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
         return this.chrome.pid;
