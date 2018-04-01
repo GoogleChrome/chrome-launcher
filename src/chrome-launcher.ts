@@ -35,7 +35,7 @@ export interface Options {
   chromePath?: string;
   userDataDir?: string|boolean;
   logLevel?: string;
-  enableExtensions?: boolean;
+  ignoreDefaultFlags?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
   envVars?: {[key: string]: string|undefined};
@@ -92,7 +92,7 @@ class Launcher {
   private outFile?: number;
   private errFile?: number;
   private chromePath?: string;
-  private enableExtensions?: boolean;
+  private ignoreDefaultFlags?: boolean;
   private chromeFlags: string[];
   private requestedPort?: number;
   private connectionPollInterval: number;
@@ -120,7 +120,7 @@ class Launcher {
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
     this.requestedPort = defaults(this.opts.port, 0);
     this.chromePath = this.opts.chromePath;
-    this.enableExtensions = defaults(this.opts.enableExtensions, false);
+    this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
@@ -139,26 +139,27 @@ class Launcher {
   }
 
   private get flags() {
-    let flags = DEFAULT_FLAGS.concat([`--remote-debugging-port=${this.port}`]);
-
-    // Place Chrome profile in a custom location we'll rm -rf later
-    if (!this.useDefaultProfile) {
-      // If in WSL, we need to use the Windows format
-      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
-    }
-
-    if (this.enableExtensions) {
-      flags = flags.filter(flag => flag !== '--disable-extensions');
-    }
+    const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS;
+    flags.push(`--remote-debugging-port=${this.port}`);
 
     if (getPlatform() === 'linux') {
       flags.push('--disable-setuid-sandbox');
+    }
+
+    if (!this.useDefaultProfile) {
+      // Place Chrome profile in a custom location we'll rm -rf later
+      // If in WSL, we need to use the Windows format
+      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
     }
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
 
     return flags;
+  }
+
+  defaultFlags() {
+    return DEFAULT_FLAGS;
   }
 
   // Wrapper function to enable easy testing.
