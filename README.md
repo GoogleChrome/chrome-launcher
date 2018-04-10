@@ -67,7 +67,7 @@ npm install chrome-launcher
   // (optional) Flags specific in [flags.ts](src/flags.ts) will not be included.
   // Typically used with the defaultFlags() method and chromeFlags option.
   // Default: false
-  ignoreDefaultFlags: booelan;
+  ignoreDefaultFlags: boolean;
 
   // (optional) Interval in ms, which defines how often launcher checks browser port to be ready.
   // Default: 500
