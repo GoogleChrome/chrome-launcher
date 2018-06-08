@@ -58,7 +58,8 @@ const sigintListener = async () => {
   for (const instance of instances) {
     try {
       await instance.kill();
-    } catch (err) {}
+    } catch (err) {
+    }
   }
   process.exit(_SIGINT_EXIT_CODE);
 };
