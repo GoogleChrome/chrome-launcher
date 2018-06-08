@@ -56,7 +56,10 @@ export interface ModuleOverrides {
 
 const sigintListener = async () => {
   for (const instance of instances) {
-    await instance.kill();
+    try {
+      await instance.kill();
+    } catch (err) {
+    }
   }
   process.exit(_SIGINT_EXIT_CODE);
 };
@@ -314,9 +317,10 @@ class Launcher {
   }
 
   kill() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       if (this.chrome) {
         this.chrome.on('close', () => {
+          delete this.chrome;
           this.destroyTmp().then(resolve);
         });
 
@@ -328,10 +332,10 @@ class Launcher {
             process.kill(-this.chrome.pid);
           }
         } catch (err) {
-          log.warn('ChromeLauncher', `Chrome could not be killed ${err.message}`);
+          const message = `Chrome could not be killed ${err.message}`;
+          log.warn('ChromeLauncher', message);
+          reject(new Error(message));
         }
-
-        delete this.chrome;
       } else {
         // fail silently as we did not start chrome
         resolve();
