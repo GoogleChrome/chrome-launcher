@@ -60,9 +60,9 @@ npm install chrome-launcher
   // Default: `about:blank`
   startingUrl: string;
 
-  // (optional) Logging level: verbose, info, error, silent
+  // (optional) Logging level
   // Default: 'silent'
-  logLevel: string;
+  logLevel: 'verbose'|'info'|'error'|'silent';
 
   // (optional) Flags specific in [flags.ts](src/flags.ts) will not be included.
   // Typically used with the defaultFlags() method and chromeFlags option.
