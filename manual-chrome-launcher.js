@@ -26,7 +26,7 @@ if (args.length) {
   chromeFlags = args.filter(flag => flag.startsWith('--'));
 
   const portFlag = chromeFlags.find(flag => flag.startsWith('--port='));
-  port = portFlag && portFlag.replace('--port=', '');
+  port = portFlag && parseInt(portFlag.replace('--port=', ''), 10);
 
   enableExtensions = !!chromeFlags.find(flag => flag === '--enable-extensions');
 
