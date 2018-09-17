@@ -107,14 +107,16 @@ describe('Launcher', () => {
     await chromeInstance.kill();
   });
 
-  it('gets all default flags', async () => {
+  // TODO: restore when the ignoreDefaultFlags commit is reintroduced.
+  it.skip('gets all default flags', async () => {
     const chromeInstance = new Launcher();
     const flags = chromeInstance.defaultFlags();
     assert.ok(flags.length);
     assert.deepStrictEqual(flags, DEFAULT_FLAGS);
   });
 
-  it('removes all default flags', async () => {
+  // TODO: restore when the ignoreDefaultFlags commit is reintroduced.
+  it.skip('removes all default flags', async () => {
     const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
     assert.ok(!chromeFlags.includes('--disable-extensions'));
@@ -139,7 +141,17 @@ describe('Launcher', () => {
     assert.deepEqual(spawnOptions.env, envVars);
   });
 
-  it('ensure specific flags are present when passed and defaults are ignored', async () => {
+  // TODO: remove when the ignoreDefaultFlags commit is reintroduced.
+  it('removes --disable-extensions from flags on enableExtensions', async () => {
+    const spawnStub = await launchChromeWithOpts({
+      enableExtensions: true
+    });
+    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    assert.ok(!chromeFlags.includes('--disable-extensions'));
+  });
+
+  // TODO: restore when the ignoreDefaultFlags commit is reintroduced.
+  it.skip('ensure specific flags are present when passed and defaults are ignored', async () => {
     const spawnStub = await launchChromeWithOpts({
       ignoreDefaultFlags: true,
       chromeFlags: ['--disable-extensions', '--mute-audio', '--no-first-run']
