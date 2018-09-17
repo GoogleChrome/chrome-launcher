@@ -7,7 +7,8 @@
     "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
     "coverage": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "test-formatting": "test/check-formatting.sh",
-    "format": "scripts/format.sh"
+    "format": "scripts/format.sh",
+    "type-check": "tsc --allowJs --checkJs --noEmit --target es2016 *.js"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.41",

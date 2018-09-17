@@ -20,6 +20,7 @@ before_script:
   - yarn build
 script:
   - yarn test-formatting
+  - yarn type-check
   - yarn test
 after_success:
   - yarn run coverage
