@@ -1,3 +1,15 @@
+## v0.10.3 (Mon, Sep 17 2018)
+* `35842ba4` fix: ignore stdio on `which` call (#121)
+* `f126c3a0` fix: reject promise on failed kill() (#112)
+* `5ee0fde2` Set custom error codes for all errors.
+* `841bdf3f` Fix picking CHROME_PATH priority over other matches.
+* `6b10d748` Fix Travis CI build: GCE for chrome bug (#87)
+* `d4aa8295` Fix readme's default logLevel (#85)
+* `5be71243` Type improvements (#102)
+* `dd5fdd49` Stricter typing for logLevel (#105)
+* `c9394cf7` Fix README typo: booelan ==> boolean (#104)
+* Update chrome-flags-for-tools.md
+
 ## v0.10.2 (Mon, Jan 8 2018)
 * `ef91605f` Fix TS typing (#82)
 * `baf2205f` tests(travis): test on Node 9, drop testing on Node 7 (#80)
