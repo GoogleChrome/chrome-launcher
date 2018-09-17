@@ -1,4 +1,4 @@
-## v0.10.3 (Mon, Sep 17 2018)
+## v0.10.4 (Mon, Sep 17 2018)
 * `35842ba4` fix: ignore stdio on `which` call (#121)
 * `f126c3a0` fix: reject promise on failed kill() (#112)
 * `5ee0fde2` Set custom error codes for all errors.
@@ -9,6 +9,9 @@
 * `dd5fdd49` Stricter typing for logLevel (#105)
 * `c9394cf7` Fix README typo: booelan ==> boolean (#104)
 * Update chrome-flags-for-tools.md
+
+## v0.10.3 (Mon, Sep 17 2018)
+Bad release. Had a breaking change (#70). Unpublished.
 
 ## v0.10.2 (Mon, Jan 8 2018)
 * `ef91605f` Fix TS typing (#82)
