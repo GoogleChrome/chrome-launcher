@@ -1,3 +1,6 @@
+## v0.10.4 (Tue, Sep 25 2018)
+* `1328319b` fix: set the `which` command's stdio to pipe (#125)
+
 ## v0.10.4 (Mon, Sep 17 2018)
 * `35842ba4` fix: ignore stdio on `which` call (#121)
 * `f126c3a0` fix: reject promise on failed kill() (#112)
