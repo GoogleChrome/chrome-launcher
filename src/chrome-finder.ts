@@ -118,7 +118,7 @@ export function linux() {
   executables.forEach((executable: string) => {
     try {
       const chromePath =
-          execFileSync('which', [executable], {stdio: 'ignore'}).toString().split(newLineRegex)[0];
+          execFileSync('which', [executable], {stdio: 'pipe'}).toString().split(newLineRegex)[0];
 
       if (canAccess(chromePath)) {
         installations.push(chromePath);
