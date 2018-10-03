@@ -80,21 +80,44 @@ Disable PlzNavigate.
 These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
 
 ```sh
---disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
 --no-default-browser-check
 --process-per-tab
 --new-window
+--allow-running-insecure-content
 --silent-debugger-extension-api
+
 --disable-notifications
 --disable-desktop-notifications
---allow-running-insecure-content
 --disable-component-update
 --disable-background-downloads
 --disable-add-to-shelf
 --disable-datasaver-prompt
 --disable-domain-reliability
---autoplay-policy=no-user-gesture-required 
+--disable-breakpad # Disable crashdump collection (reporting is already disabled in Chromium)
+--disable-features=site-per-process # Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
+--disable-hang-monitor
+
+--remote-debugging-pipe # more secure than using protocol over a websocket
+--enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
+--log-level=0 # 0 means INFO and higher.
+--block-new-web-contents # All pop-ups and calls to window.open will fail.
+--js-flags=--random-seed=1157259157 --no-script-streaming
+--autoplay-policy=user-gesture-required # Don't render video
+
+--disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
+--no-sandbox # often used with headless, though ideally you don't need to.
+
+# Headless rendering stuff I definitely don't understand
+--run-all-compositor-stages-before-draw
+--disable-new-content-rendering-timeout
+--enable-features=SurfaceSynchronization
+--disable-threaded-animation
+--disable-threaded-scrolling
+--disable-checker-imaging   
+--disable-image-animation-resync
+--use-gl="" # use angle/swiftshader? 
 ```
+
 
 ## Removed flags
 
