@@ -36,6 +36,7 @@ export interface Options {
   userDataDir?: string|boolean;
   logLevel?: 'verbose'|'info'|'error'|'silent';
   enableExtensions?: boolean;
+  enableAudio?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
   envVars?: {[key: string]: string|undefined};
@@ -96,6 +97,7 @@ class Launcher {
   private errFile?: number;
   private chromePath?: string;
   private enableExtensions?: boolean;
+  private enableAudio?: boolean;
   private chromeFlags: string[];
   private requestedPort?: number;
   private connectionPollInterval: number;
@@ -124,6 +126,7 @@ class Launcher {
     this.requestedPort = defaults(this.opts.port, 0);
     this.chromePath = this.opts.chromePath;
     this.enableExtensions = defaults(this.opts.enableExtensions, false);
+    this.enableAudio = defaults(this.opts.enableAudio, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
@@ -152,6 +155,10 @@ class Launcher {
 
     if (this.enableExtensions) {
       flags = flags.filter(flag => flag !== '--disable-extensions');
+    }
+
+    if (this.enableAudio) {
+      flags = flags.filter(flag => flag !== "--mute-audio");
     }
 
     if (getPlatform() === 'linux') {
