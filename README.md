@@ -68,6 +68,10 @@ npm install chrome-launcher
   // Default: false
   enableExtensions: boolean;
 
+  // (optional) Enable audio playback
+  // Default: false
+  enableAudio: boolean;
+
   // (optional) Interval in ms, which defines how often launcher checks browser port to be ready.
   // Default: 500
   connectionPollInterval: number;
