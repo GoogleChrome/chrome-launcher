@@ -12,10 +12,6 @@ Disable all chrome extensions entirely
 Disable various background network services, including extension updating,
 safe browsing service, upgrade detector, translate, UMA
 
-### `--safebrowsing-disable-auto-update`
-Disable fetching safebrowsing lists. Otherwise requires a 500KB download immediately after launch.
-This flag is likely redundant if disable-background-networking is on
-
 ### `--disable-sync`
 Disable syncing to a Google account
 
@@ -35,10 +31,10 @@ Skip first run wizards
 Disable timers being throttled in background pages/tabs
 
 ### `--disable-client-side-phishing-detection`
-Disables client-side phishing detection. Likely redundant due to the safebrowsing disable
+Disables client-side phishing detection. 
 
 ### `--disable-popup-blocking`
-Disable popup blocking
+Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 
 ### `--disable-prompt-on-repost`
 Reloading a page that came from a POST normally prompts the user.
