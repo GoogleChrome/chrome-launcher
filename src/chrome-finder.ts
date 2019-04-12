@@ -233,9 +233,11 @@ function findChromeExecutables(folder: string): Array<string> {
     // Some systems do not support grep -R so fallback to -r.
     // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
     try {
-      execPaths = execSync(`grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+      execPaths = execSync(
+          `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     } catch (e) {
-      execPaths = execSync(`grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+      execPaths = execSync(
+          `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     }
 
     execPaths = execPaths.toString()
