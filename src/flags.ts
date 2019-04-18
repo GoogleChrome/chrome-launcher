@@ -13,8 +13,6 @@ export const DEFAULT_FLAGS = [
   // Disable various background network services, including extension updating,
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
-  // Disable fetching safebrowsing lists, likely redundant due to disable-background-networking
-  '--safebrowsing-disable-auto-update',
   // Disable syncing to a Google account
   '--disable-sync',
   // Disable reporting to UMA, but allows for collection
