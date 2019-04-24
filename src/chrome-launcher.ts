@@ -27,7 +27,7 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set();
 
-export type RimrafModule = (path: string, callback: (error: Error) => void) => void
+export type RimrafModule = (path: string, callback: (error: Error) => void) => void;
 
 export interface Options {
   startingUrl?: string;
