@@ -50,7 +50,7 @@ export interface LaunchedChrome {
 
 export interface ModuleOverrides {
   fs?: typeof fs;
-  rimraf?: typeof rimraf;
+  rimraf?(path: string, callback: (error: Error) => void): void;
   spawn?: typeof childProcess.spawn;
 }
 
