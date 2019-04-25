@@ -27,6 +27,8 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set();
 
+export type RimrafModule = (path: string, callback: (error: Error) => void) => void;
+
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
@@ -50,7 +52,7 @@ export interface LaunchedChrome {
 
 export interface ModuleOverrides {
   fs?: typeof fs;
-  rimraf?: typeof rimraf;
+  rimraf?: RimrafModule;
   spawn?: typeof childProcess.spawn;
 }
 
@@ -101,7 +103,7 @@ class Launcher {
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
-  private rimraf: typeof rimraf;
+  private rimraf: RimrafModule;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
