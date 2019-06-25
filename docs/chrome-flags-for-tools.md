@@ -12,10 +12,6 @@ Disable all chrome extensions entirely
 Disable various background network services, including extension updating,
 safe browsing service, upgrade detector, translate, UMA
 
-### `--safebrowsing-disable-auto-update`
-Disable fetching safebrowsing lists. Otherwise requires a 500KB download immediately after launch.
-This flag is likely redundant if disable-background-networking is on
-
 ### `--disable-sync`
 Disable syncing to a Google account
 
@@ -35,10 +31,10 @@ Skip first run wizards
 Disable timers being throttled in background pages/tabs
 
 ### `--disable-client-side-phishing-detection`
-Disables client-side phishing detection. Likely redundant due to the safebrowsing disable
+Disables client-side phishing detection. 
 
 ### `--disable-popup-blocking`
-Disable popup blocking
+Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 
 ### `--disable-prompt-on-repost`
 Reloading a page that came from a POST normally prompts the user.
@@ -80,21 +76,44 @@ Disable PlzNavigate.
 These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
 
 ```sh
---disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
 --no-default-browser-check
 --process-per-tab
 --new-window
+--allow-running-insecure-content
 --silent-debugger-extension-api
+
 --disable-notifications
 --disable-desktop-notifications
---allow-running-insecure-content
 --disable-component-update
 --disable-background-downloads
 --disable-add-to-shelf
 --disable-datasaver-prompt
 --disable-domain-reliability
---autoplay-policy=no-user-gesture-required 
+--disable-breakpad # Disable crashdump collection (reporting is already disabled in Chromium)
+--disable-features=site-per-process # Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
+--disable-hang-monitor
+
+--remote-debugging-pipe # more secure than using protocol over a websocket
+--enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
+--log-level=0 # 0 means INFO and higher.
+--block-new-web-contents # All pop-ups and calls to window.open will fail.
+--js-flags=--random-seed=1157259157 --no-script-streaming
+--autoplay-policy=user-gesture-required # Don't render video
+
+--disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
+--no-sandbox # often used with headless, though ideally you don't need to.
+
+# Headless rendering stuff I definitely don't understand
+--run-all-compositor-stages-before-draw
+--disable-new-content-rendering-timeout
+--enable-features=SurfaceSynchronization
+--disable-threaded-animation
+--disable-threaded-scrolling
+--disable-checker-imaging   
+--disable-image-animation-resync
+--use-gl="" # use angle/swiftshader? 
 ```
+
 
 ## Removed flags
 
@@ -106,7 +125,7 @@ These flags are being used in various tools. They also just need to be documente
 
 ## Sources
 
-* [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/flags.ts)
+* [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
 * [Puppeteer's flags](https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/webpagetest/blob/master/agent/wptdriver/web_browser.cc)

@@ -6,6 +6,7 @@
 'use strict';
 
 import {createServer} from 'http';
+import {AddressInfo} from 'net';
 
 /**
  * Return a random, unused port.
@@ -15,7 +16,7 @@ export function getRandomPort(): Promise<number> {
     const server = createServer();
     server.listen(0);
     server.once('listening', () => {
-      const port = server.address().port;
+      const {port} = server.address() as AddressInfo;
       server.close(() => resolve(port));
     });
     server.once('error', reject);
