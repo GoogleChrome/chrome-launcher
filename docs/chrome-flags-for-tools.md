@@ -45,6 +45,7 @@ Disable a few things considered not appropriate for automation. ([Original desig
 * disables the password saving UI (which covers the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
 * disables infobar animations
 * disables dev mode extension bubbles (?), and doesn't show some other info bars
+* disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
 * means the default browser check prompt isn't shown
 * avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
 * adds this infobar:

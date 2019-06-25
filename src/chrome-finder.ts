@@ -33,14 +33,14 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?.app$\'' +
+      ' | grep -i \'google chrome\\( canary\\)\\?.app.*$\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
       .forEach((inst: string) => {
         suffixes.forEach(suffix => {
-          const execPath = path.join(inst.trim(), suffix);
-          if (canAccess(execPath)) {
+          const execPath = path.join(inst.substring(0, inst.indexOf('.app') + 4).trim(), suffix);
+          if (canAccess(execPath) && installations.indexOf(execPath) === -1) {
             installations.push(execPath);
           }
         });
