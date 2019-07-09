@@ -1,3 +1,9 @@
+## v0.11.1 (Tue, Jul 09 2019)
+* `ec80f0ca` tests: drop support for node 9. continue supporting node 8 LTS (#159)
+* `4865f3af` deps(security): bump mocha to latest (#158)
+* `e0d2b09b` deps(security): bump handlebars from 4.0.11 to 4.1.2 (#157)
+* `982be53f` update changelog for v0.10.7 and v0.11.0
+
 ## v0.11.0 (Tue, Jul 09 2019)
 * `a860504f` [Breaking change] remove enableExtensions. add ignoreDefaultFlags & defaultFlags() (#124)
 * `448a1d48` chrome-finder: Add support for MacOS Catalina (#149)
