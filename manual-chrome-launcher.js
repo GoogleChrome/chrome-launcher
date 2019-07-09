@@ -14,10 +14,9 @@
  */
 
 require('./compiled-check.js')('./dist/chrome-launcher.js');
-const {Launcher} = require('./dist/chrome-launcher');
+const {Launcher, launch} = require('./dist/chrome-launcher');
 
 const args = process.argv.slice(2);
-const launcher = new Launcher();
 let chromeFlags = [];
 let startingUrl;
 let port;
@@ -34,16 +33,16 @@ if (args.length) {
   // The basic pattern for enabling Chrome extensions
   if (shouldEnableExtensions) {
     ignoreDefaultFlags = true;
-    chromeFlags.push(...launcher.defaultFlags().filter(flag => flag !== '--disable-extensions'));
+    chromeFlags.push(...Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions'));
   }
 
   chromeFlags.push(...providedFlags);
   startingUrl = args.find(flag => !flag.startsWith('--'));
 }
 
-launcher.launch({
+launch({
   startingUrl,
   port,
   ignoreDefaultFlags,
   chromeFlags,
-}).then(_ => console.log(`✨  Chrome debugging port: ${launcher.port}`));
+}).then(v => console.log(`✨  Chrome debugging port: ${v.port}`));

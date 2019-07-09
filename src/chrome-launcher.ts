@@ -163,7 +163,7 @@ class Launcher {
     return flags;
   }
 
-  defaultFlags() {
+  static defaultFlags() {
     return DEFAULT_FLAGS;
   }
 
