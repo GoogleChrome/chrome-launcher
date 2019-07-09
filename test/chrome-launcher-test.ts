@@ -108,8 +108,7 @@ describe('Launcher', () => {
   });
 
   it('gets all default flags', async () => {
-    const chromeInstance = new Launcher();
-    const flags = chromeInstance.defaultFlags();
+    const flags = Launcher.defaultFlags();
     assert.ok(flags.length);
     assert.deepStrictEqual(flags, DEFAULT_FLAGS);
   });

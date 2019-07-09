@@ -100,7 +100,7 @@ chrome.pid: number;
 chrome.process: childProcess
 ```
 
-### `.defaultFlags()`
+### `ChromeLauncher.defaultFlags()`
 
 Returns an `Array<string>` of the default [flags](docs/chrome-flags-for-tools.md) Chrome is launched with. Typically used along with the `ignoreDefaultFlags` and `chromeFlags` options.
 
@@ -111,9 +111,9 @@ Note: This array will exclude the following flags: `--remote-debugging-port` `--
 #### Launching chrome:
 
 ```js
-const chromeLauncher = require('chrome-launcher');
+const ChromeLauncher = require('chrome-launcher');
 
-chromeLauncher.launch({
+ChromeLauncher.launch({
   startingUrl: 'https://google.com'
 }).then(chrome => {
   console.log(`Chrome debugging port running on ${chrome.port}`);
@@ -124,14 +124,27 @@ chromeLauncher.launch({
 #### Launching headless chrome:
 
 ```js
-const chromeLauncher = require('chrome-launcher');
+const ChromeLauncher = require('chrome-launcher');
 
-chromeLauncher.launch({
+ChromeLauncher.launch({
   startingUrl: 'https://google.com',
   chromeFlags: ['--headless', '--disable-gpu']
 }).then(chrome => {
   console.log(`Chrome debugging port running on ${chrome.port}`);
 });
+```
+
+#### Launching with support for extensions and audio:
+
+```js
+const ChromeLauncher = require('chrome-launcher');
+
+const newFlags = Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio);
+
+ChromeLauncher.launch({
+  ignoreDefaultFlags: true,
+  chromeFlags: newFlags,
+}).then(chrome => { ... });
 ```
 
 ### Continuous Integration
