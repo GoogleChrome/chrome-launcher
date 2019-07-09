@@ -12,11 +12,11 @@
   },
   "devDependencies": {
     "@types/mkdirp": "^0.3.29",
-    "@types/mocha": "^2.2.41",
+    "@types/mocha": "^5.2.7",
     "@types/rimraf": "^0.0.28",
     "@types/sinon": "^2.3.1",
     "clang-format": "^1.0.50",
-    "mocha": "^3.2.0",
+    "mocha": "^6.1.4",
     "nyc": "^11.0.2",
     "sinon": "^2.3.5",
     "ts-node": "8.3.0",
