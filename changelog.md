@@ -1,3 +1,22 @@
+## v0.11.0 (Tue, Jul 09 2019)
+* `a860504f` [Breaking change] remove enableExtensions. add ignoreDefaultFlags & defaultFlags() (#124)
+* `448a1d48` chrome-finder: Add support for MacOS Catalina (#149)
+* `55b891bb` deps(is-wsl): add support for WSL 2; drop Node 6 (#152)
+* `57e18181` deps: upgrade typescript and ts-node (#155)
+* `a8848116` deps(security): bump lodash from 4.17.4 to 4.17.11 (#147)
+* `0a775dab` Document that --enable-automation disables automatic page reloads (#140)
+* `c9f653e2` Removing dead --safebrowsing-disable-auto-update flag. (#139)
+* `be12d564` yarn.lock add integrity
+* `e361aa43` Update changelog.md (#137)
+
+## v0.10.7 (Wed, May 01 2019)
+* `55397e0c` deps: update yarn.lock from #142
+* `179a3f33` silence grep (#138)
+* `d2f6037a` fix: move unneeded ts types to devDeps (#142)
+* `984d61ce` docs(flags): remove a few flags that are gone.
+* `6316362c` docs: fix link to chrome-launcher's flags (#128)
+* `f1f6d162` Update chrome-flags-for-tools.md
+
 ## v0.10.5 (Tue, Sep 25 2018)
 * `1328319b` fix: set the `which` command's stdio to pipe (#125)
 
