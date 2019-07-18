@@ -113,6 +113,20 @@ describe('Launcher', () => {
     assert.deepStrictEqual(flags, DEFAULT_FLAGS);
   });
 
+  it('does not allow mutating default flags', async () => {
+    const flags = Launcher.defaultFlags();
+    flags.push('--new-flag');
+    const currentDefaultFlags = Launcher.defaultFlags().slice();
+    assert.notDeepStrictEqual(flags, currentDefaultFlags);
+  });
+
+  it('does not mutate default flags when launching', async () => {
+    const originalDefaultFlags = Launcher.defaultFlags().slice();
+    await launchChromeWithOpts();
+    const currentDefaultFlags = Launcher.defaultFlags().slice();
+    assert.deepStrictEqual(originalDefaultFlags, currentDefaultFlags);
+  });
+
   it('removes all default flags', async () => {
     const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
