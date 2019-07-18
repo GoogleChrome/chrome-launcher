@@ -5,7 +5,7 @@
  */
 'use strict';
 
-export const DEFAULT_FLAGS = [
+export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service
   '--disable-translate',
   // Disable all chrome extensions entirely

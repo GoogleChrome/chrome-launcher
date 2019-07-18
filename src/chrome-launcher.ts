@@ -144,7 +144,7 @@ class Launcher {
   }
 
   private get flags() {
-    const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS;
+    const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS.slice();
     flags.push(`--remote-debugging-port=${this.port}`);
 
     if (getPlatform() === 'linux') {
@@ -164,7 +164,7 @@ class Launcher {
   }
 
   static defaultFlags() {
-    return DEFAULT_FLAGS;
+    return DEFAULT_FLAGS.slice();
   }
 
   // Wrapper function to enable easy testing.
