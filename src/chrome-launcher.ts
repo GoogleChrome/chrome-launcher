@@ -25,7 +25,7 @@ const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32', 'wsl']);
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
-const instances = new Set();
+const instances = new Set<Launcher>();
 
 export type RimrafModule = (path: string, callback: (error: Error) => void) => void;
 
@@ -318,7 +318,7 @@ class Launcher {
   }
 
   kill() {
-    return new Promise((resolve, reject) => {
+    return new Promise<{}>((resolve, reject) => {
       if (this.chrome) {
         this.chrome.on('close', () => {
           delete this.chrome;
