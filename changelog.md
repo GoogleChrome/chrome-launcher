@@ -1,3 +1,8 @@
+## v0.11.2 (Mon, Jul 29 2019)
+* `1928187` fix: prevent mutation of default flags (#162)
+* `02a23c2` docs: fix launcher example in README (#160)
+* `90dc0e4` update manual-chrome-launcher with fixes from LH
+
 ## v0.11.1 (Tue, Jul 09 2019)
 * `ec80f0ca` tests: drop support for node 9. continue supporting node 8 LTS (#159)
 * `4865f3af` deps(security): bump mocha to latest (#158)
