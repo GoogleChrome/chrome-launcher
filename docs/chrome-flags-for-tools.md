@@ -6,7 +6,10 @@ All use cases are different, so you'll have to choose which flags are most appro
 ## Flags
 
 ### `--disable-extensions`
-Disable all chrome extensions entirely
+Disable all chrome extensions.
+
+### `--disable-component-extensions-with-background-pages`
+Disable some built-in extensions that aren't affected by `--disable-extensions`
 
 ### `--disable-background-networking`
 Disable various background network services, including extension updating,
@@ -96,7 +99,7 @@ These flags are being used in various tools. They also just need to be documente
 
 --disable-backgrounding-occluded-windows
 --disable-ipc-flooding-protection # https://crrev.com/604305
-
+--disable-renderer-backgrounding
 
 --remote-debugging-pipe # more secure than using protocol over a websocket
 --enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
