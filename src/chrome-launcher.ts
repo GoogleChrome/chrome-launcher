@@ -147,7 +147,7 @@ class Launcher {
     const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS.slice();
     flags.push(`--remote-debugging-port=${this.port}`);
 
-    if (getPlatform() === 'linux') {
+    if (!this.ignoreDefaultFlags && getPlatform() === 'linux') {
       flags.push('--disable-setuid-sandbox');
     }
 
