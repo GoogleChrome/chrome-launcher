@@ -4,7 +4,6 @@ matrix:
     - node_js: "8"
     - node_js: "10"
     - node_js: "12"
-dist: trusty
 sudo: required
 cache:
   yarn: true
@@ -22,9 +21,5 @@ script:
   - yarn test-formatting
   - yarn type-check
   - yarn test
-after_success:
-  - yarn run coverage
-# - (send to coveralls)
-# - (send to codecov)
 addons:
   chrome: stable
