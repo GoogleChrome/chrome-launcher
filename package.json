@@ -5,7 +5,6 @@
     "build": "tsc",
     "dev": "tsc -w",
     "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
-    "coverage": "nyc yarn test && nyc report --reporter=text-lcov > lcov.info",
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
     "type-check": "tsc --allowJs --checkJs --noEmit --target es2016 *.js"
@@ -17,7 +16,6 @@
     "@types/sinon": "^2.3.1",
     "clang-format": "^1.0.50",
     "mocha": "^6.1.4",
-    "nyc": "^11.0.2",
     "sinon": "^2.3.5",
     "ts-node": "8.3.0",
     "typescript": "3.2.2"
