@@ -133,6 +133,12 @@ describe('Launcher', () => {
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
 
+  it('searches for available installations', async () => {
+    const installations = Launcher.getInstallations();
+    assert.ok(Array.isArray(installations));
+    assert.ok(installations.length >= 1);
+  });
+
   it('removes --user-data-dir if userDataDir is false', async () => {
     const spawnStub = await launchChromeWithOpts();
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
