@@ -106,6 +106,12 @@ Returns an `Array<string>` of the default [flags](docs/chrome-flags-for-tools.md
 
 Note: This array will exclude the following flags: `--remote-debugging-port` `--disable-setuid-sandbox` `--user-data-dir`.
 
+### `ChromeLauncher.getInstallations()`
+
+Returns an `Array<string>` of paths to available Chrome installations. When `chromePath` is not provided to `.launch()`, the first installation returned from this method is used instead.
+
+Note: This method performs synchronous I/O operations.
+
 ## Examples
 
 #### Launching chrome:

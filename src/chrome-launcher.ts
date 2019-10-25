@@ -167,6 +167,10 @@ class Launcher {
     return DEFAULT_FLAGS.slice();
   }
 
+  static getInstallations() {
+    return chromeFinder[getPlatform() as SupportedPlatforms]();
+  }
+
   // Wrapper function to enable easy testing.
   makeTmpDir() {
     return makeTmpDir();
@@ -205,7 +209,7 @@ class Launcher {
       }
     }
     if (this.chromePath === undefined) {
-      const installations = await chromeFinder[getPlatform() as SupportedPlatforms]();
+      const installations = Launcher.getInstallations();
       if (installations.length === 0) {
         throw new ChromeNotInstalledError();
       }
