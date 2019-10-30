@@ -99,7 +99,10 @@ These flags are being used in various tools. They also just need to be documente
 
 --disable-backgrounding-occluded-windows
 --disable-ipc-flooding-protection # https://crrev.com/604305
---disable-renderer-backgrounding
+
+--disable-renderer-backgrounding # This disables non-foreground tabs from getting a lower process priority
+                                 # This doesn't (on its own) affect timers or painting behavior.
+                                 # https://github.com/karma-runner/karma-chrome-launcher/issues/123
 
 --remote-debugging-pipe # more secure than using protocol over a websocket
 --enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
