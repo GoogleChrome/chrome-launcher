@@ -8,8 +8,10 @@
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service
   '--disable-features=TranslateUI',
-  // Disable all chrome extensions entirely
+  // Disable all chrome extensions
   '--disable-extensions',
+  // Disable some extensions that aren't affected by --disable-extensions
+  '--disable-component-extensions-with-background-pages',
   // Disable various background network services, including extension updating,
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
@@ -23,4 +25,10 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--mute-audio',
   // Skip first run wizards
   '--no-first-run',
+  // Disable backgrounding renders for occluded windows
+  '--disable-backgrounding-occluded-windows',
+  // Disable renderer process backgrounding
+  '--disable-renderer-backgrounding',
+  // Disable task throttling of timer tasks from background pages.
+  '--disable-background-timer-throttling',
 ];

@@ -6,7 +6,10 @@ All use cases are different, so you'll have to choose which flags are most appro
 ## Flags
 
 ### `--disable-extensions`
-Disable all chrome extensions entirely
+Disable all chrome extensions.
+
+### `--disable-component-extensions-with-background-pages`
+Disable some built-in extensions that aren't affected by `--disable-extensions`
 
 ### `--disable-background-networking`
 Disable various background network services, including extension updating,
@@ -31,7 +34,7 @@ Skip first run wizards
 Disable timers being throttled in background pages/tabs
 
 ### `--disable-client-side-phishing-detection`
-Disables client-side phishing detection. 
+Disables client-side phishing detection.
 
 ### `--disable-popup-blocking`
 Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
@@ -94,6 +97,13 @@ These flags are being used in various tools. They also just need to be documente
 --disable-features=site-per-process # Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
 --disable-hang-monitor
 
+--disable-backgrounding-occluded-windows
+--disable-ipc-flooding-protection # https://crrev.com/604305
+
+--disable-renderer-backgrounding # This disables non-foreground tabs from getting a lower process priority
+                                 # This doesn't (on its own) affect timers or painting behavior.
+                                 # https://github.com/karma-runner/karma-chrome-launcher/issues/123
+
 --remote-debugging-pipe # more secure than using protocol over a websocket
 --enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
 --log-level=0 # 0 means INFO and higher.
@@ -110,18 +120,18 @@ These flags are being used in various tools. They also just need to be documente
 --enable-features=SurfaceSynchronization
 --disable-threaded-animation
 --disable-threaded-scrolling
---disable-checker-imaging   
+--disable-checker-imaging
 --disable-image-animation-resync
---use-gl="" # use angle/swiftshader? 
+--use-gl="" # use angle/swiftshader?
 ```
 
 
 ## Removed flags
 
 ### ~`--disable-translate`~
-[Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service. 
+[Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 
-### ~`--ignore-autoplay-restrictions`~ 
+### ~`--ignore-autoplay-restrictions`~
 [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 
 ## Sources
