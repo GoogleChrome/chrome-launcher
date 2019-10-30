@@ -1,3 +1,14 @@
+## v0.12.0 (Wed, Oct 30 2019)
+* `66a5e226` flags: add new --disable flags to reduce noise and disable backgrounding (#170)
+  - --disable-component-extensions-with-background-pages
+  - --disable-backgrounding-occluded-windows
+  - --disable-renderer-backgrounding
+  - --disable-background-timer-throttling
+* `c4890ee3` feat: expose public interface for locating Chrome installations (#177)
+  - `Launcher.getInstallations()` returns an array of paths to available Chrome binaries
+* `a5ccaa4e` deps: update assorted dependencies (#175)
+* `e67a10df` --disable-translation is now --disable-features=TranslateUI (#167)
+
 ## v0.11.2 (Mon, Jul 29 2019)
 * `1928187` fix: prevent mutation of default flags (#162)
 * `02a23c2` docs: fix launcher example in README (#160)
