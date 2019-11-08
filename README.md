@@ -145,7 +145,7 @@ ChromeLauncher.launch({
 ```js
 const ChromeLauncher = require('chrome-launcher');
 
-const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio);
+const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio');
 
 ChromeLauncher.launch({
   ignoreDefaultFlags: true,
