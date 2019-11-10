@@ -332,7 +332,9 @@ class Launcher {
         log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
         try {
           if (isWindows) {
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`);
+            // While pipe is the default, stderr also gets printed to process.stderr
+            // if you don't explicitly set `stdio`
+            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
           } else {
             process.kill(-this.chrome.pid);
           }
