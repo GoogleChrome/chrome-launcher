@@ -27,6 +27,9 @@ Disable installation of default apps on first run
 ### `--mute-audio`
 Mute any audio
 
+### `--no-default-browser-check`
+Disable the default browser check, do not prompt to set it as such
+
 ### `--no-first-run`
 Skip first run wizards
 
@@ -80,7 +83,6 @@ Disable PlzNavigate.
 These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
 
 ```sh
---no-default-browser-check
 --process-per-tab
 --new-window
 --allow-running-insecure-content
