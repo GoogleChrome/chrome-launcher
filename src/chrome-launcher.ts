@@ -34,6 +34,7 @@ export interface Options {
   chromeFlags?: Array<string>;
   port?: number;
   handleSIGINT?: boolean;
+  exitOnSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
   logLevel?: 'verbose'|'info'|'error'|'silent';
@@ -56,24 +57,28 @@ export interface ModuleOverrides {
   spawn?: typeof childProcess.spawn;
 }
 
-const sigintListener = async () => {
+const sigintListener = async (defaultAction = true) => {
   for (const instance of instances) {
     try {
       await instance.kill();
     } catch (err) {
     }
   }
-  process.exit(_SIGINT_EXIT_CODE);
+  
+  if ( defaultAction ) {
+    process.exit(_SIGINT_EXIT_CODE);
+  }
 };
 
 async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
+  opts.exitOnSIGINT = defaults(opts.exitOnSIGINT, true);
 
   const instance = new Launcher(opts);
 
   // Kill spawned Chrome process in case of ctrl-C.
   if (opts.handleSIGINT && instances.size === 0) {
-    process.on(_SIGINT, sigintListener);
+    process.on(_SIGINT, () => sigintListener(opts.exitOnSIGINT));
   }
   instances.add(instance);
 
