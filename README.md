@@ -44,6 +44,10 @@ npm install chrome-launcher
   // (optional) Close the Chrome process on `Ctrl-C`
   // Default: true
   handleSIGINT: boolean;
+  
+  // (optional) Exit the Node process on `Ctrl-C`
+  // Default: true
+  exitOnSIGINT: boolean;
 
   // (optional) Explicit path of intended Chrome binary
   // * If this `chromePath` option is defined, it will be used.
