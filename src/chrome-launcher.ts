@@ -65,7 +65,7 @@ const sigintListener = async (defaultAction = true) => {
     }
   }
   
-  if ( defaultAction ) {
+  if (defaultAction) {
     process.exit(_SIGINT_EXIT_CODE);
   }
 };
