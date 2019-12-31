@@ -2,7 +2,6 @@
 
 check_formatting ()
 {
-  ./node_modules/.bin/clang-format -style=file $1
   diff -u <(cat $1) <(./node_modules/.bin/clang-format -style=file $1) &>/dev/null
   if [ $? -eq 1 ]
   then
