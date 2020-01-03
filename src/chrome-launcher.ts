@@ -57,12 +57,7 @@ export interface ModuleOverrides {
 }
 
 const sigintListener = async () => {
-  for (const instance of instances) {
-    try {
-      await instance.kill();
-    } catch (err) {
-    }
-  }
+  await killAll();
   process.exit(_SIGINT_EXIT_CODE);
 };
 
@@ -88,6 +83,19 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   };
 
   return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
+}
+
+async function killAll(): Promise<boolean> {
+  let noErrors = true;
+  for (const instance of instances) {
+    try {
+      await instance.kill();
+      instances.delete(instance);
+    } catch (err) {
+      noErrors = false;
+    }
+  }
+  return noErrors;
 }
 
 class Launcher {
@@ -373,4 +381,4 @@ class Launcher {
 };
 
 export default Launcher;
-export {Launcher, launch};
+export {Launcher, launch, killAll};
