@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher, Options} from '../src/chrome-launcher';
+import {Launcher, launch, killAll, Options} from '../src/chrome-launcher';
 import {DEFAULT_FLAGS} from '../src/flags';
 
 import {spy, stub} from 'sinon';
@@ -96,6 +96,13 @@ describe('Launcher', () => {
     await chromeInstance.launch();
     await chromeInstance.kill();
     await chromeInstance.kill();
+  });
+
+  it('doesn\'t fail when killing all instances', async () => {
+    await launch();
+    await launch();
+    const errors = await killAll();
+    assert.strictEqual(errors.length, 0);
   });
 
   it('doesn\'t launch multiple chrome processes', async () => {

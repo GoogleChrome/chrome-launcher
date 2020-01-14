@@ -112,6 +112,18 @@ Returns an `Array<string>` of paths to available Chrome installations. When `chr
 
 Note: This method performs synchronous I/O operations.
 
+### `.killAll()`
+
+Attempts to kill all Chrome instances created with [`.launch([opts])`](#launchopts). Returns a Promise that resolves to an array of errors that occurred while killing instances. If all instances were killed successfully, the array will be empty.
+
+```js
+const ChromeLauncher = require('chrome-launcher');
+
+async function cleanup() {
+  await ChromeLauncher.killAll();
+}
+```
+
 ## Examples
 
 #### Launching chrome:
