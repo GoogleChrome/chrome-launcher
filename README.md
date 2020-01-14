@@ -114,7 +114,7 @@ Note: This method performs synchronous I/O operations.
 
 ### `.killAll()`
 
-Attempts to kill all Chrome instances created with [`.launch([opts])`](#launchopts). Returns a Promise that resolves to `true` if there were no errors, and to `false` if any errors were thrown when killing an instance.
+Attempts to kill all Chrome instances created with [`.launch([opts])`](#launchopts). Returns a Promise that resolves to an array of errors that occurred while killing instances. If all instances were killed successfully, the array will be empty.
 
 ```js
 const ChromeLauncher = require('chrome-launcher');
