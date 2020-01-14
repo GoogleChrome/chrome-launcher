@@ -85,17 +85,19 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
 }
 
-async function killAll(): Promise<boolean> {
-  let noErrors = true;
+async function killAll(): Promise<Array<Error>> {
+  let errors = [];
   for (const instance of instances) {
     try {
       await instance.kill();
+      // only delete if kill did not error
+      // this means erroring instances remain in the Set
       instances.delete(instance);
     } catch (err) {
-      noErrors = false;
+      errors.push(err);
     }
   }
-  return noErrors;
+  return errors;
 }
 
 class Launcher {
