@@ -87,6 +87,11 @@ camelcase@^5.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.3.1.tgz#e3c9b31569e106811df242f715725a1f4c494320"
   integrity sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==
 
+centra@^2.2.1:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/centra/-/centra-2.4.0.tgz#53846f97db27705e9f90c46e0f824f6eb697e2d1"
+  integrity sha512-AWmF3EHNe/noJHviynZOrdnUuQzT5AMgl9nJPXGvnzGXrI2ZvNDrEcdqskc4EtQwt2Q1IggXb0OXy7zZ1Xvvew==
+
 chalk@^2.0.1:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
@@ -517,6 +522,18 @@ path-to-regexp@^1.7.0:
   resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-1.7.0.tgz#59fde0f435badacba103a84e9d3bc64e96b9937d"
   dependencies:
     isarray "0.0.1"
+
+phin@^3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/phin/-/phin-3.4.1.tgz#b023d14fa86fc6e4b40b6d0dfd5fe478c9c1bbb8"
+  integrity sha512-NkBCNRPxeyrgaPlWx4DHTAdca3s2LkvIBiiG6RoSbykcOtW/pA/7rUP/67FPIinvbo7h+HENST/vJ17LdRNUdw==
+  dependencies:
+    centra "^2.2.1"
+
+povtor@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/povtor/-/povtor-1.1.0.tgz#bebe6618c0bcd0df55bd9f6dd2bebebb4d15c5a5"
+  integrity sha512-gUhd8L9iC4rSipLzx3mCInjusheig56wDrQLiwi5DH5FuumXJE0fEtvZNuheDqjXgMxARLoCz2erqOaa6Trgiw==
 
 require-directory@^2.1.1:
   version "2.1.1"

@@ -183,4 +183,126 @@ describe('Launcher', () => {
     const chromeInstance = new Launcher({chromePath: ''});
     chromeInstance.launch().catch(() => done());
   });
+
+  describe('waitForTarget method', () => {
+    function getChromeInstance(targetList: unknown, waitForInspectableTarget?: number) {
+      const chromeInstance = new Launcher({waitForInspectableTarget: typeof waitForInspectableTarget === 'number' ? waitForInspectableTarget : 100});
+      const getTargetListStub = stub(chromeInstance, 'getTargetList').returns(Promise.resolve(targetList));
+
+      return {
+        chromeInstance,
+        getTargetListStub
+      };
+    }
+
+    it('returns promise that is resolved with the same value as promise returned by getTargetList method', () => {
+      const response = {
+        body: ['test', 'list']
+      };
+      const {chromeInstance, getTargetListStub} = getChromeInstance(response);
+
+      return chromeInstance.waitForTarget().then((result) => {
+        assert.ok(getTargetListStub.calledOnce);
+        assert.strictEqual(result, response);
+      });
+    });
+
+    it('returns promise that is resolved with the same value as promise returned by getTargetList method after interval specified in waitForInspectableTarget option', () => {
+      const response = {
+        body: []
+      };
+      const waitTime = 90;
+      const {chromeInstance, getTargetListStub} = getChromeInstance(response, waitTime);
+      chromeInstance.getTargetRetryTimeout = 50;
+      const startTime = new Date().getTime();
+
+      return chromeInstance.waitForTarget().then((result) => {
+        assert.ok(getTargetListStub.callCount === 3);
+        assert.ok(new Date().getTime() - startTime > waitTime);
+        assert.strictEqual(result, response);
+      });
+    });
+
+    it('returns promise that is rejected with the same value as promise returned by getTargetList method after interval specified in waitForInspectableTarget option', () => {
+      const reason = 'No target';
+      const waitTime = 100;
+      const {chromeInstance, getTargetListStub} = getChromeInstance(Promise.reject(reason), waitTime);
+      chromeInstance.getTargetRetryTimeout = 40;
+      const startTime = new Date().getTime();
+
+      return chromeInstance.waitForTarget().catch((result) => {
+        assert.ok(getTargetListStub.callCount === 4);
+        assert.ok(new Date().getTime() - startTime > waitTime);
+        assert.strictEqual(result, reason);
+      });
+    });
+  });
+
+  describe('waitForInspectableTarget option', () => {
+    function getChromeInstance(options?: Options) {
+      const chromeInstance = new Launcher(options);
+      stub(chromeInstance, 'isDebuggerReady').returns(Promise.resolve());
+
+      return chromeInstance;
+    }
+
+    it('waitUntilReady does not call waitForTarget method when the option is not set', () => {
+      const chromeInstance = getChromeInstance();
+      const waitForTargetSpy = spy(chromeInstance, 'waitForTarget');
+
+      return chromeInstance.waitUntilReady().then(() => {
+        assert.ok(waitForTargetSpy.notCalled);
+      });
+    });
+
+    it('waitUntilReady does not call waitForTarget method when 0 is set for the option', () => {
+      const chromeInstance = getChromeInstance({waitForInspectableTarget: 0});
+      const waitForTargetSpy = spy(chromeInstance, 'waitForTarget');
+
+      return chromeInstance.waitUntilReady().then(() => {
+        assert.ok(waitForTargetSpy.notCalled);
+      });
+    });
+
+    it('waitUntilReady does not call waitForTarget method when negative value is set for the option', () => {
+      const chromeInstance = getChromeInstance({waitForInspectableTarget: -1});
+      const waitForTargetSpy = spy(chromeInstance, 'waitForTarget');
+
+      return chromeInstance.waitUntilReady().then(() => {
+        assert.ok(waitForTargetSpy.notCalled);
+      });
+    });
+
+    it('waitUntilReady calls waitForTarget method when the option is set', () => {
+      const chromeInstance = getChromeInstance({waitForInspectableTarget: 1000});
+      const response = {
+        body: [{
+          description: '',
+          devtoolsFrontendUrl: '/devtools/inspector.html?ws=127.0.0.1:54321/devtools/page/1C2C62A45591F2DECB9CC50E7C3B1FA5',
+          id: '1C2C62A45591F2DECB9CC50E7C3B1FA5',
+          title: '',
+          type: 'page',
+          url: 'about:blank',
+          webSocketDebuggerUrl: 'ws://127.0.0.1:54321/devtools/page/1C2C62A45591F2DECB9CC50E7C3B1FA5'
+        }]
+      };
+      const waitForTargetStub = stub(chromeInstance, 'waitForTarget').returns(Promise.resolve(response));
+
+      return chromeInstance.waitUntilReady().then((result) => {
+        assert.ok(waitForTargetStub.calledOnce);
+        assert.deepEqual(result, response.body);
+      });
+    });
+
+    it('waitUntilReady rejects when waitForTarget method returns rejected promise', () => {
+      const chromeInstance = getChromeInstance({waitForInspectableTarget: 1});
+      const reason = 'No targets';
+      const waitForTargetStub = stub(chromeInstance, 'waitForTarget').returns(Promise.reject(reason));
+
+      return chromeInstance.waitUntilReady().catch((result) => {
+        assert.ok(waitForTargetStub.calledOnce);
+        assert.strictEqual(result, reason);
+      });
+    });
+  });
 });
