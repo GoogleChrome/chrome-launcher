@@ -8,6 +8,8 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
+import * as phin from 'phin';
+import {retry} from 'povtor';
 import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
@@ -40,6 +42,7 @@ export interface Options {
   ignoreDefaultFlags?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
+  waitForInspectableTarget?: number;
   envVars?: {[key: string]: string|undefined};
 }
 
@@ -112,6 +115,7 @@ class Launcher {
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
+  private waitForInspectableTarget: number;
   private fs: typeof fs;
   private rimraf: RimrafModule;
   private spawn: typeof childProcess.spawn;
@@ -122,6 +126,7 @@ class Launcher {
   userDataDir?: string;
   port?: number;
   pid?: number;
+  getTargetRetryTimeout: number = 500;
 
   constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
     this.fs = moduleOverrides.fs || fs;
@@ -138,6 +143,7 @@ class Launcher {
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
+    this.waitForInspectableTarget = defaults(this.opts.waitForInspectableTarget, 0);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
 
     if (typeof this.opts.userDataDir === 'boolean') {
@@ -278,8 +284,26 @@ class Launcher {
     }
   }
 
+  getTargetList() {
+    return phin({
+      url: `http://127.0.0.1:${this.port}/json/list`,
+      parse: 'json'
+    });
+  }
+
+  waitForTarget() {
+    return retry({
+      action: this.getTargetList,
+      actionContext: this,
+      retryOnError: true,
+      retryTest: (response: phin.IResponse) => !response || !Array.isArray(response.body) || !response.body.length,
+      retryTimeout: this.getTargetRetryTimeout,
+      timeLimit: this.waitForInspectableTarget
+    }).promise;
+  }
+
   // resolves if ready, rejects otherwise
-  private isDebuggerReady(): Promise<{}> {
+  isDebuggerReady(): Promise<{}> {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(this.port!);
       client.once('error', err => {
@@ -312,7 +336,21 @@ class Launcher {
         launcher.isDebuggerReady()
             .then(() => {
               log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
-              resolve();
+              if (launcher.waitForInspectableTarget > 0) {
+                log.log('ChromeLauncher', 'Waiting for an inspectable target...');
+                launcher.waitForTarget()
+                  .then((response: phin.IResponse) => {
+                    log.log('ChromeLauncher', 'Received target list: %O', response.body);
+                    resolve(response.body);
+                  })
+                  .catch((reason: unknown) => {
+                    log.error('ChromeLauncher', `Cannot get target list. Reason: ${reason}`);
+                    reject(reason);
+                  });
+              }
+              else {
+                resolve();
+              }
             })
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {

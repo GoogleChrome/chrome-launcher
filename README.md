@@ -77,6 +77,11 @@ npm install chrome-launcher
   // Default: 50
   maxConnectionRetries: number;
 
+  // (optional) Interval in ms, which defines whether and how long an inspectable target should be awaited.
+  // `0` means that list of inspectable targets will not be requested and awaited.
+  // Default: 0
+  waitForInspectableTarget: number;
+
   // (optional) A dict of environmental key value pairs to pass to the spawned chrome process.
   envVars: {[key: string]: string};
 };
