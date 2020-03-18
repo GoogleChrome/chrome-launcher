@@ -23,7 +23,7 @@ const launchChromeWithOpts = async (opts: Options = {}) => {
 
   const chromeInstance =
       new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
-  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve({}));
 
   chromeInstance.prepare();
 
