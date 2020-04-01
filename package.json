@@ -27,7 +27,7 @@
     "mkdirp": "^0.5.3",
     "rimraf": "^3.0.2"
   },
-  "version": "0.13.0",
+  "version": "0.13.1",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Chrome with the Devtools Protocol port open",
   "repository": "https://github.com/GoogleChrome/chrome-launcher/",
