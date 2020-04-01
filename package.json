@@ -7,7 +7,8 @@
     "test": "mocha --require ts-node/register --reporter=dot test/**/*-test.ts --timeout=10000",
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
-    "type-check": "tsc --allowJs --checkJs --noEmit --target es2016 *.js"
+    "type-check": "tsc --allowJs --checkJs --noEmit --target es2016 *.js",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "devDependencies": {
     "@types/mkdirp": "^0.5.2",
