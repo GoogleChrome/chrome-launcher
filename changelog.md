@@ -1,3 +1,6 @@
+## v0.13.1 (Wed, Apr 1 2020)
+* `bf2957ac` deps: update various dependencies (#192)
+
 ## v0.13.0 (Thu, Feb 27 2020)
 * `83da1e41` feat: add killAll function (#186)
 * `b8c89f84` flags: disable the default browser check (#181) (#182)
