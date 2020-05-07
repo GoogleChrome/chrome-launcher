@@ -1,3 +1,13 @@
+## v0.13.1 (Wed, Apr 1 2020)
+* `bf2957ac` deps: update various dependencies (#192)
+
+## v0.13.0 (Thu, Feb 27 2020)
+* `83da1e41` feat: add killAll function (#186)
+* `b8c89f84` flags: disable the default browser check (#181) (#182)
+* `6112555c` fix: log taskkill error based on logging opts (#178) (#179)
+* `7c935efa` docs: add missing quote in README.md example  (#180)
+* `2e829c7d` Skip --disable-setuid-sandbox flag when ignoreDefaultFlags = true (#171)
+
 ## v0.12.0 (Wed, Oct 30 2019)
 * `66a5e226` flags: add new --disable flags to reduce noise and disable backgrounding (#170)
   - --disable-component-extensions-with-background-pages
