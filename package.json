@@ -24,7 +24,7 @@
   "dependencies": {
     "@types/node": "*",
     "escape-string-regexp": "^1.0.5",
-    "is-wsl": "^2.1.0",
+    "is-wsl": "^2.2.0",
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "^0.5.3",
     "rimraf": "^3.0.2"
