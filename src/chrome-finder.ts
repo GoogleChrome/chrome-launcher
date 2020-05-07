@@ -7,8 +7,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const execSync = require('child_process').execSync;
-const execFileSync = require('child_process').execFileSync;
+const {homedir} = require('os');
+const {execSync, execFileSync} = require('child_process');
+const escapeRegExp = require('escape-string-regexp');
 const log = require('lighthouse-logger');
 
 import {getLocalAppDataPath, ChromePathNotSetError} from './utils';
@@ -46,11 +47,13 @@ export function darwin() {
         });
       });
 
+
   // Retains one per line to maintain readability.
   // clang-format off
+  const home = escapeRegExp(process.env.HOME || homedir());
   const priorities: Priorities = [
-    {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome.app`), weight: 50},
-    {regex: new RegExp(`^${process.env.HOME}/Applications/.*Chrome Canary.app`), weight: 51},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome\\.app`), weight: 50},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 51},
     {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
     {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
     {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
@@ -58,11 +61,11 @@ export function darwin() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.unshift({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 150});
+    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 150});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 151});
+    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 151});
   }
 
   // clang-format on
@@ -141,11 +144,12 @@ export function linux() {
   ];
 
   if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.unshift({regex: new RegExp(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`), weight: 100});
+    priorities.unshift(
+        {regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 100});
   }
 
   if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(`${process.env.CHROME_PATH}`), weight: 101});
+    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 101});
   }
 
   return sort(uniq(installations.filter(Boolean)), priorities);
