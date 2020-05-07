@@ -34,7 +34,7 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?.app.*$\'' +
+      ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -73,11 +73,11 @@ export function darwin() {
 }
 
 function resolveChromePath() {
-  if (canAccess(`${process.env.CHROME_PATH}`)) {
+  if (canAccess(process.env.CHROME_PATH)) {
     return process.env.CHROME_PATH;
   }
 
-  if (canAccess(`${process.env.LIGHTHOUSE_CHROMIUM_PATH}`)) {
+  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
     log.warn(
         'ChromeLauncher',
         'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
@@ -104,7 +104,7 @@ export function linux() {
 
   // 2. Look into the directories where .desktop are saved on gnome based distro's
   const desktopInstallationFolders = [
-    path.join(require('os').homedir(), '.local/share/applications/'),
+    path.join(homedir(), '.local/share/applications/'),
     '/usr/share/applications/',
   ];
   desktopInstallationFolders.forEach(folder => {
@@ -157,7 +157,7 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
+  process.env.LOCALAPPDATA = getLocalAppDataPath(<string>process.env.PATH);
   process.env.PROGRAMFILES = '/mnt/c/Program Files';
   process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
 
@@ -206,7 +206,7 @@ function sort(installations: string[], priorities: Priorities) {
       .map(pair => pair.path);
 }
 
-function canAccess(file: string): Boolean {
+function canAccess(file?: string): Boolean {
   if (!file) {
     return false;
   }
