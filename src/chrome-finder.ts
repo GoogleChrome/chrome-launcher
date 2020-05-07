@@ -157,7 +157,7 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(<string>process.env.PATH);
+  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
   process.env.PROGRAMFILES = '/mnt/c/Program Files';
   process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
 
