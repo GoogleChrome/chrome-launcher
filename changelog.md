@@ -1,3 +1,7 @@
+## v0.13.2 (Thu, May 7 2020)
+* `7c1ea547` deps: bump to is-wsl@2.2.0 (#187)
+* `2ae5591d` fix: sanitize environment variables used in RegExp (#197)
+
 ## v0.13.1 (Wed, Apr 1 2020)
 * `bf2957ac` deps: update various dependencies (#192)
 
