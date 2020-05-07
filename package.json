@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@types/node": "*",
-    "is-wsl": "^2.1.1",
+    "is-wsl": "^2.2.0",
     "lighthouse-logger": "^1.0.0",
     "mkdirp": "0.5.1",
     "rimraf": "^2.6.1"
