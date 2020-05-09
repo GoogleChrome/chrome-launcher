@@ -79,6 +79,10 @@ npm install chrome-launcher
 
   // (optional) A dict of environmental key value pairs to pass to the spawned chrome process.
   envVars: {[key: string]: string};
+
+  // (optional) Disabling remote debugging
+  // Default: false
+  disableRemoteDebugging: boolean;
 };
 ```
 
