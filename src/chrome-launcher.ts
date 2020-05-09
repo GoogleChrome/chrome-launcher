@@ -41,6 +41,7 @@ export interface Options {
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
   envVars?: {[key: string]: string|undefined};
+  disableRemoteDebugging?: boolean;
 }
 
 export interface LaunchedChrome {
@@ -117,6 +118,7 @@ class Launcher {
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
+  private disableRemoteDebugging: boolean;
 
   chrome?: childProcess.ChildProcess;
   userDataDir?: string;
@@ -139,6 +141,7 @@ class Launcher {
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
+    this.disableRemoteDebugging = defaults(this.opts.disableRemoteDebugging, false);
 
     if (typeof this.opts.userDataDir === 'boolean') {
       if (!this.opts.userDataDir) {
@@ -155,7 +158,10 @@ class Launcher {
 
   private get flags() {
     const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS.slice();
-    flags.push(`--remote-debugging-port=${this.port}`);
+
+    if (!this.disableRemoteDebugging) {
+      flags.push(`--remote-debugging-port=${this.port}`);
+    }
 
     if (!this.ignoreDefaultFlags && getPlatform() === 'linux') {
       flags.push('--disable-setuid-sandbox');
