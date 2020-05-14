@@ -6,7 +6,7 @@
 'use strict';
 
 import {join} from 'path';
-import {execSync} from 'child_process';
+import {execSync, execFileSync} from 'child_process';
 import {mkdirSync} from 'fs';
 import isWsl = require('is-wsl');
 
@@ -74,21 +74,14 @@ export function makeTmpDir() {
 }
 
 export function toWinDirFormat(dir: string = ''): string {
-  const results = /\/mnt\/([a-z])\//.exec(dir);
-  if (!results) {
-    return dir;
-  }
-
-  const driveLetter = results[1];
-  return dir.replace(`/mnt/${driveLetter}/`, `${driveLetter.toUpperCase()}:\\`)
-      .replace(/\//g, '\\');
+  return execFileSync('wslpath', [dir]).toString().trim();
 }
 
 export function getLocalAppDataPath(path: string): string {
-  const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
+  const userRegExp = /\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
-  return `/mnt/${results[1]}/Users/${results[2]}/AppData/Local`;
+  return toWinDirFormat(`${results[1]}:\\Users\\${results[2]}\\AppData\\Local`);
 }
 
 function makeUnixTmpDir() {
