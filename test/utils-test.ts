@@ -22,11 +22,13 @@ import * as child_process from 'child_process';
 
 const execFileSyncStub = sinon.stub(child_process, 'execFileSync').callThrough();
 
+const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
+
 describe('toWin32Path', () => {
   beforeEach(() => execFileSyncStub.reset());
 
   it('calls toWin32Path -w', () => {
-    execFileSyncStub.returns('');
+    execFileSyncStub.returns(asBuffer(''));
 
     toWin32Path('');
 
@@ -38,7 +40,7 @@ describe('toWSLPath', () => {
   beforeEach(() => execFileSyncStub.reset());
 
   it('calls wslpath -u', () => {
-    execFileSyncStub.returns('');
+    execFileSyncStub.returns(asBuffer(''));
 
     toWSLPath('');
 
@@ -46,7 +48,7 @@ describe('toWSLPath', () => {
   })
 
   it('trims off the trailing newline', () => {
-    execFileSyncStub.returns('the-path\n');
+    execFileSyncStub.returns(asBuffer('the-path\n'));
 
     assert.deepStrictEqual(toWSLPath(''), 'the-path');
   })
@@ -56,7 +58,7 @@ describe('getWSLLocalAppDataPath', () => {
   beforeEach(() => execFileSyncStub.reset());
 
   it('transforms it to a Linux path using wslpath', () => {
-    execFileSyncStub.returns('/c/folder/');
+    execFileSyncStub.returns(asBuffer('/c/folder/'));
 
     const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
 
