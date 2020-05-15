@@ -65,7 +65,7 @@ export function makeTmpDir() {
       return makeUnixTmpDir();
     case 'wsl':
       // We populate the user's Windows temp dir so the folder is correctly created later
-      process.env.TEMP = getLocalAppDataPath(`${process.env.PATH}`);
+      process.env.TEMP = getWSLLocalAppDataPath(`${process.env.PATH}`);
     case 'win32':
       return makeWin32TmpDir();
     default:
@@ -73,15 +73,15 @@ export function makeTmpDir() {
   }
 }
 
-export function toWinDirFormat(dir: string = ''): string {
+export function toWSLPath(dir: string = ''): string {
   return execFileSync('wslpath', [dir]).toString().trim();
 }
 
-export function getLocalAppDataPath(path: string): string {
+export function getWSLLocalAppDataPath(path: string): string {
   const userRegExp = /\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
-  return toWinDirFormat(`${results[1]}:\\Users\\${results[2]}\\AppData\\Local`);
+  return toWSLPath(`${results[1]}:\\Users\\${results[2]}\\AppData\\Local`);
 }
 
 function makeUnixTmpDir() {
