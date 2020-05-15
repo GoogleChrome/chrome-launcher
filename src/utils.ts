@@ -73,6 +73,10 @@ export function makeTmpDir() {
   }
 }
 
+export function toWin32Path(dir: string = ''): string {
+  return execFileSync('wslpath', ['-w', dir]).toString().trim();
+}
+
 export function toWSLPath(dir: string = ''): string {
   return execFileSync('wslpath', [dir]).toString().trim();
 }
