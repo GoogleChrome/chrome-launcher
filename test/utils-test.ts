@@ -34,6 +34,17 @@ describe('toWin32Path', () => {
 
     assert.ok(execFileSyncStub.calledWith('wslpath', ['-w', '']));
   })
+
+  describe('when the path is already in Windows format', () => {
+    it('returns early', () => {
+      execFileSyncStub.returns(asBuffer(''));
+
+      assert.deepStrictEqual(toWin32Path('D:\\'), 'D:\\');
+      assert.deepStrictEqual(toWin32Path('C:\\'), 'C:\\');
+
+      assert.ok(execFileSyncStub.notCalled);
+    });
+  })
 })
 
 describe('toWSLPath', () => {

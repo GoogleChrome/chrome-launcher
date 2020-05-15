@@ -74,6 +74,10 @@ export function makeTmpDir() {
 }
 
 export function toWin32Path(dir: string = ''): string {
+  if (/[a-z]:\\/iu.test(dir)) {
+    return dir;
+  }
+
   return execFileSync('wslpath', ['-w', dir]).toString().trim();
 }
 
