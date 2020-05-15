@@ -78,7 +78,7 @@ export function toWin32Path(dir: string = ''): string {
 }
 
 export function toWSLPath(dir: string = ''): string {
-  return execFileSync('wslpath', [dir]).toString().trim();
+  return execFileSync('wslpath', ['-u', dir]).toString().trim();
 }
 
 export function getWSLLocalAppDataPath(path: string): string {
