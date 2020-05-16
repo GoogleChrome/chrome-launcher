@@ -13,7 +13,7 @@
   "devDependencies": {
     "@types/mkdirp": "^0.5.2",
     "@types/mocha": "^7.0.2",
-    "@types/rimraf": "^2.0.3",
+    "@types/rimraf": "^3.0.0",
     "@types/sinon": "^7.5.2",
     "clang-format": "^1.0.50",
     "mocha": "^7.1.1",
