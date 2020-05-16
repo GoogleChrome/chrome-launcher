@@ -77,7 +77,7 @@ describe('Launcher', () => {
     const chromeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
 
     chromeInstance.prepare();
-    assert.equal(chromeInstance.userDataDir, 'some_path');
+    assert.strictEqual(chromeInstance.userDataDir, 'some_path');
   });
 
   it('defaults to genering a tmp dir when no data dir is passed', () => {
@@ -85,7 +85,7 @@ describe('Launcher', () => {
     const originalMakeTmp = chromeInstance.makeTmpDir;
     chromeInstance.makeTmpDir = () => 'tmp_dir'
     chromeInstance.prepare()
-    assert.equal(chromeInstance.userDataDir, 'tmp_dir');
+    assert.strictEqual(chromeInstance.userDataDir, 'tmp_dir');
 
     // Restore the original fn.
     chromeInstance.makeTmpDir = originalMakeTmp;
@@ -155,14 +155,14 @@ describe('Launcher', () => {
   it('passes no env vars when none are passed', async () => {
     const spawnStub = await launchChromeWithOpts();
     const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
-    assert.deepEqual(spawnOptions.env, Object.assign({}, process.env));
+    assert.deepStrictEqual(spawnOptions.env, Object.assign({}, process.env));
   });
 
   it('passes env vars when passed', async () => {
     const envVars = {'hello': 'world'};
     const spawnStub = await launchChromeWithOpts({envVars});
     const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
-    assert.deepEqual(spawnOptions.env, envVars);
+    assert.deepStrictEqual(spawnOptions.env, envVars);
   });
 
   it('ensure specific flags are present when passed and defaults are ignored', async () => {
