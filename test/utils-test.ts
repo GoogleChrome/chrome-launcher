@@ -39,8 +39,8 @@ describe('toWin32Path', () => {
     it('returns early', () => {
       execFileSyncStub.returns(asBuffer(''));
 
-      assert.deepStrictEqual(toWin32Path('D:\\'), 'D:\\');
-      assert.deepStrictEqual(toWin32Path('C:\\'), 'C:\\');
+      assert.strictEqual(toWin32Path('D:\\'), 'D:\\');
+      assert.strictEqual(toWin32Path('C:\\'), 'C:\\');
 
       assert.ok(execFileSyncStub.notCalled);
     });
@@ -61,7 +61,7 @@ describe('toWSLPath', () => {
   it('trims off the trailing newline', () => {
     execFileSyncStub.returns(asBuffer('the-path\n'));
 
-    assert.deepStrictEqual(toWSLPath(''), 'the-path');
+    assert.strictEqual(toWSLPath(''), 'the-path');
   })
 })
 
@@ -73,7 +73,7 @@ describe('getWSLLocalAppDataPath', () => {
 
     const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
 
-    assert.deepStrictEqual(getWSLLocalAppDataPath(path), '/c/folder/');
+    assert.strictEqual(getWSLLocalAppDataPath(path), '/c/folder/');
     assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', 'c:\\Users\\user1\\AppData\\Local']));
   });
 });
