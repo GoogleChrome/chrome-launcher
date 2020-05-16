@@ -21,7 +21,6 @@ describe('Launcher', () => {
   });
 
   it('exposes expected interface when launched', async () => {
-    this.timeout = 3500;
     const chrome = await launch();
     assert.notStrictEqual(chrome.process, undefined);
     assert.notStrictEqual(chrome.pid, undefined);
