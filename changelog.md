@@ -1,3 +1,9 @@
+
+## v0.13.3 (Thu, Jun 4 2020)
+* `6a5d0c72` flags: disable background tracing (#203)
+* `d9154291` chore(deps): update typescript and types (#202)
+* `88e49686` test: use strict version of assert functions (#201)
+
 ## v0.13.2 (Thu, May 7 2020)
 * `7c1ea547` deps: bump to is-wsl@2.2.0 (#187)
 * `2ae5591d` fix: sanitize environment variables used in RegExp (#197)
