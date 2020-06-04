@@ -33,4 +33,6 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--disable-renderer-backgrounding',
   // Disable task throttling of timer tasks from background pages.
   '--disable-background-timer-throttling',
+  // Disable background tracing (aka slow reports & deep reports) to avoid 'Tracing already started'
+  '--force-fieldtrials=*BackgroundTracing/default/',
 ];
