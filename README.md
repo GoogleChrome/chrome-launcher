@@ -100,7 +100,7 @@ chrome.pid: number;
 chrome.process: childProcess
 ```
 
-### `ChromeLauncher.defaultFlags()`
+### `ChromeLauncher.Launcher.defaultFlags()`
 
 Returns an `Array<string>` of the default [flags](docs/chrome-flags-for-tools.md) Chrome is launched with. Typically used along with the `ignoreDefaultFlags` and `chromeFlags` options.
 
@@ -157,7 +157,7 @@ ChromeLauncher.launch({
 ```js
 const ChromeLauncher = require('chrome-launcher');
 
-const newFlags = ChromeLauncher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio');
+const newFlags = ChromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio');
 
 ChromeLauncher.launch({
   ignoreDefaultFlags: true,
