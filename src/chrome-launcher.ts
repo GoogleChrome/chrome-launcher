@@ -8,6 +8,7 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
+import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
@@ -181,6 +182,24 @@ class Launcher {
     return chromeFinder[getPlatform() as SupportedPlatforms]();
   }
 
+  static getFirstInstallation(): string[] {
+    // list of the possibilities in priority order
+    const defaultLocations: string[] = [
+      process.env.CHROME_PATH as string,
+      process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
+      // Darwin
+      `${path.sep}Applications${path.sep}Google Chrome.app${path.sep}Contents${path.sep}MacOS${path.sep}Google Chrome`,
+      `${path.sep}Applications${path.sep}Google Chrome Canary.app${path.sep}Contents${path.sep}MacOS${path.sep}Google Chrome Canary`
+    ].filter(Boolean)
+
+    console.log(defaultLocations)
+    for (const defaultLocation of defaultLocations) {
+      if (chromeFinder.canAccess(defaultLocation)) return [defaultLocation]
+    }
+
+    return Launcher.getInstallations()
+  }
+
   // Wrapper function to enable easy testing.
   makeTmpDir() {
     return makeTmpDir();
@@ -219,7 +238,7 @@ class Launcher {
       }
     }
     if (this.chromePath === undefined) {
-      const installations = Launcher.getInstallations();
+      const installations = Launcher.getFirstInstallation();
       if (installations.length === 0) {
         throw new ChromeNotInstalledError();
       }

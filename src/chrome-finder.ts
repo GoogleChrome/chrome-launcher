@@ -206,7 +206,7 @@ function sort(installations: string[], priorities: Priorities) {
       .map(pair => pair.path);
 }
 
-function canAccess(file: string|undefined): Boolean {
+export function canAccess(file: string|undefined): Boolean {
   if (!file) {
     return false;
   }
