@@ -191,7 +191,7 @@ class Launcher {
     // list of the possibilities in priority order
     const defaultLocations: string[] = [
       process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
-      // Darwin
+      // default Chrome paths on Mac
       '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
     ]
