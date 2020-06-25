@@ -193,7 +193,6 @@ class Launcher {
           path.sep}MacOS${path.sep}Google Chrome Canary`
     ].filter(Boolean)
 
-    console.log(defaultLocations)
     for (const defaultLocation of defaultLocations) {
       if (chromeFinder.canAccess(defaultLocation)) return [defaultLocation]
     }
