@@ -148,18 +148,17 @@ describe('Launcher', () => {
 
   it('search for default installations', async () => {
     process.env.CHROME_PATH = __filename;
-    let installation = Launcher.getFirstInstallation()[0];
-    assert.equal(installation, [__filename]);
+    let installation = Launcher.getFirstInstallation();
+    assert.equal(installation, __filename);
 
     delete process.env.CHROME_PATH;
     process.env.LIGHTHOUSE_CHROMIUM_PATH = __filename;
-    installation = Launcher.getFirstInstallation()[0];
-    assert.equal(installation, [__filename]);
+    installation = Launcher.getFirstInstallation();
+    assert.equal(installation, __filename);
 
     delete process.env.LIGHTHOUSE_CHROMIUM_PATH;
-    const installations = Launcher.getFirstInstallation();
-    assert.ok(Array.isArray(installations));
-    assert.ok(installations.length >= 1);
+    installation = Launcher.getFirstInstallation();
+    assert.ok(installation);
   })
 
   it('removes --user-data-dir if userDataDir is false', async () => {

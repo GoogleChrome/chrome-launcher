@@ -8,7 +8,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
-import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
@@ -178,26 +177,31 @@ class Launcher {
     return DEFAULT_FLAGS.slice();
   }
 
-  static getInstallations() {
+  static getInstallations(): string[] {
+    // fetching the lsregister for all applications can be time consuming
+    // on MacOS therefor look into default paths first
+    if (getPlatform() === 'darwin') {
+      return [Launcher.getFirstInstallation()]
+    }
+
     return chromeFinder[getPlatform() as SupportedPlatforms]();
   }
 
-  static getFirstInstallation(): string[] {
+  static getFirstInstallation(): string {
     // list of the possibilities in priority order
     const defaultLocations: string[] = [
       process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
       // Darwin
-      `${path.sep}Applications${path.sep}Google Chrome.app${path.sep}Contents${path.sep}MacOS${
-          path.sep}Google Chrome`,
-      `${path.sep}Applications${path.sep}Google Chrome Canary.app${path.sep}Contents${
-          path.sep}MacOS${path.sep}Google Chrome Canary`
-    ].filter(Boolean)
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
+    ]
 
     for (const defaultLocation of defaultLocations) {
-      if (chromeFinder.canAccess(defaultLocation)) return [defaultLocation]
+      if (!defaultLocation) continue;
+      if (chromeFinder.canAccess(defaultLocation)) return defaultLocation
     }
 
-    return Launcher.getInstallations()
+    return chromeFinder.darwin()[0];
   }
 
   // Wrapper function to enable easy testing.
@@ -238,7 +242,7 @@ class Launcher {
       }
     }
     if (this.chromePath === undefined) {
-      const installations = Launcher.getFirstInstallation();
+      const installations = Launcher.getInstallations();
       if (installations.length === 0) {
         throw new ChromeNotInstalledError();
       }
