@@ -185,11 +185,12 @@ class Launcher {
   static getFirstInstallation(): string[] {
     // list of the possibilities in priority order
     const defaultLocations: string[] = [
-      process.env.CHROME_PATH as string,
-      process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
+      process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
       // Darwin
-      `${path.sep}Applications${path.sep}Google Chrome.app${path.sep}Contents${path.sep}MacOS${path.sep}Google Chrome`,
-      `${path.sep}Applications${path.sep}Google Chrome Canary.app${path.sep}Contents${path.sep}MacOS${path.sep}Google Chrome Canary`
+      `${path.sep}Applications${path.sep}Google Chrome.app${path.sep}Contents${path.sep}MacOS${
+          path.sep}Google Chrome`,
+      `${path.sep}Applications${path.sep}Google Chrome Canary.app${path.sep}Contents${
+          path.sep}MacOS${path.sep}Google Chrome Canary`
     ].filter(Boolean)
 
     console.log(defaultLocations)
