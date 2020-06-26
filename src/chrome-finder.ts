@@ -18,11 +18,9 @@ const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
-function getDefaultInstallation(): string {
+function getDefaultInstallation() {
   // list of the possibilities in priority order
   const defaultLocations: string[] = [
-    process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
-    // default Chrome paths on Mac
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
   ]
@@ -32,7 +30,7 @@ function getDefaultInstallation(): string {
     if (canAccess(defaultLocation)) return defaultLocation
   }
 
-  return darwin()[0];
+  return
 }
 
 export function darwin() {
@@ -236,7 +234,7 @@ function sort(installations: string[], priorities: Priorities) {
       .map(pair => pair.path);
 }
 
-export function canAccess(file: string|undefined): Boolean {
+function canAccess(file: string|undefined): Boolean {
   if (!file) {
     return false;
   }

@@ -177,7 +177,7 @@ class Launcher {
     return DEFAULT_FLAGS.slice();
   }
 
-  static getInstallations(): string[] {
+  static getInstallations() {
     return chromeFinder[getPlatform() as SupportedPlatforms]();
   }
 
