@@ -18,6 +18,17 @@ const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
+/**
+ * check for MacOS default app paths
+ */
+function getDarwinDefaultInstallations(): string[] {
+  // list of the possibilities in priority order
+  return [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
+  ].filter((path) => canAccess(path));
+}
+
 export function darwin() {
   const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];
 
@@ -30,6 +41,19 @@ export function darwin() {
   const customChromePath = resolveChromePath();
   if (customChromePath) {
     installations.push(customChromePath);
+  }
+
+  const defaultPaths = getDarwinDefaultInstallations()
+  if (defaultPaths.length) {
+    installations.push(...defaultPaths);
+  }
+
+  /**
+   * don't do expensive lsregister dump if we have already found
+   * a Chrome app by now
+   */
+  if (installations.length) {
+    return installations
   }
 
   execSync(
