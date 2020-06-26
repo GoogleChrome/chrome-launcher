@@ -18,19 +18,15 @@ const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
-function getDefaultInstallation() {
+/**
+ * check for MacOS default app paths
+ */
+function getDarwinDefaultInstallations(): string[] {
   // list of the possibilities in priority order
-  const defaultLocations: string[] = [
+  return [
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
-  ]
-
-  for (const defaultLocation of defaultLocations) {
-    if (!defaultLocation) continue;
-    if (canAccess(defaultLocation)) return defaultLocation
-  }
-
-  return
+  ].filter((path) => canAccess(path));
 }
 
 export function darwin() {
@@ -47,9 +43,9 @@ export function darwin() {
     installations.push(customChromePath);
   }
 
-  const defaultPath = getDefaultInstallation()
-  if (defaultPath) {
-    installations.push(defaultPath);
+  const defaultPaths = getDarwinDefaultInstallations()
+  if (defaultPaths.length) {
+    installations.push(...defaultPaths);
   }
 
   /**
