@@ -19,14 +19,21 @@ const newLineRegex = /\r?\n/;
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
 /**
- * check for MacOS default app paths
+ * check for MacOS default app paths first to avoid waiting for the slow lsregister command
  */
-function getDarwinDefaultInstallations(): string[] {
-  // list of the possibilities in priority order
-  return [
+export function darwinFast(): string | undefined {
+  const priorityOptions: Array<string|undefined> = [
+    process.env.CHROME_PATH,
+    process.env.LIGHTHOUSE_CHROMIUM_PATH,
+    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
-  ].filter((path) => canAccess(path));
+  ];
+
+  for (const chromePath of priorityOptions) {
+    if (chromePath && canAccess(chromePath)) return chromePath;
+  }
+
+  return darwin()[0]
 }
 
 export function darwin() {
@@ -41,19 +48,6 @@ export function darwin() {
   const customChromePath = resolveChromePath();
   if (customChromePath) {
     installations.push(customChromePath);
-  }
-
-  const defaultPaths = getDarwinDefaultInstallations()
-  if (defaultPaths.length) {
-    installations.push(...defaultPaths);
-  }
-
-  /**
-   * don't do expensive lsregister dump if we have already found
-   * a Chrome app by now
-   */
-  if (installations.length) {
-    return installations
   }
 
   execSync(

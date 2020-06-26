@@ -177,6 +177,13 @@ class Launcher {
     return DEFAULT_FLAGS.slice();
   }
 
+  /** Returns the highest priority chrome installation. */
+  static getFirstInstallation() {
+    if (getPlatform() === 'darwin') return chromeFinder.darwinFast();
+    return chromeFinder[getPlatform() as SupportedPlatforms]()[0];
+  }
+
+  /** Returns all available chrome installations in decreasing priority order. */
   static getInstallations() {
     return chromeFinder[getPlatform() as SupportedPlatforms]();
   }
@@ -219,12 +226,12 @@ class Launcher {
       }
     }
     if (this.chromePath === undefined) {
-      const installations = Launcher.getInstallations();
-      if (installations.length === 0) {
+      const installation = Launcher.getFirstInstallation();
+      if (!installation) {
         throw new ChromeNotInstalledError();
       }
 
-      this.chromePath = installations[0];
+      this.chromePath = installation;
     }
 
     if (!this.tmpDirandPidFileReady) {
