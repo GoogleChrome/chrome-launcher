@@ -18,6 +18,23 @@ const newLineRegex = /\r?\n/;
 
 type Priorities = Array<{regex: RegExp, weight: number}>;
 
+function getDefaultInstallation(): string {
+  // list of the possibilities in priority order
+  const defaultLocations: string[] = [
+    process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
+    // default Chrome paths on Mac
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
+  ]
+
+  for (const defaultLocation of defaultLocations) {
+    if (!defaultLocation) continue;
+    if (canAccess(defaultLocation)) return defaultLocation
+  }
+
+  return darwin()[0];
+}
+
 export function darwin() {
   const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];
 
@@ -30,6 +47,19 @@ export function darwin() {
   const customChromePath = resolveChromePath();
   if (customChromePath) {
     installations.push(customChromePath);
+  }
+
+  const defaultPath = getDefaultInstallation()
+  if (defaultPath) {
+    installations.push(defaultPath);
+  }
+
+  /**
+   * don't do expensive lsregister dump if we have already found
+   * a Chrome app by now
+   */
+  if (installations.length) {
+    return installations
   }
 
   execSync(

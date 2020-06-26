@@ -178,30 +178,7 @@ class Launcher {
   }
 
   static getInstallations(): string[] {
-    // fetching the lsregister for all applications can be time consuming
-    // on MacOS therefor look into default paths first
-    if (getPlatform() === 'darwin') {
-      return [Launcher.getFirstInstallation()]
-    }
-
     return chromeFinder[getPlatform() as SupportedPlatforms]();
-  }
-
-  static getFirstInstallation(): string {
-    // list of the possibilities in priority order
-    const defaultLocations: string[] = [
-      process.env.CHROME_PATH as string, process.env.LIGHTHOUSE_CHROMIUM_PATH as string,
-      // default Chrome paths on Mac
-      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-      '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
-    ]
-
-    for (const defaultLocation of defaultLocations) {
-      if (!defaultLocation) continue;
-      if (chromeFinder.canAccess(defaultLocation)) return defaultLocation
-    }
-
-    return chromeFinder.darwin()[0];
   }
 
   // Wrapper function to enable easy testing.
