@@ -21,7 +21,7 @@ type Priorities = Array<{regex: RegExp, weight: number}>;
 /**
  * check for MacOS default app paths first to avoid waiting for the slow lsregister command
  */
-export function darwinFast(): string | undefined {
+export function darwinFast(): string|undefined {
   const priorityOptions: Array<string|undefined> = [
     process.env.CHROME_PATH,
     process.env.LIGHTHOUSE_CHROMIUM_PATH,
