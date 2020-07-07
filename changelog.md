@@ -1,4 +1,9 @@
 
+## v0.13.4 (Tue, Jul 7 2020)
+* `08406b28` fix: preserve existing getInstallations output
+* `f3669f45` perf: check default paths first when running on Mac (#209)
+* `aef94948` docs: update defaultFlags() example for new API (#205)
+
 ## v0.13.3 (Thu, Jun 4 2020)
 * `6a5d0c72` flags: disable background tracing (#203)
 * `d9154291` chore(deps): update typescript and types (#202)
