@@ -22,18 +22,18 @@ describe('WSL path format to Windows', () => {
   it('transforms basic path', () => {
     const wsl = '/mnt/c/Users/user1/AppData/';
     const windows = 'C:\\Users\\user1\\AppData\\';
-    assert.equal(toWinDirFormat(wsl), windows);
+    assert.strictEqual(toWinDirFormat(wsl), windows);
   });
 
   it('transforms if drive letter is different than c', () => {
     const wsl = '/mnt/d/Users/user1/AppData';
     const windows = 'D:\\Users\\user1\\AppData';
-    assert.equal(toWinDirFormat(wsl), windows);
+    assert.strictEqual(toWinDirFormat(wsl), windows);
   });
 
   it('getLocalAppDataPath returns a correct path', () => {
     const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
     const appDataPath = '/mnt/c/Users/user1/AppData/Local';
-    assert.equal(getLocalAppDataPath(path), appDataPath);
+    assert.strictEqual(getLocalAppDataPath(path), appDataPath);
   });
 });

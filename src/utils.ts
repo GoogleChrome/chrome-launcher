@@ -8,7 +8,7 @@
 import {join} from 'path';
 import {execSync} from 'child_process';
 import * as mkdirp from 'mkdirp';
-const isWsl = require('is-wsl');
+import isWsl = require('is-wsl');
 
 export const enum LaunchErrorCodes {
   ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',

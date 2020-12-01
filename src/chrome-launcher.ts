@@ -295,7 +295,7 @@ class Launcher {
       });
       client.once('connect', () => {
         this.cleanup(client);
-        resolve();
+        resolve({});
       });
     });
   }
@@ -304,7 +304,7 @@ class Launcher {
   waitUntilReady() {
     const launcher = this;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<{}>((resolve, reject) => {
       let retries = 0;
       let waitStatus = 'Waiting for browser.';
 
@@ -319,7 +319,7 @@ class Launcher {
         launcher.isDebuggerReady()
             .then(() => {
               log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
-              resolve();
+              resolve({});
             })
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
@@ -362,16 +362,16 @@ class Launcher {
         }
       } else {
         // fail silently as we did not start chrome
-        resolve();
+        resolve({});
       }
     });
   }
 
   destroyTmp() {
-    return new Promise(resolve => {
+    return new Promise<{}>(resolve => {
       // Only clean up the tmp dir if we created it.
       if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-        return resolve();
+        return resolve({});
       }
 
       if (this.outFile) {
@@ -384,7 +384,7 @@ class Launcher {
         delete this.errFile;
       }
 
-      this.rimraf(this.userDataDir, () => resolve());
+      this.rimraf(this.userDataDir, () => resolve({}));
     });
   }
 };

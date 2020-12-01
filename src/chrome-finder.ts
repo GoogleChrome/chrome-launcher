@@ -5,11 +5,11 @@
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const {homedir} = require('os');
-const {execSync, execFileSync} = require('child_process');
-const escapeRegExp = require('escape-string-regexp');
+import fs = require('fs');
+import path = require('path');
+import { homedir } from 'os';
+import { execSync, execFileSync } from 'child_process';
+import escapeRegExp = require('escape-string-regexp');
 const log = require('lighthouse-logger');
 
 import {getLocalAppDataPath, ChromePathNotSetError} from './utils';
@@ -190,7 +190,7 @@ export function win32() {
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
 
   const customChromePath = resolveChromePath();
   if (customChromePath) {
