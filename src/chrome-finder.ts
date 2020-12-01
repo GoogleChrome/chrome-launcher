@@ -7,8 +7,8 @@
 
 import fs = require('fs');
 import path = require('path');
-import { homedir } from 'os';
-import { execSync, execFileSync } from 'child_process';
+import {homedir} from 'os';
+import {execSync, execFileSync} from 'child_process';
 import escapeRegExp = require('escape-string-regexp');
 const log = require('lighthouse-logger');
 
