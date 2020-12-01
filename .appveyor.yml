@@ -5,12 +5,10 @@ version: "{build}"
 environment:
   fast_finish: true
   matrix:
-    - nodejs_version: "8"
+    - nodejs_version: "10"
       platform: x86
-    # node 7 is skipped, as appveyor only allows 1 concurrent job
-    # and we want appveyor finishing ASAP. see #2382
-    # - nodejs_version: "7"
-    #   platform: x86
+    # AppVeyor only allows 1 concurrent job and we 
+    # want appveyor finishing ASAP. See #2382
 
 build: off
 
