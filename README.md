@@ -91,7 +91,7 @@ npm install chrome-launcher
 chrome.port: number;
 
 // Method to kill Chrome (and cleanup the profile folder)
-chrome.kill: () => Promise<{}>;
+chrome.kill: () => Promise<void>;
 
 // The process id
 chrome.pid: number;

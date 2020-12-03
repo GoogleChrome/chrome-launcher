@@ -47,7 +47,7 @@ export interface LaunchedChrome {
   pid: number;
   port: number;
   process: ChildProcess;
-  kill: () => Promise<{}>;
+  kill: () => Promise<void>;
 }
 
 export interface ModuleOverrides {
@@ -286,7 +286,7 @@ class Launcher {
   }
 
   // resolves if ready, rejects otherwise
-  private isDebuggerReady(): Promise<{}> {
+  private isDebuggerReady(): Promise<void> {
     return new Promise((resolve, reject) => {
       const client = net.createConnection(this.port!);
       client.once('error', err => {
@@ -304,7 +304,7 @@ class Launcher {
   waitUntilReady() {
     const launcher = this;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       let retries = 0;
       let waitStatus = 'Waiting for browser.';
 
@@ -339,7 +339,7 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<{}>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.chrome) {
         this.chrome.on('close', () => {
           delete this.chrome;
@@ -368,7 +368,7 @@ class Launcher {
   }
 
   destroyTmp() {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       // Only clean up the tmp dir if we created it.
       if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
         return resolve();
