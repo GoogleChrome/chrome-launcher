@@ -5,7 +5,7 @@ version: "{build}"
 environment:
   fast_finish: true
   matrix:
-    - nodejs_version: "8"
+    - nodejs_version: 10
       platform: x86
     # AppVeyor only allows 1 concurrent job and we 
     # want AppVeyor finishing ASAP. See #2382
