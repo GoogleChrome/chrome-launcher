@@ -7,7 +7,7 @@
 
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service
-  '--disable-features=TranslateUI',
+  '--disable-features=Translate',
   // Disable all chrome extensions
   '--disable-extensions',
   // Disable some extensions that aren't affected by --disable-extensions
