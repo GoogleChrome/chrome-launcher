@@ -48,15 +48,15 @@ Reloading a page that came from a POST normally prompts the user.
 ### `--enable-automation`
 Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs)
 
-* disables the password saving UI (which covers the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
+* disables bubble notification about running development/unpacked extensions
+* disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
 * disables infobar animations
-* disables dev mode extension bubbles (?), and doesn't show some other info bars
 * disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
 * means the default browser check prompt isn't shown
 * avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
-* adds this infobar:
+* adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
 
-![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
+Note that some projects have chosen to avoid using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
 
 ### `--password-store=basic`
 Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
@@ -75,9 +75,6 @@ Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chr
 * "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
 * when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
 
-### `--disable-browser-side-navigation`
-Disable PlzNavigate.
-
 ## Flags to triage
 
 These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
@@ -87,20 +84,23 @@ These flags are being used in various tools. They also just need to be documente
 --new-window
 --allow-running-insecure-content
 --silent-debugger-extension-api
-
---disable-notifications
---disable-desktop-notifications
---disable-component-update
---disable-background-downloads
---disable-add-to-shelf
---disable-datasaver-prompt
+--disable-device-discovery-notifications # Avoid messages like "New printer on your network"
 --disable-domain-reliability
+--disable-notifications
+--disable-component-update # Don't update the browser 'components' listed at chrome://components/
+--disable-domain-reliability # Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
 --disable-breakpad # Disable crashdump collection (reporting is already disabled in Chromium)
+--enable-crash-reporter-for-testing # Used for turning on Breakpad crash reporting in a debug environment
+  # where crash reporting is typically compiled but disabled.
+
 --disable-features=site-per-process # Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
+--disable-features=ScriptStreaming # V8 script streaming
 --disable-hang-monitor
 
 --disable-backgrounding-occluded-windows
---disable-ipc-flooding-protection # Some javascript functions can be used to flood the browser process with IPC. By default, protection is on to limit the number of IPC sent to 10 per second per frame. This flag disables it. https://crrev.com/604305
+--disable-ipc-flooding-protection # Some javascript functions can be used to flood the browser process with IPC.
+    # By default, protection is on to limit the number of IPC sent to 10 per second per frame.
+    # This flag disables it. https://crrev.com/604305
 
 --disable-renderer-backgrounding # This disables non-foreground tabs from getting a lower process priority
                                  # This doesn't (on its own) affect timers or painting behavior.
@@ -110,38 +110,66 @@ These flags are being used in various tools. They also just need to be documente
 --enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
 --log-level=0 # 0 means INFO and higher.
 --block-new-web-contents # All pop-ups and calls to window.open will fail.
---js-flags=--random-seed=1157259157 --no-script-streaming
+--js-flags=--random-seed=1157259157
 --autoplay-policy=user-gesture-required # Don't render video
 
 --disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
 --no-sandbox # often used with headless, though ideally you don't need to.
 
-# Headless rendering stuff I definitely don't understand
---run-all-compositor-stages-before-draw
---disable-new-content-rendering-timeout
---enable-features=SurfaceSynchronization
---disable-threaded-animation
---disable-threaded-scrolling
---disable-checker-imaging
---disable-image-animation-resync
---use-gl="" # use angle/swiftshader?
+# Headless rendering stuff
+--deterministic-mode # An experimental meta flag. This sets the below indented flags
+  # which put the browser into a mode where rendering (border radius, etc) is deterministic
+  # and begin frames should be issued over DevTools Protocol.
+  # https://source.chromium.org/chromium/chromium/src/+/master:headless/app/headless_shell.cc;drc=df45d1abbc20abc7670643adda6d9625eea55b4d
+  --run-all-compositor-stages-before-draw
+  --disable-new-content-rendering-timeout
+  --enable-begin-frame-control
+  --disable-threaded-animation
+  --disable-threaded-scrolling
+  --disable-checker-imaging
+  --disable-image-animation-resync
+
+--in-process-gpu # Saves some memory by moving GPU process into a browser process thread
+--disable-partial-raster # crbug.com/919955
+--disable-skia-runtime-opts # Do not use runtime-detected high-end CPU optimizations in Skia.
+
+--use-gl="swiftshader" # Select which implementation of GL the GPU process should use. Options are:
+  # desktop: whatever desktop OpenGL the user has installed (Linux and Mac default).
+  # egl: whatever EGL / GLES2 the user has installed (Windows default - actually ANGLE).
+  # swiftshader: The SwiftShader software renderer.
+
+--window-position=0,0
+--window-size=1600,1024
+--force-device-scale-factor=1
+--force-color-profile=srgb # Force all monitors to be treated as though they have the specified color profile.
+--disable-features=PaintHolding # Don't defer paint commits (normally used to avoid flash of unstyled content)
+
+
+
 ```
 
 
-## Removed flags
+## ~Removed~ flags
 
-### ~`--disable-translate`~
-[Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
-
-### ~`--ignore-autoplay-restrictions`~
-[Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
+* `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
+* `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
+* `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
+* `--disable-save-password-bubble`
+* `--disable-browser-side-navigation` Disabled PlzNavigate.
+* `--disable-desktop-notifications`
+* `--disable-background-downloads`: [Removed Oct 2014](https://codereview.chromium.org/607843002).
+* `--disable-add-to-shelf`: [Removed June 2017](https://codereview.chromium.org/2944283002)
+* `--disable-datasaver-prompt`
+* `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
+* `--safebrowsing-disable-auto-update`
 
 ## Sources
 
 * [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
-* [Puppeteer's flags](https://github.com/GoogleChrome/puppeteer/blob/master/lib/Launcher.js)
-* [WebpageTest's flags](https://github.com/WPO-Foundation/webpagetest/blob/master/agent/wptdriver/web_browser.cc)
-
+* [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/main/src/node/Launcher.ts)
+* [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
+* [Catapult's flags](https://source.chromium.org/search?q=f:catapult%20f:desktop%20symbol:GetBrowserStartupArgs&ss=chromium%2Fchromium%2Fsrc)
+* [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
 ## All Chrome flags
 * [Peter.sh's canonical list of Chrome command-line switches](http://peter.sh/experiments/chromium-command-line-switches/)
