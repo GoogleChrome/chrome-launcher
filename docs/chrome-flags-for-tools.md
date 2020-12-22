@@ -3,89 +3,50 @@ is an attempt to document all chrome flags that are relevant to tools, automatio
 
 All use cases are different, so you'll have to choose which flags are most appropriate.
 
-## Flags
+## Disable things not typically desired in automated scenarios
 
-### `--disable-extensions`
-Disable all chrome extensions.
+* `--disable-extensions`: Disable all chrome extensions.
+* `--disable-component-extensions-with-background-pages`: Disable some built-in extensions that aren't affected by `--disable-extensions`
+* `--disable-background-networking`: Disable various background network services, including extension updating,safe browsing service, upgrade detector, translate, UMA
+* `--disable-sync`: Disable syncing to a Google account
+* `--no-first-run`: Skip first run wizards
+* `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
+* `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
+* `--disable-default-apps`: Disable installation of default apps on first run
+* `--disable-client-side-phishing-detection`: Disables client-side phishing detection.
+* `--mute-audio`: Mute any audio
 
-### `--disable-component-extensions-with-background-pages`
-Disable some built-in extensions that aren't affected by `--disable-extensions`
+# Performance & web platform behavior
 
-### `--disable-background-networking`
-Disable various background network services, including extension updating,
-safe browsing service, upgrade detector, translate, UMA
-
-### `--disable-sync`
-Disable syncing to a Google account
-
-### `--metrics-recording-only`
-Disable reporting to UMA, but allows for collection
-
-### `--disable-default-apps`
-Disable installation of default apps on first run
-
-### `--mute-audio`
-Mute any audio
-
-### `--no-default-browser-check`
-Disable the default browser check, do not prompt to set it as such
-
-### `--no-first-run`
-Skip first run wizards
-
-### `--disable-background-timer-throttling`
-Disable timers being throttled in background pages/tabs
-
-### `--disable-client-side-phishing-detection`
-Disables client-side phishing detection.
-
-### `--disable-popup-blocking`
-Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
-
-### `--disable-prompt-on-repost`
-Reloading a page that came from a POST normally prompts the user.
-
-### `--enable-automation`
-Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs)
-
-* disables bubble notification about running development/unpacked extensions
-* disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
-* disables infobar animations
-* disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
-* means the default browser check prompt isn't shown
-* avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
-* adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
-
-Note that some projects have chosen to avoid using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
-
-### `--password-store=basic`
-Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
-
-### `--use-mock-keychain`
-Use mock keychain on Mac to prevent blocking permissions dialogs
-
-### `--test-type`
-Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
-
-* It avoids creating application stubs in ~/Applications on mac.
-* It makes exit codes slightly more correct
-* windows navigation jumplists arent updated https://bugs.chromium.org/p/chromium/issues/detail?id=389375
-* doesn't start some chrome StartPageService
-* disables initializing chromecast service
-* "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
-* when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
-
-## Flags to triage
-
-These flags are being used in various tools. They also just need to be documented with their effects and confirmed as still present in Chrome.
+* `--disable-background-timer-throttling`: Disable timers being throttled in background pages/tabs
+* `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
+* `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
+* `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
+  - disables bubble notification about running development/unpacked extensions
+  - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
+  - disables infobar animations
+  - disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
+  - means the default browser check prompt isn't shown
+  - avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
+  - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
+* `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
+* `--use-mock-keychain`: Use mock keychain on Mac to prevent blocking permissions dialogs
+* `--test-type`: Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
+  - It avoids creating application stubs in ~/Applications on mac.
+  - It makes exit codes slightly more correct
+  - windows navigation jumplists arent updated https://bugs.chromium.org/p/chromium/issues/detail?id=389375
+  - doesn't start some chrome StartPageService
+  - disables initializing chromecast service
+  - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
+  - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
 
 ```sh
---process-per-tab
---new-window
+--process-per-tab # Doesn't do anything. Use --single-process instead.
+--single-process # Runs the renderer and plugins in the same process as the browser.
+--new-window # Launches URL in new browser window.
 --allow-running-insecure-content
---silent-debugger-extension-api
+--silent-debugger-extension-api # Does not show an infobar when an extension attaches to a page using chrome.debugger page. Required to attach to extension background pages.
 --disable-device-discovery-notifications # Avoid messages like "New printer on your network"
---disable-domain-reliability
 --disable-notifications
 --disable-component-update # Don't update the browser 'components' listed at chrome://components/
 --disable-domain-reliability # Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
