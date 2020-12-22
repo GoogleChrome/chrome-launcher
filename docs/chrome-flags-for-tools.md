@@ -1,26 +1,38 @@
+# Chrome Flags for Tooling
+
 Many tools maintain a list of runtime flags for Chrome to configure the environment. This file
 is an attempt to document all chrome flags that are relevant to tools, automation, benchmarking, etc.
 
 All use cases are different, so you'll have to choose which flags are most appropriate.
 
-## Disable things not typically desired in automated scenarios
+## Commonly unwanted browser features
 
 * `--disable-extensions`: Disable all chrome extensions.
 * `--disable-component-extensions-with-background-pages`: Disable some built-in extensions that aren't affected by `--disable-extensions`
-* `--disable-background-networking`: Disable various background network services, including extension updating,safe browsing service, upgrade detector, translate, UMA
-* `--disable-sync`: Disable syncing to a Google account
 * `--no-first-run`: Skip first run wizards
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
-* `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
 * `--disable-default-apps`: Disable installation of default apps on first run
 * `--disable-client-side-phishing-detection`: Disables client-side phishing detection.
 * `--mute-audio`: Mute any audio
 
-# Performance & web platform behavior
+## Performance & web platform behavior
 
 * `--disable-background-timer-throttling`: Disable timers being throttled in background pages/tabs
-* `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
+* `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
+* `--disable-features=ScriptStreaming`: V8 script streaming
+* `--disable-hang-monitor`
+* `--disable-ipc-flooding-protection`: Some javascript functions can be used to flood the browser process with IPC. By default, protection is on to limit the number of IPC sent to 10 per second per frame. This flag disables it. https://crrev.com/604305
+* `--disable-backgrounding-occluded-windows`
+* `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. https://github.com/karma-runner/karma-chrome-launcher/issues/123
+* `--js-flags=--random-seed=1157259157`
+* `--autoplay-policy=user-gesture-required`: Don't render video
+* `--allow-running-insecure-content`
+* `--disable-notifications`: Disables the Web Notification and the Push APIs.
+
+
+## Test & debugging flags
+
 * `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
   - disables bubble notification about running development/unpacked extensions
   - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
@@ -39,78 +51,59 @@ All use cases are different, so you'll have to choose which flags are most appro
   - disables initializing chromecast service
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
+* `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
+* `--log-level=0`: 0 means INFO and higher.
+* `--remote-debugging-pipe`: more secure than using protocol over a websocket
+* `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
+* `--disable-device-discovery-notifications`: Avoid messages like "New printer on your network"
 
-```sh
---process-per-tab # Doesn't do anything. Use --single-process instead.
---single-process # Runs the renderer and plugins in the same process as the browser.
---new-window # Launches URL in new browser window.
---allow-running-insecure-content
---silent-debugger-extension-api # Does not show an infobar when an extension attaches to a page using chrome.debugger page. Required to attach to extension background pages.
---disable-device-discovery-notifications # Avoid messages like "New printer on your network"
---disable-notifications
---disable-component-update # Don't update the browser 'components' listed at chrome://components/
---disable-domain-reliability # Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
---disable-breakpad # Disable crashdump collection (reporting is already disabled in Chromium)
---enable-crash-reporter-for-testing # Used for turning on Breakpad crash reporting in a debug environment
-  # where crash reporting is typically compiled but disabled.
+## Background updates, networking, reporting
 
---disable-features=site-per-process # Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
---disable-features=ScriptStreaming # V8 script streaming
---disable-hang-monitor
+* `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
+* `--disable-background-networking`: Disable various background network services, including extension updating,safe browsing service, upgrade detector, translate, UMA
+* `--disable-sync`: Disable syncing to a Google account
+* `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
+* `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
+* `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
+* `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 
---disable-backgrounding-occluded-windows
---disable-ipc-flooding-protection # Some javascript functions can be used to flood the browser process with IPC.
-    # By default, protection is on to limit the number of IPC sent to 10 per second per frame.
-    # This flag disables it. https://crrev.com/604305
+## Rendering & GPU
 
---disable-renderer-backgrounding # This disables non-foreground tabs from getting a lower process priority
-                                 # This doesn't (on its own) affect timers or painting behavior.
-                                 # https://github.com/karma-runner/karma-chrome-launcher/issues/123
+* `--deterministic-mode`: An experimental meta flag. This sets the below indented flags which put the browser into a mode where rendering (border radius, etc) is deterministic and begin frames should be issued over DevTools Protocol. https://source.chromium.org/chromium/chromium/src/+/master:headless/app/headless_shell.cc;drc=df45d1abbc20abc7670643adda6d9625eea55b4d
+  - `--run-all-compositor-stages-before-draw`
+  - `--disable-new-content-rendering-timeout`
+  - `--enable-begin-frame-control`
+  - `--disable-threaded-animation`
+  - `--disable-threaded-scrolling`
+  - `--disable-checker-imaging`
+  - `--disable-image-animation-resync`
+* `--in-process-gpu`: Saves some memory by moving GPU process into a browser process thread
+* `--disable-partial-raster`: crbug.com/919955
+* `--disable-skia-runtime-opts`: Do not use runtime-detected high-end CPU optimizations in Skia.
+* `--use-gl="swiftshader"`: Select which implementation of GL the GPU process should use. Options are: `desktop`: whatever desktop OpenGL the user has installed (Linux and Mac default). `egl`: whatever EGL / GLES2 the user has installed (Windows default - actually ANGLE). `swiftshader`: The SwiftShader software renderer.
+* `--disable-features=PaintHolding`: Don't defer paint commits (normally used to avoid flash of unstyled content)
 
---remote-debugging-pipe # more secure than using protocol over a websocket
---enable-logging=stderr # Logging behavior slightly more appropriate for a server-type process.
---log-level=0 # 0 means INFO and higher.
---block-new-web-contents # All pop-ups and calls to window.open will fail.
---js-flags=--random-seed=1157259157
---autoplay-policy=user-gesture-required # Don't render video
+## Window & screen management
 
---disable-dev-shm-usage # https://github.com/GoogleChrome/puppeteer/issues/1834
---no-sandbox # often used with headless, though ideally you don't need to.
+* `--block-new-web-contents`: All pop-ups and calls to window.open will fail.
+* `--window-position=0,0`
+* `--new-window`: Launches URL in new browser window.
+* `--window-size=1600,1024`
+* `--force-device-scale-factor=1`
+* `--force-color-profile=srgb`: Force all monitors to be treated as though they have the specified color profile.
 
-# Headless rendering stuff
---deterministic-mode # An experimental meta flag. This sets the below indented flags
-  # which put the browser into a mode where rendering (border radius, etc) is deterministic
-  # and begin frames should be issued over DevTools Protocol.
-  # https://source.chromium.org/chromium/chromium/src/+/master:headless/app/headless_shell.cc;drc=df45d1abbc20abc7670643adda6d9625eea55b4d
-  --run-all-compositor-stages-before-draw
-  --disable-new-content-rendering-timeout
-  --enable-begin-frame-control
-  --disable-threaded-animation
-  --disable-threaded-scrolling
-  --disable-checker-imaging
-  --disable-image-animation-resync
+## Process management
 
---in-process-gpu # Saves some memory by moving GPU process into a browser process thread
---disable-partial-raster # crbug.com/919955
---disable-skia-runtime-opts # Do not use runtime-detected high-end CPU optimizations in Skia.
+* `--process-per-tab`: Doesn't do anything. Use --single-process instead.
+* `--single-process`: Runs the renderer and plugins in the same process as the browser.
+* `--disable-features=site-per-process`: Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
 
---use-gl="swiftshader" # Select which implementation of GL the GPU process should use. Options are:
-  # desktop: whatever desktop OpenGL the user has installed (Linux and Mac default).
-  # egl: whatever EGL / GLES2 the user has installed (Windows default - actually ANGLE).
-  # swiftshader: The SwiftShader software renderer.
+## Headless
 
---window-position=0,0
---window-size=1600,1024
---force-device-scale-factor=1
---force-color-profile=srgb # Force all monitors to be treated as though they have the specified color profile.
---disable-features=PaintHolding # Don't defer paint commits (normally used to avoid flash of unstyled content)
+* `--disable-dev-shm-usage`: https://github.com/GoogleChrome/puppeteer/issues/1834
+* `--no-sandbox`: often used with headless, though ideally you don't need to.
 
-
-
-```
-
-
-## ~Removed~ flags
+# ~Removed~ flags
 
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 * `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
@@ -124,7 +117,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
 * `--safebrowsing-disable-auto-update`
 
-## Sources
+# Sources
 
 * [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
@@ -132,5 +125,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/search?q=f:catapult%20f:desktop%20symbol:GetBrowserStartupArgs&ss=chromium%2Fchromium%2Fsrc)
 * [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
-## All Chrome flags
+
+# All Chrome flags
+
 * [Peter.sh's canonical list of Chrome command-line switches](http://peter.sh/experiments/chromium-command-line-switches/)
