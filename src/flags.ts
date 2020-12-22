@@ -41,7 +41,7 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--disable-background-timer-throttling',
   // Disable the default throttling of IPC between renderer & browser processes.
   '--disable-ipc-flooding-protection',
-  // Disable some features not appropriate for automation https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md#--enable-automation
+  // Disable various features not appropriate for automation
   '--enable-automation',
   // Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003 crbug.com/991424
   '--password-store=basic',
