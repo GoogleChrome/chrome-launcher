@@ -17,6 +17,8 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable various background network services, including extension updating,
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
+  // Don't update the browser 'components' listed at chrome://components/
+  '--disable-component-update',
   // Disables client-side phishing detection.
   '--disable-client-side-phishing-detection',
   // Disable syncing to a Google account
@@ -41,7 +43,7 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--disable-ipc-flooding-protection',
   // Disable some features not appropriate for automation https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md#--enable-automation
   '--enable-automation',
-  // Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
+  // Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003 crbug.com/991424
   '--password-store=basic',
   // Use mock keychain on Mac to prevent blocking permissions dialogs
   '--use-mock-keychain',
