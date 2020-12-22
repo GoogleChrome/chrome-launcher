@@ -111,7 +111,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-desktop-notifications`
 * `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
-* `--disable-save-password-bubble`
+* `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
