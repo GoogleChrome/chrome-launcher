@@ -2,7 +2,7 @@ name: 🛠
 
 on:
   push:
-    # branches: [master]
+    branches: [master]
   pull_request: # run on all PRs, not just PRs to a particular branch
 
 jobs:
@@ -31,4 +31,4 @@ jobs:
     # Run tests that require headful Chrome.
     - run: sudo apt-get install xvfb
     - name: yarn test
-      run: xvfb-run --auto-servernum yarn test
+      run: xvfb-run --auto-servernum yarn test --reporter=spec
