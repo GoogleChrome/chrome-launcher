@@ -31,3 +31,4 @@ jobs:
     # Run tests that require headful Chrome.
     - run: sudo apt-get install xvfb
     - name: yarn test
+      run: xvfb-run --auto-servernum yarn test
