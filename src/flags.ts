@@ -5,6 +5,8 @@
  */
 'use strict';
 
+// https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
+
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable built-in Google Translate service
   '--disable-features=Translate',
@@ -15,6 +17,8 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   // Disable various background network services, including extension updating,
   //   safe browsing service, upgrade detector, translate, UMA
   '--disable-background-networking',
+  // Disables client-side phishing detection.
+  '--disable-client-side-phishing-detection',
   // Disable syncing to a Google account
   '--disable-sync',
   // Disable reporting to UMA, but allows for collection
@@ -33,6 +37,12 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--disable-renderer-backgrounding',
   // Disable task throttling of timer tasks from background pages.
   '--disable-background-timer-throttling',
+  // Disable some features not appropriate for automation https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md#--enable-automation
+  '--enable-automation',
+  // Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
+  '--password-store=basic',
+  // Use mock keychain on Mac to prevent blocking permissions dialogs
+  '--use-mock-keychain',
   // Disable background tracing (aka slow reports & deep reports) to avoid 'Tracing already started'
   '--force-fieldtrials=*BackgroundTracing/default/',
 ];
