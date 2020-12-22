@@ -100,7 +100,7 @@ These flags are being used in various tools. They also just need to be documente
 --disable-hang-monitor
 
 --disable-backgrounding-occluded-windows
---disable-ipc-flooding-protection # https://crrev.com/604305
+--disable-ipc-flooding-protection # Some javascript functions can be used to flood the browser process with IPC. By default, protection is on to limit the number of IPC sent to 10 per second per frame. This flag disables it. https://crrev.com/604305
 
 --disable-renderer-backgrounding # This disables non-foreground tabs from getting a lower process priority
                                  # This doesn't (on its own) affect timers or painting behavior.
