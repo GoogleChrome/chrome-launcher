@@ -33,7 +33,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 ## Test & debugging flags
 
 * `--disable-device-discovery-notifications`: Avoid messages like "New printer on your network"
-* `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
+* `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
   - disables bubble notification about running development/unpacked extensions
   - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/master:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
   - disables infobar animations
@@ -114,7 +114,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-save-password-bubble`
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
-* `--safebrowsing-disable-auto-update`
+* `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
 
 # Sources
 
