@@ -7,10 +7,10 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 ## Commonly unwanted browser features
 
-* `--disable-client-side-phishing-detection`: Disables client-side phishing detection.
+* `--disable-client-side-phishing-detection`: Disables client-side phishing detection
 * `--disable-component-extensions-with-background-pages`: Disable some built-in extensions that aren't affected by `--disable-extensions`
-* `--disable-default-apps`: Disable installation of default apps on first run
-* `--disable-extensions`: Disable all chrome extensions.
+* `--disable-default-apps`: Disable installation of default apps
+* `--disable-extensions`: Disable all chrome extensions
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
@@ -94,13 +94,14 @@ All use cases are different, so you'll have to choose which flags are most appro
 ## Process management
 
 * `--disable-features=site-per-process`: Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
-* `--process-per-tab`: Doesn't do anything. Use --single-process instead.
+* `--process-per-tab`: [Doesn't do anything](https://source.chromium.org/chromium/chromium/src/+/master:content/public/common/content_switches.cc;l=602-605;drc=2149a93144ce2030ab20863c2983b6c9d7bfd177). Use --single-process instead.
 * `--single-process`: Runs the renderer and plugins in the same process as the browser.
 
 ## Headless
 
-* `--disable-dev-shm-usage`: https://github.com/GoogleChrome/puppeteer/issues/1834
-* `--no-sandbox`: often used with headless, though ideally you don't need to.
+* `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
+* `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
+* `--disable-gpu`: Sometimes [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) with headless.
 
 # ~Removed~ flags
 
