@@ -14,6 +14,8 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
+* `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
+* `--use-file-for-fake-video-capture=<path-to-file>`: Use file for fake video capture (.y4m or .mjpeg) Needs `--use-fake-device-for-media-stream`
 
 ## Performance & web platform behavior
 
