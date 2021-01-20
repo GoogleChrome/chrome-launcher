@@ -12,7 +12,7 @@ jobs:
       matrix:
         # awaiting support for 'latest'/'lts'. https://github.com/actions/setup-node/issues/26
         node: [ '10', '12', '14' ]
-        name: basics (node ${{ matrix.node }})
+    name: basics (node ${{ matrix.node }})
 
     steps:
     - name: git clone
