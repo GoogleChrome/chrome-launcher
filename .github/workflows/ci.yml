@@ -2,7 +2,6 @@ name: 🛠
 
 on:
   push:
-    branches: [master]
   pull_request: # run on all PRs, not just PRs to a particular branch
 
 jobs:
@@ -33,3 +32,23 @@ jobs:
     - run: sudo apt-get install xvfb
     - name: yarn test
       run: xvfb-run --auto-servernum yarn test --reporter=spec
+
+  unit:
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: unit_${{ matrix.os }}
+
+    steps:
+    - name: git clone
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14.x
+
+    - run: yarn --frozen-lockfile
+    - run: yarn build
+    - run: yarn test --reporter=spec
