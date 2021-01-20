@@ -96,7 +96,7 @@ describe('Launcher', () => {
     await chromeInstance.launch();
     await chromeInstance.kill();
     await chromeInstance.kill();
-  });
+  }).timeout(30 * 1000);
 
   it('doesn\'t fail when killing all instances', async () => {
     await launch();
