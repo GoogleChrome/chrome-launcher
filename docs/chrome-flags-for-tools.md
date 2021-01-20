@@ -45,18 +45,18 @@ All use cases are different, so you'll have to choose which flags are most appro
   - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
 * `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
 * `--log-level=0`: 0 means INFO and higher.
-* `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. crbug.com/571003
+* `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/master/docs/linux/password_storage.md) https://crbug.com/571003
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
 * `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
 * `--test-type`: Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
   - It avoids creating application stubs in ~/Applications on mac.
   - It makes exit codes slightly more correct
-  - windows navigation jumplists arent updated crbug.com/389375
+  - windows navigation jumplists arent updated https://crbug.com/389375
   - doesn't start some chrome StartPageService
   - disables initializing chromecast service
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
-* `--use-mock-keychain`: Use mock keychain on Mac to prevent blocking permissions dialogs
+* `--use-mock-keychain`: Use mock keychain on Mac to prevent blocking permissions dialogs. https://crbug.com/865247
 
 ## Background updates, networking, reporting
 
@@ -79,7 +79,7 @@ All use cases are different, so you'll have to choose which flags are most appro
   - `--disable-checker-imaging`
   - `--disable-image-animation-resync`
 * `--disable-features=PaintHolding`: Don't defer paint commits (normally used to avoid flash of unstyled content)
-* `--disable-partial-raster`: crbug.com/919955
+* `--disable-partial-raster`: https://crbug.com/919955
 * `--disable-skia-runtime-opts`: Do not use runtime-detected high-end CPU optimizations in Skia.
 * `--in-process-gpu`: Saves some memory by moving GPU process into a browser process thread
 * `--use-gl="swiftshader"`: Select which implementation of GL the GPU process should use. Options are: `desktop`: whatever desktop OpenGL the user has installed (Linux and Mac default). `egl`: whatever EGL / GLES2 the user has installed (Windows default - actually ANGLE). `swiftshader`: The SwiftShader software renderer.
@@ -114,7 +114,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-desktop-notifications`
 * `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
-* `--disable-save-password-bubble`
+* `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
