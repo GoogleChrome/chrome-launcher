@@ -7,7 +7,7 @@
 
 import {join} from 'path';
 import {execSync} from 'child_process';
-import * as mkdirp from 'mkdirp';
+import {mkdirSync} from 'fs';
 import isWsl = require('is-wsl');
 
 export const enum LaunchErrorCodes {
@@ -101,6 +101,6 @@ function makeWin32TmpDir() {
   const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);
   const tmpdir = join(winTmpPath, 'lighthouse.' + randomNumber);
 
-  mkdirp.sync(tmpdir);
+  mkdirSync(tmpdir, {recursive: true});
   return tmpdir;
 }
