@@ -8,7 +8,6 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
-import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
@@ -26,8 +25,6 @@ const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32', 'wsl']);
 type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set<Launcher>();
-
-export type RimrafModule = (path: string, callback: (error: Error) => void) => void;
 
 export interface Options {
   startingUrl?: string;
@@ -52,7 +49,6 @@ export interface LaunchedChrome {
 
 export interface ModuleOverrides {
   fs?: typeof fs;
-  rimraf?: RimrafModule;
   spawn?: typeof childProcess.spawn;
 }
 
@@ -113,7 +109,6 @@ class Launcher {
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
-  private rimraf: RimrafModule;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
@@ -125,7 +120,6 @@ class Launcher {
 
   constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
     this.fs = moduleOverrides.fs || fs;
-    this.rimraf = moduleOverrides.rimraf || rimraf;
     this.spawn = moduleOverrides.spawn || spawn;
 
     log.setLevel(defaults(this.opts.logLevel, 'silent'));
@@ -384,7 +378,7 @@ class Launcher {
         delete this.errFile;
       }
 
-      this.rimraf(this.userDataDir, () => resolve());
+      this.fs.rmdir(this.userDataDir, {recursive: true}, () => resolve());
     });
   }
 };

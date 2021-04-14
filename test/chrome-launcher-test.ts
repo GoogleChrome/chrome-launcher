@@ -15,14 +15,15 @@ const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
-  writeFileSync: () => {}
+  writeFileSync: () => {},
+  rmdir: () => {},
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
   const spawnStub = stub().returns({pid: 'some_pid'});
 
   const chromeInstance =
-      new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
+      new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});
   stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
 
   chromeInstance.prepare();
@@ -53,24 +54,25 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const rimrafMock = spy();
+    const fs = {...fsMock, rmdir: spy()};
     const chromeInstance =
-        new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any, rimraf: rimrafMock as any});
+        new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     chromeInstance.prepare();
 
     await chromeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 0);
+    assert.strictEqual(fs.rmdir.callCount, 0);
   });
 
   it('cleans up the tmp dir after closing', async () => {
-    const rimrafMock = stub().callsFake((_, done) => done());
+    const rmdirMock = stub().callsFake((_path, _options, done) => done());
+    const fs = {...fsMock, rmdir: rmdirMock};
 
-    const chromeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
+    const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
     await chromeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 1);
+    assert.strictEqual(fs.rmdir.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
