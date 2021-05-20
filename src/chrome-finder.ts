@@ -197,12 +197,22 @@ export function win32() {
     installations.push(customChromePath);
   }
 
+  // Search common locations for chrome.exe
   prefixes.forEach(prefix => suffixes.forEach(suffix => {
     const chromePath = path.join(prefix, suffix);
     if (canAccess(chromePath)) {
       installations.push(chromePath);
     }
   }));
+
+  // Search %PATH% for chrome.exe
+  process.env.Path?.split(';')?.forEach(prefix => {
+    const chromePath = path.join(prefix, 'chrome.exe')
+    if (canAccess(chromePath)) {
+      installations.push(chromePath)
+    }
+  });
+
   return installations;
 }
 
