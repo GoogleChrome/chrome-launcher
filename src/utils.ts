@@ -73,23 +73,51 @@ export function makeTmpDir() {
   }
 }
 
+function toWinDirFormat(dir: string = ''): string {
+  const results = /\/mnt\/([a-z])\//.exec(dir);
+
+  if (!results) {
+    return dir;
+  }
+
+  const driveLetter = results[1];
+  return dir.replace(`/mnt/${driveLetter}/`, `${driveLetter.toUpperCase()}:\\`)
+      .replace(/\//g, '\\');
+}
+
 export function toWin32Path(dir: string = ''): string {
   if (/[a-z]:\\/iu.test(dir)) {
     return dir;
   }
 
-  return execFileSync('wslpath', ['-w', dir]).toString().trim();
+  try {
+    return execFileSync('wslpath', ['-w', dir]).toString().trim();
+  } catch {
+    return toWinDirFormat(dir);
+  }
 }
 
-export function toWSLPath(dir: string = ''): string {
-  return execFileSync('wslpath', ['-u', dir]).toString().trim();
+export function toWSLPath(dir: string, fallback: string): string {
+  try {
+    return execFileSync('wslpath', ['-u', dir]).toString().trim();
+  } catch {
+    return fallback;
+  }
+}
+
+function getLocalAppDataPath(path: string): string {
+  const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
+  const results = userRegExp.exec(path) || [];
+
+  return `/mnt/${results[1]}/Users/${results[2]}/AppData/Local`;
 }
 
 export function getWSLLocalAppDataPath(path: string): string {
   const userRegExp = /\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
-  return toWSLPath(`${results[1]}:\\Users\\${results[2]}\\AppData\\Local`);
+  return toWSLPath(
+      `${results[1]}:\\Users\\${results[2]}\\AppData\\Local`, getLocalAppDataPath(path));
 }
 
 function makeUnixTmpDir() {

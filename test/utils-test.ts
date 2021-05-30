@@ -45,6 +45,24 @@ describe('toWin32Path', () => {
       assert.ok(execFileSyncStub.notCalled);
     });
   })
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('falls back to the toWinDirFormat method', () => {
+      const wsl = '/mnt/c/Users/user1/AppData/';
+      const windows = 'C:\\Users\\user1\\AppData\\';
+
+      assert.strictEqual(toWin32Path(wsl), windows);
+    });
+
+    it('supports the drive letter not being C', () => {
+      const wsl = '/mnt/d/Users/user1/AppData';
+      const windows = 'D:\\Users\\user1\\AppData';
+
+      assert.strictEqual(toWin32Path(wsl), windows);
+    })
+  });
 })
 
 describe('toWSLPath', () => {
@@ -53,7 +71,7 @@ describe('toWSLPath', () => {
   it('calls wslpath -u', () => {
     execFileSyncStub.returns(asBuffer(''));
 
-    toWSLPath('');
+    toWSLPath('', '');
 
     assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', '']));
   })
@@ -61,7 +79,18 @@ describe('toWSLPath', () => {
   it('trims off the trailing newline', () => {
     execFileSyncStub.returns(asBuffer('the-path\n'));
 
-    assert.strictEqual(toWSLPath(''), 'the-path');
+    assert.strictEqual(toWSLPath('', ''), 'the-path');
+  })
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('uses the fallback path', () => {
+      assert.strictEqual(
+        toWSLPath('C:/Program Files', '/mnt/c/Program Files'),
+        '/mnt/c/Program Files'
+      );
+    })
   })
 })
 
@@ -75,5 +104,16 @@ describe('getWSLLocalAppDataPath', () => {
 
     assert.strictEqual(getWSLLocalAppDataPath(path), '/c/folder/');
     assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', 'c:\\Users\\user1\\AppData\\Local']));
+  });
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('falls back to the getLocalAppDataPath method', () => {
+      const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
+      const appDataPath = '/mnt/c/Users/user1/AppData/Local';
+
+      assert.strictEqual(getWSLLocalAppDataPath(path), appDataPath);
+    });
   });
 });
