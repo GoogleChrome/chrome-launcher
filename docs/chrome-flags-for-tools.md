@@ -103,7 +103,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
 * `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
-* `--disable-gpu`: Sometimes [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) with headless.
+* `--disable-gpu`: Was often [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) along with `--headless`, but as of 2021, isn't needed.
 
 # ~Removed~ flags
 
