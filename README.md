@@ -40,6 +40,11 @@ npm install chrome-launcher
   // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts
   chromeFlags: Array<string>;
 
+  // (optional) Additional preferences to be set in Chrome, for example: {'download.default_directory': __dirname}
+  // See: https://src.chromium.org/viewvc/chrome/trunk/src/chrome/common/pref_names.cc?view=markup
+  // Do note, if you set preferences when using your default profile it will overwrite these
+  prefs: {[key: string]: Object};
+
   // (optional) Close the Chrome process on `Ctrl-C`
   // Default: true
   handleSIGINT: boolean;

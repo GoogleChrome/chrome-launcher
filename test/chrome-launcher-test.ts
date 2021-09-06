@@ -64,6 +64,37 @@ describe('Launcher', () => {
     assert.strictEqual(fs.rmdir.callCount, 0);
   });
 
+  it('allows to overwrite browser prefs', async () => {
+    const existStub = stub().returns(true)
+    const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
+    const writeFileStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const chromeInstance =
+        new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
+
+    chromeInstance.prepare();
+    assert.equal(
+      writeFileStub.getCall(0).args[1],
+      '{"some":"prefs","download.default_directory":"/some/dir"}'
+    )
+  });
+
+  it('allows to set browser prefs', async () => {
+    const existStub = stub().returns(false)
+    const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
+    const writeFileStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const chromeInstance =
+        new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
+
+    chromeInstance.prepare();
+    assert.equal(readFileStub.getCalls().length, 0)
+    assert.equal(
+      writeFileStub.getCall(0).args[1],
+      '{"download.default_directory":"/some/dir"}'
+    )
+  });
+
   it('cleans up the tmp dir after closing', async () => {
     const rmdirMock = stub().callsFake((_path, _options, done) => done());
     const fs = {...fsMock, rmdir: rmdirMock};

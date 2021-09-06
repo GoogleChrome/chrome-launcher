@@ -26,9 +26,12 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set<Launcher>();
 
+type JSONLike =|{[property: string]: JSONLike}|readonly JSONLike[]|string|number|boolean|null;
+
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
+  prefs?: Record<string, JSONLike>;
   port?: number;
   handleSIGINT?: boolean;
   chromePath?: string;
@@ -105,6 +108,7 @@ class Launcher {
   private chromePath?: string;
   private ignoreDefaultFlags?: boolean;
   private chromeFlags: string[];
+  private prefs: Record<string, JSONLike>;
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
@@ -127,6 +131,7 @@ class Launcher {
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
+    this.prefs = defaults(this.opts.prefs, {});
     this.requestedPort = defaults(this.opts.port, 0);
     this.chromePath = this.opts.chromePath;
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
@@ -197,6 +202,8 @@ class Launcher {
     this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
     this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
 
+    this.setBrowserPrefs();
+
     // fix for Node4
     // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.userDataDir}/chrome.pid`;
@@ -204,6 +211,28 @@ class Launcher {
     log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
 
     this.tmpDirandPidFileReady = true;
+  }
+
+  private setBrowserPrefs() {
+    // don't set prefs if not defined
+    if (Object.keys(this.prefs).length === 0) {
+      return;
+    }
+
+    const preferenceFile = `${this.userDataDir}/Preferences`;
+    try {
+      if (this.fs.existsSync(preferenceFile)) {
+        // overwrite existing file
+        const file = this.fs.readFileSync(preferenceFile, 'utf-8');
+        const content = JSON.parse(file);
+        this.fs.writeFileSync(preferenceFile, JSON.stringify({...content, ...this.prefs}), 'utf-8');
+      } else {
+        // create new Preference file
+        this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
+      }
+    } catch (err) {
+      log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
+    }
   }
 
   async launch() {
@@ -259,7 +288,9 @@ class Launcher {
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
 
-      this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      if (chrome.pid) {
+        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      }
 
       log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
       return chrome.pid;
@@ -347,7 +378,9 @@ class Launcher {
             // if you don't explicitly set `stdio`
             execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
           } else {
-            process.kill(-this.chrome.pid);
+            if (this.chrome.pid) {
+              process.kill(-this.chrome.pid);
+            }
           }
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
