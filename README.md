@@ -41,7 +41,7 @@ npm install chrome-launcher
   chromeFlags: Array<string>;
 
   // (optional) Additional preferences to be set in Chrome, for example: {'download.default_directory': __dirname}
-  // See: https://src.chromium.org/viewvc/chrome/trunk/src/chrome/common/pref_names.cc?view=markup
+  // See: https://chromium.googlesource.com/chromium/src/+/main/chrome/common/pref_names.cc
   // Do note, if you set preferences when using your default profile it will overwrite these
   prefs: {[key: string]: Object};
 
