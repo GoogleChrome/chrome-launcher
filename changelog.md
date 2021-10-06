@@ -1,3 +1,9 @@
+## v0.14.0 (Wed, Oct 6 2021)
+
+* `630bb77f` feat: set browser preferences ([#247](https://github.com/GoogleChrome/chrome-launcher/pull/247))
+* `12b2c8e3` docs(flags): note that disable-gpu isnt needed
+
+
 ## v0.14.0 (Tue, May 18 2021)
 * `ac1f4aff` move to minimum node 12; remove `rimraf` ([#237](https://github.com/GoogleChrome/chrome-launcher/pull/237))
 * `dec646c4` deps: remove `mkdirp` for `fs.mkdirSync` ([#234](https://github.com/GoogleChrome/chrome-launcher/pull/234))
