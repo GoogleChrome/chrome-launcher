@@ -54,7 +54,7 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const fs = {...fsMock, rmdir: spy()};
+    const fs = {...fsMock, rmdir: spy(), rm: spy()};
     const chromeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
@@ -62,6 +62,7 @@ describe('Launcher', () => {
 
     await chromeInstance.destroyTmp();
     assert.strictEqual(fs.rmdir.callCount, 0);
+    assert.strictEqual(fs.rm.callCount, 0);
   });
 
   it('allows to overwrite browser prefs', async () => {
@@ -96,14 +97,14 @@ describe('Launcher', () => {
   });
 
   it('cleans up the tmp dir after closing', async () => {
-    const rmdirMock = stub().callsFake((_path, _options, done) => done());
-    const fs = {...fsMock, rmdir: rmdirMock};
+    const rmMock = stub().callsFake((_path, _options, done) => done());
+    const fs = {...fsMock, rmdir: rmMock, rm: rmMock};
 
     const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
     await chromeInstance.destroyTmp();
-    assert.strictEqual(fs.rmdir.callCount, 1);
+    assert.strictEqual(rmMock.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
