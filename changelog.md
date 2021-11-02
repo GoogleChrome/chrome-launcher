@@ -1,4 +1,9 @@
-## v0.14.0 (Wed, Oct 6 2021)
+## v0.14.2 (Wed, Oct 6 2021)
+
+`ba8d76bd` fix chrome connection in node 17, use 127.0.0.1 explicitly ([#253](https://github.com/GoogleChrome/chrome-launcher/pull/253))
+`56731dd8` fix: forward support for fs.rm in node 14.14+ ([#242](https://github.com/GoogleChrome/chrome-launcher/pull/242))
+
+## v0.14.1 (Wed, Oct 6 2021)
 
 * `630bb77f` feat: set browser preferences ([#247](https://github.com/GoogleChrome/chrome-launcher/pull/247))
 * `12b2c8e3` docs(flags): note that disable-gpu isnt needed
