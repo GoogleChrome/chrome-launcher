@@ -410,7 +410,7 @@ class Launcher {
         this.fs.closeSync(this.errFile);
         delete this.errFile;
       }
-        
+
       // backwards support for node v12 + v14.14+
       // https://nodejs.org/api/deprecations.html#DEP0147
       const rm = this.fs.rm || this.fs.rmdir;
