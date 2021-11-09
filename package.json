@@ -13,6 +13,9 @@
     "type-check": "tsc --allowJs --checkJs --noEmit --target es2019 *.js",
     "prepublishOnly": "npm run build && npm run test"
   },
+  "bin": {
+    "print-chrome-path": "bin/print-chrome-path.js"
+  },
   "devDependencies": {
     "@types/mocha": "^8.0.4",
     "@types/sinon": "^9.0.1",

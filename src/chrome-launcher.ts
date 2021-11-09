@@ -84,6 +84,15 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
 }
 
+/** Returns Chrome installation path that chrome-launcher will launch by default. */
+function getChromePath(): string {
+  const installation = Launcher.getFirstInstallation();
+  if (!installation) {
+    throw new ChromeNotInstalledError();
+  }
+  return installation;
+}
+
 async function killAll(): Promise<Array<Error>> {
   let errors = [];
   for (const instance of instances) {
@@ -420,4 +429,4 @@ class Launcher {
 };
 
 export default Launcher;
-export {Launcher, launch, killAll};
+export {Launcher, launch, killAll, getChromePath};

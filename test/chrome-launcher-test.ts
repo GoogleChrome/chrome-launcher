@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options} from '../src/chrome-launcher';
+import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher';
 import {DEFAULT_FLAGS} from '../src/flags';
 
 import {spy, stub} from 'sinon';
@@ -216,5 +216,15 @@ describe('Launcher', () => {
   it('throws an error when chromePath is empty', (done) => {
     const chromeInstance = new Launcher({chromePath: ''});
     chromeInstance.launch().catch(() => done());
+  });
+
+  describe('getChromePath', async () => {
+    it('returns the same path as a full Launcher launch', async () => {
+      const spawnStub = await launchChromeWithOpts();
+      const launchedPath = spawnStub.getCall(0).args[0] as string;
+
+      const chromePath = getChromePath();
+      assert.strictEqual(chromePath, launchedPath);
+    });
   });
 });
