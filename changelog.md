@@ -1,7 +1,11 @@
-## v0.14.2 (Wed, Oct 6 2021)
+## v0.15.0 (Wed, Nov 10 2021)
 
-`ba8d76bd` fix chrome connection in node 17, use 127.0.0.1 explicitly ([#253](https://github.com/GoogleChrome/chrome-launcher/pull/253))
-`56731dd8` fix: forward support for fs.rm in node 14.14+ ([#242](https://github.com/GoogleChrome/chrome-launcher/pull/242))
+* `1af60cb` add `getChromePath()` method for printing found chrome path ([#255](https://github.com/GoogleChrome/chrome-launcher/pull/255))
+
+## v0.14.2 (Tue, Nov 2 2021)
+
+* `ba8d76bd` fix chrome connection in node 17, use 127.0.0.1 explicitly ([#253](https://github.com/GoogleChrome/chrome-launcher/pull/253))
+* `56731dd8` fix: forward support for fs.rm in node 14.14+ ([#242](https://github.com/GoogleChrome/chrome-launcher/pull/242))
 
 ## v0.14.1 (Wed, Oct 6 2021)
 
