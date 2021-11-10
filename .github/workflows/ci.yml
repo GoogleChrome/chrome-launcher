@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # awaiting support for 'latest'/'lts'. https://github.com/actions/setup-node/issues/26
-        node: [ '12', '14', '15' ]
+        node: [ '12', '14', '16', '17' ]
     name: basics (node ${{ matrix.node }})
 
     steps:
