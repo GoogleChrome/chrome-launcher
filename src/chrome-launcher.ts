@@ -405,11 +405,6 @@ class Launcher {
 
   destroyTmp() {
     return new Promise<void>(resolve => {
-      // Only clean up the tmp dir if we created it.
-      if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-        return resolve();
-      }
-
       if (this.outFile) {
         this.fs.closeSync(this.outFile);
         delete this.outFile;
@@ -418,6 +413,11 @@ class Launcher {
       if (this.errFile) {
         this.fs.closeSync(this.errFile);
         delete this.errFile;
+      }
+
+      // Only clean up the tmp dir if we created it.
+      if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+        return resolve();
       }
 
       // backwards support for node v12 + v14.14+
