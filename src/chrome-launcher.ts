@@ -5,15 +5,16 @@
  */
 'use strict';
 
-import * as childProcess from 'child_process';
-import * as fs from 'fs';
-import * as net from 'net';
-import * as chromeFinder from './chrome-finder';
-import {getRandomPort} from './random-port';
-import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
+import childProcess from 'child_process';
+import fs from 'fs';
+import net from 'net';
 import {ChildProcess} from 'child_process';
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+import * as chromeFinder from './chrome-finder.js';
+import {getRandomPort} from './random-port.js';
+import {DEFAULT_FLAGS} from './flags.js';
+import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
+
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
 const isWsl = getPlatform() === 'wsl';
@@ -94,14 +95,14 @@ function getChromePath(): string {
 }
 
 async function killAll(): Promise<Array<Error>> {
-  let errors = [];
+  let errors: Error[] = [];
   for (const instance of instances) {
     try {
       await instance.kill();
       // only delete if kill did not error
       // this means erroring instances remain in the Set
       instances.delete(instance);
-    } catch (err) {
+    } catch (err: any) {
       errors.push(err);
     }
   }
@@ -109,8 +110,7 @@ async function killAll(): Promise<Array<Error>> {
 }
 
 class Launcher {
-  private tmpDirandPidFileReady = false;
-  private pidFile: string;
+  private hasPrepared = false;
   private startingUrl: string;
   private outFile?: number;
   private errFile?: number;
@@ -213,13 +213,9 @@ class Launcher {
 
     this.setBrowserPrefs();
 
-    // fix for Node4
-    // you can't pass a fd to fs.writeFileSync
-    this.pidFile = `${this.userDataDir}/chrome.pid`;
-
     log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
 
-    this.tmpDirandPidFileReady = true;
+    this.hasPrepared = true;
   }
 
   private setBrowserPrefs() {
@@ -239,7 +235,7 @@ class Launcher {
         // create new Preference file
         this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
       }
-    } catch (err) {
+    } catch (err: any) {
       log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
     }
   }
@@ -266,7 +262,7 @@ class Launcher {
       this.chromePath = installation;
     }
 
-    if (!this.tmpDirandPidFileReady) {
+    if (!this.hasPrepared) {
       this.prepare();
     }
 
@@ -298,7 +294,10 @@ class Launcher {
       this.chrome = chrome;
 
       if (chrome.pid) {
-        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+        // fix for Node4
+        // you can't pass a fd to fs.writeFileSync
+        const pidFile = `${this.userDataDir}/chrome.pid`;
+        this.fs.writeFileSync(pidFile, chrome.pid.toString());
       }
 
       log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
@@ -391,7 +390,7 @@ class Launcher {
               process.kill(-this.chrome.pid);
             }
           }
-        } catch (err) {
+        } catch (err: any) {
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
           reject(new Error(message));

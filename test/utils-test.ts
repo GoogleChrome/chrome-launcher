@@ -15,8 +15,8 @@
  */
 'use strict';
 
-import * as assert from 'assert';
-import {toWinDirFormat, getLocalAppDataPath} from '../src/utils';
+import assert from 'assert';
+import {toWinDirFormat, getLocalAppDataPath} from '../src/utils.js';
 
 describe('WSL path format to Windows', () => {
   it('transforms basic path', () => {
