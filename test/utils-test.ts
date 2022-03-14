@@ -16,24 +16,104 @@
 'use strict';
 
 import * as assert from 'assert';
-import {toWinDirFormat, getLocalAppDataPath} from '../src/utils';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath } from '../src/utils';
+import * as sinon from 'sinon';
+import * as child_process from 'child_process';
 
-describe('WSL path format to Windows', () => {
-  it('transforms basic path', () => {
-    const wsl = '/mnt/c/Users/user1/AppData/';
-    const windows = 'C:\\Users\\user1\\AppData\\';
-    assert.strictEqual(toWinDirFormat(wsl), windows);
+const execFileSyncStub = sinon.stub(child_process, 'execFileSync').callThrough();
+
+const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
+
+describe('toWin32Path', () => {
+  beforeEach(() => execFileSyncStub.reset());
+
+  it('calls toWin32Path -w', () => {
+    execFileSyncStub.returns(asBuffer(''));
+
+    toWin32Path('');
+
+    assert.ok(execFileSyncStub.calledWith('wslpath', ['-w', '']));
+  })
+
+  describe('when the path is already in Windows format', () => {
+    it('returns early', () => {
+      execFileSyncStub.returns(asBuffer(''));
+
+      assert.strictEqual(toWin32Path('D:\\'), 'D:\\');
+      assert.strictEqual(toWin32Path('C:\\'), 'C:\\');
+
+      assert.ok(execFileSyncStub.notCalled);
+    });
+  })
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('falls back to the toWinDirFormat method', () => {
+      const wsl = '/mnt/c/Users/user1/AppData/';
+      const windows = 'C:\\Users\\user1\\AppData\\';
+
+      assert.strictEqual(toWin32Path(wsl), windows);
+    });
+
+    it('supports the drive letter not being C', () => {
+      const wsl = '/mnt/d/Users/user1/AppData';
+      const windows = 'D:\\Users\\user1\\AppData';
+
+      assert.strictEqual(toWin32Path(wsl), windows);
+    })
   });
+})
 
-  it('transforms if drive letter is different than c', () => {
-    const wsl = '/mnt/d/Users/user1/AppData';
-    const windows = 'D:\\Users\\user1\\AppData';
-    assert.strictEqual(toWinDirFormat(wsl), windows);
-  });
+describe('toWSLPath', () => {
+  beforeEach(() => execFileSyncStub.reset());
 
-  it('getLocalAppDataPath returns a correct path', () => {
+  it('calls wslpath -u', () => {
+    execFileSyncStub.returns(asBuffer(''));
+
+    toWSLPath('', '');
+
+    assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', '']));
+  })
+
+  it('trims off the trailing newline', () => {
+    execFileSyncStub.returns(asBuffer('the-path\n'));
+
+    assert.strictEqual(toWSLPath('', ''), 'the-path');
+  })
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('uses the fallback path', () => {
+      assert.strictEqual(
+        toWSLPath('C:/Program Files', '/mnt/c/Program Files'),
+        '/mnt/c/Program Files'
+      );
+    })
+  })
+})
+
+describe('getWSLLocalAppDataPath', () => {
+  beforeEach(() => execFileSyncStub.reset());
+
+  it('transforms it to a Linux path using wslpath', () => {
+    execFileSyncStub.returns(asBuffer('/c/folder/'));
+
     const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
-    const appDataPath = '/mnt/c/Users/user1/AppData/Local';
-    assert.strictEqual(getLocalAppDataPath(path), appDataPath);
+
+    assert.strictEqual(getWSLLocalAppDataPath(path), '/c/folder/');
+    assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', 'c:\\Users\\user1\\AppData\\Local']));
+  });
+
+  describe('when wslpath is not available', () => {
+    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+
+    it('falls back to the getLocalAppDataPath method', () => {
+      const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
+      const appDataPath = '/mnt/c/Users/user1/AppData/Local';
+
+      assert.strictEqual(getWSLLocalAppDataPath(path), appDataPath);
+    });
   });
 });
