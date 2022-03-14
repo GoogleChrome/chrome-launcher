@@ -13,7 +13,7 @@ import log from 'lighthouse-logger';
 import * as chromeFinder from './chrome-finder.js';
 import {getRandomPort} from './random-port.js';
 import {DEFAULT_FLAGS} from './flags.js';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
+import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 
 const spawn = childProcess.spawn;
 const execSync = childProcess.execSync;
@@ -172,7 +172,7 @@ class Launcher {
     if (!this.useDefaultProfile) {
       // Place Chrome profile in a custom location we'll rm -rf later
       // If in WSL, we need to use the Windows format
-      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
+      flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
 
     flags.push(...this.chromeFlags);

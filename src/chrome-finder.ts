@@ -12,7 +12,7 @@ import {execSync, execFileSync} from 'child_process';
 import escapeRegExp from 'escape-string-regexp';
 import log from 'lighthouse-logger';
 
-import {getLocalAppDataPath, ChromePathNotSetError} from './utils.js';
+import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils.js';
 
 const newLineRegex = /\r?\n/;
 
@@ -175,9 +175,10 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
-  process.env.PROGRAMFILES = '/mnt/c/Program Files';
-  process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
+  process.env.LOCALAPPDATA = getWSLLocalAppDataPath(`${process.env.PATH}`);
+  process.env.PROGRAMFILES = toWSLPath('C:/Program Files', '/mnt/c/Program Files');
+  process.env['PROGRAMFILES(X86)'] =
+      toWSLPath('C:/Program Files (x86)', '/mnt/c/Program Files (x86)');
 
   return win32();
 }
