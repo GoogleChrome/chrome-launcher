@@ -1,3 +1,35 @@
+## v0.15.0 (Wed, Nov 10 2021)
+
+* `1af60cb` add `getChromePath()` method for printing found chrome path ([#255](https://github.com/GoogleChrome/chrome-launcher/pull/255))
+
+## v0.14.2 (Tue, Nov 2 2021)
+
+* `ba8d76bd` fix chrome connection in node 17, use 127.0.0.1 explicitly ([#253](https://github.com/GoogleChrome/chrome-launcher/pull/253))
+* `56731dd8` fix: forward support for fs.rm in node 14.14+ ([#242](https://github.com/GoogleChrome/chrome-launcher/pull/242))
+
+## v0.14.1 (Wed, Oct 6 2021)
+
+* `630bb77f` feat: set browser preferences ([#247](https://github.com/GoogleChrome/chrome-launcher/pull/247))
+* `12b2c8e3` docs(flags): note that disable-gpu isnt needed
+
+
+## v0.14.0 (Tue, May 18 2021)
+* `ac1f4aff` move to minimum node 12; remove `rimraf` ([#237](https://github.com/GoogleChrome/chrome-launcher/pull/237))
+* `dec646c4` deps: remove `mkdirp` for `fs.mkdirSync` ([#234](https://github.com/GoogleChrome/chrome-launcher/pull/234))
+* `83ab178a` update minimum node version ([#222](https://github.com/GoogleChrome/chrome-launcher/pull/222))
+* `a5f6eb2f` add additional chrome flags ([#227](https://github.com/GoogleChrome/chrome-launcher/pull/227))
+* `3a7c9610` reword unset-`CHROME_PATH` error message
+* `b1b8dc74` rename disabled `TranslateUI` to `Translate` to match Chrome ([#225](https://github.com/GoogleChrome/chrome-launcher/pull/225))
+* `beb41360` chore: update dependencies and test targets ([#221](https://github.com/GoogleChrome/chrome-launcher/pull/221))
+* `df9d564a` tests: migrate from travis to github actions ([#228](https://github.com/GoogleChrome/chrome-launcher/pull/228))
+* `673da08b` tests: add mac/win bots to ci ([#232](https://github.com/GoogleChrome/chrome-launcher/pull/232))
+* `a700ae0c` docs: fix readme's `getInstallations()` section ([#212](https://github.com/GoogleChrome/chrome-launcher/pull/212))
+* [`chrome-flags-for-tools.md`](https://github.com/GoogleChrome/chrome-launcher/blob/b00fa22f94371f6d38d2d23e6e0b32fc7af470f0/docs/chrome-flags-for-tools.md) update
+  - `4b98587d` massive update and refactor ([#226](https://github.com/GoogleChrome/chrome-launcher/pull/226))
+  - `e45b100f` minor tweaks to headless and others
+  - `3a90c21b` fix links
+  - `8429ca93` add feature flags description
+  - `21db5f9f` even more documented flags ([#231](https://github.com/GoogleChrome/chrome-launcher/pull/231))
 
 ## v0.13.4 (Tue, Jul 7 2020)
 * `08406b28` fix: preserve existing getInstallations output

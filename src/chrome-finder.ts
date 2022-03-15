@@ -5,14 +5,14 @@
  */
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const {homedir} = require('os');
-const {execSync, execFileSync} = require('child_process');
-const escapeRegExp = require('escape-string-regexp');
+import fs = require('fs');
+import path = require('path');
+import {homedir} from 'os';
+import {execSync, execFileSync} from 'child_process';
+import escapeRegExp = require('escape-string-regexp');
 const log = require('lighthouse-logger');
 
-import {getLocalAppDataPath, ChromePathNotSetError} from './utils';
+import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils';
 
 const newLineRegex = /\r?\n/;
 
@@ -175,9 +175,10 @@ export function linux() {
 
 export function wsl() {
   // Manually populate the environment variables assuming it's the default config
-  process.env.LOCALAPPDATA = getLocalAppDataPath(`${process.env.PATH}`);
-  process.env.PROGRAMFILES = '/mnt/c/Program Files';
-  process.env['PROGRAMFILES(X86)'] = '/mnt/c/Program Files (x86)';
+  process.env.LOCALAPPDATA = getWSLLocalAppDataPath(`${process.env.PATH}`);
+  process.env.PROGRAMFILES = toWSLPath('C:/Program Files', '/mnt/c/Program Files');
+  process.env['PROGRAMFILES(X86)'] =
+      toWSLPath('C:/Program Files (x86)', '/mnt/c/Program Files (x86)');
 
   return win32();
 }
@@ -190,7 +191,7 @@ export function win32() {
   ];
   const prefixes = [
     process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
-  ].filter(Boolean);
+  ].filter(Boolean) as string[];
 
   const customChromePath = resolveChromePath();
   if (customChromePath) {

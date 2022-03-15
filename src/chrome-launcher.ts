@@ -8,11 +8,10 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
-import * as rimraf from 'rimraf';
 import * as chromeFinder from './chrome-finder';
 import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWinDirFormat, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
+import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
 const log = require('lighthouse-logger');
 const spawn = childProcess.spawn;
@@ -27,11 +26,12 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set<Launcher>();
 
-export type RimrafModule = (path: string, callback: (error: Error) => void) => void;
+type JSONLike =|{[property: string]: JSONLike}|readonly JSONLike[]|string|number|boolean|null;
 
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
+  prefs?: Record<string, JSONLike>;
   port?: number;
   handleSIGINT?: boolean;
   chromePath?: string;
@@ -47,12 +47,11 @@ export interface LaunchedChrome {
   pid: number;
   port: number;
   process: ChildProcess;
-  kill: () => Promise<{}>;
+  kill: () => Promise<void>;
 }
 
 export interface ModuleOverrides {
   fs?: typeof fs;
-  rimraf?: RimrafModule;
   spawn?: typeof childProcess.spawn;
 }
 
@@ -85,6 +84,15 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
 }
 
+/** Returns Chrome installation path that chrome-launcher will launch by default. */
+function getChromePath(): string {
+  const installation = Launcher.getFirstInstallation();
+  if (!installation) {
+    throw new ChromeNotInstalledError();
+  }
+  return installation;
+}
+
 async function killAll(): Promise<Array<Error>> {
   let errors = [];
   for (const instance of instances) {
@@ -109,11 +117,11 @@ class Launcher {
   private chromePath?: string;
   private ignoreDefaultFlags?: boolean;
   private chromeFlags: string[];
+  private prefs: Record<string, JSONLike>;
   private requestedPort?: number;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
-  private rimraf: RimrafModule;
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
@@ -125,7 +133,6 @@ class Launcher {
 
   constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
     this.fs = moduleOverrides.fs || fs;
-    this.rimraf = moduleOverrides.rimraf || rimraf;
     this.spawn = moduleOverrides.spawn || spawn;
 
     log.setLevel(defaults(this.opts.logLevel, 'silent'));
@@ -133,6 +140,7 @@ class Launcher {
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
+    this.prefs = defaults(this.opts.prefs, {});
     this.requestedPort = defaults(this.opts.port, 0);
     this.chromePath = this.opts.chromePath;
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
@@ -164,7 +172,7 @@ class Launcher {
     if (!this.useDefaultProfile) {
       // Place Chrome profile in a custom location we'll rm -rf later
       // If in WSL, we need to use the Windows format
-      flags.push(`--user-data-dir=${isWsl ? toWinDirFormat(this.userDataDir) : this.userDataDir}`);
+      flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
 
     flags.push(...this.chromeFlags);
@@ -203,6 +211,8 @@ class Launcher {
     this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
     this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
 
+    this.setBrowserPrefs();
+
     // fix for Node4
     // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.userDataDir}/chrome.pid`;
@@ -210,6 +220,28 @@ class Launcher {
     log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
 
     this.tmpDirandPidFileReady = true;
+  }
+
+  private setBrowserPrefs() {
+    // don't set prefs if not defined
+    if (Object.keys(this.prefs).length === 0) {
+      return;
+    }
+
+    const preferenceFile = `${this.userDataDir}/Preferences`;
+    try {
+      if (this.fs.existsSync(preferenceFile)) {
+        // overwrite existing file
+        const file = this.fs.readFileSync(preferenceFile, 'utf-8');
+        const content = JSON.parse(file);
+        this.fs.writeFileSync(preferenceFile, JSON.stringify({...content, ...this.prefs}), 'utf-8');
+      } else {
+        // create new Preference file
+        this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
+      }
+    } catch (err) {
+      log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
+    }
   }
 
   async launch() {
@@ -265,7 +297,9 @@ class Launcher {
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
 
-      this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      if (chrome.pid) {
+        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      }
 
       log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
       return chrome.pid;
@@ -286,9 +320,9 @@ class Launcher {
   }
 
   // resolves if ready, rejects otherwise
-  private isDebuggerReady(): Promise<{}> {
+  private isDebuggerReady(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const client = net.createConnection(this.port!);
+      const client = net.createConnection(this.port!, '127.0.0.1');
       client.once('error', err => {
         this.cleanup(client);
         reject(err);
@@ -304,7 +338,7 @@ class Launcher {
   waitUntilReady() {
     const launcher = this;
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       let retries = 0;
       let waitStatus = 'Waiting for browser.';
 
@@ -339,7 +373,7 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<{}>((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       if (this.chrome) {
         this.chrome.on('close', () => {
           delete this.chrome;
@@ -353,7 +387,9 @@ class Launcher {
             // if you don't explicitly set `stdio`
             execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
           } else {
-            process.kill(-this.chrome.pid);
+            if (this.chrome.pid) {
+              process.kill(-this.chrome.pid);
+            }
           }
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
@@ -368,7 +404,7 @@ class Launcher {
   }
 
   destroyTmp() {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       // Only clean up the tmp dir if we created it.
       if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
         return resolve();
@@ -384,10 +420,13 @@ class Launcher {
         delete this.errFile;
       }
 
-      this.rimraf(this.userDataDir, () => resolve());
+      // backwards support for node v12 + v14.14+
+      // https://nodejs.org/api/deprecations.html#DEP0147
+      const rm = this.fs.rm || this.fs.rmdir;
+      rm(this.userDataDir, {recursive: true}, () => resolve());
     });
   }
 };
 
 export default Launcher;
-export {Launcher, launch, killAll};
+export {Launcher, launch, killAll, getChromePath};

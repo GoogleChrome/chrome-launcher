@@ -5,7 +5,7 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options} from '../src/chrome-launcher';
+import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher';
 import {DEFAULT_FLAGS} from '../src/flags';
 
 import {spy, stub} from 'sinon';
@@ -15,15 +15,16 @@ const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
-  writeFileSync: () => {}
+  writeFileSync: () => {},
+  rmdir: () => {},
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
   const spawnStub = stub().returns({pid: 'some_pid'});
 
   const chromeInstance =
-      new Launcher(opts, {fs: fsMock as any, rimraf: spy() as any, spawn: spawnStub as any});
-  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve({}));
+      new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});
+  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
 
   chromeInstance.prepare();
 
@@ -53,24 +54,57 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const rimrafMock = spy();
+    const fs = {...fsMock, rmdir: spy(), rm: spy()};
     const chromeInstance =
-        new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any, rimraf: rimrafMock as any});
+        new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     chromeInstance.prepare();
 
     await chromeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 0);
+    assert.strictEqual(fs.rmdir.callCount, 0);
+    assert.strictEqual(fs.rm.callCount, 0);
+  });
+
+  it('allows to overwrite browser prefs', async () => {
+    const existStub = stub().returns(true)
+    const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
+    const writeFileStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const chromeInstance =
+        new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
+
+    chromeInstance.prepare();
+    assert.equal(
+      writeFileStub.getCall(0).args[1],
+      '{"some":"prefs","download.default_directory":"/some/dir"}'
+    )
+  });
+
+  it('allows to set browser prefs', async () => {
+    const existStub = stub().returns(false)
+    const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
+    const writeFileStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const chromeInstance =
+        new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
+
+    chromeInstance.prepare();
+    assert.equal(readFileStub.getCalls().length, 0)
+    assert.equal(
+      writeFileStub.getCall(0).args[1],
+      '{"download.default_directory":"/some/dir"}'
+    )
   });
 
   it('cleans up the tmp dir after closing', async () => {
-    const rimrafMock = stub().callsFake((_, done) => done());
+    const rmMock = stub().callsFake((_path, _options, done) => done());
+    const fs = {...fsMock, rmdir: rmMock, rm: rmMock};
 
-    const chromeInstance = new Launcher({}, {fs: fsMock as any, rimraf: rimrafMock as any});
+    const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
     await chromeInstance.destroyTmp();
-    assert.strictEqual(rimrafMock.callCount, 1);
+    assert.strictEqual(rmMock.callCount, 1);
   });
 
   it('does not delete created directory when custom path passed', () => {
@@ -96,7 +130,7 @@ describe('Launcher', () => {
     await chromeInstance.launch();
     await chromeInstance.kill();
     await chromeInstance.kill();
-  });
+  }).timeout(30 * 1000);
 
   it('doesn\'t fail when killing all instances', async () => {
     await launch();
@@ -144,7 +178,7 @@ describe('Launcher', () => {
     const installations = Launcher.getInstallations();
     assert.ok(Array.isArray(installations));
     assert.ok(installations.length >= 1);
-  });
+  }).timeout(30_000);
 
   it('removes --user-data-dir if userDataDir is false', async () => {
     const spawnStub = await launchChromeWithOpts();
@@ -182,5 +216,15 @@ describe('Launcher', () => {
   it('throws an error when chromePath is empty', (done) => {
     const chromeInstance = new Launcher({chromePath: ''});
     chromeInstance.launch().catch(() => done());
+  });
+
+  describe('getChromePath', async () => {
+    it('returns the same path as a full Launcher launch', async () => {
+      const spawnStub = await launchChromeWithOpts();
+      const launchedPath = spawnStub.getCall(0).args[0] as string;
+
+      const chromePath = getChromePath();
+      assert.strictEqual(chromePath, launchedPath);
+    });
   });
 });

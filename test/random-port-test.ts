@@ -19,10 +19,9 @@ import * as assert from 'assert';
 import {getRandomPort} from '../src/random-port';
 
 describe('Random port generation', () => {
-  it('generates a valid random port number', () => {
-    return getRandomPort().then(port => {
-      // Verify generated port number is valid integer.
-      assert.ok(Number.isInteger(port) && port > 0 && port <= 0xFFFF);
-    });
+  it('generates a valid random port number', async () => {
+    const port = await getRandomPort();
+    // Verify generated port number is valid integer.
+    assert.ok(Number.isInteger(port) && port > 0 && port <= 0xFFFF);
   });
 });

@@ -1,5 +1,4 @@
-# Chrome Launcher [![Linux Build Status](https://img.shields.io/travis/GoogleChrome/chrome-launcher/master.svg)](https://travis-ci.org/GoogleChrome/chrome-launcher) [![Windows Build Status](https://img.shields.io/appveyor/ci/paulirish/chrome-launcher/master.svg)](https://ci.appveyor.com/project/paulirish/chrome-launcher/branch/master) [![NPM chrome-launcher package](https://img.shields.io/npm/v/chrome-launcher.svg)](https://npmjs.org/package/chrome-launcher)
-
+# Chrome Launcher [![GitHub Actions Status Badge](https://github.com/GoogleChrome/chrome-launcher/workflows/🛠/badge.svg)](https://github.com/GoogleChrome/chrome-launcher/actions) [![NPM chrome-launcher package](https://img.shields.io/npm/v/chrome-launcher.svg)](https://npmjs.org/package/chrome-launcher)
 
 <img src="https://user-images.githubusercontent.com/39191/29847271-a7ba82f8-8ccf-11e7-8d54-eb88fdf0b6d0.png" align=right height=200>
 
@@ -40,6 +39,11 @@ npm install chrome-launcher
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
   // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts
   chromeFlags: Array<string>;
+
+  // (optional) Additional preferences to be set in Chrome, for example: {'download.default_directory': __dirname}
+  // See: https://chromium.googlesource.com/chromium/src/+/main/chrome/common/pref_names.cc
+  // Do note, if you set preferences when using your default profile it will overwrite these
+  prefs: {[key: string]: Object};
 
   // (optional) Close the Chrome process on `Ctrl-C`
   // Default: true
@@ -91,7 +95,7 @@ npm install chrome-launcher
 chrome.port: number;
 
 // Method to kill Chrome (and cleanup the profile folder)
-chrome.kill: () => Promise<{}>;
+chrome.kill: () => Promise<void>;
 
 // The process id
 chrome.pid: number;

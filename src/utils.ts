@@ -6,9 +6,9 @@
 'use strict';
 
 import {join} from 'path';
-import {execSync} from 'child_process';
-import * as mkdirp from 'mkdirp';
-const isWsl = require('is-wsl');
+import {execSync, execFileSync} from 'child_process';
+import {mkdirSync} from 'fs';
+import isWsl = require('is-wsl');
 
 export const enum LaunchErrorCodes {
   ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
@@ -35,7 +35,7 @@ export class LauncherError extends Error {
 
 export class ChromePathNotSetError extends LauncherError {
   message =
-      'The environment variable CHROME_PATH must be set to executable of a build of Chromium version 54.0 or later.';
+      'The CHROME_PATH environment variable must be set to a Chrome/Chromium executable no older than Chrome stable.';
   code = LaunchErrorCodes.ERR_LAUNCHER_PATH_NOT_SET;
 }
 
@@ -65,7 +65,7 @@ export function makeTmpDir() {
       return makeUnixTmpDir();
     case 'wsl':
       // We populate the user's Windows temp dir so the folder is correctly created later
-      process.env.TEMP = getLocalAppDataPath(`${process.env.PATH}`);
+      process.env.TEMP = getWSLLocalAppDataPath(`${process.env.PATH}`);
     case 'win32':
       return makeWin32TmpDir();
     default:
@@ -73,8 +73,9 @@ export function makeTmpDir() {
   }
 }
 
-export function toWinDirFormat(dir: string = ''): string {
+function toWinDirFormat(dir: string = ''): string {
   const results = /\/mnt\/([a-z])\//.exec(dir);
+
   if (!results) {
     return dir;
   }
@@ -84,11 +85,39 @@ export function toWinDirFormat(dir: string = ''): string {
       .replace(/\//g, '\\');
 }
 
-export function getLocalAppDataPath(path: string): string {
+export function toWin32Path(dir: string = ''): string {
+  if (/[a-z]:\\/iu.test(dir)) {
+    return dir;
+  }
+
+  try {
+    return execFileSync('wslpath', ['-w', dir]).toString().trim();
+  } catch {
+    return toWinDirFormat(dir);
+  }
+}
+
+export function toWSLPath(dir: string, fallback: string): string {
+  try {
+    return execFileSync('wslpath', ['-u', dir]).toString().trim();
+  } catch {
+    return fallback;
+  }
+}
+
+function getLocalAppDataPath(path: string): string {
   const userRegExp = /\/mnt\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
   const results = userRegExp.exec(path) || [];
 
   return `/mnt/${results[1]}/Users/${results[2]}/AppData/Local`;
+}
+
+export function getWSLLocalAppDataPath(path: string): string {
+  const userRegExp = /\/([a-z])\/Users\/([^\/:]+)\/AppData\//;
+  const results = userRegExp.exec(path) || [];
+
+  return toWSLPath(
+      `${results[1]}:\\Users\\${results[2]}\\AppData\\Local`, getLocalAppDataPath(path));
 }
 
 function makeUnixTmpDir() {
@@ -101,6 +130,6 @@ function makeWin32TmpDir() {
   const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);
   const tmpdir = join(winTmpPath, 'lighthouse.' + randomNumber);
 
-  mkdirp.sync(tmpdir);
+  mkdirSync(tmpdir, {recursive: true});
   return tmpdir;
 }
