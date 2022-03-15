@@ -187,10 +187,11 @@ export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
     `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
-    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
+    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}chrome.exe`
   ];
   const prefixes = [
-    process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
+    process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)'], ...process.env.PATH?.split(path.delimiter) ?? []
   ].filter(Boolean) as string[];
 
   const customChromePath = resolveChromePath();
@@ -205,14 +206,6 @@ export function win32() {
       installations.push(chromePath);
     }
   }));
-
-  // Search %PATH% for chrome.exe
-  process.env.Path?.split(';')?.forEach(prefix => {
-    const chromePath = path.join(prefix, 'chrome.exe')
-    if (canAccess(chromePath)) {
-      installations.push(chromePath)
-    }
-  });
 
   return installations;
 }
