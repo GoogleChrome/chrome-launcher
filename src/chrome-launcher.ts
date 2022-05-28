@@ -6,7 +6,6 @@
 'use strict';
 
 import * as childProcess from 'child_process';
-import * as readline from 'readline';
 import * as fs from 'fs';
 import * as net from 'net';
 import * as chromeFinder from './chrome-finder';
@@ -296,18 +295,7 @@ class Launcher {
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       const chrome = this.spawn(
           execPath, this.flags,
-          {detached: true, stdio: ['ignore', 'pipe', 'pipe', 'pipe', 'pipe'], env: this.envVars});
-
-
-      const stdout = readline.createInterface({ input: chrome.stdout! });
-      stdout.on('line', (data: string) => {
-        console.log(`CL[pid=${chrome.pid}][out] ` + data);
-      });
-
-      const stderr = readline.createInterface({ input: chrome.stderr! });
-      stderr.on('line', (data: string) => {
-        console.log(`CL[pid=${chrome.pid}][err] ` + data);
-      });
+          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
 
 
