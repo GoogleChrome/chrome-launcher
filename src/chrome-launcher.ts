@@ -392,8 +392,8 @@ class Launcher {
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
                 log.error('ChromeLauncher', err.message);
-                const stderr =
-                    this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                // const stderr =
+                //     this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
                 log.error('ChromeLauncher', this.stderrStr);
