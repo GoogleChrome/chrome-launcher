@@ -2,12 +2,12 @@ name: smoke
 
 on:
   push:
-    # branches: [master]
+    branches: [master]
   pull_request: # run on all PRs, not just PRs to a particular branch
 
 jobs:
   # Only run smoke tests for windows against stable chrome.
-  smoke-windows:
+  lh-smoke-windows:
     strategy:
       matrix:
         smoke-test-shard: [1, 2]
