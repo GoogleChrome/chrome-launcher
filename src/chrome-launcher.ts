@@ -301,6 +301,8 @@ class Launcher {
 
       this.chrome.on('exit', (...args) => {
         console.log('on exit', this.chrome?.pid, args);
+        console.log('stdout', console.log(fs.readFileSync(`${this.userDataDir}/chrome-out.log`, 'utf-8')));
+        console.log('stderr', console.log(fs.readFileSync(`${this.userDataDir}/chrome-err.log`, 'utf-8')));
       });
       this.chrome.on('close', (...args) => {
         console.log('on close', this.chrome?.pid, args);
