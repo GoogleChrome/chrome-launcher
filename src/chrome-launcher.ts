@@ -78,7 +78,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     if (instances.size === 0) {
       process.removeListener(_SIGINT, sigintListener);
     }
-    // await instance.kill();
+    await instance.kill();
     return instance.kill();
   };
 
