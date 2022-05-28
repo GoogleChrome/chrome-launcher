@@ -424,7 +424,7 @@ class Launcher {
           if (isWindows) {
             // While pipe is the default, stderr also gets printed to process.stderr
             // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
+            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe', encoding: 'utf-8'});
           } else {
             if (this.chrome.pid) {
               process.kill(-this.chrome.pid);
