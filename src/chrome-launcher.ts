@@ -6,7 +6,6 @@
 'use strict';
 
 import * as childProcess from 'child_process';
-import * as readline from 'readline';
 import * as fs from 'fs';
 import * as net from 'net';
 import * as chromeFinder from './chrome-finder';
@@ -126,8 +125,6 @@ class Launcher {
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
-  private stderrStr: string;
-  private stdoutStr: string;
 
   chrome?: childProcess.ChildProcess;
   userDataDir?: string;
@@ -150,8 +147,6 @@ class Launcher {
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
-    this.stderrStr = '';
-    this.stdoutStr = '';
 
     if (typeof this.opts.userDataDir === 'boolean') {
       if (!this.opts.userDataDir) {
@@ -179,7 +174,6 @@ class Launcher {
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
-    // if (!process.env.CI) flags.push('--headless=chrome');
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
@@ -300,36 +294,8 @@ class Launcher {
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       const chrome = this.spawn(
           execPath, this.flags,
-          {detached: true, stdio: ['ignore', 'pipe', 'pipe', 'pipe', 'pipe'], env: this.envVars});
-
-      
-      const stderr = readline.createInterface({ input: chrome.stderr! });
-      stderr.on('line', (data: string) => {
-        this.stderrStr += `${data}\n`;
-        log.verbose('ChromeLauncher', `[stderr][pid=${chrome.pid}] `, 'hiii' + data);
-      });
-
-      const stdout = readline.createInterface({ input: chrome.stdout! });
-      stdout.on('line', (data: string) => {
-        this.stdoutStr += `${data}\n`;
-        log.verbose('ChromeLauncher', `[stdout][pid=${chrome.pid}] `, 'hiiii' + data);
-      });
-
+          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
-
-
-      this.chrome.on('exit', (...args) => {
-        console.log('on exit', this.chrome?.pid, args);
-        console.log('stdout', console.log(fs.readFileSync(`${this.userDataDir}/chrome-out.log`, 'utf-8')));
-        console.log('stderr', console.log(fs.readFileSync(`${this.userDataDir}/chrome-err.log`, 'utf-8')));
-      });
-      this.chrome.on('close', (...args) => {
-        console.log('on close', this.chrome?.pid, args);
-      });
-      this.chrome.on('error', (err) => {
-        console.log('on error', this.chrome?.pid, err);
-      });
-
 
       if (chrome.pid) {
         this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
@@ -392,13 +358,11 @@ class Launcher {
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
                 log.error('ChromeLauncher', err.message);
-                // const stderr =
-                //     this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                const stderr =
+                    this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
-                log.error('ChromeLauncher', this.stderrStr);
-                log.error('ChromeLauncher', this.stdoutStr);
-                
+                log.error('ChromeLauncher', stderr);
                 return reject(err);
               }
               delay(launcher.connectionPollInterval).then(poll);
@@ -409,12 +373,9 @@ class Launcher {
   }
 
   kill() {
-    // console.trace('traceback for kill()');
     return new Promise<void>((resolve, reject) => {
       if (this.chrome) {
-        this.chrome.on('close', (...args) => {
-          console.log('on close2', this.chrome?.pid, args);
-          console.trace('close2 trace');
+        this.chrome.on('close', () => {
           delete this.chrome;
           this.destroyTmp().then(resolve);
         });
@@ -424,14 +385,13 @@ class Launcher {
           if (isWindows) {
             // While pipe is the default, stderr also gets printed to process.stderr
             // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe', encoding: 'utf-8'});
+            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
           } else {
             if (this.chrome.pid) {
               process.kill(-this.chrome.pid);
             }
           }
         } catch (err) {
-          console.log('kill catch', err);
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
           reject(new Error(message));
