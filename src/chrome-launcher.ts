@@ -179,7 +179,7 @@ class Launcher {
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
-    if (!process.env.CI) flags.push('--headless=chrome');
+    // if (!process.env.CI) flags.push('--headless=chrome');
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
@@ -414,6 +414,7 @@ class Launcher {
       if (this.chrome) {
         this.chrome.on('close', (...args) => {
           console.log('on close2', this.chrome?.pid, args);
+          console.trace('close2 trace');
           delete this.chrome;
           this.destroyTmp().then(resolve);
         });
