@@ -431,6 +431,7 @@ class Launcher {
             }
           }
         } catch (err) {
+          console.log('kill catch', err);
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
           reject(new Error(message));
