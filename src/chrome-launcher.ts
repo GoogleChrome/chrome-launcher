@@ -373,9 +373,13 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, _) => {
       if (this.chrome) {
-        this.chrome.on('close', () => {
+        this.chrome.on('exit', (...args) => {
+          console.log('on exit', args);
+        });
+        this.chrome.on('close', (...args) => {
+          console.log('on close', args);
           delete this.chrome;
           this.destroyTmp().then(resolve);
         });
@@ -394,7 +398,7 @@ class Launcher {
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
-          reject(new Error(message));
+          resolve();
         }
       } else {
         // fail silently as we did not start chrome

@@ -30,7 +30,7 @@ jobs:
     - run: yarn build
 
     # lighthouse 
-    - run: yarn --cwd node_modules/lighthouse/ install
+    - run: yarn --cwd node_modules/lighthouse/ install --frozen-lockfile --network-timeout 1000000
     - run: yarn --cwd node_modules/lighthouse/ build-report
 
     - name: Run smoke tests
