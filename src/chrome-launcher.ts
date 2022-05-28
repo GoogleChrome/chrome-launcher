@@ -126,6 +126,8 @@ class Launcher {
   private spawn: typeof childProcess.spawn;
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
+  private stderrStr: string;
+  private stdoutStr: string;
 
   chrome?: childProcess.ChildProcess;
   userDataDir?: string;
@@ -148,6 +150,8 @@ class Launcher {
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
     this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
     this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
+    this.stderrStr = '';
+    this.stdoutStr = '';
 
     if (typeof this.opts.userDataDir === 'boolean') {
       if (!this.opts.userDataDir) {
@@ -298,16 +302,19 @@ class Launcher {
           execPath, this.flags,
           {detached: true, stdio: ['ignore', 'pipe', 'pipe', 'pipe', 'pipe'], env: this.envVars});
 
+      
+      const stderr = readline.createInterface({ input: chrome.stderr! });
+      stderr.on('line', (data: string) => {
+        this.stderrStr += `${data}\n`;
+        log.verbose('ChromeLauncher', `[stderr][pid=${chrome.pid}] `, 'hiii' + data);
+      });
 
       const stdout = readline.createInterface({ input: chrome.stdout! });
       stdout.on('line', (data: string) => {
-        console.log(`CL[pid=${chrome.pid}][out] ` + data);
+        this.stdoutStr += `${data}\n`;
+        log.verbose('ChromeLauncher', `[stdout][pid=${chrome.pid}] `, 'hiiii' + data);
       });
 
-      const stderr = readline.createInterface({ input: chrome.stderr! });
-      stderr.on('line', (data: string) => {
-        console.log(`CL[pid=${chrome.pid}][err] ` + data);
-      });
       this.chrome = chrome;
 
 
@@ -389,7 +396,9 @@ class Launcher {
                     this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
-                log.error('ChromeLauncher', stderr);
+                log.error('ChromeLauncher', this.stderrStr);
+                log.error('ChromeLauncher', this.stdoutStr);
+                
                 return reject(err);
               }
               delay(launcher.connectionPollInterval).then(poll);
