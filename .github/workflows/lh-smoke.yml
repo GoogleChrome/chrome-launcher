@@ -1,0 +1,48 @@
+name: smoke
+
+on:
+  push:
+    branches: [master]
+  pull_request: # run on all PRs, not just PRs to a particular branch
+
+jobs:
+  # Only run smoke tests for windows against stable chrome.
+  smoke-windows:
+    strategy:
+      matrix:
+        smoke-test-shard: [1, 2]
+      # e.g. if set 1 fails, continue with set 2 anyway
+      fail-fast: false
+    runs-on: windows-latest
+    name: Windows smoke ${{ matrix.smoke-test-shard }}/2
+
+    steps:
+    - name: git clone
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 14.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    
+    # chrome-launcher
+    - run: yarn install --frozen-lockfile --network-timeout 1000000
+    - run: yarn build
+
+    # lighthouse 
+    - run: yarn --cwd node_modules/lighthouse/ install
+    - run: yarn --cwd node_modules/lighthouse/ build-report
+
+    - name: Run smoke tests
+      # Windows bots are slow, so only run enough tests to verify matching behavior.
+      run: yarn --cwd node_modules/lighthouse/ smoke --debug -j=2 --retries=5 --shard=${{ matrix.smoke-test-shard }}/2 lantern
+
+    # Fail if any changes were written to source files.
+    - run: git diff --exit-code
+
+    - name: Upload failures
+      if: failure()
+      uses: actions/upload-artifact@v1
+      with:
+        name: Smokehouse (windows)
+        path: .tmp/smokehouse-ci-failures/
