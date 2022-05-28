@@ -11,7 +11,8 @@
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
     "type-check": "tsc --allowJs --checkJs --noEmit --target es2019 *.js",
-    "prepublishOnly": "npm run build && npm run test"
+    "prepublishOnly": "npm run build && npm run test",
+    "reset-link": "(yarn unlink || true) && yarn link && yarn --cwd node_modules/lighthouse/ link chrome-launcher"
   },
   "bin": {
     "print-chrome-path": "bin/print-chrome-path.js"
