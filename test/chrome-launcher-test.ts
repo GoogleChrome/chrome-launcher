@@ -20,7 +20,7 @@ const fsMock = {
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
-  const spawnStub = stub().returns({pid: 'some_pid'});
+  const spawnStub = stub().returns({pid: 'some_pid', on: () => {}});
 
   const chromeInstance =
       new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});

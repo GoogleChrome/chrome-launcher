@@ -174,6 +174,7 @@ class Launcher {
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
+    if (!process.env.CI) flags.push('--headless=chrome');
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
@@ -297,6 +298,18 @@ class Launcher {
           {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
       this.chrome = chrome;
 
+
+      this.chrome.on('exit', (...args) => {
+        console.log('on exit', this.chrome?.pid, args);
+      });
+      this.chrome.on('close', (...args) => {
+        console.log('on close', this.chrome?.pid, args);
+      });
+      this.chrome.on('error', (err) => {
+        console.log('on error', this.chrome?.pid, err);
+      });
+
+
       if (chrome.pid) {
         this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
       }
@@ -373,13 +386,11 @@ class Launcher {
   }
 
   kill() {
+    // console.trace('traceback for kill()');
     return new Promise<void>((resolve, _) => {
       if (this.chrome) {
-        this.chrome.on('exit', (...args) => {
-          console.log('on exit', args);
-        });
         this.chrome.on('close', (...args) => {
-          console.log('on close', args);
+          console.log('on close2', this.chrome?.pid, args);
           delete this.chrome;
           this.destroyTmp().then(resolve);
         });
