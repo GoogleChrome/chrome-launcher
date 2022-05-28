@@ -78,7 +78,6 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     if (instances.size === 0) {
       process.removeListener(_SIGINT, sigintListener);
     }
-    await instance.kill();
     return instance.kill();
   };
 
@@ -412,7 +411,7 @@ class Launcher {
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
-          reject();
+          reject(new Error(message));
         }
       } else {
         // fail silently as we did not start chrome
