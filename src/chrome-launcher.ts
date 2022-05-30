@@ -13,9 +13,8 @@ import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
+import {spawn, spawnSync} from 'child_process'; 
 const log = require('lighthouse-logger');
-const spawn = childProcess.spawn;
-const execSync = childProcess.execSync;
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
@@ -377,7 +376,7 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve) => {
       if (this.chromeProc) {
         this.chromeProc.on('close', () => {
           delete this.chromeProc;
@@ -389,16 +388,20 @@ class Launcher {
           if (isWindows) {
             // While pipe is the default, stderr also gets printed to process.stderr
             // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {stdio: 'pipe'});
+            const taskkillProcess = spawnSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {shell: true});
+            const [stdout, stderr] = [taskkillProcess.stdout.toString(), taskkillProcess.stderr.toString()];
+            if (stdout)
+              console.log(`[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
+            if (stderr)
+              console.log(`[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
           } else {
             if (this.chromeProc.pid) {
-              process.kill(-this.chromeProc.pid);
+              process.kill(-this.chromeProc.pid, 'SIGKILL');
             }
           }
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
-          reject(new Error(message));
         }
       } else {
         // fail silently as we did not start chrome
