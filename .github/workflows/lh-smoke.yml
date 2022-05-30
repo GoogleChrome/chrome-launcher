@@ -26,7 +26,8 @@ jobs:
         node-version: 14.x
     
     # chrome-launcher
-    - run: yarn install --frozen-lockfile --network-timeout 1000000
+    # This'll add lighthouse AND install chrome-launcher's deps
+    - run: yarn add --frozen-lockfile --network-timeout 1000000 -D https://github.com/GoogleChrome/lighthouse.git#master
     - run: yarn build
 
     # lighthouse 
@@ -38,12 +39,9 @@ jobs:
       # Windows bots are slow, so only run enough tests to verify matching behavior.
       run: yarn --cwd node_modules/lighthouse/ smoke --debug -j=2 --retries=5 --shard=${{ matrix.smoke-test-shard }}/2 lantern
 
-    # Fail if any changes were written to source files.
-    - run: git diff --exit-code
-
     - name: Upload failures
       if: failure()
       uses: actions/upload-artifact@v1
       with:
         name: Smokehouse (windows)
-        path: .tmp/smokehouse-ci-failures/
+        path: node_modules/lighthouse/.tmp/smokehouse-ci-failures/
