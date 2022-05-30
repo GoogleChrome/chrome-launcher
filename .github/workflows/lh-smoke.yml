@@ -44,4 +44,4 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: Smokehouse (windows)
-        path: .tmp/smokehouse-ci-failures/
+        path: node_modules/lighthouse/.tmp/smokehouse-ci-failures/
