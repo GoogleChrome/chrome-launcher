@@ -13,7 +13,7 @@ import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
-import {spawn, spawnSync} from 'child_process'; 
+import {spawn, spawnSync} from 'child_process';
 const log = require('lighthouse-logger');
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
@@ -298,7 +298,7 @@ class Launcher {
         // process group, making it possible to kill child process tree with `.kill(-pid)` command.
         // @see https://nodejs.org/api/child_process.html#child_process_options_detached
         detached: process.platform !== 'win32',
-        stdio: ['ignore', this.outFile, this.errFile], 
+        stdio: ['ignore', this.outFile, this.errFile],
         env: this.envVars
       });
 
@@ -306,7 +306,8 @@ class Launcher {
         this.fs.writeFileSync(this.pidFile, this.chromeProc.pid.toString());
       }
 
-      log.verbose('ChromeLauncher', `Chrome running with pid ${this.chromeProc.pid} on port ${this.port}.`);
+      log.verbose(
+          'ChromeLauncher', `Chrome running with pid ${this.chromeProc.pid} on port ${this.port}.`);
       return this.chromeProc.pid;
     })();
 
@@ -389,12 +390,16 @@ class Launcher {
         try {
           if (isWindows) {
             // https://github.com/GoogleChrome/chrome-launcher/issues/266
-            const taskkillProcess = spawnSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {shell: true});
-            const [stdout, stderr] = [taskkillProcess.stdout.toString(), taskkillProcess.stderr.toString()];
+            const taskkillProcess =
+                spawnSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {shell: true});
+            const [stdout, stderr] =
+                [taskkillProcess.stdout.toString(), taskkillProcess.stderr.toString()];
             if (stdout)
-              log.verbose('ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
+              log.verbose(
+                  'ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
             if (stderr)
-              log.verbose('ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
+              log.verbose(
+                  'ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
           } else {
             if (this.chromeProc.pid) {
               process.kill(-this.chromeProc.pid, 'SIGKILL');
