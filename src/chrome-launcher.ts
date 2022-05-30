@@ -292,9 +292,14 @@ class Launcher {
 
       log.verbose(
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
-      const chrome = this.spawn(
-          execPath, this.flags,
-          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
+      const chrome = this.spawn(execPath, this.flags, {
+        // On non-windows platforms, `detached: true` makes child process a leader of a new
+        // process group, making it possible to kill child process tree with `.kill(-pid)` command.
+        // @see https://nodejs.org/api/child_process.html#child_process_options_detached
+        detached: process.platform !== 'win32',
+        stdio: ['ignore', this.outFile, this.errFile], 
+        env: this.envVars
+      });
       this.chrome = chrome;
 
       if (chrome.pid) {
