@@ -39,9 +39,6 @@ jobs:
       # Windows bots are slow, so only run enough tests to verify matching behavior.
       run: yarn --cwd node_modules/lighthouse/ smoke --debug -j=2 --retries=5 --shard=${{ matrix.smoke-test-shard }}/2 lantern
 
-    # Fail if any changes were written to source files.
-    - run: git diff --exit-code
-
     - name: Upload failures
       if: failure()
       uses: actions/upload-artifact@v1
