@@ -388,14 +388,13 @@ class Launcher {
         log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProc.pid}`);
         try {
           if (isWindows) {
-            // While pipe is the default, stderr also gets printed to process.stderr
-            // if you don't explicitly set `stdio`
+            // https://github.com/GoogleChrome/chrome-launcher/issues/266
             const taskkillProcess = spawnSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {shell: true});
             const [stdout, stderr] = [taskkillProcess.stdout.toString(), taskkillProcess.stderr.toString()];
             if (stdout)
-              console.log(`[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
+              log.verbose('ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
             if (stderr)
-              console.log(`[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
+              log.verbose('ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
           } else {
             if (this.chromeProc.pid) {
               process.kill(-this.chromeProc.pid, 'SIGKILL');
