@@ -81,7 +81,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     return instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
+  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chromeProc!};
 }
 
 /** Returns Chrome installation path that chrome-launcher will launch by default. */
@@ -126,7 +126,7 @@ class Launcher {
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
 
-  chrome?: childProcess.ChildProcess;
+  chromeProc?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
   pid?: number;
@@ -276,9 +276,9 @@ class Launcher {
 
   private async spawnProcess(execPath: string) {
     const spawnPromise = (async () => {
-      if (this.chrome) {
-        log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-        return this.chrome.pid;
+      if (this.chromeProc) {
+        log.log('ChromeLauncher', `Chrome already running with pid ${this.chromeProc.pid}.`);
+        return this.chromeProc.pid;
       }
 
 
@@ -292,7 +292,7 @@ class Launcher {
 
       log.verbose(
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
-      const chrome = this.spawn(execPath, this.flags, {
+      this.chromeProc = this.spawn(execPath, this.flags, {
         // On non-windows platforms, `detached: true` makes child process a leader of a new
         // process group, making it possible to kill child process tree with `.kill(-pid)` command.
         // @see https://nodejs.org/api/child_process.html#child_process_options_detached
@@ -300,14 +300,13 @@ class Launcher {
         stdio: ['ignore', this.outFile, this.errFile], 
         env: this.envVars
       });
-      this.chrome = chrome;
 
-      if (chrome.pid) {
-        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      if (this.chromeProc.pid) {
+        this.fs.writeFileSync(this.pidFile, this.chromeProc.pid.toString());
       }
 
-      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-      return chrome.pid;
+      log.verbose('ChromeLauncher', `Chrome running with pid ${this.chromeProc.pid} on port ${this.port}.`);
+      return this.chromeProc.pid;
     })();
 
     const pid = await spawnPromise;
@@ -379,21 +378,21 @@ class Launcher {
 
   kill() {
     return new Promise<void>((resolve, reject) => {
-      if (this.chrome) {
-        this.chrome.on('close', () => {
-          delete this.chrome;
+      if (this.chromeProc) {
+        this.chromeProc.on('close', () => {
+          delete this.chromeProc;
           this.destroyTmp().then(resolve);
         });
 
-        log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
+        log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProc.pid}`);
         try {
           if (isWindows) {
             // While pipe is the default, stderr also gets printed to process.stderr
             // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
+            execSync(`taskkill /pid ${this.chromeProc.pid} /T /F`, {stdio: 'pipe'});
           } else {
-            if (this.chrome.pid) {
-              process.kill(-this.chrome.pid);
+            if (this.chromeProc.pid) {
+              process.kill(-this.chromeProc.pid);
             }
           }
         } catch (err) {
