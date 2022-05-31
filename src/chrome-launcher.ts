@@ -13,9 +13,8 @@ import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
+import {spawn, spawnSync} from 'child_process';
 const log = require('lighthouse-logger');
-const spawn = childProcess.spawn;
-const execSync = childProcess.execSync;
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
@@ -81,7 +80,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     return instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
+  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chromeProcess!};
 }
 
 /** Returns Chrome installation path that chrome-launcher will launch by default. */
@@ -126,7 +125,7 @@ class Launcher {
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
 
-  chrome?: childProcess.ChildProcess;
+  chromeProcess?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
   pid?: number;
@@ -174,6 +173,8 @@ class Launcher {
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
+
+    if (process.env.HEADLESS) flags.push('--headless');
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
@@ -276,9 +277,9 @@ class Launcher {
 
   private async spawnProcess(execPath: string) {
     const spawnPromise = (async () => {
-      if (this.chrome) {
-        log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-        return this.chrome.pid;
+      if (this.chromeProcess) {
+        log.log('ChromeLauncher', `Chrome already running with pid ${this.chromeProcess.pid}.`);
+        return this.chromeProcess.pid;
       }
 
 
@@ -292,17 +293,23 @@ class Launcher {
 
       log.verbose(
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
-      const chrome = this.spawn(
-          execPath, this.flags,
-          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
-      this.chrome = chrome;
+      this.chromeProcess = this.spawn(execPath, this.flags, {
+        // On non-windows platforms, `detached: true` makes child process a leader of a new
+        // process group, making it possible to kill child process tree with `.kill(-pid)` command.
+        // @see https://nodejs.org/api/child_process.html#child_process_options_detached
+        detached: process.platform !== 'win32',
+        stdio: ['ignore', this.outFile, this.errFile],
+        env: this.envVars
+      });
 
-      if (chrome.pid) {
-        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      if (this.chromeProcess.pid) {
+        this.fs.writeFileSync(this.pidFile, this.chromeProcess.pid.toString());
       }
 
-      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-      return chrome.pid;
+      log.verbose(
+          'ChromeLauncher',
+          `Chrome running with pid ${this.chromeProcess.pid} on port ${this.port}.`);
+      return this.chromeProcess.pid;
     })();
 
     const pid = await spawnPromise;
@@ -373,28 +380,30 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<void>((resolve, reject) => {
-      if (this.chrome) {
-        this.chrome.on('close', () => {
-          delete this.chrome;
+    return new Promise<void>((resolve) => {
+      if (this.chromeProcess) {
+        this.chromeProcess.on('close', () => {
+          delete this.chromeProcess;
           this.destroyTmp().then(resolve);
         });
 
-        log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
+        log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
         try {
           if (isWindows) {
-            // While pipe is the default, stderr also gets printed to process.stderr
-            // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
+            // https://github.com/GoogleChrome/chrome-launcher/issues/266
+            const taskkillProc = spawnSync(
+                `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
+
+            const {stderr} = taskkillProc;
+            if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
           } else {
-            if (this.chrome.pid) {
-              process.kill(-this.chrome.pid);
+            if (this.chromeProcess.pid) {
+              process.kill(-this.chromeProcess.pid, 'SIGKILL');
             }
           }
         } catch (err) {
           const message = `Chrome could not be killed ${err.message}`;
           log.warn('ChromeLauncher', message);
-          reject(new Error(message));
         }
       } else {
         // fail silently as we did not start chrome
