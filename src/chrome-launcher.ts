@@ -54,8 +54,8 @@ export interface ModuleOverrides {
   spawn?: typeof childProcess.spawn;
 }
 
-const sigintListener = async () => {
-  await killAll();
+const sigintListener = () => {
+  killAll();
   process.exit(_SIGINT_EXIT_CODE);
 };
 
@@ -92,11 +92,11 @@ function getChromePath(): string {
   return installation;
 }
 
-async function killAll(): Promise<Array<Error>> {
+function killAll(): Array<Error> {
   let errors = [];
   for (const instance of instances) {
     try {
-      await instance.kill();
+      instance.kill();
       // only delete if kill did not error
       // this means erroring instances remain in the Set
       instances.delete(instance);
@@ -380,60 +380,56 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<void>((resolve) => {
-      if (this.chromeProcess) {
-        this.chromeProcess.on('close', () => {
-          delete this.chromeProcess;
-          this.destroyTmp().then(resolve);
-        });
+    if (!this.chromeProcess) {
+      return;
+    }
 
-        log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
-        try {
-          if (isWindows) {
-            // https://github.com/GoogleChrome/chrome-launcher/issues/266
-            const taskkillProc = spawnSync(
-                `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
-
-            const {stderr} = taskkillProc;
-            if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
-          } else {
-            if (this.chromeProcess.pid) {
-              process.kill(-this.chromeProcess.pid, 'SIGKILL');
-            }
-          }
-        } catch (err) {
-          const message = `Chrome could not be killed ${err.message}`;
-          log.warn('ChromeLauncher', message);
-        }
-      } else {
-        // fail silently as we did not start chrome
-        resolve();
-      }
+    this.chromeProcess.on('close', () => {
+      delete this.chromeProcess;
+      this.destroyTmp();
     });
+
+    log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
+    try {
+      if (isWindows) {
+        // https://github.com/GoogleChrome/chrome-launcher/issues/266
+        const taskkillProc = spawnSync(
+            `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
+
+        const {stderr} = taskkillProc;
+        if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
+      } else {
+        if (this.chromeProcess.pid) {
+          process.kill(-this.chromeProcess.pid, 'SIGKILL');
+        }
+      }
+    } catch (err) {
+      const message = `Chrome could not be killed ${err.message}`;
+      log.warn('ChromeLauncher', message);
+    }
+    this.destroyTmp();
   }
 
   destroyTmp() {
-    return new Promise<void>(resolve => {
-      // Only clean up the tmp dir if we created it.
-      if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-        return resolve();
-      }
+    // Only clean up the tmp dir if we created it.
+    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+      return;
+    }
 
-      if (this.outFile) {
-        this.fs.closeSync(this.outFile);
-        delete this.outFile;
-      }
+    if (this.outFile) {
+      this.fs.closeSync(this.outFile);
+      delete this.outFile;
+    }
 
-      if (this.errFile) {
-        this.fs.closeSync(this.errFile);
-        delete this.errFile;
-      }
+    if (this.errFile) {
+      this.fs.closeSync(this.errFile);
+      delete this.errFile;
+    }
 
-      // backwards support for node v12 + v14.14+
-      // https://nodejs.org/api/deprecations.html#DEP0147
-      const rm = this.fs.rm || this.fs.rmdir;
-      rm(this.userDataDir, {recursive: true}, () => resolve());
-    });
+    // backwards support for node v12 + v14.14+
+    // https://nodejs.org/api/deprecations.html#DEP0147
+    const rmSync = this.fs.rmSync || this.fs.rmdirSync;
+    rmSync(this.userDataDir, {recursive: true, force: true});
   }
 };
 
