@@ -1,3 +1,12 @@
+## v0.15.1 (Tue, May 31 2022)
+
+* `3724165a` make launcher.kill() synchronous ([#268](https://github.com/GoogleChrome/chrome-launcher/pull/268))
+* `3561350a` revise taskkill procedure on windows ([#267](https://github.com/GoogleChrome/chrome-launcher/pull/267))
+* `690ae983` add lighthouse smoketests (windows) to CI ([#265](https://github.com/GoogleChrome/chrome-launcher/pull/265))
+* `279577fd` docs(chrome-flags-for-tools): add link to overview of features ([#235](https://github.com/GoogleChrome/chrome-launcher/pull/235))
+* `ff91c18b` fix: use `wslpath` to resolve Windows paths ([#200](https://github.com/GoogleChrome/chrome-launcher/pull/200))
+* `30755cde` test: run latest versions of node in CI ([#257](https://github.com/GoogleChrome/chrome-launcher/pull/257))
+
 ## v0.15.0 (Wed, Nov 10 2021)
 
 * `1af60cb` add `getChromePath()` method for printing found chrome path ([#255](https://github.com/GoogleChrome/chrome-launcher/pull/255))
