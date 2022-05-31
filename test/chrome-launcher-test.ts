@@ -111,7 +111,7 @@ describe('Launcher', () => {
 
 
   it('cleans up the tmp dir after closing (real)', async () => {
-    const rmSpy = spy(fs, 'rmSync');
+    const rmSpy = spy(fs, 'rmSync' in fs ? 'rmSync' : 'rmdirSync');
     const fsFake = {...fsMock, rmdirSync: rmSpy, rmSync: rmSpy};
 
     const chromeInstance = new Launcher({}, {fs: fsFake as any});
@@ -125,7 +125,7 @@ describe('Launcher', () => {
     // tmpdir is gone 
     const [path] = fsFake.rmSync.getCall(0).args;
     assert.strictEqual(chromeInstance.userDataDir, path);
-    assert.equal(fs.existsSync(path), false);
+    assert.equal(fs.existsSync(path), false, `userdatadir still exists: ${path}`);
   }).timeout(30 * 1000);
 
   it('does not delete created directory when custom path passed', () => {
