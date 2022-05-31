@@ -390,15 +390,11 @@ class Launcher {
         try {
           if (isWindows) {
             // https://github.com/GoogleChrome/chrome-launcher/issues/266
-            const taskkillProcess = spawnSync(
+            const taskkillProc = spawnSync(
                 `taskkill /pid ${this.chromeProc.pid} /T /F`, {shell: true, encoding: 'utf-8'});
 
-            const {stdout, stderr} = taskkillProcess;
-            if (stdout)
-              log.verbose(
-                  'ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stdout: ${stdout}`);
-            if (stderr)
-              log.warn('ChromeLauncher', `[pid=${this.chromeProc.pid}] taskkill stderr: ${stderr}`);
+            const {stderr} = taskkillProc;
+            if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
           } else {
             if (this.chromeProc.pid) {
               process.kill(-this.chromeProc.pid, 'SIGKILL');
