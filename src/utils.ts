@@ -8,7 +8,12 @@
 import {join} from 'path';
 import {execSync, execFileSync} from 'child_process';
 import {mkdirSync} from 'fs';
-import isWsl = require('is-wsl');
+import isWsl from 'is-wsl';
+
+let execFileSync_ = execFileSync;
+export function __testInjectExecFileSyncStub(execFileSyncStub: any) {
+  execFileSync_ = execFileSyncStub;
+}
 
 export const enum LaunchErrorCodes {
   ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
@@ -91,7 +96,7 @@ export function toWin32Path(dir: string = ''): string {
   }
 
   try {
-    return execFileSync('wslpath', ['-w', dir]).toString().trim();
+    return execFileSync_('wslpath', ['-w', dir]).toString().trim();
   } catch {
     return toWinDirFormat(dir);
   }
@@ -99,7 +104,7 @@ export function toWin32Path(dir: string = ''): string {
 
 export function toWSLPath(dir: string, fallback: string): string {
   try {
-    return execFileSync('wslpath', ['-u', dir]).toString().trim();
+    return execFileSync_('wslpath', ['-u', dir]).toString().trim();
   } catch {
     return fallback;
   }

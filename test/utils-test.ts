@@ -15,17 +15,20 @@
  */
 'use strict';
 
-import * as assert from 'assert';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath } from '../src/utils';
-import * as sinon from 'sinon';
-import * as child_process from 'child_process';
+import assert from 'assert';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, __testInjectExecFileSyncStub } from '../src/utils.js';
+import sinon from 'sinon';
+import child_process from 'child_process';
 
 const execFileSyncStub = sinon.stub(child_process, 'execFileSync').callThrough();
 
 const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
 
 describe('toWin32Path', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => {
+    execFileSyncStub.reset();
+    __testInjectExecFileSyncStub(execFileSyncStub);
+  });
 
   it('calls toWin32Path -w', () => {
     execFileSyncStub.returns(asBuffer(''));
@@ -66,7 +69,10 @@ describe('toWin32Path', () => {
 })
 
 describe('toWSLPath', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => {
+    execFileSyncStub.reset();
+    __testInjectExecFileSyncStub(execFileSyncStub);
+  });
 
   it('calls wslpath -u', () => {
     execFileSyncStub.returns(asBuffer(''));
@@ -95,7 +101,10 @@ describe('toWSLPath', () => {
 })
 
 describe('getWSLLocalAppDataPath', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => {
+    execFileSyncStub.reset();
+    __testInjectExecFileSyncStub(execFileSyncStub);
+  });
 
   it('transforms it to a Linux path using wslpath', () => {
     execFileSyncStub.returns(asBuffer('/c/folder/'));

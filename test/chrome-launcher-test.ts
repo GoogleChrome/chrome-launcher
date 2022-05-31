@@ -5,13 +5,13 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher';
-import {DEFAULT_FLAGS} from '../src/flags';
+import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher.js';
+import {DEFAULT_FLAGS} from '../src/flags.js';
 
 import {spy, stub} from 'sinon';
-import * as assert from 'assert';
+import assert from 'assert';
+import log from 'lighthouse-logger';
 
-const log = require('lighthouse-logger');
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
