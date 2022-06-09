@@ -62,7 +62,7 @@ describe('Launcher', () => {
 
     chromeInstance.prepare();
 
-    await chromeInstance.destroyTmp();
+    chromeInstance.destroyTmp();
     assert.strictEqual(fs.rmdirSync.callCount, 0);
     assert.strictEqual(fs.rmSync.callCount, 0);
   });
@@ -105,7 +105,7 @@ describe('Launcher', () => {
     const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
-    await chromeInstance.destroyTmp();
+    chromeInstance.destroyTmp();
     assert.strictEqual(rmMock.callCount, 1);
   });
 
@@ -149,14 +149,14 @@ describe('Launcher', () => {
   it('doesn\'t fail when killed twice', async () => {
     const chromeInstance = new Launcher();
     await chromeInstance.launch();
-    await chromeInstance.kill();
-    await chromeInstance.kill();
+    chromeInstance.kill();
+    chromeInstance.kill();
   }).timeout(30 * 1000);
 
   it('doesn\'t fail when killing all instances', async () => {
     await launch();
     await launch();
-    const errors = await killAll();
+    const errors = killAll();
     assert.strictEqual(errors.length, 0);
   });
 
@@ -166,7 +166,7 @@ describe('Launcher', () => {
     let pid = chromeInstance.pid!;
     await chromeInstance.launch();
     assert.strictEqual(pid, chromeInstance.pid);
-    await chromeInstance.kill();
+    chromeInstance.kill();
   });
 
   it('gets all default flags', async () => {

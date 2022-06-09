@@ -46,7 +46,7 @@ export interface LaunchedChrome {
   pid: number;
   port: number;
   process: ChildProcess;
-  kill: () => Promise<void>;
+  kill: () => void;
 }
 
 export interface ModuleOverrides {
@@ -72,12 +72,12 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
   await instance.launch();
 
-  const kill = async () => {
+  const kill = () => {
     instances.delete(instance);
     if (instances.size === 0) {
       process.removeListener(_SIGINT, sigintListener);
     }
-    return instance.kill();
+    instance.kill();
   };
 
   return {pid: instance.pid!, port: instance.port!, kill, process: instance.chromeProcess!};
