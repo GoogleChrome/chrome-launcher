@@ -174,8 +174,6 @@ class Launcher {
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
 
-    if (process.env.HEADLESS) flags.push('--headless');
-
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
 
