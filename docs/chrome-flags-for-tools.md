@@ -67,6 +67,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
+* `--disable-features=OptimizationHints`: Disable the [Chrome Optimization Guide](https://chromium.googlesource.com/chromium/src/+/HEAD/components/optimization_guide/) and networking with its service API
 
 ## Rendering & GPU
 
@@ -135,5 +136,5 @@ All use cases are different, so you'll have to choose which flags are most appro
 FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](f:_switches\.cc).
 ## Feature Flags FYI
 
-Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. Indepdently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/master:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1559;drc=170473ad887b7990079f1f996b126548569c5902) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. For a complete overview of all available features, see https://niek.github.io/chrome-features/.
+Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. Independently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/master:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1812;drc=77ab795d8fd2c0fe7ad7adb16478120fbf8c613e) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/master/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. For a complete overview of all available features, see https://niek.github.io/chrome-features/.
 
