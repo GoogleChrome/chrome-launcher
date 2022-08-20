@@ -16,6 +16,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--no-first-run`: Skip first run wizards
 * `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
 * `--use-file-for-fake-video-capture=<path-to-file>`: Use file for fake video capture (.y4m or .mjpeg) Needs `--use-fake-device-for-media-stream`
+* `--disable-external-intent-requests`: Disallow opening links in external applications
 
 ## Performance & web platform behavior
 
@@ -57,6 +58,7 @@ All use cases are different, so you'll have to choose which flags are most appro
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
 * `--use-mock-keychain`: Use mock keychain on Mac to prevent blocking permissions dialogs. https://crbug.com/865247
+* `--deny-permission-prompts`: Suppress all permission prompts by automatically denying them.
 
 ## Background updates, networking, reporting
 
