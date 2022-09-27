@@ -124,7 +124,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 # Sources
 
-* [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/master/src/flags.ts)
+* [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/main/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
 * [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/main/src/node/Launcher.ts)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
