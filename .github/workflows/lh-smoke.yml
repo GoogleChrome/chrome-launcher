@@ -2,7 +2,7 @@ name: smoke
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request: # run on all PRs, not just PRs to a particular branch
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
     
     # chrome-launcher
     # This'll add lighthouse AND install chrome-launcher's deps
-    - run: yarn add --frozen-lockfile --network-timeout 1000000 -D https://github.com/GoogleChrome/lighthouse.git#master
+    - run: yarn add --frozen-lockfile --network-timeout 1000000 -D https://github.com/GoogleChrome/lighthouse.git#main
     - run: yarn build
 
     # lighthouse 
