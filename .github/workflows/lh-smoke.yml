@@ -27,7 +27,7 @@ jobs:
     
     # chrome-launcher
     # This'll add lighthouse AND install chrome-launcher's deps
-    - run: yarn add --frozen-lockfile --network-timeout 1000000 -D https://github.com/GoogleChrome/lighthouse.git#master
+    - run: yarn add --frozen-lockfile --network-timeout 1000000 -D https://github.com/GoogleChrome/lighthouse.git#main
     - run: yarn build
 
     # lighthouse 
