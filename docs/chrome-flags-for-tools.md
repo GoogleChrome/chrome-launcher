@@ -36,19 +36,19 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 ## Test & debugging flags
 
-* `--disable-device-discovery-notifications`: Avoid messages like "New printer on your network"
 * `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348), [crbug.com/1277272](https://crbug.com/1277272)
-  - disables bubble notification about running development/unpacked extensions
-  - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
-  - disables infobar animations
-  - disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
-  - means the default browser check prompt isn't shown
-  - avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
+  - sets `window.navigator.webdriver` to `true` within all JS contexts. This is also set [when using](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=374-376;drc=4a843634b8b3006e431add55968f6f45ee54d35e) `--headless`, `--remote-debugging-pipe` and `--remote-debugging-port=0` (yes, [_specifically_ 0](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=412-427;drc=4a843634b8b3006e431add55968f6f45ee54d35e)).
+  - disables bubble notification about running development/unpacked extensions ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/extensions/extension_message_bubble_factory.cc;l=71-76;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
+  - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=301-308;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
+  - disables infobar animations ([source](https://source.chromium.org/chromium/chromium/src/+/main:components/infobars/content/content_infobar_manager.cc;l=48-52;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
+  - disables auto-reloading on network errors ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/chrome_content_browser_client.cc;l=1328-1331;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
+  - enables the CDP method [`Browser.getBrowserCommandLine`](https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-getBrowserCommandLine).
+  - avoids showing these 4 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate, LacrosButterBar
   - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png) ... which is known to [adversely affect screenshots](https://bugs.chromium.org/p/chromium/issues/detail?id=1277272).
 * `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
-* `--log-level=0`: 0 means INFO and higher. `2` is the most verbose.
-* `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
+* `--log-level=0`: 0 means INFO and higher. `2` is the most verbose. Protip: Use `--enable-logging=stderr --v=2` and you may spot additional components active that you may want to disable.
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
+* `--remote-debugging-port=...`: With a value of 0, Chrome will automatically select a useable port _and_ will set `navigator.webdriver` to `true`.
 * `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
 * `--test-type`: Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
   - It avoids creating application stubs in ~/Applications on mac.
@@ -58,8 +58,13 @@ All use cases are different, so you'll have to choose which flags are most appro
   - disables initializing chromecast service
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
-* `--use-mock-keychain`: Use mock keychain on Mac to prevent blocking permissions dialogs. https://crbug.com/865247
 * `--deny-permission-prompts`: Suppress all permission prompts by automatically denying them.
+
+## Chromium Annoyances
+
+* `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
+* `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog asking: _Do you want the application “Chromium.app” to accept incoming network connections?_
+* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_
 
 ## Background updates, networking, reporting
 
@@ -119,6 +124,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--disable-browser-side-navigation`: Disabled PlzNavigate.
 * `--disable-datasaver-prompt`: Removed
 * `--disable-desktop-notifications`: Removed
+* `--disable-device-discovery-notifications`: Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
 * `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
@@ -137,13 +143,15 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 Here's a [Nov 2022 comparison of what flags all these tools use](https://docs.google.com/spreadsheets/d/1n-vw_PCPS45jX3Jt9jQaAhFqBY6Ge1vWF_Pa0k7dCk4/edit#gid=1265672696).
 
-# All Chrome flags
 
-* [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
+[The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
 FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](https://source.chromium.org/search?q=f:_switches%5C.cc&ss=chromium%2Fchromium%2Fsrc).
 ## Feature Flags FYI
 
-Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. Independently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1969;drc=d6e91a65ded605d8577f0651b3665c8206ae6ce3) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. For a complete overview of all available features, see https://niek.github.io/chrome-features/.
+Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. https://niek.github.io/chrome-features/ presents all of them very clearly.
 
-Protip: Add `--enable-logging=stderr --v=2` to your Chrome invocation to see debug logs. You might spot additional components that you may want to disable.
+
+Independently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1969;drc=d6e91a65ded605d8577f0651b3665c8206ae6ce3) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. 
+
+

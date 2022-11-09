@@ -58,6 +58,4 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--use-mock-keychain',
   // Disable background tracing (aka slow reports & deep reports) to avoid 'Tracing already started'
   '--force-fieldtrials=*BackgroundTracing/default/',
-  // Avoid messages like "New printer on your network"
-  '--disable-device-discovery-notifications',
 ];
