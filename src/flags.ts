@@ -11,14 +11,15 @@
  */
 
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
-  '--disable-features=' + [
-    // Disable built-in Google Translate service
-    'Translate',
-    // Disable the Chrome Optimization Guide background networking
-    'OptimizationHints',
-    //  Disable the Chrome Media Router (cast target discovery) background networking
-    'MediaRouter',
-  ].join(','),
+  '--disable-features=' +
+      [
+        // Disable built-in Google Translate service
+        'Translate',
+        // Disable the Chrome Optimization Guide background networking
+        'OptimizationHints',
+        //  Disable the Chrome Media Router (cast target discovery) background networking
+        'MediaRouter',
+      ].join(','),
 
   // Disable all chrome extensions
   '--disable-extensions',
