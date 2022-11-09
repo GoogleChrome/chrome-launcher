@@ -37,14 +37,14 @@ All use cases are different, so you'll have to choose which flags are most appro
 ## Test & debugging flags
 
 * `--disable-device-discovery-notifications`: Avoid messages like "New printer on your network"
-* `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348)
+* `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348), [crbug.com/1277272](https://crbug.com/1277272)
   - disables bubble notification about running development/unpacked extensions
   - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=295-298;drc=00053fb4d880a925c890193b74a8ff35e1cef2a0) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
   - disables infobar animations
   - disables auto-reloading on network errors ([source](https://cs.chromium.org/chromium/src/chrome/renderer/net/net_error_helper_core.cc?l=917&rcl=6eaf0af71262eb876764c6237ee2fe021a3e7a18))
   - means the default browser check prompt isn't shown
   - avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
-  - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
+  - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png) ... which is known to [adversely affect screenshots](https://bugs.chromium.org/p/chromium/issues/detail?id=1277272).
 * `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
 * `--log-level=0`: 0 means INFO and higher. `2` is the most verbose.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
