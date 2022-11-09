@@ -17,15 +17,16 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
 * `--use-file-for-fake-video-capture=<path-to-file>`: Use file for fake video capture (.y4m or .mjpeg) Needs `--use-fake-device-for-media-stream`
 * `--disable-external-intent-requests`: Disallow opening links in external applications
+* `--disable-features=Translate`: Disables Chrome translation, both the manual option and the popup prompt when a page with differing language is detected.
 
 ## Performance & web platform behavior
 
 * `--allow-running-insecure-content`
 * `--autoplay-policy=user-gesture-required`: Don't render video
 * `--disable-background-timer-throttling`: Disable timers being throttled in background pages/tabs
-* `--disable-backgrounding-occluded-windows`
+* `--disable-backgrounding-occluded-windows`: Normally, Chrome will treat a 'foreground' tab instead as _backgrounded_ if the surrounding window is occluded (aka visually covered) by another window. This flag disables that.
 * `--disable-features=ScriptStreaming`: V8 script streaming
-* `--disable-hang-monitor`
+* `--disable-hang-monitor`: Suppresses hang monitor dialogs in renderer processes. This flag may allow slow unload handlers on a page to prevent the tab from closing.
 * `--disable-ipc-flooding-protection`: Some javascript functions can be used to flood the browser process with IPC. By default, protection is on to limit the number of IPC sent to 10 per second per frame. This flag disables it. https://crrev.com/604305
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
@@ -45,7 +46,7 @@ All use cases are different, so you'll have to choose which flags are most appro
   - avoids showing these 3 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate
   - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png)
 * `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
-* `--log-level=0`: 0 means INFO and higher.
+* `--log-level=0`: 0 means INFO and higher. `2` is the most verbose.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
 * `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
@@ -105,6 +106,8 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 ## Headless
 
+* `--headless`
+* `--headless=chrome`
 * `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
 * `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
 * `--disable-gpu`: Was often [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) along with `--headless`, but as of 2021, isn't needed.
@@ -113,9 +116,9 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * `--disable-add-to-shelf`: [Removed June 2017](https://codereview.chromium.org/2944283002)
 * `--disable-background-downloads`: [Removed Oct 2014](https://codereview.chromium.org/607843002).
-* `--disable-browser-side-navigation` Disabled PlzNavigate.
-* `--disable-datasaver-prompt`
-* `--disable-desktop-notifications`
+* `--disable-browser-side-navigation`: Disabled PlzNavigate.
+* `--disable-datasaver-prompt`: Removed
+* `--disable-desktop-notifications`: Removed
 * `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
@@ -127,17 +130,20 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * [chrome-launcher's flags](https://github.com/GoogleChrome/chrome-launcher/blob/main/src/flags.ts)
 * [Chromedriver's flags](https://cs.chromium.org/chromium/src/chrome/test/chromedriver/chrome_launcher.cc?type=cs&q=f:chrome_launcher++kDesktopSwitches&sq=package:chromium)
-* [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/main/src/node/Launcher.ts)
+* [Puppeteer's flags](https://github.com/puppeteer/puppeteer/blob/3f2c0590f154aefd2ad3449a3f943ee79d1e33a9/packages/puppeteer-core/src/node/ChromeLauncher.ts#L159)
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
-* [Catapult's flags](https://source.chromium.org/search?q=f:catapult%20f:desktop%20symbol:GetBrowserStartupArgs&ss=chromium%2Fchromium%2Fsrc)
+* [Catapult's flags](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/chrome_startup_args.py) and [here](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/desktop_browser_finder.py;l=218;drc=4a0e6f034e9756605cfc837c8526588d6c13436b)
 * [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
+
+Here's a [Nov 2022 comparison of what flags all these tools use](https://docs.google.com/spreadsheets/d/1n-vw_PCPS45jX3Jt9jQaAhFqBY6Ge1vWF_Pa0k7dCk4/edit#gid=1265672696).
 
 # All Chrome flags
 
 * [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
-FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](f:_switches\.cc).
+FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](https://source.chromium.org/search?q=f:_switches%5C.cc&ss=chromium%2Fchromium%2Fsrc).
 ## Feature Flags FYI
 
-Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. Independently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1812;drc=77ab795d8fd2c0fe7ad7adb16478120fbf8c613e) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. For a complete overview of all available features, see https://niek.github.io/chrome-features/.
+Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. Independently, Blink has [many features](https://source.chromium.org/chromium/chromium/src/+/main:out/Debug/gen/third_party/blink/renderer/platform/runtime_enabled_features.cc;l=1969;drc=d6e91a65ded605d8577f0651b3665c8206ae6ce3) that can be toggled [with commandline switches](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/renderer/platform/RuntimeEnabledFeatures.md#command_line-switches): `--enable-blink-features` / `--disable-blink-features`. For a complete overview of all available features, see https://niek.github.io/chrome-features/.
 
+Protip: Add `--enable-logging=stderr --v=2` to your Chrome invocation to see debug logs. You might spot additional components that you may want to disable.
