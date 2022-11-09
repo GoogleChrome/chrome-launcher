@@ -70,6 +70,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
 * `--disable-features=OptimizationHints`: Disable the [Chrome Optimization Guide](https://chromium.googlesource.com/chromium/src/+/HEAD/components/optimization_guide/) and networking with its service API
+* `--disable-features=MediaRouter`: Disable the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates some background network activity to discover castable targets.
 
 ## Rendering & GPU
 
