@@ -13,6 +13,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-component-extensions-with-background-pages`: Disable some built-in extensions that aren't affected by `--disable-extensions`
 * `--disable-default-apps`: Disable installation of default apps
 * `--disable-extensions`: Disable all chrome extensions
+* `--disable-features=InterestFeedContentSuggestions`: Disables the Discover feed on NTP
 * `--disable-features=Translate`: Disables Chrome translation, both the manual option and the popup prompt when a page with differing language is detected.
 * `--hide-scrollbars`: Hide scrollbars from screenshots.
 * `--mute-audio`: Mute any audio
@@ -23,15 +24,23 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 * `--disable-background-timer-throttling`: Disable timers being throttled in background pages/tabs
 * `--disable-backgrounding-occluded-windows`: Normally, Chrome will treat a 'foreground' tab instead as _backgrounded_ if the surrounding window is occluded (aka visually covered) by another window. This flag disables that.
+* `--disable-features=CalculateNativeWinOcclusion`: Disable the feature of: Calculate window occlusion on Windows will be used in the future to throttle and potentially unload foreground tabs in occluded windows.
 * `--disable-hang-monitor`: Suppresses hang monitor dialogs in renderer processes. This flag may allow slow unload handlers on a page to prevent the tab from closing.
 * `--disable-ipc-flooding-protection`: Some javascript functions can be used to flood the browser process with IPC. By default, protection is on to limit the number of IPC sent to 10 per second per frame. This flag disables it. https://crrev.com/604305
 * `--disable-renderer-backgrounding`: This disables non-foreground tabs from getting a lower process priority This doesn't (on its own) affect timers or painting behavior. [karma-chrome-launcher#123](https://github.com/karma-runner/karma-chrome-launcher/issues/123)
 
 ## Web platform behavior
 
-* `--aggressive-cache-discard`: No description
+* `--aggressive-cache-discard`
 * `--allow-running-insecure-content`
 * `--disable-back-forward-cache`: Disables the BackForwardCache feature.
+* `--disable-features=AcceptCHFrame`: Disable accepting h2/h3 [ACCEPT_CH](https://datatracker.ietf.org/doc/html/draft-davidben-http-client-hint-reliability-02#section-4.3) Client Hints frames.
+* `--disable-features=AutoExpandDetailsElement`: Removed in [Sept 2022](https://bugs.chromium.org/p/chromium/issues/detail?id=1185950#c62).
+* `--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync`: If enabled, this feature results in the browser process only asking the renderer process to run beforeunload handlers if it knows such handlers are registered. With `kAvoidUnnecessaryBeforeUnloadCheckSync`, content does not report a beforeunload handler is present. A ramification of this is navigations that would normally check beforeunload handlers before continuing will not, and navigation will synchronously continue.
+* `--disable-features=BackForwardCache`: Disable the bfcache.
+* `--disable-features=HeavyAdPrivacyMitigations`: Disables the privacy mitigations for the heavy ad intervention. This throttles the amount of interventions that can occur on a given host in a time period. It also adds noise to the thresholds used. This is separate from the intervention feature so it does not interfere with field trial activation, as this blocklist is created for every user, and noise is decided prior to seeing a heavy ad.
+* `--disable-features=IsolateOrigins`
+* `--disable-features=LazyFrameLoading`
 * `--disable-features=ScriptStreaming`: V8 script streaming
 * `--enable-precise-memory-info`: Make the values returned to window.performance.memory more granular and more up to date in shared worker. Without this flag, the memory information is still available, but it is bucketized and updated less frequently. This flag also applys to workers.
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
@@ -44,6 +53,8 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--autoplay-policy=...`: Value of `user-gesture-required` to not autoplay video. Value of `no-user-gesture-required` to always autoplay video.
 * `--deny-permission-prompts`: Suppress all permission prompts by automatically denying them.
 * `--disable-external-intent-requests`: Disallow opening links in external applications
+* `--disable-features=GlobalMediaControls`: Hide toolbar button that opens dialog for controlling media sessions.
+* `--disable-features=ImprovedCookieControls`: Disables an improved UI for third-party cookie blocking in incognito mode.
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
@@ -89,6 +100,8 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
 * `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
+* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/
+* `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
@@ -123,6 +136,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Process management
 
+* `--disable-features=DestroyProfileOnBrowserClose`:  Disable the feature of: Destroy profiles when their last browser window is closed, instead of when the browser exits.
 * `--disable-features=site-per-process`: Disables OOPIF. https://www.chromium.org/Home/chromium-security/site-isolation
 * `--no-service-autorun`: Disables the service process from adding itself as an autorun process. This does not delete existing autorun registrations, it just prevents the service from registering a new one.
 * `--process-per-tab`: [Doesn't do anything](https://source.chromium.org/chromium/chromium/src/+/main:content/public/common/content_switches.cc;l=602-605;drc=2149a93144ce2030ab20863c2983b6c9d7bfd177). Use --single-process instead.
@@ -147,6 +161,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-features=TranslateUI`: Removed as `TranslateUI` changed to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
+* `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
@@ -164,6 +179,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
 FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](https://source.chromium.org/search?q=f:_switches%5C.cc&ss=chromium%2Fchromium%2Fsrc).
+
 ## Feature Flags FYI
 
 Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. https://niek.github.io/chrome-features/ presents all of them very clearly.
