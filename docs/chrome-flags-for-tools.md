@@ -39,7 +39,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 * `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348), [crbug.com/1277272](https://crbug.com/1277272)
   - sets `window.navigator.webdriver` to `true` within all JS contexts. This is also set [when using](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=374-376;drc=4a843634b8b3006e431add55968f6f45ee54d35e) `--headless`, `--remote-debugging-pipe` and `--remote-debugging-port=0` (yes, [_specifically_ 0](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=412-427;drc=4a843634b8b3006e431add55968f6f45ee54d35e)).
   - disables bubble notification about running development/unpacked extensions ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/extensions/extension_message_bubble_factory.cc;l=71-76;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
-  - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=301-308;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed) the usecase of the [removed](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
+  - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=301-308;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed) the usecase of the [defunct](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
   - disables infobar animations ([source](https://source.chromium.org/chromium/chromium/src/+/main:components/infobars/content/content_infobar_manager.cc;l=48-52;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
   - disables auto-reloading on network errors ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/chrome_content_browser_client.cc;l=1328-1331;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
   - enables the CDP method [`Browser.getBrowserCommandLine`](https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-getBrowserCommandLine).
@@ -64,7 +64,7 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
 * `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog asking: _Do you want the application “Chromium.app” to accept incoming network connections?_
-* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_
+* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
 
 ## Background updates, networking, reporting
 
@@ -121,11 +121,11 @@ All use cases are different, so you'll have to choose which flags are most appro
 
 * `--disable-add-to-shelf`: [Removed June 2017](https://codereview.chromium.org/2944283002)
 * `--disable-background-downloads`: [Removed Oct 2014](https://codereview.chromium.org/607843002).
-* `--disable-browser-side-navigation`: Disabled PlzNavigate.
+* `--disable-browser-side-navigation`: Removed. It disabled PlzNavigate.
 * `--disable-datasaver-prompt`: Removed
 * `--disable-desktop-notifications`: Removed
-* `--disable-device-discovery-notifications`: Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
-* `--disable-features=TranslateUI`: renamed `TranslateUI` to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
+* `--disable-device-discovery-notifications`: Removed. Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
+* `--disable-features=TranslateUI`: Removed as `TranslateUI` changed to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
 * `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
