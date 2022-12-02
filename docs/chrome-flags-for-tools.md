@@ -100,7 +100,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
 * `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
-* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/ . This feature isn't disabled via other 'parent' flags.
+* `--disable-features=AutofillServerCommunication`: Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
 * `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
