@@ -10,16 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # awaiting support for 'latest'/'lts'. https://github.com/actions/setup-node/issues/26
-        node: [ '12', '14', '16', '17' ]
+        node: [ 'latest', 'lts/*', 'lts/-n' ]
     name: basics (node ${{ matrix.node }})
 
     steps:
     - name: git clone
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Setup node
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node }}
 
@@ -43,12 +42,12 @@ jobs:
 
     steps:
     - name: git clone
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: 14.x
+        node-version: lts/*
 
     - run: yarn --frozen-lockfile
     - run: yarn build
