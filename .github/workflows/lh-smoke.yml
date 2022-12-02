@@ -24,6 +24,7 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: lts/*
+        cache: 'yarn'
     
     # chrome-launcher
     # This'll add lighthouse AND install chrome-launcher's deps
