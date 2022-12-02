@@ -19,6 +19,16 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
         'OptimizationHints',
         //  Disable the Chrome Media Router (cast target discovery) background networking
         'MediaRouter',
+        /// Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
+        'DialMediaRouteProvider',
+        // Disable the feature of: Calculate window occlusion on Windows will be used in the future to throttle and potentially unload foreground tabs in occluded windows.
+        'CalculateNativeWinOcclusion',
+        // Disables the Discover feed on NTP
+        'InterestFeedContentSuggestions', 
+        // Don't update the CT lists
+        'CertificateTransparencyComponentUpdater',
+        // Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
+        'AutofillServerCommunication',
       ].join(','),
 
   // Disable all chrome extensions
@@ -58,4 +68,11 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--use-mock-keychain',
   // Disable background tracing (aka slow reports & deep reports) to avoid 'Tracing already started'
   '--force-fieldtrials=*BackgroundTracing/default/',
+
+  // Suppresses hang monitor dialogs in renderer processes. This flag may allow slow unload handlers on a page to prevent the tab from closing.
+  '--disable-hang-monitor',
+  // Reloading a page that came from a POST normally prompts the user.
+  '--disable-prompt-on-repost',
+  // Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
+  '--disable-domain-reliability',
 ];

@@ -100,7 +100,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
 * `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
-* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/
+* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/ . This feature isn't disabled via other 'parent' flags.
 * `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
@@ -174,7 +174,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/chrome_startup_args.py) and [here](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/desktop_browser_finder.py;l=218;drc=4a0e6f034e9756605cfc837c8526588d6c13436b)
 * [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
-
+* [Playwright's](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromiumSwitches.ts#L20) [flags](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromium.ts#L263)
 
 [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
