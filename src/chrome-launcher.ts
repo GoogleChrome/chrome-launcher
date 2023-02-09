@@ -251,7 +251,11 @@ class Launcher {
 
       // If an explict port is passed first look for an open connection...
       try {
-        return await this.isDebuggerReady();
+        await this.isDebuggerReady();
+        log.log(
+          'ChromeLauncher',
+          `Found existing Chrome already running using port ${this.port}, using that.`);
+        return;
       } catch (err) {
         log.log(
             'ChromeLauncher',
