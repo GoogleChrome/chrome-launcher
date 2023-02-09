@@ -145,7 +145,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 ## Headless
 
 * `--headless`: Run in headless mode, i.e., without a UI or display server dependencies.
-* `--headless=chrome`: Headless++ mode
+* `--headless=new`: New, native Headless mode. ([previously](https://bugs.chromium.org/p/chromium/issues/detail?id=1380881), `--headless=chrome`)
 * `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
 * `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
 * `--disable-gpu`: Was often [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) along with `--headless`, but as of 2021, isn't needed.
