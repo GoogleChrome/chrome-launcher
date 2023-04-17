@@ -35,7 +35,7 @@ export interface Options {
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
-  logLevel?: 'verbose'|'info'|'error'|'silent';
+  logLevel?: 'verbose'|'info'|'error'|'warn'|'silent';
   ignoreDefaultFlags?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
