@@ -35,7 +35,7 @@ export interface Options {
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
-  logLevel?: 'verbose'|'info'|'error'|'silent';
+  logLevel?: 'verbose'|'info'|'error'|'warn'|'silent';
   ignoreDefaultFlags?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
@@ -251,7 +251,11 @@ class Launcher {
 
       // If an explict port is passed first look for an open connection...
       try {
-        return await this.isDebuggerReady();
+        await this.isDebuggerReady();
+        log.log(
+          'ChromeLauncher',
+          `Found existing Chrome already running using port ${this.port}, using that.`);
+        return;
       } catch (err) {
         log.log(
             'ChromeLauncher',
