@@ -5,12 +5,12 @@
  */
 'use strict';
 
-import fs = require('fs');
-import path = require('path');
+import fs from 'fs';
+import path from 'path';
 import {homedir} from 'os';
 import {execSync, execFileSync} from 'child_process';
-import escapeRegExp = require('escape-string-regexp');
-const log = require('lighthouse-logger');
+import escapeRegExp from 'escape-string-regexp';
+import log from 'lighthouse-logger';
 
 import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils';
 

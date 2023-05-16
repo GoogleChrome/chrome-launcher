@@ -12,7 +12,8 @@ import {spy, stub} from 'sinon';
 import * as assert from 'assert';
 import * as fs from 'fs';
 
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},

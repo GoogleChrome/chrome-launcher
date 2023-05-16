@@ -9,7 +9,8 @@
 import {launch} from '../src/';
 import * as assert from 'assert';
 
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
 describe('Launcher', () => {
 
   beforeEach(() => {
