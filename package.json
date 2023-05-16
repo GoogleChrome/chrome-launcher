@@ -30,7 +30,7 @@
     "@types/node": "*",
     "escape-string-regexp": "^4.0.0",
     "is-wsl": "^2.2.0",
-    "lighthouse-logger": "^1.0.0"
+    "lighthouse-logger": "^1.4.1"
   },
   "version": "0.15.2",
   "types": "./dist/index.d.ts",
