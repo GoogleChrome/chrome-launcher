@@ -41,7 +41,7 @@ const launchChromeWithOpts = async (opts: Options = {}) => {
   }
 };
 
-describe('Launcher', () => {
+describe.only('Launcher', () => {
   beforeEach(() => {
     log.setLevel('error');
   });
