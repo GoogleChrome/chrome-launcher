@@ -7,12 +7,12 @@
 
 import fs = require('fs');
 import path = require('path');
-import {homedir} from 'os';
-import {execSync, execFileSync} from 'child_process';
 import escapeRegExp = require('escape-string-regexp');
-const log = require('lighthouse-logger');
+import {homedir} from 'os';
+import {execFileSync, execSync} from 'child_process';
+import {ChromePathNotSetError, getWSLLocalAppDataPath, toWSLPath} from './utils';
 
-import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils';
+const log = require('lighthouse-logger');
 
 const newLineRegex = /\r?\n/;
 
@@ -136,18 +136,15 @@ export function linux() {
     'chromium-browser',
     'chromium',
   ];
-  executables.forEach((executable: string) => {
-    try {
-      const chromePath =
-          execFileSync('which', [executable], {stdio: 'pipe'}).toString().split(newLineRegex)[0];
-
-      if (canAccess(chromePath)) {
-        installations.push(chromePath);
-      }
-    } catch (e) {
-      // Not installed.
-    }
-  });
+  try {
+    execFileSync('which', ['-a', ...executables], {stdio: 'pipe'})
+        .toString()
+        .split(newLineRegex)
+        .filter(canAccess)
+        .forEach((chromePath: string) => installations.push(chromePath));
+  } catch (e) {
+    // Not installed.
+  }
 
   if (!installations.length) {
     throw new ChromePathNotSetError();
@@ -187,10 +184,12 @@ export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
     `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
-    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
+    `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}chrome.exe`
   ];
   const prefixes = [
-    process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']
+    process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)'],
+    ...process.env.PATH?.split(path.delimiter) ?? []
   ].filter(Boolean) as string[];
 
   const customChromePath = resolveChromePath();
@@ -198,12 +197,24 @@ export function win32() {
     installations.push(customChromePath);
   }
 
+  // Search common locations for chrome.exe
   prefixes.forEach(prefix => suffixes.forEach(suffix => {
     const chromePath = path.join(prefix, suffix);
     if (canAccess(chromePath)) {
       installations.push(chromePath);
     }
   }));
+
+  try {
+    execFileSync('where.exe', ['chrome.exe'], {stdio: 'pipe'})
+        .toString()
+        .split(newLineRegex)
+        .filter((path: string) => !path.startsWith('INFO: ') && canAccess(path))
+        .forEach((chromePath: string) => installations.push(chromePath));
+  } catch (e) {
+    // Not installed.
+  }
+
   return installations;
 }
 
