@@ -12,7 +12,7 @@ import {execSync, execFileSync} from 'child_process';
 import escapeRegExp from 'escape-string-regexp';
 import log from 'lighthouse-logger';
 
-import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils';
+import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils.js';
 
 const newLineRegex = /\r?\n/;
 

@@ -6,7 +6,7 @@
 
 'use strict';
 
-import {launch} from '../src/';
+import {launch} from '../src/index.js';
 import * as assert from 'assert';
 
 import log from 'lighthouse-logger';

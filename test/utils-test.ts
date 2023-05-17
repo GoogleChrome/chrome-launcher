@@ -16,9 +16,9 @@
 'use strict';
 
 import * as assert from 'assert';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath } from '../src/utils';
-import * as sinon from 'sinon';
-import * as child_process from 'child_process';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath } from '../src/utils.js';
+import sinon from 'sinon';
+import child_process from 'child_process';
 
 const execFileSyncStub = sinon.stub(child_process, 'execFileSync').callThrough();
 
