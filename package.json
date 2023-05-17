@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "TS_NODE_PROJECT=test/tsconfig.json mocha --loader=ts-node/esm --reporter=dot test/**/*-test.ts --timeout=10000",
+    "test": "test/run-tests.sh",
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
     "type-check": "tsc --allowJs --checkJs --noEmit --target es2019 *.js",
