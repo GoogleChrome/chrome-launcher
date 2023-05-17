@@ -13,9 +13,8 @@ import {getRandomPort} from './random-port';
 import {DEFAULT_FLAGS} from './flags';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
 import {ChildProcess} from 'child_process';
+import {spawn, spawnSync} from 'child_process';
 const log = require('lighthouse-logger');
-const spawn = childProcess.spawn;
-const execSync = childProcess.execSync;
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
@@ -36,7 +35,7 @@ export interface Options {
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
-  logLevel?: 'verbose'|'info'|'error'|'silent';
+  logLevel?: 'verbose'|'info'|'error'|'warn'|'silent';
   ignoreDefaultFlags?: boolean;
   connectionPollInterval?: number;
   maxConnectionRetries?: number;
@@ -47,7 +46,7 @@ export interface LaunchedChrome {
   pid: number;
   port: number;
   process: ChildProcess;
-  kill: () => Promise<void>;
+  kill: () => void;
 }
 
 export interface ModuleOverrides {
@@ -55,8 +54,8 @@ export interface ModuleOverrides {
   spawn?: typeof childProcess.spawn;
 }
 
-const sigintListener = async () => {
-  await killAll();
+const sigintListener = () => {
+  killAll();
   process.exit(_SIGINT_EXIT_CODE);
 };
 
@@ -73,15 +72,15 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
 
   await instance.launch();
 
-  const kill = async () => {
+  const kill = () => {
     instances.delete(instance);
     if (instances.size === 0) {
       process.removeListener(_SIGINT, sigintListener);
     }
-    return instance.kill();
+    instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chrome!};
+  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chromeProcess!};
 }
 
 /** Returns Chrome installation path that chrome-launcher will launch by default. */
@@ -93,11 +92,11 @@ function getChromePath(): string {
   return installation;
 }
 
-async function killAll(): Promise<Array<Error>> {
+function killAll(): Array<Error> {
   let errors = [];
   for (const instance of instances) {
     try {
-      await instance.kill();
+      instance.kill();
       // only delete if kill did not error
       // this means erroring instances remain in the Set
       instances.delete(instance);
@@ -126,7 +125,7 @@ class Launcher {
   private useDefaultProfile: boolean;
   private envVars: {[key: string]: string|undefined};
 
-  chrome?: childProcess.ChildProcess;
+  chromeProcess?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
   pid?: number;
@@ -174,6 +173,8 @@ class Launcher {
       // If in WSL, we need to use the Windows format
       flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
+
+    if (process.env.HEADLESS) flags.push('--headless');
 
     flags.push(...this.chromeFlags);
     flags.push(this.startingUrl);
@@ -250,7 +251,11 @@ class Launcher {
 
       // If an explict port is passed first look for an open connection...
       try {
-        return await this.isDebuggerReady();
+        await this.isDebuggerReady();
+        log.log(
+          'ChromeLauncher',
+          `Found existing Chrome already running using port ${this.port}, using that.`);
+        return;
       } catch (err) {
         log.log(
             'ChromeLauncher',
@@ -276,9 +281,9 @@ class Launcher {
 
   private async spawnProcess(execPath: string) {
     const spawnPromise = (async () => {
-      if (this.chrome) {
-        log.log('ChromeLauncher', `Chrome already running with pid ${this.chrome.pid}.`);
-        return this.chrome.pid;
+      if (this.chromeProcess) {
+        log.log('ChromeLauncher', `Chrome already running with pid ${this.chromeProcess.pid}.`);
+        return this.chromeProcess.pid;
       }
 
 
@@ -292,17 +297,23 @@ class Launcher {
 
       log.verbose(
           'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
-      const chrome = this.spawn(
-          execPath, this.flags,
-          {detached: true, stdio: ['ignore', this.outFile, this.errFile], env: this.envVars});
-      this.chrome = chrome;
+      this.chromeProcess = this.spawn(execPath, this.flags, {
+        // On non-windows platforms, `detached: true` makes child process a leader of a new
+        // process group, making it possible to kill child process tree with `.kill(-pid)` command.
+        // @see https://nodejs.org/api/child_process.html#child_process_options_detached
+        detached: process.platform !== 'win32',
+        stdio: ['ignore', this.outFile, this.errFile],
+        env: this.envVars
+      });
 
-      if (chrome.pid) {
-        this.fs.writeFileSync(this.pidFile, chrome.pid.toString());
+      if (this.chromeProcess.pid) {
+        this.fs.writeFileSync(this.pidFile, this.chromeProcess.pid.toString());
       }
 
-      log.verbose('ChromeLauncher', `Chrome running with pid ${chrome.pid} on port ${this.port}.`);
-      return chrome.pid;
+      log.verbose(
+          'ChromeLauncher',
+          `Chrome running with pid ${this.chromeProcess.pid} on port ${this.port}.`);
+      return this.chromeProcess.pid;
     })();
 
     const pid = await spawnPromise;
@@ -373,58 +384,56 @@ class Launcher {
   }
 
   kill() {
-    return new Promise<void>((resolve, reject) => {
-      if (this.chrome) {
-        this.chrome.on('close', () => {
-          delete this.chrome;
-          this.destroyTmp().then(resolve);
-        });
+    if (!this.chromeProcess) {
+      return;
+    }
 
-        log.log('ChromeLauncher', `Killing Chrome instance ${this.chrome.pid}`);
-        try {
-          if (isWindows) {
-            // While pipe is the default, stderr also gets printed to process.stderr
-            // if you don't explicitly set `stdio`
-            execSync(`taskkill /pid ${this.chrome.pid} /T /F`, {stdio: 'pipe'});
-          } else {
-            if (this.chrome.pid) {
-              process.kill(-this.chrome.pid);
-            }
-          }
-        } catch (err) {
-          const message = `Chrome could not be killed ${err.message}`;
-          log.warn('ChromeLauncher', message);
-          reject(new Error(message));
-        }
-      } else {
-        // fail silently as we did not start chrome
-        resolve();
-      }
+    this.chromeProcess.on('close', () => {
+      delete this.chromeProcess;
+      this.destroyTmp();
     });
+
+    log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
+    try {
+      if (isWindows) {
+        // https://github.com/GoogleChrome/chrome-launcher/issues/266
+        const taskkillProc = spawnSync(
+            `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
+
+        const {stderr} = taskkillProc;
+        if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
+      } else {
+        if (this.chromeProcess.pid) {
+          process.kill(-this.chromeProcess.pid, 'SIGKILL');
+        }
+      }
+    } catch (err) {
+      const message = `Chrome could not be killed ${err.message}`;
+      log.warn('ChromeLauncher', message);
+    }
+    this.destroyTmp();
   }
 
   destroyTmp() {
-    return new Promise<void>(resolve => {
-      // Only clean up the tmp dir if we created it.
-      if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-        return resolve();
-      }
+    if (this.outFile) {
+      this.fs.closeSync(this.outFile);
+      delete this.outFile;
+    }
 
-      if (this.outFile) {
-        this.fs.closeSync(this.outFile);
-        delete this.outFile;
-      }
+    // Only clean up the tmp dir if we created it.
+    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+      return;
+    }
 
-      if (this.errFile) {
-        this.fs.closeSync(this.errFile);
-        delete this.errFile;
-      }
+    if (this.errFile) {
+      this.fs.closeSync(this.errFile);
+      delete this.errFile;
+    }
 
-      // backwards support for node v12 + v14.14+
-      // https://nodejs.org/api/deprecations.html#DEP0147
-      const rm = this.fs.rm || this.fs.rmdir;
-      rm(this.userDataDir, {recursive: true}, () => resolve());
-    });
+    // backwards support for node v12 + v14.14+
+    // https://nodejs.org/api/deprecations.html#DEP0147
+    const rmSync = this.fs.rmSync || this.fs.rmdirSync;
+    rmSync(this.userDataDir, {recursive: true, force: true, maxRetries: 10});
   }
 };
 

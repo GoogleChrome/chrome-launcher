@@ -26,6 +26,6 @@ describe('Launcher', () => {
     assert.notStrictEqual(chrome.pid, undefined);
     assert.notStrictEqual(chrome.port, undefined);
     assert.notStrictEqual(chrome.kill, undefined);
-    await chrome.kill();
+    chrome.kill();
   });
 });

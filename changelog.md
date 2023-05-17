@@ -1,3 +1,28 @@
+## v0.15.2 (Mon, April 17 2023)
+
+* `76b6a13c` Update logLevel option typing ([#295](https://github.com/GoogleChrome/chrome-launcher/pull/295))
+* `60044483` Update headless=chrome flag to headless=new ([#290](https://github.com/GoogleChrome/chrome-launcher/pull/290))
+* `b041125a` log when connection to existing chrome found for requested port ([#291](https://github.com/GoogleChrome/chrome-launcher/pull/291))
+* `f64a7d89` docs(flags): fix description of mock-keychain flag
+* `c753ba08` use updating node versions in CI ([#286](https://github.com/GoogleChrome/chrome-launcher/pull/286))
+* `8d1d85dc` docs(flags): adjust grouping. add in several features ([#283](https://github.com/GoogleChrome/chrome-launcher/pull/283))
+* `471a97c7` flags: disable optimization guide and media router ([#282](https://github.com/GoogleChrome/chrome-launcher/pull/282))
+* `83f08461` docs(flags): add disable-features=MediaRouter which is surprisingly active
+* `346b3c2c` rename master branch references to main ([#280](https://github.com/GoogleChrome/chrome-launcher/pull/280))
+* `f618e7e5` docs: a few additions to the flags doc
+* `c36bd8dc` docs: add OptimizationHints to flags
+* `1cbf8b9a` Make LaunchedChrome.kill sync ([#269](https://github.com/GoogleChrome/chrome-launcher/pull/269))
+
+
+## v0.15.1 (Tue, May 31 2022)
+
+* `3724165a` make launcher.kill() synchronous ([#268](https://github.com/GoogleChrome/chrome-launcher/pull/268))
+* `3561350a` revise taskkill procedure on windows ([#267](https://github.com/GoogleChrome/chrome-launcher/pull/267))
+* `690ae983` add lighthouse smoketests (windows) to CI ([#265](https://github.com/GoogleChrome/chrome-launcher/pull/265))
+* `279577fd` docs(chrome-flags-for-tools): add link to overview of features ([#235](https://github.com/GoogleChrome/chrome-launcher/pull/235))
+* `ff91c18b` fix: use `wslpath` to resolve Windows paths ([#200](https://github.com/GoogleChrome/chrome-launcher/pull/200))
+* `30755cde` test: run latest versions of node in CI ([#257](https://github.com/GoogleChrome/chrome-launcher/pull/257))
+
 ## v0.15.0 (Wed, Nov 10 2021)
 
 * `1af60cb` add `getChromePath()` method for printing found chrome path ([#255](https://github.com/GoogleChrome/chrome-launcher/pull/255))
