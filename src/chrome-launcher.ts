@@ -415,14 +415,14 @@ class Launcher {
   }
 
   destroyTmp() {
-    // Only clean up the tmp dir if we created it.
-    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-      return;
-    }
-
     if (this.outFile) {
       this.fs.closeSync(this.outFile);
       delete this.outFile;
+    }
+
+    // Only clean up the tmp dir if we created it.
+    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+      return;
     }
 
     if (this.errFile) {
