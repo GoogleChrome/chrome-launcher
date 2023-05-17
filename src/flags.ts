@@ -5,11 +5,22 @@
  */
 'use strict';
 
-// https://github.com/GoogleChrome/chrome-launcher/blob/master/docs/chrome-flags-for-tools.md
+/**
+ * See the following `chrome-flags-for-tools.md` for exhaustive coverage of these and related flags
+ * @url https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md 
+ */
 
 export const DEFAULT_FLAGS: ReadonlyArray<string> = [
-  // Disable built-in Google Translate service
-  '--disable-features=Translate',
+  '--disable-features=' +
+      [
+        // Disable built-in Google Translate service
+        'Translate',
+        // Disable the Chrome Optimization Guide background networking
+        'OptimizationHints',
+        //  Disable the Chrome Media Router (cast target discovery) background networking
+        'MediaRouter',
+      ].join(','),
+
   // Disable all chrome extensions
   '--disable-extensions',
   // Disable some extensions that aren't affected by --disable-extensions
