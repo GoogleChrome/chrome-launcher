@@ -16,11 +16,10 @@
 'use strict';
 
 import * as assert from 'assert';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath } from '../src/utils.js';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, _childProcessForTesting } from '../src/utils.js';
 import sinon from 'sinon';
-import child_process from 'child_process';
 
-const execFileSyncStub = sinon.stub(child_process, 'execFileSync').callThrough();
+const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
 
 const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
 
