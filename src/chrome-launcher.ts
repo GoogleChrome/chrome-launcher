@@ -8,13 +8,14 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
-import * as chromeFinder from './chrome-finder';
-import {getRandomPort} from './random-port';
-import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
+import * as chromeFinder from './chrome-finder.js';
+import {getRandomPort} from './random-port.js';
+import {DEFAULT_FLAGS} from './flags.js';
+import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 import {ChildProcess} from 'child_process';
 import {spawn, spawnSync} from 'child_process';
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
@@ -253,8 +254,8 @@ class Launcher {
       try {
         await this.isDebuggerReady();
         log.log(
-          'ChromeLauncher',
-          `Found existing Chrome already running using port ${this.port}, using that.`);
+            'ChromeLauncher',
+            `Found existing Chrome already running using port ${this.port}, using that.`);
         return;
       } catch (err) {
         log.log(
