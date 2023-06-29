@@ -6,10 +6,11 @@
 
 'use strict';
 
-import {launch} from '../src/';
+import {launch} from '../src/index.js';
 import * as assert from 'assert';
 
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
 describe('Launcher', () => {
 
   beforeEach(() => {
@@ -26,6 +27,6 @@ describe('Launcher', () => {
     assert.notStrictEqual(chrome.pid, undefined);
     assert.notStrictEqual(chrome.port, undefined);
     assert.notStrictEqual(chrome.kill, undefined);
-    await chrome.kill();
+    chrome.kill();
   });
 });

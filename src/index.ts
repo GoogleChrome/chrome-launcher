@@ -1,1 +1,1 @@
-export * from './chrome-launcher';
+export * from './chrome-launcher.js';

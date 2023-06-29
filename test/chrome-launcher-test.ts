@@ -5,18 +5,23 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher';
-import {DEFAULT_FLAGS} from '../src/flags';
+import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher.js';
+import {DEFAULT_FLAGS} from '../src/flags.js';
 
-import {spy, stub} from 'sinon';
+import sinon from 'sinon';
 import * as assert from 'assert';
+import fs from 'fs';
 
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
+const {spy, stub} = sinon;
+
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
   writeFileSync: () => {},
-  rmdir: () => {},
+  rmdirSync: () => {},
+  rmSync: () => {},
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
@@ -54,22 +59,22 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const fs = {...fsMock, rmdir: spy(), rm: spy()};
+    const fs = {...fsMock, rmdirSync: spy(), rmSync: spy()};
     const chromeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     chromeInstance.prepare();
 
-    await chromeInstance.destroyTmp();
-    assert.strictEqual(fs.rmdir.callCount, 0);
-    assert.strictEqual(fs.rm.callCount, 0);
+    chromeInstance.destroyTmp();
+    assert.strictEqual(fs.rmdirSync.callCount, 0);
+    assert.strictEqual(fs.rmSync.callCount, 0);
   });
 
   it('allows to overwrite browser prefs', async () => {
     const existStub = stub().returns(true)
     const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
@@ -84,7 +89,7 @@ describe('Launcher', () => {
     const existStub = stub().returns(false)
     const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
@@ -96,16 +101,35 @@ describe('Launcher', () => {
     )
   });
 
-  it('cleans up the tmp dir after closing', async () => {
-    const rmMock = stub().callsFake((_path, _options, done) => done());
-    const fs = {...fsMock, rmdir: rmMock, rm: rmMock};
+  it('cleans up the tmp dir after closing (mocked)', async () => {
+    const rmMock = stub().callsFake((_path, _options) => {});
+    const fs = {...fsMock, rmdirSync: rmMock, rmSync: rmMock};
 
     const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
-    await chromeInstance.destroyTmp();
+    chromeInstance.destroyTmp();
     assert.strictEqual(rmMock.callCount, 1);
   });
+
+
+  it('cleans up the tmp dir after closing (real)', async () => {
+    const rmSpy = spy(fs, 'rmSync' in fs ? 'rmSync' : 'rmdirSync');
+    const fsFake = {...fsMock, rmdirSync: rmSpy, rmSync: rmSpy};
+
+    const chromeInstance = new Launcher({}, {fs: fsFake as any});
+
+    await chromeInstance.launch();
+    assert.ok(chromeInstance.userDataDir);
+    assert.ok(fs.existsSync(chromeInstance.userDataDir));
+
+    chromeInstance.kill();
+
+    // tmpdir is gone 
+    const [path] = fsFake.rmSync.getCall(0).args;
+    assert.strictEqual(chromeInstance.userDataDir, path);
+    assert.equal(fs.existsSync(path), false, `userdatadir still exists: ${path}`);
+  }).timeout(30 * 1000);
 
   it('does not delete created directory when custom path passed', () => {
     const chromeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
@@ -128,14 +152,14 @@ describe('Launcher', () => {
   it('doesn\'t fail when killed twice', async () => {
     const chromeInstance = new Launcher();
     await chromeInstance.launch();
-    await chromeInstance.kill();
-    await chromeInstance.kill();
+    chromeInstance.kill();
+    chromeInstance.kill();
   }).timeout(30 * 1000);
 
   it('doesn\'t fail when killing all instances', async () => {
     await launch();
     await launch();
-    const errors = await killAll();
+    const errors = killAll();
     assert.strictEqual(errors.length, 0);
   });
 
@@ -145,7 +169,7 @@ describe('Launcher', () => {
     let pid = chromeInstance.pid!;
     await chromeInstance.launch();
     assert.strictEqual(pid, chromeInstance.pid);
-    await chromeInstance.kill();
+    chromeInstance.kill();
   });
 
   it('gets all default flags', async () => {
