@@ -1,3 +1,9 @@
+## v1.0.0 (Tue, Jul 18 2023)
+
+* `37609a01` deps: upgrade `lighthouse-logger` to 2.0.1 ([#309](https://github.com/GoogleChrome/chrome-launcher/pull/309))
+* `dacd3578` Publish as ESM ([#302](https://github.com/GoogleChrome/chrome-launcher/pull/302))
+* `f9e43693` fix: always close file handles to stdout/stderr logs ([#259](https://github.com/GoogleChrome/chrome-launcher/pull/259))
+
 ## v0.15.2 (Mon, April 17 2023)
 
 * `76b6a13c` Update logLevel option typing ([#295](https://github.com/GoogleChrome/chrome-launcher/pull/295))
