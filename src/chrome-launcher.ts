@@ -230,7 +230,12 @@ class Launcher {
       return;
     }
 
-    const preferenceFile = `${this.userDataDir}/Preferences`;
+    const profileDir = `${this.userDataDir}/Default`;
+    if (!this.fs.existsSync(profileDir)) {
+      this.fs.mkdirSync(profileDir, {recursive: true});
+    }
+
+    const preferenceFile = `${profileDir}/Preferences`;
     try {
       if (this.fs.existsSync(preferenceFile)) {
         // overwrite existing file
