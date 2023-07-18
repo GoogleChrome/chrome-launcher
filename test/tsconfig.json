@@ -5,6 +5,5 @@
   },
   "include": [
     "*-test.ts",
-    "../types"
   ]
 }
