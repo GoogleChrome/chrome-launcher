@@ -121,7 +121,7 @@ Note: This method performs synchronous I/O operations.
 Attempts to kill all Chrome instances created with [`.launch([opts])`](#launchopts). Returns a Promise that resolves to an array of errors that occurred while killing instances. If all instances were killed successfully, the array will be empty.
 
 ```js
-const ChromeLauncher = require('chrome-launcher');
+import * as ChromeLauncher from 'chrome-launcher';
 
 async function cleanup() {
   await ChromeLauncher.killAll();
@@ -133,7 +133,7 @@ async function cleanup() {
 #### Launching chrome:
 
 ```js
-const ChromeLauncher = require('chrome-launcher');
+import * as ChromeLauncher from 'chrome-launcher';
 
 ChromeLauncher.launch({
   startingUrl: 'https://google.com'
@@ -146,7 +146,7 @@ ChromeLauncher.launch({
 #### Launching headless chrome:
 
 ```js
-const ChromeLauncher = require('chrome-launcher');
+import * as ChromeLauncher from 'chrome-launcher';
 
 ChromeLauncher.launch({
   startingUrl: 'https://google.com',
@@ -159,7 +159,7 @@ ChromeLauncher.launch({
 #### Launching with support for extensions and audio:
 
 ```js
-const ChromeLauncher = require('chrome-launcher');
+import * as ChromeLauncher from 'chrome-launcher';
 
 const newFlags = ChromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio');
 
