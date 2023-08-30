@@ -180,6 +180,24 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](https://source.chromium.org/search?q=f:_switches%5C.cc&ss=chromium%2Fchromium%2Fsrc).
 
+## Set Preferences
+
+Many Chrome settings are defined in a JSON file located at `USER_DATA_DIR/Default/Preferences`.  Browse your own Preferences file to see what's in there. 
+
+If you wanted to launch a fresh Chrome profile **_with_** some Preferences set, for example: disable DevTools source-map fetching:
+
+```sh
+mkdir -p your_empty_user_data_dir/Default/
+touch    your_empty_user_data_dir/Default/Preferences
+```
+
+Set the file content to:
+```json
+{"devtools":{"synced_preferences_sync_disabled":{"jsSourceMapsEnabled":"false","cssSourceMapsEnabled":"false"}}}
+```
+
+Then launch: `chrome --user-data-dir=your_empty_user_data_dir ...`.
+
 ## Feature Flags FYI
 
 Chromium and Blink use feature flags to disable/enable many features at runtime. Chromium has [~400 features](https://source.chromium.org/search?q=%22const%20base::Feature%22%20f:%5C.cc&sq=&ss=chromium%2Fchromium%2Fsrc) that can be toggled with `--enable-features` / `--disable-features`. https://niek.github.io/chrome-features/ presents all of them very clearly.
