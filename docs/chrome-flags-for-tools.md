@@ -182,7 +182,7 @@ FYI: (Probably) all flags are defined in files matching the pattern of [`*_switc
 
 ## Set Preferences
 
-Many Chrome settings are defined in a JSON file located at `USER_DATA_DIR/Default/Preferences`.  Browse your own Preferences file to see what's in there. 
+Many Chrome settings are defined in a JSON file located at `USER_DATA_DIR/Default/Preferences`.  Browse your own Preferences file to see what's in there; some, but not all, preferences are defined in [pref_names.h](https://source.chromium.org/chromium/chromium/src/+/main:chrome/common/pref_names.h) 
 
 If you wanted to launch a fresh Chrome profile **_with_** some Preferences set, for example: disable DevTools source-map fetching:
 
