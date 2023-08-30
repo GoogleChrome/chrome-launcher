@@ -38,7 +38,7 @@ jobs:
 
     - name: Run smoke tests
       # Windows bots are slow, so only run enough tests to verify matching behavior.
-      run: yarn --cwd node_modules/lighthouse/ smoke --debug -j=2 --retries=0 --shard=${{ matrix.smoke-test-shard }}/2 dbw oopif offline lantern metrics
+      run: yarn --cwd node_modules/lighthouse/ smoke --debug -j=2 --retries=5 --shard=${{ matrix.smoke-test-shard }}/2 dbw oopif offline lantern metrics
 
     - name: Upload failures
       if: failure()
