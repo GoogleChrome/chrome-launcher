@@ -89,6 +89,7 @@ export function darwin() {
   }
 
   console.log(new Date().toISOString(),'returning installs');
+  console.log(installations, priorities);
   // clang-format on
   return sort(installations, priorities);
 }
@@ -141,9 +142,10 @@ export function linux() {
   ];
   executables.forEach((executable: string) => {
     try {
+      console.log('WHICH');
       const chromePath =
           execFileSync('which', [executable], {stdio: 'pipe'}).toString().split(newLineRegex)[0];
-
+      console.log('WHICH DONE');
       if (canAccess(chromePath)) {
         installations.push(chromePath);
       }
@@ -258,6 +260,7 @@ function findChromeExecutables(folder: string): Array<string> {
 
     // Some systems do not support grep -R so fallback to -r.
     // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
+    console.log('grep ER');
     try {
       execPaths = execSync(
           `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
@@ -265,6 +268,7 @@ function findChromeExecutables(folder: string): Array<string> {
       execPaths = execSync(
           `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     }
+    console.log('grep ER DONE');
 
     execPaths = execPaths.toString()
                     .split(newLineRegex)
