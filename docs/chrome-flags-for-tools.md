@@ -188,15 +188,10 @@ If you wanted to launch a fresh Chrome profile **_with_** some Preferences set, 
 
 ```sh
 mkdir -p your_empty_user_data_dir/Default/
-touch    your_empty_user_data_dir/Default/Preferences
-```
+echo '{"devtools":{"preferences":{"jsSourceMapsEnabled":"false","cssSourceMapsEnabled":"false"}}}' > your_empty_user_data_dir/Default/Preferences
 
-Set the file content to:
-```json
-{"devtools":{"synced_preferences_sync_disabled":{"jsSourceMapsEnabled":"false","cssSourceMapsEnabled":"false"}}}
+chrome --user-data-dir=your_empty_user_data_dir ...
 ```
-
-Then launch: `chrome --user-data-dir=your_empty_user_data_dir ...`.
 
 ## Feature Flags FYI
 
