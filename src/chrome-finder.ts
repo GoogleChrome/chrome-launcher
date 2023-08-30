@@ -28,11 +28,11 @@ export function darwinFast(): string|undefined {
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ];
-  console.log('darwin fast attempt')
+  console.log(new Date().toISOString(),'darwin fast attempt')
   for (const chromePath of priorityOptions) {
     if (chromePath && canAccess(chromePath)) return chromePath;
   }
-  console.log('falling back to darwin slow')
+  console.log(new Date().toISOString(),'falling back to darwin slow')
   return darwin()[0]
 }
 
@@ -49,7 +49,7 @@ export function darwin() {
   if (customChromePath) {
     installations.push(customChromePath);
   }
-  console.log('running lsregister');
+  console.log(new Date().toISOString(), 'running lsregister');
   execSync(
       `${LSREGISTER} -dump` +
       ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
@@ -66,7 +66,7 @@ export function darwin() {
       });
 
 
-  console.log('running lsregister DONE');
+  console.log(new Date().toISOString(),'running lsregister DONE');
 
   // Retains one per line to maintain readability.
   // clang-format off
@@ -88,6 +88,7 @@ export function darwin() {
     priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 151});
   }
 
+  console.log(new Date().toISOString(),'returning installs');
   // clang-format on
   return sort(installations, priorities);
 }
