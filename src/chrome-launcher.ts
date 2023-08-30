@@ -195,7 +195,9 @@ class Launcher {
 
   /** Returns all available chrome installations in decreasing priority order. */
   static getInstallations() {
-    return chromeFinder[getPlatform() as SupportedPlatforms]();
+    const platform = getPlatform() as SupportedPlatforms;
+
+    return chromeFinder[platform]();
   }
 
   // Wrapper function to enable easy testing.

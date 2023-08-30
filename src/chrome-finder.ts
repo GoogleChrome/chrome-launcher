@@ -28,11 +28,11 @@ export function darwinFast(): string|undefined {
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ];
-
+  console.log('darwin fast attempt')
   for (const chromePath of priorityOptions) {
     if (chromePath && canAccess(chromePath)) return chromePath;
   }
-
+  console.log('falling back to darwin slow')
   return darwin()[0]
 }
 
@@ -49,7 +49,7 @@ export function darwin() {
   if (customChromePath) {
     installations.push(customChromePath);
   }
-
+  console.log('running lsregister');
   execSync(
       `${LSREGISTER} -dump` +
       ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
@@ -65,6 +65,8 @@ export function darwin() {
         });
       });
 
+
+  console.log('running lsregister DONE');
 
   // Retains one per line to maintain readability.
   // clang-format off

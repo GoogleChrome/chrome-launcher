@@ -55,7 +55,9 @@ export class ChromeNotInstalledError extends LauncherError {
 }
 
 export function getPlatform() {
-  return isWsl ? 'wsl' : process.platform;
+  const platform =  isWsl ? 'wsl' : process.platform;
+  console.log({platform});
+  return platform;
 }
 
 export function makeTmpDir() {
