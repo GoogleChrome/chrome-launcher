@@ -74,7 +74,8 @@ describe('Launcher', () => {
     const existStub = stub().returns(true)
     const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const mkdirStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
@@ -89,7 +90,8 @@ describe('Launcher', () => {
     const existStub = stub().returns(false)
     const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const mkdirStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
