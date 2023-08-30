@@ -12,7 +12,8 @@ import sinon from 'sinon';
 import * as assert from 'assert';
 import fs from 'fs';
 
-import log from 'lighthouse-logger';
+// import log from 'lighthouse-logger';
+import debug from 'debug'
 
 const {spy, stub} = sinon;
 
@@ -43,11 +44,12 @@ const launchChromeWithOpts = async (opts: Options = {}) => {
 
 describe('Launcher', () => {
   beforeEach(() => {
-    log.setLevel('error');
+     debug.enable('*');
+    // log.setLevel('verbose');
   });
 
   afterEach(() => {
-    log.setLevel('');
+    // log.setLevel('');
   });
 
   it('sets default launching flags', async () => {

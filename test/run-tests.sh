@@ -3,4 +3,4 @@
 set -euxo pipefail
 
 export TS_NODE_PROJECT="test/tsconfig.json"
-mocha --loader=ts-node/esm --reporter=dot test/**/*-test.ts --timeout=10000
+mocha --loader=ts-node/esm --reporter=spec test/**/*-test.ts --timeout=10000

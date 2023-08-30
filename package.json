@@ -19,6 +19,7 @@
     "print-chrome-path": "bin/print-chrome-path.js"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.8",
     "@types/mocha": "^8.0.4",
     "@types/sinon": "^9.0.1",
     "clang-format": "^1.0.50",
