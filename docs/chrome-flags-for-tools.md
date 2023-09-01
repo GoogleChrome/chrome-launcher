@@ -159,7 +159,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-desktop-notifications`: Removed
 * `--disable-device-discovery-notifications`: Removed. Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
 * `--disable-features=TranslateUI`: Removed as `TranslateUI` changed to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
-* `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
+* `--disable-infobars`: [Removed May 2019](https://chromium-review.googlesource.com/c/chromium/src/+/1599303)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
