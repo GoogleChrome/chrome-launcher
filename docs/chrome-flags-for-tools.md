@@ -19,6 +19,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
+* `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
 
 ## Task throttling
 
