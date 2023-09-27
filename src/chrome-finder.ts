@@ -26,6 +26,7 @@ export function darwinFast(): string|undefined {
     process.env.CHROME_PATH,
     process.env.LIGHTHOUSE_CHROMIUM_PATH,
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
+    '/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ];
 
@@ -37,7 +38,11 @@ export function darwinFast(): string|undefined {
 }
 
 export function darwin() {
-  const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];
+  const suffixes = [
+    '/Contents/MacOS/Google Chrome Canary',
+    '/Contents/MacOS/Google Chrome Dev',
+    '/Contents/MacOS/Google Chrome'
+  ];
 
   const LSREGISTER = '/System/Library/Frameworks/CoreServices.framework' +
       '/Versions/A/Frameworks/LaunchServices.framework' +
@@ -52,7 +57,7 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
+      ' | grep -i \'google chrome\\( canary| dev\\)\\?\\.app\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -71,10 +76,13 @@ export function darwin() {
   const home = escapeRegExp(process.env.HOME || homedir());
   const priorities: Priorities = [
     {regex: new RegExp(`^${home}/Applications/.*Chrome\\.app`), weight: 50},
-    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 51},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Dev\\.app`), weight: 51},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 52},
     {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
-    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
-    {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
+    {regex: /^\/Applications\/.*Chrome Dev.app/, weight: 101},
+    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 102},
+    {regex: /^\/Volumes\/.*Chrome.app/, weight: -3},
+    {regex: /^\/Volumes\/.*Chrome Dev.app/, weight: -2},
     {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
   ];
 
