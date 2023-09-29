@@ -32,7 +32,7 @@
     "is-wsl": "^2.2.0",
     "lighthouse-logger": "^1.0.0"
   },
-  "version": "0.15.1",
+  "version": "0.15.2",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Chrome with the Devtools Protocol port open",
   "repository": "https://github.com/GoogleChrome/chrome-launcher/",
