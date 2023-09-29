@@ -35,9 +35,9 @@ npm install chrome-launcher
   // Default: an available port is autoselected
   port: number;
 
-  // (optional) When a port is specified but no Chrome is found at that port:
-  // * if this option is true and there is no Chrome with that debug port, throw an error
-  // * else, launch a new Chrome with that debug port
+  // (optional) When `port` is specified *and* no Chrome is found at that port,
+  // * if `false` (default), chrome-launcher will launch a new Chrome with that port.
+  // * if `true`, throw an error
   // This option is useful when you wish to explicitly connect to a running Chrome, such as on a mobile device via adb
   // Default: false
   portStrictMode: boolean;
