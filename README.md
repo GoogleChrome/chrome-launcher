@@ -35,6 +35,13 @@ npm install chrome-launcher
   // Default: an available port is autoselected
   port: number;
 
+  // (optional) When a port is specified but no Chrome is found at that port:
+  // * if this option is true and there is no Chrome with that debug port, throw an error
+  // * else, launch a new Chrome with that debug port
+  // This option is useful when you wish to explicitly connect to a running Chrome, such as on a mobile device via adb
+  // Default: false
+  failIfNoChromeAtPort: boolean;
+
   // (optional) Additional flags to pass to Chrome, for example: ['--headless', '--disable-gpu']
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
   // Do note, many flags are set by default: https://github.com/GoogleChrome/chrome-launcher/blob/main/src/flags.ts
