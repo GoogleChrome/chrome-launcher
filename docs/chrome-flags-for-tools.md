@@ -44,6 +44,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-features=IsolateOrigins`
 * `--disable-features=LazyFrameLoading`
 * `--disable-features=ScriptStreaming`: V8 script streaming
+* `--no-process-per-site`: Disables renderer process reuse (across tabs of the same site). 
 * `--enable-precise-memory-info`: Make the values returned to window.performance.memory more granular and more up to date in shared worker. Without this flag, the memory information is still available, but it is bucketized and updated less frequently. This flag also applys to workers.
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
 * `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
@@ -92,7 +93,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Chromium Annoyances
 
-* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
+* `--disable-features=MediaRouter`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. Also disables the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates background networking activity to discover cast targets. A superset of disabling `DialMediaRouteProvider`.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
 * `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog abou: _Chrome wants to use your confidential information stored in your keychain_
 
@@ -108,7 +109,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
 * `--disable-features=OptimizationHints`: Disable the [Chrome Optimization Guide](https://chromium.googlesource.com/chromium/src/+/HEAD/components/optimization_guide/) and networking with its service API
-* `--disable-features=MediaRouter`: Disable the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates some background network activity to discover castable targets.
+* `--disable-features=DialMediaRouteProvider`: A weaker form of disabling the `MediaRouter` feature. See that flag's details.
 * `--no-pings`: Don't send hyperlink auditing pings
 
 ## Rendering & GPU
