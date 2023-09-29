@@ -40,7 +40,7 @@ npm install chrome-launcher
   // * else, launch a new Chrome with that debug port
   // This option is useful when you wish to explicitly connect to a running Chrome, such as on a mobile device via adb
   // Default: false
-  failIfNoChromeAtPort: boolean;
+  portStrictMode: boolean;
 
   // (optional) Additional flags to pass to Chrome, for example: ['--headless', '--disable-gpu']
   // See: https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md

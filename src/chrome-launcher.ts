@@ -33,7 +33,7 @@ export interface Options {
   chromeFlags?: Array<string>;
   prefs?: Record<string, JSONLike>;
   port?: number;
-  failIfNoChromeAtPort?: boolean;
+  portStrictMode?: boolean;
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
@@ -120,7 +120,7 @@ class Launcher {
   private chromeFlags: string[];
   private prefs: Record<string, JSONLike>;
   private requestedPort?: number;
-  private failIfNoChromeAtPort?: boolean;
+  private portStrictMode?: boolean;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
@@ -144,7 +144,7 @@ class Launcher {
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
     this.prefs = defaults(this.opts.prefs, {});
     this.requestedPort = defaults(this.opts.port, 0);
-    this.failIfNoChromeAtPort = opts.failIfNoChromeAtPort;
+    this.portStrictMode = opts.portStrictMode;
     this.chromePath = this.opts.chromePath;
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
@@ -266,7 +266,7 @@ class Launcher {
             `Found existing Chrome already running using port ${this.port}, using that.`);
         return;
       } catch (err) {
-        if (this.failIfNoChromeAtPort) {
+        if (this.portStrictMode) {
           throw new Error(`found no Chrome at port ${this.requestedPort}`);
         }
 
