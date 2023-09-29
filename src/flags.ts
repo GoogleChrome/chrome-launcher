@@ -24,7 +24,7 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
         // Disable the feature of: Calculate window occlusion on Windows will be used in the future to throttle and potentially unload foreground tabs in occluded windows.
         'CalculateNativeWinOcclusion',
         // Disables the Discover feed on NTP
-        'InterestFeedContentSuggestions', 
+        'InterestFeedContentSuggestions',
         // Don't update the CT lists
         'CertificateTransparencyComponentUpdater',
         // Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
