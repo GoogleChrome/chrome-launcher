@@ -5,14 +5,17 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher';
-import {DEFAULT_FLAGS} from '../src/flags';
+import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher.js';
+import {DEFAULT_FLAGS} from '../src/flags.js';
 
-import {spy, stub} from 'sinon';
+import sinon from 'sinon';
 import * as assert from 'assert';
-import * as fs from 'fs';
+import fs from 'fs';
 
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
+const {spy, stub} = sinon;
+
 const fsMock = {
   openSync: () => {},
   closeSync: () => {},
@@ -71,7 +74,8 @@ describe('Launcher', () => {
     const existStub = stub().returns(true)
     const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const mkdirStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
@@ -86,7 +90,8 @@ describe('Launcher', () => {
     const existStub = stub().returns(false)
     const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
     const writeFileStub = stub()
-    const fs = {...fsMock, rmdirSync: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub };
+    const mkdirStub = stub()
+    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 

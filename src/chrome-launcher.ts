@@ -8,13 +8,14 @@
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
-import * as chromeFinder from './chrome-finder';
-import {getRandomPort} from './random-port';
-import {DEFAULT_FLAGS} from './flags';
-import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils';
+import * as chromeFinder from './chrome-finder.js';
+import {getRandomPort} from './random-port.js';
+import {DEFAULT_FLAGS} from './flags.js';
+import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 import {ChildProcess} from 'child_process';
 import {spawn, spawnSync} from 'child_process';
-const log = require('lighthouse-logger');
+import log from 'lighthouse-logger';
+
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
@@ -32,6 +33,7 @@ export interface Options {
   chromeFlags?: Array<string>;
   prefs?: Record<string, JSONLike>;
   port?: number;
+  portStrictMode?: boolean;
   handleSIGINT?: boolean;
   chromePath?: string;
   userDataDir?: string|boolean;
@@ -118,6 +120,7 @@ class Launcher {
   private chromeFlags: string[];
   private prefs: Record<string, JSONLike>;
   private requestedPort?: number;
+  private portStrictMode?: boolean;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
@@ -141,6 +144,7 @@ class Launcher {
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
     this.prefs = defaults(this.opts.prefs, {});
     this.requestedPort = defaults(this.opts.port, 0);
+    this.portStrictMode = opts.portStrictMode;
     this.chromePath = this.opts.chromePath;
     this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
     this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
@@ -229,7 +233,12 @@ class Launcher {
       return;
     }
 
-    const preferenceFile = `${this.userDataDir}/Preferences`;
+    const profileDir = `${this.userDataDir}/Default`;
+    if (!this.fs.existsSync(profileDir)) {
+      this.fs.mkdirSync(profileDir, {recursive: true});
+    }
+
+    const preferenceFile = `${profileDir}/Preferences`;
     try {
       if (this.fs.existsSync(preferenceFile)) {
         // overwrite existing file
@@ -253,10 +262,14 @@ class Launcher {
       try {
         await this.isDebuggerReady();
         log.log(
-          'ChromeLauncher',
-          `Found existing Chrome already running using port ${this.port}, using that.`);
+            'ChromeLauncher',
+            `Found existing Chrome already running using port ${this.port}, using that.`);
         return;
       } catch (err) {
+        if (this.portStrictMode) {
+          throw new Error(`found no Chrome at port ${this.requestedPort}`);
+        }
+
         log.log(
             'ChromeLauncher',
             `No debugging port found on port ${this.port}, launching a new Chrome.`);
@@ -415,14 +428,14 @@ class Launcher {
   }
 
   destroyTmp() {
-    // Only clean up the tmp dir if we created it.
-    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-      return;
-    }
-
     if (this.outFile) {
       this.fs.closeSync(this.outFile);
       delete this.outFile;
+    }
+
+    // Only clean up the tmp dir if we created it.
+    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+      return;
     }
 
     if (this.errFile) {

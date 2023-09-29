@@ -19,6 +19,8 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
+* `--ash-no-nudges`: Avoids blue bubble "user education" nudges (eg., "… give your browser a new look", Memory Saver)
+* `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
 
 ## Task throttling
 
@@ -159,7 +161,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-desktop-notifications`: Removed
 * `--disable-device-discovery-notifications`: Removed. Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
 * `--disable-features=TranslateUI`: Removed as `TranslateUI` changed to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
-* `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
+* `--disable-infobars`: [Removed May 2019](https://chromium-review.googlesource.com/c/chromium/src/+/1599303)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
@@ -179,6 +181,19 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
 FYI: (Probably) all flags are defined in files matching the pattern of [`*_switches.cc`](https://source.chromium.org/search?q=f:_switches%5C.cc&ss=chromium%2Fchromium%2Fsrc).
+
+## Set Preferences
+
+Many Chrome settings are defined in a JSON file located at `USER_DATA_DIR/Default/Preferences`.  Browse your own Preferences file to see what's in there; some, but not all, preferences are defined in [pref_names.h](https://source.chromium.org/chromium/chromium/src/+/main:chrome/common/pref_names.h) 
+
+If you wanted to launch a fresh Chrome profile **_with_** some Preferences set, for example: disable DevTools source-map fetching:
+
+```sh
+mkdir -p your_empty_user_data_dir/Default/
+echo '{"devtools":{"preferences":{"jsSourceMapsEnabled":"false","cssSourceMapsEnabled":"false"}}}' > your_empty_user_data_dir/Default/Preferences
+
+chrome --user-data-dir=your_empty_user_data_dir ...
+```
 
 ## Feature Flags FYI
 

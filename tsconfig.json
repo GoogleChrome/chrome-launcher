@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "esnext",
+        "moduleResolution": "node",
         "outDir": "dist",
         "target": "es2019",
         "declaration": true,
@@ -10,12 +11,13 @@
         "strictNullChecks": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true
+        "noUnusedParameters": true,
+        "allowSyntheticDefaultImports": true,
     },
     "exclude": [
         "node_modules"
     ],
     "include": [
-        "src"
+        "src",
     ]
 }
