@@ -19,6 +19,8 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--mute-audio`: Mute any audio
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
+* `--ash-no-nudges`: Avoids blue bubble "user education" nudges (eg., "… give your browser a new look", Memory Saver)
+* `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
 
 ## Task throttling
 
@@ -42,6 +44,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-features=IsolateOrigins`
 * `--disable-features=LazyFrameLoading`
 * `--disable-features=ScriptStreaming`: V8 script streaming
+* `--no-process-per-site`: Disables renderer process reuse (across tabs of the same site). 
 * `--enable-precise-memory-info`: Make the values returned to window.performance.memory more granular and more up to date in shared worker. Without this flag, the memory information is still available, but it is bucketized and updated less frequently. This flag also applys to workers.
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
 * `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
@@ -90,7 +93,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Chromium Annoyances
 
-* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
+* `--disable-features=MediaRouter`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. Also disables the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates background networking activity to discover cast targets. A superset of disabling `DialMediaRouteProvider`.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
 * `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog abou: _Chrome wants to use your confidential information stored in your keychain_
 
@@ -100,13 +103,13 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
 * `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
-* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/
+* `--disable-features=AutofillServerCommunication`: Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
 * `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
 * `--disable-features=OptimizationHints`: Disable the [Chrome Optimization Guide](https://chromium.googlesource.com/chromium/src/+/HEAD/components/optimization_guide/) and networking with its service API
-* `--disable-features=MediaRouter`: Disable the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates some background network activity to discover castable targets.
+* `--disable-features=DialMediaRouteProvider`: A weaker form of disabling the `MediaRouter` feature. See that flag's details.
 * `--no-pings`: Don't send hyperlink auditing pings
 
 ## Rendering & GPU
@@ -159,7 +162,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-desktop-notifications`: Removed
 * `--disable-device-discovery-notifications`: Removed. Avoided messages like "New printer on your network". [Replaced](https://crbug.com/1020447#c1) with `--disable-features=MediaRouter`.
 * `--disable-features=TranslateUI`: Removed as `TranslateUI` changed to `Translate` in [Sept 2020](https://chromium-review.googlesource.com/c/chromium/src/+/2404484).
-* `--disable-infobars`: [Removed April 2014](https://codereview.chromium.org/240193003)
+* `--disable-infobars`: [Removed May 2019](https://chromium-review.googlesource.com/c/chromium/src/+/1599303)
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
@@ -174,7 +177,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/chrome_startup_args.py) and [here](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/desktop_browser_finder.py;l=218;drc=4a0e6f034e9756605cfc837c8526588d6c13436b)
 * [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
-
+* [Playwright's](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromiumSwitches.ts#L20) [flags](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromium.ts#L263)
 
 [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
