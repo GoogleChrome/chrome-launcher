@@ -29,6 +29,8 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
         'CertificateTransparencyComponentUpdater',
         // Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
         'AutofillServerCommunication',
+        // Disables "Enhanced ad privacy in Chrome" dialog. (Though as of 2024-03-20 it shouldn't show up if the profile has no stored country)
+        'PrivacySandboxSettings4',
       ].join(','),
 
   // Disable all chrome extensions
