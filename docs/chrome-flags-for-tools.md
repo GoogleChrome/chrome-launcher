@@ -58,6 +58,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-external-intent-requests`: Disallow opening links in external applications
 * `--disable-features=GlobalMediaControls`: Hide toolbar button that opens dialog for controlling media sessions.
 * `--disable-features=ImprovedCookieControls`: Disables an improved UI for third-party cookie blocking in incognito mode.
+* `--disable-features=PrivacySandboxSettings4`: Disables "Enhanced ad privacy in Chrome" dialog (if it wasn't disabled through other means).
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
