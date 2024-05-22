@@ -21,6 +21,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--no-first-run`: Skip first run wizards
 * `--ash-no-nudges`: Avoids blue bubble "user education" nudges (eg., "… give your browser a new look", Memory Saver)
 * `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
+* `--propagate-iph-for-testing`: Specifies which in-product help (IPH) features are allowed. If no arguments are provided, then all IPH features are disabled.
 
 ## Task throttling
 
