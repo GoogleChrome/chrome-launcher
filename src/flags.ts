@@ -77,4 +77,6 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
   '--disable-prompt-on-repost',
   // Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
   '--disable-domain-reliability',
+  // Disable the in-product Help (IPH) system.
+  '--propagate-iph-for-testing',
 ];
