@@ -167,7 +167,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
-* `--headless=new`: Unnecessary [from January 2025 with Chrome 132](https://developer.chrome.com/blog/removing-headless-old-from-chrome) sinc just `--headless` runs the new headless mode too.
+* `--headless=new`: Unnecessary [from January 2025 with Chrome 132](https://developer.chrome.com/blog/removing-headless-old-from-chrome) since just `--headless` runs the new headless mode too.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
 
