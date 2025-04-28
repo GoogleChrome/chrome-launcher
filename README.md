@@ -109,7 +109,18 @@ chrome.pid: number;
 
 // The childProcess object for the launched Chrome
 chrome.process: childProcess
+
+// If chromeFlags contains --remote-debugging-pipe. Otherwise remoteDebuggingPipes is null.
+chrome.remoteDebuggingPipes.incoming: ReadableStream
+chrome.remoteDebuggingPipes.outgoing: WritableStream
 ```
+
+When `--remote-debugging-pipe` is passed via `chromeFlags`, then `port` will be
+unusable (0) by default. Instead, debugging messages are exchanged via
+`remoteDebuggingPipes.incoming` and `remoteDebuggingPipes.outgoing`. The data
+in these pipes are JSON values terminated by a NULL byte (`\x00`).
+Data written to `remoteDebuggingPipes.outgoing` are sent to Chrome,
+data read from `remoteDebuggingPipes.incoming` are received from Chrome.
 
 ### `ChromeLauncher.Launcher.defaultFlags()`
 
@@ -175,6 +186,9 @@ ChromeLauncher.launch({
   chromeFlags: newFlags,
 }).then(chrome => { ... });
 ```
+
+To programatically load an extension at runtime, use `--remote-debugging-pipe`
+as shown in [test/load-extension-test.ts](test/load-extension-test.ts).
 
 ### Continuous Integration
 

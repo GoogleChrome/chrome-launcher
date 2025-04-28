@@ -44,10 +44,15 @@ export interface Options {
   envVars?: {[key: string]: string|undefined};
 }
 
+export interface RemoteDebuggingPipes {
+  incoming: NodeJS.ReadableStream, outgoing: NodeJS.WritableStream,
+}
+
 export interface LaunchedChrome {
   pid: number;
   port: number;
   process: ChildProcess;
+  remoteDebuggingPipes: RemoteDebuggingPipes|null;
   kill: () => void;
 }
 
@@ -82,7 +87,13 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     instance.kill();
   };
 
-  return {pid: instance.pid!, port: instance.port!, kill, process: instance.chromeProcess!};
+  return {
+    pid: instance.pid!,
+    port: instance.port!,
+    process: instance.chromeProcess!,
+    remoteDebuggingPipes: instance.remoteDebuggingPipes,
+    kill,
+  };
 }
 
 /** Returns Chrome installation path that chrome-launcher will launch by default. */
@@ -121,6 +132,7 @@ class Launcher {
   private prefs: Record<string, JSONLike>;
   private requestedPort?: number;
   private portStrictMode?: boolean;
+  private useRemoteDebuggingPipe: boolean;
   private connectionPollInterval: number;
   private maxConnectionRetries: number;
   private fs: typeof fs;
@@ -131,6 +143,7 @@ class Launcher {
   chromeProcess?: childProcess.ChildProcess;
   userDataDir?: string;
   port?: number;
+  remoteDebuggingPipes: RemoteDebuggingPipes|null = null;
   pid?: number;
 
   constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
@@ -162,11 +175,18 @@ class Launcher {
       this.useDefaultProfile = false;
       this.userDataDir = this.opts.userDataDir;
     }
+
+    // Using startsWith because it could also be --remote-debugging-pipe=cbor
+    this.useRemoteDebuggingPipe =
+        this.chromeFlags.some(f => f.startsWith('--remote-debugging-pipe'));
   }
 
   private get flags() {
     const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS.slice();
-    flags.push(`--remote-debugging-port=${this.port}`);
+    // When useRemoteDebuggingPipe is true, this.port defaults to 0.
+    if (this.port) {
+      flags.push(`--remote-debugging-port=${this.port}`);
+    }
 
     if (!this.ignoreDefaultFlags && getPlatform() === 'linux') {
       flags.push('--disable-setuid-sandbox');
@@ -305,7 +325,12 @@ class Launcher {
       // We do this here so that we can know the port before
       // we pass it into chrome.
       if (this.requestedPort === 0) {
-        this.port = await getRandomPort();
+        if (this.useRemoteDebuggingPipe) {
+          // When useRemoteDebuggingPipe is true, this.port defaults to 0.
+          this.port = 0;
+        } else {
+          this.port = await getRandomPort();
+        }
       }
 
       log.verbose(
@@ -315,12 +340,20 @@ class Launcher {
         // process group, making it possible to kill child process tree with `.kill(-pid)` command.
         // @see https://nodejs.org/api/child_process.html#child_process_options_detached
         detached: process.platform !== 'win32',
-        stdio: ['ignore', this.outFile, this.errFile],
+        stdio: this.useRemoteDebuggingPipe ?
+            ['ignore', this.outFile, this.errFile, 'pipe', 'pipe'] :
+            ['ignore', this.outFile, this.errFile],
         env: this.envVars
       });
 
       if (this.chromeProcess.pid) {
         this.fs.writeFileSync(this.pidFile, this.chromeProcess.pid.toString());
+      }
+      if (this.useRemoteDebuggingPipe) {
+        this.remoteDebuggingPipes = {
+          incoming: this.chromeProcess.stdio[4] as NodeJS.ReadableStream,
+          outgoing: this.chromeProcess.stdio[3] as NodeJS.WritableStream,
+        };
       }
 
       log.verbose(
@@ -330,7 +363,10 @@ class Launcher {
     })();
 
     const pid = await spawnPromise;
-    await this.waitUntilReady();
+    // When useRemoteDebuggingPipe is true, this.port defaults to 0.
+    if (this.port !== 0) {
+      await this.waitUntilReady();
+    }
     return pid;
   }
 
@@ -346,6 +382,10 @@ class Launcher {
   // resolves if ready, rejects otherwise
   private isDebuggerReady(): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Note: only meaningful when this.port is set.
+      // When useRemoteDebuggingPipe is true, this.port defaults to 0. In that
+      // case, we could consider ping-ponging over the pipe, but that may get
+      // in the way of the library user, so we do not.
       const client = net.createConnection(this.port!, '127.0.0.1');
       client.once('error', err => {
         this.cleanup(client);
