@@ -21,6 +21,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--no-first-run`: Skip first run wizards
 * `--ash-no-nudges`: Avoids blue bubble "user education" nudges (eg., "… give your browser a new look", Memory Saver)
 * `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
+* `--propagate-iph-for-testing`: Specifies which in-product help (IPH) features are allowed. If no arguments are provided, then all IPH features are disabled.
 
 ## Task throttling
 
@@ -44,6 +45,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-features=IsolateOrigins`
 * `--disable-features=LazyFrameLoading`
 * `--disable-features=ScriptStreaming`: V8 script streaming
+* `--no-process-per-site`: Disables renderer process reuse (across tabs of the same site). 
 * `--enable-precise-memory-info`: Make the values returned to window.performance.memory more granular and more up to date in shared worker. Without this flag, the memory information is still available, but it is bucketized and updated less frequently. This flag also applys to workers.
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
 * `--use-fake-device-for-media-stream`: Use fake device for Media Stream to replace camera and microphone
@@ -57,6 +59,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-external-intent-requests`: Disallow opening links in external applications
 * `--disable-features=GlobalMediaControls`: Hide toolbar button that opens dialog for controlling media sessions.
 * `--disable-features=ImprovedCookieControls`: Disables an improved UI for third-party cookie blocking in incognito mode.
+* `--disable-features=PrivacySandboxSettings4`: Disables "Enhanced ad privacy in Chrome" dialog (if it wasn't disabled through other means).
 * `--disable-notifications`: Disables the Web Notification and the Push APIs.
 * `--disable-popup-blocking`: Disable popup blocking.  `--block-new-web-contents` is the strict version of this.
 * `--disable-prompt-on-repost`: Reloading a page that came from a POST normally prompts the user.
@@ -92,7 +95,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Chromium Annoyances
 
-* `--disable-features=DialMediaRouteProvider`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. This is a sub-component of the MediaRouter.
+* `--disable-features=MediaRouter`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. Also disables the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates background networking activity to discover cast targets. A superset of disabling `DialMediaRouteProvider`.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
 * `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog abou: _Chrome wants to use your confidential information stored in your keychain_
 
@@ -102,13 +105,13 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
 * `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
-* `--disable-features=AutofillServerCommunication`:  Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/
+* `--disable-features=AutofillServerCommunication`: Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
 * `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
 * `--metrics-recording-only`: Disable reporting to UMA, but allows for collection
 * `--disable-features=OptimizationHints`: Disable the [Chrome Optimization Guide](https://chromium.googlesource.com/chromium/src/+/HEAD/components/optimization_guide/) and networking with its service API
-* `--disable-features=MediaRouter`: Disable the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates some background network activity to discover castable targets.
+* `--disable-features=DialMediaRouteProvider`: A weaker form of disabling the `MediaRouter` feature. See that flag's details.
 * `--no-pings`: Don't send hyperlink auditing pings
 
 ## Rendering & GPU
@@ -147,7 +150,6 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 ## Headless
 
 * `--headless`: Run in headless mode, i.e., without a UI or display server dependencies.
-* `--headless=new`: New, native Headless mode. ([previously](https://bugs.chromium.org/p/chromium/issues/detail?id=1380881), `--headless=chrome`)
 * `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
 * `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
 * `--disable-gpu`: Was often [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) along with `--headless`, but as of 2021, isn't needed.
@@ -165,6 +167,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
+* `--headless=new`: Unnecessary [from January 2025 with Chrome 132](https://developer.chrome.com/blog/removing-headless-old-from-chrome) since just `--headless` runs the new headless mode too.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
 
@@ -176,7 +179,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * [WebpageTest's flags](https://github.com/WPO-Foundation/wptagent/blob/master/internal/chrome_desktop.py)
 * [Catapult's flags](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/chrome_startup_args.py) and [here](https://source.chromium.org/chromium/chromium/src/+/main:third_party/catapult/telemetry/telemetry/internal/backends/chrome/desktop_browser_finder.py;l=218;drc=4a0e6f034e9756605cfc837c8526588d6c13436b)
 * [Karma's flags](https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js)
-
+* [Playwright's](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromiumSwitches.ts#L20) [flags](https://github.com/microsoft/playwright/blob/e998b6cab94d1462192987537b924ef86153ea09/packages/playwright-core/src/server/chromium/chromium.ts#L263)
 
 [The canonical list of Chrome command-line switches on peter.sh](http://peter.sh/experiments/chromium-command-line-switches/) (maintained by the Chromium team)
 
