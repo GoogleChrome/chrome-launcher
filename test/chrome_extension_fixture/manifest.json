@@ -1,0 +1,17 @@
+{
+    "name": "Extension calls back to test server",
+    "version": "1",
+    "manifest_version": 3,
+    "background": {
+        "scripts": ["background.js"],
+        "service_worker": "background.js"
+    },
+    "content_scripts": [{
+        "js": ["contentscript.js"],
+        "matches": ["*://*/start_extension_test"]
+    }],
+    "permissions": ["tabs", "scripting"],
+    "host_permissions": ["*://*/*"],
+    "description": "Extension calls back to test server; key in manifest fixes extension ID to: gpehbnajinmdnomnoadgbmkjoohjfjco",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4lw1K+Rjtxei6dDA+DIBrGM4kDVR2TWISibAaF7LbDONI1SMS7NN/TkkKqIjVy6xHgBWnNvOahqkT4ltou4bkQpdLP102JKq/4b2FDX+u9pJozxCQqEY7eExvEIduFYcuswQ6QuFFJmiStyKLYqcZKdRuLD6yBNbG+p2mr11PrXzSBzu+9o98yysXNhHphogv02Kev7GTbme58FUHyb8fI8nPgi3KzzzzJAPgJkIpHRRBtkDSelQ0+9XjZPOxxPW0n4yHXDD/tIA0VpZJUGiDwRRZD9bzuxyMf/midlUA5jbGHdcdC5tgDH4PiBQp2AeowRXd1ww+kVwLvcaVhnqewIDAQAB"
+}
