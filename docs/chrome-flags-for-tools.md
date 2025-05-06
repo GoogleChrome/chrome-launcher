@@ -150,7 +150,6 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 ## Headless
 
 * `--headless`: Run in headless mode, i.e., without a UI or display server dependencies.
-* `--headless=new`: New, native Headless mode. ([previously](https://bugs.chromium.org/p/chromium/issues/detail?id=1380881), `--headless=chrome`)
 * `--no-sandbox`: [Sometimes used](https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#setting-up-chrome-linux-sandbox) with headless, though not recommended.
 * `--disable-dev-shm-usage`: Often used in Lambda, Cloud Functions scenarios. ([pptr issue](https://github.com/GoogleChrome/puppeteer/issues/1834), [crbug](https://bugs.chromium.org/p/chromium/issues/detail?id=736452))
 * `--disable-gpu`: Was often [used](https://bugs.chromium.org/p/chromium/issues/detail?id=737678) along with `--headless`, but as of 2021, isn't needed.
@@ -168,6 +167,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-save-password-bubble`: [Removed May 2016](https://codereview.chromium.org/1978563002)
 * `--disable-search-geolocation-disclosure`: Removed.
 * `--disable-translate`: [Removed April 2017](https://codereview.chromium.org/2819813002/) Used to disable built-in Google Translate service.
+* `--headless=new`: Unnecessary [from January 2025 with Chrome 132](https://developer.chrome.com/blog/removing-headless-old-from-chrome) since just `--headless` runs the new headless mode too.
 * `--ignore-autoplay-restrictions`: [Removed December 2017](https://chromium-review.googlesource.com/#/c/816855/) Can use `--autoplay-policy=no-user-gesture-required` instead.
 * `--safebrowsing-disable-auto-update`: [Removed Nov 2017](https://bugs.chromium.org/p/chromium/issues/detail?id=74848#c26)
 

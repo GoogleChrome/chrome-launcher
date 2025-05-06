@@ -25,7 +25,7 @@ const fsMock = {
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
-  const spawnStub = stub().returns({pid: 'some_pid'});
+  const spawnStub = stub().returns({pid: 'some_pid', stdio: []});
 
   const chromeInstance =
       new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});
@@ -242,6 +242,44 @@ describe('Launcher', () => {
   it('throws an error when chromePath is empty', (done) => {
     const chromeInstance = new Launcher({chromePath: ''});
     chromeInstance.launch().catch(() => done());
+  });
+
+  describe('remote-debugging-pipe flag', () => {
+    // These tests perform some basic tests on the expected effects of passing
+    // the --remote-debugging-pipe flag. There is a real end-to-end example in
+    // load-extension-test.ts.
+    it('remote-debugging-pipe flag adds pipes expected by Chrome', async () => {
+      const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe']});
+      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      assert.equal(stdioAndPipes.length, 5, 'Passed pipes to Chrome');
+      assert.equal(stdioAndPipes[3], 'pipe', 'Fourth pipe is pipe');
+      assert.equal(stdioAndPipes[4], 'pipe', 'Fifth pipe is pipe');
+    });
+
+    it('without remote-debugging-pipe flag, no pipes', async () => {
+      const spawnStub = await launchChromeWithOpts({});
+      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      assert.equal(stdioAndPipes.length, 3, 'Only standard stdio pipes');
+    });
+
+    it('remote-debugging-pipe flag without remote-debugging-port', async () => {
+      const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe']});
+      const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+      assert.notEqual(chromeFlags.indexOf('--remote-debugging-pipe'), -1);
+      assert.ok(
+          !chromeFlags.find(f => f.startsWith('--remote-debugging-port')),
+          '--remote-debugging-port should be unset');
+    });
+
+    it('remote-debugging-pipe flag with value is also accepted', async () => {
+      // Chrome's source code indicates that it may support formats other than
+      // JSON, as an explicit value. Here is an example of what it could look
+      // like. Since chrome-launcher does not interpret the data in the pipes,
+      // we can support arbitrary types.
+      const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe=cbor']});
+      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      assert.equal(stdioAndPipes.length, 5);
+    });
   });
 
   describe('getChromePath', async () => {
