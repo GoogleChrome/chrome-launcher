@@ -42,7 +42,7 @@ jobs:
 
     - name: Upload failures
       if: failure()
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: Smokehouse (windows)
         path: node_modules/lighthouse/.tmp/smokehouse-ci-failures/

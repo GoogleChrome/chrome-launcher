@@ -16,7 +16,7 @@
     "reset-link": "(yarn unlink || true) && yarn link && yarn --cwd node_modules/lighthouse/ link chrome-launcher"
   },
   "bin": {
-    "print-chrome-path": "bin/print-chrome-path.js"
+    "print-chrome-path": "bin/print-chrome-path.cjs"
   },
   "devDependencies": {
     "@types/mocha": "^8.0.4",
