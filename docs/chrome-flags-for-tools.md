@@ -36,7 +36,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 * `--aggressive-cache-discard`
 * `--allow-running-insecure-content`
-* `--disable-back-forward-cache`: Disables the BackForwardCache feature.
+* `--disable-back-forward-cache`: Disables the BackForwardCache feature to avoids surprises like main request not being intercepted during page.goBack().
 * `--disable-features=AcceptCHFrame`: Disable accepting h2/h3 [ACCEPT_CH](https://datatracker.ietf.org/doc/html/draft-davidben-http-client-hint-reliability-02#section-4.3) Client Hints frames.
 * `--disable-features=AutoExpandDetailsElement`: Removed in [Sept 2022](https://bugs.chromium.org/p/chromium/issues/detail?id=1185950#c62).
 * `--disable-features=AvoidUnnecessaryBeforeUnloadCheckSync`: If enabled, this feature results in the browser process only asking the renderer process to run beforeunload handlers if it knows such handlers are registered. With `kAvoidUnnecessaryBeforeUnloadCheckSync`, content does not report a beforeunload handler is present. A ramification of this is navigations that would normally check beforeunload handlers before continuing will not, and navigation will synchronously continue.
@@ -45,6 +45,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--disable-features=IsolateOrigins`
 * `--disable-features=LazyFrameLoading`
 * `--disable-features=ScriptStreaming`: V8 script streaming
+* `--disable-field-trial-config`: See https://source.chromium.org/chromium/chromium/src/+/main:testing/variations/README.md
 * `--no-process-per-site`: Disables renderer process reuse (across tabs of the same site). 
 * `--enable-precise-memory-info`: Make the values returned to window.performance.memory more granular and more up to date in shared worker. Without this flag, the memory information is still available, but it is bucketized and updated less frequently. This flag also applys to workers.
 * `--js-flags=--random-seed=1157259157`: Initialize V8's RNG with a fixed seed.
@@ -54,7 +55,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Interactivity suppression
 
-* `--autoplay-policy=...`: Value of `user-gesture-required` to not autoplay video. Value of `no-user-gesture-required` to always autoplay video.
+* `--autoplay-policy=…`: Value of `user-gesture-required` to not autoplay video. Value of `no-user-gesture-required` to always autoplay video.
 * `--deny-permission-prompts`: Suppress all permission prompts by automatically denying them.
 * `--disable-external-intent-requests`: Disallow opening links in external applications
 * `--disable-features=GlobalMediaControls`: Hide toolbar button that opens dialog for controlling media sessions.
@@ -74,7 +75,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
   - disables auto-reloading on network errors ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/chrome_content_browser_client.cc;l=1328-1331;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
   - enables the CDP method [`Browser.getBrowserCommandLine`](https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-getBrowserCommandLine).
   - avoids showing these 4 infobars: ShowBadFlagsPrompt, GoogleApiKeysInfoBarDelegate, ObsoleteSystemInfoBarDelegate, LacrosButterBar
-  - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png) ... which is known to [adversely affect screenshots](https://bugs.chromium.org/p/chromium/issues/detail?id=1277272).
+  - adds this infobar: ![image](https://user-images.githubusercontent.com/39191/30349667-92a7a086-97c8-11e7-86b2-1365e3d407e3.png) … which is known to [adversely affect screenshots](https://bugs.chromium.org/p/chromium/issues/detail?id=1277272).
 * `--test-type`: Basically the 2014 version of `--enable-automation`. [codesearch](https://cs.chromium.org/search/?q=kTestType%5Cb&type=cs)
   - It avoids creating application stubs in ~/Applications on mac.
   - It makes exit codes slightly more correct
@@ -84,28 +85,28 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
   - "Component extensions with background pages are not enabled during tests because they generate a lot of background behavior that can interfere."
   - when quitting the browser, it disables additional checks that may stop that quitting process. (like unsaved form modifications or unhandled profile notifications..)
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
-* `--remote-debugging-port=...`: With a value of 0, Chrome will automatically select a useable port _and_ will set `navigator.webdriver` to `true`.
+* `--remote-debugging-port=…`: With a value of 0, Chrome will automatically select a useable port _and_ will set `navigator.webdriver` to `true`.
 * `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
 
 ## General
 
 * `--enable-logging=stderr`: Logging behavior slightly more appropriate for a server-type process.
 * `--log-level=0`: 0 means INFO and higher. `2` is the most verbose. Protip: Use `--enable-logging=stderr --v=2` and you may spot additional components active that you may want to disable.
-* `--user-data-dir=...`: Directory where the browser stores the user profile.
+* `--user-data-dir=…`: Directory where the browser stores the user profile.
 
 ## Chromium Annoyances
 
 * `--disable-features=MediaRouter`: Avoid the startup dialog for _Do you want the application “Chromium.app” to accept incoming network connections?_. Also disables the [Chrome Media Router](https://chromium.googlesource.com/chromium/src/+/HEAD/docs/media/media_router.md) which creates background networking activity to discover cast targets. A superset of disabling `DialMediaRouteProvider`.
 * `--password-store=basic`: Avoid potential instability of using Gnome Keyring or KDE wallet. [chromium/linux/password_storage.md](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/password_storage.md) https://crbug.com/571003
-* `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog abou: _Chrome wants to use your confidential information stored in your keychain_
+* `--use-mock-keychain`: Use mock keychain on Mac to prevent the blocking permissions dialog asking: _Do you want the application “Chromium.app” to accept incoming network connections?_
 
 ## Background networking
 
 * `--disable-background-networking`: Disable various background network services, including extension updating,safe browsing service, upgrade detector, translate, UMA
 * `--disable-breakpad`: Disable crashdump collection (reporting is already disabled in Chromium)
-* `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/
+* `--disable-component-update`: Don't update the browser 'components' listed at chrome://components/ after startup as it creates lots of network activity.
 * `--disable-domain-reliability`: Disables Domain Reliability Monitoring, which tracks whether the browser has difficulty contacting Google-owned sites and uploads reports to Google.
-* `--disable-features=AutofillServerCommunication`: Disables autofill server communication. This feature isn't disabled via other 'parent' flags.
+* `--disable-features=AutofillServerCommunication`: Disables (mostly for hermetic testing) autofill server communication. The URL of the autofill server can further be controlled via the autofill-server-url param. The given URL should specify the complete autofill server API url up to the parent "directory" of the "query" and "upload" resources. i.e., https://other.autofill.server:port/tbproxy/af/
 * `--disable-features=CertificateTransparencyComponentUpdater`
 * `--disable-sync`: Disable syncing to a Google account
 * `--enable-crash-reporter-for-testing`: Used for turning on Breakpad crash reporting in a debug environment where crash reporting is typically compiled but disabled.
@@ -195,7 +196,7 @@ If you wanted to launch a fresh Chrome profile **_with_** some Preferences set, 
 mkdir -p your_empty_user_data_dir/Default/
 echo '{"devtools":{"preferences":{"jsSourceMapsEnabled":"false","cssSourceMapsEnabled":"false"}}}' > your_empty_user_data_dir/Default/Preferences
 
-chrome --user-data-dir=your_empty_user_data_dir ...
+chrome --user-data-dir=your_empty_user_data_dir …
 ```
 
 ## Feature Flags FYI
