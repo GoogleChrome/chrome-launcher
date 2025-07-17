@@ -356,6 +356,12 @@ class Launcher {
         };
       }
 
+      // handle process closed right after it started
+      this.chromeProcess.on('close', () => {
+        delete this.chromeProcess;
+        this.destroyTmp();
+      });
+
       log.verbose(
           'ChromeLauncher',
           `Chrome running with pid ${this.chromeProcess.pid} on port ${this.port}.`);
@@ -441,11 +447,6 @@ class Launcher {
       return;
     }
 
-    this.chromeProcess.on('close', () => {
-      delete this.chromeProcess;
-      this.destroyTmp();
-    });
-
     log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
     try {
       if (isWindows) {
@@ -468,19 +469,20 @@ class Launcher {
   }
 
   destroyTmp() {
+    // close all opened files
     if (this.outFile) {
       this.fs.closeSync(this.outFile);
       delete this.outFile;
     }
 
-    // Only clean up the tmp dir if we created it.
-    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
-      return;
-    }
-
     if (this.errFile) {
       this.fs.closeSync(this.errFile);
       delete this.errFile;
+    }
+
+    // Only clean up the tmp dir if we created it.
+    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+      return;
     }
 
     // backwards support for node v12 + v14.14+
