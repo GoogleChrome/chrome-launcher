@@ -5,7 +5,7 @@ is an attempt to document all chrome flags that are relevant to tools, automatio
 
 All use cases are different, so you'll have to choose which flags are most appropriate.
 
-Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadsheets/d/1n-vw_PCPS45jX3Jt9jQaAhFqBY6Ge1vWF_Pa0k7dCk4/edit#gid=1265672696)**  all these [tools](#sources) use.
+Here's a **[July 2025 comparison of what flags](https://docs.google.com/spreadsheets/d/1n-vw_PCPS45jX3Jt9jQaAhFqBY6Ge1vWF_Pa0k7dCk4/edit#gid=1265672696)**  all these [tools](#sources) use.
 
 ## Commonly unwanted browser features
 

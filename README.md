@@ -5,6 +5,7 @@
 Launch Google Chrome with ease from node.
 
 * [Disables many Chrome services](https://github.com/GoogleChrome/chrome-launcher/blob/main/src/flags.ts) that add noise to automated scenarios
+  * See our [chrome-flags-for-tools.md](https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md) doc for an in-depth accounting of Chrome flags that are useful for measurement/automation tools.
 * Opens up the browser's `remote-debugging-port` on an available port
 * Automagically locates a Chrome binary to launch
 * Uses a fresh Chrome profile for each launch, and cleans itself up on `kill()`
