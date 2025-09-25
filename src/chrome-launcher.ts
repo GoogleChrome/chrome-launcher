@@ -29,7 +29,7 @@ const instances = new Set<Launcher>();
 type JSONLike =|{[property: string]: JSONLike}|readonly JSONLike[]|string|number|boolean|null;
 
 export interface Options {
-  startingUrl?: string;
+  startingUrl?: string|Array<string>;
   chromeFlags?: Array<string>;
   prefs?: Record<string, JSONLike>;
   port?: number;
@@ -123,7 +123,7 @@ function killAll(): Array<Error> {
 class Launcher {
   private tmpDirandPidFileReady = false;
   private pidFile: string;
-  private startingUrl: string;
+  private startingUrl: string|Array<string>;
   private outFile?: number;
   private errFile?: number;
   private chromePath?: string;
@@ -154,6 +154,7 @@ class Launcher {
 
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
+    this.startingUrl = typeof this.startingUrl === 'string' ? [this.startingUrl] : this.startingUrl;
     this.chromeFlags = defaults(this.opts.chromeFlags, []);
     this.prefs = defaults(this.opts.prefs, {});
     this.requestedPort = defaults(this.opts.port, 0);
@@ -201,7 +202,7 @@ class Launcher {
     if (process.env.HEADLESS) flags.push('--headless');
 
     flags.push(...this.chromeFlags);
-    flags.push(this.startingUrl);
+    flags.push(...this.startingUrl);
 
     return flags;
   }
