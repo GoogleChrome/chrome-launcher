@@ -31,6 +31,8 @@ export const DEFAULT_FLAGS: ReadonlyArray<string> = [
         'AutofillServerCommunication',
         // Disables "Enhanced ad privacy in Chrome" dialog (though as of 2024-03-20 it shouldn't show up if the profile has no stored country).
         'PrivacySandboxSettings4',
+        // Disable RenderDocument (https://chromium.googlesource.com/chromium/src/+/main/docs/render_document.md) until remaining bugs are fixed. https://github.com/GoogleChrome/lighthouse/pull/16363
+        'RenderDocument',
       ].join(','),
 
   // Disable all chrome extensions
