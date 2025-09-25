@@ -20,7 +20,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--no-default-browser-check`: Disable the default browser check, do not prompt to set it as such
 * `--no-first-run`: Skip first run wizards
 * `--ash-no-nudges`: Avoids blue bubble "user education" nudges (eg., "… give your browser a new look", Memory Saver)
-* `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen
+* `--disable-search-engine-choice-screen`: Disable the 2023+ search engine choice screen. Required for some versions because of crbug.com/357068286, is now guarded behind --no-first-run
 * `--propagate-iph-for-testing`: Specifies which in-product help (IPH) features are allowed. If no arguments are provided, then all IPH features are disabled.
 
 ## Task throttling
@@ -68,6 +68,7 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 
 ## Catch-all automation
 * `--enable-automation`: Disable a few things considered not appropriate for automation. ([Original design doc](https://docs.google.com/a/google.com/document/d/1JYj9K61UyxIYavR8_HATYIglR9T_rDwAtLLsD3fbDQg/preview), though renamed [here](https://codereview.chromium.org/2564973002#msg24)) [codesearch](https://cs.chromium.org/search/?q=kEnableAutomation&type=cs). Note that some projects have chosen to **avoid** using this flag: [web-platform-tests/wpt/#6348](https://github.com/web-platform-tests/wpt/pull/6348), [crbug.com/1277272](https://crbug.com/1277272)
+  - Starts local server to listen to chromedriver commands
   - sets `window.navigator.webdriver` to `true` within all JS contexts. This is also set [when using](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=374-376;drc=4a843634b8b3006e431add55968f6f45ee54d35e) `--headless`, `--remote-debugging-pipe` and `--remote-debugging-port=0` (yes, [_specifically_ 0](https://source.chromium.org/chromium/chromium/src/+/main:content/child/runtime_features.cc;l=412-427;drc=4a843634b8b3006e431add55968f6f45ee54d35e)).
   - disables bubble notification about running development/unpacked extensions ([source](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/ui/extensions/extension_message_bubble_factory.cc;l=71-76;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed))
   - disables the password saving UI (which [covers](https://source.chromium.org/chromium/chromium/src/+/main:chrome/browser/password_manager/chrome_password_manager_client.cc;l=301-308;drc=1e6c1a39cbbc1dcad6e7828661d74d76463465ed) the usecase of the [defunct](https://bugs.chromium.org/p/chromedriver/issues/detail?id=1015) `--disable-save-password-bubble` flag)
@@ -87,6 +88,8 @@ Here's a **[Nov 2022 comparison of what flags](https://docs.google.com/spreadshe
 * `--remote-debugging-pipe`: more secure than using protocol over a websocket
 * `--remote-debugging-port=…`: With a value of 0, Chrome will automatically select a useable port _and_ will set `navigator.webdriver` to `true`.
 * `--silent-debugger-extension-api`: Does not show an infobar when a Chrome extension attaches to a page using `chrome.debugger` page. Required to attach to extension background pages.
+* `--no-experiments`:  Disables all experiments set on chrome://flags.
+* `--enable-benchmarking`: Enables the benchmarking extensions disables field trials and forces the use of the default variant uses settings that reduce noise / non-determinism in chrome. Originally used via chrome://flags.
 
 ## General
 
