@@ -7,7 +7,7 @@
 
 import {join} from 'path';
 import childProcess from 'child_process';
-import {mkdirSync} from 'fs';
+import {mkdtempSync} from 'fs';
 import isWsl from 'is-wsl';
 
 export const enum LaunchErrorCodes {
@@ -124,14 +124,10 @@ function makeUnixTmpDir() {
   return childProcess.execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
 }
 
-function makeWin32TmpDir() {
+export function makeWin32TmpDir() {
   const winTmpPath = process.env.TEMP || process.env.TMP ||
       (process.env.SystemRoot || process.env.windir) + '\\temp';
-  const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);
-  const tmpdir = join(winTmpPath, 'lighthouse.' + randomNumber);
-
-  mkdirSync(tmpdir, {recursive: true});
-  return tmpdir;
+  return mkdtempSync(join(winTmpPath, 'lighthouse.'));
 }
 
 export {childProcess as _childProcessForTesting};
