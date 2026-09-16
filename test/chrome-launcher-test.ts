@@ -5,7 +5,8 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, Options, getChromePath} from '../src/chrome-launcher.js';
+import {Launcher, launch, killAll, getChromePath} from '../src/chrome-launcher.js';
+import type {Options} from '../src/chrome-launcher.js';
 import {DEFAULT_FLAGS} from '../src/flags.js';
 
 import sinon from 'sinon';
