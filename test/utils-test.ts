@@ -16,7 +16,10 @@
 'use strict';
 
 import * as assert from 'assert';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, _childProcessForTesting } from '../src/utils.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, makeWin32TmpDir, makeTmpDir, _childProcessForTesting } from '../src/utils.js';
 import sinon from 'sinon';
 
 const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
@@ -116,3 +119,101 @@ describe('getWSLLocalAppDataPath', () => {
     });
   });
 });
+
+describe('makeWin32TmpDir', () => {
+  let originalTemp: string | undefined;
+  let testTmpDir: string;
+
+  beforeEach(() => {
+    originalTemp = process.env.TEMP;
+    testTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cl-test-'));
+    process.env.TEMP = testTmpDir;
+  });
+
+  afterEach(() => {
+    if (originalTemp !== undefined) {
+      process.env.TEMP = originalTemp;
+    } else {
+      delete process.env.TEMP;
+    }
+    fs.rmSync(testTmpDir, {recursive: true, force: true});
+  });
+
+  it('creates unique directories with lighthouse. prefix', () => {
+    const dir1 = makeWin32TmpDir();
+    const dir2 = makeWin32TmpDir();
+
+    assert.notStrictEqual(dir1, dir2);
+    assert.ok(fs.existsSync(dir1));
+    assert.ok(fs.existsSync(dir2));
+    assert.ok(path.basename(dir1).startsWith('lighthouse.'));
+    assert.ok(path.basename(dir2).startsWith('lighthouse.'));
+  });
+
+  it('creates distinct directory paths independently of random seed', () => {
+    const randomStub = sinon.stub(Math, 'random').returns(0.12345678);
+    try {
+      const dir1 = makeWin32TmpDir();
+      const dir2 = makeWin32TmpDir();
+
+      assert.notStrictEqual(dir1, dir2);
+      assert.strictEqual(randomStub.called, false);
+    } finally {
+      randomStub.restore();
+    }
+  });
+
+  it('does not overwrite or reuse existing directories in temp path', () => {
+    const randomStub = sinon.stub(Math, 'random').returns(0.5);
+    try {
+      const predictedDir = path.join(testTmpDir, 'lighthouse.55000000');
+      fs.mkdirSync(predictedDir);
+      fs.writeFileSync(path.join(predictedDir, 'existing.txt'), 'do-not-delete');
+
+      const createdDir = makeWin32TmpDir();
+
+      assert.notStrictEqual(createdDir, predictedDir);
+      assert.strictEqual(fs.existsSync(path.join(createdDir, 'existing.txt')), false);
+    } finally {
+      randomStub.restore();
+    }
+  });
+});
+
+describe('makeTmpDir (win32 platform)', () => {
+  let originalPlatform: PropertyDescriptor | undefined;
+  let originalTemp: string | undefined;
+  let testTmpDir: string;
+
+  beforeEach(() => {
+    originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
+    Object.defineProperty(process, 'platform', {value: 'win32', configurable: true});
+    originalTemp = process.env.TEMP;
+    testTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cl-test-'));
+    process.env.TEMP = testTmpDir;
+  });
+
+  afterEach(() => {
+    if (originalPlatform) {
+      Object.defineProperty(process, 'platform', originalPlatform);
+    }
+    if (originalTemp !== undefined) {
+      process.env.TEMP = originalTemp;
+    } else {
+      delete process.env.TEMP;
+    }
+    fs.rmSync(testTmpDir, {recursive: true, force: true});
+  });
+
+  it('delegates to makeWin32TmpDir on win32', () => {
+    const dir1 = makeTmpDir();
+    const dir2 = makeTmpDir();
+
+    assert.notStrictEqual(dir1, dir2);
+    assert.ok(fs.existsSync(dir1));
+    assert.ok(fs.existsSync(dir2));
+    assert.ok(path.basename(dir1).startsWith('lighthouse.'));
+    assert.ok(path.basename(dir2).startsWith('lighthouse.'));
+  });
+});
+

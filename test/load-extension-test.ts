@@ -12,7 +12,7 @@ import * as assert from 'assert';
 import log from 'lighthouse-logger';
 
 import {createServer} from 'http';
-import {AddressInfo} from 'net';
+import type {AddressInfo} from 'net';
 import {fileURLToPath} from 'url';
 
 // Awaited is in TypeScript 4.5, but the project uses typescript@^4.1.2

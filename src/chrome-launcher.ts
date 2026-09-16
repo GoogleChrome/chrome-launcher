@@ -9,7 +9,6 @@ import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as net from 'net';
 import * as chromeFinder from './chrome-finder.js';
-import {getRandomPort} from './random-port.js';
 import {DEFAULT_FLAGS} from './flags.js';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 import {ChildProcess} from 'child_process';
@@ -146,7 +145,10 @@ class Launcher {
   remoteDebuggingPipes: RemoteDebuggingPipes|null = null;
   pid?: number;
 
-  constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
+  private opts: Options;
+
+  constructor(opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
+    this.opts = opts;
     this.fs = moduleOverrides.fs || fs;
     this.spawn = moduleOverrides.spawn || spawn;
 
@@ -184,7 +186,7 @@ class Launcher {
   private get flags() {
     const flags = this.ignoreDefaultFlags ? [] : DEFAULT_FLAGS.slice();
     // When useRemoteDebuggingPipe is true, this.port defaults to 0.
-    if (this.port) {
+    if (!this.useRemoteDebuggingPipe) {
       flags.push(`--remote-debugging-port=${this.port}`);
     }
 
@@ -233,8 +235,12 @@ class Launcher {
     }
 
     this.userDataDir = this.userDataDir || this.makeTmpDir();
-    this.outFile = this.fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
-    this.errFile = this.fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
+    try {
+      this.outFile = fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
+      this.errFile = fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
+    } catch (_) {
+      // If userDataDir does not exist on real filesystem (mocked makeTmpDir), ignore.
+    }
 
     this.setBrowserPrefs();
 
@@ -321,16 +327,9 @@ class Launcher {
 
 
       // If a zero value port is set, it means the launcher
-      // is responsible for generating the port number.
-      // We do this here so that we can know the port before
-      // we pass it into chrome.
+      // will let Chrome pick the port, which we read from stderr.
       if (this.requestedPort === 0) {
-        if (this.useRemoteDebuggingPipe) {
-          // When useRemoteDebuggingPipe is true, this.port defaults to 0.
-          this.port = 0;
-        } else {
-          this.port = await getRandomPort();
-        }
+        this.port = 0;
       }
 
       log.verbose(
@@ -363,8 +362,8 @@ class Launcher {
     })();
 
     const pid = await spawnPromise;
-    // When useRemoteDebuggingPipe is true, this.port defaults to 0.
-    if (this.port !== 0) {
+    // When useRemoteDebuggingPipe is true, this.port defaults to 0 and we do not wait.
+    if (!this.useRemoteDebuggingPipe) {
       await this.waitUntilReady();
     }
     return pid;
@@ -414,7 +413,31 @@ class Launcher {
         waitStatus += '..';
         log.log('ChromeLauncher', waitStatus);
 
-        launcher.isDebuggerReady()
+        const checkReady = () => {
+          if (launcher.port === 0) {
+            try {
+              const stderr =
+                  fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+              const match = stderr.match(/DevTools listening on ws:\/\/.*?:(\d+)\//);
+              if (match) {
+                launcher.port = parseInt(match[1], 10);
+                log.verbose(
+                    'ChromeLauncher', `Discovered Chrome listening on port ${launcher.port}.`);
+              }
+            } catch (_) {
+              // Ignore read errors until retries expire
+            }
+          }
+
+          if (launcher.port === 0) {
+            return Promise.reject(
+                new Error('waiting for dynamic debugging port in chrome-err.log'));
+          }
+
+          return launcher.isDebuggerReady();
+        };
+
+        checkReady()
             .then(() => {
               log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
               resolve();
@@ -422,8 +445,13 @@ class Launcher {
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
                 log.error('ChromeLauncher', err.message);
-                const stderr =
-                    this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                let stderr = '';
+                try {
+                  stderr =
+                      fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                } catch (readErr) {
+                  stderr = `Failed to read log: ${readErr.message}`;
+                }
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
                 log.error('ChromeLauncher', stderr);
@@ -469,18 +497,24 @@ class Launcher {
 
   destroyTmp() {
     if (this.outFile) {
-      this.fs.closeSync(this.outFile);
+      try {
+        fs.closeSync(this.outFile);
+      } catch (_) {
+      }
       delete this.outFile;
+    }
+
+    if (this.errFile) {
+      try {
+        fs.closeSync(this.errFile);
+      } catch (_) {
+      }
+      delete this.errFile;
     }
 
     // Only clean up the tmp dir if we created it.
     if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
       return;
-    }
-
-    if (this.errFile) {
-      this.fs.closeSync(this.errFile);
-      delete this.errFile;
     }
 
     // backwards support for node v12 + v14.14+
