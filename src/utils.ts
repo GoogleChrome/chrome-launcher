@@ -10,12 +10,13 @@ import childProcess from 'child_process';
 import {mkdtempSync} from 'fs';
 import isWsl from 'is-wsl';
 
-export const enum LaunchErrorCodes {
-  ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
-  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
-  ERR_LAUNCHER_UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
-  ERR_LAUNCHER_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
-}
+export const LaunchErrorCodes = {
+  ERR_LAUNCHER_PATH_NOT_SET: 'ERR_LAUNCHER_PATH_NOT_SET',
+  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY: 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
+  ERR_LAUNCHER_UNSUPPORTED_PLATFORM: 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
+  ERR_LAUNCHER_NOT_INSTALLED: 'ERR_LAUNCHER_NOT_INSTALLED',
+} as const;
+export type LaunchErrorCodes = typeof LaunchErrorCodes[keyof typeof LaunchErrorCodes];
 
 export function defaults<T>(val: T|undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
@@ -26,8 +27,13 @@ export async function delay(time: number) {
 }
 
 export class LauncherError extends Error {
-  constructor(public message: string = 'Unexpected error', public code?: string) {
-    super();
+  message: string;
+  code?: string;
+
+  constructor(message: string = 'Unexpected error', code?: string) {
+    super(message);
+    this.message = message;
+    this.code = code;
     this.stack = new Error().stack;
     return this;
   }

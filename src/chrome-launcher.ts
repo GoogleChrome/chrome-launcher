@@ -146,7 +146,10 @@ class Launcher {
   remoteDebuggingPipes: RemoteDebuggingPipes|null = null;
   pid?: number;
 
-  constructor(private opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
+  private opts: Options;
+
+  constructor(opts: Options = {}, moduleOverrides: ModuleOverrides = {}) {
+    this.opts = opts;
     this.fs = moduleOverrides.fs || fs;
     this.spawn = moduleOverrides.spawn || spawn;
 
