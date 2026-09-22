@@ -7,7 +7,7 @@
 
 import {join} from 'path';
 import childProcess from 'child_process';
-import {mkdirSync} from 'fs';
+import fs, {mkdirSync} from 'fs';
 import isWsl from 'is-wsl';
 
 export const enum LaunchErrorCodes {
@@ -56,6 +56,30 @@ export class ChromeNotInstalledError extends LauncherError {
 
 export function getPlatform() {
   return isWsl ? 'wsl' : process.platform;
+}
+
+/**
+ * Reads at most `maxBytes` from the end of a file, decoded as UTF-8.
+ *
+ * Chrome appends to its stderr log for as long as the browser is running, and we
+ * only read that log back to explain why a launch failed. `fs.readFileSync` throws
+ * ERR_FS_FILE_TOO_LARGE once the file is larger than the max buffer size, which
+ * would replace the error we were trying to report with a confusing one (and would
+ * load the whole file into memory for any large log). The tail is the useful part,
+ * so only read that.
+ */
+export function readFileTail(fsModule: typeof fs, filePath: string, maxBytes = 64 * 1024): string {
+  const fd = fsModule.openSync(filePath, 'r');
+  try {
+    const {size} = fsModule.fstatSync(fd);
+    const start = Math.max(0, size - maxBytes);
+    const buffer = Buffer.alloc(size - start);
+    // The file can grow between the stat and the read, so decode only what we got.
+    const bytesRead = fsModule.readSync(fd, buffer, 0, buffer.length, start);
+    return buffer.toString('utf-8', 0, bytesRead);
+  } finally {
+    fsModule.closeSync(fd);
+  }
 }
 
 export function makeTmpDir() {

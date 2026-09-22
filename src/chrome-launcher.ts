@@ -11,7 +11,7 @@ import * as net from 'net';
 import * as chromeFinder from './chrome-finder.js';
 import {getRandomPort} from './random-port.js';
 import {DEFAULT_FLAGS} from './flags.js';
-import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
+import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, readFileTail, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 import {ChildProcess} from 'child_process';
 import {spawn, spawnSync} from 'child_process';
 import log from 'lighthouse-logger';
@@ -21,6 +21,9 @@ const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
 const _SIGINT_EXIT_CODE = 130;
 const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32', 'wsl']);
+// How much of chrome-err.log to report when a launch fails. Chrome writes to that
+// file for the whole life of the browser, so it can get very large.
+const _ERROR_LOG_TAIL_LENGTH = 64 * 1024;
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
@@ -422,8 +425,8 @@ class Launcher {
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
                 log.error('ChromeLauncher', err.message);
-                const stderr =
-                    this.fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                const stderr = readFileTail(
+                    this.fs, `${this.userDataDir}/chrome-err.log`, _ERROR_LOG_TAIL_LENGTH);
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
                 log.error('ChromeLauncher', stderr);
