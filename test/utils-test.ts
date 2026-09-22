@@ -16,12 +16,69 @@
 'use strict';
 
 import * as assert from 'assert';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, _childProcessForTesting } from '../src/utils.js';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, readFileTail, _childProcessForTesting } from '../src/utils.js';
 import sinon from 'sinon';
 
 const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
 
 const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
+
+describe('readFileTail', () => {
+  let tmpDir: string;
+
+  beforeEach(() => {
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-launcher-utils-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tmpDir, {recursive: true, force: true});
+  });
+
+  const writeLog = (name: string, contents: string) => {
+    const file = path.join(tmpDir, name);
+    fs.writeFileSync(file, contents);
+    return file;
+  };
+
+  it('returns the whole file when it is shorter than the limit', () => {
+    const file = writeLog('small.log', 'a short log\n');
+
+    assert.strictEqual(readFileTail(fs, file, 1024), 'a short log\n');
+  });
+
+  it('returns the last bytes of a file longer than the limit', () => {
+    const contents = 'start of the log\n' + 'x'.repeat(4096) + '\nthe last line\n';
+    const file = writeLog('long.log', contents);
+
+    assert.strictEqual(readFileTail(fs, file, 64), contents.slice(-64));
+  });
+
+  it('never asks for more than the limit, no matter how long the file is', () => {
+    // The point of the limit: a chrome-err.log can grow past what fs.readFileSync
+    // can allocate, so the read has to be sized by the limit, not by the file.
+    const contents = 'y'.repeat(200 * 1024) + 'the end';
+    const file = writeLog('huge.log', contents);
+
+    const readSync = sinon.spy(fs.readSync);
+    const spiedFs = {...fs, readSync};
+
+    const tail = readFileTail(spiedFs as any, file, 1024);
+
+    assert.strictEqual(tail, contents.slice(-1024));
+    const [, , , length, position] = readSync.getCall(0).args as any[];
+    assert.strictEqual(length, 1024, 'length asked for');
+    assert.strictEqual(position, contents.length - 1024, 'offset read from');
+  });
+
+  it('returns an empty string for an empty file', () => {
+    const file = writeLog('empty.log', '');
+
+    assert.strictEqual(readFileTail(fs, file, 1024), '');
+  });
+});
 
 describe('toWin32Path', () => {
   beforeEach(() => execFileSyncStub.reset());

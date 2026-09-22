@@ -11,6 +11,8 @@ import {DEFAULT_FLAGS} from '../src/flags.js';
 import sinon from 'sinon';
 import * as assert from 'assert';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 
 import log from 'lighthouse-logger';
 
@@ -101,6 +103,46 @@ describe('Launcher', () => {
       writeFileStub.getCall(0).args[1],
       '{"download.default_directory":"/some/dir"}'
     )
+  });
+
+  it('reports the end of chrome-err.log when Chrome never comes up', async () => {
+    const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-launcher-test-'));
+    const marker = 'the actual reason chrome died';
+    // Long enough that reading all of it back would be wasteful, let alone fail.
+    fs.writeFileSync(
+        path.join(userDataDir, 'chrome-err.log'),
+        'the start of the log, which nobody wants\n' + 'filler\n'.repeat(20 * 1024) + marker);
+
+    const chromeInstance = new Launcher({
+      userDataDir,
+      logLevel: 'error',
+      connectionPollInterval: 1,
+      maxConnectionRetries: 1,
+    });
+    chromeInstance.prepare();
+    stub(chromeInstance as any, 'isDebuggerReady')
+        .rejects(new Error('connect ECONNREFUSED 127.0.0.1:9222'));
+
+    const errorSpy = spy(log, 'error');
+    try {
+      await assert.rejects(chromeInstance.waitUntilReady());
+
+      const reported =
+          errorSpy.getCalls().map(call => call.args[1]).find(arg => typeof arg === 'string' &&
+              arg.includes(marker)) as string|undefined;
+      assert.ok(reported, 'the end of chrome-err.log was reported');
+      assert.ok(!reported!.includes('the start of the log'),
+          'only the tail was reported, not the beginning');
+      assert.ok(reported!.length <= 64 * 1024, `reported ${reported!.length} bytes`);
+    } finally {
+      errorSpy.restore();
+      // Close the log handles ourselves: destroyTmp() bails out before closing the
+      // err log when the data dir was supplied by the caller.
+      chromeInstance.destroyTmp();
+      const errFile = (chromeInstance as any).errFile;
+      if (typeof errFile === 'number') fs.closeSync(errFile);
+      fs.rmSync(userDataDir, {recursive: true, force: true});
+    }
   });
 
   it('cleans up the tmp dir after closing (mocked)', async () => {
