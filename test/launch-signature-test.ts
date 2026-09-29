@@ -6,7 +6,8 @@
 
 'use strict';
 
-import {launch} from '../src/index.js';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+import {launch} from '../dist/index.js';
 import * as assert from 'assert';
 
 import log from 'lighthouse-logger';

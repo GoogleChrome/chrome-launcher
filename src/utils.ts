@@ -7,15 +7,16 @@
 
 import {join} from 'path';
 import childProcess from 'child_process';
-import {mkdirSync} from 'fs';
+import {mkdtempSync} from 'fs';
 import isWsl from 'is-wsl';
 
-export const enum LaunchErrorCodes {
-  ERR_LAUNCHER_PATH_NOT_SET = 'ERR_LAUNCHER_PATH_NOT_SET',
-  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY = 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
-  ERR_LAUNCHER_UNSUPPORTED_PLATFORM = 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
-  ERR_LAUNCHER_NOT_INSTALLED = 'ERR_LAUNCHER_NOT_INSTALLED',
-}
+export const LaunchErrorCodes = {
+  ERR_LAUNCHER_PATH_NOT_SET: 'ERR_LAUNCHER_PATH_NOT_SET',
+  ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY: 'ERR_LAUNCHER_INVALID_USER_DATA_DIRECTORY',
+  ERR_LAUNCHER_UNSUPPORTED_PLATFORM: 'ERR_LAUNCHER_UNSUPPORTED_PLATFORM',
+  ERR_LAUNCHER_NOT_INSTALLED: 'ERR_LAUNCHER_NOT_INSTALLED',
+} as const;
+export type LaunchErrorCodes = typeof LaunchErrorCodes[keyof typeof LaunchErrorCodes];
 
 export function defaults<T>(val: T|undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
@@ -26,8 +27,13 @@ export async function delay(time: number) {
 }
 
 export class LauncherError extends Error {
-  constructor(public message: string = 'Unexpected error', public code?: string) {
-    super();
+  message: string;
+  code?: string;
+
+  constructor(message: string = 'Unexpected error', code?: string) {
+    super(message);
+    this.message = message;
+    this.code = code;
     this.stack = new Error().stack;
     return this;
   }
@@ -124,14 +130,10 @@ function makeUnixTmpDir() {
   return childProcess.execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
 }
 
-function makeWin32TmpDir() {
+export function makeWin32TmpDir() {
   const winTmpPath = process.env.TEMP || process.env.TMP ||
       (process.env.SystemRoot || process.env.windir) + '\\temp';
-  const randomNumber = Math.floor(Math.random() * 9e7 + 1e7);
-  const tmpdir = join(winTmpPath, 'lighthouse.' + randomNumber);
-
-  mkdirSync(tmpdir, {recursive: true});
-  return tmpdir;
+  return mkdtempSync(join(winTmpPath, 'lighthouse.'));
 }
 
 export {childProcess as _childProcessForTesting};

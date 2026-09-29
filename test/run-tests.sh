@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
- 
+
 set -euxo pipefail
 
-export TS_NODE_PROJECT="test/tsconfig.json"
-mocha --loader=ts-node/esm --reporter=dot test/**/*-test.ts --timeout=10000
+has_files=false
+for arg in "$@"; do
+  if [[ "$arg" != -* ]]; then
+    has_files=true
+    break
+  fi
+done
+if [ "$has_files" = false ]; then
+  set -- 'test/**/*-test.ts' "$@"
+fi
+
+node --test "$@"
