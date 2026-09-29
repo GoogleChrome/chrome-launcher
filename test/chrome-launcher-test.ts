@@ -5,9 +5,10 @@
  */
 'use strict';
 
-import {Launcher, launch, killAll, getChromePath} from '../src/chrome-launcher.js';
-import type {Options} from '../src/chrome-launcher.js';
-import {DEFAULT_FLAGS} from '../src/flags.js';
+import {describe, it, beforeEach, afterEach} from 'node:test';
+import {Launcher, launch, killAll, getChromePath} from '../dist/chrome-launcher.js';
+import type {Options} from '../dist/chrome-launcher.js';
+import {DEFAULT_FLAGS} from '../dist/flags.js';
 
 import sinon from 'sinon';
 import * as assert from 'assert';

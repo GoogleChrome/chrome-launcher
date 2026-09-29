@@ -1,3 +1,4 @@
+import {describe, it, beforeEach, afterEach} from "node:test";
 /**
  * Copyright 2017 Google Inc. All Rights Reserved.
  *
@@ -19,7 +20,7 @@ import * as assert from 'assert';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, makeWin32TmpDir, makeTmpDir, _childProcessForTesting } from '../src/utils.js';
+import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, makeWin32TmpDir, makeTmpDir, _childProcessForTesting } from '../dist/utils.js';
 import sinon from 'sinon';
 
 const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();

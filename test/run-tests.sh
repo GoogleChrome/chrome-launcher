@@ -13,4 +13,4 @@ if [ "$has_files" = false ]; then
   set -- 'test/**/*-test.ts' "$@"
 fi
 
-node --import ./test/register.mjs --test "$@"
+node --test "$@"
