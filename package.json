@@ -12,7 +12,6 @@
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
     "type-check": "tsc --allowJs --checkJs --noEmit --target es2019 *.js",
-    "prepublishOnly": "npm run build && npm run test",
     "reset-link": "(yarn unlink || true) && yarn link && yarn --cwd node_modules/lighthouse/ link chrome-launcher"
   },
   "bin": {
@@ -33,7 +32,10 @@
   "version": "1.2.0",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Chrome with the Devtools Protocol port open",
-  "repository": "https://github.com/GoogleChrome/chrome-launcher/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GoogleChrome/chrome-launcher.git"
+  },
   "author": "The Chromium Authors",
   "license": "Apache-2.0"
 }

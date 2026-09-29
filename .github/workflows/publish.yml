@@ -1,0 +1,39 @@
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC provenance authentication
+  contents: read  # Required for repository checkout
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Install xvfb
+        run: sudo apt-get install -y xvfb
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: xvfb-run --auto-servernum yarn test
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public --registry https://registry.npmjs.org/
