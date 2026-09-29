@@ -1,6 +1,8 @@
 ## v1.2.2 (Tue, Sep 29 2026)
 
 * `8f032f9b` Use `--remote-debugging-port=0` and `fs.mkdtempSync` ([#366](https://github.com/GoogleChrome/chrome-launcher/pull/366))
+* Fix Windows `EPERM` error on process teardown in `destroyTmp()` ([#355](https://github.com/GoogleChrome/chrome-launcher/issues/355))
+* Migrate tests to Node's native `node:test` runner, dropping `mocha` and `ts-node`
 * `259e5240` release: add npm trusted publishing workflow and normalize repository
 
 ## v1.2.1 (Thu, Sep 25 2025)
