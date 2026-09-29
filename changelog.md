@@ -1,3 +1,21 @@
+## v1.2.2 (Tue, Sep 29 2026)
+
+* `8f032f9b` Use `--remote-debugging-port=0` and `fs.mkdtempSync` ([#366](https://github.com/GoogleChrome/chrome-launcher/pull/366))
+* `259e5240` release: add npm trusted publishing workflow and normalize repository
+
+## v1.2.1 (Thu, Sep 25 2025)
+
+* `fe7654fb` readme link to chrome-flags-for-tools
+* `783ff4aa` flags: disable RenderDocument ([#361](https://github.com/GoogleChrome/chrome-launcher/pull/361))
+* `0fa56e76` more flags ([#360](https://github.com/GoogleChrome/chrome-launcher/pull/360))
+* `0323cc71` Update flags documentation ([#359](https://github.com/GoogleChrome/chrome-launcher/pull/359))
+
+## v1.2.0 (Tue, May 6 2025)
+
+* `89c4456e` chore(deps): bump minimatch from 3.0.4 to 3.1.2 ([#320](https://github.com/GoogleChrome/chrome-launcher/pull/320))
+* `4705e1de` chore(deps): bump path-parse from 1.0.6 to 1.0.7 ([#321](https://github.com/GoogleChrome/chrome-launcher/pull/321))
+* `96df0364` chore(deps): bump braces from 3.0.2 to 3.0.3 ([#333](https://github.com/GoogleChrome/chrome-launcher/pull/333))
+
 ## v1.0.0 (Tue, Jul 18 2023)
 
 * `37609a01` deps: upgrade `lighthouse-logger` to 2.0.1 ([#309](https://github.com/GoogleChrome/chrome-launcher/pull/309))
