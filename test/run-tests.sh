@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
- 
+
 set -euxo pipefail
 
 has_files=false
@@ -10,7 +10,7 @@ for arg in "$@"; do
   fi
 done
 if [ "$has_files" = false ]; then
-  set -- test/**/*-test.ts "$@"
+  set -- 'test/**/*-test.ts' "$@"
 fi
 
-node --import ./test/loader.mjs ./node_modules/.bin/mocha --reporter=dot --timeout=10000 "$@"
+node --import ./test/register.mjs --test "$@"

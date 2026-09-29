@@ -116,7 +116,7 @@ describe('Launcher', () => {
   });
 
 
-  it('cleans up the tmp dir after closing (real)', async () => {
+  it('cleans up the tmp dir after closing (real)', {timeout: 30000}, async () => {
     const rmSpy = spy(fs, 'rmSync' in fs ? 'rmSync' : 'rmdirSync');
     const fsFake = {...fsMock, rmdirSync: rmSpy, rmSync: rmSpy};
 
@@ -132,7 +132,7 @@ describe('Launcher', () => {
     const [path] = fsFake.rmSync.getCall(0).args;
     assert.strictEqual(chromeInstance.userDataDir, path);
     assert.equal(fs.existsSync(path), false, `userdatadir still exists: ${path}`);
-  }).timeout(30 * 1000);
+  });
 
   it('does not delete created directory when custom path passed', () => {
     const chromeInstance = new Launcher({userDataDir: 'some_path'}, {fs: fsMock as any});
@@ -152,12 +152,12 @@ describe('Launcher', () => {
     chromeInstance.makeTmpDir = originalMakeTmp;
   });
 
-  it('doesn\'t fail when killed twice', async () => {
+  it('doesn\'t fail when killed twice', {timeout: 30000}, async () => {
     const chromeInstance = new Launcher();
     await chromeInstance.launch();
     chromeInstance.kill();
     chromeInstance.kill();
-  }).timeout(30 * 1000);
+  });
 
   it('doesn\'t fail when killing all instances', async () => {
     await launch();
@@ -201,11 +201,11 @@ describe('Launcher', () => {
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
 
-  it('searches for available installations', async () => {
+  it('searches for available installations', {timeout: 30000}, async () => {
     const installations = Launcher.getInstallations();
     assert.ok(Array.isArray(installations));
     assert.ok(installations.length >= 1);
-  }).timeout(30_000);
+  });
 
   it('removes --user-data-dir if userDataDir is false', async () => {
     const spawnStub = await launchChromeWithOpts();
@@ -240,9 +240,9 @@ describe('Launcher', () => {
     assert.ok(!chromeFlags.includes('--disable-default-app'));
   });
 
-  it('throws an error when chromePath is empty', (done) => {
+  it('throws an error when chromePath is empty', async () => {
     const chromeInstance = new Launcher({chromePath: ''});
-    chromeInstance.launch().catch(() => done());
+    await assert.rejects(chromeInstance.launch());
   });
 
   describe('remote-debugging-pipe flag', () => {

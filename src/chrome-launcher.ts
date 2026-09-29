@@ -519,8 +519,14 @@ class Launcher {
 
     // backwards support for node v12 + v14.14+
     // https://nodejs.org/api/deprecations.html#DEP0147
-    const rmSync = this.fs.rmSync || this.fs.rmdirSync;
-    rmSync(this.userDataDir, {recursive: true, force: true, maxRetries: 10});
+    try {
+      const rmSync = this.fs.rmSync || this.fs.rmdirSync;
+      rmSync(this.userDataDir, {recursive: true, force: true, maxRetries: 10, retryDelay: 250});
+    } catch (err) {
+      log.warn(
+          'ChromeLauncher',
+          `Could not delete temporary directory ${this.userDataDir}: ${err.message}`);
+    }
   }
 };
 
