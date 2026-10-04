@@ -8,6 +8,7 @@
 import {describe, it, after} from 'node:test';
 import assert from 'assert';
 import {spawn, spawnSync, type ChildProcess} from 'child_process';
+import {existsSync} from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'url';
 
@@ -43,6 +44,7 @@ function killTree(pid: number) {
 type ChildResult = {
   parent: number;
   chrome: number[];
+  tempProfiles: string[];
   code: number | null;
   signal: NodeJS.Signals | null;
 };
@@ -70,7 +72,7 @@ function launchAndSignal(
       const line = stdout.split('\n').find((entry) => entry.startsWith('{'));
       if (!line || announced) return;
       announced = true;
-      const info = JSON.parse(line) as {parent: number; chrome: number[]};
+      const info = JSON.parse(line) as {parent: number; chrome: number[]; tempProfiles: string[]};
       leaked.push(...info.chrome);
       setTimeout(() => {
         try {
@@ -88,11 +90,16 @@ function launchAndSignal(
         reject(new Error(`child exited before launch (${code} ${exitSignal})\n${stderr}`));
         return;
       }
-      const info = JSON.parse(stdout.split('\n').find((entry) => entry.startsWith('{'))!);
+      const info = JSON.parse(stdout.split('\n').find((entry) => entry.startsWith('{'))!) as {
+        parent: number;
+        chrome: number[];
+        tempProfiles: string[];
+      };
       setTimeout(() => {
         resolve({
           parent: info.parent,
           chrome: info.chrome,
+          tempProfiles: info.tempProfiles,
           code,
           signal: exitSignal,
         });
@@ -120,6 +127,15 @@ describe('termination signals', () => {
     assert.strictEqual(result.code, 143);
     assert.strictEqual(result.signal, null);
     assert.strictEqual(isAlive(result.chrome[0]), false);
+  });
+
+  it('removes the temporary profile on SIGTERM', {timeout: 30_000}, async () => {
+    const result = await launchAndSignal('SIGTERM');
+    assert.ok(result.tempProfiles.length > 0);
+    assert.deepStrictEqual(
+        result.tempProfiles.map(profile => existsSync(profile)),
+        result.tempProfiles.map(() => false),
+    );
   });
 
   it('kills every live Chrome when one launch is still active', {timeout: 30_000}, async () => {
