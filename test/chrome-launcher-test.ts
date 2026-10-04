@@ -365,6 +365,70 @@ describe('Launcher', () => {
       }
     });
 
+    it('finds a marker that starts exactly at the tail boundary', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const marker = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        const contents =
+            'x'.repeat(100) + marker + 'x'.repeat(1024 * 1024 - marker.length);
+        await withLog(contents, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('uses the last marker when several markers fit in the tail', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const stale = 'DevTools listening on ws://127.0.0.1:1/\n';
+        const current = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        const contents = stale + 'x'.repeat(64 * 1024) + current;
+        await withLog(contents, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('rejects when the tail has no listening marker', async () => {
+      await withLog('Chrome failed before opening the debugging port.\n', async userDataDir => {
+        const launcher = new Launcher({
+          userDataDir,
+          connectionPollInterval: 1,
+          maxConnectionRetries: 0,
+          logLevel: 'silent',
+        });
+        launcher.port = 0;
+
+        await assert.rejects(
+            launcher.waitUntilReady(), /waiting for dynamic debugging port in chrome-err.log/);
+        assert.strictEqual(launcher.port, 0);
+      });
+    });
+
     it('reads the debugging port from a log larger than 2 GiB', async () => {
       const {server, port} = await listenOnLocalPort();
       const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-launcher-'));
