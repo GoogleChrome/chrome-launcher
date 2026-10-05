@@ -18,7 +18,9 @@ import log from 'lighthouse-logger';
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
 const _SIGINT = 'SIGINT';
+const _SIGTERM = 'SIGTERM';
 const _SIGINT_EXIT_CODE = 130;
+const _SIGTERM_EXIT_CODE = 143;
 const _SUPPORTED_PLATFORMS = new Set(['darwin', 'linux', 'win32', 'wsl']);
 
 type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
@@ -60,19 +62,33 @@ export interface ModuleOverrides {
   spawn?: typeof childProcess.spawn;
 }
 
-const sigintListener = () => {
+// SIGINT is Ctrl-C. SIGTERM is the default `kill` and what process supervisors
+// send. Chrome is spawned detached outside Windows, so it outlives the parent
+// unless this listener runs killAll() first. See #367.
+const terminationListener = (signal: NodeJS.Signals) => {
   killAll();
-  process.exit(_SIGINT_EXIT_CODE);
+  process.exit(signal === _SIGTERM ? _SIGTERM_EXIT_CODE : _SIGINT_EXIT_CODE);
 };
+
+function listenForTermination() {
+  process.on(_SIGINT, terminationListener);
+  process.on(_SIGTERM, terminationListener);
+}
+
+function unlistenForTermination() {
+  process.removeListener(_SIGINT, terminationListener);
+  process.removeListener(_SIGTERM, terminationListener);
+}
 
 async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   opts.handleSIGINT = defaults(opts.handleSIGINT, true);
 
   const instance = new Launcher(opts);
 
-  // Kill spawned Chrome process in case of ctrl-C.
+  // Kill spawned Chrome on SIGINT and SIGTERM. Callers who set
+  // `handleSIGINT: false` own both signals themselves.
   if (opts.handleSIGINT && instances.size === 0) {
-    process.on(_SIGINT, sigintListener);
+    listenForTermination();
   }
   instances.add(instance);
 
@@ -81,7 +97,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
   const kill = () => {
     instances.delete(instance);
     if (instances.size === 0) {
-      process.removeListener(_SIGINT, sigintListener);
+      unlistenForTermination();
     }
     instance.kill();
   };
