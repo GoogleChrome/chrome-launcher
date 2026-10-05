@@ -13,6 +13,9 @@ import {DEFAULT_FLAGS} from '../dist/flags.js';
 import sinon from 'sinon';
 import * as assert from 'assert';
 import fs from 'fs';
+import net from 'net';
+import os from 'os';
+import path from 'path';
 
 import log from 'lighthouse-logger';
 
@@ -291,6 +294,172 @@ describe('Launcher', () => {
 
       const chromePath = getChromePath();
       assert.strictEqual(chromePath, launchedPath);
+    });
+  });
+
+  describe('dynamic debugging port from chrome-err.log', () => {
+    async function listenOnLocalPort(): Promise<{server: net.Server, port: number}> {
+      const server = net.createServer();
+      await new Promise<void>(resolve => server.listen(0, '127.0.0.1', () => resolve()));
+      const address = server.address();
+      if (address === null || typeof address === 'string') {
+        throw new Error('expected a TCP port');
+      }
+      return {server, port: address.port};
+    }
+
+    async function withLog(contents: string, run: (userDataDir: string) => Promise<void>) {
+      const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-launcher-'));
+      fs.writeFileSync(path.join(userDataDir, 'chrome-err.log'), contents);
+      try {
+        await run(userDataDir);
+      } finally {
+        fs.rmSync(userDataDir, {recursive: true, force: true});
+      }
+    }
+
+    it('uses the latest listening port, including when the log is larger than one read', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const stale = 'DevTools listening on ws://127.0.0.1:1/\n';
+        const filler = 'x'.repeat(2 * 1024 * 1024);
+        const current = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        await withLog(stale + filler + current, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('uses the latest listening port when the whole log still fits in one read', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const stale = 'DevTools listening on ws://127.0.0.1:1/\n';
+        const current = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        await withLog(stale + current, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('finds a marker that starts exactly at the tail boundary', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const marker = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        const contents =
+            'x'.repeat(100) + marker + 'x'.repeat(1024 * 1024 - marker.length);
+        await withLog(contents, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('uses the last marker when several markers fit in the tail', async () => {
+      const {server, port} = await listenOnLocalPort();
+      try {
+        const stale = 'DevTools listening on ws://127.0.0.1:1/\n';
+        const current = `DevTools listening on ws://127.0.0.1:${port}/\n`;
+        const contents = stale + 'x'.repeat(64 * 1024) + current;
+        await withLog(contents, async userDataDir => {
+          const launcher = new Launcher({
+            userDataDir,
+            connectionPollInterval: 1,
+            maxConnectionRetries: 2,
+            logLevel: 'silent',
+          });
+          launcher.port = 0;
+
+          await launcher.waitUntilReady();
+
+          assert.strictEqual(launcher.port, port);
+        });
+      } finally {
+        server.close();
+      }
+    });
+
+    it('rejects when the tail has no listening marker', async () => {
+      await withLog('Chrome failed before opening the debugging port.\n', async userDataDir => {
+        const launcher = new Launcher({
+          userDataDir,
+          connectionPollInterval: 1,
+          maxConnectionRetries: 0,
+          logLevel: 'silent',
+        });
+        launcher.port = 0;
+
+        await assert.rejects(
+            launcher.waitUntilReady(), /waiting for dynamic debugging port in chrome-err.log/);
+        assert.strictEqual(launcher.port, 0);
+      });
+    });
+
+    it('reads the debugging port from a log larger than 2 GiB', async () => {
+      const {server, port} = await listenOnLocalPort();
+      const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chrome-launcher-'));
+      const logPath = path.join(userDataDir, 'chrome-err.log');
+      const reportedSize = 3055630622;
+      try {
+        const fd = fs.openSync(logPath, 'w');
+        fs.ftruncateSync(fd, reportedSize);
+        const line = Buffer.from(`DevTools listening on ws://127.0.0.1:${port}/\n`);
+        fs.writeSync(fd, line, 0, line.length, reportedSize - line.length);
+        fs.closeSync(fd);
+
+        const allocated = fs.statSync(logPath).blocks * 512;
+        assert.ok(allocated < 64 * 1024 * 1024);
+        assert.throws(() => fs.readFileSync(logPath), {code: 'ERR_FS_FILE_TOO_LARGE'});
+
+        const launcher = new Launcher({
+          userDataDir,
+          connectionPollInterval: 1,
+          maxConnectionRetries: 2,
+          logLevel: 'silent',
+        });
+        launcher.port = 0;
+
+        await launcher.waitUntilReady();
+
+        assert.strictEqual(launcher.port, port);
+      } finally {
+        server.close();
+        fs.rmSync(userDataDir, {recursive: true, force: true});
+      }
     });
   });
 });
