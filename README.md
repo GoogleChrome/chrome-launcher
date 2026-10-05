@@ -53,7 +53,7 @@ npm install chrome-launcher
   // Do note, if you set preferences when using your default profile it will overwrite these
   prefs: {[key: string]: Object};
 
-  // (optional) Close the Chrome process on `Ctrl-C`
+  // (optional) Close the Chrome process on SIGINT (`Ctrl-C`) and SIGTERM
   // Default: true
   handleSIGINT: boolean;
 
