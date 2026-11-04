@@ -27,6 +27,10 @@ type SupportedPlatforms = 'darwin'|'linux'|'win32'|'wsl';
 
 const instances = new Set<Launcher>();
 
+// chrome-err.log is opened append-only and can grow past 2 GiB. readFileSync throws
+// ERR_FS_FILE_TOO_LARGE at that size, so readiness only looks at the tail.
+const STDERR_LOG_TAIL_BYTES = 1024 * 1024;
+
 type JSONLike =|{[property: string]: JSONLike}|readonly JSONLike[]|string|number|boolean|null;
 
 export interface Options {
@@ -394,6 +398,36 @@ class Launcher {
     }
   }
 
+  private readChromeStderr(): string {
+    const filePath = `${this.userDataDir}/chrome-err.log`;
+    const size = fs.statSync(filePath).size;
+    const length = Math.min(size, STDERR_LOG_TAIL_BYTES);
+    if (length <= 0) {
+      return '';
+    }
+
+    const fd = fs.openSync(filePath, 'r');
+    try {
+      const buffer = Buffer.alloc(length);
+      const bytesRead = fs.readSync(fd, buffer, 0, length, size - length);
+      return buffer.toString('utf8', 0, bytesRead);
+    } finally {
+      fs.closeSync(fd);
+    }
+  }
+
+  // The log is append-only, so the last listening line is the current launch.
+  private debuggingPortFromStderr(stderr: string): number|undefined {
+    const pattern = /DevTools listening on ws:\/\/.*?:(\d+)\//g;
+    let port: number|undefined;
+    let match: RegExpExecArray|null = pattern.exec(stderr);
+    while (match) {
+      port = parseInt(match[1], 10);
+      match = pattern.exec(stderr);
+    }
+    return port;
+  }
+
   // resolves if ready, rejects otherwise
   private isDebuggerReady(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -432,11 +466,10 @@ class Launcher {
         const checkReady = () => {
           if (launcher.port === 0) {
             try {
-              const stderr =
-                  fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
-              const match = stderr.match(/DevTools listening on ws:\/\/.*?:(\d+)\//);
-              if (match) {
-                launcher.port = parseInt(match[1], 10);
+              const stderr = launcher.readChromeStderr();
+              const port = launcher.debuggingPortFromStderr(stderr);
+              if (port !== undefined) {
+                launcher.port = port;
                 log.verbose(
                     'ChromeLauncher', `Discovered Chrome listening on port ${launcher.port}.`);
               }
@@ -463,8 +496,7 @@ class Launcher {
                 log.error('ChromeLauncher', err.message);
                 let stderr = '';
                 try {
-                  stderr =
-                      fs.readFileSync(`${this.userDataDir}/chrome-err.log`, {encoding: 'utf-8'});
+                  stderr = launcher.readChromeStderr();
                 } catch (readErr) {
                   stderr = `Failed to read log: ${readErr.message}`;
                 }
