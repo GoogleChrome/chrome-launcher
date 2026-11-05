@@ -1,3 +1,12 @@
+## v1.2.3 (Thu, Nov 5 2026)
+
+* `8afeee2b` ci: fix zizmor findings, pin actions to shas, bump to v7 ([#374](https://github.com/GoogleChrome/chrome-launcher/pull/374))
+* `ee50efbe` docs: add releasing.md ([#375](https://github.com/GoogleChrome/chrome-launcher/pull/375))
+* `27c0222b` flags: remove RenderDocument from disabled features ([#372](https://github.com/GoogleChrome/chrome-launcher/pull/372))
+* `9b543fe9` ci: use stable LTS Node versions instead of 'latest' ([#373](https://github.com/GoogleChrome/chrome-launcher/pull/373))
+* `017c7500` fix: read the tail of chrome-err.log ([#369](https://github.com/GoogleChrome/chrome-launcher/pull/369))
+* `a8e688f6` fix: kill detached Chrome on SIGTERM ([#368](https://github.com/GoogleChrome/chrome-launcher/pull/368))
+
 ## v1.2.2 (Tue, Sep 29 2026)
 
 * `8f032f9b` Use `--remote-debugging-port=0` and `fs.mkdtempSync` ([#366](https://github.com/GoogleChrome/chrome-launcher/pull/366))
