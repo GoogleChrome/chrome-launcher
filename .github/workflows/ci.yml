@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 'latest', 'lts/*', 'lts/-1' ]
+        node: [ 'lts/*', 'lts/-1', 'lts/-2' ]
     name: basics (node ${{ matrix.node }})
 
     steps:
