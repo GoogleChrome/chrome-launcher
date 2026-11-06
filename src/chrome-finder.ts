@@ -26,6 +26,8 @@ export function darwinFast(): string|undefined {
     process.env.CHROME_PATH,
     process.env.LIGHTHOUSE_CHROMIUM_PATH,
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
+    '/Applications/Google Chrome Dev.app/Contents/MacOS/Google Chrome Dev',
+    '/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ];
 
@@ -37,7 +39,12 @@ export function darwinFast(): string|undefined {
 }
 
 export function darwin() {
-  const suffixes = ['/Contents/MacOS/Google Chrome Canary', '/Contents/MacOS/Google Chrome'];
+  const suffixes = [
+    '/Contents/MacOS/Google Chrome Canary',
+    '/Contents/MacOS/Google Chrome Dev',
+    '/Contents/MacOS/Google Chrome Beta',
+    '/Contents/MacOS/Google Chrome',
+  ];
 
   const LSREGISTER = '/System/Library/Frameworks/CoreServices.framework' +
       '/Versions/A/Frameworks/LaunchServices.framework' +
@@ -52,7 +59,7 @@ export function darwin() {
 
   execSync(
       `${LSREGISTER} -dump` +
-      ' | grep -i \'google chrome\\( canary\\)\\?\\.app\'' +
+      ' | grep -i \'google chrome\\( canary\\| dev\\| beta\\)\\?\\.app\'' +
       ' | awk \'{$1=""; print $0}\'')
       .toString()
       .split(newLineRegex)
@@ -71,10 +78,16 @@ export function darwin() {
   const home = escapeRegExp(process.env.HOME || homedir());
   const priorities: Priorities = [
     {regex: new RegExp(`^${home}/Applications/.*Chrome\\.app`), weight: 50},
-    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 51},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Beta\\.app`), weight: 51},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Dev\\.app`), weight: 52},
+    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 53},
     {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
-    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
-    {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
+    {regex: /^\/Applications\/.*Chrome Beta.app/, weight: 101},
+    {regex: /^\/Applications\/.*Chrome Dev.app/, weight: 102},
+    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 103},
+    {regex: /^\/Volumes\/.*Chrome.app/, weight: -4},
+    {regex: /^\/Volumes\/.*Chrome Beta.app/, weight: -3},
+    {regex: /^\/Volumes\/.*Chrome Dev.app/, weight: -2},
     {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
   ];
 
@@ -129,9 +142,11 @@ export function linux() {
     installations = installations.concat(findChromeExecutables(folder));
   });
 
-  // Look for google-chrome(-stable) & chromium(-browser) executables by using the which command
+  // Look for google-chrome(-stable|-beta|-unstable) & chromium(-browser) executables by using the which command
   const executables = [
     'google-chrome-stable',
+    'google-chrome-beta',
+    'google-chrome-unstable',
     'google-chrome',
     'chromium-browser',
     'chromium',
@@ -154,7 +169,9 @@ export function linux() {
   }
 
   const priorities: Priorities = [
-    {regex: /chrome-wrapper$/, weight: 51},
+    {regex: /chrome-wrapper$/, weight: 53},
+    {regex: /google-chrome-unstable$/, weight: 52},
+    {regex: /google-chrome-beta$/, weight: 51},
     {regex: /google-chrome-stable$/, weight: 50},
     {regex: /google-chrome$/, weight: 49},
     {regex: /chromium-browser$/, weight: 48},
@@ -187,6 +204,8 @@ export function win32() {
   const installations: Array<string> = [];
   const suffixes = [
     `${path.sep}Google${path.sep}Chrome SxS${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}Google${path.sep}Chrome Dev${path.sep}Application${path.sep}chrome.exe`,
+    `${path.sep}Google${path.sep}Chrome Beta${path.sep}Application${path.sep}chrome.exe`,
     `${path.sep}Google${path.sep}Chrome${path.sep}Application${path.sep}chrome.exe`
   ];
   const prefixes = [
