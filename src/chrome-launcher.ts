@@ -33,6 +33,16 @@ const STDERR_LOG_TAIL_BYTES = 1024 * 1024;
 
 type JSONLike =|{[property: string]: JSONLike}|readonly JSONLike[]|string|number|boolean|null;
 
+const windowsExePathRegex = /\.exe$/i;
+const windowsMountPathRegex = /^\/mnt\/[a-z]\//i;
+
+function isWindowsChromePath(chromePath: string | undefined) {
+  if (!chromePath) {
+    return false;
+  }
+  return windowsExePathRegex.test(chromePath) || windowsMountPathRegex.test(chromePath);
+}
+
 export interface Options {
   startingUrl?: string;
   chromeFlags?: Array<string>;
@@ -216,8 +226,8 @@ class Launcher {
 
     if (!this.useDefaultProfile) {
       // Place Chrome profile in a custom location we'll rm -rf later
-      // If in WSL, we need to use the Windows format
-      flags.push(`--user-data-dir=${isWsl ? toWin32Path(this.userDataDir) : this.userDataDir}`);
+      // If in WSL and using Windows Chrome binary, we need to use the Windows format
+      flags.push(`--user-data-dir=${isWsl  && isWindowsChromePath(this.chromePath) ? toWin32Path(this.userDataDir) : this.userDataDir}`);
     }
 
     if (process.env.HEADLESS) flags.push('--headless');
