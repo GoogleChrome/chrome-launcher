@@ -9,9 +9,13 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      # Open a single PR for all production dependency updates...
+      # Open a single PR for minor/patch production dependency updates. Major
+      # bumps can break consumers of this library, so they get their own PRs...
       prod-dependencies:
         dependency-type: production
+        update-types:
+          - "minor"
+          - "patch"
         patterns:
           - "*"
       # ...and a single PR for all development dependency updates.

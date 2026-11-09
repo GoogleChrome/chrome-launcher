@@ -32,6 +32,14 @@
     "is-wsl": "^3.1.1",
     "lighthouse-logger": "^2.0.2"
   },
+  "peerDependencies": {
+    "@types/node": "*"
+  },
+  "peerDependenciesMeta": {
+    "@types/node": {
+      "optional": true
+    }
+  },
   "version": "1.2.3",
   "types": "./dist/index.d.ts",
   "description": "Launch latest Chrome with the Devtools Protocol port open",
