@@ -21,6 +21,10 @@ export function defaults<T>(val: T|undefined, def: T): T {
   return typeof val === 'undefined' ? def : val;
 }
 
+export function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
+}
+
 export async function delay(time: number) {
   return new Promise(resolve => setTimeout(resolve, time));
 }

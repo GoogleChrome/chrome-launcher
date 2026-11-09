@@ -12,7 +12,7 @@ import * as net from 'net';
 
 import * as chromeFinder from './chrome-finder.js';
 import {DEFAULT_FLAGS} from './flags.js';
-import {ChromeNotInstalledError, defaults, delay, getPlatform, InvalidUserDataDirectoryError, makeTmpDir, toWin32Path, UnsupportedPlatformError} from './utils.js';
+import {ChromeNotInstalledError, defaults, delay, getErrorMessage, getPlatform, InvalidUserDataDirectoryError, makeTmpDir, toWin32Path, UnsupportedPlatformError} from './utils.js';
 
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
@@ -124,7 +124,7 @@ function getChromePath(): string {
 }
 
 function killAll(): Array<Error> {
-  let errors = [];
+  const errors: Error[] = [];
   for (const instance of instances) {
     try {
       instance.kill();
@@ -132,7 +132,7 @@ function killAll(): Array<Error> {
       // this means erroring instances remain in the Set
       instances.delete(instance);
     } catch (err) {
-      errors.push(err);
+      errors.push(err instanceof Error ? err : new Error(String(err)));
     }
   }
   return errors;
@@ -140,7 +140,7 @@ function killAll(): Array<Error> {
 
 class Launcher {
   private tmpDirandPidFileReady = false;
-  private pidFile: string;
+  private pidFile?: string;
   private startingUrl: string;
   private outFile?: number;
   private errFile?: number;
@@ -293,7 +293,7 @@ class Launcher {
         this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
       }
     } catch (err) {
-      log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
+      log.log('ChromeLauncher', `Failed to set browser prefs: ${getErrorMessage(err)}`);
     }
   }
 
@@ -361,7 +361,7 @@ class Launcher {
         env: this.envVars
       });
 
-      if (this.chromeProcess.pid) {
+      if (this.chromeProcess.pid && this.pidFile) {
         this.fs.writeFileSync(this.pidFile, this.chromeProcess.pid.toString());
       }
       if (this.useRemoteDebuggingPipe) {
@@ -494,7 +494,7 @@ class Launcher {
                 try {
                   stderr = launcher.readChromeStderr();
                 } catch (readErr) {
-                  stderr = `Failed to read log: ${readErr.message}`;
+                  stderr = `Failed to read log: ${getErrorMessage(readErr)}`;
                 }
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
@@ -533,7 +533,7 @@ class Launcher {
         }
       }
     } catch (err) {
-      const message = `Chrome could not be killed ${err.message}`;
+      const message = `Chrome could not be killed ${getErrorMessage(err)}`;
       log.warn('ChromeLauncher', message);
     }
     this.destroyTmp();
@@ -567,7 +567,7 @@ class Launcher {
     } catch (err) {
       log.warn(
           'ChromeLauncher',
-          `Could not delete temporary directory ${this.userDataDir}: ${err.message}`);
+          `Could not delete temporary directory ${this.userDataDir}: ${getErrorMessage(err)}`);
     }
   }
 };
