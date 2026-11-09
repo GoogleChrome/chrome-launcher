@@ -3,17 +3,16 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-'use strict';
 
 import * as childProcess from 'child_process';
+import {ChildProcess, spawn, spawnSync} from 'child_process';
 import * as fs from 'fs';
+import log from 'lighthouse-logger';
 import * as net from 'net';
+
 import * as chromeFinder from './chrome-finder.js';
 import {DEFAULT_FLAGS} from './flags.js';
-import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
-import {ChildProcess} from 'child_process';
-import {spawn, spawnSync} from 'child_process';
-import log from 'lighthouse-logger';
+import {ChromeNotInstalledError, defaults, delay, getErrorMessage, getPlatform, InvalidUserDataDirectoryError, makeTmpDir, toWin32Path, UnsupportedPlatformError} from './utils.js';
 
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
@@ -125,7 +124,7 @@ function getChromePath(): string {
 }
 
 function killAll(): Array<Error> {
-  let errors = [];
+  const errors: Error[] = [];
   for (const instance of instances) {
     try {
       instance.kill();
@@ -133,7 +132,7 @@ function killAll(): Array<Error> {
       // this means erroring instances remain in the Set
       instances.delete(instance);
     } catch (err) {
-      errors.push(err);
+      errors.push(err instanceof Error ? err : new Error(String(err)));
     }
   }
   return errors;
@@ -141,7 +140,7 @@ function killAll(): Array<Error> {
 
 class Launcher {
   private tmpDirandPidFileReady = false;
-  private pidFile: string;
+  private pidFile?: string;
   private startingUrl: string;
   private outFile?: number;
   private errFile?: number;
@@ -258,14 +257,12 @@ class Launcher {
     try {
       this.outFile = fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
       this.errFile = fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
-    } catch (_) {
+    } catch {
       // If userDataDir does not exist on real filesystem (mocked makeTmpDir), ignore.
     }
 
     this.setBrowserPrefs();
 
-    // fix for Node4
-    // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.userDataDir}/chrome.pid`;
 
     log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
@@ -296,7 +293,7 @@ class Launcher {
         this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
       }
     } catch (err) {
-      log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
+      log.log('ChromeLauncher', `Failed to set browser prefs: ${getErrorMessage(err)}`);
     }
   }
 
@@ -311,7 +308,7 @@ class Launcher {
             'ChromeLauncher',
             `Found existing Chrome already running using port ${this.port}, using that.`);
         return;
-      } catch (err) {
+      } catch {
         if (this.portStrictMode) {
           throw new Error(`found no Chrome at port ${this.requestedPort}`);
         }
@@ -335,7 +332,6 @@ class Launcher {
     }
 
     this.pid = await this.spawnProcess(this.chromePath);
-    return Promise.resolve();
   }
 
   private async spawnProcess(execPath: string) {
@@ -365,7 +361,7 @@ class Launcher {
         env: this.envVars
       });
 
-      if (this.chromeProcess.pid) {
+      if (this.chromeProcess.pid && this.pidFile) {
         this.fs.writeFileSync(this.pidFile, this.chromeProcess.pid.toString());
       }
       if (this.useRemoteDebuggingPipe) {
@@ -473,7 +469,7 @@ class Launcher {
                 log.verbose(
                     'ChromeLauncher', `Discovered Chrome listening on port ${launcher.port}.`);
               }
-            } catch (_) {
+            } catch {
               // Ignore read errors until retries expire
             }
           }
@@ -498,7 +494,7 @@ class Launcher {
                 try {
                   stderr = launcher.readChromeStderr();
                 } catch (readErr) {
-                  stderr = `Failed to read log: ${readErr.message}`;
+                  stderr = `Failed to read log: ${getErrorMessage(readErr)}`;
                 }
                 log.error(
                     'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
@@ -537,7 +533,7 @@ class Launcher {
         }
       }
     } catch (err) {
-      const message = `Chrome could not be killed ${err.message}`;
+      const message = `Chrome could not be killed ${getErrorMessage(err)}`;
       log.warn('ChromeLauncher', message);
     }
     this.destroyTmp();
@@ -547,7 +543,7 @@ class Launcher {
     if (this.outFile) {
       try {
         fs.closeSync(this.outFile);
-      } catch (_) {
+      } catch {
       }
       delete this.outFile;
     }
@@ -555,7 +551,7 @@ class Launcher {
     if (this.errFile) {
       try {
         fs.closeSync(this.errFile);
-      } catch (_) {
+      } catch {
       }
       delete this.errFile;
     }
@@ -565,15 +561,13 @@ class Launcher {
       return;
     }
 
-    // backwards support for node v12 + v14.14+
-    // https://nodejs.org/api/deprecations.html#DEP0147
     try {
-      const rmSync = this.fs.rmSync || this.fs.rmdirSync;
-      rmSync(this.userDataDir, {recursive: true, force: true, maxRetries: 10, retryDelay: 250});
+      this.fs.rmSync(
+          this.userDataDir, {recursive: true, force: true, maxRetries: 10, retryDelay: 250});
     } catch (err) {
       log.warn(
           'ChromeLauncher',
-          `Could not delete temporary directory ${this.userDataDir}: ${err.message}`);
+          `Could not delete temporary directory ${this.userDataDir}: ${getErrorMessage(err)}`);
     }
   }
 };

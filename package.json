@@ -3,7 +3,7 @@
   "main": "./dist/index.js",
   "type": "module",
   "engines": {
-    "node": ">=12.13.0"
+    "node": ">=16"
   },
   "scripts": {
     "build": "tsc",
@@ -11,23 +11,34 @@
     "test": "test/run-tests.sh",
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
-    "type-check": "tsc --allowJs --checkJs --noEmit --target es2019 *.js",
     "reset-link": "(yarn unlink || true) && yarn link && yarn --cwd node_modules/lighthouse/ link chrome-launcher"
   },
+  "files": [
+    "dist",
+    "bin"
+  ],
   "bin": {
-    "print-chrome-path": "bin/print-chrome-path.cjs"
+    "print-chrome-path": "bin/print-chrome-path.js"
   },
   "devDependencies": {
-    "@types/sinon": "^9.0.1",
-    "clang-format": "^1.0.50",
-    "sinon": "^9.0.1",
-    "typescript": "^4.1.2"
+    "@types/node": "^26.6.6",
+    "@types/sinon": "^22.0.2",
+    "clang-format": "^1.8.0",
+    "sinon": "^22.1.0",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@types/node": "*",
-    "escape-string-regexp": "^4.0.0",
-    "is-wsl": "^2.2.0",
-    "lighthouse-logger": "^2.0.1"
+    "escape-string-regexp": "^5.0.0",
+    "is-wsl": "^3.1.1",
+    "lighthouse-logger": "^2.0.2"
+  },
+  "peerDependencies": {
+    "@types/node": "*"
+  },
+  "peerDependenciesMeta": {
+    "@types/node": {
+      "optional": true
+    }
   },
   "version": "1.2.3",
   "types": "./dist/index.d.ts",

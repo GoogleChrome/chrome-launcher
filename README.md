@@ -59,7 +59,7 @@ npm install chrome-launcher
 
   // (optional) Explicit path of intended Chrome binary
   // * If this `chromePath` option is defined, it will be used.
-  // * Otherwise, the `CHROME_PATH` env variable will be used if set. (`LIGHTHOUSE_CHROMIUM_PATH` is deprecated)
+  // * Otherwise, the `CHROME_PATH` env variable will be used if set.
   // * Otherwise, a detected Chrome Canary will be used if found
   // * Otherwise, a detected Chrome (stable) will be used
   chromePath: string;
@@ -193,20 +193,17 @@ as shown in [test/load-extension-test.ts](test/load-extension-test.ts).
 
 ### Continuous Integration
 
-In a CI environment like Travis, Chrome may not be installed. If you want to use `chrome-launcher`, Travis can [install Chrome at run time with an addon](https://docs.travis-ci.com/user/chrome).  Alternatively, you can also install Chrome using the [`download-chrome.sh`](https://raw.githubusercontent.com/GoogleChrome/chrome-launcher/v0.8.0/scripts/download-chrome.sh) script.
+GitHub Actions hosted runners come with Chrome preinstalled, so
+`chrome-launcher` works out of the box.
 
-Then in `.travis.yml`, use it like so:
+In other CI environments Chrome may not be installed. You can install it with
+[`@puppeteer/browsers`](https://pptr.dev/browsers-api) and point
+`chrome-launcher` at it with the `CHROME_PATH` env variable (or the `chromePath`
+option):
 
-```yaml
-language: node_js
-install:
-  - yarn install
-before_script:
-  - export DISPLAY=:99.0
-  - export CHROME_PATH="$(pwd)/chrome-linux/chrome"
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3 # wait for xvfb to boot
-
-addons:
-  chrome: stable
+```sh
+export CHROME_PATH="$(npx @puppeteer/browsers install chrome@stable --path "$PWD/.cache/chrome" --format '{{path}}')"
 ```
+
+If you need headful Chrome on a Linux machine without a display, run your
+command under `xvfb-run`, for example `xvfb-run --auto-servernum npm test`.

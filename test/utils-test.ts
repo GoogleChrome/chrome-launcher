@@ -14,8 +14,6 @@ import {describe, it, beforeEach, afterEach} from "node:test";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
-
 import * as assert from 'assert';
 import fs from 'fs';
 import os from 'os';
@@ -25,7 +23,7 @@ import sinon from 'sinon';
 
 const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
 
-const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
+const asBuffer = (str: string) => Buffer.from(str, 'utf-8');
 
 describe('toWin32Path', () => {
   beforeEach(() => execFileSyncStub.reset());
