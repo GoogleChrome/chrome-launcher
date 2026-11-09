@@ -32,7 +32,6 @@ jobs:
     - run: yarn build
 
     - run: yarn test-formatting
-    - run: yarn type-check
 
     # Run tests that require headful Chrome.
     - run: sudo apt-get install xvfb

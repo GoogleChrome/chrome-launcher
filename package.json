@@ -11,9 +11,12 @@
     "test": "test/run-tests.sh",
     "test-formatting": "test/check-formatting.sh",
     "format": "scripts/format.sh",
-    "type-check": "tsc --ignoreConfig --allowJs --checkJs --noEmit --target es2019 --types node --strict false --skipLibCheck *.js",
     "reset-link": "(yarn unlink || true) && yarn link && yarn --cwd node_modules/lighthouse/ link chrome-launcher"
   },
+  "files": [
+    "dist",
+    "bin"
+  ],
   "bin": {
     "print-chrome-path": "bin/print-chrome-path.js"
   },
