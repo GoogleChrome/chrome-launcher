@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
-        "module": "esnext",
-        "moduleResolution": "node",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "rootDir": "src",
+        "types": ["node"],
+        "skipLibCheck": true,
         "outDir": "dist",
         "target": "es2019",
         "declaration": true,
+        "strict": false,
         "noImplicitAny": true,
         "inlineSourceMap": true,
         "noEmitOnError": false,
