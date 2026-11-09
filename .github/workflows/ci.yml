@@ -30,6 +30,8 @@ jobs:
 
     - run: yarn --frozen-lockfile --network-timeout 1000000
     - run: yarn build
+    - name: Type-check tests
+      run: yarn tsc -p test
 
     - run: yarn test-formatting
 

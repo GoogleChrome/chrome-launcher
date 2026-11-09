@@ -193,12 +193,17 @@ as shown in [test/load-extension-test.ts](test/load-extension-test.ts).
 
 ### Continuous Integration
 
-GitHub Actions hosted runners come with Chrome preinstalled, so `chrome-launcher` works out of the box.
+GitHub Actions hosted runners come with Chrome preinstalled, so
+`chrome-launcher` works out of the box.
 
-In other CI environments Chrome may not be installed. You can install it with [`@puppeteer/browsers`](https://pptr.dev/browsers-api) and point `chrome-launcher` at it with the `CHROME_PATH` env variable (or the `chromePath` option):
+In other CI environments Chrome may not be installed. You can install it with
+[`@puppeteer/browsers`](https://pptr.dev/browsers-api) and point
+`chrome-launcher` at it with the `CHROME_PATH` env variable (or the `chromePath`
+option):
 
 ```sh
 export CHROME_PATH="$(npx @puppeteer/browsers install chrome@stable --path "$PWD/.cache/chrome" --format '{{path}}')"
 ```
 
-If you need headful Chrome on a Linux machine without a display, run your command under `xvfb-run`, for example `xvfb-run --auto-servernum npm test`.
+If you need headful Chrome on a Linux machine without a display, run your
+command under `xvfb-run`, for example `xvfb-run --auto-servernum npm test`.

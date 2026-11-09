@@ -23,7 +23,7 @@ import sinon from 'sinon';
 
 const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
 
-const asBuffer = (str: string): Buffer => Buffer.from(str, 'utf-8');
+const asBuffer = (str: string) => Buffer.from(str, 'utf-8');
 
 describe('toWin32Path', () => {
   beforeEach(() => execFileSyncStub.reset());
