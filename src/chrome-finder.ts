@@ -3,16 +3,14 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-'use strict';
 
-import fs from 'fs';
-import path from 'path';
-import {homedir} from 'os';
-import {execSync, execFileSync} from 'child_process';
+import {execFileSync, execSync} from 'child_process';
 import escapeRegExp from 'escape-string-regexp';
-import log from 'lighthouse-logger';
+import fs from 'fs';
+import {homedir} from 'os';
+import path from 'path';
 
-import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils.js';
+import {ChromePathNotSetError, getWSLLocalAppDataPath, toWSLPath} from './utils.js';
 
 const newLineRegex = /\r?\n/;
 
@@ -24,7 +22,6 @@ type Priorities = Array<{regex: RegExp, weight: number}>;
 export function darwinFast(): string|undefined {
   const priorityOptions: Array<string|undefined> = [
     process.env.CHROME_PATH,
-    process.env.LIGHTHOUSE_CHROMIUM_PATH,
     '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary',
     '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   ];
@@ -78,10 +75,6 @@ export function darwin() {
     {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
   ];
 
-  if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 150});
-  }
-
   if (process.env.CHROME_PATH) {
     priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 151});
   }
@@ -93,13 +86,6 @@ export function darwin() {
 function resolveChromePath() {
   if (canAccess(process.env.CHROME_PATH)) {
     return process.env.CHROME_PATH;
-  }
-
-  if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
-    log.warn(
-        'ChromeLauncher',
-        'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
-    return process.env.LIGHTHOUSE_CHROMIUM_PATH;
   }
 
   return undefined;
@@ -144,7 +130,7 @@ export function linux() {
       if (canAccess(chromePath)) {
         installations.push(chromePath);
       }
-    } catch (e) {
+    } catch {
       // Not installed.
     }
   });
@@ -160,11 +146,6 @@ export function linux() {
     {regex: /chromium-browser$/, weight: 48},
     {regex: /chromium$/, weight: 47},
   ];
-
-  if (process.env.LIGHTHOUSE_CHROMIUM_PATH) {
-    priorities.unshift(
-        {regex: new RegExp(escapeRegExp(process.env.LIGHTHOUSE_CHROMIUM_PATH)), weight: 100});
-  }
 
   if (process.env.CHROME_PATH) {
     priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 101});
@@ -233,7 +214,7 @@ function canAccess(file: string|undefined): Boolean {
   try {
     fs.accessSync(file);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -258,7 +239,7 @@ function findChromeExecutables(folder: string): Array<string> {
     try {
       execPaths = execSync(
           `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
-    } catch (e) {
+    } catch {
       execPaths = execSync(
           `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
     }

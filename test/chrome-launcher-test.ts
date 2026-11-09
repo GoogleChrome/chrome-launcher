@@ -3,7 +3,6 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-'use strict';
 
 import {describe, it, beforeEach, afterEach} from 'node:test';
 import {Launcher, launch, killAll, getChromePath} from '../dist/chrome-launcher.js';
@@ -25,7 +24,6 @@ const fsMock = {
   openSync: () => {},
   closeSync: () => {},
   writeFileSync: () => {},
-  rmdirSync: () => {},
   rmSync: () => {},
 };
 
@@ -64,14 +62,13 @@ describe('Launcher', () => {
   });
 
   it('accepts and uses a custom path', async () => {
-    const fs = {...fsMock, rmdirSync: spy(), rmSync: spy()};
+    const fs = {...fsMock, rmSync: spy()};
     const chromeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     chromeInstance.prepare();
 
     chromeInstance.destroyTmp();
-    assert.strictEqual(fs.rmdirSync.callCount, 0);
     assert.strictEqual(fs.rmSync.callCount, 0);
   });
 
@@ -110,7 +107,7 @@ describe('Launcher', () => {
 
   it('cleans up the tmp dir after closing (mocked)', async () => {
     const rmMock = stub().callsFake((_path, _options) => {});
-    const fs = {...fsMock, rmdirSync: rmMock, rmSync: rmMock};
+    const fs = {...fsMock, rmSync: rmMock};
 
     const chromeInstance = new Launcher({}, {fs: fs as any});
 
@@ -121,8 +118,8 @@ describe('Launcher', () => {
 
 
   it('cleans up the tmp dir after closing (real)', {timeout: 30000}, async () => {
-    const rmSpy = spy(fs, 'rmSync' in fs ? 'rmSync' : 'rmdirSync');
-    const fsFake = {...fsMock, rmdirSync: rmSpy, rmSync: rmSpy};
+    const rmSpy = spy(fs, 'rmSync');
+    const fsFake = {...fsMock, rmSync: rmSpy};
 
     const chromeInstance = new Launcher({}, {fs: fsFake as any});
 

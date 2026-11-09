@@ -14,8 +14,6 @@ import {describe, it, beforeEach, afterEach} from "node:test";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
-
 import * as assert from 'assert';
 import fs from 'fs';
 import os from 'os';
