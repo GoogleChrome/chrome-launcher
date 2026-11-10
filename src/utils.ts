@@ -4,10 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import childProcess from 'child_process';
-import {mkdtempSync} from 'fs';
 import isWsl from 'is-wsl';
-import {join} from 'path';
+import childProcess from 'node:child_process';
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 
 export const LaunchErrorCodes = {
   ERR_LAUNCHER_PATH_NOT_SET: 'ERR_LAUNCHER_PATH_NOT_SET',
@@ -126,7 +127,7 @@ export function getWSLLocalAppDataPath(path: string): string {
 }
 
 function makeUnixTmpDir() {
-  return childProcess.execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
+  return mkdtempSync(join(tmpdir(), 'lighthouse.'));
 }
 
 export function makeWin32TmpDir() {

@@ -4,11 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import * as childProcess from 'child_process';
-import {ChildProcess, spawn, spawnSync} from 'child_process';
-import * as fs from 'fs';
 import log from 'lighthouse-logger';
-import * as net from 'net';
+import * as childProcess from 'node:child_process';
+import {ChildProcess, spawn, spawnSync} from 'node:child_process';
+import * as fs from 'node:fs';
+import * as net from 'node:net';
 
 import * as chromeFinder from './chrome-finder.js';
 import {DEFAULT_FLAGS} from './flags.js';
@@ -523,7 +523,7 @@ class Launcher {
       if (isWindows) {
         // https://github.com/GoogleChrome/chrome-launcher/issues/266
         const taskkillProc = spawnSync(
-            `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
+            'taskkill', ['/pid', `${this.chromeProcess.pid}`, '/T', '/F'], {encoding: 'utf-8'});
 
         const {stderr} = taskkillProc;
         if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);

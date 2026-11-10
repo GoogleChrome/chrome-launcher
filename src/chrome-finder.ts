@@ -4,11 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {execFileSync, execSync} from 'child_process';
 import escapeRegExp from 'escape-string-regexp';
-import fs from 'fs';
-import {homedir} from 'os';
-import path from 'path';
+import {execFileSync, execSync} from 'node:child_process';
+import fs from 'node:fs';
+import {homedir} from 'node:os';
+import path from 'node:path';
 
 import {ChromePathNotSetError, getWSLLocalAppDataPath, toWSLPath} from './utils.js';
 
@@ -224,31 +224,42 @@ function uniq(arr: Array<any>) {
 }
 
 function findChromeExecutables(folder: string): Array<string> {
-  const argumentsRegex = /(^[^ ]+).*/; // Take everything up to the first space
-  const chromeExecRegex = '^Exec=\/.*\/(google-chrome|chrome|chromium)-.*';
+  const chromeExecRegex = /^Exec=\/.*\/(google-chrome|chrome|chromium)-.*/;
 
-  let installations: Array<string> = [];
-  if (canAccess(folder)) {
-    // Output of the grep & print looks like:
-    //    /opt/google/chrome/google-chrome --profile-directory
-    //    /home/user/Downloads/chrome-linux/chrome-wrapper %U
-    let execPaths;
+  const installations: Array<string> = [];
+  if (!canAccess(folder)) {
+    return installations;
+  }
 
-    // Some systems do not support grep -R so fallback to -r.
-    // See https://github.com/GoogleChrome/chrome-launcher/issues/46 for more context.
+  let entries: string[];
+  try {
+    entries = fs.readdirSync(folder, {recursive: true, encoding: 'utf8'});
+  } catch {
+    return installations;
+  }
+
+  for (const entry of entries) {
+    let contents: string;
     try {
-      execPaths = execSync(
-          `grep -ER "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+      contents = fs.readFileSync(path.join(folder, entry), 'utf8');
     } catch {
-      execPaths = execSync(
-          `grep -Er "${chromeExecRegex}" ${folder} | awk -F '=' '{print $2}'`, {stdio: 'pipe'});
+      // Directories and unreadable files.
+      continue;
     }
 
-    execPaths = execPaths.toString()
-                    .split(newLineRegex)
-                    .map((execPath: string) => execPath.replace(argumentsRegex, '$1'));
-
-    execPaths.forEach((execPath: string) => canAccess(execPath) && installations.push(execPath));
+    for (const line of contents.split(newLineRegex)) {
+      if (!chromeExecRegex.test(line)) {
+        continue;
+      }
+      // Matching lines look like:
+      //    Exec=/opt/google/chrome/google-chrome --profile-directory=Default
+      //    Exec=/home/user/Downloads/chrome-linux/chrome-wrapper %U
+      // Take the value up to the next `=`, then everything up to the first space.
+      const execPath = line.split('=')[1].split(' ')[0];
+      if (canAccess(execPath)) {
+        installations.push(execPath);
+      }
+    }
   }
 
   return installations;
