@@ -18,7 +18,7 @@ const tempProfilesBeforeLaunch = new Set(
     readdirSync(tmpdir()).filter(name => name.startsWith('lighthouse.')));
 const chromes = [];
 for (let i = 0; i < count; i++) {
-  chromes.push(await launch({chromeFlags: flags, logLevel: 'silent', ...opts}));
+  chromes.push(await launch({chromeFlags: flags, ...opts}));
 }
 const tempProfiles = readdirSync(tmpdir())
     .filter(name => name.startsWith('lighthouse.') && !tempProfilesBeforeLaunch.has(name))
@@ -40,7 +40,7 @@ if (relaunch) {
   });
   for (const chrome of chromes) chrome.kill();
   chromes.length = 0;
-  chromes.push(await launch({chromeFlags: flags, logLevel: 'silent', ...opts}));
+  chromes.push(await launch({chromeFlags: flags, ...opts}));
   report();
 }
 

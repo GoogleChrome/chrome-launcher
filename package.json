@@ -33,8 +33,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "is-wsl": "^3.1.1",
-    "lighthouse-logger": "^2.0.2"
+    "is-wsl": "^3.1.1"
   },
   "peerDependencies": {
     "@types/node": "*"

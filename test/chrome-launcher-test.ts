@@ -4,7 +4,7 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {describe, it, beforeEach, afterEach, mock} from 'node:test';
+import {describe, it, afterEach, mock} from 'node:test';
 import {Launcher, launch, killAll, getChromePath} from '../dist/chrome-launcher.js';
 import type {Options} from '../dist/chrome-launcher.js';
 import {DEFAULT_FLAGS} from '../dist/flags.js';
@@ -15,7 +15,6 @@ import net from 'net';
 import os from 'os';
 import path from 'path';
 
-import log from 'lighthouse-logger';
 
 // A mock function with loosely typed arguments, for standing in for fs and spawn.
 const stub = (impl: (...args: any[]) => any = () => {}) => mock.fn(impl);
@@ -45,12 +44,7 @@ const launchChromeWithOpts = async (opts: Options = {}) => {
 };
 
 describe('Launcher', () => {
-  beforeEach(() => {
-    log.setLevel('error');
-  });
-
   afterEach(() => {
-    log.setLevel('');
     mock.restoreAll();
   });
 
@@ -328,7 +322,6 @@ describe('Launcher', () => {
             userDataDir,
             connectionPollInterval: 1,
             maxConnectionRetries: 2,
-            logLevel: 'silent',
           });
           launcher.port = 0;
 
@@ -351,7 +344,6 @@ describe('Launcher', () => {
             userDataDir,
             connectionPollInterval: 1,
             maxConnectionRetries: 2,
-            logLevel: 'silent',
           });
           launcher.port = 0;
 
@@ -375,7 +367,6 @@ describe('Launcher', () => {
             userDataDir,
             connectionPollInterval: 1,
             maxConnectionRetries: 2,
-            logLevel: 'silent',
           });
           launcher.port = 0;
 
@@ -399,7 +390,6 @@ describe('Launcher', () => {
             userDataDir,
             connectionPollInterval: 1,
             maxConnectionRetries: 2,
-            logLevel: 'silent',
           });
           launcher.port = 0;
 
@@ -418,7 +408,6 @@ describe('Launcher', () => {
           userDataDir,
           connectionPollInterval: 1,
           maxConnectionRetries: 0,
-          logLevel: 'silent',
         });
         launcher.port = 0;
 
@@ -448,7 +437,6 @@ describe('Launcher', () => {
           userDataDir,
           connectionPollInterval: 1,
           maxConnectionRetries: 2,
-          logLevel: 'silent',
         });
         launcher.port = 0;
 
