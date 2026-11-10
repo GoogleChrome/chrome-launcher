@@ -29,9 +29,7 @@
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
-    "@types/sinon": "^22.0.2",
     "clang-format": "^1.8.0",
-    "sinon": "^22.1.0",
     "typescript": "^7.0.2"
   },
   "dependencies": {

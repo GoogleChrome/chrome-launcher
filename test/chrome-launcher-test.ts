@@ -4,12 +4,11 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import {describe, it, beforeEach, afterEach} from 'node:test';
+import {describe, it, beforeEach, afterEach, mock} from 'node:test';
 import {Launcher, launch, killAll, getChromePath} from '../dist/chrome-launcher.js';
 import type {Options} from '../dist/chrome-launcher.js';
 import {DEFAULT_FLAGS} from '../dist/flags.js';
 
-import sinon from 'sinon';
 import * as assert from 'assert';
 import fs from 'fs';
 import net from 'net';
@@ -18,7 +17,8 @@ import path from 'path';
 
 import log from 'lighthouse-logger';
 
-const {spy, stub} = sinon;
+// A mock function with loosely typed arguments, for standing in for fs and spawn.
+const stub = (impl: (...args: any[]) => any = () => {}) => mock.fn(impl);
 
 const fsMock = {
   openSync: () => {},
@@ -28,11 +28,11 @@ const fsMock = {
 };
 
 const launchChromeWithOpts = async (opts: Options = {}) => {
-  const spawnStub = stub().returns({pid: 'some_pid', stdio: []});
+  const spawnStub = stub(() => ({pid: 'some_pid', stdio: []}));
 
   const chromeInstance =
       new Launcher(opts, {fs: fsMock as any, spawn: spawnStub as any});
-  stub(chromeInstance, 'waitUntilReady').returns(Promise.resolve());
+  mock.method(chromeInstance, 'waitUntilReady', async () => {});
 
   chromeInstance.prepare();
 
@@ -51,74 +51,75 @@ describe('Launcher', () => {
 
   afterEach(() => {
     log.setLevel('');
+    mock.restoreAll();
   });
 
   it('sets default launching flags', async () => {
     const spawnStub = await launchChromeWithOpts({userDataDir: 'some_path'});
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    const chromeFlags = spawnStub.mock.calls[0].arguments[1] as string[];
     assert.ok(chromeFlags.find(f => f.startsWith('--remote-debugging-port')))
     assert.ok(chromeFlags.find(f => f.startsWith('--disable-background-networking')))
     assert.strictEqual(chromeFlags[chromeFlags.length - 1], 'about:blank');
   });
 
   it('accepts and uses a custom path', async () => {
-    const fs = {...fsMock, rmSync: spy()};
+    const fs = {...fsMock, rmSync: stub()};
     const chromeInstance =
         new Launcher({userDataDir: 'some_path'}, {fs: fs as any});
 
     chromeInstance.prepare();
 
     chromeInstance.destroyTmp();
-    assert.strictEqual(fs.rmSync.callCount, 0);
+    assert.strictEqual(fs.rmSync.mock.callCount(), 0);
   });
 
   it('allows to overwrite browser prefs', async () => {
-    const existStub = stub().returns(true)
-    const readFileStub = stub().returns(JSON.stringify({ some: 'prefs' }))
+    const existStub = stub(() => true)
+    const readFileStub = stub(() => JSON.stringify({ some: 'prefs' }))
     const writeFileStub = stub()
     const mkdirStub = stub()
-    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
+    const fs = {...fsMock, rmdir: stub(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
     chromeInstance.prepare();
     assert.equal(
-      writeFileStub.getCall(0).args[1],
+      writeFileStub.mock.calls[0].arguments[1],
       '{"some":"prefs","download.default_directory":"/some/dir"}'
     )
   });
 
   it('allows to set browser prefs', async () => {
-    const existStub = stub().returns(false)
-    const readFileStub = stub().returns(Buffer.from(JSON.stringify({ some: 'prefs' })))
+    const existStub = stub(() => false)
+    const readFileStub = stub(() => Buffer.from(JSON.stringify({ some: 'prefs' })))
     const writeFileStub = stub()
     const mkdirStub = stub()
-    const fs = {...fsMock, rmdir: spy(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
+    const fs = {...fsMock, rmdir: stub(), readFileSync: readFileStub, writeFileSync: writeFileStub, existsSync: existStub, mkdirSync: mkdirStub };
     const chromeInstance =
         new Launcher({prefs: {'download.default_directory': '/some/dir'}}, {fs: fs as any});
 
     chromeInstance.prepare();
-    assert.equal(readFileStub.getCalls().length, 0)
+    assert.equal(readFileStub.mock.callCount(), 0)
     assert.equal(
-      writeFileStub.getCall(0).args[1],
+      writeFileStub.mock.calls[0].arguments[1],
       '{"download.default_directory":"/some/dir"}'
     )
   });
 
   it('cleans up the tmp dir after closing (mocked)', async () => {
-    const rmMock = stub().callsFake((_path, _options) => {});
+    const rmMock = stub();
     const fs = {...fsMock, rmSync: rmMock};
 
     const chromeInstance = new Launcher({}, {fs: fs as any});
 
     chromeInstance.prepare();
     chromeInstance.destroyTmp();
-    assert.strictEqual(rmMock.callCount, 1);
+    assert.strictEqual(rmMock.mock.callCount(), 1);
   });
 
 
   it('cleans up the tmp dir after closing (real)', {timeout: 30000}, async () => {
-    const rmSpy = spy(fs, 'rmSync');
+    const rmSpy = mock.method(fs, 'rmSync');
     const fsFake = {...fsMock, rmSync: rmSpy};
 
     const chromeInstance = new Launcher({}, {fs: fsFake as any});
@@ -130,7 +131,8 @@ describe('Launcher', () => {
     chromeInstance.kill();
 
     // tmpdir is gone 
-    const [path] = fsFake.rmSync.getCall(0).args;
+    const [path] = fsFake.rmSync.mock.calls[0].arguments;
+    assert.ok(typeof path === 'string');
     assert.strictEqual(chromeInstance.userDataDir, path);
     assert.equal(fs.existsSync(path), false, `userdatadir still exists: ${path}`);
   });
@@ -198,7 +200,7 @@ describe('Launcher', () => {
 
   it('removes all default flags', async () => {
     const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    const chromeFlags = spawnStub.mock.calls[0].arguments[1] as string[];
     assert.ok(!chromeFlags.includes('--disable-extensions'));
   });
 
@@ -210,20 +212,20 @@ describe('Launcher', () => {
 
   it('removes --user-data-dir if userDataDir is false', async () => {
     const spawnStub = await launchChromeWithOpts();
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    const chromeFlags = spawnStub.mock.calls[0].arguments[1] as string[];
     assert.ok(!chromeFlags.includes('--user-data-dir'));
   });
 
   it('passes no env vars when none are passed', async () => {
     const spawnStub = await launchChromeWithOpts();
-    const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
+    const spawnOptions = spawnStub.mock.calls[0].arguments[2] as {env: {}};
     assert.deepStrictEqual(spawnOptions.env, Object.assign({}, process.env));
   });
 
   it('passes env vars when passed', async () => {
     const envVars = {'hello': 'world'};
     const spawnStub = await launchChromeWithOpts({envVars});
-    const spawnOptions = spawnStub.getCall(0).args[2] as {env: {}};
+    const spawnOptions = spawnStub.mock.calls[0].arguments[2] as {env: {}};
     assert.deepStrictEqual(spawnOptions.env, envVars);
   });
 
@@ -232,7 +234,7 @@ describe('Launcher', () => {
       ignoreDefaultFlags: true,
       chromeFlags: ['--disable-extensions', '--mute-audio', '--no-first-run']
     });
-    const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+    const chromeFlags = spawnStub.mock.calls[0].arguments[1] as string[];
     assert.ok(chromeFlags.includes('--mute-audio'));
     assert.ok(chromeFlags.includes('--disable-extensions'));
 
@@ -252,7 +254,7 @@ describe('Launcher', () => {
     // load-extension-test.ts.
     it('remote-debugging-pipe flag adds pipes expected by Chrome', async () => {
       const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe']});
-      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      const stdioAndPipes = spawnStub.mock.calls[0].arguments[2].stdio as string[];
       assert.equal(stdioAndPipes.length, 5, 'Passed pipes to Chrome');
       assert.equal(stdioAndPipes[3], 'pipe', 'Fourth pipe is pipe');
       assert.equal(stdioAndPipes[4], 'pipe', 'Fifth pipe is pipe');
@@ -260,13 +262,13 @@ describe('Launcher', () => {
 
     it('without remote-debugging-pipe flag, no pipes', async () => {
       const spawnStub = await launchChromeWithOpts({});
-      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      const stdioAndPipes = spawnStub.mock.calls[0].arguments[2].stdio as string[];
       assert.equal(stdioAndPipes.length, 3, 'Only standard stdio pipes');
     });
 
     it('remote-debugging-pipe flag without remote-debugging-port', async () => {
       const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe']});
-      const chromeFlags = spawnStub.getCall(0).args[1] as string[];
+      const chromeFlags = spawnStub.mock.calls[0].arguments[1] as string[];
       assert.notEqual(chromeFlags.indexOf('--remote-debugging-pipe'), -1);
       assert.ok(
           !chromeFlags.find(f => f.startsWith('--remote-debugging-port')),
@@ -279,7 +281,7 @@ describe('Launcher', () => {
       // like. Since chrome-launcher does not interpret the data in the pipes,
       // we can support arbitrary types.
       const spawnStub = await launchChromeWithOpts({chromeFlags: ['--remote-debugging-pipe=cbor']});
-      const stdioAndPipes = spawnStub.getCall(0).args[2].stdio as string[];
+      const stdioAndPipes = spawnStub.mock.calls[0].arguments[2].stdio as string[];
       assert.equal(stdioAndPipes.length, 5);
     });
   });
@@ -287,7 +289,7 @@ describe('Launcher', () => {
   describe('getChromePath', async () => {
     it('returns the same path as a full Launcher launch', async () => {
       const spawnStub = await launchChromeWithOpts();
-      const launchedPath = spawnStub.getCall(0).args[0] as string;
+      const launchedPath = spawnStub.mock.calls[0].arguments[0] as string;
 
       const chromePath = getChromePath();
       assert.strictEqual(chromePath, launchedPath);

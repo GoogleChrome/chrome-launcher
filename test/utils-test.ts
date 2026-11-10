@@ -1,4 +1,4 @@
-import {describe, it, beforeEach, afterEach} from "node:test";
+import {describe, it, beforeEach, afterEach, mock} from "node:test";
 /**
  * Copyright 2017 Google Inc. All Rights Reserved.
  *
@@ -19,36 +19,53 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { toWin32Path, toWSLPath, getWSLLocalAppDataPath, makeWin32TmpDir, makeTmpDir, _childProcessForTesting } from '../dist/utils.js';
-import sinon from 'sinon';
 
-const execFileSyncStub = sinon.stub(_childProcessForTesting, 'execFileSync').callThrough();
+const execFileSyncMock = mock.method(_childProcessForTesting, 'execFileSync').mock;
+
+const execFileSyncReturns = (value: Buffer) => execFileSyncMock.mockImplementation((() => value) as any);
+const execFileSyncThrows = (err: Error) => execFileSyncMock.mockImplementation((() => {
+  throw err;
+}) as any);
+const execFileSyncReset = () => {
+  execFileSyncMock.resetCalls();
+  execFileSyncReturns(Buffer.alloc(0));
+};
+const execFileSyncCalledWith = (...args: unknown[]) =>
+    execFileSyncMock.calls.some(call => {
+      try {
+        assert.deepStrictEqual(call.arguments, args);
+        return true;
+      } catch {
+        return false;
+      }
+    });
 
 const asBuffer = (str: string) => Buffer.from(str, 'utf-8');
 
 describe('toWin32Path', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => execFileSyncReset());
 
   it('calls toWin32Path -w', () => {
-    execFileSyncStub.returns(asBuffer(''));
+    execFileSyncReturns(asBuffer(''));
 
     toWin32Path('');
 
-    assert.ok(execFileSyncStub.calledWith('wslpath', ['-w', '']));
+    assert.ok(execFileSyncCalledWith('wslpath', ['-w', '']));
   })
 
   describe('when the path is already in Windows format', () => {
     it('returns early', () => {
-      execFileSyncStub.returns(asBuffer(''));
+      execFileSyncReturns(asBuffer(''));
 
       assert.strictEqual(toWin32Path('D:\\'), 'D:\\');
       assert.strictEqual(toWin32Path('C:\\'), 'C:\\');
 
-      assert.ok(execFileSyncStub.notCalled);
+      assert.strictEqual(execFileSyncMock.callCount(), 0);
     });
   })
 
   describe('when wslpath is not available', () => {
-    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+    beforeEach(() => execFileSyncThrows(new Error('oh noes!')));
 
     it('falls back to the toWinDirFormat method', () => {
       const wsl = '/mnt/c/Users/user1/AppData/';
@@ -67,24 +84,24 @@ describe('toWin32Path', () => {
 })
 
 describe('toWSLPath', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => execFileSyncReset());
 
   it('calls wslpath -u', () => {
-    execFileSyncStub.returns(asBuffer(''));
+    execFileSyncReturns(asBuffer(''));
 
     toWSLPath('', '');
 
-    assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', '']));
+    assert.ok(execFileSyncCalledWith('wslpath', ['-u', '']));
   })
 
   it('trims off the trailing newline', () => {
-    execFileSyncStub.returns(asBuffer('the-path\n'));
+    execFileSyncReturns(asBuffer('the-path\n'));
 
     assert.strictEqual(toWSLPath('', ''), 'the-path');
   })
 
   describe('when wslpath is not available', () => {
-    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+    beforeEach(() => execFileSyncThrows(new Error('oh noes!')));
 
     it('uses the fallback path', () => {
       assert.strictEqual(
@@ -96,19 +113,19 @@ describe('toWSLPath', () => {
 })
 
 describe('getWSLLocalAppDataPath', () => {
-  beforeEach(() => execFileSyncStub.reset());
+  beforeEach(() => execFileSyncReset());
 
   it('transforms it to a Linux path using wslpath', () => {
-    execFileSyncStub.returns(asBuffer('/c/folder/'));
+    execFileSyncReturns(asBuffer('/c/folder/'));
 
     const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
 
     assert.strictEqual(getWSLLocalAppDataPath(path), '/c/folder/');
-    assert.ok(execFileSyncStub.calledWith('wslpath', ['-u', 'c:\\Users\\user1\\AppData\\Local']));
+    assert.ok(execFileSyncCalledWith('wslpath', ['-u', 'c:\\Users\\user1\\AppData\\Local']));
   });
 
   describe('when wslpath is not available', () => {
-    beforeEach(() => execFileSyncStub.throws(new Error('oh noes!')));
+    beforeEach(() => execFileSyncThrows(new Error('oh noes!')));
 
     it('falls back to the getLocalAppDataPath method', () => {
       const path = '/mnt/c/Users/user1/.bin:/mnt/c/Users/user1:/mnt/c/Users/user1/AppData/';
@@ -150,20 +167,20 @@ describe('makeWin32TmpDir', () => {
   });
 
   it('creates distinct directory paths independently of random seed', () => {
-    const randomStub = sinon.stub(Math, 'random').returns(0.12345678);
+    const randomStub = mock.method(Math, 'random', () => 0.12345678);
     try {
       const dir1 = makeWin32TmpDir();
       const dir2 = makeWin32TmpDir();
 
       assert.notStrictEqual(dir1, dir2);
-      assert.strictEqual(randomStub.called, false);
+      assert.strictEqual(randomStub.mock.callCount(), 0);
     } finally {
-      randomStub.restore();
+      randomStub.mock.restore();
     }
   });
 
   it('does not overwrite or reuse existing directories in temp path', () => {
-    const randomStub = sinon.stub(Math, 'random').returns(0.5);
+    const randomStub = mock.method(Math, 'random', () => 0.5);
     try {
       const predictedDir = path.join(testTmpDir, 'lighthouse.55000000');
       fs.mkdirSync(predictedDir);
@@ -174,7 +191,7 @@ describe('makeWin32TmpDir', () => {
       assert.notStrictEqual(createdDir, predictedDir);
       assert.strictEqual(fs.existsSync(path.join(createdDir, 'existing.txt')), false);
     } finally {
-      randomStub.restore();
+      randomStub.mock.restore();
     }
   });
 });
