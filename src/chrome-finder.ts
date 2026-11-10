@@ -4,7 +4,6 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-import escapeRegExp from 'escape-string-regexp';
 import {execFileSync, execSync} from 'node:child_process';
 import fs from 'node:fs';
 import {homedir} from 'node:os';
@@ -14,7 +13,8 @@ import {ChromePathNotSetError, getWSLLocalAppDataPath, toWSLPath} from './utils.
 
 const newLineRegex = /\r?\n/;
 
-type Priorities = Array<{regex: RegExp, weight: number}>;
+type Matcher = RegExp|((installation: string) => boolean);
+type Priorities = Array<{match: Matcher, weight: number}>;
 
 /**
  * check for MacOS default app paths first to avoid waiting for the slow lsregister command
@@ -65,18 +65,21 @@ export function darwin() {
 
   // Retains one per line to maintain readability.
   // clang-format off
-  const home = escapeRegExp(process.env.HOME || homedir());
+  const homeApplications = `${process.env.HOME || homedir()}/Applications/`;
+  const inHomeApplications = (app: string) => (inst: string) =>
+      inst.startsWith(homeApplications) && inst.includes(app, homeApplications.length);
   const priorities: Priorities = [
-    {regex: new RegExp(`^${home}/Applications/.*Chrome\\.app`), weight: 50},
-    {regex: new RegExp(`^${home}/Applications/.*Chrome Canary\\.app`), weight: 51},
-    {regex: /^\/Applications\/.*Chrome.app/, weight: 100},
-    {regex: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
-    {regex: /^\/Volumes\/.*Chrome.app/, weight: -2},
-    {regex: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
+    {match: inHomeApplications('Chrome.app'), weight: 50},
+    {match: inHomeApplications('Chrome Canary.app'), weight: 51},
+    {match: /^\/Applications\/.*Chrome.app/, weight: 100},
+    {match: /^\/Applications\/.*Chrome Canary.app/, weight: 101},
+    {match: /^\/Volumes\/.*Chrome.app/, weight: -2},
+    {match: /^\/Volumes\/.*Chrome Canary.app/, weight: -1},
   ];
 
   if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 151});
+    const chromePath = process.env.CHROME_PATH;
+    priorities.unshift({match: inst => inst.includes(chromePath), weight: 151});
   }
 
   // clang-format on
@@ -140,15 +143,16 @@ export function linux() {
   }
 
   const priorities: Priorities = [
-    {regex: /chrome-wrapper$/, weight: 51},
-    {regex: /google-chrome-stable$/, weight: 50},
-    {regex: /google-chrome$/, weight: 49},
-    {regex: /chromium-browser$/, weight: 48},
-    {regex: /chromium$/, weight: 47},
+    {match: /chrome-wrapper$/, weight: 51},
+    {match: /google-chrome-stable$/, weight: 50},
+    {match: /google-chrome$/, weight: 49},
+    {match: /chromium-browser$/, weight: 48},
+    {match: /chromium$/, weight: 47},
   ];
 
   if (process.env.CHROME_PATH) {
-    priorities.unshift({regex: new RegExp(escapeRegExp(process.env.CHROME_PATH)), weight: 101});
+    const chromePath = process.env.CHROME_PATH;
+    priorities.unshift({match: inst => inst.includes(chromePath), weight: 101});
   }
 
   return sort(uniq(installations.filter(Boolean)), priorities);
@@ -194,7 +198,8 @@ function sort(installations: string[], priorities: Priorities) {
       // assign priorities
       .map((inst: string) => {
         for (const pair of priorities) {
-          if (pair.regex.test(inst)) {
+          const {match} = pair;
+          if (typeof match === 'function' ? match(inst) : match.test(inst)) {
             return {path: inst, weight: pair.weight};
           }
         }

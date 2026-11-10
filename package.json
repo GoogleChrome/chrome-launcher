@@ -35,7 +35,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "escape-string-regexp": "^5.0.0",
     "is-wsl": "^3.1.1",
     "lighthouse-logger": "^2.0.2"
   },
