@@ -6,7 +6,7 @@
         "types": ["node"],
         "skipLibCheck": true,
         "outDir": "dist",
-        "target": "es2021",
+        "target": "es2023",
         "declaration": true,
         "strict": true,
         "inlineSourceMap": true,
@@ -14,7 +14,6 @@
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "allowSyntheticDefaultImports": true,
     },
     "exclude": [
         "node_modules"

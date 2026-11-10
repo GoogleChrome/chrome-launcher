@@ -1,9 +1,16 @@
 {
   "name": "chrome-launcher",
   "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "type": "module",
   "engines": {
-    "node": ">=16"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "build": "tsc",
