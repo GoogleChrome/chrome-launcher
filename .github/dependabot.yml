@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Open a single PR for minor/patch production dependency updates. Major
+      # bumps can break consumers of this library, so they get their own PRs...
+      prod-dependencies:
+        dependency-type: production
+        update-types:
+          - "minor"
+          - "patch"
+        patterns:
+          - "*"
+      # ...and a single PR for all development dependency updates.
+      dev-dependencies:
+        dependency-type: development
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "ci"
+    groups:
+      # Open a single PR for all GitHub Actions updates. Dependabot keeps the
+      # SHA pins and updates the trailing `# vX.Y.Z` comments.
+      github-actions:
+        patterns:
+          - "*"

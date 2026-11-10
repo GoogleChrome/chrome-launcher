@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-'use strict';
 
-import {join} from 'path';
-import childProcess from 'child_process';
-import {mkdtempSync} from 'fs';
 import isWsl from 'is-wsl';
+import childProcess from 'node:child_process';
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 
 export const LaunchErrorCodes = {
   ERR_LAUNCHER_PATH_NOT_SET: 'ERR_LAUNCHER_PATH_NOT_SET',
@@ -18,24 +18,16 @@ export const LaunchErrorCodes = {
 } as const;
 export type LaunchErrorCodes = typeof LaunchErrorCodes[keyof typeof LaunchErrorCodes];
 
-export function defaults<T>(val: T|undefined, def: T): T {
-  return typeof val === 'undefined' ? def : val;
-}
-
-export async function delay(time: number) {
-  return new Promise(resolve => setTimeout(resolve, time));
+export function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 export class LauncherError extends Error {
-  message: string;
   code?: string;
 
   constructor(message: string = 'Unexpected error', code?: string) {
     super(message);
-    this.message = message;
     this.code = code;
-    this.stack = new Error().stack;
-    return this;
   }
 }
 
@@ -127,7 +119,7 @@ export function getWSLLocalAppDataPath(path: string): string {
 }
 
 function makeUnixTmpDir() {
-  return childProcess.execSync('mktemp -d -t lighthouse.XXXXXXX').toString().trim();
+  return mkdtempSync(join(tmpdir(), 'lighthouse.'));
 }
 
 export function makeWin32TmpDir() {
