@@ -105,6 +105,10 @@ chrome.port: number;
 // Method to kill Chrome (and cleanup the profile folder)
 chrome.kill: () => Promise<void>;
 
+// Same as kill(). Lets `using chrome = await launch()` clean up on scope exit
+// (TypeScript 5.2+, or natively from Node 24).
+chrome[Symbol.dispose]: () => void;
+
 // The process id
 chrome.pid: number;
 

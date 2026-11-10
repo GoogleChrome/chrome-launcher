@@ -56,7 +56,7 @@ export function darwin() {
       .forEach((inst: string) => {
         suffixes.forEach(suffix => {
           const execPath = path.join(inst.substring(0, inst.indexOf('.app') + 4).trim(), suffix);
-          if (canAccess(execPath) && installations.indexOf(execPath) === -1) {
+          if (canAccess(execPath) && !installations.includes(execPath)) {
             installations.push(execPath);
           }
         });
@@ -155,7 +155,7 @@ export function linux() {
     priorities.unshift({match: inst => inst.includes(chromePath), weight: 101});
   }
 
-  return sort(uniq(installations.filter(Boolean)), priorities);
+  return sort([...new Set(installations.filter(Boolean))], priorities);
 }
 
 export function wsl() {
@@ -211,7 +211,7 @@ function sort(installations: string[], priorities: Priorities) {
       .map(pair => pair.path);
 }
 
-function canAccess(file: string|undefined): Boolean {
+function canAccess(file: string|undefined): boolean {
   if (!file) {
     return false;
   }
@@ -222,10 +222,6 @@ function canAccess(file: string|undefined): Boolean {
   } catch {
     return false;
   }
-}
-
-function uniq(arr: Array<any>) {
-  return Array.from(new Set(arr));
 }
 
 function findChromeExecutables(folder: string): Array<string> {

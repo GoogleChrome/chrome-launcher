@@ -9,10 +9,11 @@ import * as childProcess from 'node:child_process';
 import {ChildProcess, spawn, spawnSync} from 'node:child_process';
 import * as fs from 'node:fs';
 import * as net from 'node:net';
+import {setTimeout as delay} from 'node:timers/promises';
 
 import * as chromeFinder from './chrome-finder.js';
 import {DEFAULT_FLAGS} from './flags.js';
-import {ChromeNotInstalledError, defaults, delay, getErrorMessage, getPlatform, InvalidUserDataDirectoryError, makeTmpDir, toWin32Path, UnsupportedPlatformError} from './utils.js';
+import {ChromeNotInstalledError, getErrorMessage, getPlatform, InvalidUserDataDirectoryError, makeTmpDir, toWin32Path, UnsupportedPlatformError} from './utils.js';
 
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
@@ -58,6 +59,8 @@ export interface LaunchedChrome {
   process: ChildProcess;
   remoteDebuggingPipes: RemoteDebuggingPipes|null;
   kill: () => void;
+  /** Kills Chrome, so that `using chrome = await launch()` cleans up on scope exit. */
+  [Symbol.dispose]: () => void;
 }
 
 export interface ModuleOverrides {
@@ -84,7 +87,7 @@ function unlistenForTermination() {
 }
 
 async function launch(opts: Options = {}): Promise<LaunchedChrome> {
-  opts.handleSIGINT = defaults(opts.handleSIGINT, true);
+  opts.handleSIGINT ??= true;
 
   const instance = new Launcher(opts);
 
@@ -111,6 +114,7 @@ async function launch(opts: Options = {}): Promise<LaunchedChrome> {
     process: instance.chromeProcess!,
     remoteDebuggingPipes: instance.remoteDebuggingPipes,
     kill,
+    [Symbol.dispose]: kill,
   };
 }
 
@@ -171,19 +175,19 @@ class Launcher {
     this.fs = moduleOverrides.fs || fs;
     this.spawn = moduleOverrides.spawn || spawn;
 
-    log.setLevel(defaults(this.opts.logLevel, 'silent'));
+    log.setLevel(this.opts.logLevel ?? 'silent');
 
     // choose the first one (default)
-    this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
-    this.chromeFlags = defaults(this.opts.chromeFlags, []);
-    this.prefs = defaults(this.opts.prefs, {});
-    this.requestedPort = defaults(this.opts.port, 0);
+    this.startingUrl = this.opts.startingUrl ?? 'about:blank';
+    this.chromeFlags = this.opts.chromeFlags ?? [];
+    this.prefs = this.opts.prefs ?? {};
+    this.requestedPort = this.opts.port ?? 0;
     this.portStrictMode = opts.portStrictMode;
     this.chromePath = this.opts.chromePath;
-    this.ignoreDefaultFlags = defaults(this.opts.ignoreDefaultFlags, false);
-    this.connectionPollInterval = defaults(this.opts.connectionPollInterval, 500);
-    this.maxConnectionRetries = defaults(this.opts.maxConnectionRetries, 50);
-    this.envVars = defaults(opts.envVars, Object.assign({}, process.env));
+    this.ignoreDefaultFlags = this.opts.ignoreDefaultFlags ?? false;
+    this.connectionPollInterval = this.opts.connectionPollInterval ?? 500;
+    this.maxConnectionRetries = this.opts.maxConnectionRetries ?? 50;
+    this.envVars = opts.envVars ?? {...process.env};
 
     if (typeof this.opts.userDataDir === 'boolean') {
       if (!this.opts.userDataDir) {
@@ -414,14 +418,9 @@ class Launcher {
 
   // The log is append-only, so the last listening line is the current launch.
   private debuggingPortFromStderr(stderr: string): number|undefined {
-    const pattern = /DevTools listening on ws:\/\/.*?:(\d+)\//g;
-    let port: number|undefined;
-    let match: RegExpExecArray|null = pattern.exec(stderr);
-    while (match) {
-      port = parseInt(match[1], 10);
-      match = pattern.exec(stderr);
-    }
-    return port;
+    const matches = [...stderr.matchAll(/DevTools listening on ws:\/\/.*?:(\d+)\//g)];
+    const last = matches.at(-1);
+    return last ? parseInt(last[1], 10) : undefined;
   }
 
   // resolves if ready, rejects otherwise
@@ -443,69 +442,56 @@ class Launcher {
     });
   }
 
-  // resolves when debugger is ready, rejects after 10 polls
-  waitUntilReady() {
-    const launcher = this;
-
-    return new Promise<void>((resolve, reject) => {
-      let retries = 0;
-      let waitStatus = 'Waiting for browser.';
-
-      const poll = () => {
-        if (retries === 0) {
-          log.log('ChromeLauncher', waitStatus);
+  // Reads the dynamic port from chrome-err.log if needed, then probes it.
+  private async checkReady(): Promise<void> {
+    if (this.port === 0) {
+      try {
+        const port = this.debuggingPortFromStderr(this.readChromeStderr());
+        if (port !== undefined) {
+          this.port = port;
+          log.verbose('ChromeLauncher', `Discovered Chrome listening on port ${this.port}.`);
         }
-        retries++;
-        waitStatus += '..';
-        log.log('ChromeLauncher', waitStatus);
+      } catch {
+        // Ignore read errors until retries expire
+      }
+    }
 
-        const checkReady = () => {
-          if (launcher.port === 0) {
-            try {
-              const stderr = launcher.readChromeStderr();
-              const port = launcher.debuggingPortFromStderr(stderr);
-              if (port !== undefined) {
-                launcher.port = port;
-                log.verbose(
-                    'ChromeLauncher', `Discovered Chrome listening on port ${launcher.port}.`);
-              }
-            } catch {
-              // Ignore read errors until retries expire
-            }
+    if (this.port === 0) {
+      throw new Error('waiting for dynamic debugging port in chrome-err.log');
+    }
+
+    await this.isDebuggerReady();
+  }
+
+  // resolves when debugger is ready, rejects once maxConnectionRetries is exceeded
+  async waitUntilReady(): Promise<void> {
+    let waitStatus = 'Waiting for browser.';
+    log.log('ChromeLauncher', waitStatus);
+
+    for (let retries = 1;; retries++) {
+      waitStatus += '..';
+      log.log('ChromeLauncher', waitStatus);
+
+      try {
+        await this.checkReady();
+        log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
+        return;
+      } catch (err) {
+        if (retries > this.maxConnectionRetries) {
+          log.error('ChromeLauncher', getErrorMessage(err));
+          let stderr = '';
+          try {
+            stderr = this.readChromeStderr();
+          } catch (readErr) {
+            stderr = `Failed to read log: ${getErrorMessage(readErr)}`;
           }
-
-          if (launcher.port === 0) {
-            return Promise.reject(
-                new Error('waiting for dynamic debugging port in chrome-err.log'));
-          }
-
-          return launcher.isDebuggerReady();
-        };
-
-        checkReady()
-            .then(() => {
-              log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
-              resolve();
-            })
-            .catch(err => {
-              if (retries > launcher.maxConnectionRetries) {
-                log.error('ChromeLauncher', err.message);
-                let stderr = '';
-                try {
-                  stderr = launcher.readChromeStderr();
-                } catch (readErr) {
-                  stderr = `Failed to read log: ${getErrorMessage(readErr)}`;
-                }
-                log.error(
-                    'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
-                log.error('ChromeLauncher', stderr);
-                return reject(err);
-              }
-              delay(launcher.connectionPollInterval).then(poll);
-            });
-      };
-      poll();
-    });
+          log.error('ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
+          log.error('ChromeLauncher', stderr);
+          throw err;
+        }
+        await delay(this.connectionPollInterval);
+      }
+    }
   }
 
   kill() {
