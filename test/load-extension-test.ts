@@ -8,7 +8,7 @@ import {describe, it, beforeEach, afterEach} from 'node:test';
 import * as ChromeLauncher from '../dist/chrome-launcher.js';
 import * as assert from 'assert';
 
-import log from 'lighthouse-logger';
+import log from '../dist/logger.js';
 
 import {createServer} from 'http';
 import type {AddressInfo} from 'net';

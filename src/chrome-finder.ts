@@ -10,7 +10,7 @@ import path from 'path';
 import {homedir} from 'os';
 import {execSync, execFileSync} from 'child_process';
 import escapeRegExp from 'escape-string-regexp';
-import log from 'lighthouse-logger';
+import log from './logger.js';
 
 import {getWSLLocalAppDataPath, toWSLPath, ChromePathNotSetError} from './utils.js';
 
@@ -96,9 +96,7 @@ function resolveChromePath() {
   }
 
   if (canAccess(process.env.LIGHTHOUSE_CHROMIUM_PATH)) {
-    log.warn(
-        'ChromeLauncher',
-        'LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
+    log.warn('LIGHTHOUSE_CHROMIUM_PATH is deprecated, use CHROME_PATH env variable instead.');
     return process.env.LIGHTHOUSE_CHROMIUM_PATH;
   }
 

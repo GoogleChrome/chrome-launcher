@@ -13,7 +13,7 @@ import {DEFAULT_FLAGS} from './flags.js';
 import {makeTmpDir, defaults, delay, getPlatform, toWin32Path, InvalidUserDataDirectoryError, UnsupportedPlatformError, ChromeNotInstalledError} from './utils.js';
 import {ChildProcess} from 'child_process';
 import {spawn, spawnSync} from 'child_process';
-import log from 'lighthouse-logger';
+import log from './logger.js';
 
 const isWsl = getPlatform() === 'wsl';
 const isWindows = getPlatform() === 'win32';
@@ -172,7 +172,7 @@ class Launcher {
     this.fs = moduleOverrides.fs || fs;
     this.spawn = moduleOverrides.spawn || spawn;
 
-    log.setLevel(defaults(this.opts.logLevel, 'silent'));
+    log.setLevel(this.opts.logLevel);
 
     // choose the first one (default)
     this.startingUrl = defaults(this.opts.startingUrl, 'about:blank');
@@ -268,7 +268,7 @@ class Launcher {
     // you can't pass a fd to fs.writeFileSync
     this.pidFile = `${this.userDataDir}/chrome.pid`;
 
-    log.verbose('ChromeLauncher', `created ${this.userDataDir}`);
+    log.verbose(`created ${this.userDataDir}`);
 
     this.tmpDirandPidFileReady = true;
   }
@@ -296,7 +296,7 @@ class Launcher {
         this.fs.writeFileSync(preferenceFile, JSON.stringify({...this.prefs}), 'utf-8');
       }
     } catch (err) {
-      log.log('ChromeLauncher', `Failed to set browser prefs: ${err.message}`);
+      log.log(`Failed to set browser prefs: ${err.message}`);
     }
   }
 
@@ -307,18 +307,14 @@ class Launcher {
       // If an explict port is passed first look for an open connection...
       try {
         await this.isDebuggerReady();
-        log.log(
-            'ChromeLauncher',
-            `Found existing Chrome already running using port ${this.port}, using that.`);
+        log.log(`Found existing Chrome already running using port ${this.port}, using that.`);
         return;
       } catch (err) {
         if (this.portStrictMode) {
           throw new Error(`found no Chrome at port ${this.requestedPort}`);
         }
 
-        log.log(
-            'ChromeLauncher',
-            `No debugging port found on port ${this.port}, launching a new Chrome.`);
+        log.log(`No debugging port found on port ${this.port}, launching a new Chrome.`);
       }
     }
     if (this.chromePath === undefined) {
@@ -341,7 +337,7 @@ class Launcher {
   private async spawnProcess(execPath: string) {
     const spawnPromise = (async () => {
       if (this.chromeProcess) {
-        log.log('ChromeLauncher', `Chrome already running with pid ${this.chromeProcess.pid}.`);
+        log.log(`Chrome already running with pid ${this.chromeProcess.pid}.`);
         return this.chromeProcess.pid;
       }
 
@@ -352,8 +348,7 @@ class Launcher {
         this.port = 0;
       }
 
-      log.verbose(
-          'ChromeLauncher', `Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
+      log.verbose(`Launching with command:\n"${execPath}" ${this.flags.join(' ')}`);
       this.chromeProcess = this.spawn(execPath, this.flags, {
         // On non-windows platforms, `detached: true` makes child process a leader of a new
         // process group, making it possible to kill child process tree with `.kill(-pid)` command.
@@ -375,9 +370,7 @@ class Launcher {
         };
       }
 
-      log.verbose(
-          'ChromeLauncher',
-          `Chrome running with pid ${this.chromeProcess.pid} on port ${this.port}.`);
+      log.verbose(`Chrome running with pid ${this.chromeProcess.pid} on port ${this.port}.`);
       return this.chromeProcess.pid;
     })();
 
@@ -457,11 +450,11 @@ class Launcher {
 
       const poll = () => {
         if (retries === 0) {
-          log.log('ChromeLauncher', waitStatus);
+          log.log(waitStatus);
         }
         retries++;
         waitStatus += '..';
-        log.log('ChromeLauncher', waitStatus);
+        log.log(waitStatus);
 
         const checkReady = () => {
           if (launcher.port === 0) {
@@ -470,8 +463,7 @@ class Launcher {
               const port = launcher.debuggingPortFromStderr(stderr);
               if (port !== undefined) {
                 launcher.port = port;
-                log.verbose(
-                    'ChromeLauncher', `Discovered Chrome listening on port ${launcher.port}.`);
+                log.verbose(`Discovered Chrome listening on port ${launcher.port}.`);
               }
             } catch (_) {
               // Ignore read errors until retries expire
@@ -488,21 +480,20 @@ class Launcher {
 
         checkReady()
             .then(() => {
-              log.log('ChromeLauncher', waitStatus + `${log.greenify(log.tick)}`);
+              log.log(waitStatus + `${log.greenify(log.tick)}`);
               resolve();
             })
             .catch(err => {
               if (retries > launcher.maxConnectionRetries) {
-                log.error('ChromeLauncher', err.message);
+                log.error(err.message);
                 let stderr = '';
                 try {
                   stderr = launcher.readChromeStderr();
                 } catch (readErr) {
                   stderr = `Failed to read log: ${readErr.message}`;
                 }
-                log.error(
-                    'ChromeLauncher', `Logging contents of ${this.userDataDir}/chrome-err.log`);
-                log.error('ChromeLauncher', stderr);
+                log.error(`Logging contents of ${this.userDataDir}/chrome-err.log`);
+                log.error(stderr);
                 return reject(err);
               }
               delay(launcher.connectionPollInterval).then(poll);
@@ -522,7 +513,7 @@ class Launcher {
       this.destroyTmp();
     });
 
-    log.log('ChromeLauncher', `Killing Chrome instance ${this.chromeProcess.pid}`);
+    log.log(`Killing Chrome instance ${this.chromeProcess.pid}`);
     try {
       if (isWindows) {
         // https://github.com/GoogleChrome/chrome-launcher/issues/266
@@ -530,7 +521,7 @@ class Launcher {
             `taskkill /pid ${this.chromeProcess.pid} /T /F`, {shell: true, encoding: 'utf-8'});
 
         const {stderr} = taskkillProc;
-        if (stderr) log.error('ChromeLauncher', `taskkill stderr`, stderr);
+        if (stderr) log.error('taskkill stderr', stderr);
       } else {
         if (this.chromeProcess.pid) {
           process.kill(-this.chromeProcess.pid, 'SIGKILL');
@@ -538,7 +529,7 @@ class Launcher {
       }
     } catch (err) {
       const message = `Chrome could not be killed ${err.message}`;
-      log.warn('ChromeLauncher', message);
+      log.warn(message);
     }
     this.destroyTmp();
   }
@@ -571,9 +562,7 @@ class Launcher {
       const rmSync = this.fs.rmSync || this.fs.rmdirSync;
       rmSync(this.userDataDir, {recursive: true, force: true, maxRetries: 10, retryDelay: 250});
     } catch (err) {
-      log.warn(
-          'ChromeLauncher',
-          `Could not delete temporary directory ${this.userDataDir}: ${err.message}`);
+      log.warn(`Could not delete temporary directory ${this.userDataDir}: ${err.message}`);
     }
   }
 };
