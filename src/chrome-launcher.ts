@@ -141,6 +141,7 @@ function killAll(): Array<Error> {
 
 class Launcher {
   private tmpDirandPidFileReady = false;
+  private createdTmpDir = false;
   private pidFile: string;
   private startingUrl: string;
   private outFile?: number;
@@ -254,7 +255,11 @@ class Launcher {
       throw new UnsupportedPlatformError();
     }
 
-    this.userDataDir = this.userDataDir || this.makeTmpDir();
+    if (!this.userDataDir) {
+      // Also used with the default profile (`userDataDir: false`) to hold the logs and pid file.
+      this.userDataDir = this.makeTmpDir();
+      this.createdTmpDir = true;
+    }
     try {
       this.outFile = fs.openSync(`${this.userDataDir}/chrome-out.log`, 'a');
       this.errFile = fs.openSync(`${this.userDataDir}/chrome-err.log`, 'a');
@@ -561,7 +566,7 @@ class Launcher {
     }
 
     // Only clean up the tmp dir if we created it.
-    if (this.userDataDir === undefined || this.opts.userDataDir !== undefined) {
+    if (this.userDataDir === undefined || !this.createdTmpDir) {
       return;
     }
 
