@@ -199,6 +199,43 @@ describe('Launcher', () => {
     assert.deepStrictEqual(originalDefaultFlags, currentDefaultFlags);
   });
 
+  describe('disabled features', () => {
+    const prefix = '--disable-features=';
+    const defaults =
+        DEFAULT_FLAGS.find(flag => flag.startsWith(prefix))!.slice(prefix.length).split(',');
+
+    for (const customFlags of [
+      ['--disable-features=BackForwardCache'],
+      ['--disable-features=BackForwardCache', '--disable-features=CustomFeature'],
+      ['--disable-features=Translate,CustomFeature'],
+      ['--disable-features='],
+    ]) {
+      it(`preserves default disabled features with ${customFlags.join(' ')}`, async () => {
+        const originalFlags = customFlags.slice();
+        const spawnStub = await launchChromeWithOpts({chromeFlags: customFlags});
+        const flags = spawnStub.getCall(0).args[1] as string[];
+        const disabledFlags = flags.filter(flag => flag.startsWith(prefix));
+        const customFeatures =
+            customFlags.flatMap(flag => flag.slice(prefix.length).split(',')).filter(Boolean);
+
+        assert.strictEqual(disabledFlags.length, 1);
+        assert.deepStrictEqual(disabledFlags[0].slice(prefix.length).split(','),
+            [...new Set([...defaults, ...customFeatures])]);
+        assert.deepStrictEqual(customFlags, originalFlags);
+        assert.deepStrictEqual(Launcher.defaultFlags(), DEFAULT_FLAGS);
+        assert.strictEqual(flags[flags.length - 1], 'about:blank');
+      });
+    }
+
+    it('leaves custom feature flags unchanged when defaults are ignored', async () => {
+      const chromeFlags = ['--disable-features=CustomFeature', '--enable-features=Translate'];
+      const spawnStub = await launchChromeWithOpts({chromeFlags, ignoreDefaultFlags: true});
+      const flags = spawnStub.getCall(0).args[1] as string[];
+      assert.deepStrictEqual(flags.filter(flag => flag.startsWith(prefix)), [chromeFlags[0]]);
+      assert.ok(flags.includes(chromeFlags[1]));
+    });
+  });
+
   it('removes all default flags', async () => {
     const spawnStub = await launchChromeWithOpts({ignoreDefaultFlags: true});
     const chromeFlags = spawnStub.getCall(0).args[1] as string[];
