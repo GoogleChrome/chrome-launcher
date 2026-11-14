@@ -222,7 +222,20 @@ class Launcher {
 
     if (process.env.HEADLESS) flags.push('--headless');
 
-    flags.push(...this.chromeFlags);
+    // Chrome only uses the last --disable-features switch. Merge custom
+    // entries so they do not silently re-enable the default-disabled features.
+    let chromeFlags = this.chromeFlags;
+    if (!this.ignoreDefaultFlags) {
+      const prefix = '--disable-features=';
+      const featureFlags = [...flags, ...chromeFlags].filter(flag => flag.startsWith(prefix));
+      const features =
+          featureFlags.flatMap(flag => flag.slice(prefix.length).split(',')).filter(Boolean);
+      const index = flags.findIndex(flag => flag.startsWith(prefix));
+      flags[index] = prefix + [...new Set(features)].join(',');
+      chromeFlags = chromeFlags.filter(flag => !flag.startsWith(prefix));
+    }
+
+    flags.push(...chromeFlags);
     flags.push(this.startingUrl);
 
     return flags;
