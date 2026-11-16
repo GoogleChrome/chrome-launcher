@@ -10,7 +10,7 @@ import {describe, it, beforeEach, afterEach} from 'node:test';
 import {launch} from '../dist/index.js';
 import * as assert from 'assert';
 
-import log from 'lighthouse-logger';
+import log from '../dist/logger.js';
 
 describe('Launcher', () => {
 

@@ -17,7 +17,7 @@ import net from 'net';
 import os from 'os';
 import path from 'path';
 
-import log from 'lighthouse-logger';
+import log from '../dist/logger.js';
 
 const {spy, stub} = sinon;
 
