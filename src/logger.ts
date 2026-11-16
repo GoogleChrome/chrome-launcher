@@ -14,18 +14,27 @@ const logVerbose = debug('ChromeLauncher:verbose');
 const logWarn = debug('ChromeLauncher:warn');
 const logError = debug('ChromeLauncher:error');
 
+// Snapshot initial `process.env.DEBUG` matches at module load so `setLevel(undefined)`
+// still respects `DEBUG=ChromeLauncher*` even if another library (e.g. `lighthouse`)
+// later calls `debug.enable(...)` and overwrites global `debug` namespaces.
+const envDefaults = {
+  normal: logNormal.enabled,
+  verbose: logVerbose.enabled,
+  warn: logWarn.enabled,
+  error: logError.enabled,
+};
+
 // Force yellow for warnings and red for errors in Node.
 (logWarn as unknown as {color: number}).color = 3;
 (logError as unknown as {color: number}).color = 1;
 
 export type LogLevel = 'verbose'|'info'|'error'|'warn'|'silent'|'';
 
-function setEnabled(
-    normal: boolean|null, verbose: boolean|null, warn: boolean|null, error: boolean|null) {
-  (logNormal as unknown as {enabled: boolean | null}).enabled = normal;
-  (logVerbose as unknown as {enabled: boolean | null}).enabled = verbose;
-  (logWarn as unknown as {enabled: boolean | null}).enabled = warn;
-  (logError as unknown as {enabled: boolean | null}).enabled = error;
+function setEnabled(normal: boolean, verbose: boolean, warn: boolean, error: boolean) {
+  logNormal.enabled = normal;
+  logVerbose.enabled = verbose;
+  logWarn.enabled = warn;
+  logError.enabled = error;
 }
 
 const log = {
@@ -33,12 +42,11 @@ const log = {
     if (level === undefined) {
       // Respect `DEBUG=ChromeLauncher*` when `logLevel` is not explicitly configured;
       // otherwise default to silent without clobbering global `debug` namespaces.
-      if (debug.enabled('ChromeLauncher') || debug.enabled('ChromeLauncher:verbose') ||
-          debug.enabled('ChromeLauncher:warn') || debug.enabled('ChromeLauncher:error')) {
-        setEnabled(null, null, null, null);
-      } else {
-        setEnabled(false, false, false, false);
-      }
+      setEnabled(
+          envDefaults.normal || debug.enabled('ChromeLauncher'),
+          envDefaults.verbose || debug.enabled('ChromeLauncher:verbose'),
+          envDefaults.warn || debug.enabled('ChromeLauncher:warn'),
+          envDefaults.error || debug.enabled('ChromeLauncher:error'));
       return;
     }
 
