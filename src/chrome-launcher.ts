@@ -531,7 +531,6 @@ class Launcher {
       const message = `Chrome could not be killed ${err.message}`;
       log.warn(message);
     }
-    this.destroyTmp();
   }
 
   destroyTmp() {
