@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@types/node": "*",
-    "debug": "^4.4.3",
-    "escape-string-regexp": "^4.0.0",
-    "is-wsl": "^2.2.0"
+    "debug": "4.4.3",
+    "escape-string-regexp": "4.0.0",
+    "is-wsl": "2.2.0"
   },
   "version": "1.2.3",
   "types": "./dist/index.d.ts",
