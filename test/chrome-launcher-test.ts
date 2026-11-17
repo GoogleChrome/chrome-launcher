@@ -120,6 +120,21 @@ describe('Launcher', () => {
   });
 
 
+  it('cleans up the tmp dir it created when the default profile is used', async () => {
+    for (const userDataDir of [false, '']) {
+      const rmMock = stub().callsFake((_path, _options) => {});
+      const fs = {...fsMock, rmdirSync: rmMock, rmSync: rmMock};
+
+      const chromeInstance = new Launcher({userDataDir}, {fs: fs as any});
+      chromeInstance.makeTmpDir = () => 'tmp_dir';
+
+      chromeInstance.prepare();
+      chromeInstance.destroyTmp();
+      assert.strictEqual(rmMock.callCount, 1, `userDataDir: ${JSON.stringify(userDataDir)}`);
+      assert.strictEqual(rmMock.getCall(0).args[0], 'tmp_dir');
+    }
+  });
+
   it('cleans up the tmp dir after closing (real)', {timeout: 30000}, async () => {
     const rmSpy = spy(fs, 'rmSync' in fs ? 'rmSync' : 'rmdirSync');
     const fsFake = {...fsMock, rmdirSync: rmSpy, rmSync: rmSpy};
